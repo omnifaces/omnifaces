@@ -147,30 +147,8 @@ public final class Validators {
 				}
 
 				Node node = iterator.next();
-				ElementKind kind = node.getKind();
 				boolean last = !iterator.hasNext();
-
-				switch (kind) {
-					case BEAN:
-						if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal these can be all null, this is then assumed to be the base itself.
-							base = resolveProperty(base, node, last);
-						}
-						break;
-
-					case CONTAINER_ELEMENT: // List, Map, Array, etc
-						base = resolveProperty(base, node, last);
-						break;
-
-					case PROPERTY:
-						if (!last || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
-							base = resolveProperty(base, node, last);
-						}
-						break;
-
-					default:
-						// Rest is applicable to property validations.
-						throw new UnsupportedOperationException(node + " kind " + kind + " is not supported.");
-				}
+				base = resolveProperty(node, base, last);
 			}
 
 			return base;
@@ -179,6 +157,35 @@ public final class Validators {
 			String propertyPath = getPropertyNodes(violation).stream().map(Node::toString).collect(joining("."));
 			logger.log(WARNING, format(ERROR_RESOLVE_BASE, propertyPath, bean == null ? "null" : bean.getClass()), e);
 			return violation.getLeafBean(); // Fall back.
+		}
+	}
+
+	private static Object resolveProperty(Node node, Object base, boolean last) {
+		ElementKind kind = node.getKind();
+
+		switch (kind) {
+			case BEAN:
+				if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal these can be all null, this is then assumed to be the base itself.
+					return resolveProperty(base, node, last);
+				}
+				else {
+					return base;
+				}
+
+			case CONTAINER_ELEMENT: // List, Map, Array, etc
+				return resolveProperty(base, node, last);
+
+			case PROPERTY:
+				if (!last || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
+					return resolveProperty(base, node, last);
+				}
+				else {
+					return base;
+				}
+
+			default:
+				// Rest is applicable to property validations.
+				throw new UnsupportedOperationException(node + " kind " + kind + " is not supported.");
 		}
 	}
 
