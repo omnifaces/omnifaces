@@ -917,7 +917,7 @@ public final class FacesLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getRequestParameter(FacesContext context, String name, Class<T> type) {
-		return getRequestParameter(context, name, (value) -> (T) ofNullable(createConverter(context, type)).map(c -> c.getAsObject(context, context.getViewRoot(), value)).orElse(value));
+		return getRequestParameter(context, name, value -> (T) ofNullable(createConverter(context, type)).map(c -> c.getAsObject(context, context.getViewRoot(), value)).orElse(value));
 	}
 
 	/**

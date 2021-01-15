@@ -449,7 +449,7 @@ public abstract class FileServlet extends HttpServlet {
 	 * Returns true if the given accept header accepts the given value.
 	 */
 	private static boolean accepts(String acceptHeader, String toAccept) {
-		String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
+		String[] acceptValues = acceptHeader.split("\\s*[,;]\\s*");
 		Arrays.sort(acceptValues);
 		return Arrays.binarySearch(acceptValues, toAccept) > -1
 			|| Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1

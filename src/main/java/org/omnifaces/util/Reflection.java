@@ -128,9 +128,9 @@ public final class Reflection {
 		 */
 		public PropertyPath with(Comparable<? extends Serializable> node) {
 			requireNonNull(node, "node");
-			List<Comparable<? extends Serializable>> nodes = new ArrayList<>(this.nodes);
-			nodes.add(node);
-			return new PropertyPath(unmodifiableList(nodes));
+			List<Comparable<? extends Serializable>> newNodes = new ArrayList<>(this.nodes);
+			newNodes.add(node);
+			return new PropertyPath(unmodifiableList(newNodes));
 		}
 
 		@Override

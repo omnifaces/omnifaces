@@ -13,6 +13,7 @@
 package org.omnifaces.converter;
 
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Utils.coalesce;
@@ -89,7 +90,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
 		String type = collectionType;
 		Converter converter = createConverter(itemConverter);
-		ValueExpression valueExpression = component.getValueExpression("value");
+		ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
 		if (valueExpression != null) {
 			Method getter = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression).getMethod();

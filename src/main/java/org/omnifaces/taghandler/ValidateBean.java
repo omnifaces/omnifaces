@@ -23,6 +23,7 @@ import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Beans.unwrapIfNecessary;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
@@ -274,7 +275,6 @@ public class ValidateBean extends TagHandler {
 	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
-	private static final String VALUE_ATTRIBUTE = "value";
 	private static final String ERROR_MISSING_FORM =
 		"o:validateBean must be nested in an UIForm.";
 	private static final String ERROR_INVALID_PARENT =
