@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.ofNullable;
 import static java.util.logging.Level.FINEST;
 import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
@@ -55,6 +56,7 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -915,19 +917,21 @@ public final class FacesLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getRequestParameter(FacesContext context, String name, Class<T> type) {
-		String value = getRequestParameter(context, name);
+		return getRequestParameter(context, name, (value) -> (T) ofNullable(createConverter(context, type)).map(c -> c.getAsObject(context, context.getViewRoot(), value)).orElse(value));
+	}
 
-		if (value == null) {
-			return null;
-		}
+	/**
+	 * @see Faces#getRequestParameter(String, Function)
+	 */
+	public static <T> T getRequestParameter(FacesContext context, String name, Function<String, T> converter) {
+		return getRequestParameter(context, name, converter, () -> null);
+	}
 
-		Converter<T> converter = createConverter(context, type);
-
-		if (converter == null) {
-			return (T) value;
-		}
-
-		return converter.getAsObject(context, context.getViewRoot(), value);
+	/**
+	 * @see Faces#getRequestParameter(String, Function, Supplier)
+	 */
+	public static <T> T getRequestParameter(FacesContext context, String name, Function<String, T> converter, Supplier<T> defaultValue) {
+		return ofNullable(getRequestParameter(context, name)).filter(value -> !isEmpty(value)).map(converter).orElseGet(defaultValue);
 	}
 
 	/**
