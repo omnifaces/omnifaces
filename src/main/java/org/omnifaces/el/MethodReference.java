@@ -26,6 +26,7 @@ import jakarta.el.MethodInfo;
  */
 public class MethodReference extends MethodInfo {
 
+	/** An object array representing "no method parameters". */
 	public static final Object[] NO_PARAMS = new Object[0];
 
 	private Object base;
@@ -33,12 +34,24 @@ public class MethodReference extends MethodInfo {
 	private Object[] actualParameters;
 	private boolean fromMethod;
 
+	/**
+	 * Construct a method reference.
+	 * @param base The base of the EL method expression.
+	 * @param method The concrete {@link Method} instance of the EL method expression.
+	 */
 	public MethodReference(Object base, Method method) {
 		super(method.getName(), method.getReturnType(), method.getParameterTypes());
 		this.base = base;
 		this.method = method;
 	}
 
+	/**
+	 * Construct a method reference.
+	 * @param base The base of the EL method expression.
+	 * @param method The concrete {@link Method} instance of the EL method expression.
+	 * @param actualParameters The actual (evaluated) parameters of the method call.
+	 * @param fromMethod Whether this method reference is from an actual method call and not from a getter of a property.
+	 */
 	public MethodReference(Object base, Method method, Object[] actualParameters, boolean fromMethod) {
 		this(base, method);
 		this.actualParameters = coalesce(actualParameters, NO_PARAMS);

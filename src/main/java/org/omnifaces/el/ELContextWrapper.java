@@ -33,19 +33,19 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELContextWrapper extends ELContext implements FacesWrapper<ELContext> {
 
-	private ELContext elContext;
+	private ELContext wrapped;
 
-	public ELContextWrapper() {
-		//
-	}
-
-	public ELContextWrapper(ELContext elContext) {
-		this.elContext = elContext;
+	/**
+	 * Construct EL context wrapper.
+	 * @param wrapped The EL context to be wrapped.
+	 */
+	public ELContextWrapper(ELContext wrapped) {
+		this.wrapped = wrapped;
 	}
 
 	@Override
 	public ELContext getWrapped() {
-		return elContext;
+		return wrapped;
 	}
 
 	@Override

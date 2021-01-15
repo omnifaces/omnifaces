@@ -35,6 +35,11 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
 	private final String servletPath;
 
+	/**
+	 * Construct the URI extension request wrapper.
+	 * @param request The request to be wrapped.
+	 * @param servletPath The involved servlet path.
+	 */
 	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
 		super(request);
 		this.servletPath = servletPath;

@@ -30,6 +30,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** The default URI when a resource is not found. */
 	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
 
 	// Constructors ---------------------------------------------------------------------------------------------------

@@ -32,10 +32,14 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
 
 	private static final long serialVersionUID = 1L;
 
-	private ValueExpression valueExpression;
+	private ValueExpression wrapped;
 
-	public ValueExpressionWrapper(ValueExpression valueExpression) {
-		this.valueExpression = valueExpression;
+	/**
+	 * Construct the value expression wrapper.
+	 * @param wrapped The value expression to be wrapped.
+	 */
+	public ValueExpressionWrapper(ValueExpression wrapped) {
+		this.wrapped = wrapped;
 	}
 
 	@Override
@@ -90,7 +94,7 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
 
 	@Override
 	public ValueExpression getWrapped() {
-		return valueExpression;
+		return wrapped;
 	}
 
 }

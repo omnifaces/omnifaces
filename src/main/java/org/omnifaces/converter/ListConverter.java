@@ -78,6 +78,10 @@ public class ListConverter implements Converter<Object> {
 		return value.toString();
 	}
 
+	/**
+	 * Sets the list of available items.
+	 * @param list The list of available items.
+	 */
 	public void setList(List<?> list) {
 		this.list = list;
 	}

@@ -32,19 +32,19 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELResolver> {
 
-	private ELResolver elResolver;
+	private ELResolver wrapped;
 
-	public ELResolverWrapper() {
-		//
-	}
-
-	public ELResolverWrapper(ELResolver elResolver) {
-		this.elResolver = elResolver;
+	/**
+	 * Construct EL resolver wrapper.
+	 * @param wrapped The EL resolver to be wrapped.
+	 */
+	public ELResolverWrapper(ELResolver wrapped) {
+		this.wrapped = wrapped;
 	}
 
 	@Override
 	public ELResolver getWrapped() {
-		return elResolver;
+		return wrapped;
 	}
 
 	@Override

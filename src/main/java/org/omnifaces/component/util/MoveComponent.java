@@ -51,12 +51,12 @@ import org.omnifaces.util.State;
  * shows a list of supported destinations:
  *
  * <ul>
- * 		<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower
- *		<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
- *		<li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
- *		<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet"
- *		<li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
- *		<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
+ * 		<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower.
+ *		<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1.
+ *		<li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location.
+ *		<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet".
+ *		<li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component.
+ *		<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher.
  * </ul>
  *
  * @since 2.0
@@ -72,6 +72,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	private static final String ERROR_COMPONENT_NOT_FOUND =
 		"A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
 
+	/** The default scope, which is "facelet". */
 	public static final String DEFAULT_SCOPE = "facelet";
 
 	private final State state = new State(getStateHelper());
@@ -84,11 +85,35 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	 * Destination of component to be moved by {@link MoveComponent}.
 	 */
 	public enum Destination {
+
+		/**
+		 * Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower.
+		 */
 		BEFORE,
+
+		/**
+		 * Component is added as the first child of the target component, any other children will have their index increased by 1.
+		 */
 		ADD_FIRST,
+
+		/**
+		 * Component is added as the last child of the target component, any other children will stay at their original location.
+		 */
 		ADD_LAST,
+
+		/**
+		 * Component will be moved to the facet section of the target component under the name denoted by "facet".
+		 */
 		FACET,
+
+		/**
+		 * A Behavior will be moved to the behavior section of the target component.
+		 */
 		BEHAVIOR,
+
+		/**
+		 * Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher.
+		 */
 		AFTER
 	}
 
@@ -107,6 +132,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Constructs the component.
+	 */
 	public MoveComponent() {
 		subscribeToViewEvent(isPostback() ? PostAddToViewEvent.class : PreRenderViewEvent.class, this);
 	}
@@ -143,7 +171,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 		return csvToList(getBehaviorEvents());
 	}
 
-	public void doProcess() {
+	private void doProcess() {
 		String forValue = getFor();
 
 		if (!isEmpty(forValue)) {
@@ -254,42 +282,94 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
+	/**
+	 * Returns ID of the target component for which the component moving will be done.
+	 * @return ID of the target component for which the component moving will be done.
+	 */
   	public String getFor() {
 		return state.get("for");
 	}
 
-	public void setFor(String nameValue) {
-		state.put("for", nameValue);
+  	/**
+  	 * Sets ID of the target component for which the component moving will be done.
+  	 * @param forValue ID of the target component for which the component moving will be done.
+  	 */
+	public void setFor(String forValue) {
+		state.put("for", forValue);
 	}
 
+	/**
+	 * Returns the destination relative to the target component where the source component(s) are moved to. Default is <code>ADD_LAST</code>.
+	 * @return The destination relative to the target component where the source component(s) are moved to.
+	 */
 	public Destination getDestination() {
 		return state.get(destination, ADD_LAST);
 	}
 
+	/**
+	 * Sets the destination relative to the target component where the source component(s) are moved to. Valid values are
+	 * <ul>
+	 * <li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower
+	 * <li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
+	 * <li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
+	 * <li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet"
+	 * <li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
+	 * <li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
+	 * </ul>
+	 * @param destinationValue The destination relative to the target component where the source component(s) are moved to.
+	 */
 	public void setDestination(Destination destinationValue) {
 		state.put(destination, destinationValue);
 	}
 
+	/**
+	 * Returns in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+	 * @return In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+	 */
 	public String getFacet() {
 		return state.get(facet);
 	}
 
+	/**
+	 * Sets in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+	 * @param facetValue In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+	 */
 	public void setFacet(String facetValue) {
 		state.put(facet, facetValue);
 	}
 
+	/**
+	 * Returns in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+	 * @return In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+	 */
 	public String getBehaviorDefaultEvent() {
 		return state.get(behaviorDefaultEvent, "");
 	}
 
+	/**
+	 * Sets in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+	 * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+	 * to check whether the behavior event matches with what the component supports.
+	 * @param behaviorDefaultEventValue In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+	 */
 	public void setBehaviorDefaultEvent(String behaviorDefaultEventValue) {
 		state.put(behaviorDefaultEvent, behaviorDefaultEventValue);
 	}
 
+	/**
+	 * Returns in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+	 * @return In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+	 */
 	public String getBehaviorEvents() {
 		return state.get(behaviorEvents);
 	}
 
+	/**
+	 * Sets in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+	 * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+	 * to check whether the behavior event matches with what the component supports.
+	 * @param behaviorEventsValue In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+	 */
 	public void setBehaviorEvents(String behaviorEventsValue) {
 		state.put(behaviorEvents, behaviorEventsValue);
 	}

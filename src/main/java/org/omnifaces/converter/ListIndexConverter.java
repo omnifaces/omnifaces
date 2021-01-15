@@ -97,6 +97,10 @@ public class ListIndexConverter implements Converter<Object> {
 		);
 	}
 
+	/**
+	 * Sets the list of available items.
+	 * @param list The list of available items.
+	 */
 	public void setList(List<?> list) {
 		this.list = list;
 	}

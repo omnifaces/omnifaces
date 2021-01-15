@@ -50,6 +50,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
+	/** The component state. */
 	protected final State state = new State(getStateHelper());
 
 	// Init -----------------------------------------------------------------------------------------------------------

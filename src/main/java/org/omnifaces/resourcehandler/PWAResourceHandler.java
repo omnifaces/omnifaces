@@ -236,9 +236,13 @@ import org.omnifaces.util.Json;
  */
 public class PWAResourceHandler extends DefaultResourceHandler {
 
+	/** The resource name <code>manifest.json</code>. */
 	public static final String MANIFEST_RESOURCE_NAME = "manifest.json";
+
+	/** The resource name <code>sw.js</code>. */
 	public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
-	public static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
+
+	private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
 
 	private final Bean<WebAppManifest> manifestBean;
 

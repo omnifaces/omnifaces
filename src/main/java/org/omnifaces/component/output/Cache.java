@@ -163,10 +163,13 @@ public class Cache extends OutputFamily {
 
 	/** The component type, which is {@value org.omnifaces.component.output.Cache#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
-	public static final String VALUE_SET = "org.omnifaces.cache.VALUE_SET";
+
+	/** The default scope, which is "session". */
 	public static final String DEFAULT_SCOPE = "session";
-	public static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
-	public static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
+
+	private static final String VALUE_SET = "org.omnifaces.cache.VALUE_SET";
+	private static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
+	private static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
 
 	private static final String ERROR_NO_BUFFERED_RESPONSE = format(
 		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
@@ -180,6 +183,9 @@ public class Cache extends OutputFamily {
 		key, scope, time, useBuffer, reset, disabled
 	}
 
+	/**
+	 * Constructs the component.
+	 */
 	public Cache() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
@@ -380,48 +386,137 @@ public class Cache extends OutputFamily {
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
+	/**
+	 * Returns key used to store content in the cache.
+	 * @return Key used to store content in the cache.
+	 */
 	public String getKey() {
 		return state.get(key);
 	}
 
+	/**
+	 * Optional key used to store content in the cache. If no key is specified, a key is calculated
+	 * based on the client Id of this component.
+	 * <p>
+	 * While auto-generated keys can be convenient, note that in the face of dynamic behavior on a view the
+	 * id of a component and thus the cache key can change in ways that are difficult to predict.
+	 * <p>
+	 * Keys are relative to the scope for which they are defined, meaning a key "foo" for the a session scoped
+	 * cache will not conflict with a key of the same name for an application scoped cache.
+	 * @param keyValue Key used to store content in the cache.
+	 */
 	public void setKey(String keyValue) {
 		state.put(key, keyValue);
 	}
 
+	/**
+	 * Returns scope identifier used to set the scope in which caching takes place. Default is <code>session</code>.
+	 * @return Scope identifier used to set the scope in which caching takes place.
+	 */
 	public String getScope() {
 		return state.get(scope, DEFAULT_SCOPE);
 	}
 
+	/**
+	 * Optional scope identifier used to set the scope in which caching takes place. If no scope is specified,
+	 * the default scope "session" will be used.
+	 * <p>
+	 * The supported scopes depent on the caching provider that is installed via the
+	 * <code>org.omnifaces.CACHE_PROVIDER</code>. If no such provider is installed, a default one is used
+	 * that supports scopes "session" and "application".
+	 * <p>
+	 * A runtime exception will be thrown if an unsupported value for scope is used.
+	 * @param scopeValue Scope identifier used to set the scope in which caching takes place.
+	 */
 	public void setScope(String scopeValue) {
 		state.put(scope, scopeValue);
 	}
 
+	/**
+	 * Returns amount of time in seconds for which the cached content is valid (TTL). Default is <code>-1</code>.
+	 * @return Amount of time in seconds for which the cached content is valid (TTL).
+	 */
 	public Integer getTime() {
 		return state.get(time, -1);
 	}
 
+	/**
+	 * Optional amount of time in seconds for which the cached content is valid (TTL). This is counted
+	 * from the moment content is actually added to the cache. If no time is provided the content will be subject
+	 * to the global cache settings, and in absence of these are subject to the behavior of the cache implementation
+	 * that is used. The default cache implementation will simply cache indefinitely.
+	 * <p>
+	 * Whether the content is actually removed from the cache (to preserve memory) after the given time has elapsed is
+	 * dependend on the actual cache implementation that is used. The default cache implementation will
+	 * <strong>NOT</strong> do this automatically, but will instead remove it only when the cache item is being accessed
+	 * again.
+	 * <p>
+	 * Following the above, new content will only be inserted into the cache following a page request. A time of e.g. <code>30</code>
+	 * <strong>will not</strong> cause new content to be inserted into the cache at <code>30</code> seconds intervals.
+	 * <p>
+	 * Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This means after content times out,
+	 * several simultaneous page requests may render the same content and it's undetermined which of those will end up being cached.
+	 * @param timeValue Amount of time in seconds for which the cached content is valid (TTL).
+	 */
 	public void setTime(Integer timeValue) {
 		state.put(time, timeValue);
 	}
 
+	/**
+	 * Returns whether to switch to an alternative method to grab the content generated by the children of this component. Default is <code>false</code>.
+	 * @return Whether to switch to an alternative method to grab the content generated by the children of this component.
+	 */
 	public boolean isUseBuffer() {
 		return state.get(useBuffer, FALSE);
 	}
 
+	/**
+	 * Switches to an alternative method to grab the content generated by the children of this component.
+	 * <p>
+	 * Normally this content is obtained by replacing the so-called response writer when the parent Cache
+	 * component delegates rendering to its children. However, in some cases (like <code>h:form</code>) there is an amount
+	 * of post-processing being done on the response outside the context of this parent - child delegation.
+	 * <p>
+	 * Via this switch, the full response is buffered if the cache doesn't contain content for this component and special
+	 * markers are inserted surrounding the children's rendering. Afterwards, the content between the markers (if any) is
+	 * extracted and inserted into the cache. Note that the full response is only buffered incase there's no value in the cache.
+	 * For all other requests this buffering will not happen.
+	 * <p>
+	 * Since this is clearly a more resource intensive and invasive method to grab content, it's not enabled by default.
+	 * In addition to setting this attribute to <code>true</code>, the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code>
+	 * Servlet Filter needs to be configured to filter the Faces Servlet (or alternatively just the pages for which the buffering
+	 * method should be used).
+	 * @param useBufferValue Whether to switch to an alternative method to grab the content generated by the children of this component
+	 */
 	public void setUseBuffer(boolean useBufferValue) {
 		state.put(useBuffer, useBufferValue);
 	}
 
+	/**
+	 * Returns whether to reset this cache. Default is <code>false</code>.
+	 * @return Whether to reset this cache.
+	 */
 	public boolean isReset() {
 		return state.get(reset, FALSE);
 	}
 
+	/**
+	 * Resets the cache when set to <code>true</code>.
+	 * <p>
+	 * This attribute can be used to reset the cache, meaning that the first time the cache component is rendered
+	 * again, it will re-render its children and will cause any cached value expressions (via <code>o:cacheValue</code>) to be
+	 * re-evaluated when its next referenced.
+	 * <p>
+	 * Note that this value has to remain true until the cache component is rendered, after that it should be set to false
+	 * again otherwise the cached content will be reset again at the next rendering.
+	 * @param resetValue Whether to reset this cache.
+	 */
 	public void setReset(boolean resetValue) {
 		state.put(reset, resetValue);
 	}
 
 	/**
-	 * Returns whether this cache is disabled.
+	 * Returns whether this cache is disabled. Default is <code>false</code>.
 	 * @return Whether this cache is disabled.
 	 * @since 1.8
 	 */
@@ -430,7 +525,14 @@ public class Cache extends OutputFamily {
 	}
 
 	/**
-	 * Sets whether this cache is disabled.
+	 * Disables the cache when set to <code>true</code>. Default is <code>false</code>.
+	 * <p>
+	 * This attribute can be used to disable the cache (temporarily). In disabled state the children will be rendered directly
+	 * and cached content (if any) will not be used, nor will the rendering outcome of the children be cached.
+	 * <p>
+	 * When the attribute is set to <code>false</code> again any content that was cached before the cache was disabled will be
+	 * shown again if said content is still available in the cache. The content that was rendered when the cache was disabled
+	 * has no effect on any such previously cached content.
 	 * @param disabledValue Whether this cache is disabled.
 	 * @since 1.8
 	 */

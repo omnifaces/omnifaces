@@ -22,14 +22,14 @@ import org.omnifaces.component.util.FaceletContextConsumer;
  * Handler that can be used by components which wish to receive various extra services.
  * <p>
  * Those extra services consist of:
- * 
+ *
  * <ul>
  * <li> Receiving the {@link FaceletContext} for the Facelet in which the component appears
  * </ul>
- * 
+ *
  * <p>
  * The handler has to be used alongside a component declaration in a Facelets <code>*-taglib.xml</code>, e.g.
- * 
+ *
  * <pre>
  * 	&lt;tag&gt;
  *		&lt;tag-name&gt;someComponent&lt;/tag-name&gt;
@@ -39,13 +39,17 @@ import org.omnifaces.component.util.FaceletContextConsumer;
  *		&lt;/component&gt;
  *	&lt;/tag&gt;
  * </pre>
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
- * 
+ *
  */
 public class ComponentExtraHandler extends ComponentHandler {
 
+	/**
+	 * The tag constructor.
+	 * @param config The tag config.
+	 */
 	public ComponentExtraHandler(ComponentConfig config) {
 		super(config);
 	}

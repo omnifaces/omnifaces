@@ -378,14 +378,26 @@ public abstract class WebAppManifest {
 			return new ImageResource(resourceIdentifier, sizes);
 		}
 
+		/**
+		 * Returns the source of this image resource.
+		 * @return The source of this image resource.
+		 */
 		public String getSrc() {
 			return src;
 		}
 
+		/**
+		 * Returns the supported sizes of this image resource.
+		 * @return The supported sizes of this image resource.
+		 */
 		public String getSizes() {
 			return sizes;
 		}
 
+		/**
+		 * Returns the content type of this image resource.
+		 * @return The content type of this image resource.
+		 */
 		public String getType() {
 			return type;
 		}
@@ -502,6 +514,10 @@ public abstract class WebAppManifest {
 			return new Size(width, height);
 		}
 
+		/**
+		 * Returns the value of this size.
+		 * @return The value of this size.
+		 */
 		public String getValue() {
 			return value;
 		}
@@ -568,14 +584,26 @@ public abstract class WebAppManifest {
 			return new RelatedApplication(platform, url, id);
 		}
 
+		/**
+		 * Returns the platform on which the application can be found.
+		 * @return The platform on which the application can be found.
+		 */
 		public Platform getPlatform() {
 			return platform;
 		}
 
+		/**
+		 * Returns the URL at which the application can be found.
+		 * @return The URL at which the application can be found.
+		 */
 		public String getUrl() {
 			return url;
 		}
 
+		/**
+		 * Returns the ID used to represent the application on the specified platform.
+		 * @return The ID used to represent the application on the specified platform.
+		 */
 		public String getId() {
 			return id;
 		}

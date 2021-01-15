@@ -69,6 +69,11 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
 	private static final String VERSION_SUFFIX = "v=";
 	private final Lazy<String> versionString;
 
+	/**
+	 * Creates a new instance of this versioned resource handler which wraps the given resource handler.
+	 * This will also initialize the version based on the context parameter.
+	 * @param wrapped The resource handler to be wrapped.
+	 */
 	public VersionedResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
 		versionString = new Lazy<>(() -> encodeURL(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))));

@@ -29,6 +29,10 @@ public class DelegatingVariableMapper extends VariableMapper {
 	private final VariableMapper wrapped;
 	private final Map<String, ValueExpression> variables = new HashMap<>();
 
+	/**
+	 * Construct delegating variable mapper.
+	 * @param wrapped The variable mapper to be wrapped.
+	 */
 	public DelegatingVariableMapper(VariableMapper wrapped) {
 		this.wrapped = wrapped;
 	}
@@ -46,6 +50,11 @@ public class DelegatingVariableMapper extends VariableMapper {
 		}
 	}
 
+	/**
+	 * Resolve wrapped variable of given name.
+	 * @param name Name of wrapped variable.
+	 * @return Resolved wrapped variable.
+	 */
 	public ValueExpression resolveWrappedVariable(String name) {
 		ValueExpression wrappedVariable = wrapped.resolveVariable(name);
 		ValueExpression globalVariable = variables.get(name);
@@ -68,6 +77,12 @@ public class DelegatingVariableMapper extends VariableMapper {
 		return variables.put(name, expression);
 	}
 
+	/**
+	 * Sets wrapped variable of given name with given value expression.
+	 * @param name Name of wrapped variable.
+	 * @param expression Value expression of wrapped variable.
+	 * @return The wrapped variable.
+	 */
 	public ValueExpression setWrappedVariable(String name, ValueExpression expression) {
 		return wrapped.setVariable(name, expression);
 	}

@@ -38,6 +38,10 @@ public class CacheValue extends TagHandler {
 	private final TagAttribute name;
 	private final TagAttribute value;
 
+	/**
+	 * Construct the tag.
+	 * @param config The tag config.
+	 */
 	public CacheValue(TagConfig config) {
 		super(config);
 		this.name = this.getRequiredAttribute("name");

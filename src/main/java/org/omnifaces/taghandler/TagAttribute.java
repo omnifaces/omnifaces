@@ -75,6 +75,10 @@ public class TagAttribute extends TagHandler {
 	private final String name;
 	private final jakarta.faces.view.facelets.TagAttribute defaultValue;
 
+	/**
+	 * The tag constructor.
+	 * @param config The tag config.
+	 */
 	public TagAttribute(TagConfig config) {
 		super(config);
 		name = getRequiredAttribute("name").getValue();

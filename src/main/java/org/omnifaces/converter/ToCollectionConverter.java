@@ -154,14 +154,26 @@ public class ToCollectionConverter implements Converter<Collection> {
 		return builder.toString();
 	}
 
+	/**
+	 * Sets the delimiter to split on.
+	 * @param delimiter The delimiter to split on.
+	 */
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
 	}
 
+	/**
+	 * Sets the FQN of the collection to create.
+	 * @param collectionType The FQN of the collection to create.
+	 */
 	public void setCollectionType(String collectionType) {
 		this.collectionType = collectionType;
 	}
 
+	/**
+	 * Sets the converter for the item.
+	 * @param itemConverter The converter for the item.
+	 */
 	public void setItemConverter(Object itemConverter) {
 		this.itemConverter = itemConverter;
 	}

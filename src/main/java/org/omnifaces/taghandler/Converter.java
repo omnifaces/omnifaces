@@ -154,6 +154,13 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 		private final ValueExpression id;
 		private final DeferredAttributes attributes;
 
+		/**
+		 * Construct the deferred converter.
+		 * @param converter The wrapped converter.
+		 * @param binding The binding expression.
+		 * @param id The ID expression.
+		 * @param attributes The deferred attributes.
+		 */
 		public DeferredConverter(jakarta.faces.convert.Converter<Object> converter, ValueExpression binding, ValueExpression id, DeferredAttributes attributes) {
 			this.converter = converter;
 			this.binding = binding;

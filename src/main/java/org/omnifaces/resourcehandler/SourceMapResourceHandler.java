@@ -76,6 +76,11 @@ public class SourceMapResourceHandler extends DefaultResourceHandler {
 
 	private String sourceMapPattern;
 
+	/**
+	 * Creates a new instance of this source map resource handler which wraps the given resource handler.
+	 * This will also initialize the source map pattern based on the context parameter.
+	 * @param wrapped The resource handler to be wrapped.
+	 */
 	public SourceMapResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
 		sourceMapPattern = getInitParameterOrDefault(PARAM_NAME_SOURCE_MAP_PATTERN, DEFAULT_SOURCE_MAP_PATTERN);

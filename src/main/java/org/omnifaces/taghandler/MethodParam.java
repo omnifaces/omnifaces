@@ -42,6 +42,10 @@ public class MethodParam extends TagHandler {
 	private final TagAttribute name;
 	private final TagAttribute value;
 
+	/**
+	 * The tag constructor.
+	 * @param config The tag config.
+	 */
 	public MethodParam(TagConfig config) {
 		super(config);
 		name = getRequiredAttribute("name");

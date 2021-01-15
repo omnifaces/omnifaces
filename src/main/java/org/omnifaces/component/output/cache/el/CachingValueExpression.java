@@ -38,6 +38,12 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 	private final String name;
 	private final transient Cache cache;
 
+	/**
+	 * Construct the caching value expression.
+	 * @param name The cache name.
+	 * @param valueExpression The value expression to be wrapped.
+	 * @param cache The cache itself.
+	 */
 	public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
 		super(valueExpression);
 		this.name = name;

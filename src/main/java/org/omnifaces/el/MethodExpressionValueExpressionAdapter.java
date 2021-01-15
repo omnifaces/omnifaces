@@ -50,6 +50,10 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private final ValueExpression valueExpression;
 
+	/**
+	 * Construct method expression which adapts the given value expression.
+	 * @param valueExpression Value expression to be adapted to method expression.
+	 */
 	public MethodExpressionValueExpressionAdapter(ValueExpression valueExpression) {
 		this.valueExpression = valueExpression;
 	}
@@ -103,6 +107,10 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 		return false;
 	}
 
+	/**
+	 * Returns the underlying value expression.
+	 * @return The underlying value expression.
+	 */
 	public ValueExpression getValueExpression() {
 		return valueExpression;
 	}

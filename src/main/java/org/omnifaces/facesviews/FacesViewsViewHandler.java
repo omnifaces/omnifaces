@@ -84,6 +84,10 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 	private final boolean extensionless;
 
+	/**
+	 * Construct faces views view handler.
+	 * @param wrapped The view handler to be wrapped.
+	 */
 	public FacesViewsViewHandler(ViewHandler wrapped) {
 		super(wrapped);
 		extensionless = isScannedViewsAlwaysExtensionless(getServletContext());

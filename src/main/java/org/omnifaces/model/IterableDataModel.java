@@ -40,6 +40,10 @@ public class IterableDataModel<E> extends DataModel<E> {
 	private Iterable<E> iterable;
 	private List<E> list;
 
+	/**
+	 * Construct the iterable data model based on the given iterable instance.
+	 * @param iterable The iterable instance to construct the iterable data model for.
+	 */
 	public IterableDataModel(Iterable<E> iterable) {
 		setWrappedData(iterable);
 	}

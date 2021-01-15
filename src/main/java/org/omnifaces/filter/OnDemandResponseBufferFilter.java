@@ -44,6 +44,7 @@ import org.omnifaces.servlet.BufferedHttpServletResponse;
  */
 public class OnDemandResponseBufferFilter extends HttpFilter {
 
+	/** The request attribute name under which the buffered response is stored. */
 	public static final String BUFFERED_RESPONSE = "org.omnifaces.servlet.BUFFERED_RESPONSE";
 
 	@Override

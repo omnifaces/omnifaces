@@ -30,17 +30,26 @@ public class ScopedRunner {
 	private Map<String, Object> scopedVariables;
 	private Map<String, Object> previousVariables = new HashMap<>();
 
+	/**
+	 * Construct a scoped runner.
+	 * @param context The involved faces context.
+	 */
 	public ScopedRunner(FacesContext context) {
 		this(context, new HashMap<>());
 	}
 
+	/**
+	 * Construct a scoped runner.
+	 * @param context The involved faces context.
+	 * @param scopedVariables Initial scoped variables.
+	 */
 	public ScopedRunner(FacesContext context, Map<String, Object> scopedVariables) {
 		this.context = context;
 		this.scopedVariables = scopedVariables;
 	}
 
 	/**
-	 * Adds the given variable to this instance. Can be used in a builder-pattern.
+	 * Adds the given scoped variable to this instance. Can be used in a builder-pattern.
 	 *
 	 * @param key the key name of the variable
 	 * @param value the value of the variable

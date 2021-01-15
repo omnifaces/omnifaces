@@ -115,12 +115,26 @@ public class SitemapUrl extends OutputFamily {
 	/** The available values of the "changefreq" element of the sitemap URL. */
 	public enum ChangeFrequency {
 		// Cannot be uppercased. They have to exactly match the sitemap spec.
+
+		/** Always changed. */
 		always,
+
+		/** Hourly changed. */
 		hourly,
+
+		/** Daily changed. */
 		daily,
+
+		/** Weekly changed. */
 		weekly,
+
+		/** Monthly changed. */
 		monthly,
+
+		/** Yearly changed. */
 		yearly,
+
+		/** Never changed. */
 		never
 	}
 

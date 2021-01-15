@@ -35,15 +35,27 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	private Callback.SerializableReturning<Object> callback;
 	private Class<?> expectedType;
 
+	/**
+	 * Construct a read only value expression.
+	 * @param expectedType The type the result of the expression will be coerced to after evaluation.
+	 * @param callback The functional interface that will be called when the value expression is resolved.
+	 */
 	public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
 		this(expectedType);
 		this.callback = callback;
 	}
 
+	/**
+	 * Construct a read only value expression.
+	 * @param expectedType The type the result of the expression will be coerced to after evaluation.
+	 */
 	public ReadOnlyValueExpression(Class<?> expectedType) {
 		this.expectedType = expectedType;
 	}
 
+	/**
+	 * Construct a read only value expression.
+	 */
 	public ReadOnlyValueExpression() {
 		//
 	}
