@@ -101,8 +101,6 @@ public class SocketIT extends OmniFacesIT {
 		guardNoRequest(closeAllSockets).click();
 		waitGui(browser).withTimeout(3, SECONDS).until().element(clientClosedMessages).text().contains("|sessionScopedUserTargeted|"); // These are async.
 		waitGui(browser).withTimeout(3, SECONDS).until().element(clientClosedMessages).text().contains("|viewScopedAjaxAware|");
-		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|closed:sessionScopedUserTargeted|");
-		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|closed:viewScopedAjaxAware|");
 		closeCurrentTabAndSwitchTo(tabToSwitch);
 	}
 
