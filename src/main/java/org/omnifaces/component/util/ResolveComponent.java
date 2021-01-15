@@ -50,6 +50,7 @@ import org.omnifaces.util.State;
 @FacesComponent(ResolveComponent.COMPONENT_TYPE)
 public class ResolveComponent extends UtilFamily implements FaceletContextConsumer, SystemEventListener {
 
+	/** The component type, which is {@value org.omnifaces.component.util.ResolveComponent#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.util.ResolveComponent";
 
 	private static final String ERROR_COMPONENT_NOT_FOUND =

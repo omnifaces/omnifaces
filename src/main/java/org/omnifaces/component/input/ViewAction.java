@@ -80,6 +80,7 @@ public class ViewAction extends UIViewAction {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.ViewAction#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewAction";
 
 	enum PropertyKeys {

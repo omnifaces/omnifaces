@@ -89,6 +89,7 @@ public class ViewParam extends UIViewParameter {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.ViewParam#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
 
 	// Variables ------------------------------------------------------------------------------------------------------

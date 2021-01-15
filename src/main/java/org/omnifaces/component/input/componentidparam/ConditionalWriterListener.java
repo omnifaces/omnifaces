@@ -42,6 +42,12 @@ public class ConditionalWriterListener implements PhaseListener {
 	private final List<String> clientIds;
 	private final boolean renderChildren;
 
+	/**
+	 * Construct conditional writer listener.
+	 * @param componentIds Component IDs.
+	 * @param clientIds Client IDs.
+	 * @param renderChildren Whether to render children.
+	 */
 	public ConditionalWriterListener(List<String> componentIds, List<String> clientIds, boolean renderChildren) {
 		this.componentIds = componentIds;
 		this.clientIds = clientIds;

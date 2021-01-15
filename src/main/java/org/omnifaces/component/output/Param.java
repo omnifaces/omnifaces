@@ -62,6 +62,7 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.output.Param#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Param";
 
 	// Private constants ----------------------------------------------------------------------------------------------

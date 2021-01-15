@@ -320,6 +320,7 @@ public final class Hacks {
 	/**
 	 * Returns f:metadata facet from UIViewRoot.
 	 * MyFaces 3.x unexpectedly doesn't use {@link UIViewRoot#METADATA_FACET_NAME} anymore to identify the facet.
+	 * @param viewRoot The UIViewRoot to obtain f:metadata facet from.
 	 * @return f:metadata facet from UIViewRoot.
 	 * @since 4.0
 	 */

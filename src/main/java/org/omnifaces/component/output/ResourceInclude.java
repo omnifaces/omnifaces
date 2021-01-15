@@ -53,7 +53,7 @@ public class ResourceInclude extends OutputFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type. */
+	/** The component type, which is {@value org.omnifaces.component.output.ResourceInclude#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------

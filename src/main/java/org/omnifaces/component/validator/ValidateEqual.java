@@ -41,7 +41,7 @@ public class ValidateEqual extends ValidateMultipleFields {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.validator.ValidateEqual#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateEqual";
 
 	// Actions --------------------------------------------------------------------------------------------------------

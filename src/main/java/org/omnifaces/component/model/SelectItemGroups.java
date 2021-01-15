@@ -60,7 +60,7 @@ public class SelectItemGroups extends UISelectItems {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.model.SelectItemGroups#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.model.SelectItemGroups";
 
 	// Private constants ----------------------------------------------------------------------------------------------

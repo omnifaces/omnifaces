@@ -120,7 +120,7 @@ public class Url extends OutputFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.output.Url#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Url";
 
 	// Private constants ----------------------------------------------------------------------------------------------

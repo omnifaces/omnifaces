@@ -85,7 +85,7 @@ public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.script.Highlight#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.Highlight";
 
 	// Private constants ----------------------------------------------------------------------------------------------

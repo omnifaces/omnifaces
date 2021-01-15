@@ -63,6 +63,7 @@ public class InputHidden extends HtmlInputHidden {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.InputHidden#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputHidden";
 
 	// Actions --------------------------------------------------------------------------------------------------------

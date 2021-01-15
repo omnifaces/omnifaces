@@ -64,7 +64,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.script.OnloadScript#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.OnloadScript";
 
 	// Actions --------------------------------------------------------------------------------------------------------

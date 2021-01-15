@@ -65,7 +65,11 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
 public class PathParam<T> extends Param<T> {
 
 	// Constants
+
+	/** The component type, which is {@value org.omnifaces.component.output.PathParam#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.PathParam";
+
+	/** The predefined value of the <code>name</code> attribute of this component. */
 	public static final String PATH_PARAM_NAME_ATTRIBUTE_VALUE = "org.omnifaces.pathparam";
 
 	// Actions

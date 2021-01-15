@@ -62,7 +62,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.validator.ValidateOrder#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOrder";
 
 	// Private constants ----------------------------------------------------------------------------------------------

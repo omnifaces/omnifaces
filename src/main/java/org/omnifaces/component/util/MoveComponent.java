@@ -66,6 +66,7 @@ import org.omnifaces.util.State;
 @FacesComponent(MoveComponent.COMPONENT_TYPE)
 public class MoveComponent extends UtilFamily implements SystemEventListener, ClientBehaviorHolder {
 
+	/** The component type, which is {@value org.omnifaces.component.util.MoveComponent#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.util.MoveComponent";
 
 	private static final String ERROR_COMPONENT_NOT_FOUND =

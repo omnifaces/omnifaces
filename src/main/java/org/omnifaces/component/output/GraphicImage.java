@@ -208,6 +208,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.output.GraphicImage#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
 	protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
 	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";

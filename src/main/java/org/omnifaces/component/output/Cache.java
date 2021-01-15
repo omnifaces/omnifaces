@@ -161,6 +161,7 @@ import org.omnifaces.util.cache.TimeToLiveCache;
 @FacesComponent(Cache.COMPONENT_TYPE)
 public class Cache extends OutputFamily {
 
+	/** The component type, which is {@value org.omnifaces.component.output.Cache#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
 	public static final String VALUE_SET = "org.omnifaces.cache.VALUE_SET";
 	public static final String DEFAULT_SCOPE = "session";

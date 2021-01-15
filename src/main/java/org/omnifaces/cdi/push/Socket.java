@@ -744,7 +744,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.cdi.push.Socket#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.Socket";
 
 	/** The boolean context parameter name to register web socket endpoint during startup. */

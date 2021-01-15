@@ -39,7 +39,7 @@ public class TreeInsertChildren extends TreeFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.tree.TreeInsertChildren#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
 
 	// Actions --------------------------------------------------------------------------------------------------------

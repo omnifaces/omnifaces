@@ -124,7 +124,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.tree.Tree#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.Tree";
 
 	// Private constants ----------------------------------------------------------------------------------------------

@@ -48,7 +48,7 @@ public class TreeNodeItem extends TreeFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.tree.TreeNodeItem#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
 
 	// Actions --------------------------------------------------------------------------------------------------------

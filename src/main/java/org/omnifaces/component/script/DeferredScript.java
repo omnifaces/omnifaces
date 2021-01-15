@@ -61,7 +61,7 @@ public class DeferredScript extends ScriptFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.script.DeferredScript#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.DeferredScript";
 
 	// Constructors ---------------------------------------------------------------------------------------------------

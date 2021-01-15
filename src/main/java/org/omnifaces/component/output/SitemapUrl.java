@@ -109,7 +109,7 @@ public class SitemapUrl extends OutputFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.output.SitemapUrl#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.SitemapUrl";
 
 	/** The available values of the "changefreq" element of the sitemap URL. */

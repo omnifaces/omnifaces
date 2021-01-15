@@ -179,6 +179,7 @@ public class HashParam extends OnloadParam {
 	/**
 	 * Convert the value to string using any converter and ensure that an empty string is returned when the component
 	 * is invalid or the resulting string is null or represents the default value.
+	 * @param context The involved faces context.
 	 * @return The rendered value.
 	 */
 	@SuppressWarnings("unchecked")

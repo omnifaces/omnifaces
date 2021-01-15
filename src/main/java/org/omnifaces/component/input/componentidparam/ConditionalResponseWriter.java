@@ -47,6 +47,14 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 	private Map<String, Boolean> renderedIdCache = new HashMap<>();
 	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
+	/**
+	 * Construct conditional response writer.
+	 * @param responseWriter Response writer to be wrapped.
+	 * @param facesContext Involved faces context.
+	 * @param componentIds Component IDs.
+	 * @param clientIds Client IDs.
+	 * @param renderChildren Whether to render children.
+	 */
 	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
 		super(responseWriter);
 		this.facesContext = facesContext;

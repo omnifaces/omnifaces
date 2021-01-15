@@ -119,7 +119,7 @@ public class OmniMessages extends HtmlMessages {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.messages.OmniMessages#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.messages.OmniMessages";
 
 	// Private constants ----------------------------------------------------------------------------------------------

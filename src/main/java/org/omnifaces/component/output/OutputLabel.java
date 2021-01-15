@@ -41,6 +41,7 @@ import jakarta.faces.event.PostRestoreStateEvent;
 @FacesComponent(OutputLabel.COMPONENT_TYPE)
 public class OutputLabel extends HtmlOutputLabel {
 
+	/** The component type, which is {@value org.omnifaces.component.output.OutputLabel#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
 
 	private static final String ERROR_FOR_COMPONENT_NOT_FOUND =

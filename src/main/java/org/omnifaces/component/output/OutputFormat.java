@@ -57,7 +57,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component type. */
+	/** The component type, which is {@value org.omnifaces.component.output.OutputFormat#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputFormat";
 
 	// Private constants ----------------------------------------------------------------------------------------------

@@ -263,6 +263,7 @@ public class InputFile extends HtmlInputFile {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.InputFile#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputFile";
 
 	// Private constants ----------------------------------------------------------------------------------------------

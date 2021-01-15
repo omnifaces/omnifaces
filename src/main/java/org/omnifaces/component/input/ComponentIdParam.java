@@ -45,6 +45,7 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
 @FacesComponent(ComponentIdParam.COMPONENT_TYPE)
 public class ComponentIdParam extends ViewParam {
 
+	/** The component type, which is {@value org.omnifaces.component.input.ComponentIdParam#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ComponentIdParam";
 
 	private enum PropertyKeys {

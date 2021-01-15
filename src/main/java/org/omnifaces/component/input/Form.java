@@ -126,6 +126,7 @@ public class Form extends HtmlForm {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.Form#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
 	enum PropertyKeys {
