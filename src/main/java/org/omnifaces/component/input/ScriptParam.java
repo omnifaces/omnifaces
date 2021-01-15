@@ -14,6 +14,7 @@ package org.omnifaces.component.input;
 
 import static java.lang.String.format;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getScriptParameters;
 import static org.omnifaces.util.Reflection.invokeMethods;
@@ -182,7 +183,7 @@ public class ScriptParam extends OnloadParam {
 		for (ScriptParam scriptParam : getScriptParameters(context)) {
 			String value = getRequestParameter(context, scriptParam.getClientId());
 			scriptParam.decodeImmediately(context, value);
-			ValueExpression valueExpression = scriptParam.getValueExpression("value");
+			ValueExpression valueExpression = scriptParam.getValueExpression(VALUE_ATTRIBUTE);
 
 			if (valueExpression != null) {
 				beans.add(getValueReference(context.getELContext(), valueExpression).getBase());

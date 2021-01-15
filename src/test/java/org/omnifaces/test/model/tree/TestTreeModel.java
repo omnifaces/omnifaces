@@ -13,7 +13,7 @@
 package org.omnifaces.test.model.tree;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 import org.omnifaces.model.tree.ListTreeModel;
@@ -47,17 +47,17 @@ public class TestTreeModel {
 		TreeModel<String> copy = new ListTreeModel<>();
 		copy.addChild("One").addChild("Two").getParent().addChild("Three");
 		assertEquals("[One[Two, Three]]", copy.toString());
-		assertTrue(tree + " equals " + copy, tree.equals(copy));
+		assertEquals(tree + " equals " + copy, copy, tree);
 
 		TreeModel<String> copyOne = copy.getChildren().iterator().next();
 		assertEquals("One[Two, Three]", one.toString());
 		assertEquals("One[Two, Three]", copyOne.toString());
-		assertTrue(one + " equals " + copyOne, one.equals(copyOne));
+		assertEquals(one + " equals " + copyOne, copyOne, one);
 
 		copy.setData("Copy");
 		assertEquals("One[Two, Three]", one.toString());
 		assertEquals("One[Two, Three]", copyOne.toString());
-		assertTrue(one + " equals not " + copyOne, !one.equals(copyOne));
+		assertNotEquals(one + " equals not " + copyOne, copyOne, one);
 	}
 
 }

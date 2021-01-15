@@ -17,6 +17,8 @@ import static jakarta.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDAT
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static org.omnifaces.util.Beans.getQualifier;
+import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
@@ -81,8 +83,6 @@ import org.omnifaces.cdi.Param;
 public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
-	private static final String LABEL = "label";
-	private static final String VALUE = "value";
 
 	private static Boolean interpretEmptyStringSubmittedValuesAsNull;
 
@@ -255,17 +255,17 @@ public class ParamProducer {
 
 	private static boolean runWithSimulatedLabelAndValueOnViewRoot(FacesContext context, ParamValue paramValue, BooleanSupplier callback) {
 		UIComponent component = context.getViewRoot();
-		Object originalLabel = getAttribute(component, LABEL);
-		Object originalValue = getAttribute(component, VALUE);
+		Object originalLabel = getAttribute(component, LABEL_ATTRIBUTE);
+		Object originalValue = getAttribute(component, VALUE_ATTRIBUTE);
 
 		try {
-			setAttribute(component, LABEL, paramValue.label);
-			setAttribute(component, VALUE, createValueExpression("#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
+			setAttribute(component, LABEL_ATTRIBUTE, paramValue.label);
+			setAttribute(component, VALUE_ATTRIBUTE, createValueExpression("#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
 			return callback.getAsBoolean();
 		}
 		finally {
-			setAttribute(component, LABEL, originalLabel);
-			setAttribute(component, VALUE, originalValue);
+			setAttribute(component, LABEL_ATTRIBUTE, originalLabel);
+			setAttribute(component, VALUE_ATTRIBUTE, originalValue);
 		}
 	}
 

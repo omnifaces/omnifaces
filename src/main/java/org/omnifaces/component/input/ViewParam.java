@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.input;
 
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.isPostback;
 
@@ -139,7 +140,7 @@ public class ViewParam extends UIViewParameter {
 	 */
 	@Override
 	public String getStringValueFromModel(FacesContext context) {
-		ValueExpression ve = getValueExpression("value");
+		ValueExpression ve = getValueExpression(VALUE_ATTRIBUTE);
 		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
 		return (value != null) ? super.getStringValueFromModel(context) : null;
 	}

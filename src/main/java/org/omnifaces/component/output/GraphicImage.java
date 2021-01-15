@@ -15,6 +15,7 @@ package org.omnifaces.component.output;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeIdAttributeIfNecessary;
@@ -279,7 +280,7 @@ public class GraphicImage extends HtmlGraphicImage {
 			}
 		}
 		else {
-			ValueExpression value = getValueExpression("value");
+			ValueExpression value = getValueExpression(VALUE_ATTRIBUTE);
 
 			if (value != null) {
 				resource = createGraphicResourceByValue(context, value, dataURI);

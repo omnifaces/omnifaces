@@ -56,10 +56,8 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
-		if (!sessionListenerDisabled) {
-			if (!EagerBeansRepository.getInstance().instantiateSessionScoped()) {
-				sessionListenerDisabled = true;
-			}
+		if (!sessionListenerDisabled && !EagerBeansRepository.getInstance().instantiateSessionScoped()) {
+			sessionListenerDisabled = true;
 		}
 	}
 

@@ -128,9 +128,9 @@ public final class Reflection {
 		 */
 		public PropertyPath with(Comparable<? extends Serializable> node) {
 			requireNonNull(node, "node");
-			List<Comparable<? extends Serializable>> nodes = new ArrayList<>(this.nodes);
-			nodes.add(node);
-			return new PropertyPath(unmodifiableList(nodes));
+			List<Comparable<? extends Serializable>> newNodes = new ArrayList<>(this.nodes);
+			newNodes.add(node);
+			return new PropertyPath(unmodifiableList(newNodes));
 		}
 
 		@Override
@@ -402,7 +402,7 @@ public final class Reflection {
 			Integer size = ((Integer) nextPropertyNode) + 1;
 
 			for (int index = 0; index < size; index++) {
-				((List) value).add(isNeedsFurtherRecursion(elementType) ? instance(elementType) : null);
+				((List) value).add(createDefaultValueIfNecessary(elementType));
 			}
 		}
 		else if (Map.class.isAssignableFrom(type)) {
@@ -413,7 +413,7 @@ public final class Reflection {
 			value = Array.newInstance(type.getComponentType(), length);
 
 			for (int index = 0; index < length; index++) {
-				Array.set(value, index, isNeedsFurtherRecursion(type.getComponentType()) ? instance(type.getComponentType()) : null);
+				Array.set(value, index, createDefaultValueIfNecessary(type.getComponentType()));
 			}
 		}
 		else {
@@ -428,6 +428,10 @@ public final class Reflection {
 		}
 
 		return value;
+	}
+
+	private static Object createDefaultValueIfNecessary(Class<?> type) {
+		return isNeedsFurtherRecursion(type) ? instance(type) : null;
 	}
 
 	private static Map<String, PropertyDescriptor> getPropertyDescriptors(Class<?> type, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {

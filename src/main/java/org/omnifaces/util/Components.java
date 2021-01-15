@@ -169,8 +169,11 @@ public final class Components {
 
 	private static final Logger logger = Logger.getLogger(Components.class.getName());
 
-	private static final String ATTRIBUTE_LABEL = "label";
-	private static final String ATTRIBUTE_VALUE = "value";
+	/** The name of the label attribute. */
+	public static final String LABEL_ATTRIBUTE = "label";
+
+	/** The name of the value attribute. */
+	public static final String VALUE_ATTRIBUTE = "value";
 
 	private static final String ERROR_MISSING_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -988,10 +991,10 @@ public final class Components {
 		Object[] result = new Object[1];
 
 		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(() -> {
-			Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
+			Object label = component.getAttributes().get(LABEL_ATTRIBUTE);
 
 			if (isEmpty(label)) {
-				ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
+				ValueExpression labelExpression = component.getValueExpression(LABEL_ATTRIBUTE);
 
 				if (labelExpression != null) {
 					label = labelExpression.getValue(getELContext());
@@ -1011,13 +1014,13 @@ public final class Components {
 	 */
 	public static void setLabel(UIComponent component, Object label) {
 		if (label instanceof ValueExpression) {
-			component.setValueExpression(ATTRIBUTE_LABEL, (ValueExpression) label);
+			component.setValueExpression(LABEL_ATTRIBUTE, (ValueExpression) label);
 		}
 		else if (label != null) {
-			component.getAttributes().put(ATTRIBUTE_LABEL, label);
+			component.getAttributes().put(LABEL_ATTRIBUTE, label);
 		}
 		else {
-			component.getAttributes().remove(ATTRIBUTE_LABEL);
+			component.getAttributes().remove(LABEL_ATTRIBUTE);
 		}
 	}
 
@@ -1076,13 +1079,13 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> getExpectedValueType(UIComponent component) {
-		ValueExpression valueExpression = component.getValueExpression(ATTRIBUTE_VALUE);
+		ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
 		if (valueExpression != null) {
 			return getExpectedType(valueExpression);
 		}
 		else {
-			Object value = component.getAttributes().get(ATTRIBUTE_VALUE);
+			Object value = component.getAttributes().get(VALUE_ATTRIBUTE);
 
 			if (value != null) {
 				return (Class<T>) value.getClass();
