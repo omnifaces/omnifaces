@@ -378,7 +378,7 @@ public final class FacesViews {
 			}
 		}
 
-		collectedViews.keySet().removeIf(collectedView -> excludedPaths.stream().anyMatch(excludedPath -> collectedView.startsWith(excludedPath)));
+		collectedViews.keySet().removeIf(collectedView -> excludedPaths.stream().anyMatch(collectedView::startsWith));
 
 		if (!collectedViews.isEmpty()) {
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
@@ -770,7 +770,7 @@ public final class FacesViews {
 		if (!isEmpty(excludedPaths)) {
 			String path = resource + "/";
 
-			if (excludedPaths.stream().anyMatch(excludedPath -> path.startsWith(excludedPath))) {
+			if (excludedPaths.stream().anyMatch(path::startsWith)) {
 				return false;
 			}
 		}

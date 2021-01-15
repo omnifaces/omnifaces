@@ -41,7 +41,7 @@ public final class Strings {
 
 	private static final Pattern PATTERN_DIACRITICAL_MARKS = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 	private static final Pattern PATTERN_NON_ALPHANUMERIC_CHARS = Pattern.compile("[^\\p{Alnum}]+");
-	private static final Pattern PATTERN_XML_TAGS = Pattern.compile("\\<.*?\\>");
+	private static final Pattern PATTERN_XML_TAGS = Pattern.compile("\\<[^\\>]*+\\>");
 	private static final Pattern PATTERN_MULTIPLE_SPACES = Pattern.compile("\\s\\s+");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -173,9 +173,7 @@ public final class Strings {
 
 		String normalized = Normalizer.normalize(string.toLowerCase(), Form.NFD);
 		String withoutDiacriticalMarks = PATTERN_DIACRITICAL_MARKS.matcher(normalized).replaceAll("");
-		String hyphenizated = PATTERN_NON_ALPHANUMERIC_CHARS.matcher(withoutDiacriticalMarks).replaceAll("-");
-
-		return hyphenizated;
+		return PATTERN_NON_ALPHANUMERIC_CHARS.matcher(withoutDiacriticalMarks).replaceAll("-");
 	}
 
 	/**
@@ -237,9 +235,7 @@ public final class Strings {
 		}
 
 		String withoutTags = PATTERN_XML_TAGS.matcher(string).replaceAll("");
-		String whitespaceCollapsed = PATTERN_MULTIPLE_SPACES.matcher(withoutTags).replaceAll(" ").trim();
-
-		return whitespaceCollapsed;
+		return PATTERN_MULTIPLE_SPACES.matcher(withoutTags).replaceAll(" ").trim();
 	}
 
 	/**

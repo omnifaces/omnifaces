@@ -34,7 +34,7 @@ public abstract class DefaultPhaseListener implements PhaseListener {
 	 * Construct default phase listener for given phase ID.
 	 * @param phaseId Phase ID to create new default phase listener for.
 	 */
-	public DefaultPhaseListener(PhaseId phaseId) {
+	protected DefaultPhaseListener(PhaseId phaseId) {
 		this.phaseId = phaseId;
 	}
 

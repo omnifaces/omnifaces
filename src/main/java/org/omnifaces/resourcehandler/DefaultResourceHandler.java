@@ -38,7 +38,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	 * Creates a new instance of this default resource handler which wraps the given resource handler.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
-	public DefaultResourceHandler(ResourceHandler wrapped) {
+	protected DefaultResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
 	}
 

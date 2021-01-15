@@ -326,10 +326,7 @@ enum WebXmlSingleton implements WebXml {
 			Class<Throwable> exceptionClass = (Class<Throwable>) Class.forName(getTextContent(node));
 			String exceptionLocation = xpath.compile(XPATH_LOCATION).evaluate(node.getParentNode()).trim();
 			Class<Throwable> key = (exceptionClass == Throwable.class) ? null : exceptionClass;
-
-			if (!errorPageLocations.containsKey(key)) {
-				errorPageLocations.put(key, exceptionLocation);
-			}
+			errorPageLocations.computeIfAbsent(key, k -> exceptionLocation);
 		}
 
 		if (!errorPageLocations.containsKey(null)) {

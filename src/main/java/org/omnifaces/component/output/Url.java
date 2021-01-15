@@ -200,7 +200,7 @@ public class Url extends OutputFamily {
 				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
 			}
 			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
+				throw new IllegalArgumentException(format(errorMessage, domain), e);
 			}
 
 			return stripTrailingSlash(normalizedDomain) + uri;

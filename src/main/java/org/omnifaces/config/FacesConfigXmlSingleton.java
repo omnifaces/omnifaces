@@ -147,10 +147,7 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 
 			String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
 			String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
-
-			if (!resourceBundles.containsKey(var)) {
-				resourceBundles.put(var, baseName);
-			}
+			resourceBundles.computeIfAbsent(var, k -> baseName);
 		}
 
 		return Collections.unmodifiableMap(resourceBundles);

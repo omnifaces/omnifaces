@@ -251,7 +251,7 @@ public class SitemapUrl extends OutputFamily {
 
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("lastmod", this);
-			writer.writeText(lastModified.toString(), "lastModified");
+			writer.writeText(lastModified.toString(), PropertyKeys.lastModified.name());
 			writer.endElement("lastmod");
 		}
 	}
@@ -267,7 +267,7 @@ public class SitemapUrl extends OutputFamily {
 		if (changeFrequency != null) {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("changefreq", this);
-			writer.writeText(changeFrequency, "changeFrequency");
+			writer.writeText(changeFrequency, PropertyKeys.changeFrequency.name());
 			writer.endElement("changefreq");
 		}
 	}
@@ -288,7 +288,7 @@ public class SitemapUrl extends OutputFamily {
 
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("priority", this);
-			writer.writeText(priority, "priority");
+			writer.writeText(priority, PropertyKeys.priority.name());
 			writer.endElement("priority");
 		}
 	}

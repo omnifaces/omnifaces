@@ -173,7 +173,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	/**
 	 * The default constructor sets the default message and sets the renderer type to <code>null</code>.
 	 */
-	public ValidateMultipleFields() {
+	protected ValidateMultipleFields() {
 		defaultMessage = OmniFaces.getMessage(getClass().getAnnotation(FacesComponent.class).value());
 		setRendererType(null);
 	}

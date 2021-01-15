@@ -63,7 +63,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	 * Construct a new {@link HttpServletResponseOutputWrapper} which wraps the given response.
 	 * @param wrappedResponse The wrapped response.
 	 */
-	public HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
+	protected HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
 		super(wrappedResponse);
 	}
 

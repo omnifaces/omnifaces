@@ -60,7 +60,7 @@ public abstract class DynamicResource extends Resource {
 	 * @param libraryName The library name.
 	 * @param contentType The content type.
 	 */
-	public DynamicResource(String resourceName, String libraryName, String contentType) {
+	protected DynamicResource(String resourceName, String libraryName, String contentType) {
 		setResourceName(resourceName);
 		setLibraryName(libraryName);
 		setContentType(contentType);
