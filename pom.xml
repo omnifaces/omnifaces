@@ -585,7 +585,6 @@
 		</profile>
 
 		<!-- Tomcat-MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
-		<!-- Not used for now because MyFaces unexpectedly fails with java.lang.IllegalStateException: No Factories configured for this Application. -->
 		<profile>
 			<id>tomcat-myfaces</id>
 			<dependencies>
