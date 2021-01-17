@@ -1,6 +1,6 @@
 language: java
 jdk:
-   - openjdk15
+   - openjdk11
 cache:
    directories:
       - "$HOME/.m2/repository"
@@ -19,7 +19,6 @@ env:
    - SERVER=wildfly
    - SERVER=tomcat-mojarra
    - SERVER=tomcat-myfaces
-#  - SERVER=piranha
 #  - SERVER=tomee
 #  - SERVER=payara
 #  - SERVER=glassfish
