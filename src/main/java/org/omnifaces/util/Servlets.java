@@ -438,6 +438,17 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns the referrer of the request.
+	 * @param request The involved HTTP servlet request.
+	 * @return The referrer of the request.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.10
+	 */
+	public static String getReferrer(HttpServletRequest request) {
+		return request.getHeader("Referer"); // Yes, typo is set in stone, see https://en.wikipedia.org/wiki/HTTP_referer#Etymology
+	}
+
+	/**
 	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
 	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
 	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.

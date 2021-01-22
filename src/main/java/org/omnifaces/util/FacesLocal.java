@@ -1144,6 +1144,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getReferrer()
+	 */
+	public static String getReferrer(FacesContext context) {
+		return Servlets.getReferrer(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#isRequestSecure()
 	 */
 	public static boolean isRequestSecure(FacesContext context) {
