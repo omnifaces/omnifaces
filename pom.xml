@@ -68,7 +68,7 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>22.0.0.Beta1</test.wildfly.version>
+		<test.wildfly.version>22.0.0.Final</test.wildfly.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
 		<test.weld.version>4.0.0.Final</test.weld.version>
 		<test.hibernateValidator.version>7.0.0.Final</test.hibernateValidator.version>
