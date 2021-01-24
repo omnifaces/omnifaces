@@ -157,8 +157,12 @@ public class ParamProducer {
 	private static String[] getPathParameter(FacesContext context, int pathIndex) {
 		String pathInfo = getRequestPathInfo(context);
 
-		if (pathInfo != null) {
-			String[] pathParts = pathInfo.substring(1).split("/");
+		if (!isEmpty(pathInfo)) {
+			if (pathInfo.charAt(0) == '/') {
+				pathInfo = pathInfo.substring(1);
+			}
+
+			String[] pathParts = pathInfo.split("/");
 
 			if (pathIndex < pathParts.length) {
 				return new String[] { pathParts[pathIndex] };
