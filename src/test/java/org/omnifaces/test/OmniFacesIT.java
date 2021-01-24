@@ -119,7 +119,7 @@ public abstract class OmniFacesIT {
 	}
 
 	protected static boolean isMyFaces() {
-		return isOneOf(System.getProperty("profile.id"), "tomee", "tomcat-myfaces");
+		return isOneOf(System.getProperty("profile.id"), "liberty", "tomee", "tomcat-myfaces");
 	}
 
 	protected static boolean isLiberty() {
