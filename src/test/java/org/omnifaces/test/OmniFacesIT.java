@@ -114,10 +114,6 @@ public abstract class OmniFacesIT {
 		return url.split(";jsessionid=", 2)[0];
 	}
 
-	protected static boolean isWildfly() {
-		return "wildfly".equals(System.getProperty("profile.id"));
-	}
-
 	protected static boolean isMojarra() {
 		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra");
 	}

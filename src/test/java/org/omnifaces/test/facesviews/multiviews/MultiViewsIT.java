@@ -54,19 +54,17 @@ public class MultiViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsIT", "", "", "");
 
-		if (!isWildfly()) { // Unfortunately, WildFly 22 appears to have sort of mapping ordering problem when something's mapped on welcome file. This all is working fine in older WF versions and in other servers. TODO: investigate and fix.
-			open("foo/42");
-			verify200("MultiViewsIT", "foo/42", "foo", "42");
+		open("foo/42");
+		verify200("MultiViewsIT", "foo/42", "foo", "42");
 
-			guardHttp(formSubmit).click();
-			verify200("MultiViewsIT", "foo/42", "foo", "42");
+		guardHttp(formSubmit).click();
+		verify200("MultiViewsIT", "foo/42", "foo", "42");
 
-			open("foo/42/bar/");
-			verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
+		open("foo/42/bar/");
+		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
 
-			guardHttp(formSubmit).click();
-			verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
-		}
+		guardHttp(formSubmit).click();
+		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
 
 		guardHttp(link).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
@@ -104,13 +102,11 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testNonExistingPage() {
-		if (!isWildfly()) { // Unfortunately, WildFly 22 appears to have sort of mapping ordering problem when something's mapped on welcome file. This all is working fine in older WF versions and in other servers. TODO: investigate and fix.
-			open("MultiViewsITNonExistingPage");
-			verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
+		open("MultiViewsITNonExistingPage");
+		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
 
-			open("MultiViewsITNonExistingPage/");
-			verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
-		}
+		open("MultiViewsITNonExistingPage/");
+		verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
 		if (!isMyFaces()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("MultiViewsITNonExistingPage.xhtml");
