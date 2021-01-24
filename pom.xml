@@ -552,12 +552,13 @@
 									<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.basedir}/src/test/resources/tomcat</directory>
+											<directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
 											<includes>
 												<include>tomcat-users.xml</include>
 											</includes>
 										</resource>
 									</resources>
+									<overwrite>true</overwrite>
 								</configuration>
 							</execution>
 						</executions>
@@ -636,6 +637,7 @@
 											</includes>
 										</resource>
 									</resources>
+									<overwrite>true</overwrite>
 								</configuration>
 							</execution>
 						</executions>
