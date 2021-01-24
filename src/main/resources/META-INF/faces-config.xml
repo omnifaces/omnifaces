@@ -29,6 +29,7 @@
 
 	<application>
 		<view-handler>org.omnifaces.viewhandler.OmniViewHandler</view-handler>
+		<resource-handler>org.omnifaces.facesviews.FacesViewsResourceHandler</resource-handler>
 		<resource-handler>org.omnifaces.resourcehandler.GraphicResourceHandler</resource-handler>
 		<resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
 		<resource-handler>org.omnifaces.resourcehandler.PWAResourceHandler</resource-handler>

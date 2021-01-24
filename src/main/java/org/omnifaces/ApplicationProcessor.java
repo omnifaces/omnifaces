@@ -35,7 +35,7 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Check if {@link Application#getResourceHandler()} chain is unique, otherwise log and fail.
- * <li>Register the {@link FacesViews} resource handler and view handler.
+ * <li>Register the {@link FacesViews} view handler.
  * <li>Register the {@link MessagesKeywordResolver}.
  * </ol>
  * <p>
@@ -66,7 +66,7 @@ public class ApplicationProcessor implements SystemEventListener {
 			ServletContext servletContext = getServletContext();
 			Application application = (Application) event.getSource();
 			checkDuplicateResourceHandler();
-			FacesViews.registerResourceHandlerAndViewHander(servletContext, application);
+			FacesViews.registerViewHander(servletContext, application);
 			MessagesKeywordResolver.register(application);
 		}
 		catch (Exception | LinkageError e) {

@@ -255,7 +255,6 @@ public final class FacesViews {
 	 * This is invoked by {@link ApplicationInitializer}.
 	 * @param servletContext The involved servlet context.
 	 */
-	@SuppressWarnings("deprecation")
 	public static void registerForwardingFilter(ServletContext servletContext) {
 		if (!isFacesViewsEnabled(servletContext)) {
 			return;
@@ -337,18 +336,14 @@ public final class FacesViews {
 	}
 
 	/**
-	 * Register {@link FacesViewsResourceHandler} and {@link FacesViewsViewHandler}.
+	 * Register a view handler that transforms a view id with extension back to an extensionless one.
 	 * This is invoked by {@link ApplicationProcessor}, because the {@link Application} has to be available.
 	 * @param servletContext The involved servlet context.
 	 * @param application The involved faces application.
 	 */
-	public static void registerResourceHandlerAndViewHander(ServletContext servletContext, Application application) {
-		if (isFacesViewsEnabled(servletContext)) {
-			application.setResourceHandler(new FacesViewsResourceHandler(application.getResourceHandler()));
-
-			if (!isEmpty(getEncounteredExtensions(servletContext))) {
-				application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
-			}
+	public static void registerViewHander(ServletContext servletContext, Application application) {
+		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
+			application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 		}
 	}
 
