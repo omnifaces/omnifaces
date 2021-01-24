@@ -344,9 +344,9 @@ public class GraphicImage extends HtmlGraphicImage {
 	/**
 	 * Sets whether or not to render image in data URI format.
 	 * @param dataURI Whether or not to render image in data URI format.
-	 * @since 3.10
+	 * @since 3.10.1
 	 */
-	public void setDataURI(String dataURI) {
+	public void setDataURI(boolean dataURI) {
 		state.put(PropertyKeys.dataURI, dataURI);
 	}
 
