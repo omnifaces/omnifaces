@@ -69,6 +69,7 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>22.0.0.Final</test.wildfly.version>
+		<test.liberty.version>21.0.0.2-beta</test.liberty.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
 		<test.weld.version>4.0.0.Final</test.weld.version>
 		<test.hibernateValidator.version>7.0.0.Final</test.hibernateValidator.version>
@@ -499,6 +500,84 @@
 							<systemPropertyVariables>
 								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- OpenLiberty integration test profile: mvn verify -P liberty -->
+		<profile>
+			<id>liberty</id>
+			<dependencies>
+				<dependency>
+					<groupId>io.openliberty.arquillian</groupId>
+					<artifactId>arquillian-liberty-managed-jakarta</artifactId>
+					<version>2.0.0-M1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>io.openliberty.beta</groupId>
+											<artifactId>openliberty-jakartaee9</artifactId>
+											<version>${test.liberty.version}</version>
+											<type>zip</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.openliberty.arquillian</groupId>
+											<artifactId>arquillian-liberty-support-jakarta</artifactId>
+											<version>2.0.0-M1</version>
+											<type>zip</type>
+											<classifier>feature</classifier>
+											<outputDirectory>${project.build.directory}/wlp/usr</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>update-liberty-server</id> <!-- Liberty apparently requires a bit more specific server.xml in order for its own Arquillian plugin to be able to manage it. -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/wlp/usr/servers/defaultServer</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/test/resources/arquillian/liberty</directory>
+											<includes>
+												<include>server.xml</include>
+											</includes>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<arquillian.launch>liberty</arquillian.launch>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>

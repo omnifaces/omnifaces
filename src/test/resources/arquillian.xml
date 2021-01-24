@@ -22,6 +22,12 @@
 		<property name="browser">htmlUnit</property>
 	</extension>
 
+	<container qualifier="liberty">
+		<configuration>
+			<property name="wlpHome">target/wlp</property>
+		</configuration>
+	</container>
+
 	<container qualifier="tomcat">
 		<configuration>
 			<property name="user">arquillian</property>
