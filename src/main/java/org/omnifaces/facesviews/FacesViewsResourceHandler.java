@@ -13,16 +13,17 @@
 package org.omnifaces.facesviews;
 
 import static org.omnifaces.facesviews.FacesViews.getMappedPath;
+import static org.omnifaces.facesviews.FacesViews.isFacesViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
-import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ResourceHandlerWrapper;
 import jakarta.faces.application.ViewResource;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.ApplicationProcessor;
+import org.omnifaces.util.Servlets;
 
 /**
  * Facelets resource handler that resolves mapped resources (views) to the folders from which
@@ -32,9 +33,10 @@ import org.omnifaces.ApplicationProcessor;
  *
  * @author Arjan Tijms
  * @see FacesViews
- * @see ApplicationProcessor
  */
 public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
+
+	private final boolean facesViewsEnabled;
 
 	/**
 	 * Construct faces views resource handler.
@@ -42,16 +44,21 @@ public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 	 */
 	public FacesViewsResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
+		facesViewsEnabled = isFacesViewsEnabled(Servlets.getContext());
 	}
 
 	@Override
 	public ViewResource createViewResource(FacesContext context, String path) {
+		if (!facesViewsEnabled) {
+			return super.createViewResource(context, path);
+		}
+
 		ViewResource resource = super.createViewResource(context, getMappedPath(path));
 
 		if (resource == null && isDevelopment()) {
 			// If resource is null it means it wasn't found.
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
-			scanAndStoreViews(getServletContext(), false);
+			scanAndStoreViews(getServletContext(context), false);
 			resource = super.createViewResource(context, getMappedPath(path));
 		}
 
