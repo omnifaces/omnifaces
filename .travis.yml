@@ -17,6 +17,7 @@ branches:
 # Do integration test on configured servers.
 env:
    - SERVER=wildfly
+   - SERVER=liberty
    - SERVER=tomcat-mojarra
    - SERVER=tomcat-myfaces
 #  - SERVER=tomee
