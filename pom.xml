@@ -69,9 +69,9 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>20.0.1.Final</test.wildfly.version>
-		<test.tomee.version>8.0.4</test.tomee.version>
-		<test.payara.version>5.2020.4</test.payara.version>
+		<test.wildfly.version>22.0.0.Final</test.wildfly.version>
+		<test.tomee.version>8.0.5</test.tomee.version>
+		<test.payara.version>5.2020.7</test.payara.version>
 	</properties>
 
 	<dependencies>
