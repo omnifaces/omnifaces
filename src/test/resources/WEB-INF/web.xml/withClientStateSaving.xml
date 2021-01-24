@@ -23,6 +23,11 @@
 		<param-name>jakarta.faces.STATE_SAVING_METHOD</param-name>
 		<param-value>client</param-value>
 	</context-param>
+	
+	<context-param>
+		<param-name>org.apache.myfaces.ALWAYS_FORCE_SESSION_CREATION</param-name> <!-- Otherwise ViewScopedViewStateIT fails in OpenLiberty -->
+		<param-value>false</param-value>
+	</context-param>
 
 	<servlet>
 		<servlet-name>facesServlet</servlet-name>
