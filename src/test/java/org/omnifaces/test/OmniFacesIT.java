@@ -122,6 +122,10 @@ public abstract class OmniFacesIT {
 		return isOneOf(System.getProperty("profile.id"), "tomee", "tomcat-myfaces");
 	}
 
+	protected static boolean isLiberty() {
+		return isOneOf(System.getProperty("profile.id"), "liberty");
+	}
+
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
 		return buildWebArchive(testClass).createDeployment();
 	}
