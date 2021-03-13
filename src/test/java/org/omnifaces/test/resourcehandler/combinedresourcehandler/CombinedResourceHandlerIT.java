@@ -31,11 +31,19 @@ import org.openqa.selenium.support.FindBy;
 
 public class CombinedResourceHandlerIT extends OmniFacesIT {
 
-	private static final String HEAD_COMBINED_RESOURCE_NAME = serializeURLSafe("omnifaces:omnifaces.js|javax.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
-	private static final String DEFERRED_COMBINED_RESOURCE_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
+	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|javax.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
+	private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
+	private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
+	private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
 
-	@FindBy(css="script[crossorigin=anonymous]")
-	private List<WebElement> combinedResources;
+	@FindBy(css="script[src*='ln=omnifaces.combined']")
+	private List<WebElement> combinedScripts;
+
+	@FindBy(css="link[rel=stylesheet][href*='ln=omnifaces.combined']")
+	private WebElement combinedStylesheet;
+
+	@FindBy(css="link[rel=stylesheet][href*='print.css']")
+	private WebElement printStylesheet;
 
 	@FindBy(id="bodyWithTargetBody")
 	private WebElement bodyWithTargetBody;
@@ -119,9 +127,11 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	private void verifyElements() {
 		waitGui(browser).withTimeout(3, SECONDS).until().element(deferredInBody).text().not().equalTo(""); // Wait until last o:deferredScript is finished.
 
-		assertEquals(2, combinedResources.size());
-		assertEquals(HEAD_COMBINED_RESOURCE_NAME, combinedResources.get(0).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-		assertEquals(DEFERRED_COMBINED_RESOURCE_NAME, combinedResources.get(1).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+		assertEquals(2, combinedScripts.size());
+		assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+		assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, combinedScripts.get(1).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+		assertEquals(HEAD_COMBINED_STYLESHEET_NAME, combinedStylesheet.getAttribute("href").split("(.*/javax.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+		assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheet.getAttribute("href").split("(.*/javax.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
 		assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
 		assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
 		assertEquals("3,headWithTarget", headWithTarget.getText());
