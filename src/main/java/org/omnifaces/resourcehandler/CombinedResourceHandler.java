@@ -99,6 +99,9 @@ import org.omnifaces.util.cache.Cache;
  * The generated combined resource URL also includes the "<code>v</code>" request parameter which is the last modified
  * time of the newest individual resource in minutes, so that the browser will always be forced to request the latest
  * version whenever one of the individual resources has changed.
+ * <p>
+ * Since 3.11, <code>&lt;h:outputStylesheet media="print"&gt;</code> will be explicitly excluded from the combined
+ * resource.
  *
  * <h3>Caching</h3>
  * <p>
@@ -509,6 +512,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
+			if ("print".equals(component.getAttributes().get("media"))) {
+				return;
+			}
+
 			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
 
 			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) {
