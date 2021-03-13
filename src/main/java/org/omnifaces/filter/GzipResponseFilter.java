@@ -95,7 +95,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  *     &lt;param-name&gt;mimetypes&lt;/param-name&gt;
  *     &lt;param-value&gt;
  *         text/plain, text/html, text/xml, text/css, text/javascript, text/csv, text/rtf,
- *         application/xml, application/xhtml+xml, application/javascript, application/json,
+ *         application/xml, application/xhtml+xml, application/javascript, application/x-javascript, application/json,
  *         image/svg+xml
  *     &lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -110,6 +110,8 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * exactly that value which appears in the <code>Content-Type</code> header of the response. The in the above example
  * mentioned mime types are already the default values. Note that GZIP does not have any benefit when applied on
  * binary mimetypes like images, office documents, PDF files, etcetera. So setting it for them is not recommended.
+ * <p>
+ * Since 3.11, <code>application/x-javascript</code> has been added to default <code>mimetypes</code>.
  *
  * @author Bauke Scholtz
  * @since 1.1
@@ -130,7 +132,7 @@ public class GzipResponseFilter extends HttpFilter {
 	private static final int DEFAULT_THRESHOLD = 150;
 	private static final Set<String> DEFAULT_MIMETYPES = unmodifiableSet(
 		"text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
-		"application/xml", "application/xhtml+xml", "application/javascript", "application/json",
+		"application/xml", "application/xhtml+xml", "application/javascript", "application/x-javascript", "application/json",
 		"image/svg+xml"
 	);
 
