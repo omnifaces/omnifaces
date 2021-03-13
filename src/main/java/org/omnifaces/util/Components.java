@@ -411,6 +411,18 @@ public final class Components {
 		return parentType.cast(parent);
 	}
 
+	/**
+	 * Finds from the given component the closest parent of the given parent type.
+	 * @param <C> The generic component type.
+	 * @param component The component to find the closest parent of the given parent type for.
+	 * @param parentType The parent type.
+	 * @return From the given component the closest parent of the given parent type.
+	 * @since 3.11
+	 */
+	public static <C extends UIComponent> Optional<C> findClosestParent(UIComponent component, Class<C> parentType) {
+		return Optional.ofNullable(getClosestParent(component, parentType));
+	}
+
 	// Iteration / Visiting -------------------------------------------------------------------------------------------
 
 	/**
