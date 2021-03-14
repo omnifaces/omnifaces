@@ -68,14 +68,14 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>22.0.0.Final</test.wildfly.version>
-		<test.liberty.version>21.0.0.2-beta</test.liberty.version>
-		<test.tomcat.version>10.0.0</test.tomcat.version>
+		<test.wildfly.version>23.0.0.Final</test.wildfly.version>
+		<test.liberty.version>21.0.0.3-beta</test.liberty.version>
+		<test.tomcat.version>10.0.4</test.tomcat.version>
 		<test.weld.version>4.0.0.Final</test.weld.version>
-		<test.hibernateValidator.version>7.0.0.Final</test.hibernateValidator.version>
+		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version>
 		<test.jsonp.version>2.0.0</test.jsonp.version>
 		<test.mojarra.version>3.0.0</test.mojarra.version>
-		<test.myfaces.version>3.0.0-RC1</test.myfaces.version>
+		<test.myfaces.version>3.0.0</test.myfaces.version>
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 		<test.glassfish.version>6.0.0</test.glassfish.version> <!-- TODO: Java11 compatible version. -->
