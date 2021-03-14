@@ -70,6 +70,7 @@
 		<!-- Test server versions. -->
 		<test.wildfly.version>23.0.0.Final</test.wildfly.version>
 		<test.liberty.version>21.0.0.3-beta</test.liberty.version>
+		<test.glassfish.version>6.1.0-M1</test.glassfish.version>
 		<test.tomcat.version>10.0.4</test.tomcat.version>
 		<test.weld.version>4.0.0.Final</test.weld.version>
 		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version>
@@ -78,7 +79,6 @@
 		<test.myfaces.version>3.0.0</test.myfaces.version>
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
-		<test.glassfish.version>6.0.0</test.glassfish.version> <!-- TODO: Java11 compatible version. -->
 	</properties>
 
 	<repositories>
@@ -585,6 +585,50 @@
 			</build>
 		</profile>
 
+		<!-- GlassFish integration test profile: mvn verify -P glassfish -->
+		<profile>
+			<id>glassfish</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-managed-6</artifactId>
+					<version>1.0.0.Alpha1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish.main.distributions</groupId>
+											<artifactId>glassfish</artifactId>
+											<version>${test.glassfish.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<environmentVariables>
+								<GLASSFISH_HOME>${project.build.directory}/glassfish6</GLASSFISH_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- Tomcat-Mojarra integration test profile: mvn verify -P tomcat-mojarra -->
 		<profile>
 			<id>tomcat-mojarra</id>
@@ -826,50 +870,6 @@
 						<configuration>
 							<environmentVariables>
 								<GLASSFISH_HOME>${project.build.directory}/payara5</GLASSFISH_HOME>
-							</environmentVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- GlassFish integration test profile: mvn verify -P glassfish -->
-		<profile>
-			<id>glassfish</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.jboss.arquillian.container</groupId>
-					<artifactId>arquillian-glassfish-managed-6</artifactId>
-					<version>1.0.0.Alpha1</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.glassfish.main.distributions</groupId>
-											<artifactId>glassfish</artifactId>
-											<version>${test.glassfish.version}</version>
-											<type>zip</type>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<configuration>
-							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/glassfish6</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>

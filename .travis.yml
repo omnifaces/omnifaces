@@ -18,11 +18,11 @@ branches:
 env:
    - SERVER=wildfly
    - SERVER=liberty
+   - SERVER=glassfish
    - SERVER=tomcat-mojarra
    - SERVER=tomcat-myfaces
 #  - SERVER=tomee
 #  - SERVER=payara
-#  - SERVER=glassfish
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
 
 # Do snapshot deployment.
