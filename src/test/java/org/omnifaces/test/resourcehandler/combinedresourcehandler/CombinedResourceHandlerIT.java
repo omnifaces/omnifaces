@@ -40,10 +40,10 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	private List<WebElement> combinedScripts;
 
 	@FindBy(css="link[rel=stylesheet][href*='ln=omnifaces.combined']")
-	private WebElement combinedStylesheet;
+	private List<WebElement> combinedStylesheets;
 
 	@FindBy(css="link[rel=stylesheet][href*='print.css']")
-	private WebElement printStylesheet;
+	private List<WebElement> printStylesheets;
 
 	@FindBy(id="bodyWithTargetBody")
 	private WebElement bodyWithTargetBody;
@@ -130,8 +130,11 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 		assertEquals(2, combinedScripts.size());
 		assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
 		assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, combinedScripts.get(1).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-		assertEquals(HEAD_COMBINED_STYLESHEET_NAME, combinedStylesheet.getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
-		assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheet.getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+		assertEquals(1, combinedStylesheets.size());
+		assertEquals(HEAD_COMBINED_STYLESHEET_NAME, combinedStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+		assertEquals(1, printStylesheets.size());
+		assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+
 		assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
 		assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
 		assertEquals("3,headWithTarget", headWithTarget.getText());

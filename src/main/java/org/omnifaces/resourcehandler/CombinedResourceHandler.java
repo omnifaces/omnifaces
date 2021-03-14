@@ -512,7 +512,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if ("print".equals(component.getAttributes().get("media"))) {
+			if (component != null && "print".equals(component.getAttributes().get("media"))) {
 				return;
 			}
 
