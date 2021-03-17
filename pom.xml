@@ -75,6 +75,7 @@
 		<test.weld.version>4.0.0.Final</test.weld.version>
 		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version>
 		<test.jsonp.version>2.0.0</test.jsonp.version>
+		<test.jstl.version>2.0.0</test.jstl.version>
 		<test.mojarra.version>3.0.0</test.mojarra.version>
 		<test.myfaces.version>3.0.0</test.myfaces.version>
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
@@ -696,7 +697,8 @@
 									org.glassfish:jakarta.faces:${test.mojarra.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
-									org.glassfish:jakarta.json:${test.jsonp.version}
+									org.glassfish:jakarta.json:${test.jsonp.version},
+									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
@@ -772,11 +774,11 @@
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
-									org.apache.myfaces.core:myfaces-api:${test.myfaces.version},
 									org.apache.myfaces.core:myfaces-impl:${test.myfaces.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
-									org.glassfish:jakarta.json:${test.jsonp.version}
+									org.glassfish:jakarta.json:${test.jsonp.version},
+									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
