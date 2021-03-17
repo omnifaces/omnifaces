@@ -54,6 +54,9 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsIT.xhtml");
 		verify200("FacesViewsIT", "");
 
+		open("FacesViewsIT.jsf");
+		verify200("FacesViewsIT", "");
+
 		guardHttp(formSubmit).click();
 		verify200("FacesViewsIT", "");
 
@@ -70,6 +73,12 @@ public class FacesViewsIT extends OmniFacesIT {
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
 		open("FacesViewsITOtherPage.xhtml");
+		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+
+		guardHttp(formSubmit).click();
+		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+
+		open("FacesViewsITOtherPage.jsf");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
 		guardHttp(formSubmit).click();
@@ -93,6 +102,12 @@ public class FacesViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
+		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.jsf");
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
+		guardHttp(formSubmit).click();
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
 		verify404("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
 	}
@@ -109,12 +124,18 @@ public class FacesViewsIT extends OmniFacesIT {
 			open("FacesViewsITNonExistingPage.xhtml");
 			verify404("FacesViewsITNonExistingPage.xhtml");
 		}
+
+		open("FacesViewsITNonExistingPage.jsf");
+		verify404("FacesViewsITNonExistingPage.jsf");
 	}
 
 	@Test
 	public void testExcludedFolder() {
 		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
 		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
+		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
 
 		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
 		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder");

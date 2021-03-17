@@ -584,6 +584,14 @@ public final class FacesViews {
 			}
 
 			collectedViews.put(extensionlessResource, resourcePath);
+
+			// If FacesServlet is explicitly mapped on virtual extensions (e.g. when FacesViews is later enabled on a legacy app with *.jsf),
+			// then we need to collect them as well so that these can properly be 301-redirected to extensionless one.
+			for (String facesServletExtension : getFacesServletExtensions(servletContext)) {
+				if (!resourcePath.endsWith(facesServletExtension)) {
+					collectedViews.put(extensionlessResource + facesServletExtension, resourcePath);
+				}
+			}
 		}
 
 		// Optionally, collect all unique extensions that we have encountered.
