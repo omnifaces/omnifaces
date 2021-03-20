@@ -148,7 +148,12 @@ public final class BeansLocal {
 			return object;
 		}
 
-		return (T) getInstance(beanManager, object.getClass().getSuperclass());
+		if (object instanceof Class) {
+			return (T) ((Class<?>) object).getSuperclass();
+		}
+		else {
+			return (T) getInstance(beanManager, object.getClass().getSuperclass());
+		}
 	}
 
 	/**
