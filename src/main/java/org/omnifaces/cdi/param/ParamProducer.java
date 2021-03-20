@@ -106,10 +106,11 @@ public class ParamProducer {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		String[] submittedValues = param.pathIndex() > -1 ? getPathParameter(context, param.pathIndex()) : getSubmittedValues(context, name);
+		Class<?> sourceType = getSourceType(type);
 		Class<V> targetType = getTargetType(type);
-		ParamValue<V> paramValue = new ParamValue<>(param, name, label, type, submittedValues, targetType);
+		ParamValue<V> paramValue = new ParamValue<>(param, name, label, sourceType, submittedValues, targetType);
 		Object[] convertedValues = getConvertedValues(context, paramValue);
-		V value = coerceValues(type, convertedValues);
+		V value = coerceValues(sourceType, convertedValues);
 		paramValue.setValue(validateValues(context, paramValue, convertedValues, value, injectionPoint) ? value : null);
 
 		return paramValue;
@@ -296,27 +297,18 @@ public class ParamProducer {
 		}
 	}
 
-	static <V> V coerceValues(Type type, Object... values) {
-		if (type instanceof ParameterizedType) {
-			return coerceValues(((ParameterizedType) type).getRawType(), values);
-		}
-
-		if (!(type instanceof Class)) {
-			return null;
-		}
-
-		Class<?> cls = (Class<?>) type;
+	static <V> V coerceValues(Class<?> sourceType, Object... values) {
 		Object coercedValue = null;
 
 		if (values != null) {
-			if (cls.isArray()) {
-				coercedValue = Array.newInstance(cls.getComponentType(), values.length);
+			if (sourceType.isArray()) {
+				coercedValue = Array.newInstance(sourceType.getComponentType(), values.length);
 
 				for (int i = 0; i < values.length; i++) {
-					Array.set(coercedValue, i, coerceValues(cls.getComponentType(), values[i]));
+					Array.set(coercedValue, i, coerceValues(sourceType.getComponentType(), values[i]));
 				}
 			}
-			else if (List.class.isAssignableFrom(cls)) {
+			else if (List.class.isAssignableFrom(sourceType)) {
 				coercedValue = asList(values);
 			}
 			else {
@@ -325,7 +317,7 @@ public class ParamProducer {
 		}
 
 		if (coercedValue == null) {
-			coercedValue = getDefaultValue(cls);
+			coercedValue = getDefaultValue(sourceType);
 		}
 
 		return (V) coercedValue;
@@ -400,6 +392,15 @@ public class ParamProducer {
 		}
 
 		return valid;
+	}
+
+	static Class<?> getSourceType(Type type) {
+		if (type instanceof ParameterizedType) {
+			return (Class<?>) ((ParameterizedType) type).getRawType();
+		}
+		else {
+			return (Class<?>) type;
+		}
 	}
 
 	static <V> Class<V> getTargetType(Type type) {
