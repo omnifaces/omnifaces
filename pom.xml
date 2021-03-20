@@ -68,18 +68,20 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>23.0.0.Final</test.wildfly.version>
-		<test.liberty.version>21.0.0.3-beta</test.liberty.version>
-		<test.glassfish.version>6.1.0-M1</test.glassfish.version>
-		<test.tomcat.version>10.0.4</test.tomcat.version>
-		<test.weld.version>4.0.0.Final</test.weld.version>
-		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version>
-		<test.jsonp.version>2.0.0</test.jsonp.version>
-		<test.jstl.version>2.0.0</test.jstl.version>
-		<test.mojarra.version>3.0.0</test.mojarra.version>
-		<test.myfaces.version>3.0.0</test.myfaces.version>
-		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
+		<test.wildfly.version>23.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.liberty.version>21.0.0.4-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
+		<test.glassfish.version>6.1.0-M1</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.tomcat.version>10.0.4</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee.jakarta/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
+
+		<!-- Test impl versions for servletcontainers (Tomcat). -->
+		<test.mojarra.version>3.0.0</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces.version>3.0.0</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld.version>4.0.0.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate/hibernate-validator -->
+		<test.jsonp.version>2.0.0</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
+		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 	</properties>
 
 	<repositories>
