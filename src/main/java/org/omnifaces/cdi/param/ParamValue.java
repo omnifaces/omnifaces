@@ -14,6 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static org.omnifaces.cdi.param.ParamProducer.coerceValues;
 import static org.omnifaces.cdi.param.ParamProducer.getConvertedValues;
+import static org.omnifaces.cdi.param.ParamProducer.getSourceType;
 import static org.omnifaces.cdi.param.ParamProducer.getTargetType;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -40,7 +41,7 @@ public class ParamValue<V> implements Serializable {
 	final Param param;
 	final String name;
 	final String label;
-	final Type type;
+	final Class<?> sourceType;
 	final String[] submittedValues;
 	final Class<V> targetType;
 
@@ -55,18 +56,18 @@ public class ParamValue<V> implements Serializable {
 	 */
 	@Deprecated
 	public ParamValue(String[] submittedValues, Param param, Type type, V value) {
-		this(param, param.name(), param.name(), type, submittedValues, getTargetType(type));
+		this(param, param.name(), param.name(), getSourceType(type), submittedValues, getTargetType(type));
 		setValue(value);
 	}
 
 	/**
 	 * Internal only. This is exclusively used by {@link ParamProducer} for injection.
 	 */
-	ParamValue(Param param, String name, String label, Type type, String[] submittedValues, Class<V> targetType) {
+	ParamValue(Param param, String name, String label, Class<?> sourceType, String[] submittedValues, Class<V> targetType) {
 		this.param = param;
 		this.name = name;
 		this.label = label;
-		this.type = type;
+		this.sourceType = sourceType;
 		this.submittedValues = submittedValues;
 		this.targetType = targetType;
 	}
@@ -110,7 +111,7 @@ public class ParamValue<V> implements Serializable {
 			}
 			else {
 				// The original value was NOT serializable so we need to generate it from the raw submitted value again.
-				setValue((V) coerceValues(type, getConvertedValues(getContext(), this)));
+				setValue((V) coerceValues(sourceType, getConvertedValues(getContext(), this)));
 			}
 		}
 
