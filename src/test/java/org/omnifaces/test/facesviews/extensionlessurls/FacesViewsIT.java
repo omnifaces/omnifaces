@@ -120,7 +120,7 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
-		if (!isMyFaces()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
+		if (!isMyFacesUsed()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("FacesViewsITNonExistingPage.xhtml");
 			verify404("FacesViewsITNonExistingPage.xhtml");
 		}

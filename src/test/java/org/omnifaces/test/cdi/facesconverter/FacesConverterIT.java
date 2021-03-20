@@ -64,7 +64,7 @@ public class FacesConverterIT extends OmniFacesIT {
 		assertEquals("ResourceDependency is injected in facesConverterITConverter", "facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText());
 		assertTrue("EJB is injected in facesConverterITManagedConverter", facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
 
-		if (!isMojarra()) { // Mojarra bugs on this.
+		if (!isMojarraUsed()) { // Mojarra bugs on this.
 			assertEquals("ResourceDependency is injected in facesConverterITManagedConverter", "facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText());
 		}
 
@@ -72,7 +72,7 @@ public class FacesConverterIT extends OmniFacesIT {
 		assertEquals("ResourceDependency is injected in facesConverterITExtendedConverter", "facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText());
 		assertTrue("EJB is injected in facesConverterITExtendedManagedConverter", facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
 
-		if (!isMojarra()) { // Mojarra bugs on this.
+		if (!isMojarraUsed()) { // Mojarra bugs on this.
 			assertEquals("ResourceDependency is injected in facesConverterITExtendedManagedConverter", "facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText());
 		}
 
@@ -83,7 +83,7 @@ public class FacesConverterIT extends OmniFacesIT {
 		assertEquals("ResourceDependency is still injected in facesConverterITConverter after page refresh", "facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText());
 		assertTrue("EJB is still injected in facesConverterITManagedConverter after page refresh", facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
 
-		if (!isMojarra()) { // Mojarra bugs on this.
+		if (!isMojarraUsed()) { // Mojarra bugs on this.
 			assertEquals("ResourceDependency is still injected in facesConverterITManagedConverter after page refresh", "facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText());
 		}
 
@@ -91,7 +91,7 @@ public class FacesConverterIT extends OmniFacesIT {
 		assertEquals("ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh", "facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText());
 		assertTrue("EJB is still injected in facesConverterITExtendedManagedConverter after page refresh", facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
 
-		if (!isMojarra()) { // Mojarra bugs on this.
+		if (!isMojarraUsed()) { // Mojarra bugs on this.
 			assertEquals("ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh", "facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText());
 		}
 	}

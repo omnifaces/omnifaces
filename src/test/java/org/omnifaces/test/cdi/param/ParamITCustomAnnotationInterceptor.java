@@ -12,10 +12,10 @@
  */
 package org.omnifaces.test.cdi.param;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Priority;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Priority;
+import jakarta.interceptor.Interceptor;
+import jakarta.interceptor.InvocationContext;
 
 @ParamITCustomAnnotation
 @Interceptor

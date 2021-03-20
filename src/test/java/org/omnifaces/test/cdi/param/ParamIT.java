@@ -112,7 +112,7 @@ public class ParamIT extends OmniFacesIT {
 
 	@Test
 	public void testStringParamOnBeanWithCustomAnnotation() {
-		if (isTomee()) {
+		if (isBValUsed()) {
 			return; // BVal doesn't support this. You really have to add @Inject to @Param.
 		}
 

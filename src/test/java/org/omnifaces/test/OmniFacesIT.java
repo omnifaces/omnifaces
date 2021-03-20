@@ -114,12 +114,16 @@ public abstract class OmniFacesIT {
 		return url.split(";jsessionid=", 2)[0];
 	}
 
-	protected static boolean isMojarra() {
+	protected static boolean isMojarraUsed() {
 		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra");
 	}
 
-	protected static boolean isMyFaces() {
+	protected static boolean isMyFacesUsed() {
 		return isOneOf(System.getProperty("profile.id"), "liberty", "tomee", "tomcat-myfaces");
+	}
+
+	protected static boolean isBValUsed() {
+		return isOneOf(System.getProperty("profile.id"), "tomee");
 	}
 
 	protected static boolean isLiberty() {

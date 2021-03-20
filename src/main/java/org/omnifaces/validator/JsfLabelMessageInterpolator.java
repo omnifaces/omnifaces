@@ -46,9 +46,10 @@ import jakarta.validation.MessageInterpolator;
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;validation-config
- *     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+ *     xmlns="https://jakarta.ee/xml/ns/validation/configuration"
  *     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- *     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd"
+ *     xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
+ *     version="3.0"
  * &gt;
  *     &lt;message-interpolator&gt;org.omnifaces.validator.JsfLabelMessageInterpolator&lt;/message-interpolator&gt;
  * &lt;/validation-config&gt;

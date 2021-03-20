@@ -14,10 +14,10 @@ package org.omnifaces.test.cdi.param;
 
 import static org.omnifaces.util.Faces.isValidationFailed;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-import javax.validation.constraints.Size;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.Size;
 
 import org.omnifaces.cdi.Param;
 
