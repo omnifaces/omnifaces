@@ -109,6 +109,27 @@ public class ParamIT extends OmniFacesIT {
 		assertEquals("requiredStringParam: Validation Error: Value is required.", messages.getText());
 	}
 
+
+	@Test
+	public void testStringParamOnBeanWithCustomAnnotation() {
+		if (isTomee()) {
+			return; // BVal doesn't support this. You really have to add @Inject to @Param.
+		}
+
+		open("ParamITCustomAnnotation.xhtml?stringParam=foo");
+		assertEquals("foo", stringParam.getText());
+		assertEquals("initSuccess", initResult.getText());
+		assertEquals("", messages.getText());
+	}
+
+	@Test
+	public void testInvalidStringParamOnBeanWithCustomAnnotation() {
+		open("ParamITCustomAnnotation.xhtml?stringParam=f");
+		assertEquals("", stringParam.getText());
+		assertEquals("initValidationFailed", initResult.getText());
+		assertEquals("size must be between 2 and 2147483647", messages.getText());
+	}
+
 	@Test
 	public void testStringParamArray() {
 		openWithQueryString("stringParamArray=foo&stringParamArray=bar");

@@ -135,8 +135,10 @@ public class ParamExtension implements Extension {
 
 		@Override
 		public void inject(T instance, CreationalContext<T> ctx) {
+			Class<?> beanClass = Beans.unwrapIfNecessary(instance.getClass());
+
 			for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
-				ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(instance.getClass(), paramWithoutInject));
+				ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(beanClass, paramWithoutInject));
 				Field field = paramWithoutInject.getJavaMember();
 				modifyField(instance, field, paramValue.getValue());
 			}
