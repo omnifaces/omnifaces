@@ -72,6 +72,7 @@
 		<test.liberty.version>21.0.0.4-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
 		<test.glassfish.version>6.1.0-M1</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.0.4</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+        <test.piranha.version>21.4.0-SNAPSHOT</test.piranha.version> <!-- TODO: Build snapshot locally, not all tests pass yet, uses JDK 16 to run tests-->
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee.jakarta/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 
@@ -791,6 +792,49 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <!-- Piranha integration test profile: mvn verify -P piranha -->
+        <!-- 
+                Note1: Piranha must be run using JDK 16, so the entire test suite should be run with JDK 16.
+                There's no need to compile OmniFaces with JDK 16. JDK 11 is fine for that.
+                
+                Note2: Piranha is still in development, and at the moment not everything is implemented. 
+                The following is the current status as-of Piranha 21.4:
+                
+                Tests run: 93, Failures: 6, Errors: 7, Skipped: 0
+         -->
+        <profile>
+            <id>piranha</id>
+            <dependencies>
+                <dependency>
+                    <groupId>cloud.piranha.arquillian</groupId>
+                    <artifactId>piranha-arquillian-server</artifactId>
+                    <version>${test.piranha.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                            <systemPropertyVariables>
+                                <javaEEServer>piranha-embedded</javaEEServer>
+                                <piranha.rootIsWarName>true</piranha.rootIsWarName>
+                                <war.libraries>
+                                    org.glassfish:jakarta.faces:${test.mojarra.version},
+                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+                                    org.glassfish:jakarta.json:${test.jsonp.version},
+                                    org.glassfish.tyrus:tyrus-core:2.0.0
+                                </war.libraries>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<!-- TomEE integration test profile: mvn verify -P tomee -->
 		<profile>
