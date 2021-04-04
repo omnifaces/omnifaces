@@ -48,7 +48,8 @@
 		<o:form id="uploadSingleMaxsizeClient" enctype="multipart/form-data">
 			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
 				maxsize="10" maxsizeMessage="{0}: {1} larger than {2}" />
-			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+			<h:message id="message" for="@previous" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingleAndAddLocalMessage}" />
 		</o:form>
 
 		<o:form id="uploadSingleMaxsizeServer" enctype="multipart/form-data">

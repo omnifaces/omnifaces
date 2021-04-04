@@ -55,6 +55,9 @@ public class InputFileIT extends OmniFacesIT {
 	@FindBy(id="uploadSingleMaxsizeClient:file")
 	private WebElement uploadSingleMaxsizeClientFile;
 
+	@FindBy(id="uploadSingleMaxsizeClient:message")
+	private WebElement uploadSingleMaxsizeClientMessage;
+
 	@FindBy(id="uploadSingleMaxsizeClient:submit")
 	private WebElement uploadSingleMaxsizeClientSubmit;
 
@@ -130,16 +133,16 @@ public class InputFileIT extends OmniFacesIT {
 	public void uploadSingleMaxsizeClient() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeClientFile.sendKeys(txtFile.getAbsolutePath());
-		triggerOnchange(uploadSingleMaxsizeClientFile, messages);
+		triggerOnchange(uploadSingleMaxsizeClientFile, uploadSingleMaxsizeClientMessage);
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
-		String message = messages.getText();
+		String message = uploadSingleMaxsizeClientMessage.getText();
 		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10.0 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name.
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeClientFile.sendKeys(gifFile.getAbsolutePath());
 		guardHttp(uploadSingleMaxsizeClientSubmit).click();
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
-		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), uploadSingleMaxsizeClientMessage.getText());
 	}
 
 	@Test

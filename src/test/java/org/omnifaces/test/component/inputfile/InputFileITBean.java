@@ -13,6 +13,7 @@
 package org.omnifaces.test.component.inputfile;
 
 import static org.omnifaces.util.Messages.addGlobalInfo;
+import static org.omnifaces.util.Messages.addInfo;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public class InputFileITBean {
 
 	public void uploadSingle() {
 		addGlobalInfo("uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
+	}
+
+	public void uploadSingleAndAddLocalMessage() {
+		addInfo("uploadSingleMaxsizeClient:file", "uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
 	}
 
 	public void uploadMultiple() {
