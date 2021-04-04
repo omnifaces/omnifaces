@@ -23,6 +23,9 @@ import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static javax.faces.component.search.SearchExpressionContext.createSearchExpressionContext;
+import static javax.faces.component.search.SearchExpressionHint.IGNORE_NO_RESULT;
+import static javax.faces.component.search.SearchExpressionHint.RESOLVE_SINGLE_COMPONENT;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
@@ -86,6 +89,8 @@ import javax.faces.component.behavior.BehaviorBase;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.component.html.HtmlBody;
+import javax.faces.component.search.SearchExpressionContext;
+import javax.faces.component.search.SearchExpressionHint;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
@@ -186,6 +191,8 @@ public final class Components {
 		"Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
 	private static final String ERROR_CHILDREN_DISALLOWED =
 		"Component '%s' may not have any children. Encountered children of types '%s'.";
+
+	private static final Set<SearchExpressionHint> RESOLVE_LABEL_FOR = EnumSet.of(RESOLVE_SINGLE_COMPONENT, IGNORE_NO_RESULT);
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -1273,7 +1280,10 @@ public final class Components {
 			String forValue = messageComponent.getFor();
 
 			if (!isEmpty(forValue)) {
-				UIComponent forComponent = findComponentRelatively(messageComponent, forValue);
+				FacesContext facesContext = context.getFacesContext();
+				SearchExpressionContext searchExpressionContext = createSearchExpressionContext(facesContext, messageComponent, RESOLVE_LABEL_FOR, null);
+	            String forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
+				UIComponent forComponent = findComponentRelatively(messageComponent, forClientId);
 
 				if (input.equals(forComponent)) {
 					found[0] = messageComponent;
