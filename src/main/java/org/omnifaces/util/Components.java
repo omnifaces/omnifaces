@@ -1282,7 +1282,7 @@ public final class Components {
 			if (!isEmpty(forValue)) {
 				FacesContext facesContext = context.getFacesContext();
 				SearchExpressionContext searchExpressionContext = createSearchExpressionContext(facesContext, messageComponent, RESOLVE_LABEL_FOR, null);
-	            String forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
+				String forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
 				UIComponent forComponent = findComponentRelatively(messageComponent, forClientId);
 
 				if (input.equals(forComponent)) {
