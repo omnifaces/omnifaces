@@ -28,4 +28,9 @@
 		<servlet-name>facesServlet</servlet-name>
 		<url-pattern>*.xhtml</url-pattern>
 	</servlet-mapping>
+
+	<mime-mapping>
+		<extension>gif</extension>
+		<mime-type>image/gif</mime-type> <!-- For InputFileIT in Piranha (it doesn't have this in its default mime mapping yet). -->
+	</mime-mapping>
 </web-app>
