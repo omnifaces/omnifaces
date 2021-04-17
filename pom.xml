@@ -828,8 +828,9 @@
 									org.glassfish:jakarta.faces:${test.mojarra.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
-									org.glassfish.tyrus:tyrus-container-servlet:${test.tyrus.version}
+									org.glassfish.tyrus:tyrus-core:${test.tyrus.version}
 								</war.libraries>
+								<!-- tyrus-core should actually be tyrus-container-servlet, but it currently fails to init in Piranha -->
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
