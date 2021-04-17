@@ -115,7 +115,7 @@ public abstract class OmniFacesIT {
 	}
 
 	protected static boolean isMojarraUsed() {
-		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra");
+		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra", "piranha");
 	}
 
 	protected static boolean isMyFacesUsed() {
