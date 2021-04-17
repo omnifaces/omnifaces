@@ -83,6 +83,7 @@
 		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.0</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<test.tyrus.version>2.0.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 	</properties>
 
 	<repositories>
@@ -827,7 +828,7 @@
 									org.glassfish:jakarta.faces:${test.mojarra.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
-									org.glassfish.tyrus:tyrus-core:2.0.0
+									org.glassfish.tyrus:tyrus-container-servlet:${test.tyrus.version}
 								</war.libraries>
 							</systemPropertyVariables>
 						</configuration>
