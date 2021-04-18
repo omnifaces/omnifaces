@@ -73,12 +73,6 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testWelcomeFileWithPathParameters() {
-		if (isLiberty()) {
-			// Unfortunately, OpenLiberty doesn't seem to deal well with path parameters in a MultiViews welcome file.
-			// TODO: investigate and fix?
-			return;
-		}
-
 		open("foo/42");
 		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
@@ -124,12 +118,6 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testNonExistingPage() {
-		if (isLiberty()) {
-			// Unfortunately, OpenLiberty doesn't seem to deal well with path parameters in a MultiViews welcome file.
-			// TODO: investigate and fix?
-			return;
-		}
-
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
 
