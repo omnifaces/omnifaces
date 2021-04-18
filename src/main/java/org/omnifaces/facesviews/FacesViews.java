@@ -820,7 +820,13 @@ public final class FacesViews {
 	 * @since 2.6
 	 */
 	public static boolean isMultiViewsEnabled(HttpServletRequest request) {
-		return isMultiViewsEnabled(request.getServletContext(), request.getServletPath());
+		String resource = request.getServletPath();
+
+		if (isEmpty(resource) && request.getPathInfo() != null) {
+			resource = request.getPathInfo();
+		}
+
+		return isMultiViewsEnabled(request.getServletContext(), resource);
 	}
 
 	private static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
