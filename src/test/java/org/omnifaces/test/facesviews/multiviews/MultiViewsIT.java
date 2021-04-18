@@ -48,15 +48,31 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testWelcomeFile() {
-		verify200("MultiViewsIT", "", "", "");
+	public void testWelcomeFileOnEmptyPath() {
+		open("");
+		verify200("MultiViewsITWelcomeFile", "", "", "");
 
 		guardHttp(formSubmit).click();
-		verify200("MultiViewsIT", "", "", "");
+		verify200("MultiViewsITWelcomeFile", "", "", "");
 
 		guardHttp(link).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
 
+	@Test
+	public void testWelcomeFileOnNamedPath() {
+		open("MultiViewsITWelcomeFile");
+		verify200("MultiViewsITWelcomeFile", "", "", ""); // So it should have autoredirected back to empty path.
+
+		guardHttp(formSubmit).click();
+		verify200("MultiViewsITWelcomeFile", "", "", "");
+
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
+
+	@Test
+	public void testWelcomeFileWithPathParameters() {
 		if (isLiberty()) {
 			// Unfortunately, OpenLiberty doesn't seem to deal well with path parameters in a MultiViews welcome file.
 			// TODO: investigate and fix?
@@ -64,16 +80,16 @@ public class MultiViewsIT extends OmniFacesIT {
 		}
 
 		open("foo/42");
-		verify200("MultiViewsIT", "foo/42", "foo", "42");
+		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
 		guardHttp(formSubmit).click();
-		verify200("MultiViewsIT", "foo/42", "foo", "42");
+		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
 		open("foo/42/bar/");
-		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
+		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
 
 		guardHttp(formSubmit).click();
-		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
+		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
 	}
 
 	@Test
@@ -115,10 +131,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		}
 
 		open("MultiViewsITNonExistingPage");
-		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
+		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
 
 		open("MultiViewsITNonExistingPage/");
-		verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
+		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
 		if (!isMyFacesUsed()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("MultiViewsITNonExistingPage.xhtml");

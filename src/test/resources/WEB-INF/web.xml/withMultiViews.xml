@@ -35,7 +35,7 @@
 	</servlet-mapping>
 
 	<welcome-file-list>
-		<welcome-file>MultiViewsIT</welcome-file>
+		<welcome-file>MultiViewsITWelcomeFile</welcome-file>
 	</welcome-file-list>
 
 	<error-page>
