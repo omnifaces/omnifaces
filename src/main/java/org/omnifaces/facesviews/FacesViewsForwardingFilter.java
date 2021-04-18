@@ -114,6 +114,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			resource = getMultiViewsWelcomeFile(servletContext);
 
 			if (resource != null) {
+				if (request.getPathInfo() != null) {
+					servletPath += request.getPathInfo();
+				}
+
 				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, servletPath);
 				request.getRequestDispatcher(resource).forward(request, response);
 				return true;
