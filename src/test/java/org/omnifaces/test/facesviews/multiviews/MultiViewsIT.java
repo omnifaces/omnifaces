@@ -147,12 +147,6 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
 		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
 
-		if (isLiberty()) {
-			// Unfortunately, OpenLiberty doesn't seem to deal well with returning 404 to multiviews excluded folder. It returns 200 all time.
-			// TODO: investigate and fix?
-			return;
-		}
-
 		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
 		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
 
