@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.application.ResourceHandler;
 import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
@@ -57,10 +58,11 @@ public final class Hacks {
 
 	private static final String MOJARRA_PACKAGE_PREFIX = "com.sun.faces.";
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
-	private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
+	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
-			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET",
-			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
+			ResourceHandler.RESOURCE_IDENTIFIER, // Mojarra rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
+			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET", // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
+			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET"); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
 	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
@@ -185,10 +187,10 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 */
 	public static void removeResourceDependencyState(FacesContext context) {
-		// MyFaces remembers processed resource dependencies in a map which it doesn't clear on change of view.
-		context.getAttributes().keySet().removeAll(MYFACES_RESOURCE_DEPENDENCY_KEYS);
+		// Mojarra and MyFaces remembers rendered resource dependencies in a map which isn't cleared on change of view.
+		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
 
-		// PrimeFaces puts "namelibrary=true" for every processed resource dependency.
+		// PrimeFaces puts "namelibrary=true" for every rendered resource dependency.
 		// NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
  	}
