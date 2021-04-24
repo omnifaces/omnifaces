@@ -21,7 +21,9 @@
 	xmlns:o="http://omnifaces.org/ui"
 	xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+	<h:head>
+		<h:outputStylesheet name="style.css" />
+	</h:head>
 
 	<h:body>
 		<div id="exception">#{requestScope['jakarta.servlet.error.exception']}</div>

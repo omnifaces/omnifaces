@@ -58,9 +58,8 @@ public final class Hacks {
 
 	private static final String MOJARRA_PACKAGE_PREFIX = "com.sun.faces.";
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
-	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
+	private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
-			ResourceHandler.RESOURCE_IDENTIFIER, // Mojarra rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
 			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET", // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
 			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET"); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
@@ -187,8 +186,13 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 */
 	public static void removeResourceDependencyState(FacesContext context) {
-		// Mojarra and MyFaces remembers rendered resource dependencies in a map which isn't cleared on change of view.
-		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
+		// MyFaces remembers rendered resource dependencies in a map which isn't cleared on change of view.
+		context.getAttributes().keySet().removeAll(MYFACES_RESOURCE_DEPENDENCY_KEYS);
+
+		if (context.getRenderResponse()) {
+			// Mojarra 2.3+ rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
+			context.getAttributes().keySet().remove(ResourceHandler.RESOURCE_IDENTIFIER);
+		}
 
 		// PrimeFaces puts "namelibrary=true" for every rendered resource dependency.
 		// NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
