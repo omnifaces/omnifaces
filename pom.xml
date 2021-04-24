@@ -69,10 +69,18 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>22.0.0.Final</test.wildfly.version>
-		<test.tomee.version>8.0.5</test.tomee.version>
-		<test.payara.version>5.2020.7</test.payara.version>
+		<test.wildfly.version>23.0.1.Final</test.wildfly.version>
+		<test.tomee.version>8.0.6</test.tomee.version>
+		<test.payara.version>5.2021.2</test.payara.version>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>redhat-all</id>
+			<snapshots />
+			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 23.0.1.Final -->
+		</repository>
+	</repositories>
 
 	<dependencies>
 
