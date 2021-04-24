@@ -16,6 +16,7 @@ branches:
 # Do integration test on configured servers.
 env:
    - SERVER=wildfly
+   - SERVER=wildfly23
    - SERVER=tomee
    - SERVER=payara
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER

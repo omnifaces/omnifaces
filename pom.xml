@@ -72,10 +72,19 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
-		<test.tomee.version>7.0.1</test.tomee.version>
-		<test.payara.version>4.1.1.163</test.payara.version>
+		<test.wildfly.jsf22.version>13.0.0.Final</test.wildfly.jsf22.version>
+		<test.wildfly.jsf23.version>23.0.1.Final</test.wildfly.jsf23.version>
+		<test.tomee.version>8.0.5</test.tomee.version>
+		<test.payara.version>4.1.2.181</test.payara.version>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>redhat-all</id>
+			<snapshots />
+			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 23.0.1.Final -->
+		</repository>
+	</repositories>
 
 	<dependencies>
 
@@ -463,7 +472,7 @@
 										<artifactItem>
 											<groupId>org.wildfly</groupId>
 											<artifactId>wildfly-dist</artifactId>
-											<version>${test.wildfly.version}</version>
+											<version>${test.wildfly.jsf22.version}</version>
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
@@ -476,7 +485,55 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
+								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.jsf22.version}</jboss.home>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- WildFly with JSF 2.3 integration test profile: mvn verify -P wildfly23 -->
+		<profile>
+			<id>wildfly23</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly.arquillian</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<version>3.0.1.Final</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.wildfly</groupId>
+											<artifactId>wildfly-dist</artifactId>
+											<version>${test.wildfly.jsf23.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.jsf23.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
 						</configuration>
