@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
+import java.util.List;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
@@ -48,6 +50,12 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="form3:throwNonAjaxDuringRenderResponse")
 	private WebElement throwNonAjaxDuringRenderResponse;
 
+	@FindBy(css="link[rel=stylesheet][href*='style.css']")
+	private List<WebElement> stylesheets;
+
+	@FindBy(xpath="//style[contains(text(),'@import')][contains(text(),'style.css')]")
+	private List<WebElement> styleimports;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(FullAjaxExceptionHandlerIT.class)
@@ -58,38 +66,50 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 	@Test
 	public void throwDuringInvokeApplication() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardAjax(throwDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 	@Test
 	public void throwDuringUpdateModelValues() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardAjax(throwDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 	@Test
 	public void throwDuringRenderResponse() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardAjax(throwDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 	@Test
 	public void throwNonAjaxDuringInvokeApplication() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardHttp(throwNonAjaxDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 	@Test
 	public void throwNonAjaxDuringUpdateModelValues() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardHttp(throwNonAjaxDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 	@Test
 	public void throwNonAjaxDuringRenderResponse() {
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 		guardHttp(throwNonAjaxDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertTrue(stylesheets.size() + styleimports.size() == 1);
 	}
 
 }
