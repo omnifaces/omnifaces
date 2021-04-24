@@ -113,7 +113,7 @@ OmniFaces.Push = (function(Util, window) {
 			if (socket) {
 				var s = socket;
 				socket = null;
-				reconnectAttempts == null;
+				reconnectAttempts = null;
 				s.close();
 			}
 		}
