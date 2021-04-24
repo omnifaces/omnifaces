@@ -5,9 +5,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
 	<modelVersion>4.0.0</modelVersion>
-	<prerequisites>
-		<maven>3.0.0</maven>
-	</prerequisites>
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
@@ -63,7 +60,7 @@
 		<javase.version>1.7</javase.version>
 		<javaee.version>7</javaee.version>
 		<javadoc.version>1.8</javadoc.version>
-		
+
 		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -147,9 +144,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.jboss.arquillian.graphene</groupId>
 			<artifactId>graphene-webdriver</artifactId>
-			<version>2.1.0.Final</version>
+			<version>2.1.0.Final</version> <!-- Newer versions appear to intermittently fail in RequestGuard and not be fully compatible with websockets -->
 			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
@@ -158,25 +161,32 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- Test dependencies.	-->
+			<!-- Test dependencies. -->
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
-				<version>1.1.11.Final</version>
+				<version>1.6.0.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.extension</groupId>
 				<artifactId>arquillian-drone-bom</artifactId>
-				<version>2.0.0.Final</version>
+				<version>2.0.1.Final</version> <!-- Newer versions are incompatible with graphene-webdriver:2.1.0.Final -->
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.jboss.shrinkwrap.resolver</groupId>
+				<artifactId>shrinkwrap-resolver-bom</artifactId>
+				<version>3.1.4</version>
+				<type>pom</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.jboss.arquillian.selenium</groupId>
 				<artifactId>selenium-bom</artifactId>
-				<version>2.53.1</version>
+				<version>3.13.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -202,7 +212,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.11</version>
+				<version>4.1</version>
 				<configuration>
 					<header>license.txt</header>
 					<excludes>
@@ -226,7 +236,7 @@
 			<plugin>
 				<groupId>com.samaxes.maven</groupId>
 				<artifactId>minify-maven-plugin</artifactId>
-				<version>1.7.4</version>
+				<version>1.7.6</version>
 				<configuration>
 					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
 					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
@@ -287,7 +297,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -306,7 +316,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -321,11 +331,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
+				<version>3.2.0</version>
 				<configuration>
 					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
+					<doclint>all,-missing</doclint>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
 						<link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
@@ -345,7 +356,7 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
+				<version>1.6.8</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
@@ -370,7 +381,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.mycila</groupId>
 										<artifactId>license-maven-plugin</artifactId>
-										<versionRange>[2.11,)</versionRange>
+										<versionRange>[3.0,)</versionRange>
 										<goals>
 											<goal>format</goal>
 										</goals>
@@ -385,7 +396,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.samaxes.maven</groupId>
 										<artifactId>minify-maven-plugin</artifactId>
-										<versionRange>[1.7.4,)</versionRange>
+										<versionRange>[1.7.6,)</versionRange>
 										<goals>
 											<goal>minify</goal>
 										</goals>
@@ -405,7 +416,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.10</version>
+					<version>3.1.2</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -421,7 +432,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.19.1</version>
+					<version>2.22.2</version>
 					<executions>
 						<execution>
 							<goals>
@@ -456,7 +467,7 @@
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
-					<version>2.0.0.Final</version>
+					<version>3.0.1.Final</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -594,7 +605,7 @@
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
 					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
-					<version>1.0.0.Final</version>
+					<version>1.0.2</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
