@@ -140,7 +140,7 @@
 			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- Test dependencies. -->
 		<dependency>
 			<groupId>jakarta.platform</groupId>
@@ -228,7 +228,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>3.0</version>
+				<version>4.1</version>
 				<configuration>
 					<header>license.txt</header>
 					<excludes>
