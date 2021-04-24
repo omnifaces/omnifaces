@@ -84,7 +84,6 @@ public final class Hacks {
 	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
 			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES", // Mojarra processed @ResourceDependency
-			ResourceHandler.RESOURCE_IDENTIFIER, // Mojarra 2.3+ rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
 			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
 			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
@@ -394,6 +393,11 @@ public final class Hacks {
 	public static void removeResourceDependencyState(FacesContext context) {
 		// Mojarra and MyFaces remembers processed and rendered resource dependencies in a map.
 		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
+
+		if (context.getRenderResponse()) {
+			// Mojarra 2.3+ rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
+			context.getAttributes().keySet().remove(ResourceHandler.RESOURCE_IDENTIFIER);
+		}
 
 		// Mojarra 2.2- and PrimeFaces puts "namelibrary=true" for every rendered resource dependency.
 		// NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
