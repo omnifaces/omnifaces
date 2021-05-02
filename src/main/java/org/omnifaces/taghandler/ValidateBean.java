@@ -598,7 +598,7 @@ public class ValidateBean extends TagHandler {
 		if (!isEmpty(label)) {
 			ResourceBundle messageBundle = getMessageBundle();
 
-			if (messageBundle != null) {
+			if (messageBundle != null && messageBundle.containsKey(BeanValidator.MESSAGE_ID)) {
 				String pattern = messageBundle.getString(BeanValidator.MESSAGE_ID);
 
 				if (pattern != null) {
