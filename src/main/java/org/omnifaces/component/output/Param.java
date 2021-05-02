@@ -68,20 +68,16 @@ public class Param extends UIParameter implements ParamHolder {
 		converter;
 	}
 
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private Converter localConverter;
-
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	@Override
 	public Converter getConverter() {
-		return localConverter != null ? localConverter : (Converter) getStateHelper().eval(PropertyKeys.converter);
+		return (Converter) getStateHelper().eval(PropertyKeys.converter);
 	}
 
 	@Override
 	public void setConverter(Converter converter) {
-		localConverter = converter;
+		getStateHelper().put(PropertyKeys.converter, converter);
 	}
 
 	@Override
