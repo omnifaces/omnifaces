@@ -396,9 +396,9 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>com.github.blutorange</groupId>
-										<artifactId>closure-compiler-maven-plugin</artifactId>
-										<versionRange>[2.21.0,)</versionRange>
+										<groupId>com.samaxes.maven</groupId>
+										<artifactId>minify-maven-plugin</artifactId>
+										<versionRange>[1.7.6,)</versionRange>
 										<goals>
 											<goal>minify</goal>
 										</goals>
