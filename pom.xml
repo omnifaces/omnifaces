@@ -234,30 +234,30 @@
 
 			<!-- Configure the JavaScript minifier. -->
 			<plugin>
-				<groupId>com.github.blutorange</groupId>
-				<artifactId>closure-compiler-maven-plugin</artifactId>
-				<version>2.21.0</version>
+				<groupId>com.samaxes.maven</groupId>
+				<artifactId>minify-maven-plugin</artifactId>
+				<version>1.7.6</version>
 				<configuration>
-					<baseSourceDir>${basedir}/src/main/resources</baseSourceDir>
-					<baseTargetDir>${project.build.outputDirectory}</baseTargetDir>
-					<sourceDir>META-INF/resources/omnifaces</sourceDir>
-					<targetDir>META-INF/resources/omnifaces</targetDir>
-					<closureLanguageOut>ECMASCRIPT5</closureLanguageOut>
+					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
+					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+					<jsSourceDir>META-INF/resources/omnifaces</jsSourceDir>
+					<nosuffix>true</nosuffix>
+					<jsEngine>CLOSURE</jsEngine>
 				</configuration>
 				<executions>
 					<execution>
 						<id>minify-omnifaces</id>
 						<configuration>
-							<includes>
-								<include>omnifaces.unminified.js</include>
-								<include>util.unminified.js</include>
-								<include>highlight.unminified.js</include>
-								<include>deferredscript.unminified.js</include>
-								<include>unload.unminified.js</include>
-								<include>push.unminified.js</include>
-								<include>inputfile.unminified.js</include>
-							</includes>
-							<outputFilename>omnifaces.js</outputFilename>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>util.unminified.js</jsSourceFile>
+								<jsSourceFile>highlight.unminified.js</jsSourceFile>
+								<jsSourceFile>deferredscript.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+								<jsSourceFile>push.unminified.js</jsSourceFile>
+								<jsSourceFile>inputfile.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>
 						<goals>
 							<goal>minify</goal>
@@ -266,11 +266,11 @@
 					<execution>
 						<id>minify-fixviewstate</id>
 						<configuration>
-							<includes>
-								<include>omnifaces.unminified.js</include>
-								<include>fixviewstate.unminified.js</include>
-							</includes>
-							<outputFilename>fixviewstate.js</outputFilename>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>fixviewstate.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>fixviewstate.js</jsFinalFile>
 						</configuration>
 						<goals>
 							<goal>minify</goal>
@@ -279,12 +279,12 @@
 					<execution>
 						<id>minify-unload</id>
 						<configuration>
-							<includes>
-								<include>omnifaces.unminified.js</include>
-								<include>util.unminified.js</include>
-								<include>unload.unminified.js</include>
-							</includes>
-							<outputFilename>unload.js</outputFilename>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>util.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>unload.js</jsFinalFile>
 						</configuration>
 						<goals>
 							<goal>minify</goal>
@@ -394,9 +394,9 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>com.github.blutorange</groupId>
-										<artifactId>closure-compiler-maven-plugin</artifactId>
-										<versionRange>[2.21.0,)</versionRange>
+										<groupId>com.samaxes.maven</groupId>
+										<artifactId>minify-maven-plugin</artifactId>
+										<versionRange>[1.7.6,)</versionRange>
 										<goals>
 											<goal>minify</goal>
 										</goals>
