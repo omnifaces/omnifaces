@@ -71,22 +71,18 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
 		converter;
 	}
 
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private Converter<T> localConverter;
-
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Converter<T> getConverter() {
-		return localConverter != null ? localConverter : (Converter<T>) getStateHelper().eval(PropertyKeys.converter);
+		return (Converter<T>) getStateHelper().eval(PropertyKeys.converter);
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("rawtypes")
 	public void setConverter(Converter converter) {
-		localConverter = converter;
+		getStateHelper().put(PropertyKeys.converter, converter);
 	}
 
 	/**
