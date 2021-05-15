@@ -20,12 +20,15 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:o="http://omnifaces.org/ui"
 	xmlns:of="http://omnifaces.org/functions"
+	xmlns:p="http://primefaces.org/ui"
 >
 	<h:head>
 		<h:outputStylesheet name="style.css" />
 	</h:head>
 
 	<h:body>
-		<div id="exception">#{requestScope['jakarta.servlet.error.exception']}</div>
+		<p:panel>
+			<div id="exception">#{requestScope['jakarta.servlet.error.exception']}</div>
+		</p:panel>
 	</h:body>
 </html>

@@ -51,7 +51,8 @@ public class ApplicationProcessor implements SystemEventListener {
 	private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
 		"Resource handler %s is duplicated."
 			+ " This will result in erratic resource handling behavior."
-			+ " Please check your faces-config.xml files, also in web fragment JAR files.";
+			+ " Please check if your build is clean and does not contain duplicate libraries having same resource handler."
+			+ " Also check if the same resource handler is not declared multiple times in all your faces-config.xml files combined.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

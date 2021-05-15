@@ -554,9 +554,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
 		ViewHandler viewHandler = context.getApplication().getViewHandler();
 		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
+		Hacks.removeResourceDependencyState(context);
 		context.setViewRoot(viewRoot);
 		context.getPartialViewContext().setRenderAll(true);
-		Hacks.removeResourceDependencyState(context);
 
 		try {
 			ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
