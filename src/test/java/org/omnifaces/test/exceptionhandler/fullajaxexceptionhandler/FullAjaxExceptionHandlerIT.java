@@ -15,15 +15,19 @@ package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.test.OmniFacesIT;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -41,6 +45,15 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="form1:throwDuringRenderResponse")
 	private WebElement throwDuringRenderResponse;
 
+	@FindBy(id="form1:throwPrimeFacesDuringInvokeApplication")
+	private WebElement throwPrimeFacesDuringInvokeApplication;
+
+	@FindBy(id="form1:throwPrimeFacesDuringUpdateModelValues")
+	private WebElement throwPrimeFacesDuringUpdateModelValues;
+
+	@FindBy(id="form1:throwPrimeFacesDuringRenderResponse")
+	private WebElement throwPrimeFacesDuringRenderResponse;
+
 	@FindBy(id="form2:throwNonAjaxDuringInvokeApplication")
 	private WebElement throwNonAjaxDuringInvokeApplication;
 
@@ -50,66 +63,120 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="form3:throwNonAjaxDuringRenderResponse")
 	private WebElement throwNonAjaxDuringRenderResponse;
 
-	@FindBy(css="link[rel=stylesheet][href*='style.css']")
-	private List<WebElement> stylesheets;
-
-	@FindBy(xpath="//style[contains(text(),'@import')][contains(text(),'style.css')]")
-	private List<WebElement> styleimports;
-
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(FullAjaxExceptionHandlerIT.class)
 			.withFacesConfig(withFullAjaxExceptionHandler)
 			.withWebXml(withErrorPage)
+			.withPrimeFaces()
 			.createDeployment();
 	}
 
 	@Test
 	public void throwDuringInvokeApplication() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardAjax(throwDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 	}
 
 	@Test
 	public void throwDuringUpdateModelValues() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardAjax(throwDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 	}
 
 	@Test
 	public void throwDuringRenderResponse() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardAjax(throwDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwPrimeFacesDuringInvokeApplication() {
+		assertAllResourcesRendered();
+		guardAjax(throwPrimeFacesDuringInvokeApplication).click();
+		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwPrimeFacesDuringUpdateModelValues() {
+		assertAllResourcesRendered();
+		guardAjax(throwPrimeFacesDuringUpdateModelValues).click();
+		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwPrimeFacesDuringRenderResponse() {
+		assertAllResourcesRendered();
+		guardAjax(throwPrimeFacesDuringRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertAllResourcesRendered();
 	}
 
 	@Test
 	public void throwNonAjaxDuringInvokeApplication() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 	}
 
 	@Test
 	public void throwNonAjaxDuringUpdateModelValues() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 	}
 
 	@Test
 	public void throwNonAjaxDuringRenderResponse() {
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
-		assertTrue(stylesheets.size() + styleimports.size() == 1);
+		assertAllResourcesRendered();
+	}
+
+	private void assertAllResourcesRendered() {
+		assertStylesheetResourceRendered("primefaces-aristo", "theme.css");
+		assertStylesheetResourceRendered("primefaces", "components.css");
+		assertStylesheetResourceRendered(null, "style.css");
+
+		assertScriptResourceRendered("primefaces", "jquery/jquery.js");
+		assertScriptResourceRendered("primefaces", "jquery/jquery-plugins.js");
+		assertScriptResourceRendered("primefaces", "core.js");
+		assertScriptResourceRendered("primefaces", "components.js");
+	}
+
+	private void assertStylesheetResourceRendered(String library, String name) {
+		List<WebElement> stylesheets = new ArrayList<>();
+		stylesheets.addAll(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : ("[href*='ln=" + library + "']")))));
+		stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
+
+		if (stylesheets.isEmpty()) {
+			fail("Missing stylesheet " + new ResourceIdentifier(library, name));
+		}
+		else if (stylesheets.size() > 1) {
+			fail("Duplicate stylesheet " + new ResourceIdentifier(library, name));
+		}
+	}
+
+	private void assertScriptResourceRendered(String library, String name) {
+		List<WebElement> scripts = browser.findElements(By.cssSelector("script[src*='" + name + "']" + (library == null ? "" : ("[src*='ln=" + library + "']"))));
+
+		if (scripts.isEmpty()) {
+			fail("Missing script " + new ResourceIdentifier(library, name));
+		}
+		else if (scripts.size() > 1) {
+			fail("Duplicate script " + new ResourceIdentifier(library, name));
+		}
 	}
 
 }
