@@ -16,10 +16,13 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
+import static org.omnifaces.util.FacesLocal.isAjaxRequest;
+import static org.omnifaces.util.FacesLocal.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.instance;
@@ -73,6 +76,7 @@ public final class Hacks {
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
 
+	private static final String PRIMEFACES_PACKAGE_PREFIX = "org.primefaces.";
 	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
@@ -394,8 +398,9 @@ public final class Hacks {
 		// Mojarra and MyFaces remembers processed and rendered resource dependencies in a map.
 		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
 
-		if (context.getRenderResponse()) {
-			// Mojarra 2.3+ rendered @ResourceDependency/<h:outputScript>/<h:outputStylesheet>
+		if (isRenderResponse(context) || isPrimeFacesAjaxRequest(context)) {
+			// Mojarra 2.3+ resource dependency state is not properly cleared during render response, so it needs to be manually cleared.
+			// PrimeFaces core.js updateHead() function basically replaces the entire head instead of appending to it, so all state should be cleared nonetheless.
 			context.getAttributes().keySet().remove(ResourceHandler.RESOURCE_IDENTIFIER);
 		}
 
@@ -528,6 +533,21 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
+	}
+
+	/**
+	 * Returns true if the current request is a PrimeFaces ajax request.
+	 * @param context The involved faces context.
+	 * @return Whether the current request is a PrimeFaces ajax request.
+	 * @since 2.7.12
+	 */
+	public static boolean isPrimeFacesAjaxRequest(FacesContext context) {
+		if (!isAjaxRequest(context)) {
+			return false;
+		}
+
+		UIComponent actionSource = getCurrentActionSource();
+		return actionSource != null && actionSource.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
 	}
 
 	/**
