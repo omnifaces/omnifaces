@@ -20,6 +20,7 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:o="http://omnifaces.org/ui"
 	xmlns:of="http://omnifaces.org/functions"
+	xmlns:p="http://primefaces.org/ui"
 >
 	<h:head>
 		<h:outputStylesheet name="style.css" />
@@ -31,14 +32,18 @@
 				<f:ajax />
 			</h:commandButton>
 
+			<p:commandButton id="throwPrimeFacesDuringInvokeApplication" process="@this" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
+
 			<h:inputText id="input" value="#{fullAjaxExceptionHandlerITBean.throwDuringUpdateModelValues}" />
 			<h:commandButton id="throwDuringUpdateModelValues">
 				<f:ajax execute="input" />
 			</h:commandButton>
+			<p:commandButton id="throwPrimeFacesDuringUpdateModelValues" process="input" />
 
 			<h:commandButton id="throwDuringRenderResponse">
 				<f:ajax render="output" />
 			</h:commandButton>
+			<p:commandButton id="throwPrimeFacesDuringRenderResponse" process="@this" update="output" />
 			<h:panelGroup id="output">
 				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
 			</h:panelGroup>

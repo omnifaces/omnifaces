@@ -28,6 +28,8 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.JavascriptExecutor;
@@ -120,6 +122,7 @@ public abstract class OmniFacesIT {
 		private WebArchive archive;
 		private boolean facesConfigSet;
 		private boolean webXmlSet;
+		private boolean primeFacesSet;
 
 		private <T extends OmniFacesIT> ArchiveBuilder(Class<T> testClass) {
 			String packageName = testClass.getPackage().getName();
@@ -183,6 +186,17 @@ public abstract class OmniFacesIT {
 			}
 
 			webXmlSet = true;
+			return this;
+		}
+
+		public ArchiveBuilder withPrimeFaces() {
+			if (primeFacesSet) {
+				throw new IllegalStateException("There can be only one web.xml");
+			}
+
+			MavenResolverSystem maven = Maven.resolver();
+			archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:8.0").withTransitivity().asFile());
+			primeFacesSet = true;
 			return this;
 		}
 
