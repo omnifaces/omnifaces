@@ -219,7 +219,7 @@ public abstract class OmniFacesIT {
 
 		public ArchiveBuilder withPrimeFaces() {
 			if (primeFacesSet) {
-				throw new IllegalStateException("There can be only one web.xml");
+				throw new IllegalStateException("There can be only one PrimeFaces library");
 			}
 
 			MavenResolverSystem maven = Maven.resolver();
