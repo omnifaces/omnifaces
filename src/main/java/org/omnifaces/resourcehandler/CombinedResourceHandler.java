@@ -425,9 +425,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				// Otherwise JSF will re-execute dynamic remove during restore view phase.
 				// This is unnecessary as CombinedResourceHandler already takes care of it.
 				// See also https://github.com/omnifaces/omnifaces/issues/135
-				container.setInView(false);
+				if (container != null) {
+					container.setInView(false);
+				}
 				view.removeComponentResource(context, resourceToRemove, target);
-				container.setInView(true);
+				if (container != null) {
+					container.setInView(true);
+				}
 			}
 		}
 	}
