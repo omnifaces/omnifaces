@@ -49,13 +49,15 @@ import org.omnifaces.validator.MultiFieldValidator;
  * This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components in question.
  * The <code>UIInput</code> components must be referenced by a space separated collection of their client IDs in the
  * <code>components</code> attribute. This validator can be placed anywhere in the form, but keep in mind that the
- * components will be validated in the order as they appear in the form. So if this validator is been placed before all
- * of the components, then it will be executed before any of the component's own validators. If this validator fails,
- * then the component's own validators will not be fired. If this validator is been placed after all of the components,
- * then it will be executed after any of the component's own validators. If any of them fails, then this validator
- * will not be exeucted. It is not recommended to put this validator somewhere in between the referenced components as
- * the resulting behaviour may be confusing. Put this validator either before or after all of the components, depending
- * on how you would like to prioritize the validation.
+ * components will be converted and validated in the order as they appear in the form. So if this validator is been
+ * placed before all of the components, then it will be executed before any of the component's own converters and
+ * validators. If this validator fails, then the component's own converters and validators will not be fired. If this
+ * validator is been placed after all of the components, then it will be executed after any of the component's own
+ * converters and validators. If any of them fails, then this validator will not be exeucted. It is not recommended to
+ * put this validator somewhere in between the referenced components as the resulting behaviour may be confusing, for
+ * example because only the values of preceding components are converted and the values of following components are not
+ * converted. Put this validator either before or after all of the components, depending on how you would like to
+ * prioritize the validation.
  * <pre>
  * &lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
  * &lt;h:message for="myId" /&gt;
