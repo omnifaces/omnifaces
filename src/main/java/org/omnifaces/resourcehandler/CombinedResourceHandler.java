@@ -437,7 +437,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		for (UIComponent resourceToRemove : componentResourcesToRemove) {
 			if (resourceToRemove != null) {
-				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
+				UIComponent container = coalesce(isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove);
 
 				// setInView(false) forces JSF to not save dynamic remove action in state.
 				// Otherwise JSF will re-execute dynamic remove during restore view phase.
