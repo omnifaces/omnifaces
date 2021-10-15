@@ -888,7 +888,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+			UIComponent component = findComponentIgnoringIAE(viewRoot, name);
 
 			if (component instanceof UIForm) {
 				return (UIForm) component;
@@ -950,7 +950,7 @@ public final class Components {
 			String sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 			if (sourceClientId != null) {
-				UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(sourceClientId));
+				UIComponent actionSource = findComponentIgnoringIAE(parent, sourceClientId);
 
 				if (actionSource != null) {
 					return actionSource;
@@ -963,7 +963,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(name));
+			UIComponent actionSource = findComponentIgnoringIAE(parent, name);
 
 			if (actionSource instanceof UICommand) {
 				return actionSource;
@@ -1635,7 +1635,7 @@ public final class Components {
 	 */
 	private static UIComponent findComponentIgnoringIAE(UIComponent parent, String clientId) {
 		try {
-			return parent.findComponent(clientId);
+			return parent.findComponent(stripIterationIndexFromClientId(clientId));
 		}
 		catch (IllegalArgumentException ignore) {
 			logger.log(FINEST, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
