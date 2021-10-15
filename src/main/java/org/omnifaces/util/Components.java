@@ -284,7 +284,7 @@ public final class Components {
 		}
 
 		for (UIComponent parent = component; parent != null; parent = parent.getParent()) {
-			if (parent instanceof NamingContainer) {
+			if (parent instanceof NamingContainer || parent instanceof UIViewRoot) {
 				UIComponent result = findComponentIgnoringIAE(parent, clientId);
 
 				if (result != null) {
