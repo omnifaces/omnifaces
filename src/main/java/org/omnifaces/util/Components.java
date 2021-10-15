@@ -923,6 +923,10 @@ public final class Components {
 
 		UIViewRoot viewRoot = context.getViewRoot();
 
+		if (viewRoot == null) {
+			return null;
+		}
+
 		// The initial implementation has visited the tree for UIForm components which returns true on isSubmitted().
 		// But with testing it turns out to return false on ajax requests where the form is not included in execute!
 		// The current implementation just walks through the request parameter map instead.
@@ -977,19 +981,13 @@ public final class Components {
 			return null;
 		}
 
-		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
-
-		if (actionSource == null) { // Can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
-			actionSource = getCurrentActionSource(context, getCurrentForm());
-		}
-
-		return (C) actionSource;
+		return (C) getCurrentActionSource(context, context.getViewRoot());
 	}
 
 	/**
 	 * Helper method for {@link #getCurrentActionSource()}.
 	 */
-	private static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
+	static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
 		if (parent == null) {
 			return null;
 		}
@@ -1018,6 +1016,10 @@ public final class Components {
 			if (actionSource instanceof UICommand) {
 				return actionSource;
 			}
+		}
+
+		if (parent instanceof UIViewRoot) { // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
+			return getCurrentActionSource(context, getCurrentForm());
 		}
 
 		return null;

@@ -351,7 +351,7 @@ public final class Hacks {
 			return false;
 		}
 
-		UIComponent actionSource = getCurrentActionSource();
+		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
 		return actionSource != null && actionSource.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
 	}
 
