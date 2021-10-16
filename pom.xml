@@ -69,35 +69,22 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>25.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.liberty.version>21.0.0.6-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
-		<test.glassfish.version>6.1.0-M1</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.tomcat.version>10.0.6</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>21.5.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 16 to run tests -->
+		<test.liberty.version>21.0.0.10-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta couldn't be found by Arquillian -->
+		<test.glassfish.version>6.2.2</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.tomcat.version>10.0.12</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.piranha.version>21.10.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee.jakarta/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
-		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
+		<test.payara.version>6.2021.1.Alpha1</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web TODO: Arquillian couldn't start it -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-		<test.mojarra.version>3.0.0</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces.version>3.0.0</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld.version>4.0.1.SP1</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.mojarra.version>3.0.1</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces.version>3.0.1</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld.version>4.0.2.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.hibernateValidator.version>7.0.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>2.0.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.tyrus.version>2.0.1</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>jakarta-staging</id>
-			<snapshots />
-			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0 -->
-		</repository>
-		<repository>
-			<id>redhat-all</id>
-			<snapshots />
-			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 22.0.0.Beta1 -->
-		</repository>
-	</repositories>
 
 	<dependencies>
 
@@ -519,7 +506,7 @@
 				<dependency>
 					<groupId>io.openliberty.arquillian</groupId>
 					<artifactId>arquillian-liberty-managed-jakarta</artifactId>
-					<version>2.0.0-M1</version>
+					<version>2.0.1</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -596,8 +583,8 @@
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
-					<artifactId>arquillian-glassfish-managed-6</artifactId>
-					<version>1.0.0.Alpha1</version>
+					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
+					<version>1.0.2</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -919,7 +906,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/payara5</GLASSFISH_HOME>
+								<GLASSFISH_HOME>${project.build.directory}/payara6</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>
