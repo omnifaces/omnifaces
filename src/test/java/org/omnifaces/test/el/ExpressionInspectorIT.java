@@ -66,14 +66,14 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 
 	@Test
 	public void test() {
-		assertEquals("valueReferenceBase is 'Bar'", "Bar", valueReferenceBase.getText());
+		assertEquals("valueReferenceBase is 'Bar'", isTomee() ? "ExpressionInspectorITBean$Bar$$OwbNormalScopeProxy0" : "Bar", valueReferenceBase.getText());
 		assertEquals("valueReferenceProperty is 'selected'", "selected", valueReferenceProperty.getText());
-		assertEquals("getterReferenceBase is 'Bar'", "Bar", getterReferenceBase.getText());
+		assertEquals("getterReferenceBase is 'Bar'", isTomee() ? "ExpressionInspectorITBean$Bar$$OwbNormalScopeProxy0" : "Bar", getterReferenceBase.getText());
 		assertEquals("getterReferenceMethodName is 'getSelected'", "getSelected", getterReferenceMethodName.getText());
 		assertEquals("getterReferenceReturnType is 'Baz'", "Baz", getterReferenceReturnType.getText());
 		assertEquals("getterReferenceParamTypes is empty", "", getterReferenceParamTypes.getText());
 		assertEquals("getterReferenceActualParameters is empty", "", getterReferenceActualParameters.getText());
-		assertEquals("methodReferenceBase is 'Foo'", "Foo", methodReferenceBase.getText());
+		assertEquals("methodReferenceBase is 'Foo'", isTomee() ? "ExpressionInspectorITBean$Foo$$OwbNormalScopeProxy0" : "Foo", methodReferenceBase.getText());
 		assertEquals("methodReferenceMethodName is 'create'", "create", methodReferenceMethodName.getText());
 		assertEquals("methodReferenceReturnType is 'void'", "void", methodReferenceReturnType.getText());
 		assertEquals("methodReferenceFirstParamType is 'Baz'", "Baz", methodReferenceFirstParamType.getText());
