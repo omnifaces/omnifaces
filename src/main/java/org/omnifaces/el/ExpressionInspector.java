@@ -19,7 +19,6 @@ import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -63,8 +62,6 @@ import javax.faces.el.CompositeComponentExpressionHolder;
  * @since 1.4
  */
 public final class ExpressionInspector {
-
-	private static final Logger logger = Logger.getLogger(ExpressionInspector.class.getName());
 
 	private ExpressionInspector() {
 		// Hide constructor.
