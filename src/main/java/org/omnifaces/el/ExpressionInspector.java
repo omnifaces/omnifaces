@@ -12,7 +12,6 @@
  */
 package org.omnifaces.el;
 
-import static java.util.logging.Level.FINEST;
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Components.createValueExpression;
@@ -25,11 +24,9 @@ import java.util.logging.Logger;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.MethodExpression;
-import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
-import javax.faces.FacesException;
 import javax.faces.el.CompositeComponentExpressionHolder;
 
 /**
@@ -174,40 +171,13 @@ public final class ExpressionInspector {
 	 * @since 2.5
 	 */
 	public static MethodReference getMethodReference(ELContext context, MethodExpression methodExpression) {
-		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
-		// Invoke getMethodInfo() on the method expression to have the expression chain resolved.
-		// The InspectorElContext contains a special resolver that will record the last outcome before the method is
-		// resolved on it. It represents the base we are looking for and is missing in MethodInfo.
-		MethodInfo methodInfo;
+		// Historical note: MethodExpression#getMethodInfo() was previously used as 1st attempt to obtain method reference.
+		// However as per #646 it turns out to be unreliable.
+		// Hence MethodExpressionValueExpressionAdapter, which was previously used as fallback, is form now on used as permanent approach.
 
-		try {
-			methodInfo = methodExpression.getMethodInfo(inspectorElContext); // Oracle EL will return null on methods with arguments.
-		}
-		catch (MethodNotFoundException ignore) {
-			logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish Oracle EL from Apache EL.", ignore);
-			methodInfo = null; // Apache EL will throw MNFE on methods with arguments.
-		}
-
-		if (methodInfo == null) { // Apparently method with arguments is used, let's retry with ME-VE adapter.
-			ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
-			methodInfo = new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
-		}
-
-		if (methodInfo instanceof MethodReference) {
-			return (MethodReference) methodInfo; // From ME-VE adapter or <o:methodParam>.
-		}
-		else {
-			Object base = inspectorElContext.getOutcome();
-
-			try {
-				Method method = base.getClass().getMethod(methodInfo.getName(), methodInfo.getParamTypes());
-				return new MethodReference(base, method);
-			}
-			catch (Exception e) {
-				throw new FacesException(e); // This is unexpected as getMethodInfo() would otherwise have thrown EL exception.
-			}
-		}
+		ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
+		return (MethodReference) new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
 	}
 
 	/**
