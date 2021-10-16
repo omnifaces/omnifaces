@@ -83,14 +83,6 @@
 		<test.tyrus.version>1.18</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>redhat-all</id>
-			<snapshots />
-			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 23.0.1.Final -->
-		</repository>
-	</repositories>
-
 	<dependencies>
 
 		<!-- Java EE 8 dependencies. -->
