@@ -70,7 +70,7 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.jsf22.version>13.0.0.Final</test.wildfly.jsf22.version>
-		<test.wildfly.jsf23.version>23.0.1.Final</test.wildfly.jsf23.version>
+		<test.wildfly.jsf23.version>25.0.0.Final</test.wildfly.jsf23.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
 		<test.tomee.version>7.1.4</test.tomee.version>
 		<test.payara.version>4.1.2.181</test.payara.version>
 	</properties>
@@ -331,7 +331,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.1</version>
 				<configuration>
 					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
@@ -416,7 +416,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.2</version>
+					<version>3.2.0</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
