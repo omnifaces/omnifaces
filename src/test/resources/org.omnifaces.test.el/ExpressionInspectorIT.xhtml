@@ -1,0 +1,42 @@
+<!--
+
+    Copyright 2021 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head />
+
+	<h:body>
+		<h:outputText id="valueReferenceBase" value="#{expressionInspectorITBean.valueReference.base['class'].simpleName}" />
+		<h:outputText id="valueReferenceProperty" value="#{expressionInspectorITBean.valueReference.property}" />
+
+		<h:outputText id="getterReferenceBase" value="#{expressionInspectorITBean.getterReference.base['class'].simpleName}" />
+		<h:outputText id="getterReferenceMethodName" value="#{expressionInspectorITBean.getterReference.method.name}" />
+		<h:outputText id="getterReferenceReturnType" value="#{expressionInspectorITBean.getterReference.returnType.simpleName}" />
+		<h:outputText id="getterReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.getterReference.paramTypes, ', ')}" />
+		<h:outputText id="getterReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.getterReference.actualParameters, ', ')}" />
+
+		<h:outputText id="methodReferenceBase" value="#{expressionInspectorITBean.methodReference.base['class'].simpleName}" />
+		<h:outputText id="methodReferenceMethodName" value="#{expressionInspectorITBean.methodReference.method.name}" />
+		<h:outputText id="methodReferenceReturnType" value="#{expressionInspectorITBean.methodReference.returnType.simpleName}" />
+		<h:outputText id="methodReferenceFirstParamType" value="#{empty expressionInspectorITBean.methodReference.paramTypes ? '' : expressionInspectorITBean.methodReference.paramTypes[0].simpleName}" />
+		<h:outputText id="methodReferenceFirstActualParameter" value="#{empty expressionInspectorITBean.methodReference.actualParameters ? '' : expressionInspectorITBean.methodReference.actualParameters[0]['class'].simpleName}" />
+	</h:body>
+</html>
