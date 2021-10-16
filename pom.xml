@@ -68,7 +68,7 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>23.0.2.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly.version>25.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
 		<test.liberty.version>21.0.0.6-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
 		<test.glassfish.version>6.1.0-M1</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.0.6</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
@@ -337,7 +337,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.1</version>
 				<configuration>
 					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 					<javadocVersion>${javase.version}</javadocVersion>
@@ -423,7 +423,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.2</version>
+					<version>3.2.0</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
