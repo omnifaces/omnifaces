@@ -149,6 +149,12 @@ public abstract class OmniFacesIT {
 				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
 
+			String warLibraries = System.getProperty("war.libraries");
+
+			if (warLibraries != null) {
+				archive.addAsLibraries(Maven.resolver().resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
+			}
+
 			addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
 		}
 
