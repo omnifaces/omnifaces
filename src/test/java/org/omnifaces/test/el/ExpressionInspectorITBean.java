@@ -15,14 +15,13 @@ package org.omnifaces.test.el;
 import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Faces.getELContext;
 
-import javax.inject.Named;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
 
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
