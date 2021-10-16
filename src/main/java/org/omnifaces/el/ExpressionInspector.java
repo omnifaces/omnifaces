@@ -12,7 +12,6 @@
  */
 package org.omnifaces.el;
 
-import static java.util.logging.Level.FINEST;
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Components.createValueExpression;
@@ -20,16 +19,13 @@ import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.MethodExpression;
-import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
-import jakarta.faces.FacesException;
 import jakarta.faces.el.CompositeComponentExpressionHolder;
 
 /**
@@ -66,8 +62,6 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * @since 1.4
  */
 public final class ExpressionInspector {
-
-	private static final Logger logger = Logger.getLogger(ExpressionInspector.class.getName());
 
 	private ExpressionInspector() {
 		// Hide constructor.
@@ -174,40 +168,13 @@ public final class ExpressionInspector {
 	 * @since 2.5
 	 */
 	public static MethodReference getMethodReference(ELContext context, MethodExpression methodExpression) {
-		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
-		// Invoke getMethodInfo() on the method expression to have the expression chain resolved.
-		// The InspectorElContext contains a special resolver that will record the last outcome before the method is
-		// resolved on it. It represents the base we are looking for and is missing in MethodInfo.
-		MethodInfo methodInfo;
+		// Historical note: MethodExpression#getMethodInfo() was previously used as 1st attempt to obtain method reference.
+		// However as per #646 it turns out to be unreliable.
+		// Hence MethodExpressionValueExpressionAdapter, which was previously used as fallback, is form now on used as permanent approach.
 
-		try {
-			methodInfo = methodExpression.getMethodInfo(inspectorElContext); // Oracle EL will return null on methods with arguments.
-		}
-		catch (MethodNotFoundException ignore) {
-			logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish Oracle EL from Apache EL.", ignore);
-			methodInfo = null; // Apache EL will throw MNFE on methods with arguments.
-		}
-
-		if (methodInfo == null) { // Apparently method with arguments is used, let's retry with ME-VE adapter.
-			ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
-			methodInfo = new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
-		}
-
-		if (methodInfo instanceof MethodReference) {
-			return (MethodReference) methodInfo; // From ME-VE adapter or <o:methodParam>.
-		}
-		else {
-			Object base = inspectorElContext.getOutcome();
-
-			try {
-				Method method = base.getClass().getMethod(methodInfo.getName(), methodInfo.getParamTypes());
-				return new MethodReference(base, method);
-			}
-			catch (Exception e) {
-				throw new FacesException(e); // This is unexpected as getMethodInfo() would otherwise have thrown EL exception.
-			}
-		}
+		ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
+		return (MethodReference) new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
 	}
 
 	/**
