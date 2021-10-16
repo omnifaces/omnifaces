@@ -14,6 +14,7 @@ package org.omnifaces.el;
 
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
+import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Reflection.findMethod;
 
@@ -87,7 +88,7 @@ public final class ExpressionInspector {
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		valueExpression.getValue(inspectorElContext);
 
-		Object base = inspectorElContext.getBase();
+		Object base = unwrapIfNecessary(inspectorElContext.getBase());
 		Object property = inspectorElContext.getProperty();
 
 		if (base instanceof CompositeComponentExpressionHolder) {
@@ -133,7 +134,7 @@ public final class ExpressionInspector {
 		// value expresses referred to a property, and invoke() when it's a method.
 		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
 
-		Object base = inspectorElContext.getBase();
+		Object base = unwrapIfNecessary(inspectorElContext.getBase());
 		String property = inspectorElContext.getProperty().toString();
 		boolean fromMethod = (type == ValueExpressionType.METHOD);
 		Object[] params = fromMethod ? inspectorElContext.getParams() : NO_PARAMS;
