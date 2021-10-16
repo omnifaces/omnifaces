@@ -75,14 +75,6 @@
 		<test.payara.version>4.1.2.181</test.payara.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>redhat-all</id>
-			<snapshots />
-			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 23.0.1.Final -->
-		</repository>
-	</repositories>
-
 	<dependencies>
 
 		<!-- Java EE 7 dependencies. -->
