@@ -18,6 +18,7 @@ env:
    - SERVER=wildfly
    - SERVER=tomee
    - SERVER=payara
+   - SERVER=tomcat
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
 
 # Do snapshot deployment.
