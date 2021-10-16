@@ -70,8 +70,8 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>25.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
-		<test.tomee.version>8.0.6</test.tomee.version>
-		<test.payara.version>5.2021.2</test.payara.version>
+		<test.tomee.version>8.0.6</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee --> <!-- TODO: version 8.0.7 is failig a lot of tests -->
+		<test.payara.version>5.2021.7</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 		<test.tomcat.version>9.0.54</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat). -->
