@@ -80,10 +80,9 @@ public class GraphicResource extends DynamicResource {
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
 	private static final String[] EMPTY_PARAMS = new String[0];
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@SuppressWarnings({ "unchecked" })
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
 		GraphicImageBean.class,
-		jakarta.faces.bean.ApplicationScoped.class,
 		jakarta.enterprise.context.ApplicationScoped.class
 	};
 
@@ -93,7 +92,7 @@ public class GraphicResource extends DynamicResource {
 		byte[].class
 	};
 
-	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
+	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<>() {
 		private static final long serialVersionUID = 1L;
 	};
 
