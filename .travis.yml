@@ -19,7 +19,8 @@ env:
    - SERVER=wildfly
    - SERVER=liberty
    - SERVER=glassfish
-   - SERVER=tomcat-mojarra
+   - SERVER=tomcat-mojarra4
+   - SERVER=tomcat-mojarra3
    - SERVER=tomcat-myfaces
 #  - SERVER=tomee
 #  - SERVER=payara
