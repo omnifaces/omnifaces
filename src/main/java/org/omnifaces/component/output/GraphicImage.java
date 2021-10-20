@@ -72,8 +72,8 @@ import org.omnifaces.util.State;
  * <h2>Image streaming</h2>
  * <p>
  * When not rendered as data URI, the {@link InputStream} or <code>byte[]</code> property <strong>must</strong> point to
- * a <em>stateless</em> <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean
- * (both JSF and CDI application scopes are supported). The property will namely be evaluated at the moment the browser
+ * a <em>stateless</em> <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean.
+ * The property will namely be evaluated at the moment the browser
  * requests the image content based on the URL as specified in HTML <code>&lt;img src&gt;</code>, which is usually a
  * different request than the one which rendered the JSF page. E.g.
  * <pre>
