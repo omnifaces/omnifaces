@@ -43,7 +43,8 @@ OmniFaces.ScriptParam = (function(Util) {
 
 		params["execute"] = scriptParamId;
 		params[OmniFaces.EVENT] = "setScriptParamValues";
-		jsf.ajax.request(form, null, params);
+		var faces = window.faces || window.jsf;
+		faces.ajax.request(form, null, params);
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------

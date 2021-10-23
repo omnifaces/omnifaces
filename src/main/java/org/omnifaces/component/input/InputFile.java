@@ -12,9 +12,8 @@
  */
 package org.omnifaces.component.input;
 
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
@@ -25,9 +24,12 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.getMessage;
 import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
+import static org.omnifaces.util.Components.addFacesScriptResource;
+import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
 import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.isRenderResponse;
@@ -45,7 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIForm;
@@ -257,8 +258,6 @@ import org.omnifaces.util.Utils;
  * @since 2.5
  */
 @FacesComponent(InputFile.COMPONENT_TYPE)
-@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically inputfile.js.
 public class InputFile extends HtmlInputFile {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -282,6 +281,22 @@ public class InputFile extends HtmlInputFile {
 
 	private final State state = new State(getStateHelper());
 	private String messageComponentClientId;
+
+	// Init -----------------------------------------------------------------------------------------------------------
+
+	/**
+	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
+	 */
+	public InputFile() {
+		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+	}
+
+	private void registerScriptsIfNecessary() {
+		// This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
+		// resource name which cannot be resolved statically.
+		addFacesScriptResource(); // Required for jsf.ajax.request.
+		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

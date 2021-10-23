@@ -111,7 +111,9 @@ OmniFaces.Util = (function(window, document) {
 			}
 		}
 
-		if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
+		var faces = window.faces || window.jsf;
+
+		if ((!faces || faces.getProjectStage() == "Development") && window.console && console.error) {
 			console.error(ERROR_MISSING_FORM);
 		}
 

@@ -58,7 +58,8 @@ OmniFaces.InputFile = (function(window, document) {
 				
 				var params = { fileName: fileName };
 				params[OmniFaces.EVENT] = "validationFailed";
-				jsf.ajax.request(inputFile.id, event, params);
+				var faces = window.faces || window.jsf;
+				faces.ajax.request(inputFile.id, event, params);
 
 				if (originalEnctype) {
 					inputFile.form.enctype = originalEnctype;

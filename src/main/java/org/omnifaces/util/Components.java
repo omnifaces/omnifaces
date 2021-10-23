@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static jakarta.faces.component.UIComponent.getCompositeComponentParent;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
@@ -30,6 +32,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
@@ -46,6 +49,7 @@ import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
@@ -751,6 +755,15 @@ public final class Components {
 				addScriptResourceToTarget(libraryName, resourceName, "body");
 			}
 		}
+	}
+
+	/**
+	 * Add the Faces JavaScript resource to current view. If Faces 4.0+ is present, then it will add the
+	 * <code>jakarta.faces:faces.js</code> resource, else it will add the <code>jakarta.faces:jsf.js</code> resource.
+	 * @since 4.0
+	 */
+	public static void addFacesScriptResource() {
+		addScriptResource(JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME);
 	}
 
 	private static UIOutput createScriptResource() {

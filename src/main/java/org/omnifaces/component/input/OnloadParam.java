@@ -12,14 +12,13 @@
  */
 package org.omnifaces.component.input;
 
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Ajax.isExecuted;
 import static org.omnifaces.util.Ajax.update;
+import static org.omnifaces.util.Components.addFacesScriptResource;
 import static org.omnifaces.util.Components.addFormIfNecessary;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
@@ -70,7 +69,8 @@ public abstract class OnloadParam extends UIViewParameter {
 
 			// This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
 			// ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
-			addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
+			// Also,  JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
+			addFacesScriptResource(); // Required for jsf.ajax.request.
 			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 
 			if (!isAjaxRequestWithPartialRendering(context)) {

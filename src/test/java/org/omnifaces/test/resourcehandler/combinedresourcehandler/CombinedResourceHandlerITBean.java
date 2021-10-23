@@ -18,6 +18,7 @@ import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 
 @Named
 @ViewScoped // @RequestScoped was been sufficient, this is however explicitly @ViewScoped in order to also test #457.
@@ -27,6 +28,10 @@ public class CombinedResourceHandlerITBean implements Serializable {
 
 	public void rebuild() {
 		Faces.setViewRoot(Faces.getViewId());
+	}
+
+	public boolean isFacesJsAvailable() {
+		return Hacks.isFacesScriptResourceAvailable();
 	}
 
 }

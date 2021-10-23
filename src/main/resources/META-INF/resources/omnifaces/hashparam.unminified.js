@@ -80,7 +80,8 @@ OmniFaces.HashParam = (function(Util, window, document) {
 		if (!updating) {
 			var params = { execute: id, hash: window.location.hash.substring(1) };
 			params[OmniFaces.EVENT] = "setHashParamValues";
-			jsf.ajax.request(Util.getFacesForm(), null, params);
+			var faces = window.faces || window.jsf;
+			faces.ajax.request(Util.getFacesForm(), null, params);
 		}
 	}
 

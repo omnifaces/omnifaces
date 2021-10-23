@@ -33,6 +33,12 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	/** The default URI when a resource is not found. */
 	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
 
+	/**
+	 * The Faces 4+ script resource name.
+	 * @since 4.0
+	 */
+	public static final String FACES_SCRIPT_RESOURCE_NAME = "faces.js";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**

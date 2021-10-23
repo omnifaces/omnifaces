@@ -22,17 +22,19 @@ OmniFaces.Form = (function(Util, window) {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	function init() {
-		if (window.jsf) { // Standard JSF API.
-			var originalGetViewState = jsf.getViewState;
+		var faces = window.faces || window.jsf;
 
-			jsf.getViewState = function(form) {
+		if (faces) { // Standard JSF API.
+			var originalGetViewState = faces.getViewState;
+
+			faces.getViewState = function(form) {
 				var originalViewState = originalGetViewState(form);
 
 				if (form.attributes["data-partialsubmit"] != "true") {
 					return originalViewState;
 				}
 
-				var params = jsf.ajax.request.arguments;
+				var params = faces.ajax.request.arguments;
 				var execute = params ? params[2].execute : null;
 
 				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
