@@ -449,9 +449,9 @@
 		<!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
 		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
 
-		<!-- WildFly integration test profile: mvn verify -P wildfly -->
+		<!-- WildFly with JSF 2.2 integration test profile: mvn verify -P wildfly-jsf22 -->
 		<profile>
-			<id>wildfly</id>
+			<id>wildfly-jsf22</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -497,9 +497,9 @@
 			</build>
 		</profile>
 
-		<!-- WildFly with JSF 2.3 integration test profile: mvn verify -P wildfly23 -->
+		<!-- WildFly with JSF 2.3 integration test profile: mvn verify -P wildfly-jsf23 -->
 		<profile>
-			<id>wildfly23</id>
+			<id>wildfly-jsf23</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
