@@ -119,10 +119,6 @@ public abstract class OmniFacesIT {
 		return isOneOf(System.getProperty("profile.id"), "tomcat-mojarra4");
 	}
 
-	protected static boolean isMyFacesUsed() {
-		return isOneOf(System.getProperty("profile.id"), "liberty", "tomee", "tomcat-myfaces");
-	}
-
 	protected static boolean isBValUsed() {
 		return isOneOf(System.getProperty("profile.id"), "tomee");
 	}
