@@ -1,0 +1,36 @@
+#
+# Copyright 2021 OmniFaces
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+# the License. You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+#
+
+name: Java CI with Maven
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test 4.x on ${{matrix.server}}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        server: [wildfly, liberty, glassfish, tomcat-mojarra4, tomcat-mojarra3, tomcat-myfaces ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+        cache: maven
+    - name: Test with Maven
+      run: mvn verify -Dmaven.javadoc.skip=true -P ${{matrix.server}}
