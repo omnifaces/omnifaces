@@ -105,10 +105,6 @@ public abstract class OmniFacesIT {
 		return url.split(";jsessionid=", 2)[0];
 	}
 
-	protected static boolean isTomee() {
-		return "tomee".equals(System.getProperty("profile.id"));
-	}
-
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
 		return buildWebArchive(testClass).createDeployment();
 	}
