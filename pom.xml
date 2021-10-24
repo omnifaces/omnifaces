@@ -70,7 +70,7 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>25.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
-		<test.tomee.version>8.0.6</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee --> <!-- Version 8.0.7/8.0.8 are failig a lot of tests because bundled MyFaces 2.3.9 incorrectly used jakarta.faces library name for jsf.js instead of javax.faces. -->
+		<test.tomee.version>8.0.6</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee --> <!-- Version 8.0.7/8.0.8 are failing due to https://issues.apache.org/jira/browse/TOMEE-3807 -->
 		<test.payara.version>5.2021.7</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 		<test.tomcat.version>9.0.54</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 
