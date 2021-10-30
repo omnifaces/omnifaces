@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * <p>
@@ -130,6 +131,9 @@ public final class Xml {
 				for (int i = 0; i < children.getLength(); i++) {
 					document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
 				}
+			}
+			catch (SAXParseException e) {
+				throw new SAXException("Cannot parse " + url.toExternalForm(), e);
 			}
 		}
 	}
