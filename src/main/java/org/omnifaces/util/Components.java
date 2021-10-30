@@ -1516,8 +1516,8 @@ public final class Components {
 			ActionSource2 source = (ActionSource2) component;
 			addExpressionStringIfNotNull(source.getActionExpression(), actions);
 
-			for (ActionListener actionListener : source.getActionListeners()) {
-				actions.add(actionListener.getClass().getName());
+			for (ActionListener listener : source.getActionListeners()) {
+				addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
 			}
 		}
 
@@ -1731,15 +1731,17 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {
-		for (Field field : classType.getDeclaredFields()) {
-			if (fieldType.isAssignableFrom(field.getType())) {
-				field.setAccessible(true);
+		for (Class<?> type = classType; type != Object.class; type = type.getSuperclass()) {
+			for (Field field : type.getDeclaredFields()) {
+				if (fieldType.isAssignableFrom(field.getType())) {
+					field.setAccessible(true);
 
-				try {
-					return (F) field.get(instance);
-				}
-				catch (IllegalAccessException e) {
-					throw new IllegalStateException(e);
+					try {
+						return (F) field.get(instance);
+					}
+					catch (IllegalAccessException e) {
+						throw new IllegalStateException(e);
+					}
 				}
 			}
 		}
