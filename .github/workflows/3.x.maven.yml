@@ -11,7 +11,7 @@
 # specific language governing permissions and limitations under the License.
 #
 
-name: tests
+name: 3.x
 
 on:
   push:
