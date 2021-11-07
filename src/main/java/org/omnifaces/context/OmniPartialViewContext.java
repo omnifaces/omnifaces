@@ -311,6 +311,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		private OmniPartialViewContext context;
 		private PartialResponseWriter wrapped;
 		private boolean updating;
+		private boolean updated;
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
@@ -329,7 +330,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		@Override
 		public void startUpdate(String targetId) throws IOException {
-			updating = true;
+			updating = updated = true;
 			wrapped.startUpdate(targetId);
 		}
 
@@ -391,12 +392,12 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			try {
 				wrapped.flush(); // Note: this doesn't actually flush to writer, but clears internal state.
 
-				if (updating) {
-					// If reset() method is entered with updating=true, then it means that Mojarra is used and that
+				if (updated) {
+					// If reset() method is entered with updated=true, then it means that Mojarra is used and that
 					// an exception was been thrown during ajax render response. The following calls will gently close
 					// the partial response which Mojarra has left open.
-					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
-					updating = false;
+					// MyFaces never enters reset() method with updated=true, this is handled in endDocument() method.
+					updated = updating = false;
 					wrapped.startError("");
 					wrapped.endError();
 					wrapped.endElement("partial-response"); // Don't use endDocument() as it will flush.
