@@ -43,11 +43,20 @@
 			<h:commandButton id="throwDuringRenderResponse">
 				<f:ajax render="output" />
 			</h:commandButton>
+			<h:commandButton id="throwDuringSecondUpdateOfRenderResponse">
+				<f:ajax render="before output" />
+			</h:commandButton>
+			<h:commandButton id="throwDuringTreeVisitingOnRenderResponse">
+				<f:ajax render="before data" />
+			</h:commandButton>
 			<p:commandButton id="throwPrimeFacesDuringRenderResponse" process="@this" update="output" />
+			<p:commandButton id="throwPrimeFacesDuringSecondUpdateOfRenderResponse" process="@this" update="before output" />
+			<p:commandButton id="throwPrimeFacesDuringTreeVisitingOnRenderResponse" process="@this" update="before data" />
+			<h:outputText id="before" />
 			<h:panelGroup id="output">
-				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
+				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
 			</h:panelGroup>
-
+			<h:dataTable id="data" value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
 			<h:commandButton id="throwNonAjaxDuringUpdateModelValues" />
 		</o:form>
 		<o:form id="form2">
