@@ -219,7 +219,7 @@ public abstract class OmniFacesIT {
 			}
 
 			MavenResolverSystem maven = Maven.resolver();
-			archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:8.0").withTransitivity().asFile());
+			archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:10.0.0").withTransitivity().asFile());
 			primeFacesSet = true;
 			return this;
 		}
