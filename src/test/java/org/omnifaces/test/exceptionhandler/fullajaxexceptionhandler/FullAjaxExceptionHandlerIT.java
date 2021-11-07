@@ -110,6 +110,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 	@Test
 	public void throwDuringSecondUpdateOfRenderResponse() {
+		refresh(); // TODO: fix so that this is not necessary anymore -- PrimeFaces will unnecessarily render duplicate CSS resources in error page because existing ones have JSESSIONID path param appended and new ones not.
 		assertAllResourcesRendered();
 		guardAjax(throwDuringSecondUpdateOfRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));

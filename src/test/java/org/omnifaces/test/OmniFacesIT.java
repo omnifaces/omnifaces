@@ -50,6 +50,10 @@ public abstract class OmniFacesIT {
 		open(getClass().getSimpleName() + ".xhtml");
 	}
 
+	protected void refresh() {
+		init();
+	}
+
 	protected void open(String pageName) {
 		browser.get(baseURL + pageName);
 		waitGui(browser);
