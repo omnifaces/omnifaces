@@ -45,6 +45,12 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="form1:throwDuringRenderResponse")
 	private WebElement throwDuringRenderResponse;
 
+	@FindBy(id="form1:throwDuringSecondUpdateOfRenderResponse")
+	private WebElement throwDuringSecondUpdateOfRenderResponse;
+
+	@FindBy(id="form1:throwDuringTreeVisitingOnRenderResponse")
+	private WebElement throwDuringTreeVisitingOnRenderResponse;
+
 	@FindBy(id="form1:throwPrimeFacesDuringInvokeApplication")
 	private WebElement throwPrimeFacesDuringInvokeApplication;
 
@@ -53,6 +59,12 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 	@FindBy(id="form1:throwPrimeFacesDuringRenderResponse")
 	private WebElement throwPrimeFacesDuringRenderResponse;
+
+	@FindBy(id="form1:throwPrimeFacesDuringSecondUpdateOfRenderResponse")
+	private WebElement throwPrimeFacesDuringSecondUpdateOfRenderResponse;
+
+	@FindBy(id="form1:throwPrimeFacesDuringTreeVisitingOnRenderResponse")
+	private WebElement throwPrimeFacesDuringTreeVisitingOnRenderResponse;
 
 	@FindBy(id="form2:throwNonAjaxDuringInvokeApplication")
 	private WebElement throwNonAjaxDuringInvokeApplication;
@@ -97,6 +109,22 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
+	public void throwDuringSecondUpdateOfRenderResponse() {
+		assertAllResourcesRendered();
+		guardAjax(throwDuringSecondUpdateOfRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwDuringTreeVisitingOnRenderResponse() {
+		assertAllResourcesRendered();
+		guardAjax(throwDuringTreeVisitingOnRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
 	public void throwPrimeFacesDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringInvokeApplication).click();
@@ -116,6 +144,22 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	public void throwPrimeFacesDuringRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwPrimeFacesDuringSecondUpdateOfRenderResponse() {
+		assertAllResourcesRendered();
+		guardAjax(throwPrimeFacesDuringSecondUpdateOfRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwPrimeFacesDuringTreeVisitingOnRenderResponse() {
+		assertAllResourcesRendered();
+		guardAjax(throwPrimeFacesDuringTreeVisitingOnRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
