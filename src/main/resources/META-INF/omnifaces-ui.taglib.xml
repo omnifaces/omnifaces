@@ -5161,14 +5161,18 @@ public enum Baz {
         <attribute>
 			<description>
 				<![CDATA[
-					The format String which should be used to display error messages occurring as a result of bean validation.
-                    The default format String is set differently depending on the systems used, but typically involves prepending
-                    a list of labels for the verified fields before showing the error message. If this default results in a
-                    confusing error message, it may be overridden here, using <code>{0}</code> to represent the error description
-                    and <code>{1}</code> to represent the label/list of labels associated with the validation.
+					The faces message uses a predefined message format, which corresponds to the value of <code>javax.faces.validator.BeanValidator.MESSAGE</code>
+					in the message bundle. The default message format of <code>{1}: {0}</code> prepends all the validated labels which
+					were checked when the error message occurred. This is useful in the case of validating a single bean property, but
+					sometimes confusing in the case of validating a bean with many properties.
+					<p>
+					In case you'd like to fine-tune the bean
+					validation message on a per-<code>&lt;o:validateBean&gt;</code>-basis, then you can since OmniFaces 3.12 use the
+					<code>messageFormat</code> attribute. Any <code>{0}</code> placeholder will be substituted with the error message
+					and any <code>{1}</code> placeholder will be substituted with the labels of all validated fields.
 				]]>
 			</description>
-			<name>format</name>
+			<name>messageFormat</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
