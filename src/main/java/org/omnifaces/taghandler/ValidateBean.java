@@ -289,7 +289,6 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;!-- Displays: "Errors encountered: First Name and Last Name cannot both be null" --&gt;
  * &lt;o:validateBean messageFormat="Errors encountered: {0}" /&gt;"
  * </pre>
- * </p>
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
