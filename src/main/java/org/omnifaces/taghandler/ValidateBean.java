@@ -262,6 +262,34 @@ import org.omnifaces.util.copier.SerializationCopier;
  * <code>showMessageFor</code> attribute does by design not have any effect when <code>validateMethod="actual"</code>
  * is used.
  *
+ * <h3>Message format</h3>
+ * <p>
+ * The faces message uses a predefined message format, which corresponds to the value of {@link BeanValidator#MESSAGE_ID}
+ * in the message bundle. The default message format of <code>{1}: {0}</code> prepends the labels of all the validated
+ * fields. This is useful in the case of validating a single bean property, but sometimes confusing in the case of
+ * validating a bean with many properties.
+ * <p>
+ * In a form containing properties like <i>First Name</i>, <i>Last Name</i>, <i>Address</i>, <i>Zip Code</i>, and
+ * <i>Phone Number</i> where at the bean level, at least one of the name fields must be non-null, overriding the message
+ * format can help make a more clear error message.
+ * <p>
+ * This can be done by overriding the {@link BeanValidator#MESSAGE_ID} line in the message bundle:
+ * <pre>
+ * jakarta.faces.validator.BeanValidator.MESSAGE = Errors encountered: {0}
+ * </pre>
+ * <p>
+ * However, this change affects all bean validation messages site-wide. In case you'd like to fine-tune the bean
+ * validation message on a per-<code>&lt;o:validateBean&gt;</code>-basis, then you can since OmniFaces 3.12 use the
+ * <code>messageFormat</code> attribute. Any <code>{0}</code> placeholder will be substituted with the error message
+ * and any <code>{1}</code> placeholder will be substituted with the labels of all validated fields.
+ * <pre>
+ * &lt;!-- Displays: "First Name, Last Name, Address, Zip Code, Phone Number: First Name and Last Name cannot both be null" --&gt;
+ * &lt;o:validateBean /&gt;
+ *
+ * &lt;!-- Displays: "Errors encountered: First Name and Last Name cannot both be null" --&gt;
+ * &lt;o:validateBean messageFormat="Errors encountered: {0}" /&gt;"
+ * </pre>
+ *
  * @author Bauke Scholtz
  * @author Arjan Tijms
  * @author Andre Wachsmuth
@@ -302,6 +330,7 @@ public class ValidateBean extends TagHandler {
 	private String groups;
 	private String copier;
 	private String showMessageFor;
+	private String messageFormat;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -340,6 +369,7 @@ public class ValidateBean extends TagHandler {
 		groups = getString(context, getAttribute("validationGroups"));
 		copier = getString(context, getAttribute("copier"));
 		showMessageFor = coalesce(getString(context, getAttribute("showMessageFor")), DEFAULT_SHOWMESSAGEFOR);
+		messageFormat = getString(context, getAttribute("messageFormat"));
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -488,13 +518,13 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			if ("@violating".equals(showMessageFor)) {
-				invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations);
+				invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, messageFormat);
 			}
 			else if (showMessageFor.charAt(0) != '@') {
-				invalidateInputsByShowMessageForAndShowMessages(context, form, violations, showMessageFor);
+				invalidateInputsByShowMessageForAndShowMessages(context, form, violations, showMessageFor, messageFormat);
 			}
 			else {
-				invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessageFor);
+				invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessageFor, messageFormat);
 			}
 
 			if (context.isValidationFailed() && renderResponseOnFail) {
@@ -567,7 +597,7 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
+	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, String messageFormat) {
 		for (ConstraintViolation<?> violation : violations) {
 			Object base = resolveViolatedBase(bean, violation);
 			String property = resolveViolatedProperty(violation);
@@ -576,12 +606,12 @@ public class ValidateBean extends TagHandler {
 				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
-				addError(clientId, formatMessage(violation.getMessage(), getLabel(input)));
+				addError(clientId, formatMessage(violation.getMessage(), getLabel(input), messageFormat));
 			});
 		}
 	}
 
-	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor) {
+	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor, String messageFormat) {
 		for (String forId : showMessageFor.split("\\s+")) {
 			UIComponent component = form.findComponent(forId);
 			context.validationFailed();
@@ -591,11 +621,11 @@ public class ValidateBean extends TagHandler {
 			}
 
 			String clientId = component.getClientId(context);
-			addErrors(clientId, violations, getLabel(component));
+			addErrors(clientId, violations, getLabel(component), messageFormat);
 		}
 	}
 
-	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
+	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor, String messageFormat) {
 		context.validationFailed();
 		StringBuilder labels = new StringBuilder();
 
@@ -611,47 +641,51 @@ public class ValidateBean extends TagHandler {
 			});
 		}
 
-		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
+		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor, messageFormat);
 	}
 
-	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
+	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor, String messageFormat) {
 		if ("@form".equals(showMessagesFor)) {
 			String formId = form.getClientId(context);
-			addErrors(formId, violations, labels);
+			addErrors(formId, violations, labels, messageFormat);
 		}
 		else if ("@all".equals(showMessagesFor)) {
 			for (String clientId : clientIds) {
-				addErrors(clientId, violations, labels);
+				addErrors(clientId, violations, labels, messageFormat);
 			}
 		}
 		else if ("@global".equals(showMessagesFor)) {
 			for (ConstraintViolation<?> violation : violations) {
-				addGlobalError(formatMessage(violation.getMessage(), labels));
+				addGlobalError(formatMessage(violation.getMessage(), labels, messageFormat));
 			}
 		}
 		else {
 			for (String clientId : showMessagesFor.split("\\s+")) {
-				addErrors(clientId, violations, labels);
+				addErrors(clientId, violations, labels, messageFormat);
 			}
 		}
 	}
 
-	private static void addErrors(String clientId, Set<ConstraintViolation<?>> violations, String labels) {
+	private static void addErrors(String clientId, Set<ConstraintViolation<?>> violations, String labels, String messageFormat) {
 		for (ConstraintViolation<?> violation : violations) {
-			addError(clientId, formatMessage(violation.getMessage(), labels));
+			addError(clientId, formatMessage(violation.getMessage(), labels, messageFormat));
 		}
 	}
 
-	private static String formatMessage(String message, String label) {
+	private static String formatMessage(String message, String label, String messageFormat) {
 		if (!isEmpty(label)) {
-			ResourceBundle messageBundle = getMessageBundle();
+			String pattern = messageFormat;
 
-			if (messageBundle != null && messageBundle.containsKey(BeanValidator.MESSAGE_ID)) {
-				String pattern = messageBundle.getString(BeanValidator.MESSAGE_ID);
+			if (pattern == null) {
+				ResourceBundle messageBundle = getMessageBundle();
 
-				if (pattern != null) {
-					return format(pattern, message, label);
+				if (messageBundle != null && messageBundle.containsKey(BeanValidator.MESSAGE_ID)) {
+					pattern = messageBundle.getString(BeanValidator.MESSAGE_ID);
 				}
+			}
+
+			if (pattern != null) {
+				return format(pattern, message, label);
 			}
 		}
 

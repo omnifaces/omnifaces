@@ -103,6 +103,17 @@
 				copier="org.omnifaces.test.taghandler.validatebean.ValidateBeanITEntityCopier" />
 		</o:form>
 
+		<o:form id="validateClassLevelWithMessageFormat">
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}" messageFormat="Numbers: {0}" />
+		</o:form>
+
 		<o:form id="validateClassLevelWithMessageForForm">
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />

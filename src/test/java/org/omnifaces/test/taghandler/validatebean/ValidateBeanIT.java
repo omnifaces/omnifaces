@@ -95,6 +95,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelByCopier:command")
 	private WebElement validateClassLevelByCopierCommand;
 
+	@FindBy(id="validateClassLevelWithMessageFormat:number1")
+	private WebElement validateClassLevelWithMessageFormatNumber1;
+
+	@FindBy(id="validateClassLevelWithMessageFormat:number2")
+	private WebElement validateClassLevelWithMessageFormatNumber2;
+
+	@FindBy(id="validateClassLevelWithMessageFormat:globalMessage")
+	private WebElement validateClassLevelWithMessageFormatMessage;
+
+	@FindBy(id="validateClassLevelWithMessageFormat:command")
+	private WebElement validateClassLevelWithMessageFormatCommand;
+
 	@FindBy(id="validateClassLevelWithMessageForForm:number1")
 	private WebElement validateClassLevelWithMessageForFormNumber1;
 
@@ -498,6 +510,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 		validateClassLevelByCopierNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelByCopierCommand).click();
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithMessageFormat() {
+		validateClassLevelWithMessageFormatNumber1.sendKeys("2");
+		validateClassLevelWithMessageFormatNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageFormatCommand).click();
+		assertEquals("Numbers: invalidEntity", messages.getText());
+
+		validateClassLevelWithMessageFormatNumber2.sendKeys("0"); // So it becomes 10
+		guardAjax(validateClassLevelWithMessageFormatCommand).click();
 		assertEquals("actionSuccess", messages.getText());
 	}
 
