@@ -5158,6 +5158,20 @@ public enum Baz {
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+        <attribute>
+			<description>
+				<![CDATA[
+					The format String which should be used to display error messages occurring as a result of bean validation.
+                    The default format String is set differently depending on the systems used, but typically involves prepending
+                    a list of labels for the verified fields before showing the error message. If this default results in a
+                    confusing error message, it may be overridden here, using <code>{0}</code> to represent the error description
+                    and <code>{1}</code> to represent the label/list of labels associated with the validation.
+				]]>
+			</description>
+			<name>format</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
 
 	<tag>
