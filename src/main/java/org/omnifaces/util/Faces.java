@@ -2080,6 +2080,38 @@ public final class Faces {
 	}
 
 	/**
+	 * Add a cookie with given name, value, domain, path, maxage, HttpOnly flag and custom attributes to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
+	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * Defaults to {@link #getRequestHostname()} when <code>null</code>.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @param httpOnly When set to true, then JavaScript is not allowed to manipulate the cookie.
+	 * @param attributes Any custom attributes you'd like to add to the cookie, such as <code>SameSite:None</code>. Any
+	 * key whose name matches a predefined cookie attribute name, such as <code>domain</code>, <code>path</code>,
+	 * <code>HttpOnly</code>, etc, will override them. If the underlying Faces and/or Servlet implementation does not
+	 * allow a certain custom attribute, then it will throw {@link IllegalArgumentException}.
+	 * @throws NullPointerException When faces context is unavailable.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @throws IllegalArgumentException When a custom attribute is specified which is not supported by the underlying
+	 * Faces and/or Servlet implementation. As of now, it's only supported when running minimally Faces 4 on on top of
+	 * minimally Servlet 6.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 * @since 4.0
+	 */
+	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge, boolean httpOnly, Map<String, String> attributes) {
+		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge, httpOnly, attributes);
+	}
+
+	/**
 	 * Remove the cookie with given name and path from the HTTP response. Note that the name and path must be exactly
 	 * the same as it was when the cookie was created.
 	 * @param name The cookie name.

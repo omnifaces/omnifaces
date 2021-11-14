@@ -1356,6 +1356,13 @@ public final class FacesLocal {
 	 * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
+		addResponseCookie(context, name, value, domain, path, maxAge, true, null);
+	}
+
+	/**
+	 * @see Faces#addResponseCookie(String, String, String, String, int, boolean, Map)
+	 */
+	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly, Map<String, String> attributes) {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
@@ -1370,6 +1377,11 @@ public final class FacesLocal {
 		properties.put("maxAge", maxAge);
 		properties.put("httpOnly", httpOnly);
 		properties.put("secure", isSecure((HttpServletRequest) externalContext.getRequest()));
+
+		if (attributes != null) {
+			properties.putAll(attributes);
+		}
+
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
 
