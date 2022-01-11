@@ -39,9 +39,15 @@
 			</h:commandButton>
 		</h:form>
 
-		<h:form id="uploadSingleAccept" enctype="multipart/form-data">
+		<h:form id="uploadSingleAcceptAnyImage" enctype="multipart/form-data">
 			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
 				accept="image/*" acceptMessage="{0}: {1} is not {2}" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+		</h:form>
+
+		<h:form id="uploadSingleAcceptSvgImage" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+				accept="image/svg+xml" acceptMessage="{0}: {1} is not {2}" />
 			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
 		</h:form>
 
