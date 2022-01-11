@@ -13,7 +13,9 @@
 package org.omnifaces.util.copier;
 
 import static java.lang.String.format;
-import static org.omnifaces.util.Reflection.invokeMethod;
+import static org.omnifaces.util.Reflection.findMethod;
+
+import java.lang.reflect.Method;
 
 /**
  * Copier that copies an object using the {@link Cloneable} facility.
@@ -24,17 +26,37 @@ import static org.omnifaces.util.Reflection.invokeMethod;
  */
 public class CloneCopier implements Copier {
 
-	private static final String ERROR_CANT_CLONE =
-			"Can not clone object of type %s since it doesn't implement Cloneable";
+	private static final String ERROR_MISSING_INTERFACE =
+		"Can not clone object of type %s because it doesn't implement Cloneable,"
+			+ " you need to make sure that the class implements java.lang.Cloneable";
+
+	private static final String ERROR_INACCESSIBLE_METHOD =
+		"Can not clone object of type %s because clone() method is not accessible,"
+			+ " you need to make sure that the clone() method is overridden and that it is public instead of protected";
+
+	private static final String ERROR_UNINVOKABLE_METHOD =
+		"Can not clone object of type %s because clone() method is not invokable,"
+			+ " you need to make sure that invoking the clone() method does not throw an exception";
 
 	@Override
 	public Object copy(Object object) {
 
 		if (!(object instanceof Cloneable)) {
-			throw new IllegalStateException(format(ERROR_CANT_CLONE, object.getClass()));
+			throw new IllegalStateException(format(ERROR_MISSING_INTERFACE, object.getClass()));
 		}
 
-		return invokeMethod(object, "clone");
+		Method method = findMethod(object, "clone");
+
+		if (!method.isAccessible()) {
+			throw new IllegalStateException(format(ERROR_INACCESSIBLE_METHOD, object.getClass()));
+		}
+
+		try {
+			return method.invoke(object);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(format(ERROR_UNINVOKABLE_METHOD, object.getClass()));
+		}
 	}
 
 }

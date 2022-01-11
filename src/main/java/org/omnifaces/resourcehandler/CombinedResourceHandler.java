@@ -24,6 +24,7 @@ import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isNumber;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -169,7 +170,10 @@ import org.omnifaces.util.cache.Cache;
  * </td><td>
  * Set the desired value of <code>crossorigin</code> attribute of combined script resources. Supported values are
  * specified in <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin">MDN</a>.
- * The default value is <code>anonymous</code> (i.e. no cookies are transferred at all).
+ * Since 2.4, the default value is <code>anonymous</code> (i.e. no cookies are transferred at all). Since 3.13, when the
+ * value is <code>anonymous</code>, then the combined resource handler will also set the <code>integrity</code>
+ * attribute with a base64 encoded sha384 hash as SRI, see also
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">MDN</a>.
  * </td></tr>
  * </table>
  * <p>
@@ -269,7 +273,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	public static final String PARAM_NAME_CACHE_TTL =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
 
-	/** The context parameter name to specify 'crossorigin' attribute of combined JS resources. @since 3.5 */
+	/** The context parameter name to specify 'crossorigin' attribute of combined resources. @since 3.5 */
 	public static final String PARAM_NAME_CROSSORIGIN =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CROSSORIGIN";
 
@@ -292,6 +296,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private boolean inlineJS;
 	private Integer cacheTTL;
 	private String crossorigin;
+	private boolean needsIntegrity;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -312,6 +317,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		inlineJS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_JS));
 		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
 		crossorigin = coalesce(getInitParameter(PARAM_NAME_CROSSORIGIN), DEFAULT_CROSSORIGIN);
+		needsIntegrity = DEFAULT_CROSSORIGIN.equals(crossorigin);
 		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
 
@@ -638,21 +644,23 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				Resource resource = FacesLocal.createResource(context, LIBRARY_NAME, resourceName);
 
 				if (resource instanceof CDNResource) {
-					setFallbackURL((CDNResource) resource);
+					setFallbackURL(context, (CDNResource) resource);
 				}
-				else if (RENDERER_TYPE_JS.equals(rendererType)) {
+				else if (isOneOf(rendererType, RENDERER_TYPE_JS, RENDERER_TYPE_CSS)) {
 					componentResource.getPassThroughAttributes().put("crossorigin", crossorigin);
+					componentResource.getPassThroughAttributes().put("integrity", getIntegrityIfNecessary(context, resource));
 				}
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
-		private void setFallbackURL(CDNResource cdnResource) {
+		private void setFallbackURL(FacesContext context, CDNResource cdnResource) {
 			String fallbackURL = cdnResource.getLocalRequestPath();
 
 			if (RENDERER_TYPE_JS.equals(rendererType)) {
-				componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallbackURL + "\"></script>')");
+				componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallbackURL
+					+ "\" crossorigin=\"" + crossorigin + "\" integrity=\"" + getIntegrityIfNecessary(context, cdnResource) + "\"></script>')");
 			}
 			else if (RENDERER_TYPE_CSS.equals(rendererType)) {
 				componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallbackURL + "'");
@@ -665,8 +673,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 					callbacks = ",null,function(){" + onsuccess + "}";
 				}
 
-				componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallbackURL + "', '" + crossorigin + "'" + callbacks + ")");
+				componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallbackURL
+					+ "','" + crossorigin + "','" + getIntegrityIfNecessary(context, cdnResource) + "'" + callbacks + ")");
 			}
+		}
+
+		private String getIntegrityIfNecessary(FacesContext context, Resource resource) {
+			return needsIntegrity ? new ResourceIdentifier(resource).getIntegrity(context) : "";
 		}
 	}
 

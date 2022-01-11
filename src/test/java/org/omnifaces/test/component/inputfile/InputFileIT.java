@@ -46,11 +46,17 @@ public class InputFileIT extends OmniFacesIT {
 	@FindBy(id="uploadSingleAjax:submit")
 	private WebElement uploadSingleAjaxSubmit;
 
-	@FindBy(id="uploadSingleAccept:file")
-	private WebElement uploadSingleAcceptFile;
+	@FindBy(id="uploadSingleAcceptAnyImage:file")
+	private WebElement uploadSingleAcceptAnyImageFile;
 
-	@FindBy(id="uploadSingleAccept:submit")
-	private WebElement uploadSingleAcceptSubmit;
+	@FindBy(id="uploadSingleAcceptAnyImage:submit")
+	private WebElement uploadSingleAcceptAnyImageSubmit;
+
+	@FindBy(id="uploadSingleAcceptSvgImage:file")
+	private WebElement uploadSingleAcceptSvgImageFile;
+
+	@FindBy(id="uploadSingleAcceptSvgImage:submit")
+	private WebElement uploadSingleAcceptSvgImageSubmit;
 
 	@FindBy(id="uploadSingleMaxsizeClient:file")
 	private WebElement uploadSingleMaxsizeClientFile;
@@ -114,19 +120,35 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleAccept() throws IOException {
+	public void uploadSingleAcceptAnyImage() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
-		uploadSingleAcceptFile.sendKeys(txtFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptSubmit).click();
-		assertTrue(uploadSingleAcceptFile.getText().isEmpty());
+		uploadSingleAcceptAnyImageFile.sendKeys(txtFile.getAbsolutePath());
+		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
+		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
 		assertEquals("label: " + txtFile.getName() + " is not image/*", messages.getText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
-		uploadSingleAcceptFile.clear();
-		uploadSingleAcceptFile.sendKeys(gifFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptSubmit).click();
-		assertTrue(uploadSingleAcceptFile.getText().isEmpty());
+		uploadSingleAcceptAnyImageFile.clear();
+		uploadSingleAcceptAnyImageFile.sendKeys(gifFile.getAbsolutePath());
+		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
+		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), messages.getText());
+	}
+
+	@Test
+	public void uploadSingleAcceptSvgImage() throws IOException {
+		File txtFile = createTempFile("file", "txt", "hello world");
+		uploadSingleAcceptSvgImageFile.sendKeys(txtFile.getAbsolutePath());
+		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
+		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
+		assertEquals("label: " + txtFile.getName() + " is not image/svg+xml", messages.getText());
+
+		File svgFile = createTempFile("file", "svg", "<svg/>");
+		uploadSingleAcceptSvgImageFile.clear();
+		uploadSingleAcceptSvgImageFile.sendKeys(svgFile.getAbsolutePath());
+		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
+		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
+		assertEquals("uploadSingle: " + svgFile.length() + ", " + svgFile.getName(), messages.getText());
 	}
 
 	@Test

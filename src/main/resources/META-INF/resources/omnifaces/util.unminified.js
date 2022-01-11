@@ -157,12 +157,13 @@ OmniFaces.Util = (function(window, document) {
 	 * Load a script.
 	 * @param {string} url Required; The URL of the script.
 	 * @param {string} crossorigin Optional; The crossorigin of the script. Defaults to "anonymous".
+	 * @param {string} integrity Optional; The integrity of the script. Defaults to "".
 	 * @param {function} begin Optional; Function to invoke before deferred script is loaded.
 	 * @param {function} success Optional; Function to invoke after deferred script is successfully loaded.
 	 * @param {function} error Optional; Function to invoke when loading of deferred script failed.
 	 * @param {function} complete Optional; Function to invoke after deferred script is loaded, regardless of its success/error outcome.
 	 */
-	self.loadScript = function(url, crossorigin, begin, success, error, complete) {
+	self.loadScript = function(url, crossorigin, integrity, begin, success, error, complete) {
 		var beginFunction = self.resolveFunction(begin);
 		var successFunction = self.resolveFunction(success);
 		var errorFunction = self.resolveFunction(error);
@@ -174,6 +175,7 @@ OmniFaces.Util = (function(window, document) {
 		script.async = true;
 		script.src = url;
 		script.setAttribute("crossorigin", crossorigin || "anonymous");
+		script.setAttribute("integrity", integrity || "");
 
 		script.onerror = function() {
 			errorFunction();
