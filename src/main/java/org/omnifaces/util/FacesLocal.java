@@ -1428,6 +1428,14 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#isRequestedSessionExpired()
+	 */
+	public static boolean isRequestedSessionExpired(FacesContext context) {
+		HttpServletRequest request = getRequest(context);
+		return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
+	}
+
+	/**
 	 * @see Faces#getSessionCreationTime()
 	 */
 	public static long getSessionCreationTime(FacesContext context) {

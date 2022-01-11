@@ -2127,7 +2127,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static String getSessionId() {
-		return FacesLocal. getSessionId(getContext());
+		return FacesLocal.getSessionId(getContext());
 	}
 
 	/**
@@ -2162,6 +2162,20 @@ public final class Faces {
 	 */
 	public static boolean isSessionNew() {
 		return FacesLocal.isSessionNew(getContext());
+	}
+
+	/**
+	 * Returns whether the requested HTTP session is expired.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestedSessionExpired}</code>.
+	 * @return <code>true</code> if the requested HTTP session is expired, otherwise <code>false</code>.
+	 * @throws NullPointerException When faces context is unavailable.
+	 * @see HttpServletRequest#getRequestedSessionId()
+	 * @see HttpServletRequest#isRequestedSessionIdValid()
+	 * @since 3.13
+	 */
+	public static boolean isRequestedSessionExpired() {
+		return FacesLocal.isRequestedSessionExpired(getContext());
 	}
 
 	/**
