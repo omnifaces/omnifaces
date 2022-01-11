@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
@@ -548,7 +549,7 @@ public class InputFile extends HtmlInputFile {
 		if (accept != null) {
 			String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
 
-			if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
+			if (contentType == null || !contentType.matches(convertAcceptToRegex(accept))) {
 				message = getAcceptMessage();
 				param = accept;
 			}
@@ -563,6 +564,21 @@ public class InputFile extends HtmlInputFile {
 			addError(getClientId(context), message, Components.getLabel(this), fileName, param);
 			setValid(false);
 		}
+	}
+
+	private String convertAcceptToRegex(String accept) {
+		String[] parts = accept.replaceAll("\\s*", "").split("(?=[*,])");
+		StringBuilder regex = new StringBuilder();
+
+		for (String part : parts) {
+			switch (part) {
+				case "*": regex.append(".*"); break;
+				case ",": regex.append("|"); break;
+				default: regex.append(Pattern.quote(part)); break;
+			}
+		}
+
+		return regex.toString();
 	}
 
 	private String getMessageComponentClientId() {
