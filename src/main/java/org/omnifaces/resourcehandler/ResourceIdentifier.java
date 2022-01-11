@@ -12,9 +12,20 @@
  */
 package org.omnifaces.resourcehandler;
 
-import java.util.Map;
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
+import static org.omnifaces.util.FacesLocal.createResource;
+import static org.omnifaces.util.Utils.toByteArray;
 
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
+import javax.faces.application.Resource;
 import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 
 /**
  * Convenience class to represent a resource identifier.
@@ -23,6 +34,15 @@ import javax.faces.component.UIComponent;
  * @since 1.3
  */
 public class ResourceIdentifier {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(ResourceIdentifier.class.getName());
+
+	private static final Map<String, String> INTEGRITIES = new ConcurrentHashMap<>();
+
+	private static final String WARNING_CANNOT_COMPUTE_INTEGRITY =
+		"Cannot compute integrity for %s; defaulting to empty string";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -58,6 +78,15 @@ public class ResourceIdentifier {
 		setLibraryAndName(library, name);
 	}
 
+	/**
+	 * Create a new instance based on given resource.
+	 * @param resource The resource.
+	 * @since 3.13
+	 */
+	public ResourceIdentifier(Resource resource) {
+		setLibraryAndName(resource.getLibraryName(), resource.getResourceName());
+	}
+
 	private void setLibraryAndName(String library, String name) {
 		this.library = library;
 		this.name = (name != null) ? name.split("[?#;]", 2)[0] : null; // Split gets rid of query string and path fragment.
@@ -79,6 +108,17 @@ public class ResourceIdentifier {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Returns the resource integrity as base64 encoded sha384 hash.
+	 * This is lazily computed and will return an empty string when the integrity could not be computed.
+	 * The reason for the compute failure will be logged as WARNING.
+	 * @return The resource integrity as base64 encoded sha384 hash.
+	 * @since 3.13
+	 */
+	public String getIntegrity(FacesContext context) {
+		return INTEGRITIES.computeIfAbsent(toString(), k -> computeIntegrity(context, this));
 	}
 
 	// Object overrides -----------------------------------------------------------------------------------------------
@@ -122,6 +162,20 @@ public class ResourceIdentifier {
 	@Override
 	public String toString() {
 		return (library != null ? (library + ":") : "") + name;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static String computeIntegrity(FacesContext context, ResourceIdentifier id) {
+		try {
+			byte[] content = toByteArray(createResource(context, id).getInputStream());
+			byte[] sha384 = MessageDigest.getInstance("SHA-384").digest(content);
+			return "sha384-" + Base64.getEncoder().encodeToString(sha384);
+		}
+		catch (Exception e) {
+			logger.log(WARNING, format(WARNING_CANNOT_COMPUTE_INTEGRITY, id), e);
+			return "";
+		}
 	}
 
 }

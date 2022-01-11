@@ -34,6 +34,8 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|javax.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
 	private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
 	private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
+	private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-ysBfZCyXtYzzO6x03bBw3yhvPx1GFZPFyBAyAWs8d953bHh1I+5e+cfry9w420Ul";
+	private static final String HEAD_COMBINED_STYLESHEET_INTEGRITY = "sha384-abuz3LL+ctcCJ1xayZt5v41hAEWyilMFeXRpHtRI2ZzyVAj2D7D3g6ECizTFWMA0";
 	private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
 
 	@FindBy(css="script[src*='ln=omnifaces.combined']")
@@ -142,6 +144,14 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 		assertEquals("5,bodyWithoutTarget", bodyWithoutTarget.getText());
 		assertEquals("6,deferredInHead", deferredInHead.getText());
 		assertEquals("7,deferredInBody", deferredInBody.getText());
+
+		verifyIntegrity(combinedScripts.get(1), DEFERRED_COMBINED_SCRIPT_INTEGRITY);
+		verifyIntegrity(combinedStylesheets.get(0), HEAD_COMBINED_STYLESHEET_INTEGRITY);
+	}
+
+	private void verifyIntegrity(WebElement element, String integrity) {
+		assertEquals("anonymous", element.getAttribute("crossorigin"));
+		assertEquals(integrity, element.getAttribute("integrity"));
 	}
 
 }

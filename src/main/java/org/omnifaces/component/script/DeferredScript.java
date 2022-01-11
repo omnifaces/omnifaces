@@ -36,6 +36,10 @@ import org.omnifaces.renderer.DeferredScriptRenderer;
  * <p>
  * This will give bonus points with among others the Google PageSpeed tool, on the contrary to placing the script at
  * bottom of body, or using <code>defer="true"</code> or even <code>async="true"</code>.
+ * <p>
+ * Since 2.4 this will render the <code>crossorigin</code> attribute with a value of <code>anonymous</code>.
+ * Since 3.13 this will also render the <code>integrity</code> attribute with a base64 encoded sha384 hash as SRI, see
+ * also <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">MDN</a>.
  *
  * <h3>Usage</h3>
  * <p>

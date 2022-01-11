@@ -29,6 +29,7 @@ import javax.faces.render.Renderer;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * This renderer is the default renderer of {@link DeferredScript}. The rendering is extracted from the component so
@@ -54,10 +55,8 @@ public class DeferredScriptRenderer extends Renderer {
 	 */
 	@Override
 	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
-		Map<String, Object> attributes = component.getAttributes();
-		String library = (String) attributes.get("library");
-		String name = (String) attributes.get("name");
-		Resource resource = createResource(context, library, name);
+		ResourceIdentifier id = new ResourceIdentifier(component);
+		Resource resource = createResource(context, id);
 
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("script", component);
@@ -66,8 +65,11 @@ public class DeferredScriptRenderer extends Renderer {
 		if (resource != null) {
 			writer.write("OmniFaces.DeferredScript.add('");
 			writer.write(resource.getRequestPath());
-			writer.write('\'');
+			writer.write("','anonymous','");
+			writer.write(id.getIntegrity(context));
+			writer.write("'");
 
+			Map<String, Object> attributes = component.getAttributes();
 			String onbegin = (String) attributes.get("onbegin");
 			String onsuccess = (String) attributes.get("onsuccess");
 			String onerror = (String) attributes.get("onerror");
