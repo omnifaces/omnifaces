@@ -31,8 +31,10 @@
 			<h:commandButton id="throwDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
 				<f:ajax />
 			</h:commandButton>
-
 			<p:commandButton id="throwPrimeFacesDuringInvokeApplication" process="@this" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
+			<h:commandButton id="throwMixedDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
+				<p:ajax />
+			</h:commandButton>
 
 			<h:inputText id="input" value="#{fullAjaxExceptionHandlerITBean.throwDuringUpdateModelValues}" />
 			<h:commandButton id="throwDuringUpdateModelValues">
