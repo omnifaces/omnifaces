@@ -19,6 +19,7 @@ import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isRenderResponse;
@@ -40,6 +41,8 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
+import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.render.ResponseStateManager;
@@ -352,7 +355,38 @@ public final class Hacks {
 		}
 
 		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
-		return actionSource != null && actionSource.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
+
+		if (actionSource == null) {
+			return false;
+		}
+
+		if (isPrimeFacesClass(actionSource)) {
+			return true;
+		}
+
+		if (!(actionSource instanceof ClientBehaviorHolder)) {
+			return false;
+		}
+
+		String ajaxEvent = getRequestParameter(context, "javax.faces.behavior.event");
+
+		if (ajaxEvent == null) {
+			return false;
+		}
+
+		ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
+
+		for (ClientBehavior ajaxBehavior : ajaxSource.getClientBehaviors().get(ajaxEvent)) {
+			if (isPrimeFacesClass(ajaxBehavior)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean isPrimeFacesClass(Object object) {
+		return object.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
 	}
 
 	/**
