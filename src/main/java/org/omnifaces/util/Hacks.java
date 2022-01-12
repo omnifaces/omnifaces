@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -42,6 +43,7 @@ import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.behavior.ClientBehaviorContext;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
@@ -368,7 +370,7 @@ public final class Hacks {
 			return false;
 		}
 
-		String ajaxEvent = getRequestParameter(context, "javax.faces.behavior.event");
+		String ajaxEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
 
 		if (ajaxEvent == null) {
 			return false;
@@ -376,10 +378,8 @@ public final class Hacks {
 
 		ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
 
-		for (ClientBehavior ajaxBehavior : ajaxSource.getClientBehaviors().get(ajaxEvent)) {
-			if (isPrimeFacesClass(ajaxBehavior)) {
-				return true;
-			}
+		if (ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesClass)) {
+			return true;
 		}
 
 		return false;
