@@ -54,6 +54,9 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="form1:throwPrimeFacesDuringInvokeApplication")
 	private WebElement throwPrimeFacesDuringInvokeApplication;
 
+	@FindBy(id="form1:throwMixedDuringInvokeApplication")
+	private WebElement throwMixedDuringInvokeApplication;
+
 	@FindBy(id="form1:throwPrimeFacesDuringUpdateModelValues")
 	private WebElement throwPrimeFacesDuringUpdateModelValues;
 
@@ -129,6 +132,14 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	public void throwPrimeFacesDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringInvokeApplication).click();
+		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
+		assertAllResourcesRendered();
+	}
+
+	@Test
+	public void throwMixedDuringInvokeApplication() {
+		assertAllResourcesRendered();
+		guardAjax(throwMixedDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
 		assertAllResourcesRendered();
 	}

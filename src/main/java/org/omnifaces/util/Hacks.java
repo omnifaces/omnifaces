@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
@@ -21,6 +22,7 @@ import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isRenderResponse;
@@ -42,6 +44,7 @@ import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.component.StateHelper;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.FacesContextWrapper;
 import jakarta.faces.render.ResponseStateManager;
@@ -392,7 +395,36 @@ public final class Hacks {
 		}
 
 		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
-		return actionSource != null && actionSource.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
+
+		if (actionSource == null) {
+			return false;
+		}
+
+		if (isPrimeFacesClass(actionSource)) {
+			return true;
+		}
+
+		if (!(actionSource instanceof ClientBehaviorHolder)) {
+			return false;
+		}
+
+		String ajaxEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
+
+		if (ajaxEvent == null) {
+			return false;
+		}
+
+		ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
+
+		if (ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesClass)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean isPrimeFacesClass(Object object) {
+		return object.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
 	}
 
 	/**
