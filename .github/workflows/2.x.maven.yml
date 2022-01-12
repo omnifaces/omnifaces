@@ -42,7 +42,7 @@ jobs:
       run: mvn verify -P ${{matrix.server}}
 
   deploy:
-    name: Deploy 2.x SNAPSHOT to Sonatype
+    name: Deploy 2.x SNAPSHOT
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -52,10 +52,15 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
-        cache: maven
+        server-id: ossrh
+        server-username: OSSRH_USERNAME
+        server-password: OSSRH_PASSWORD
     - name: Extract project version
       id: project
       run: echo ::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
     - name: Deploy with Maven
       if:  ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
       run: mvn deploy -Dmaven.test.skip=true
+      env:
+        OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
+        OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
