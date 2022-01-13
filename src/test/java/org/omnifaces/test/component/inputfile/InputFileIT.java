@@ -91,6 +91,30 @@ public class InputFileIT extends OmniFacesIT {
 	@FindBy(id="uploadMultipleAjax:submit")
 	private WebElement uploadMultipleAjaxSubmit;
 
+	@FindBy(id="uploadMultipleMaxsizeClient:file1")
+	private WebElement uploadMultipleMaxsizeClientFile1;
+
+	@FindBy(id="uploadMultipleMaxsizeClient:file2")
+	private WebElement uploadMultipleMaxsizeClientFile2;
+
+	@FindBy(id="uploadMultipleMaxsizeClient:message")
+	private WebElement uploadMultipleMaxsizeClientMessage;
+
+	@FindBy(id="uploadMultipleMaxsizeClient:submit")
+	private WebElement uploadMultipleMaxsizeClientSubmit;
+
+	@FindBy(id="uploadMultipleMaxsizeServer:file1")
+	private WebElement uploadMultipleMaxsizeServerFile1;
+
+	@FindBy(id="uploadMultipleMaxsizeServer:file2")
+	private WebElement uploadMultipleMaxsizeServerFile2;
+
+	@FindBy(id="uploadMultipleMaxsizeServer:message")
+	private WebElement uploadMultipleMaxsizeServerMessage;
+
+	@FindBy(id="uploadMultipleMaxsizeServer:submit")
+	private WebElement uploadMultipleMaxsizeServerSubmit;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return createWebArchive(InputFileIT.class);
@@ -200,6 +224,45 @@ public class InputFileIT extends OmniFacesIT {
 		uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardAjaxUpload(uploadMultipleAjaxSubmit, messages);
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+	}
+
+	@Test
+	public void uploadMultipleMaxsizeClient() throws IOException {
+		File txtFile1 = createTempFile("file1", "txt", "hello hello");
+		File txtFile2 = createTempFile("file2", "txt", "world");
+		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
+		uploadMultipleMaxsizeClientFile2.sendKeys(txtFile2.getAbsolutePath());
+		triggerOnchange(uploadMultipleMaxsizeClientFile1, uploadMultipleMaxsizeClientMessage);
+		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
+		String message = uploadMultipleMaxsizeClientMessage.getText();
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10.0 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
+
+		txtFile1 = createTempFile("file1", "txt", "hello");
+		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
+		guardHttp(uploadMultipleMaxsizeClientSubmit).click();
+		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
+		assertTrue(uploadMultipleMaxsizeClientFile2.getText().isEmpty());
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+	}
+
+	@Test
+	public void uploadMultipleMaxsizeServer() throws IOException {
+		File txtFile1 = createTempFile("file1", "txt", "hello");
+		File txtFile2 = createTempFile("file2", "txt", "world world");
+		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
+		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
+		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
+		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
+		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
+		assertEquals("label: " + txtFile2.getName() + " larger than 10.0 B", messages.getText());
+
+		txtFile2 = createTempFile("file2", "txt", "world");
+		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
+		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
+		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
+		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
+		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
 	}
 

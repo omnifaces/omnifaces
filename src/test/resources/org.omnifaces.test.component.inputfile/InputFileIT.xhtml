@@ -80,5 +80,23 @@
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 		</o:form>
+
+		<o:form id="uploadMultipleMaxsizeClient" enctype="multipart/form-data">
+			<o:inputFile id="file1" value="#{inputFileITBean.files}" multiple="true" label="label"
+				maxsize="10" maxsizeMessage="{0}: {1} larger than {2}" />
+			<h:message id="message" for="@previous" />
+			<o:inputFile id="file2" a:name="uploadMultipleMaxsizeClient:file1" rendered="#{facesContext.currentPhaseId.ordinal eq 6}" />
+			<!-- Above additional input is a work around for Selenium WebDriver API not supporting multi file upload. -->
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadMultiple}" />
+		</o:form>
+
+		<o:form id="uploadMultipleMaxsizeServer" enctype="multipart/form-data">
+			<o:inputFile id="file1" value="#{inputFileITBean.files}" multiple="true" label="label"
+				maxsize="#{facesContext.currentPhaseId.ordinal ne 6 ? 10 : null}" maxsizeMessage="{0}: {1} larger than {2}" />
+				<!-- Above maxsize value should skip client side validation, so we can test server side validation. -->
+			<o:inputFile id="file2" a:name="uploadMultipleMaxsizeServer:file1" rendered="#{facesContext.currentPhaseId.ordinal eq 6}" />
+			<!-- Above additional input is a work around for Selenium WebDriver API not supporting multi file upload. -->
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadMultiple}" />
+		</o:form>
 	</h:body>
 </html>
