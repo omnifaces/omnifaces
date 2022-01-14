@@ -353,6 +353,11 @@ public final class Servlets {
 		for (String parameter : parameters) {
 			if (parameter.contains("=")) {
 				String[] pair = parameter.split(quote("="));
+
+				if (pair.length == 0) {
+					continue;
+				}
+
 				String key = decodeURL(pair[0]);
 				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
 				List<String> values = parameterMap.get(key);
