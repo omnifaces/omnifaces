@@ -583,7 +583,7 @@ public class InputFile extends HtmlInputFile {
 	}
 
 	private String convertAcceptToRegex(String accept) {
-		String[] parts = accept.replaceAll("\\s*", "").split("(?=[*,])");
+		String[] parts = accept.replaceAll("\\s*", "").split("(?<=[*,])|(?=[*,])");
 		StringBuilder regex = new StringBuilder();
 
 		for (String part : parts) {
