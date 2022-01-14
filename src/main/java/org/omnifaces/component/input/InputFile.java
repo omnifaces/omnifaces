@@ -281,6 +281,7 @@ public class InputFile extends HtmlInputFile {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
+	private transient Object transientSubmittedValue;
 	private String messageComponentClientId;
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -423,6 +424,24 @@ public class InputFile extends HtmlInputFile {
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
+
+	/**
+	 * An override which ensures that the Faces implementation being used doesn't save it in the state.
+	 * The {@link Part} does namely not belong there.
+	 */
+	@Override
+	public Object getSubmittedValue() {
+		return transientSubmittedValue;
+	}
+
+	/**
+	 * An override which ensures that the Faces implementation being used doesn't save it in the state.
+	 * The {@link Part} does namely not belong there.
+	 */
+	@Override
+	public void setSubmittedValue(Object submittedValue) {
+		this.transientSubmittedValue = submittedValue;
+	}
 
 	/**
 	 * Returns whether or not to allow multiple file selection.
