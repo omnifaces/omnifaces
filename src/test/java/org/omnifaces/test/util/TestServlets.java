@@ -12,16 +12,20 @@
  */
 package org.omnifaces.test.util;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.servlet.http.Part;
 
 import org.junit.Test;
 import org.omnifaces.util.Servlets;
+
+import com.google.common.collect.ImmutableMap;
 
 public class TestServlets {
 
@@ -137,6 +141,12 @@ public class TestServlets {
 			throw new UnsupportedOperationException();
 		}
 
+	}
+
+	@Test
+	public void testToParameterMap() {
+		assertEquals(Servlets.toParameterMap("="), Collections.emptyMap());
+		assertEquals(Servlets.toParameterMap("myParam=123&=&anotherParam=x"), ImmutableMap.of("myParam", asList("123"), "anotherParam", asList("x")));
 	}
 
 }
