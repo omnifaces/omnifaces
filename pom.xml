@@ -76,6 +76,7 @@
 
 		<!-- Test impl versions for servletcontainers (Tomcat). -->
 		<test.mojarra.version>2.3.17</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces.version>2.3.9</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
 		<test.weld.version>3.1.8.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.hibernateValidator.version>6.2.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
@@ -662,6 +663,86 @@
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.jsonp.version},
+									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
+								</war.libraries>
+							</systemProperties>
+							<environmentVariables>
+								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Tomcat-MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
+		<profile>
+			<id>tomcat-myfaces</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-tomcat-managed-8</artifactId>
+					<version>1.2.0.Alpha1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomcat</groupId>
+											<artifactId>tomcat</artifactId>
+											<version>${test.tomcat.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
+											<includes>
+												<include>tomcat-users.xml</include>
+											</includes>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemProperties>
+								<arquillian.launch>tomcat</arquillian.launch>
+								<war.libraries>
+									org.apache.myfaces.core:myfaces-impl:${test.myfaces.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
