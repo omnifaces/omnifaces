@@ -73,7 +73,7 @@
 		<test.glassfish.version>6.2.4</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.0.14</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 		<test.piranha.version>21.12.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
-		<test.tomee.version>9.0.0-M7</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
+		<test.tomee.version>9.0.0-M7</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) https://issues.apache.org/jira/browse/TOMEE-3824 -->
 		<test.payara.version>6.2021.1.Alpha1</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web TODO: Arquillian couldn't start it -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
