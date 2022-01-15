@@ -39,7 +39,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Test with Maven
-      run: mvn verify -P ${{matrix.server}}
+      run: mvn -B verify -P ${{matrix.server}}
 
   deploy:
     name: Deploy 2.x SNAPSHOT
@@ -59,8 +59,8 @@ jobs:
       id: project
       run: echo ::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
     - name: Deploy with Maven
-      if:  ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
-      run: mvn deploy -Dmaven.test.skip=true
+      if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
+      run: mvn -B deploy -Dmaven.test.skip=true
       env:
         OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
         OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
