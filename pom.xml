@@ -13,10 +13,10 @@
 
 	<name>OmniFaces</name>
 	<description>JSF 2.2+ utility library</description>
-	<url>http://omnifaces.org</url>
+	<url>https://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
-		<url>http://omnifaces.org</url>
+		<url>https://omnifaces.org</url>
 	</organization>
 	<inceptionYear>2012</inceptionYear>
 
@@ -36,7 +36,7 @@
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -69,15 +69,15 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>25.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
-		<test.tomee.version>8.0.6</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee --> <!-- Version 8.0.7/8.0.8 are failing due to https://issues.apache.org/jira/browse/TOMEE-3807 -->
-		<test.payara.version>5.2021.7</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
-		<test.tomcat.version>9.0.54</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.wildfly.version>26.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
+		<test.tomee.version>8.0.9</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
+		<test.payara.version>5.2021.10</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
+		<test.tomcat.version>9.0.56</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat). -->
-		<test.mojarra.version>2.3.16</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.mojarra.version>2.3.17</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
 		<test.weld.version>3.1.8.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>6.2.0.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.hibernateValidator.version>6.2.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>1.2.6</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<test.tyrus.version>1.18</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
@@ -152,7 +152,7 @@
 		<dependency>
 			<groupId>org.jboss.arquillian.graphene</groupId>
 			<artifactId>graphene-webdriver</artifactId>
-			<version>2.1.0.Final</version> <!-- Newer versions appear to intermittently fail in RequestGuard and not be fully compatible with websockets -->
+			<version>2.1.0.Final</version> <!-- Newer versions appear not be fully compatible with websockets and unload (tried 2.5.4) -->
 			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
@@ -300,7 +300,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.2.2</version>
 				<configuration>
 					<archive>
 						<manifest>
