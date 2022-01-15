@@ -11,6 +11,9 @@
 # specific language governing permissions and limitations under the License.
 #
 
+# NOTE: this workflow file cannot have the same file name across all branches, otherwise each branch will pick the 
+# latest modified one. Hence the workflow files have each a different file name with the branch name as prefix. 
+
 name: 3.x
 
 on:
@@ -26,8 +29,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        server: [wildfly, tomee, payara, tomcat-mojarra ]
-
+        server: [wildfly, tomee, payara, tomcat-mojarra]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 8
@@ -37,4 +39,28 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Test with Maven
-      run: mvn verify -Dmaven.javadoc.skip=true -P ${{matrix.server}}
+      run: mvn -B verify -P ${{matrix.server}}
+
+  deploy:
+    name: Deploy 3.x SNAPSHOT
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+        server-id: ossrh
+        server-username: OSSRH_USERNAME
+        server-password: OSSRH_PASSWORD
+    - name: Extract project version
+      id: project
+      run: echo ::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+    - name: Deploy with Maven
+      if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
+      run: mvn -B deploy -Dmaven.test.skip=true
+      env:
+        OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
+        OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
