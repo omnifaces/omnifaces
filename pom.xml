@@ -82,6 +82,10 @@
 		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>1.2.6</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<test.tyrus.version>1.18</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		
+		<!-- Sonar config. -->
+		<sonar.organization>balusc-github</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
