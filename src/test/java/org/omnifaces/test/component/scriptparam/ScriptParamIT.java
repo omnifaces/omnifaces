@@ -12,12 +12,12 @@
  */
 package org.omnifaces.test.component.scriptparam;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.omnifaces.util.Utils;
 import org.openqa.selenium.WebElement;
@@ -48,13 +48,13 @@ public class ScriptParamIT extends OmniFacesIT {
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
 		long scriptLoadTimestamp = Long.valueOf(this.scriptLoadTimestamp.getText());
-		assertTrue("Script param is set later", scriptLoadTimestamp > pageLoadTimestamp);
+		assertTrue(scriptLoadTimestamp > pageLoadTimestamp, "Script param is set later");
 
 		String clientTimeZoneOffset = this.clientTimeZoneOffset.getText();
-		assertTrue("Client time zone offset is a number", Utils.isNumber(clientTimeZoneOffset));
+		assertTrue(Utils.isNumber(clientTimeZoneOffset), "Client time zone offset is a number");
 
 		String appName = this.appName.getText();
-		assertEquals("navigator.appName is 'Netscape'", "Netscape", appName);
+		assertEquals("Netscape", appName, "navigator.appName is 'Netscape'");
 	}
 
 }

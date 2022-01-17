@@ -12,13 +12,13 @@
  */
 package org.omnifaces.test.resourcehandler.cdnresourcehandler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCDNResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withCDNResources;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

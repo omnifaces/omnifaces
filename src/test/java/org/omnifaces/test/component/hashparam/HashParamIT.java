@@ -13,11 +13,11 @@
 package org.omnifaces.test.component.hashparam;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -51,40 +51,40 @@ public class HashParamIT extends OmniFacesIT {
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
 		long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
-		assertTrue("Hash param is set later", hashLoadTimestamp > pageLoadTimestamp);
+		assertTrue(hashLoadTimestamp > pageLoadTimestamp, "Hash param is set later");
 
 		foo.sendKeys("");
 		bar.sendKeys("bar");
 		guardAjax(submit).click();
-		assertTrue(browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)", browser.getCurrentUrl().endsWith("#bar=bar"));
+		assertTrue(browser.getCurrentUrl().endsWith("#bar=bar"), browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("foo");
 		bar.sendKeys("");
 		guardAjax(submit).click();
-		assertTrue(browser.getCurrentUrl() + " ends with #foo=foo", browser.getCurrentUrl().endsWith("#foo=foo"));
+		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo"), browser.getCurrentUrl() + " ends with #foo=foo");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("foo");
 		bar.sendKeys("bar");
 		guardAjax(submit).click();
-		assertTrue(browser.getCurrentUrl() + " ends with #foo=foo&bar=bar", browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"));
+		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"), browser.getCurrentUrl() + " ends with #foo=foo&bar=bar");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("def");
 		bar.sendKeys("def");
 		guardAjax(submit).click();
-		assertTrue(browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)", browser.getCurrentUrl().endsWith("#foo=def"));
+		assertTrue(browser.getCurrentUrl().endsWith("#foo=def"), browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("");
 		bar.sendKeys("");
 		guardAjax(submit).click();
-		assertTrue(browser.getCurrentUrl() + " ends with no hash param", !browser.getCurrentUrl().contains("#"));
+		assertTrue(!browser.getCurrentUrl().contains("#"), browser.getCurrentUrl() + " ends with no hash param");
 	}
 
 }

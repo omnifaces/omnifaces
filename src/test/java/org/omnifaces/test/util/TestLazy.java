@@ -12,12 +12,12 @@
  */
 package org.omnifaces.test.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Lazy;
 
 /**
@@ -29,7 +29,7 @@ public class TestLazy {
 
 	private final AtomicInteger numCreations = new AtomicInteger();
 
-	@Before
+	@BeforeEach
 	public void before() {
 		numCreations.set(0);
 	}

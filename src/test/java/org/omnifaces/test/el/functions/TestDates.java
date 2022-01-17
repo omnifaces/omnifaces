@@ -16,7 +16,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.time.format.DateTimeFormatter.ISO_TIME;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,7 +31,7 @@ import java.util.Calendar;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.el.functions.Dates;
 import org.omnifaces.util.Utils;
 
@@ -80,7 +80,7 @@ public class TestDates {
 	private static <D> void testZonedDateTimeUtilities(D date) {
 		ZonedDateTime zonedDateTime = Utils.toZonedDateTime(date);
 		D thisShouldBeExactlyTheSameAsOriginal = Utils.fromZonedDateTime(zonedDateTime, date.getClass());
-		assertEquals("Date conversion is repeatable", date, thisShouldBeExactlyTheSameAsOriginal);
+		assertEquals(date, thisShouldBeExactlyTheSameAsOriginal, "Date conversion is repeatable");
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class TestDates {
 			expectedResult = expectedDate + "T" + expectedTime;
 		}
 
-		assertEquals("Date format", expectedResult, actualResult);
+		assertEquals(expectedResult, actualResult, "Date format");
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class TestDates {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime expectedResult = now.plusWeeks(10);
 		LocalDateTime actualResult = Dates.addWeeks(now, 10);
-		assertEquals("10 weeks have been added", expectedResult, actualResult);
+		assertEquals(expectedResult, actualResult, "10 weeks have been added");
 	}
 
 	@Test
@@ -172,11 +172,11 @@ public class TestDates {
 		LocalDateTime start = LocalDateTime.now();
 		LocalDateTime end = start.plusWeeks(10);
 		int weeksBetween = Dates.weeksBetween(start, end);
-		assertEquals("Diff is 10 weeks", 10, weeksBetween);
+		assertEquals(10, weeksBetween, "Diff is 10 weeks");
 
 		end = end.minusDays(1);
 		weeksBetween = Dates.weeksBetween(start, end);
-		assertEquals("Diff is 9 weeks", 9, weeksBetween);
+		assertEquals(9, weeksBetween, "Diff is 9 weeks");
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class TestDates {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime expectedResult = now.plusMinutes(10);
 		LocalDateTime actualResult = Dates.addMinutes(now, 10);
-		assertEquals("10 minutes have been added", expectedResult, actualResult);
+		assertEquals(expectedResult, actualResult, "10 minutes have been added");
 	}
 
 	@Test
@@ -192,30 +192,30 @@ public class TestDates {
 		LocalDateTime start = LocalDateTime.now();
 		LocalDateTime end = start.plusMinutes(10);
 		long minutesBetween = Dates.minutesBetween(start, end);
-		assertEquals("Diff is 10 minutes", 10, minutesBetween);
+		assertEquals(10, minutesBetween, "Diff is 10 minutes");
 
 		end = end.minusNanos(1);
 		minutesBetween = Dates.minutesBetween(start, end);
-		assertEquals("Diff is 9 minutes", 9, minutesBetween);
+		assertEquals(9, minutesBetween, "Diff is 9 minutes");
 	}
 
 	@Test
 	public void testMonths() {
-		assertEquals("There are 12 months", 12, Dates.getMonths().size());
+		assertEquals(12, Dates.getMonths().size(), "There are 12 months");
 
 		int index = 1;
 		for (Entry<String, Integer> month : Dates.getMonths().entrySet()) {
-			assertEquals("Month index", index++, month.getValue().intValue());
+			assertEquals(index++, month.getValue().intValue(), "Month index");
 		}
 	}
 
 	@Test
 	public void testDaysOfWeek() {
-		assertEquals("There are 7 days of week", 7, Dates.getDaysOfWeek().size());
+		assertEquals(7, Dates.getDaysOfWeek().size(), "There are 7 days of week");
 
 		int index = 1;
 		for (Entry<String, Integer> dayOfWeek : Dates.getDaysOfWeek().entrySet()) {
-			assertEquals("Day of week index", index++, dayOfWeek.getValue().intValue());
+			assertEquals(index++, dayOfWeek.getValue().intValue(), "Day of week index");
 		}
 	}
 

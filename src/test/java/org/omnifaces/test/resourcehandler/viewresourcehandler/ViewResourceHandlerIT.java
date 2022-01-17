@@ -13,8 +13,8 @@
 package org.omnifaces.test.resourcehandler.viewresourcehandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withViewResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withViewResources;
 
@@ -27,8 +27,8 @@ import java.util.Scanner;
 import org.apache.http.HttpStatus;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 
 public class ViewResourceHandlerIT extends OmniFacesIT {
@@ -52,7 +52,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Override
-	@Before
+	@BeforeEach
 	public void init() {
 		// NOOP (there's no XHTML file in this test).
 	}
@@ -61,8 +61,8 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	public void test() {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
-			assertEquals("Response code", HttpStatus.SC_OK, connection.getResponseCode());
-			assertEquals("Content type", EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type"));
+			assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");
+			assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type"), "Content type");
 
 			String actualPageSource;
 
@@ -79,8 +79,8 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 				.replace("127.0.0.1", "localhost") // Depends on server used. We don't want to be dependent on that.
 				.trim();
 
-			assertEquals("XML prolog", EXPECTED_XML_PROLOG, actualXmlProlog);
-			assertEquals("Page source", EXPECTED_XML_BODY, actualXmlBody);
+			assertEquals(EXPECTED_XML_PROLOG, actualXmlProlog, "XML prolog");
+			assertEquals(EXPECTED_XML_BODY, actualXmlBody, "Page source");
 		}
 		catch (Exception e) {
 			fail("Exception thrown: " + e);
