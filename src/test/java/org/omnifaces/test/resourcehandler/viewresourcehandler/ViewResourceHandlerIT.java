@@ -62,7 +62,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
 			assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");
-			assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type"), "Content type");
+			assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type").replace(" ", ""), "Content type");
 
 			String actualPageSource;
 
