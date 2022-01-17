@@ -14,8 +14,8 @@ package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.By;

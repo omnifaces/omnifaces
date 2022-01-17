@@ -13,7 +13,7 @@
 package org.omnifaces.test.util;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,7 @@ import java.util.Collections;
 
 import jakarta.servlet.http.Part;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Servlets;
 
 import com.google.common.collect.ImmutableMap;

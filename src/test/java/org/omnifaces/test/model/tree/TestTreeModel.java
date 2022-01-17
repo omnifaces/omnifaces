@@ -12,10 +12,10 @@
  */
 package org.omnifaces.test.model.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 
@@ -47,17 +47,17 @@ public class TestTreeModel {
 		TreeModel<String> copy = new ListTreeModel<>();
 		copy.addChild("One").addChild("Two").getParent().addChild("Three");
 		assertEquals("[One[Two, Three]]", copy.toString());
-		assertEquals(tree + " equals " + copy, copy, tree);
+		assertEquals(copy, tree, tree + " equals " + copy);
 
 		TreeModel<String> copyOne = copy.getChildren().iterator().next();
 		assertEquals("One[Two, Three]", one.toString());
 		assertEquals("One[Two, Three]", copyOne.toString());
-		assertEquals(one + " equals " + copyOne, copyOne, one);
+		assertEquals(copyOne, one, one + " equals " + copyOne);
 
 		copy.setData("Copy");
 		assertEquals("One[Two, Three]", one.toString());
 		assertEquals("One[Two, Three]", copyOne.toString());
-		assertNotEquals(one + " equals not " + copyOne, copyOne, one);
+		assertNotEquals(copyOne, one, one + " equals not " + copyOne);
 	}
 
 }

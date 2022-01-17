@@ -25,19 +25,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@RunWith(Arquillian.class)
+@ExtendWith(ArquillianExtension.class)
 public abstract class OmniFacesIT {
 
 	@Drone
@@ -46,7 +46,7 @@ public abstract class OmniFacesIT {
 	@ArquillianResource
 	protected URL baseURL;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		open(getClass().getSimpleName() + ".xhtml");
 	}

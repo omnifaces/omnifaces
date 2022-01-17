@@ -12,11 +12,11 @@
  */
 package org.omnifaces.test.el;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -66,18 +66,18 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 
 	@Test
 	public void test() {
-		assertEquals("valueReferenceBase is 'Bar'", "Bar", valueReferenceBase.getText());
-		assertEquals("valueReferenceProperty is 'selected'", "selected", valueReferenceProperty.getText());
-		assertEquals("getterReferenceBase is 'Bar'", "Bar", getterReferenceBase.getText());
-		assertEquals("getterReferenceMethodName is 'getSelected'", "getSelected", getterReferenceMethodName.getText());
-		assertEquals("getterReferenceReturnType is 'Baz'", "Baz", getterReferenceReturnType.getText());
-		assertEquals("getterReferenceParamTypes is empty", "", getterReferenceParamTypes.getText());
-		assertEquals("getterReferenceActualParameters is empty", "", getterReferenceActualParameters.getText());
-		assertEquals("methodReferenceBase is 'Foo'", "Foo", methodReferenceBase.getText());
-		assertEquals("methodReferenceMethodName is 'create'", "create", methodReferenceMethodName.getText());
-		assertEquals("methodReferenceReturnType is 'void'", "void", methodReferenceReturnType.getText());
-		assertEquals("methodReferenceFirstParamType is 'Baz'", "Baz", methodReferenceFirstParamType.getText());
-		assertEquals("methodReferenceFirstActualParameter is 'Baz'", "Baz", methodReferenceFirstActualParameter.getText());
+		assertEquals("Bar", valueReferenceBase.getText(), "valueReferenceBase is 'Bar'");
+		assertEquals("selected", valueReferenceProperty.getText(), "valueReferenceProperty is 'selected'");
+		assertEquals("Bar", getterReferenceBase.getText(), "getterReferenceBase is 'Bar'");
+		assertEquals("getSelected", getterReferenceMethodName.getText(), "getterReferenceMethodName is 'getSelected'");
+		assertEquals("Baz", getterReferenceReturnType.getText(), "getterReferenceReturnType is 'Baz'");
+		assertEquals("", getterReferenceParamTypes.getText(), "getterReferenceParamTypes is empty");
+		assertEquals("", getterReferenceActualParameters.getText(), "getterReferenceActualParameters is empty");
+		assertEquals("Foo", methodReferenceBase.getText(), "methodReferenceBase is 'Foo'");
+		assertEquals("create", methodReferenceMethodName.getText(), "methodReferenceMethodName is 'create'");
+		assertEquals("void", methodReferenceReturnType.getText(), "methodReferenceReturnType is 'void'");
+		assertEquals("Baz", methodReferenceFirstParamType.getText(), "methodReferenceFirstParamType is 'Baz'");
+		assertEquals("Baz", methodReferenceFirstActualParameter.getText(), "methodReferenceFirstActualParameter is 'Baz'");
 	}
 
 }

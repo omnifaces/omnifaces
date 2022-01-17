@@ -12,12 +12,12 @@
  */
 package org.omnifaces.test.cdi.facesconverter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -60,39 +60,39 @@ public class FacesConverterIT extends OmniFacesIT {
 	public void test() {
 		waitUntilTextContent(loaded); // Wait until "load" event is finished because of resource dependencies.
 
-		assertTrue("EJB is injected in facesConverterITConverter", facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"));
-		assertEquals("ResourceDependency is injected in facesConverterITConverter", "facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText());
-		assertTrue("EJB is injected in facesConverterITManagedConverter", facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
+		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITConverter");
+		assertEquals("facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITConverter");
+		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITManagedConverter");
 
 		if (!isMojarraUsed()) { // Mojarra bugs on this (fixed in 2.3.16, so this check can be removed once all IT envs run 2.3.16 or newer).
-			assertEquals("ResourceDependency is injected in facesConverterITManagedConverter", "facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText());
+			assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITManagedConverter");
 		}
 
-		assertTrue("EJB is injected in facesConverterITExtendedConverter", facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"));
-		assertEquals("ResourceDependency is injected in facesConverterITExtendedConverter", "facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText());
-		assertTrue("EJB is injected in facesConverterITExtendedManagedConverter", facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
+		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITExtendedConverter");
+		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedConverter");
+		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITExtendedManagedConverter");
 
 		if (!isMojarraUsed()) { // Mojarra bugs on this (fixed in 2.3.16, so this check can be removed once all IT envs run 2.3.16 or newer).
-			assertEquals("ResourceDependency is injected in facesConverterITExtendedManagedConverter", "facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText());
+			assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedManagedConverter");
 		}
 
 		init(); // This basically refreshes the page.
 		waitUntilTextContent(loaded);
 
-		assertTrue("EJB is still injected in facesConverterITConverter after page refresh", facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"));
-		assertEquals("ResourceDependency is still injected in facesConverterITConverter after page refresh", "facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText());
-		assertTrue("EJB is still injected in facesConverterITManagedConverter after page refresh", facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
+		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITConverter after page refresh");
+		assertEquals("facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITConverter after page refresh");
+		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITManagedConverter after page refresh");
 
 		if (!isMojarraUsed()) { // Mojarra bugs on this (fixed in 2.3.16, so this check can be removed once all IT envs run 2.3.16 or newer).
-			assertEquals("ResourceDependency is still injected in facesConverterITManagedConverter after page refresh", "facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText());
+			assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITManagedConverter after page refresh");
 		}
 
-		assertTrue("EJB is still injected in facesConverterITExtendedConverter after page refresh", facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"));
-		assertEquals("ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh", "facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText());
-		assertTrue("EJB is still injected in facesConverterITExtendedManagedConverter after page refresh", facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
+		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITExtendedConverter after page refresh");
+		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh");
+		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITExtendedManagedConverter after page refresh");
 
 		if (!isMojarraUsed()) { // Mojarra bugs on this (fixed in 2.3.16, so this check can be removed once all IT envs run 2.3.16 or newer).
-			assertEquals("ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh", "facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText());
+			assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh");
 		}
 	}
 

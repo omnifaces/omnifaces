@@ -14,18 +14,21 @@ package org.omnifaces.test.cdi.viewscoped;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSession;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+@TestMethodOrder(OrderAnnotation.class)
 public class ViewScopedIT extends OmniFacesIT {
 
 	@FindBy(id="bean")
@@ -59,7 +62,7 @@ public class ViewScopedIT extends OmniFacesIT {
 			.createDeployment();
 	}
 
-	@Test @InSequence(1)
+	@Test @Order(1)
 	public void nonAjax() {
 		assertEquals("init", messages.getText());
 		String previousBean = bean.getText();
@@ -118,7 +121,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertEquals("unload init", messages.getText());
 	}
 
-	@Test @InSequence(2)
+	@Test @Order(2)
 	public void ajax() {
 
 		// Unloaded bean is from previous test.
@@ -174,7 +177,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertEquals("unload init", messages.getText());
 	}
 
-	@Test @InSequence(3)
+	@Test @Order(3)
 	public void destroyViewState() {
 
 		// Unloaded bean is from previous test.
