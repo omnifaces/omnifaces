@@ -36,14 +36,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.faces.application.ResourceHandler;
 import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
-import javax.faces.component.behavior.ClientBehavior;
-import javax.faces.component.behavior.ClientBehaviorContext;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
@@ -83,7 +82,10 @@ public final class Hacks {
 	private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
 	private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
 	private static final String MOJARRA_VIEW_MAP_ID = "com.sun.faces.application.view.viewMapId";
-	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
+	private static final Set<String> MYFACES_SERIALIZED_VIEWS =
+		unmodifiableSet(
+			"org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW", // MyFaces 2.3.9
+			"org.apache.myfaces.application.viewstate.StateCacheServerSide.SERIALIZED_VIEW"); // MyFaces 2.3-next-M6
 	private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
 	private static final String MOJARRA_CACHED_SERVLET_MAPPING_KEY = "com.sun.faces.INVOCATION_PATH";
@@ -260,7 +262,7 @@ public final class Hacks {
 				return;
 			}
 
-			Object viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+			Object viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
 
 			if (viewCollection == null) {
 				return;
