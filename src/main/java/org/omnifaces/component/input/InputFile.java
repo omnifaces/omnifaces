@@ -291,6 +291,7 @@ public class InputFile extends HtmlInputFile {
 			setValid(false);
 			context.validationFailed();
 			update(getMessageComponentClientId());
+			context.renderResponse();
 		}
 		else {
 			super.decode(context);
