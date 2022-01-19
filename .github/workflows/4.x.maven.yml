@@ -92,7 +92,7 @@ jobs:
         key: ${{runner.os}}-m2-${{hashFiles('**/pom.xml')}}
         restore-keys: ${{runner.os}}-m2
     - name: Build and analyze
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=omnifaces_omnifaces
+      run: mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=omnifaces_omnifaces -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
