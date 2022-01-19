@@ -317,6 +317,7 @@ public class InputFile extends HtmlInputFile {
 			setValid(false);
 			context.validationFailed();
 			update(getMessageComponentClientId());
+			context.renderResponse();
 		}
 		else {
 			super.decode(context);
@@ -335,6 +336,10 @@ public class InputFile extends HtmlInputFile {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Object getConvertedValue(FacesContext context, Object submittedValue) {
+		if (submittedValue == null) {
+			return null;
+		}
+
 		if (isMultiple()) {
 			List<Part> convertedParts = new ArrayList<>();
 
