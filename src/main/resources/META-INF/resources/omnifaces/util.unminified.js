@@ -79,7 +79,7 @@ OmniFaces.Util = (function(window, document) {
 		self.addEventListener(document, "submit", listener); // Invoke given listener on any (propagated!) submit event (e.g. h:commandLink and p:commandButton ajax=false).
 
 		if (window.mojarra) {
-			decorateFacesSubmit(mojarra, "jsfcljs", listener); // Decorate Mojarra h:commandLink submit handler to invoke given listener first.
+			decorateFacesSubmit(mojarra, window.faces ? "cljs" : "jsfcljs", listener); // Decorate Mojarra h:commandLink submit handler to invoke given listener first.
 		}
 
 		if (window.myfaces) {
