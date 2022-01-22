@@ -198,6 +198,7 @@ public abstract class OmniFacesIT {
 			archive.setWebXML("WEB-INF/web.xml/" + webXml.name() + ".xml");
 
 			switch (webXml) {
+				case withDevelopmentStage:
 				case withErrorPage:
 					archive.addAsWebInfResource("WEB-INF/500.xhtml");
 					break;
@@ -250,6 +251,7 @@ public abstract class OmniFacesIT {
 	public static enum WebXml {
 		basic,
 		distributable,
+		withDevelopmentStage,
 		withErrorPage,
 		withFacesViews,
 		withMultiViews,
