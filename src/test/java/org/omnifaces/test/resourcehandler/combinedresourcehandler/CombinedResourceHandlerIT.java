@@ -34,8 +34,8 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|jakarta.faces:" + (isFaces4Used() ? "faces.js" : "jsf.js") + "|headWithTarget.js|bodyWithTargetHead.js");
 	private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
 	private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
-	private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-ysBfZCyXtYzzO6x03bBw3yhvPx1GFZPFyBAyAWs8d953bHh1I+5e+cfry9w420Ul";
-	private static final String HEAD_COMBINED_STYLESHEET_INTEGRITY = "sha384-abuz3LL+ctcCJ1xayZt5v41hAEWyilMFeXRpHtRI2ZzyVAj2D7D3g6ECizTFWMA0";
+	private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-O+BEiFMIrNp5+3EV1U/ZpJg3T+qlYYvqTsF0UIsd5swios9XPYrMkDuxHxvtkBlx";
+	private static final String HEAD_COMBINED_STYLESHEET_INTEGRITY = "sha384-hK8kfbP+Ilff/XDJqs5ZaQnx8kmWBoGYRkf3kcvQzdDSHLbfIe8QAkpIkR4uh4UX";
 	private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
 
 	@FindBy(css="script[src*='ln=omnifaces.combined']")
