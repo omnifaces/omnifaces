@@ -15,6 +15,8 @@ package org.omnifaces.component.validator;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Components.getValue;
 import static org.omnifaces.util.Components.isEditable;
@@ -48,7 +50,8 @@ import org.omnifaces.validator.MultiFieldValidator;
  * <p>
  * This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components in question.
  * The <code>UIInput</code> components must be referenced by a space separated collection of their client IDs in the
- * <code>components</code> attribute. This validator can be placed anywhere in the form, but keep in mind that the
+ * <code>components</code> attribute. Since version 3.13 you can also specify a single client ID of a common parent.
+ * This validator can be placed anywhere in the form, but keep in mind that the
  * components will be converted and validated in the order as they appear in the form. So if this validator is been
  * placed before all of the components, then it will be executed before any of the component's own converters and
  * validators. If this validator fails, then the component's own converters and validators will not be fired. If this
@@ -155,6 +158,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		"%s attribute '%s' must refer existing client IDs. Client ID '%s' cannot be found.";
 	private static final String ERROR_INVALID_COMPONENT =
 		"%s attribute '%s' must refer UIInput client IDs. Client ID '%s' is of type '%s'.";
+	private static final String ERROR_INVALID_COMPONENTS =
+		"%s attribute '%s' must refer UIInput client IDs or any UIComponent which contains UIInput children."
+			+ " Client ID '%s' is of type '%s' and does not contain UIInput children.";
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
@@ -247,13 +253,13 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		List<UIInput> inputs = new ArrayList<>();
 
 		for (String clientId : components.split("\\s+")) {
-			UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.components);
+			for (UIInput input : findInputComponents(namingContainerParent, clientId, PropertyKeys.components)) {
+				if (!input.isValid()) {
+					return Collections.emptyList();
+				}
 
-			if (!input.isValid()) {
-				return Collections.emptyList();
+				inputs.add(input);
 			}
-
-			inputs.add(input);
 		}
 
 		return Collections.unmodifiableList(inputs);
@@ -332,6 +338,27 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		}
 
 		return (UIInput) found;
+	}
+
+	private List<UIInput> findInputComponents(UIComponent parent, String clientId, PropertyKeys property) {
+		UIComponent found = parent.findComponent(clientId);
+
+		if (found == null) {
+			throw new IllegalArgumentException(format(
+				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+		}
+		else if (!(found instanceof UIInput)) {
+			List<UIInput> inputs = findComponentsInChildren(found, UIInput.class);
+
+			if (inputs.isEmpty()) {
+				throw new IllegalArgumentException(format(
+					ERROR_INVALID_COMPONENTS, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+			}
+
+			return inputs;
+		}
+
+		return asList((UIInput) found);
 	}
 
 	private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
