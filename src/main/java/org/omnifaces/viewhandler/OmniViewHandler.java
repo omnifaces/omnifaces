@@ -13,13 +13,10 @@
 package org.omnifaces.viewhandler;
 
 import static java.lang.String.format;
-import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
-import static org.omnifaces.util.Components.forEachComponent;
-import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
@@ -34,6 +31,7 @@ import javax.faces.FacesException;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -43,7 +41,6 @@ import javax.faces.render.ResponseStateManager;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -67,8 +64,6 @@ import org.omnifaces.util.Hacks;
 public class OmniViewHandler extends ViewHandlerWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final NestedFormsChecker NESTED_FORMS_CHECKER = new NestedFormsChecker();
 
 	private static final String ERROR_NESTED_FORM_ENCOUNTERED =
 		"Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
@@ -195,30 +190,29 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	private void validateComponentTreeStructure(FacesContext context, UIViewRoot view) {
-		checkNestedForms(context, view);
+		checkNestedForms(context, view, null);
 	}
 
-	private void checkNestedForms(FacesContext context, UIViewRoot view) {
-		forEachComponent(context).fromRoot(view).ofTypes(UIForm.class).withHints(SKIP_ITERATION).invoke(NESTED_FORMS_CHECKER);
+	private void checkNestedForms(FacesContext context, UIComponent parent, UIForm nestedParent) {
+		for (UIComponent child : parent.getChildren()) { // Historical note: UIViewRoot#visitTree() is inappropriate for this task: #653
+			UIForm form = null;
+
+			if (child instanceof UIForm) {
+				form = (UIForm) child;
+
+				if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
+					throw new IllegalStateException(
+						format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
+				}
+			}
+
+			checkNestedForms(context, child, form);
+		}
 	}
 
 	@Override
 	public ViewHandler getWrapped() {
 		return wrapped;
-	}
-
-	// Inner classes -------------------------------------------------------------------------------------------------
-
-	private static class NestedFormsChecker implements Callback.WithArgument<UIForm> {
-		@Override
-		public void invoke(UIForm form) {
-			UIForm nestedParent = getClosestParent(form, UIForm.class);
-
-			if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
-				throw new IllegalStateException(
-					format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
-			}
-		}
 	}
 
 }
