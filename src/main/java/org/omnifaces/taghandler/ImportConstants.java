@@ -22,7 +22,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -144,18 +146,51 @@ public class ImportConstants extends TagHandler {
 	private static Map<String, Object> collectConstants(final String type) {
 		Map<String, Object> constants = new LinkedHashMap<>();
 
-		for (Field field : toClass(type).getFields()) {
-			if (isPublicStaticFinal(field)) {
-				try {
-					constants.put(field.getName(), field.get(null));
-				}
-				catch (Exception e) {
-					throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
+		for (Class<?> declaredType : getDeclaredTypes(toClass(type))) {
+			for (Field field : declaredType.getDeclaredFields()) {
+				if (isPublicStaticFinal(field)) {
+					try {
+						if (constants.containsKey(field.getName())) {
+							constants.put(field.getName(), field.get(null));
+						}
+					}
+					catch (Exception e) {
+						throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
+					}
 				}
 			}
 		}
 
 		return new ConstantsMap(constants, type);
+	}
+
+	/**
+	 * Returns an ordered set of all declared types of given type except for Object.class.
+	 */
+	private static Set<Class<?>> getDeclaredTypes(Class<?> type) {
+		Set<Class<?>> declaredTypes = new LinkedHashSet<>();
+		declaredTypes.add(type);
+		fillAllSuperClasses(type, declaredTypes);
+
+		for (Class<?> declaredType : new LinkedHashSet<>(declaredTypes)) {
+			fillAllInterfaces(declaredType, declaredTypes);
+		}
+
+		return Collections.unmodifiableSet(declaredTypes);
+	}
+
+	private static void fillAllSuperClasses(Class<?> type, Set<Class<?>> set) {
+		for (Class<?> sc = type.getSuperclass(); sc != Object.class; sc = sc.getSuperclass()) {
+			set.add(sc);
+		}
+	}
+
+	private static void fillAllInterfaces(Class<?> type, Set<Class<?>> set) {
+		for (Class<?> i : type.getInterfaces()) {
+			if (set.add(i)) {
+				fillAllInterfaces(i, set);
+			}
+		}
 	}
 
 	/**
