@@ -96,6 +96,7 @@ public class ViewParam extends UIViewParameter {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String submittedValue;
+	private boolean defaultValueSet;
 	private Map<String, Object> attributeInterceptMap;
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -111,8 +112,11 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public void processValidators(FacesContext context) {
 		if (!context.isPostback()) {
+			defaultValueSet = false;
+
 			if (isEmpty(getSubmittedValue())) {
 				setSubmittedValue(getDefault());
+				defaultValueSet = true;
 			}
 
 			if (getSubmittedValue() == null) {
@@ -140,6 +144,10 @@ public class ViewParam extends UIViewParameter {
 	 */
 	@Override
 	public String getStringValueFromModel(FacesContext context) {
+		if (defaultValueSet) {
+			return null;
+		}
+
 		ValueExpression ve = getValueExpression(VALUE_ATTRIBUTE);
 		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
 		return (value != null) ? super.getStringValueFromModel(context) : null;
