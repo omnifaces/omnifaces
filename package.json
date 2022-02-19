@@ -1,0 +1,14 @@
+{
+  "name": "omnifaces",
+  "version": "4.0.0",
+  "description": "Build omnifaces.js",
+  "scripts": {
+    "compile": "tsc",
+    "pack": "browserify target/tsc/OmniFaces.js -o target/tsc/omnifaces.unminified.js -s OmniFaces",
+    "build": "npm run compile && npm run pack"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "typescript": "^4.5.5"
+  }
+}

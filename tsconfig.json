@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+	"target": "es5",
+	"module": "commonjs",
+	"rootDir": "src/main/resources/META-INF/resources/omnifaces/omnifaces.js",
+	"outDir": "target/tsc",
+	"removeComments": true,
+	"noImplicitAny": true,
+	"noImplicitUseStrict": true,
+	"sourceMap": true
+  },
+  "files": [
+    "src/main/resources/META-INF/resources/omnifaces/omnifaces.js/OmniFaces.ts"
+  ]
+}
