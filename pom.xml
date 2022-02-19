@@ -205,10 +205,11 @@
 	<build>
 		<resources>
 
-			<!-- Exclude unminified JavaScript files (and Eclipse's jsfdia) from resources. -->
+			<!-- Exclude TypeScript files, unminified JavaScript files and Eclipse's jsfdia from resources. -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
+					<exclude>**/*.ts</exclude>
 					<exclude>**/*.unminified.js</exclude>
 					<exclude>**/*.jsfdia</exclude>
 				</excludes>
@@ -241,15 +242,50 @@
 				</executions>
 			</plugin>
 
+			<!-- Configure the TypeScript compiler and packer for omnifaces.js. -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.12.1</version>
+				<configuration>
+					<nodeVersion>v4.6.0</nodeVersion>
+					<installDirectory>target</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm run build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Configure the JavaScript minifier. -->
 			<plugin>
 				<groupId>com.samaxes.maven</groupId>
 				<artifactId>minify-maven-plugin</artifactId>
 				<version>1.7.6</version>
 				<configuration>
-					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
-					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
-					<jsSourceDir>META-INF/resources/omnifaces</jsSourceDir>
+					<jsTargetDir>META-INF/resources/omnifaces</jsTargetDir>
 					<nosuffix>true</nosuffix>
 					<jsEngine>CLOSURE</jsEngine>
 				</configuration>
@@ -257,19 +293,11 @@
 					<execution>
 						<id>minify-omnifaces</id>
 						<configuration>
+							<webappSourceDir>${project.build.directory}</webappSourceDir>
+							<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+							<jsSourceDir>tsc</jsSourceDir>
 							<jsSourceFiles>
 								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
-								<jsSourceFile>util.unminified.js</jsSourceFile>
-								<jsSourceFile>highlight.unminified.js</jsSourceFile>
-								<jsSourceFile>deferredscript.unminified.js</jsSourceFile>
-								<jsSourceFile>unload.unminified.js</jsSourceFile>
-								<jsSourceFile>push.unminified.js</jsSourceFile>
-								<jsSourceFile>inputfile.unminified.js</jsSourceFile>
-								<jsSourceFile>form.unminified.js</jsSourceFile>
-								<jsSourceFile>hashparam.unminified.js</jsSourceFile>
-								<jsSourceFile>scriptparam.unminified.js</jsSourceFile>
-								<jsSourceFile>sw-register.unminified.js</jsSourceFile>
-								<jsSourceFile>graphicimage.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>
@@ -280,6 +308,9 @@
 					<execution>
 						<id>minify-sw</id>
 						<configuration>
+							<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
+							<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+							<jsSourceDir>META-INF/resources/omnifaces</jsSourceDir>
 							<jsSourceFiles>
 								<jsSourceFile>sw.unminified.js</jsSourceFile>
 							</jsSourceFiles>
