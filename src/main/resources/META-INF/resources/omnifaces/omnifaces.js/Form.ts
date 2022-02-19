@@ -57,10 +57,18 @@ export module Form {
 				executeIds.push(CLIENT_WINDOW_PARAM);
 
 				const partialViewState: string[] = [];
+				const encodedSeparatorChar = encodeURIComponent(faces.separatorchar);
 
-				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: Record<string, string>, key: string, value: string) {
-					if (executeIds.indexOf(key) > -1) {
-						partialViewState.push(key + "=" + value);
+				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: any, key: string, value: string) {
+					for (
+						let clientId = key; 
+						executeIds.indexOf(clientId) > -1 || clientId.indexOf(encodedSeparatorChar) > -1; 
+						clientId = clientId.substring(0, clientId.lastIndexOf(encodedSeparatorChar))) 
+					{
+						if (executeIds.indexOf(clientId) > -1) {
+							partialViewState.push(key + "=" + value);
+							break;
+						}
 					}
 				}); 
 
