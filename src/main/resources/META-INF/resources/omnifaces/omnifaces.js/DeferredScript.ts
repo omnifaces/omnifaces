@@ -1,15 +1,18 @@
-/*
- * Copyright OmniFaces
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+///
+/// Copyright OmniFaces
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+/// the License. You may obtain a copy of the License at
+///
+///     https://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+/// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+/// specific language governing permissions and limitations under the License.
+///
+
+import { Util } from "./Util";
+
 /**
  * Deferred script loader.
  * 
@@ -17,33 +20,50 @@
  * @see org.omnifaces.component.script.DeferredScript
  * @since 1.8
  */
-OmniFaces.DeferredScript = (function(Util) {
+export module DeferredScript {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
-	var deferredScripts = [];
-	var self = {};
+	const deferredScripts: Script[] = [];
+
+	// Private static classes -----------------------------------------------------------------------------------------
+
+	class Script {
+
+		// Private fields ---------------------------------------------------------------------------------------------
+
+		readonly url: string;
+		readonly crossorigin: string;
+		readonly integrity: string;
+		readonly begin: Function;
+		readonly success: Function;
+		readonly error: Function;
+
+		// Constructor ------------------------------------------------------------------------------------------------
+
+		constructor(url: string, crossorigin: string, integrity: string, begin: Function, success: Function, error: Function) {
+			this.url = url;
+			this.crossorigin = crossorigin;
+			this.integrity = integrity;
+			this.begin = begin;
+			this.success = success;
+			this.error = error;
+		}
+	}
 
 	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
 	 * Add a deferred script to the loader and registers the onload listener to load the first deferred script.
-	 * @param {string} url Required; The URL of the deferred script.
-	 * @param {string} crossorigin Optional; The crossorigin of the deferred script. Defaults to "anonymous".
-	 * @param {string} integrity Optional; The integrity of the deferred script. Defaults to "".
-	 * @param {function} begin Optional; Function to invoke before deferred script is loaded.
-	 * @param {function} success Optional; Function to invoke after deferred script is successfully loaded.
-	 * @param {function} error Optional; Function to invoke when loading of deferred script failed.
+	 * @param url Required; The URL of the deferred script.
+	 * @param crossorigin Optional; The crossorigin of the deferred script. Defaults to "anonymous".
+	 * @param integrity Optional; The integrity of the deferred script. Defaults to "".
+	 * @param begin Optional; Function to invoke before deferred script is loaded.
+	 * @param success Optional; Function to invoke after deferred script is successfully loaded.
+	 * @param error Optional; Function to invoke when loading of deferred script failed.
 	 */
-	self.add = function(url, crossorigin, integrity, begin, success, error) {
-		deferredScripts.push({
-			url: url, 
-			crossorigin: crossorigin,
-			integrity: integrity,
-			begin: begin, 
-			success: success, 
-			error: error
-		});
+	export function add(url: string, crossorigin: string, integrity: string, begin: Function, success: Function, error: Function) {
+		deferredScripts.push(new Script(url, crossorigin, integrity, begin, success, error));
 
 		if (deferredScripts.length == 1) {
 			Util.addOnloadListener(function() {
@@ -56,23 +76,19 @@ OmniFaces.DeferredScript = (function(Util) {
 
 	/**
 	 * Load the deferred script of the given index. When loaded, then it will implicitly load the next deferred script.
-	 * @param {int} index The index of the deferred script to be loaded. If no one exists, then the method returns.
+	 * @param index The index of the deferred script to be loaded. If no one exists, then the method returns.
 	 */
-	function loadDeferredScript(index) {
+	function loadDeferredScript(index: number) {
 		if (index < 0 || index >= deferredScripts.length) {
 			return; // No such script.
 		}
 
-		var deferredScript = deferredScripts[index];
-		var completeFunction = function() {
+		const deferredScript = deferredScripts[index];
+		const completeFunction = function() {
 			loadDeferredScript(index + 1);
 		};
 
 		Util.loadScript(deferredScript.url, deferredScript.crossorigin, deferredScript.integrity, deferredScript.begin, deferredScript.success, deferredScript.error, completeFunction);
 	}
 
-	// Expose self to public ------------------------------------------------------------------------------------------
-
-	return self;
-
-})(OmniFaces.Util);
+}

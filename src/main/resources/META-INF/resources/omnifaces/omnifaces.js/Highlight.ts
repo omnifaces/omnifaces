@@ -1,32 +1,34 @@
-/*
- * Copyright OmniFaces
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+///
+/// Copyright OmniFaces
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+/// the License. You may obtain a copy of the License at
+///
+///     https://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+/// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+/// specific language governing permissions and limitations under the License.
+///
+
+import { Util } from "./Util";
+
 /**
  * Highlight/focus.
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.Highlight
  */
-OmniFaces.Highlight = (function(Util, document) {
+export module Highlight {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
-	var DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
-	var DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
+	export const DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
+	export const DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
-	var labelsByFor;
-	var self = {};
+	let labelsByFor: Record<string, HTMLLabelElement>;
 
 	// Public static functions ----------------------------------------------------------------------------------------
 
@@ -34,24 +36,24 @@ OmniFaces.Highlight = (function(Util, document) {
 	 * Apply the highlight. Add the given error style class to all input elements of the given client IDs and their
 	 * associated labels. If doFocus is <code>true</code>, then also set the focus on the first input element. All
 	 * non-existing input elements are ignored.
-	 * @param {string[]} clientIds Array of client IDs of elements to highlight.
-	 * @param {string} styleClass CSS style class to be set on the elements and the associated label elements.
-	 * @param {boolean} doFocus Whether or not to put focus on the first highlighted element.
+	 * @param clientIds Array of client IDs of elements to highlight.
+	 * @param styleClass CSS style class to be set on the elements and the associated label elements.
+	 * @param doFocus Whether or not to put focus on the first highlighted element.
 	 */
-	self.apply = function(clientIds, styleClass, doFocus) {
+	export function apply(clientIds: string[], styleClass: string, doFocus: boolean) {
 		labelsByFor = getLabelsByFor();
 
-		for (var i = 0; i < clientIds.length; i++) {
-			var input = getElementByIdOrName(clientIds[i]);
+		for (let clientId of clientIds) {
+			const input = getElementByIdOrName(clientId);
 
 			if (input) {
 				input.className += " " + styleClass;
 				input.setAttribute(DATA_HIGHLIGHT_CLASS, styleClass);
-				var label = labelsByFor[input.id];
+				const label = labelsByFor[input.id];
 
 				if (label) {
 					label.className += " " + styleClass;
-					input.setAttribute(DATA_HIGHLIGHT_LABEL, true);
+					input.setAttribute(DATA_HIGHLIGHT_LABEL, "true");
 				}
 
 				if (doFocus) {
@@ -68,15 +70,15 @@ OmniFaces.Highlight = (function(Util, document) {
 
 	/**
 	 * Return a mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
-	 * @return {Object} A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+	 * @return A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
 	 */
-	function getLabelsByFor() {
-		var labels = document.getElementsByTagName("LABEL");
-		var labelsByFor = {};
+	function getLabelsByFor(): Record<string, HTMLLabelElement> {
+		const labels = document.getElementsByTagName("LABEL") as HTMLCollectionOf<HTMLLabelElement>;
+		const labelsByFor: Record<string, HTMLLabelElement> = {};
 
-		for ( var i = 0; i < labels.length; i++) {
-			var label = labels[i];
-			var htmlFor = label.htmlFor;
+		for (var i = 0; i < labels.length; i++) {
+			const label = labels[i];
+			const htmlFor = label.htmlFor;
 
 			if (htmlFor) {
 				labelsByFor[htmlFor] = label;
@@ -88,14 +90,14 @@ OmniFaces.Highlight = (function(Util, document) {
 
 	/**
 	 * Returns an element by ID or name.
-	 * @param {string} Client ID.
-	 * @return {HTMLElement} HTML element identified by given client ID. 
+	 * @param Client ID.
+	 * @return HTML element identified by given client ID. 
 	 */
-	function getElementByIdOrName(clientId) {
-		var element = document.getElementById(clientId);
+	function getElementByIdOrName(clientId: string): HTMLElement {
+		let element = document.getElementById(clientId);
 
 		if (!element) {
-			var elements = document.getElementsByName(clientId); // #21
+			const elements = document.getElementsByName(clientId); // #21
 
 			if (elements && elements.length) {
 				element = elements[0];
@@ -107,18 +109,17 @@ OmniFaces.Highlight = (function(Util, document) {
 
 	/**
 	 * Remove the highlight. Remove the error style class from involved input element and its associated label.
-	 * @param {Event} The input event.
 	 */
 	function removeHighlight() {
-		var input = this;
+		const input = this;
 		Util.removeEventListener(input, "click input", removeHighlight);
-		var styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
+		const styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
 
 		if (styleClass) {
 			input.removeAttribute(DATA_HIGHLIGHT_CLASS);
-			var regex = new RegExp(" " + styleClass, "g");
+			const regex = new RegExp(" " + styleClass, "g");
 			input.className = input.className.replace(regex, "");
-			var label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
+			let label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
 
 			if (label) {
 				input.removeAttribute(DATA_HIGHLIGHT_LABEL);
@@ -127,9 +128,4 @@ OmniFaces.Highlight = (function(Util, document) {
 			}
 		}
 	}
-
-	// Expose self to public ------------------------------------------------------------------------------------------
-
-	return self;
-
-})(OmniFaces.Util, document);
+}

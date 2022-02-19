@@ -1,15 +1,19 @@
-/*
- * Copyright OmniFaces
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+///
+/// Copyright OmniFaces
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+/// the License. You may obtain a copy of the License at
+///
+///     https://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+/// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+/// specific language governing permissions and limitations under the License.
+///
+
+import { EVENT } from "./OmniFaces";
+import { Util } from "./Util";
+
 /**
  * Script param handling.
  * 
@@ -17,54 +21,46 @@
  * @see org.omnifaces.component.input.ScriptParam
  * @since 3.6
  */
-OmniFaces.ScriptParam = (function(Util) {
-
-	// Private static fields ------------------------------------------------------------------------------------------
-
-	var self = {};
+export module ScriptParam {
 
 	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
 	 * On page load, send all evaluated script results to the bean.
 	 */
-	self.run = function(scriptParamId, scripts) {
-		var form = Util.getFacesForm();
+	export function run(scriptParamId: string, scripts: Record<string, string>) {
+		const form = Util.getFacesForm();
 
 		if (!form) {
 			return;
 		}
 		
-		var params = {};
+		const params: Record<string, string> = {};
 
-		for (var clientId in scripts) {
+		for (let clientId in scripts) {
 			params[clientId] = JSON.stringify(clone(scripts[clientId]));
 		}
 
 		params["execute"] = scriptParamId;
-		params[OmniFaces.EVENT] = "setScriptParamValues";
-		var faces = window.faces || window.jsf;
+		params[EVENT] = "setScriptParamValues";
+		const faces = window.faces || window.jsf;
 		faces.ajax.request(form, null, params);
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------
 
-	function clone(object) {
+	function clone(object: any) {
 		if (!(object instanceof Object)) {
 			return object;
 		}
 
-		var clone = {};
-		
-		for (var property in object) { 
+		const clone: Record<any, any> = {};
+
+		for (let property in object) { 
 			object[property] instanceof Function || object[property] instanceof Object || (clone[property] = object[property]);
 		}
 
 		return clone;
 	}
 
-	// Expose self to public ------------------------------------------------------------------------------------------
-
-	return self;
-
-})(OmniFaces.Util);
+}

@@ -1,15 +1,20 @@
-/*
- * Copyright OmniFaces
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+///
+/// Copyright OmniFaces
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+/// the License. You may obtain a copy of the License at
+///
+///     https://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+/// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+/// specific language governing permissions and limitations under the License.
+///
+
+import { VIEW_STATE_PARAM } from "./OmniFaces";
+import { CLIENT_WINDOW_PARAM } from "./OmniFaces";
+import { Util } from "./Util";
+
 /**
  * Form partial submit.
  * 
@@ -17,43 +22,43 @@
  * @see org.omnifaces.component.input.Form
  * @since 3.0
  */
-OmniFaces.Form = (function(Util, window) {
+export module Form {
 
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	function init() {
-		var faces = window.faces || window.jsf;
+		const faces = window.faces || window.jsf;
 
 		if (faces) { // Standard JSF API.
-			var originalGetViewState = faces.getViewState;
+			const originalGetViewState = faces.getViewState;
 
-			faces.getViewState = function(form) {
-				var originalViewState = originalGetViewState(form);
+			faces.getViewState = function(form: HTMLFormElement) {
+				const originalViewState = originalGetViewState(form);
 
-				if (form.attributes["data-partialsubmit"] != "true") {
+				if (form.dataset["partialsubmit"] != "true") {
 					return originalViewState;
 				}
 
-				var params = faces.ajax.request.arguments;
-				var execute = params ? params[2].execute : null;
+				const params = faces.ajax.request.arguments;
+				const execute = params ? params[2].execute : null;
 
 				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
 					return originalViewState;
 				}
 
-				var executeIds = [];
+				let executeIds: string[] = [];
 
 				if (execute.indexOf("@none") == -1) {
 					executeIds = execute.replace("@this", params[0].id).split(" ").map(encodeURIComponent);
 					executeIds.push(encodeURIComponent(form.id));
 				}
 
-				executeIds.push(OmniFaces.VIEW_STATE_PARAM);
-				executeIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
+				executeIds.push(VIEW_STATE_PARAM);
+				executeIds.push(CLIENT_WINDOW_PARAM);
 
-				var partialViewState = [];
+				const partialViewState: string[] = [];
 
-				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(entry, key, value) {
+				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: Record<string, string>, key: string, value: string) {
 					if (executeIds.indexOf(key) > -1) {
 						partialViewState.push(key + "=" + value);
 					}
@@ -62,14 +67,10 @@ OmniFaces.Form = (function(Util, window) {
 				return partialViewState.join("&");
 			}
 		}
-
-		if (window.PrimeFaces) { // PrimeFaces API.
-			// TODO
-		}
 	}
 
 	// Global initialization ------------------------------------------------------------------------------------------
 
 	Util.addOnloadListener(init);
 
-})(OmniFaces.Util, window);
+}
