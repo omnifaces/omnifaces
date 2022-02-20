@@ -117,7 +117,6 @@ public final class Utils {
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 	private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
-	private static final int BASE64_SEGMENT_LENGTH = 4;
 	private static final int UNICODE_3_BYTES = 0xfff;
 	private static final int UNICODE_2_BYTES = 0xff;
 	private static final int UNICODE_1_BYTE = 0xf;
@@ -1149,7 +1148,6 @@ public final class Utils {
 		}
 
 		try {
-			System.out.println(string.length() % BASE64_SEGMENT_LENGTH);
 			InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
 			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
