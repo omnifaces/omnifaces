@@ -31,6 +31,8 @@
 	<h:head />
 
 	<h:body>
+		<o:form id="thisIsNeededByScriptParam" />
+
 		<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
 		<h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{scriptParamITBean.postScriptParamInvoked}" /></h:panelGroup>
 		
