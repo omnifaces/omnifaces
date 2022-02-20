@@ -25,6 +25,7 @@
 	<f:metadata>
 		<o:scriptParam script="new Date().getTimezoneOffset()" value="#{scriptParamITBean.clientTimeZoneOffset}" render="scriptLoadTimestamp clientTimeZoneOffset" />
 		<o:scriptParam script="window.navigator" value="#{scriptParamITBean.navigator}" render="appName" />
+		<f:viewAction action="#{scriptParamITBean.onload}" />
 	</f:metadata>
 
 	<h:head />
