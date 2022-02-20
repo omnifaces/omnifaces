@@ -31,7 +31,7 @@ import org.openqa.selenium.support.FindBy;
 
 public class CombinedResourceHandlerIT extends OmniFacesIT {
 
-	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|javax.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
+	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("javax.faces:jsf.js|omnifaces:omnifaces.js|headWithTarget.js|bodyWithTargetHead.js");
 	private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
 	private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
 	private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-O+BEiFMIrNp5+3EV1U/ZpJg3T+qlYYvqTsF0UIsd5swios9XPYrMkDuxHxvtkBlx";
