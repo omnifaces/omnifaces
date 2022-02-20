@@ -18,6 +18,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Components.addFacesScriptResource;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Components.forEachComponent;
@@ -25,6 +26,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -291,6 +293,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
 		if (manifestResourceRequest) {
 			if (!resourceContentsRequest && !manifest.getCacheableViewIds().isEmpty()) {
+				addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
 				addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 				addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
 			}
@@ -399,6 +402,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			});
 		}
 
+		cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
 		cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
 		return cacheableResources;
 	}

@@ -12,10 +12,14 @@
  */
 package org.omnifaces.component.output;
 
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
+import static org.omnifaces.util.Components.addFacesScriptResource;
+import static org.omnifaces.util.Components.addScriptResource;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeIdAttributeIfNecessary;
@@ -32,7 +36,6 @@ import java.util.Map;
 import jakarta.el.ValueExpression;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.Resource;
-import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlGraphicImage;
 import jakarta.faces.context.FacesContext;
@@ -204,7 +207,6 @@ import org.omnifaces.util.State;
  * @see MethodReference
  */
 @FacesComponent(GraphicImage.COMPONENT_TYPE)
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically graphicimage.js.
 public class GraphicImage extends HtmlGraphicImage {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -234,6 +236,14 @@ public class GraphicImage extends HtmlGraphicImage {
 	 */
 	public GraphicImage() {
 		setRendererType(null);
+		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+	}
+
+	private void registerScriptsIfNecessary() {
+		// This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
+		// resource name which cannot be resolved statically.
+		addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
+		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

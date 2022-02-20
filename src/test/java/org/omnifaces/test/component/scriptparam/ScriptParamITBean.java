@@ -30,6 +30,11 @@ public class ScriptParamITBean implements Serializable {
 	private JsonObject navigator;
 	private boolean postScriptParamInvoked;
 
+	public void onload() {
+		// Presence of f:viewAction along with o:scriptParam while using @ViewScoped should not
+		// throw "Component ID omnifaces_omnifaces_js has already been found in the view". #671
+	}
+
 	@PostScriptParam
 	public void initScriptParams() {
 		postScriptParamInvoked = true;

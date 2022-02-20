@@ -12,11 +12,14 @@
  */
 package org.omnifaces.component.script;
 
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Components.addFacesScriptResource;
+import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Components.getAttribute;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 
-import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ComponentSystemEvent;
@@ -58,7 +61,6 @@ import org.omnifaces.renderer.DeferredScriptRenderer;
  * @see ScriptFamily
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class DeferredScript extends ScriptFamily {
@@ -76,6 +78,14 @@ public class DeferredScript extends ScriptFamily {
 	 */
 	public DeferredScript() {
 		setRendererType(DeferredScriptRenderer.RENDERER_TYPE);
+		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+	}
+
+	private void registerScriptsIfNecessary() {
+		// This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
+		// resource name which cannot be resolved statically.
+		addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
+		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

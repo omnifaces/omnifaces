@@ -18,6 +18,7 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.BeansLocal.getInstance;
+import static org.omnifaces.util.Components.addFacesScriptResource;
 import static org.omnifaces.util.Components.addFormIfNecessary;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
@@ -211,6 +212,7 @@ public class ViewScopeManager {
 	 */
 	private static void registerUnloadScript(UUID beanStorageId) {
 		addFormIfNecessary(); // Required to get view state ID.
+		addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
 		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 		addScript(format(SCRIPT_INIT, beanStorageId));
 	}

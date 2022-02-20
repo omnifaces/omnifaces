@@ -41,7 +41,6 @@ import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
-import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.setContext;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
@@ -712,15 +711,16 @@ public final class Components {
 	 * @since 3.6
 	 */
 	public static void addScript(String script) {
-		if (isAjaxRequestWithPartialRendering()) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (isAjaxRequestWithPartialRendering(context)) {
 			oncomplete(script);
 		}
+		else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
+			subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(script)); // Just to avoid it misses when view rebuilds in the meanwhile.
+		}
 		else {
-			UIOutput outputScript = createScriptResource();
-			UIOutput content = new UIOutput();
-			content.setValue(script);
-			outputScript.getChildren().add(content);
-			addComponentResource(outputScript, "body");
+			addScriptToBody(script);
 		}
 	}
 
@@ -746,13 +746,14 @@ public final class Components {
 				load(libraryName, resourceName);
 			}
 			else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToTarget(libraryName, resourceName, "head"));
+				addScriptResourceToHead(libraryName, resourceName);
+				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToHead(libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
 			}
 			else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
-				addScriptResourceToTarget(libraryName, resourceName, "head");
+				addScriptResourceToHead(libraryName, resourceName);
 			}
 			else {
-				addScriptResourceToTarget(libraryName, resourceName, "body");
+				addScriptResourceToBody(libraryName, resourceName);
 			}
 		}
 	}
@@ -776,7 +777,7 @@ public final class Components {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String id = (libraryName != null ? (libraryName.replaceAll("\\W+", "_") + "_") : "") + resourceName.replaceAll("\\W+", "_");
 
-		for (UIComponent existingResource : context.getViewRoot().getComponentResources(context, target)) {
+		for (UIComponent existingResource : context.getViewRoot().getComponentResources(context)) {
 			if (id.equals(existingResource.getId())) {
 				return existingResource;
 			}
@@ -793,6 +794,14 @@ public final class Components {
 		return addComponentResource(outputScript, target);
 	}
 
+	private static void addScriptResourceToHead(String libraryName, String resourceName) {
+		addScriptResourceToTarget(libraryName, resourceName, "head");
+	}
+
+	private static void addScriptResourceToBody(String libraryName, String resourceName) {
+		addScriptResourceToTarget(libraryName, resourceName, "body");
+	}
+
 	private static UIComponent addComponentResource(UIComponent resource, String target) {
 		FacesContext context = FacesContext.getCurrentInstance();
 
@@ -802,6 +811,14 @@ public final class Components {
 
 		context.getViewRoot().addComponentResource(context, resource, target);
 		return resource;
+	}
+
+	private static void addScriptToBody(String script) {
+		UIOutput outputScript = createScriptResource();
+		UIOutput content = new UIOutput();
+		content.setValue(script);
+		outputScript.getChildren().add(content);
+		addComponentResource(outputScript, "body");
 	}
 
 	// Building / rendering -------------------------------------------------------------------------------------------
