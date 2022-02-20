@@ -1127,8 +1127,7 @@ public final class Utils {
 			InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
 			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
 			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
-			String base64 = Base64.getUrlEncoder().encodeToString(deflated.toByteArray());
-			return base64.replace("=", "");
+			return Base64.getUrlEncoder().withoutPadding().encodeToString(deflated.toByteArray());
 		}
 		catch (IOException e) {
 			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
@@ -1150,8 +1149,8 @@ public final class Utils {
 		}
 
 		try {
-			String base64 = string + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
-			InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(base64));
+			System.out.println(string.length() % BASE64_SEGMENT_LENGTH);
+			InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
 			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
 		catch (UnsupportedEncodingException e) {
