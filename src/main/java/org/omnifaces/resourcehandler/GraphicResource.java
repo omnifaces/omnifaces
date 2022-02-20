@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +57,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.xml.bind.DatatypeConverter;
 
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;
@@ -376,7 +376,7 @@ public class GraphicResource extends DynamicResource {
 			throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, content));
 		}
 
-		return DatatypeConverter.printBase64Binary(bytes);
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 
 	/**
