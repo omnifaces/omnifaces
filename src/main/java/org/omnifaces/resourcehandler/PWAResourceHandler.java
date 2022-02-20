@@ -287,6 +287,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
 		if (manifestResourceRequest) {
 			if (!resourceContentsRequest && !manifest.getCacheableViewIds().isEmpty()) {
+				addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Ensure it's always included BEFORE omnifaces.js.
 				addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 				addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
 			}
@@ -395,6 +396,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			});
 		}
 
+		cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME));
 		cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
 		return cacheableResources;
 	}

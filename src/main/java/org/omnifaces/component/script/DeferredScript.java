@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.script;
 
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getAttribute;
@@ -58,6 +60,7 @@ import org.omnifaces.renderer.DeferredScriptRenderer;
  * @see ScriptFamily
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Ensure it's always included BEFORE omnifaces.js.
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)

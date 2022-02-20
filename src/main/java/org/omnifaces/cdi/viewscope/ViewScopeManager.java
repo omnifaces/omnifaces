@@ -14,6 +14,8 @@ package org.omnifaces.cdi.viewscope;
 
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
@@ -211,6 +213,7 @@ public class ViewScopeManager {
 	 */
 	private static void registerUnloadScript(UUID beanStorageId) {
 		addFormIfNecessary(); // Required to get view state ID.
+		addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Ensure it's always included BEFORE omnifaces.js.
 		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 		addScript(format(SCRIPT_INIT, beanStorageId));
 	}
