@@ -833,7 +833,7 @@ public final class Components {
 			}
 			else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
 				addScriptResourceToHead(libraryName, resourceName);
-				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
+				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToHead(libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
 			}
 			else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
 				addScriptResourceToHead(libraryName, resourceName);
