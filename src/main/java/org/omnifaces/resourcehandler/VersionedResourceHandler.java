@@ -19,7 +19,6 @@ import static org.omnifaces.util.Utils.isBlank;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceWrapper;
 
 import org.omnifaces.util.Lazy;
 
@@ -66,6 +65,7 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
 	/** The context parameter name to specify value of the version to be appended to the resource URL. */
 	public static final String PARAM_NAME_VERSION = "org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION";
 
+	private static final String XHTML_EXTENSION = ".xhtml";
 	private static final String VERSION_SUFFIX = "v=";
 	private final Lazy<String> versionString;
 
@@ -85,26 +85,19 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
 		if (requestPath.contains('&' + VERSION_SUFFIX) || requestPath.contains('?' + VERSION_SUFFIX)) {
 			// ignore already-versioned resources
 			return resource;
-		} else {
-			return new VersionedResource(resource);
+		}
+		else if (!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
+			// do not touch CDN resources
+			return resource;
+		}
+		else if (resource.getResourceName().endsWith(XHTML_EXTENSION)) {
+			// do not touch XHTML resources
+			return resource;
+		}
+		else {
+			requestPath += (requestPath.contains("?") ? '&' : '?') + VERSION_SUFFIX + versionString.get();
+			return new RemappedResource(resource, requestPath);
 		}
 	}
 
-	private class VersionedResource extends ResourceWrapper {
-		public VersionedResource(Resource wrapped) {
-			super(wrapped);
-		}
-
-		@Override
-		public String getRequestPath() {
-			String requestPath = getWrapped().getRequestPath();
-
-			if (!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
-				// do not touch CDN resources
-				return requestPath;
-			}
-
-			return requestPath + (requestPath.contains("?") ? '&' : '?') + VERSION_SUFFIX + versionString.get();
-		}
-	}
 }
