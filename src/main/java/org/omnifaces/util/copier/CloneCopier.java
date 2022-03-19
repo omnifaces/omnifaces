@@ -14,6 +14,7 @@ package org.omnifaces.util.copier;
 
 import static java.lang.String.format;
 import static org.omnifaces.util.Reflection.findMethod;
+import static org.omnifaces.util.Reflection.invokeMethod;
 
 import java.lang.reflect.Method;
 
@@ -46,8 +47,9 @@ public class CloneCopier implements Copier {
 		}
 
 		Method method = findMethod(object, "clone");
+		Method canAccess = findMethod(method, "canAccess", object); // New since Java 9.
 
-		if (!method.isAccessible()) {
+		if (canAccess != null && !((boolean) invokeMethod(method, canAccess, object))) {
 			throw new IllegalStateException(format(ERROR_INACCESSIBLE_METHOD, object.getClass()));
 		}
 
