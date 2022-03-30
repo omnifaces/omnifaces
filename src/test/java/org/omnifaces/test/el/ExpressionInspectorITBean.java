@@ -21,6 +21,8 @@ import javax.el.MethodExpression;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.component.ActionSource2;
+import javax.faces.component.UIComponent;
 import javax.inject.Named;
 
 import org.omnifaces.el.ExpressionInspector;
@@ -34,6 +36,7 @@ public class ExpressionInspectorITBean {
 	private ValueReference valueReference;
 	private MethodReference getterReference;
 	private MethodReference methodReference;
+	private boolean methodReferenceResolved;
 
 	@PostConstruct
 	public void init() {
@@ -57,6 +60,26 @@ public class ExpressionInspectorITBean {
 
 	public MethodReference getMethodReference() {
 		return methodReference;
+	}
+
+	public void resolveMethodReference() {
+		final UIComponent actionSource = Components.getCurrentActionSource();
+		if (actionSource instanceof ActionSource2) {
+			final MethodExpression actionExpression = ((ActionSource2) actionSource).getActionExpression();
+			if (actionExpression != null) {
+				final MethodReference mr = ExpressionInspector.getMethodReference(getELContext(), actionExpression);
+				if (mr.getBase().getClass().equals(ExpressionInspectorITBean.class)
+						&& mr.getName().equals("resolveMethodReference")) {
+					methodReferenceResolved = true;
+					return;
+				}
+			}
+		}
+		methodReferenceResolved = false;
+	}
+
+	public String getmethodReferenceResolved() {
+		return methodReferenceResolved ? "true" : "";
 	}
 
 	@Named

@@ -132,7 +132,11 @@ public final class ExpressionInspector {
 
 		// Calling getValue() will cause getValue() to be called on the resolver in case the
 		// value expresses referred to a property, and invoke() when it's a method.
-		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
+		final Object value = valueExpression.getValue(inspectorElContext);
+		if (value instanceof MethodExpressionValueExpressionAdapter) {
+			return getMethodReference(context, ((MethodExpressionValueExpressionAdapter) value).getValueExpression());
+		}
+		final ValueExpressionType type = (ValueExpressionType) value;
 
 		Object base = unwrapIfNecessary(inspectorElContext.getBase());
 		String property = inspectorElContext.getProperty().toString();

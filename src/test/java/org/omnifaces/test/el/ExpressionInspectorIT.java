@@ -12,6 +12,7 @@
  */
 package org.omnifaces.test.el;
 
+import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -59,6 +60,12 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 	@FindBy(id="methodReferenceFirstActualParameter")
 	private WebElement methodReferenceFirstActualParameter;
 
+	@FindBy(id = "form:resolveMethodReference")
+	private WebElement resolveMethodReference;
+
+	@FindBy(id = "form:methodReferenceResolved")
+	private WebElement methodReferenceResolved;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return createWebArchive(ExpressionInspectorIT.class);
@@ -78,6 +85,10 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 		assertEquals("void", methodReferenceReturnType.getText(), "methodReferenceReturnType is 'void'");
 		assertEquals("Baz", methodReferenceFirstParamType.getText(), "methodReferenceFirstParamType is 'Baz'");
 		assertEquals("Baz", methodReferenceFirstActualParameter.getText(), "methodReferenceFirstActualParameter is 'Baz'");
+		assertEquals("", methodReferenceResolved.getText(), "methodReferenceResolved is ''");
+		guardHttp(resolveMethodReference).click();
+		waitUntilTextContent(methodReferenceResolved);
+		assertEquals("true", methodReferenceResolved.getText(), "methodReferenceResolved is 'true'");
 	}
 
 }
