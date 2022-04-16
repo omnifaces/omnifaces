@@ -24,6 +24,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
 import org.omnifaces.el.ExpressionInspector;
+import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.util.Components;
 
@@ -34,6 +35,7 @@ public class ExpressionInspectorITBean {
 	private ValueReference valueReference;
 	private MethodReference getterReference;
 	private MethodReference methodReference;
+	private MethodReference valueMethodReference;
 
 	@PostConstruct
 	public void init() {
@@ -45,6 +47,9 @@ public class ExpressionInspectorITBean {
 
 		MethodExpression methodExpression = Components.createMethodExpression("#{foo.create(bar.selected)}", Void.class, Baz.class);
 		methodReference = ExpressionInspector.getMethodReference(elContext, methodExpression);
+
+		MethodExpressionValueExpressionAdapter methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
+		valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
 	}
 
 	public ValueReference getValueReference() {
@@ -57,6 +62,10 @@ public class ExpressionInspectorITBean {
 
 	public MethodReference getMethodReference() {
 		return methodReference;
+	}
+
+	public MethodReference getValueMethodReference() {
+		return valueMethodReference;
 	}
 
 	@Named

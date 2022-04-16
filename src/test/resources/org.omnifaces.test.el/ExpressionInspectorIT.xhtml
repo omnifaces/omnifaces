@@ -38,5 +38,11 @@
 		<h:outputText id="methodReferenceReturnType" value="#{expressionInspectorITBean.methodReference.returnType.simpleName}" />
 		<h:outputText id="methodReferenceFirstParamType" value="#{empty expressionInspectorITBean.methodReference.paramTypes ? '' : expressionInspectorITBean.methodReference.paramTypes[0].simpleName}" />
 		<h:outputText id="methodReferenceFirstActualParameter" value="#{empty expressionInspectorITBean.methodReference.actualParameters ? '' : expressionInspectorITBean.methodReference.actualParameters[0]['class'].simpleName}" />
+
+		<h:outputText id="valueMethodReferenceBase" value="#{expressionInspectorITBean.valueMethodReference.base['class'].simpleName}" />
+		<h:outputText id="valueMethodReferenceMethodName" value="#{expressionInspectorITBean.valueMethodReference.method.name}" />
+		<h:outputText id="valueMethodReferenceReturnType" value="#{expressionInspectorITBean.valueMethodReference.returnType.simpleName}" />
+		<h:outputText id="valueMethodReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.paramTypes, ', ')}" />
+		<h:outputText id="valueMethodReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.actualParameters, ', ')}" />
 	</h:body>
 </html>
