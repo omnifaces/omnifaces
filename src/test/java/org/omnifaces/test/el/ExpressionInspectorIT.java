@@ -74,6 +74,27 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 	@FindBy(id="valueMethodReferenceActualParameters")
 	private WebElement valueMethodReferenceActualParameters;
 
+	@FindBy(id="methodValueReferenceBase")
+	private WebElement methodValueReferenceBase;
+
+	@FindBy(id="methodValueReferenceProperty")
+	private WebElement methodValueReferenceProperty;
+
+	@FindBy(id="methodMethodReferenceBase")
+	private WebElement methodMethodReferenceBase;
+
+	@FindBy(id="methodMethodReferenceMethodName")
+	private WebElement methodMethodReferenceMethodName;
+
+	@FindBy(id="methodMethodReferenceReturnType")
+	private WebElement methodMethodReferenceReturnType;
+
+	@FindBy(id="methodMethodReferenceParamTypes")
+	private WebElement methodMethodReferenceParamTypes;
+
+	@FindBy(id="methodMethodReferenceActualParameters")
+	private WebElement methodMethodReferenceActualParameters;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return createWebArchive(ExpressionInspectorIT.class);
@@ -101,6 +122,15 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 		assertEquals("Baz", valueMethodReferenceReturnType.getText(), "valueMethodReferenceReturnType is 'Baz'");
 		assertEquals("", valueMethodReferenceParamTypes.getText(), "valueMethodReferenceParamTypes is empty");
 		assertEquals("", valueMethodReferenceActualParameters.getText(), "valueMethodReferenceActualParameters is empty");
+
+		assertEquals("Bar", methodValueReferenceBase.getText(), "methodValueReferenceBase is 'Bar'");
+		assertEquals("selected", methodValueReferenceProperty.getText(), "methodValueReferenceProperty is 'selected'");
+
+		assertEquals("Bar", methodMethodReferenceBase.getText(), "methodMethodReferenceBase is 'Bar'");
+		assertEquals("getSelected", methodMethodReferenceMethodName.getText(), "methodMethodReferenceMethodName is 'getSelected'");
+		assertEquals("Baz", methodMethodReferenceReturnType.getText(), "methodMethodReferenceReturnType is 'Baz'");
+		assertEquals("", methodMethodReferenceParamTypes.getText(), "methodMethodReferenceParamTypes is empty");
+		assertEquals("", methodMethodReferenceActualParameters.getText(), "methodMethodReferenceActualParameters is empty");
 	}
 
 }

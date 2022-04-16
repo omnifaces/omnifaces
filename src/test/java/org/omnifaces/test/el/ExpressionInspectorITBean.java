@@ -13,6 +13,7 @@
 package org.omnifaces.test.el;
 
 import static org.omnifaces.util.Components.createValueExpression;
+import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getELContext;
 
 import javax.annotation.PostConstruct;
@@ -36,6 +37,8 @@ public class ExpressionInspectorITBean {
 	private MethodReference getterReference;
 	private MethodReference methodReference;
 	private MethodReference valueMethodReference;
+	private ValueReference methodValueReference;
+	private MethodReference methodMethodReference;
 
 	@PostConstruct
 	public void init() {
@@ -50,6 +53,10 @@ public class ExpressionInspectorITBean {
 
 		MethodExpressionValueExpressionAdapter methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
 		valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
+
+		ValueExpression valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
+		methodValueReference = ExpressionInspector.getValueReference(elContext, valueExpressionMethodExpression);
+		methodMethodReference = ExpressionInspector.getMethodReference(elContext, valueExpressionMethodExpression);
 	}
 
 	public ValueReference getValueReference() {
@@ -66,6 +73,14 @@ public class ExpressionInspectorITBean {
 
 	public MethodReference getValueMethodReference() {
 		return valueMethodReference;
+	}
+
+	public ValueReference getMethodValueReference() {
+		return methodValueReference;
+	}
+
+	public MethodReference getMethodMethodReference() {
+		return methodMethodReference;
 	}
 
 	@Named
