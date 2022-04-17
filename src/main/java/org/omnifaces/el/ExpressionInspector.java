@@ -12,6 +12,7 @@
  */
 package org.omnifaces.el;
 
+import static java.beans.Introspector.decapitalize;
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Beans.unwrapIfNecessary;
@@ -84,7 +85,15 @@ public final class ExpressionInspector {
 	public static ValueReference getValueReference(ELContext context, ValueExpression valueExpression) {
 
 		InspectorElContext inspectorElContext = new InspectorElContext(context);
-		valueExpression.getType(inspectorElContext);
+		Class<?> type = valueExpression.getType(inspectorElContext);
+
+		if (type != null && MethodExpression.class.isAssignableFrom(type)) {
+			MethodReference methodReference = getMethodReference(inspectorElContext, valueExpression);
+			Object base = methodReference.getBase();
+			String property = decapitalize(methodReference.getName().replaceFirst("(get|is)", ""));
+			return new ValueReference(base, property);
+		}
+
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		valueExpression.getValue(inspectorElContext);
 
@@ -121,10 +130,14 @@ public final class ExpressionInspector {
 		// discovers the final target was a method. E.g. a.b.c().d.f('1')
 		// In that case too, the result will be that the inspectorElContext contains the
 		// one but last base and property, and the length of the expression chain.
-		valueExpression.getType(inspectorElContext);
+		Class<?> type = valueExpression.getType(inspectorElContext);
 
-		// If everything went well, we thus have the length of the chain now.
+		// If the type happens to be a value expression wrapping a method expression, then extract it from there instead.
+		if (type != null && MethodExpression.class.isAssignableFrom(type)) {
+			return getMethodReference(inspectorElContext, (MethodExpression) valueExpression.getValue(inspectorElContext));
+		}
 
+		// Else if everything went well, we thus have the length of the chain now.
 		// Indicate that we're now at pass 2 and want to resolve the entire chain.
 		// We can then capture the last element (the special resolver makes sure that
 		// we don't actually invoke that last element)
@@ -132,11 +145,11 @@ public final class ExpressionInspector {
 
 		// Calling getValue() will cause getValue() to be called on the resolver in case the
 		// value expresses referred to a property, and invoke() when it's a method.
-		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
+		ValueExpressionType valueExpressionType = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
 
 		Object base = unwrapIfNecessary(inspectorElContext.getBase());
 		String property = inspectorElContext.getProperty().toString();
-		boolean fromMethod = (type == ValueExpressionType.METHOD);
+		boolean fromMethod = (valueExpressionType == ValueExpressionType.METHOD);
 		Object[] params = fromMethod ? inspectorElContext.getParams() : NO_PARAMS;
 		String methodName = fromMethod ? property : ("get" + capitalize(property));
 		Method method = findMethod(base, methodName, params);
@@ -174,8 +187,16 @@ public final class ExpressionInspector {
 		// However as per #646 it turns out to be unreliable.
 		// Hence MethodExpressionValueExpressionAdapter, which was previously used as fallback, is form now on used as permanent approach.
 
-		ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
-		return (MethodReference) new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
+		MethodExpressionValueExpressionAdapter adapter = null;
+
+		if (methodExpression instanceof MethodExpressionValueExpressionAdapter) {
+			adapter = (MethodExpressionValueExpressionAdapter) methodExpression;
+		}
+		else {
+			adapter = new MethodExpressionValueExpressionAdapter(createValueExpression(methodExpression.getExpressionString(), Object.class));
+		}
+
+		return (MethodReference) adapter.getMethodInfo(context);
 	}
 
 	/**
