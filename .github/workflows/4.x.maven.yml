@@ -22,6 +22,9 @@ on:
   pull_request:
     branches: [ 4.x ]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test 4.x on ${{matrix.server}}
