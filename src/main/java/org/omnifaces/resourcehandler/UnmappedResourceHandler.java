@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.logging.Level.FINE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
@@ -23,6 +24,7 @@ import static org.omnifaces.util.Utils.stream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -114,6 +116,10 @@ import org.omnifaces.util.Hacks;
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(UnmappedResourceHandler.class.getName());
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -160,7 +166,14 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 			return;
 		}
 
-		InputStream inputStream = resource.getInputStream();
+		InputStream inputStream = null;
+
+		try {
+			inputStream = resource.getInputStream();
+		}
+		catch (Exception resourceNameIsProbablyInvalid) {
+			logger.log(FINE, "Ignoring thrown exception; this can only be caused by a spoofed request.", resourceNameIsProbablyInvalid);
+		}
 
 		if (inputStream == null) {
 			externalContext.setResponseStatus(SC_NOT_FOUND);
