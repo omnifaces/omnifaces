@@ -15,8 +15,10 @@ package org.omnifaces.resourcehandler;
 import static java.util.logging.Level.FINE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
+import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
+import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.Utils.stream;
@@ -141,7 +143,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		String path = resource.getRequestPath();
+		String path = fixMyFacesMultiViewsPrefixMappingIfNecessary(resource.getRequestPath());
 		return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
 	}
 
@@ -193,6 +195,28 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 
 	private static boolean isResourceRequest(String path) {
 		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
+	}
+
+	private static String fixMyFacesMultiViewsPrefixMappingIfNecessary(String path) {
+		if (!(Hacks.isMyFacesUsed() && isMultiViewsEnabled(getServletContext()) && isPrefixMapping())) {
+			return path;
+		}
+
+		int resourceIdentifierIndex = path.indexOf(RESOURCE_IDENTIFIER);
+
+		if (resourceIdentifierIndex > -1) {
+			String contextPath = getRequestContextPath();
+
+			if (path.startsWith(contextPath)) {
+				String resourcePath = contextPath + RESOURCE_IDENTIFIER;
+
+				if (!path.startsWith(resourcePath)) {
+					return resourcePath + path.substring(resourceIdentifierIndex);
+				}
+			}
+		}
+
+		return path;
 	}
 
 	private static String unmapRequestPath(String path) {
