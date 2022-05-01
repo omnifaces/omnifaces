@@ -150,7 +150,7 @@ public class ImportConstants extends TagHandler {
 			for (Field field : declaredType.getDeclaredFields()) {
 				if (isPublicStaticFinal(field)) {
 					try {
-						if (constants.containsKey(field.getName())) {
+						if (!constants.containsKey(field.getName())) {
 							constants.put(field.getName(), field.get(null));
 						}
 					}
