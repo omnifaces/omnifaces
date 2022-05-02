@@ -27,5 +27,7 @@
 		<h:outputText id="parent" value="#{ImportConstantsITParentBean.VALUE}" />
 		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITChildBean" />
 		<h:outputText id="child" value="#{ImportConstantsITChildBean.VALUE}" />
+		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITEnumImplementingInterface" />
+		<h:outputText id="enumValues" value="#{ImportConstantsITEnumImplementingInterface.values()}" />
 	</h:body>
 </html>

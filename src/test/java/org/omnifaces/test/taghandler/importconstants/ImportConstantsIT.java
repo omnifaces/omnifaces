@@ -29,6 +29,9 @@ public class ImportConstantsIT extends OmniFacesIT {
 	@FindBy(id="child")
 	private WebElement child;
 
+	@FindBy(id="enumValues")
+	private WebElement enumValues;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(ImportConstantsIT.class)
@@ -39,6 +42,7 @@ public class ImportConstantsIT extends OmniFacesIT {
 	public void test() {
 		assertEquals("parent", parent.getText());
 		assertEquals("child", child.getText());
+		assertEquals("[ONE, TWO, THREE]", enumValues.getText());
 	}
 
 }
