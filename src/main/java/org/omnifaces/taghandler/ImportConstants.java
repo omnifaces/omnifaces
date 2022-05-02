@@ -171,7 +171,7 @@ public class ImportConstants extends TagHandler {
 		Set<Class<?>> declaredTypes = new LinkedHashSet<>();
 		declaredTypes.add(type);
 		fillAllSuperClasses(type, declaredTypes);
-		declaredTypes.stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
+		new LinkedHashSet<>(declaredTypes).stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
 		return Collections.unmodifiableSet(declaredTypes);
 	}
 
