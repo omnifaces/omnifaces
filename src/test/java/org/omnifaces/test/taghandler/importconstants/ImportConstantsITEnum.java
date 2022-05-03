@@ -12,8 +12,8 @@
  */
 package org.omnifaces.test.taghandler.importconstants;
 
-public interface ImportConstantsITInterface {
+public enum ImportConstantsITEnum {
 
-	public static final String VALUE = "interface";
+	ONE, TWO, THREE;
 
 }
