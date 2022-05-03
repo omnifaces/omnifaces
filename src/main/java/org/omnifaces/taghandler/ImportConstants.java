@@ -16,6 +16,7 @@ import static java.lang.Math.max;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Facelets.getStringLiteral;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -180,7 +181,7 @@ public class ImportConstants extends TagHandler {
 	}
 
 	private static void fillAllSuperClasses(Class<?> type, Set<Class<?>> set) {
-		for (Class<?> sc = type.getSuperclass(); sc != Object.class; sc = sc.getSuperclass()) {
+		for (Class<?> sc = type.getSuperclass(); !isOneOf(sc, null, Object.class); sc = sc.getSuperclass()) {
 			set.add(sc);
 		}
 	}
