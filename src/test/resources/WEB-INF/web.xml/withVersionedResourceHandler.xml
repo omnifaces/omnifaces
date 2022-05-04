@@ -33,9 +33,4 @@
 		<servlet-name>facesServlet</servlet-name>
 		<url-pattern>*.xhtml</url-pattern>
 	</servlet-mapping>
-
-	<mime-mapping>
-		<extension>xml</extension>
-		<mime-type>text/xml</mime-type> <!-- WildFly uses application/xml instead. -->
-	</mime-mapping>
 </web-app>

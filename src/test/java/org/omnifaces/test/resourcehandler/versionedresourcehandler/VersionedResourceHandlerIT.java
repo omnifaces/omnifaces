@@ -12,9 +12,10 @@
  */
 package org.omnifaces.test.resourcehandler.versionedresourcehandler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
@@ -36,7 +37,7 @@ public class VersionedResourceHandlerIT extends OmniFacesIT {
 	@Test
 	public void test() {
 		String queryString = someCss.getAttribute("href").split("\\?")[1];
-		Assertions.assertEquals("before=true&v=3.13.3&after=true", queryString);
+		assertEquals("before=true&v=3.13.3&after=true", queryString);
 	}
 
 }
