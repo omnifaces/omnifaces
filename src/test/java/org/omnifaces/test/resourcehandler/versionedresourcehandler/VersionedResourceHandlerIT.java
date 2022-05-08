@@ -12,6 +12,8 @@
  */
 package org.omnifaces.test.resourcehandler.versionedresourcehandler;
 
+import static java.util.regex.Pattern.quote;
+import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -23,7 +25,7 @@ import org.openqa.selenium.support.FindBy;
 
 public class VersionedResourceHandlerIT extends OmniFacesIT {
 
-	@FindBy(css="link[rel=stylesheet][href*='some.css']")
+	@FindBy(css="link[rel=stylesheet]")
 	private WebElement someCss;
 
 	@Deployment(testable=false)
@@ -36,8 +38,11 @@ public class VersionedResourceHandlerIT extends OmniFacesIT {
 
 	@Test
 	public void test() {
-		String queryString = someCss.getAttribute("href").split("\\?")[1];
-		assertEquals("before=true&v=3.13.3&after=true", queryString);
+		String[] parts = someCss.getAttribute("href").split("\\?", 2);
+		String resourceName = parts[0].split(quote(RESOURCE_IDENTIFIER + "/"), 2)[1].split("\\.xhtml", 2)[0];
+		String queryString = parts[1];
+		assertEquals("some.min.css", resourceName);
+		assertEquals("before=true&v=3.13.3", queryString);
 	}
 
 }

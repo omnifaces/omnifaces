@@ -12,13 +12,10 @@
  */
 package org.omnifaces.test.resourcehandler.versionedresourcehandler;
 
-import static org.omnifaces.util.Utils.formatURLWithQueryString;
-
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 
 import org.omnifaces.resourcehandler.DefaultResourceHandler;
-import org.omnifaces.resourcehandler.RemappedResource;
 
 public class VersionedResourceHandlerITAfterResourceHandler extends DefaultResourceHandler {
 
@@ -28,6 +25,7 @@ public class VersionedResourceHandlerITAfterResourceHandler extends DefaultResou
 
 	@Override
 	public Resource decorateResource(Resource resource) {
-		return new RemappedResource(resource, formatURLWithQueryString(resource.getRequestPath(), "after=true"));
+		resource.setResourceName(resource.getResourceName().replace(".", ".min."));
+		return resource;
 	}
 }
