@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.regex.Pattern.quote;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,9 +90,40 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	}
 
 	@Override
+	public void setResourceName(String resourceName) {
+		String previousResourceName = getResourceName();
+		Resource wrapped = getWrapped();
+
+		if (wrapped != null) {
+			wrapped.setResourceName(resourceName);
+		}
+		else {
+			this.resourceName = resourceName;
+		}
+
+		requestPath = requestPath.replaceFirst(quote("/" + previousResourceName), "/" + resourceName);
+	}
+
+	@Override
 	public String getLibraryName() {
 		Resource wrapped = getWrapped();
 		return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
+	}
+
+	@Override
+	public void setLibraryName(String libraryName) {
+		String previousLibraryName = getLibraryName();
+		Resource wrapped = getWrapped();
+
+		if (wrapped != null) {
+			wrapped.setLibraryName(libraryName);
+		}
+		else {
+			this.libraryName = libraryName;
+		}
+
+		String queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
+		requestPath = requestPath.replaceFirst(quote(queryParam + previousLibraryName), queryParam + libraryName);
 	}
 
 	@Override
