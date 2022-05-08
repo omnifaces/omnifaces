@@ -253,6 +253,7 @@ public abstract class OmniFacesIT {
 		withCombinedResourceHandler,
 		withMessageBundle,
 		withCDNResourceHandler,
+		withVersionedResourceHandler,
 		withViewExpiredExceptionHandler,
 		withViewResourceHandler;
 	}
@@ -269,6 +270,7 @@ public abstract class OmniFacesIT {
 		withClientStateSaving,
 		withCDNResources,
 		withInterpretEmptyStringSubmittedValuesAsNull,
+		withVersionedResourceHandler,
 		withViewResources;
 	}
 
