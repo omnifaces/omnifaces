@@ -14,8 +14,8 @@ package org.omnifaces.test.resourcehandler.versionedresourcehandler;
 
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
 
 import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.resourcehandler.RemappedResource;

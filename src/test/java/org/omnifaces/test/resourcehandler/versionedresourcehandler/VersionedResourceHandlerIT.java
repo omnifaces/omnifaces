@@ -12,8 +12,8 @@
  */
 package org.omnifaces.test.resourcehandler.versionedresourcehandler;
 
+import static jakarta.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static java.util.regex.Pattern.quote;
-import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
