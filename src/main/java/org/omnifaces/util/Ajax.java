@@ -196,6 +196,8 @@ public final class Ajax {
 
 		for (UIComponent column : table.getChildren()) {
 			if (column instanceof UIColumn) {
+				if (!column.isRendered()) continue;
+
 				for (UIComponent cell : column.getChildren()) {
 					renderIds.add(format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
 				}
