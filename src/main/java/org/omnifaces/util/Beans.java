@@ -107,7 +107,7 @@ public final class Beans {
 		}
 		catch (Exception | LinkageError e) {
 			logger.log(FINE, "Cannot get BeanManager from CDI.current(); falling back to JNDI.", e);
-			return JNDI.lookup("java:comp/BeanManager");
+			return JNDI.lookup(Hacks.isTomcat() ? "java:comp/env/BeanManager" : "java:comp/BeanManager");
 		}
 	}
 
