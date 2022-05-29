@@ -452,6 +452,18 @@ public final class Hacks {
 	}
 
 	// Tomcat related -------------------------------------------------------------------------------------------------
+	
+	/**
+	 * @return {@code true} if we are running in an environment with Tomcat servlet container classes
+	 */
+	public static boolean isTomcat() {
+		try {
+			Class.forName("org.apache.catalina.Container");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
 
 	/**
 	 * Returns true if the given WS session is from Tomcat and given illegal state exception is caused by a push bomb
