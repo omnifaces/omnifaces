@@ -29,8 +29,13 @@
 		<div id="firstPathParamAsString">#{multiViewsITBean.firstPathParamAsString}</div>
 		<div id="secondPathParamAsInteger">#{multiViewsITBean.secondPathParamAsInteger}</div>
 	
-		<h:form id="form">
+		<o:form id="form">
 			<h:commandButton id="submit" />
-		</h:form>
+		</o:form>
+
+		<h:link id="link" outcome="/MultiViewsITOtherPage">
+			<o:pathParam value="pathParam" />
+			<o:pathParam value="471" />
+		</h:link>
 	</h:body>
 </html>
