@@ -88,7 +88,7 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testSubfolderWelcomeFileOnEmptyPath() {
-		open("subfolder");
+		open("subfolder/");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
 		guardHttp(formSubmit).click();
@@ -101,7 +101,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	@Test
 	public void testSubfolderWelcomeFileOnNamedPath() {
 		open("subfolder/MultiViewsITWelcomeFile");
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to empty path.
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to subfolder.
 
 		guardHttp(formSubmit).click();
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
