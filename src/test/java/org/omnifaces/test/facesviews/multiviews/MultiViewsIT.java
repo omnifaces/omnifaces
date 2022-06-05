@@ -87,24 +87,42 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testSubfolder() {
+	public void testSubfolderWelcomeFileOnEmptyPath() {
 		open("subfolder");
-		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
 		guardHttp(formSubmit).click();
-		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
+
+	@Test
+	public void testSubfolderWelcomeFileOnNamedPath() {
+		open("subfolder/MultiViewsITWelcomeFile");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to empty path.
+
+		guardHttp(formSubmit).click();
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
+
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
+
+	@Test
+	public void testSubfolderWelcomeFileWithPathParameters() {
 		open("subfolder/foo/42");
-		verify200("subfolder/MultiViewsIT", "subfolder/foo/42", "foo", "42");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
 		guardHttp(formSubmit).click();
-		verify200("subfolder/MultiViewsIT", "subfolder/foo/42", "foo", "42");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
 		open("subfolder/foo/42/bar/");
-		verify200("subfolder/MultiViewsIT", "subfolder/foo/42/bar/", "foo", "42");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
 
 		guardHttp(formSubmit).click();
-		verify200("subfolder/MultiViewsIT", "subfolder/foo/42/bar/", "foo", "42");
+		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
 	}
 
 	@Test
