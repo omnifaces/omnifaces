@@ -65,6 +65,27 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
+	public void testSubfolder() {
+		open("subfolder");
+		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
+
+		guardHttp(formSubmit).click();
+		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
+
+		open("subfolder/foo/42");
+		verify200("subfolder/MultiViewsIT", "subfolder/foo/42", "foo", "42");
+
+		guardHttp(formSubmit).click();
+		verify200("subfolder/MultiViewsIT", "subfolder/foo/42", "foo", "42");
+
+		open("subfolder/foo/42/bar/");
+		verify200("subfolder/MultiViewsIT", "subfolder/foo/42/bar/", "foo", "42");
+
+		guardHttp(formSubmit).click();
+		verify200("subfolder/MultiViewsIT", "subfolder/foo/42/bar/", "foo", "42");
+	}
+
+	@Test
 	public void testOtherPage() {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
