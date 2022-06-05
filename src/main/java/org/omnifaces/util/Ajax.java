@@ -190,16 +190,22 @@ public final class Ajax {
 
 	private static void updateRowCells(UIData table, int index) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getClientId();
+		String parentId = table.getParent().getClientId(context);
 		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
 			if (column instanceof UIColumn) {
-				if (!column.isRendered()) continue;
+				if (!column.isRendered()) {
+					continue;
+				}
 
 				for (UIComponent cell : column.getChildren()) {
+					if (!cell.isRendered()) {
+						continue;
+					}
+
 					renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
 				}
 			}
@@ -214,6 +220,10 @@ public final class Ajax {
 		int columnCount = columns.getRowCount();
 
 		for (UIComponent cell : columns.getChildren()) {
+			if (!cell.isRendered()) {
+				continue;
+			}
+
 			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
 				renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
 			}
@@ -250,14 +260,18 @@ public final class Ajax {
 
 	private static void updateColumnCells(UIData table, int index, int rowCount) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getClientId();
+		String parentId = table.getParent().getClientId(context);
 		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
 		UIColumn column = findColumn(table, index);
 
-		if (column != null) {
+		if (column != null && column.isRendered()) {
 			for (UIComponent cell : column.getChildren()) {
+				if (!cell.isRendered()) {
+					continue;
+				}
+
 				String cellId = cell.getId();
 
 				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
