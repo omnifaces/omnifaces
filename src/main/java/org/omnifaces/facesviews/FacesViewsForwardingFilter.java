@@ -115,13 +115,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		}
 
 		if (multiViews && !resources.containsKey(resource)) {
-			resource = getMultiViewsWelcomeFile(servletContext, resources, normalizedServletPath);
+			if (request.getPathInfo() != null) {
+				servletPath += request.getPathInfo();
+			}
+
+			resource = getMultiViewsWelcomeFile(servletContext, resources, servletPath);
 
 			if (resource != null) {
-				if (request.getPathInfo() != null) {
-					servletPath += request.getPathInfo();
-				}
-
 				String pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
 				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo.isEmpty() ? "/" : pathInfo);
 				request.getRequestDispatcher(resource).forward(request, response);
