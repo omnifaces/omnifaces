@@ -46,11 +46,14 @@ import static org.omnifaces.util.Xml.getNodeTextContents;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -444,7 +447,7 @@ public final class FacesViews {
 			throw new IllegalStateException(e);
 		}
 
-		Set<String> mappedWelcomeFiles = new HashSet<>();
+		Set<String> mappedWelcomeFiles = new LinkedHashSet<>();
 
 		for (String welcomeFile : getNodeTextContents(webXml, "welcome-file-list/welcome-file")) {
 			if (isExtensionless(welcomeFile)) {
@@ -689,6 +692,26 @@ public final class FacesViews {
 		String queryString = (request.getQueryString() == null) ? "" : ("?" + request.getQueryString());
 		String baseURL = getRequestBaseURL(request);
 		return baseURL.substring(0, baseURL.length() - 1) + stripExtension(resource) + queryString;
+	}
+
+	static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String normalizedServletPath) {
+		Path path = Paths.get(normalizedServletPath).getParent();
+
+		if (path != null) {
+			Set<String> mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
+
+			for (; path.getParent() != null; path = path.getParent()) {
+				for (String mappedWelcomeFile : mappedWelcomeFiles) {
+					String subfolderWelcomeFile = path.toString() + mappedWelcomeFile;
+
+					if (resources.containsKey(subfolderWelcomeFile + "/*")) {
+						return subfolderWelcomeFile;
+					}
+				}
+			}
+		}
+
+		return getMultiViewsWelcomeFile(servletContext);
 	}
 
 
