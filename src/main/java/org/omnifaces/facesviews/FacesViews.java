@@ -631,10 +631,10 @@ public final class FacesViews {
 		return baseURL.substring(0, baseURL.length() - 1) + stripExtension(resource) + queryString;
 	}
 
-	static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String normalizedServletPath) {
+	static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String servletPath) {
 		Set<String> mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
 
-		for (Path path = Paths.get(normalizedServletPath); path.getParent() != null; path = path.getParent()) {
+		for (Path path = Paths.get(servletPath); path.getParent() != null; path = path.getParent()) {
 			for (String mappedWelcomeFile : mappedWelcomeFiles) {
 				String subfolderWelcomeFile = path.toString() + mappedWelcomeFile;
 
@@ -807,6 +807,12 @@ public final class FacesViews {
 
 		if (multiViewsResources != null && multiViewsResources.contains(resource)) {
 			return true;
+		}
+
+		Map<String, String> mappedResources = getMappedResources(servletContext);
+
+		if (mappedResources != null && mappedResources.containsKey(resource)) {
+			return false;
 		}
 
 		return getMultiViewsWelcomeFile(servletContext) != null;
