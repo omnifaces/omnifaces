@@ -66,9 +66,6 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testSubfolder() {
-		open("subfolder");
-		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
-
 		open("subfolder/");
 		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
 
