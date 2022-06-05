@@ -190,14 +190,17 @@ public final class Ajax {
 
 	private static void updateRowCells(UIData table, int index) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String tableId = table.getClientId(context);
+		String parentId = table.getParent().getClientId();
+		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
 			if (column instanceof UIColumn) {
+				if (!column.isRendered()) continue;
+
 				for (UIComponent cell : column.getChildren()) {
-					renderIds.add(format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+					renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
 				}
 			}
 			else if (column instanceof UIData) { // <p:columns>.
@@ -247,7 +250,8 @@ public final class Ajax {
 
 	private static void updateColumnCells(UIData table, int index, int rowCount) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String tableId = table.getClientId(context);
+		String parentId = table.getParent().getClientId();
+		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
 		UIColumn column = findColumn(table, index);
@@ -257,7 +261,7 @@ public final class Ajax {
 				String cellId = cell.getId();
 
 				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					renderIds.add(format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
+					renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, rowIndex, separator, cellId));
 				}
 			}
 		}
