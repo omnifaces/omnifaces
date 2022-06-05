@@ -72,7 +72,7 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	@Test
 	public void testSubfolder() {
-		open("subfolder");
+		open("subfolder/");
 		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
 
 		guardHttp(formSubmit).click();
@@ -89,6 +89,9 @@ public class MultiViewsIT extends OmniFacesIT {
 
 		guardHttp(formSubmit).click();
 		verify200("subfolder/MultiViewsIT", "subfolder/foo/42/bar/", "foo", "42");
+
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 
 	@Test

@@ -119,7 +119,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 				}
 
 				String pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
-				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
+				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo.isEmpty() ? "/" : pathInfo);
 				request.getRequestDispatcher(resource).forward(request, response);
 				return true;
 			}
