@@ -69,6 +69,9 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("subfolder");
 		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
 
+		open("subfolder/");
+		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
+
 		guardHttp(formSubmit).click();
 		verify200("subfolder/MultiViewsIT", "subfolder/", "", "");
 

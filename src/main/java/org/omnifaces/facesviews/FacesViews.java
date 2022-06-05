@@ -695,18 +695,14 @@ public final class FacesViews {
 	}
 
 	static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String normalizedServletPath) {
-		Path path = Paths.get(normalizedServletPath).getParent();
+		Set<String> mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
 
-		if (path != null) {
-			Set<String> mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
+		for (Path path = Paths.get(normalizedServletPath); path.getParent() != null; path = path.getParent()) {
+			for (String mappedWelcomeFile : mappedWelcomeFiles) {
+				String subfolderWelcomeFile = path.toString() + mappedWelcomeFile;
 
-			for (; path.getParent() != null; path = path.getParent()) {
-				for (String mappedWelcomeFile : mappedWelcomeFiles) {
-					String subfolderWelcomeFile = path.toString() + mappedWelcomeFile;
-
-					if (resources.containsKey(subfolderWelcomeFile + "/*")) {
-						return subfolderWelcomeFile;
-					}
+				if (resources.containsKey(subfolderWelcomeFile + "/*")) {
+					return subfolderWelcomeFile;
 				}
 			}
 		}
