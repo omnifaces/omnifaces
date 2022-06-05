@@ -32,8 +32,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 
-import org.omnifaces.taghandler.ImportConstants;
-
 /**
  * <p>
  * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the
@@ -96,7 +94,13 @@ public final class Beans {
 		}
 		catch (Exception | LinkageError e) {
 			logger.log(FINE, "Cannot get BeanManager from CDI.current(); falling back to JNDI.", e);
-			return JNDI.lookup("java:comp/BeanManager");
+			BeanManager manager = JNDI.lookup("java:comp/BeanManager");
+
+			if (manager == null) {
+				manager = JNDI.lookup("java:comp/env/BeanManager"); // E.g. Tomcat.
+			}
+
+			return manager;
 		}
 	}
 
