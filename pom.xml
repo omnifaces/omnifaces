@@ -68,23 +68,23 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>26.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly.version>26.1.1.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
 		<test.liberty.version>21.0.0.10-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta and newer couldn't be found by Arquillian? -->
-		<test.glassfish.version>6.2.4</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.tomcat.version>10.0.14</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.glassfish.version>6.2.5</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.tomcat.version>10.0.22</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 		<test.piranha.version>21.12.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
 		<test.tomee.version>9.0.0-M7</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) https://issues.apache.org/jira/browse/TOMEE-3824 -->
-		<test.payara.version>6.2021.1.Alpha1</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web TODO: Arquillian couldn't start it -->
+		<test.payara.version>6.2022.1.Alpha2</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-		<test.mojarra4.version>4.0.0-M1</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
 		<test.mojarra3.version>3.0.2</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces.version>3.0.1</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld.version>4.0.2.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>7.0.2.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.myfaces.version>3.0.2</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld.version>4.0.3.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator.version>7.0.4.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>2.0.1</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.tyrus.version>2.0.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Sonar config. -->
 		<sonar.organization>balusc-github</sonar.organization>
@@ -992,9 +992,9 @@
 			<id>payara</id>
 			<dependencies>
 				<dependency>
-					<groupId>org.jboss.arquillian.container</groupId>
-					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
-					<version>1.0.2</version>
+					<groupId>org.omnifaces.arquillian</groupId>
+					<artifactId>arquillian-glassfish-server-managed</artifactId>
+					<version>1.1</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
