@@ -12,10 +12,10 @@
  */
 package org.omnifaces.cdi.config;
 
-import static org.omnifaces.util.Utils.toZonedDateTime;
-
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
@@ -45,10 +45,11 @@ import org.omnifaces.cdi.Eager;
  * <li>You can reference the current time as {@link Temporal} via <code>#{now}</code> in EL.</li>
  * <li>They have a {@link TemporalDate#getTime()} method which allows you to obtain the epoch time via
  * <code>#{startup.time}</code> and <code>#{now.time}</code> in EL.</li>
- * <li>They have a {@link TemporalDate#getInstant()} method which allows you to convert them to {@link Instant} via
- * <code>#{startup.instant}</code> and <code>#{now.instant}</code> in EL.</li>
+ * <li>They have a {@link TemporalDate#getInstant()} method which allows you to convert them to {@link Instant} at
+ * {@link ZoneOffset#UTC} via <code>#{startup.instant}</code> and <code>#{now.instant}</code> in EL.</li>
  * <li>They have a {@link TemporalDate#getZonedDateTime()} method which allows you to convert them to
- * {@link ZonedDateTime} via <code>#{startup.zonedDateTime}</code> and <code>#{now.zonedDateTime}</code> in EL.</li>
+ * {@link ZonedDateTime} at {@link ZoneId#systemDefault()} via <code>#{startup.zonedDateTime}</code> and
+ * <code>#{now.zonedDateTime}</code> in EL.</li>
  * <li>They are injectable in CDI beans via e.g. <code>&#64;Inject &#64;Named private Temporal startup;</code>.
  * </ul>
  *
@@ -76,7 +77,7 @@ public class DateProducer {
 	}
 
 	/**
-	 * {@link Instant} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL
+	 * {@link ZonedDateTime} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL
 	 * expressions relying on {@link Date#getTime()} such as <code>#{now.time}</code> so that they continue working
 	 * after migration from {@link Date} to {@link Temporal} in OmniFaces 4.0.
 	 *
@@ -87,49 +88,49 @@ public class DateProducer {
 
 		private static final long serialVersionUID = 1L;
 
-		private Instant instant;
 		private ZonedDateTime zonedDateTime;
+		private Instant instant;
 		private long time;
 		private String string;
 
 		/**
-		 * Constructs a new proxyable instant which is initialized with {@link Instant#now()}.
+		 * Constructs a new proxyable temporal date which is initialized with {@link ZonedDateTime#now()}.
 		 */
 		public TemporalDate() {
-			this(Instant.now());
+			this(ZonedDateTime.now());
 		}
 
 		/**
-		 * Constructs a new proxyable instant which is initialized with given {@link Instant}.
-		 * @param instant Instant to initialize with.
+		 * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
+		 * @param zonedDateTime ZonedDateTime to initialize with.
 		 */
-		public TemporalDate(Instant instant) {
-			this.instant = instant;
-			this.zonedDateTime = toZonedDateTime(instant);
+		public TemporalDate(ZonedDateTime zonedDateTime) {
+			this.zonedDateTime = zonedDateTime;
+			this.instant = zonedDateTime.toInstant();
 			this.time = instant.toEpochMilli();
-			this.string = instant.toString();
+			this.string = zonedDateTime.toString();
 		}
 
 		/**
-		 * Convenience method to return this as {@link Instant}.
-		 * @return This as {@link Instant}.
-		 */
-		public Instant getInstant() {
-			return instant;
-		}
-
-		/**
-		 * Convenience method to return this as {@link ZonedDateTime}.
-		 * @return This as {@link ZonedDateTime}.
+		 * Convenience method to return this temporal date as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
+		 * @return This as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
 		 */
 		public ZonedDateTime getZonedDateTime() {
 			return zonedDateTime;
 		}
 
 		/**
+		 * Convenience method to return this temporal date as {@link Instant} at {@link ZoneOffset#UTC}.
+		 * @return This as {@link Instant} at {@link ZoneOffset#UTC}.
+		 */
+		public Instant getInstant() {
+			return instant;
+		}
+
+		/**
 		 * Has the same signature as {@link Date#getTime()}.
 		 * This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
-		 * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this instant.
+		 * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this temporal date.
 		 */
 		public long getTime() {
 			return time;
@@ -138,31 +139,31 @@ public class DateProducer {
 		// Required overrides -----------------------------------------------------------------------------------------
 
 		/**
-		 * Returns {@link Instant#compareTo(Instant)}
+		 * Returns {@link ZonedDateTime#compareTo(java.time.chrono.ChronoZonedDateTime)}
 		 */
 		@Override
 		public int compareTo(TemporalDate other) {
-			return instant.compareTo(other.getInstant());
+			return zonedDateTime.compareTo(other.getZonedDateTime());
 		}
 
 		/**
-		 * Returns {@link Instant#equals(Object)}
+		 * Returns {@link ZonedDateTime#equals(Object)}
 		 */
 		@Override
 		public boolean equals(Object other) {
-			return instant.equals(other);
+			return zonedDateTime.equals(other);
 		}
 
 		/**
-		 * Returns {@link Instant#hashCode()}
+		 * Returns {@link ZonedDateTime#hashCode()}
 		 */
 		@Override
 		public int hashCode() {
-			return instant.hashCode();
+			return zonedDateTime.hashCode();
 		}
 
 		/**
-		 * Returns {@link Instant#toString()}.
+		 * Returns {@link ZonedDateTime#toString()}.
 		 */
 		@Override
 		public String toString() {
@@ -173,32 +174,32 @@ public class DateProducer {
 
 		@Override
 		public boolean isSupported(TemporalField field) {
-			return instant.isSupported(field);
+			return zonedDateTime.isSupported(field);
 		}
 
 		@Override
 		public long getLong(TemporalField field) {
-			return instant.getLong(field);
+			return zonedDateTime.getLong(field);
 		}
 
 		@Override
 		public boolean isSupported(TemporalUnit unit) {
-			return instant.isSupported(unit);
+			return zonedDateTime.isSupported(unit);
 		}
 
 		@Override
 		public Temporal with(TemporalField field, long newValue) {
-			return instant.with(field, newValue);
+			return zonedDateTime.with(field, newValue);
 		}
 
 		@Override
 		public Temporal plus(long amountToAdd, TemporalUnit unit) {
-			return instant.plus(amountToAdd, unit);
+			return zonedDateTime.plus(amountToAdd, unit);
 		}
 
 		@Override
 		public long until(Temporal endExclusive, TemporalUnit unit) {
-			return instant.until(endExclusive, unit);
+			return zonedDateTime.until(endExclusive, unit);
 		}
 
 	}
