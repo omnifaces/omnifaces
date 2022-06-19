@@ -793,10 +793,11 @@ public final class FacesViews {
 			return false;
 		}
 
+		String extensionlessResource = stripExtension(resource);
 		Set<String> excludedPaths = getExcludedPaths(servletContext);
 
 		if (!isEmpty(excludedPaths)) {
-			String path = resource + "/";
+			String path = extensionlessResource + "/";
 
 			if (excludedPaths.stream().anyMatch(path::startsWith)) {
 				return false;
@@ -805,13 +806,13 @@ public final class FacesViews {
 
 		Set<String> multiViewsResources = getMultiViewsResources(servletContext);
 
-		if (multiViewsResources != null && multiViewsResources.contains(resource)) {
+		if (multiViewsResources != null && multiViewsResources.contains(extensionlessResource)) {
 			return true;
 		}
 
 		Map<String, String> mappedResources = getMappedResources(servletContext);
 
-		if (mappedResources != null && mappedResources.containsKey(resource)) {
+		if (mappedResources != null && mappedResources.containsKey(extensionlessResource)) {
 			return false;
 		}
 
