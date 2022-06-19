@@ -69,19 +69,19 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>26.0.0.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
-		<test.tomee.version>8.0.9</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
-		<test.payara.version>5.2021.10</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
-		<test.tomcat.version>9.0.56</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.wildfly.version>26.1.1.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
+		<test.tomee.version>8.0.12</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
+		<test.payara.version>5.2022.2</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
+		<test.tomcat.version>9.0.64</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat). -->
 		<test.mojarra.version>2.3.17</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces.version>2.3.9</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld.version>3.1.8.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>6.2.1.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.myfaces.version>2.3.10</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld.version>3.1.9.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator.version>6.2.2.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>1.2.6</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>1.18</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.tyrus.version>1.19</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 	</properties>
 
 	<dependencies>
