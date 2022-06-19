@@ -443,7 +443,7 @@
 					</configuration>
 				</plugin>
 
-				<!-- Global configuration for integration test profiles. -->
+				<!-- Global configuration for (integration) test profiles. -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
@@ -459,6 +459,11 @@
 					<configuration>
 						<outputDirectory>${project.build.directory}</outputDirectory>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.2</version> <!-- 2.22.2 is the minimum version having native JUnit 5 support. -->
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
