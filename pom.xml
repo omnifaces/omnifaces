@@ -1022,9 +1022,9 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/payara6</GLASSFISH_HOME>
-							</environmentVariables>
+							<systemPropertyVariables>
+								<glassfish.home>${project.build.directory}/payara6</glassfish.home>
+							</systemPropertyVariables>
 						</configuration>
 					</plugin>
 				</plugins>
