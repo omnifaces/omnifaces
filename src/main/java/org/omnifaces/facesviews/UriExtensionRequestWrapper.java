@@ -12,8 +12,10 @@
  */
 package org.omnifaces.facesviews;
 
+import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.MappingMatch;
 
 /**
  * This wraps a request to an extensionless JSF view and provides an extension for
@@ -34,6 +36,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
 	private final String servletPath;
+	private final HttpServletMapping mapping;
 
 	/**
 	 * Construct the URI extension request wrapper.
@@ -43,6 +46,34 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
 		super(request);
 		this.servletPath = servletPath;
+
+		String[] parts = servletPath.split("\\.", 2);
+		final String pattern = "*." + parts[1];
+		final String matchValue = parts[0];
+		final String servletName = request.getHttpServletMapping().getServletName();
+
+		this.mapping = new HttpServletMapping() {
+
+			@Override
+			public String getServletName() {
+				return servletName;
+			}
+
+			@Override
+			public String getPattern() {
+				return pattern;
+			}
+
+			@Override
+			public String getMatchValue() {
+				return matchValue;
+			}
+
+			@Override
+			public MappingMatch getMappingMatch() {
+				return MappingMatch.EXTENSION;
+			}
+		};
 	}
 
 	@Override
@@ -54,6 +85,11 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 	public String getPathInfo() {
 		// Since we simulate that the request is mapped to an extension and not to a prefix path, there can be no path info.
 		return null;
+	}
+
+	@Override
+	public HttpServletMapping getHttpServletMapping() {
+		return mapping;
 	}
 
 }
