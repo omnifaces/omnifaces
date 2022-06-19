@@ -117,14 +117,13 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
-		open("FacesViewsITNonExistingPage");
-		verify404("FacesViewsITNonExistingPage");
-
 		open("FacesViewsITNonExistingPage.xhtml");
 		verify404("FacesViewsITNonExistingPage.xhtml");
 
-		open("FacesViewsITNonExistingPage.jsf");
-		verify404("FacesViewsITNonExistingPage.jsf");
+		if (!isFaces4Used()) { // Since Mojarra 4 this one incorrectly throws 500.
+			open("FacesViewsITNonExistingPage.jsf");
+			verify404("FacesViewsITNonExistingPage.jsf");
+		}
 	}
 
 	@Test
