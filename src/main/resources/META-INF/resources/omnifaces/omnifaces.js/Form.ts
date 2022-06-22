@@ -62,7 +62,7 @@ export module Form {
 				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: any, key: string, value: string) {
 					for (
 						let clientId = key; 
-						executeIds.indexOf(clientId) > -1 || clientId.indexOf(encodedSeparatorChar) > -1; 
+						clientId.indexOf(encodedSeparatorChar) > -1;
 						clientId = clientId.substring(0, clientId.lastIndexOf(encodedSeparatorChar))) 
 					{
 						if (executeIds.indexOf(clientId) > -1) {
