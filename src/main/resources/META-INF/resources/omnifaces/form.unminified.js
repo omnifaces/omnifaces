@@ -27,8 +27,9 @@ OmniFaces.Form = (function(Util, window) {
 
 			jsf.getViewState = function(form) {
 				var originalViewState = originalGetViewState(form);
+				var partialSubmit = form.attributes["data-partialsubmit"];
 
-				if (form.attributes["data-partialsubmit"] != "true") {
+				if (!partialSubmit || partialSubmit.value != "true") {
 					return originalViewState;
 				}
 
