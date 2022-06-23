@@ -16,6 +16,10 @@ import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.faces.component.behavior.ClientBehaviorContext;
+import javax.faces.context.PartialViewContext;
+import javax.faces.render.ResponseStateManager;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
@@ -46,20 +50,34 @@ public class FormIT extends OmniFacesIT {
 	public void testFormDefault() {
 		guardAjax(formDefaultSubmit).click();
 		String params = formDefaultParams.getText();
+		assertTrue(params.contains("formDefault"));
 		assertFalse(params.contains("formDefault:input1"));
 		assertTrue(params.contains("formDefault:input2"));
 		assertTrue(params.contains("formDefault:input3"));
 		assertFalse(params.contains("formDefault:input4"));
+		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM));
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME));
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME));
 	}
 
 	@Test
 	public void testFormDisabled() {
 		guardAjax(formDisabledSubmit).click();
 		String params = formDisabledParams.getText();
+		assertTrue(params.contains("formDisabled"));
 		assertTrue(params.contains("formDisabled:input1"));
 		assertTrue(params.contains("formDisabled:input2"));
 		assertTrue(params.contains("formDisabled:input3"));
 		assertTrue(params.contains("formDisabled:input4"));
+		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM));
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME));
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME));
+		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME));
 	}
 
 }
