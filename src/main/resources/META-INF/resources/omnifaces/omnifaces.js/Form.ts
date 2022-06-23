@@ -47,34 +47,48 @@ export module Form {
 				}
 
 				let executeIds: string[] = [];
+				let encodedExecuteIds: string[] = [];
+				let implicitExecuteIds: string[] = [];
 
 				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", params[0].id).split(" ").map(encodeURIComponent);
-					executeIds.push(encodeURIComponent(form.id));
+					executeIds = execute.replace("@this", params[0].id).split(" ");
+					encodedExecuteIds = executeIds.map(encodeURIComponent);
+					implicitExecuteIds.push(encodeURIComponent(form.id));
 				}
 
-				executeIds.push(VIEW_STATE_PARAM);
-				executeIds.push(CLIENT_WINDOW_PARAM);
+				implicitExecuteIds.push(VIEW_STATE_PARAM);
+				implicitExecuteIds.push(CLIENT_WINDOW_PARAM);
 
 				const partialViewState: string[] = [];
-				const encodedSeparatorChar = encodeURIComponent(faces.separatorchar);
 
 				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: any, key: string, value: string) {
-					for (
-						let clientId = key; 
-						clientId.indexOf(encodedSeparatorChar) > -1;
-						clientId = clientId.substring(0, clientId.lastIndexOf(encodedSeparatorChar))) 
-					{
-						if (executeIds.indexOf(clientId) > -1) {
-							partialViewState.push(key + "=" + value);
-							break;
-						}
+					if (implicitExecuteIds.indexOf(key) > -1 || encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
+						partialViewState.push(key + "=" + value);
 					}
 				}); 
 
 				return partialViewState.join("&");
 			}
 		}
+	}
+
+	function containsNamedChild(executeIds: string[], key: string) {
+		var name = key.replace("%3A", "\\:");
+
+		try {
+			for (let executeId of executeIds) {
+				var parent = document.getElementById(executeId);
+
+				if (parent && parent.querySelector("[name='" + name + "']")) {
+					return true;
+				}
+			}
+		}
+		catch (e) {
+			console.warn("Cannot determine if " + executeIds + " contains child " + name, e);
+		}
+
+		return false;		
 	}
 
 	// Global initialization ------------------------------------------------------------------------------------------
