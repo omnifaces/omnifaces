@@ -23,45 +23,49 @@ OmniFaces.Form = (function(Util, window) {
 
 	function init() {
 		if (window.jsf) { // Standard JSF API.
-			var originalGetViewState = jsf.getViewState;
+			var originalAjaxRequest = jsf.ajax.request;
 
-			jsf.getViewState = function(form) {
-				var originalViewState = originalGetViewState(form);
-				var partialSubmit = form.attributes["data-partialsubmit"];
+			jsf.ajax.request = function(source, event, options) {
+				var originalGetViewState = jsf.getViewState;
 
-				if (!partialSubmit || partialSubmit.value != "true") {
-					return originalViewState;
-				}
+				jsf.getViewState = function(form) {
+					var originalViewState = originalGetViewState(form);
+					var partialSubmit = form.attributes["data-partialsubmit"];
 
-				var params = jsf.ajax.request.arguments;
-				var execute = params ? params[2].execute : null;
-
-				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
-					return originalViewState;
-				}
-
-				var executeIds = [];
-				var encodedExecuteIds = [];
-				var implicitExecuteIds = [];
-
-				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", params[0].id).split(" ");
-					encodedExecuteIds = executeIds.map(encodeURIComponent);
-					implicitExecuteIds.push(encodeURIComponent(form.id));
-				}
-
-				implicitExecuteIds.push(OmniFaces.VIEW_STATE_PARAM);
-				implicitExecuteIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
-
-				var partialViewState = [];
-
-				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_, key, value) {
-					if (implicitExecuteIds.indexOf(key) > -1 || encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
-						partialViewState.push(key + "=" + value);
+					if (!partialSubmit || partialSubmit.value != "true") {
+						return originalViewState;
 					}
-				});
 
-				return partialViewState.join("&");
+					var execute = options ? options.execute : null;
+
+					if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
+						return originalViewState;
+					}
+
+					var executeIds = [];
+					var encodedExecuteIds = [];
+
+					if (execute.indexOf("@none") == -1) {
+						executeIds = execute.replace("@this", source.id).split(" ");
+						encodedExecuteIds = executeIds.map(encodeURIComponent);
+						encodedExecuteIds.push(encodeURIComponent(form.id));
+					}
+
+					encodedExecuteIds.push(OmniFaces.VIEW_STATE_PARAM);
+					encodedExecuteIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
+
+					var partialViewState = [];
+
+					originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry, key, value) {
+						if (encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
+							partialViewState.push(key + "=" + value);
+						}
+					});
+
+					return partialViewState.join("&");
+				}
+
+				originalAjaxRequest(source, event, options);
 			}
 		}
 
