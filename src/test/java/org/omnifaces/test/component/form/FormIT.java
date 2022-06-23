@@ -50,34 +50,34 @@ public class FormIT extends OmniFacesIT {
 	public void testFormDefault() {
 		guardAjax(formDefaultSubmit).click();
 		String params = formDefaultParams.getText();
-		assertTrue(params.contains("formDefault"));
-		assertFalse(params.contains("formDefault:input1"));
-		assertTrue(params.contains("formDefault:input2"));
-		assertTrue(params.contains("formDefault:input3"));
-		assertFalse(params.contains("formDefault:input4"));
-		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM));
-		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME));
-		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME));
+		assertTrue(params.contains("formDefault"), "formDefault");
+		assertFalse(params.contains("formDefault:input1"), "formDefault:input1");
+		assertTrue(params.contains("formDefault:input2"), "formDefault:input2");
+		assertTrue(params.contains("formDefault:input3"), "formDefault:input3");
+		assertFalse(params.contains("formDefault:input4"), "formDefault:input4");
+		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM), ResponseStateManager.VIEW_STATE_PARAM);
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME), ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME);
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME), ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME), PartialViewContext.PARTIAL_EVENT_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME), PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME), PartialViewContext.PARTIAL_RENDER_PARAM_NAME);
 	}
 
 	@Test
-	public void testFormDisabled() {
+	public void testFormDisabledPartialSubmit() {
 		guardAjax(formDisabledSubmit).click();
 		String params = formDisabledParams.getText();
-		assertTrue(params.contains("formDisabled"));
-		assertTrue(params.contains("formDisabled:input1"));
-		assertTrue(params.contains("formDisabled:input2"));
-		assertTrue(params.contains("formDisabled:input3"));
-		assertTrue(params.contains("formDisabled:input4"));
-		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM));
-		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME));
-		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME));
-		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME));
+		assertTrue(params.contains("formDisabled"), "formDisabled");
+		assertTrue(params.contains("formDisabled:input1"), "formDisabled:input1");
+		assertTrue(params.contains("formDisabled:input2"), "formDisabled:input2");
+		assertTrue(params.contains("formDisabled:input3"), "formDisabled:input3");
+		assertTrue(params.contains("formDisabled:input4"), "formDisabled:input4");
+		assertTrue(params.contains(ResponseStateManager.VIEW_STATE_PARAM), ResponseStateManager.VIEW_STATE_PARAM);
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME), ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME);
+		assertTrue(params.contains(ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME), ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EVENT_PARAM_NAME), PartialViewContext.PARTIAL_EVENT_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME), PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME);
+		assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME), PartialViewContext.PARTIAL_RENDER_PARAM_NAME);
 	}
 
 }
