@@ -30,44 +30,47 @@ export module Form {
 		const faces = window.faces || window.jsf;
 
 		if (faces) { // Standard JSF API.
-			const originalGetViewState = faces.getViewState;
+			const originalAjaxRequest = faces.ajax.request;
 
-			faces.getViewState = function(form: HTMLFormElement) {
-				const originalViewState = originalGetViewState(form);
+			faces.ajax.request = function(source: HTMLElement, event: any, options: any) {
+				const originalGetViewState = faces.getViewState;
 
-				if (form.dataset["partialsubmit"] != "true") {
-					return originalViewState;
-				}
+				faces.getViewState = function(form: HTMLFormElement) {
+					const originalViewState = originalGetViewState(form);
 
-				const params = faces.ajax.request.arguments;
-				const execute = params ? params[2].execute : null;
-
-				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
-					return originalViewState;
-				}
-
-				let executeIds: string[] = [];
-				let encodedExecuteIds: string[] = [];
-				let implicitExecuteIds: string[] = [];
-
-				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", params[0].id).split(" ");
-					encodedExecuteIds = executeIds.map(encodeURIComponent);
-					implicitExecuteIds.push(encodeURIComponent(form.id));
-				}
-
-				implicitExecuteIds.push(VIEW_STATE_PARAM);
-				implicitExecuteIds.push(CLIENT_WINDOW_PARAM);
-
-				const partialViewState: string[] = [];
-
-				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: any, key: string, value: string) {
-					if (implicitExecuteIds.indexOf(key) > -1 || encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
-						partialViewState.push(key + "=" + value);
+					if (form.dataset["partialsubmit"] != "true") {
+						return originalViewState;
 					}
-				}); 
 
-				return partialViewState.join("&");
+					const execute = options ? options.execute : null;
+
+					if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
+						return originalViewState;
+					}
+
+					let executeIds: string[] = [];
+					let encodedExecuteIds: string[] = [];
+
+					if (execute.indexOf("@none") == -1) {
+						executeIds = execute.replace("@this", source.id).split(" ");
+						encodedExecuteIds = executeIds.map(encodeURIComponent);
+					}
+
+					encodedExecuteIds.push(VIEW_STATE_PARAM);
+					encodedExecuteIds.push(CLIENT_WINDOW_PARAM);
+
+					const partialViewState: string[] = [];
+
+					originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_entry: any, key: string, value: string) {
+						if (encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
+							partialViewState.push(key + "=" + value);
+						}
+					}); 
+
+					return partialViewState.join("&");
+				}
+
+				originalAjaxRequest(source, event, options);
 			}
 		}
 	}
