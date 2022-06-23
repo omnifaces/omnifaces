@@ -41,22 +41,25 @@ OmniFaces.Form = (function(Util, window) {
 				}
 
 				var executeIds = [];
+				var encodedExecuteIds = [];
+				var implicitExecuteIds = [];
 
 				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", params[0].id).split(" ").map(encodeURIComponent);
-					executeIds.push(encodeURIComponent(form.id));
+					executeIds = execute.replace("@this", params[0].id).split(" ");
+					encodedExecuteIds = executeIds.map(encodeURIComponent);
+					implicitExecuteIds.push(encodeURIComponent(form.id));
 				}
 
-				executeIds.push(OmniFaces.VIEW_STATE_PARAM);
-				executeIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
+				implicitExecuteIds.push(OmniFaces.VIEW_STATE_PARAM);
+				implicitExecuteIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
 
 				var partialViewState = [];
 
-				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(entry, key, value) {
-					if (executeIds.indexOf(key) > -1) {
+				originalViewState.replace(/([^=&]+)=([^&]*)/g, function(_, key, value) {
+					if (implicitExecuteIds.indexOf(key) > -1 || encodedExecuteIds.indexOf(key) > -1 || containsNamedChild(executeIds, key)) {
 						partialViewState.push(key + "=" + value);
 					}
-				}); 
+				});
 
 				return partialViewState.join("&");
 			}
@@ -65,6 +68,27 @@ OmniFaces.Form = (function(Util, window) {
 		if (window.PrimeFaces) { // PrimeFaces API.
 			// TODO
 		}
+	}
+
+	function containsNamedChild(executeIds, key) {
+		var name = key.replace("%3A", "\\:");
+
+		try {
+			for (var i = 0; i < executeIds.length; i++) {
+				var parent = document.getElementById(executeIds[i]);
+
+				if (parent && parent.querySelector("[name='" + name + "']")) {
+					return true;
+				}
+			}
+		}
+		catch (e) {
+			if (window.console && console.warn) {
+				console.warn("Cannot determine if " + executeIds + " contains child " + name, e);
+			}
+		}
+
+		return false;		
 	}
 
 	// Global initialization ------------------------------------------------------------------------------------------
