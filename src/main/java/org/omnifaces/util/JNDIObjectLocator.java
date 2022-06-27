@@ -344,15 +344,21 @@ public class JNDIObjectLocator implements Serializable {
 	@SuppressWarnings("unchecked")
 	private <T> T getJNDIObject(String jndiName, boolean noCaching) {
 		if (noCaching || this.noCaching) {
-			return this.lookup(jndiName);
+			return this.lookup(jndiName, true);
 		}
 		else {
-			return (T) jndiObjectCache.get().computeIfAbsent(jndiName, this::lookup);
+			try {
+				return (T) jndiObjectCache.get().computeIfAbsent(jndiName,
+					name -> lookup(name, false));
+			} catch (IllegalStateException e) {
+				clearCache();
+				throw e;
+			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T lookup(String name) {
+	private <T> T lookup(String name, boolean clearCache) {
 		initialContextLock.lock();
 		boolean shouldClearCache = false;
 
@@ -364,7 +370,7 @@ public class JNDIObjectLocator implements Serializable {
 				return null;
 			}
 			else {
-				shouldClearCache = true;
+				shouldClearCache = clearCache;
 				throw new IllegalStateException(e);
 			}
 		}
