@@ -25,6 +25,7 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Formatter;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -114,31 +115,30 @@ public class FacesExceptionFilter extends HttpFilter {
 			throws ServletException, IOException
 	{
 		try {
-			doFilter(request, response, chain);
-		}
-		catch (Throwable exception) {
-			request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
-			Throwable cause = exception instanceof ServletException ? exception.getCause() : exception;
-			String location = WebXml.instance().findErrorPageLocation(cause);
-			logException(request, exception, location, LOG_EXCEPTION_HANDLED, location);
-			throw exception;
-		}
-	}
-
-	private void doFilter
-		(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException
-	{
-		try {
 			chain.doFilter(request, response);
 		}
 		catch (FileNotFoundException ignore) {
 			logger.log(FINEST, "Ignoring thrown exception; this is a JSF quirk and it should be interpreted as 404.", ignore);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
-		catch (ServletException ignore) {
-			logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", ignore);
-			throw new ServletException(unwrap(ignore.getRootCause(), exceptionTypesToUnwrap));
+		catch (Throwable exception) {
+			request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
+			Throwable cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
+			String location = WebXml.instance().findErrorPageLocation(cause);
+			logException(request, cause, location, LOG_EXCEPTION_HANDLED, location);
+
+			if (Objects.equals(exception, cause)) {
+				throw exception;
+			}
+
+			logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", exception);
+
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			}
+			else {
+				throw new ServletException(cause);
+			}
 		}
 	}
 
