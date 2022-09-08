@@ -32,6 +32,7 @@ import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.cache.CacheInitializer;
+import static org.omnifaces.ApplicationInitializer.isOmniFacesDisabled;
 
 /**
  * <p>
@@ -75,6 +76,9 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
+		if (isOmniFacesDisabled(event.getServletContext())) {
+			return;
+		}
 		checkJSF23Available();
 		checkCDI11Available();
 

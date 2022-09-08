@@ -47,11 +47,16 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 
 	static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
 		"OmniFaces failed to initialize! Report an issue to OmniFaces.";
+	static final String DISABLE_ENV_INIT_CHECKS = "org.omnifaces.DISABLE_ENV_INIT_CHECKS";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
+		if (isOmniFacesDisabled(servletContext)) {
+			logger.info("OmniFaces initialization is disabled");
+			return;
+		}
 		logOmniFacesVersion();
 
 		try {
@@ -67,4 +72,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		logger.info("Using OmniFaces version " + OmniFaces.getVersion());
 	}
 
+	static boolean isOmniFacesDisabled(ServletContext servletContext) {
+		return Boolean.parseBoolean(servletContext.getInitParameter(DISABLE_ENV_INIT_CHECKS));
+	}
 }
