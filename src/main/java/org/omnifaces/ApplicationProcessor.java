@@ -13,11 +13,13 @@
 package org.omnifaces;
 
 import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Faces.getServletContext;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
@@ -27,6 +29,7 @@ import jakarta.servlet.ServletContext;
 
 import org.omnifaces.component.search.MessagesKeywordResolver;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
 
 /**
@@ -48,6 +51,8 @@ public class ApplicationProcessor implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
+
 	private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
 		"Resource handler %s is duplicated."
 			+ " This will result in erratic resource handling behavior."
@@ -63,15 +68,21 @@ public class ApplicationProcessor implements SystemEventListener {
 
 	@Override
 	public void processEvent(SystemEvent event) {
+		ServletContext servletContext = getServletContext();
+
 		try {
-			ServletContext servletContext = getServletContext();
 			Application application = (Application) event.getSource();
 			checkDuplicateResourceHandler();
 			FacesViews.registerViewHander(servletContext, application);
 			MessagesKeywordResolver.register(application);
 		}
 		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			if (OmniFaces.skipDeploymentException(servletContext)) {
+				logger.log(WARNING, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			}
+			else {
+				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			}
 		}
 	}
 

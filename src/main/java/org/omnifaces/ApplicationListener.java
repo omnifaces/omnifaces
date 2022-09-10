@@ -12,6 +12,7 @@
  */
 package org.omnifaces;
 
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Reflection.toClass;
 
@@ -27,6 +28,7 @@ import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.component.output.Cache;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.resourcehandler.GraphicResource;
@@ -71,11 +73,15 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		checkJSFAvailable();
-		checkCDIAvailable();
+		ServletContext servletContext = event.getServletContext();
+		boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
+
+		if (!skipDeploymentException) {
+			checkJSFAvailable();
+			checkCDIAvailable();
+		}
 
 		try {
-			ServletContext servletContext = event.getServletContext();
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
 			FacesViews.addFacesServletMappings(servletContext);
@@ -84,7 +90,12 @@ public class ApplicationListener extends DefaultServletContextListener {
 			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			if (skipDeploymentException) {
+				logger.log(WARNING, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			}
+			else {
+				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			}
 		}
 	}
 
