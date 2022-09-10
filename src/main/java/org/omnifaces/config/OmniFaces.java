@@ -12,12 +12,19 @@
  */
 package org.omnifaces.config;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.util.ResourceBundle.getBundle;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.getMessageBundle;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+
+import org.omnifaces.ApplicationInitializer;
+import org.omnifaces.ApplicationListener;
+import org.omnifaces.ApplicationProcessor;
 
 
 /**
@@ -41,6 +48,15 @@ public final class OmniFaces {
 
 	/** Returns the "omnifaces_form" ID of dynamic form. */
 	public static final String OMNIFACES_DYNAMIC_FORM_ID = "omnifaces_form";
+
+	/**
+	 * The boolean context parameter name to skip any OmniFaces deployment exception.
+	 * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
+	 * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
+	 * deployment of the web application.
+	 * @since 3.14
+	 */
+	public static final String PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION = "org.omnifaces.SKIP_DEPLOYMENT_EXCEPTION";
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -100,6 +116,19 @@ public final class OmniFaces {
 		}
 
 		return messageBundle.getString(key);
+	}
+
+	/**
+	 * Returns whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
+	 * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
+	 * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
+	 * deployment of the web application.
+	 * @param servletContext The involved servlet context.
+	 * @return whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
+	 * @since 3.14
+	 */
+	public static boolean skipDeploymentException(ServletContext servletContext) {
+		return parseBoolean(servletContext.getInitParameter(PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION));
 	}
 
 }
