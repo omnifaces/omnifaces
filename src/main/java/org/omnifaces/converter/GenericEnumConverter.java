@@ -80,7 +80,9 @@ import jakarta.faces.convert.FacesConverter;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  * <p>
- * However, when you're having a valueless input component, then this converter may be still useful.
+ * However, when you're having an input component without a value attribute, and thus the exact type cannot be
+ * automatically determined by simply inspecting the return type of the associated getter method, then this converter
+ * may be still useful.
  * <pre>
  * &lt;h:selectManyCheckbox converter="omnifaces.GenericEnumConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
