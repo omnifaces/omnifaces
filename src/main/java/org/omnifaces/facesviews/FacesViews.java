@@ -74,6 +74,7 @@ import org.omnifaces.ApplicationListener;
 import org.omnifaces.ApplicationProcessor;
 import org.omnifaces.cdi.Param;
 import org.omnifaces.component.output.PathParam;
+import org.omnifaces.config.WebXml;
 
 /**
  * <p>
@@ -344,7 +345,7 @@ public final class FacesViews {
 	 * @param servletContext The involved servlet context.
 	 * @param application The involved faces application.
 	 */
-	public static void registerViewHander(ServletContext servletContext, Application application) {
+	public static void registerViewHandler(ServletContext servletContext, Application application) {
 		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
 			application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 		}
@@ -398,15 +399,26 @@ public final class FacesViews {
 		URL webXml;
 
 		try {
-			webXml = servletContext.getResource("/WEB-INF/web.xml");
+			// default EE location of web.xml
+			webXml = servletContext.getResource(WebXml.WEB_XML);
 		}
 		catch (MalformedURLException e) {
 			throw new IllegalStateException(e);
 		}
 
+		if (webXml == null) {
+			try {
+				// try Quarkus location if not found
+				webXml = servletContext.getResource("/" + WebXml.QUARKUS_WEB_XML);
+			}
+			catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
 		Set<String> mappedWelcomeFiles = new LinkedHashSet<>();
 
-		for (String welcomeFile : getNodeTextContents(webXml, "welcome-file-list/welcome-file")) {
+		for (String welcomeFile : getNodeTextContents(webXml, WebXml.XPATH_WELCOME_FILE)) {
 			if (isExtensionless(welcomeFile)) {
 				mappedWelcomeFiles.add(addLeadingSlashIfNecessary(stripTrailingSlash(welcomeFile)));
 			}

@@ -62,13 +62,6 @@ enum WebXmlSingleton implements WebXml {
 	INSTANCE;
 
 	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String WEB_XML = "/WEB-INF/web.xml";
-	private static final String QUARKUS_WEB_XML = "META-INF/web.xml";
-	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
-
-	private static final String XPATH_WELCOME_FILE =
-		"welcome-file-list/welcome-file";
 	private static final String XPATH_EXCEPTION_TYPE =
 		"error-page/exception-type";
 	private static final String XPATH_LOCATION =

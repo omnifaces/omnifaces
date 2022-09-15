@@ -67,6 +67,12 @@ import org.omnifaces.cdi.config.WebXmlProducer;
  */
 public interface WebXml {
 
+	// Public constants ------------------------------------------------------------------------------------------------
+	String WEB_XML = "/WEB-INF/web.xml";
+	String QUARKUS_WEB_XML = "META-INF/web.xml";
+	String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
+	String XPATH_WELCOME_FILE = "welcome-file-list/welcome-file";
+
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
 	/**
