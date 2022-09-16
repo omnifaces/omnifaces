@@ -340,12 +340,21 @@ public final class FacesViews {
 	}
 
 	/**
+	 * The method name has a typo. Use {@link #registerViewHandler(ServletContext, Application)} instead.
+	 * @deprecated Since 3.14
+	 */
+	@Deprecated
+	public static void registerViewHander(ServletContext servletContext, Application application) {
+		registerViewHandler(servletContext, application);
+	}
+
+	/**
 	 * Register a view handler that transforms a view id with extension back to an extensionless one.
 	 * This is invoked by {@link ApplicationProcessor}, because the {@link Application} has to be available.
 	 * @param servletContext The involved servlet context.
 	 * @param application The involved faces application.
 	 */
-	public static void registerViewHander(ServletContext servletContext, Application application) {
+	public static void registerViewHandler(ServletContext servletContext, Application application) {
 		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
 			application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 		}
