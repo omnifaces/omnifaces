@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static org.omnifaces.util.Servlets.getWebXmlURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Xml.createDocument;
@@ -63,8 +64,6 @@ enum WebXmlSingleton implements WebXml {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String WEB_XML = "/WEB-INF/web.xml";
-	private static final String QUARKUS_WEB_XML = "META-INF/web.xml";
 	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
 
 	private static final String XPATH_WELCOME_FILE =
@@ -290,11 +289,6 @@ enum WebXmlSingleton implements WebXml {
 	 */
 	private static Document loadRootWebXml(ServletContext context) throws IOException, SAXException {
 		return createDocument(asList(getWebXmlURL(context)));
-	}
-
-	private static URL getWebXmlURL(ServletContext context) throws IOException {
-		URL webXml = context.getResource(WEB_XML);
-		return webXml != null ? webXml : Thread.currentThread().getContextClassLoader().getResource(QUARKUS_WEB_XML);
 	}
 
 	/**
