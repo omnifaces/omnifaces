@@ -136,6 +136,23 @@ public final class BeansLocal {
 	}
 
 	/**
+	 * @see Beans#getInstance(String, boolean)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getInstance(BeanManager beanManager, String name, boolean create) {
+		Set<Bean<?>> beans = beanManager.getBeans(name);
+		Bean<?> bean = beanManager.resolve(beans);
+		return (T) getInstance(beanManager, bean, create);
+	}
+
+	/**
+	 * @see Beans#getInstance(String)
+	 */
+	public static <T> T getInstance(BeanManager beanManager, String name) {
+		return getInstance(beanManager, name, true);
+	}
+
+	/**
 	 * @see Beans#unwrapIfNecessary(Object)
 	 */
 	@SuppressWarnings("unchecked")
@@ -223,7 +240,7 @@ public final class BeansLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> void destroy(BeanManager beanManager, T instance) {
 		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
-			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
+			destroy(beanManager, (Class<T>) instance);
 		}
 		else {
 			for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {

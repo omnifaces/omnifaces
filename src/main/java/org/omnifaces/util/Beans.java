@@ -224,6 +224,43 @@ public final class Beans {
 	}
 
 	/**
+	 * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't
+	 * exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
+	 * <code>null</code> if there's no current instance.
+	 * @param <T> The expected return type.
+	 * @param name The CDI managed bean name.
+	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
+	 * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there
+	 * is none and/or the <code>create</code> argument is <code>false</code>.
+	 * @since 3.14
+	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#resolve(java.util.Set)
+	 * @see BeanManager#getContext(Class)
+	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
+	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
+	 */
+	public static <T> T getInstance(String name, boolean create) {
+		return BeansLocal.getInstance(getManager(), name, create);
+	}
+
+	/**
+	 * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't
+	 * exist.
+	 * @param <T> The expected return type.
+	 * @param name The CDI managed bean name.
+	 * @return The CDI managed bean instance (actual) associated with the given bean name.
+	 * @since 3.14
+	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#resolve(java.util.Set)
+	 * @see BeanManager#getContext(Class)
+	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
+	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
+	 */
+	public static <T> T getInstance(String name) {
+		return BeansLocal.getInstance(getManager(), name);
+	}
+
+	/**
 	 * Returns <code>true</code> if given object or class is actually a CDI proxy.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param object The object to be checked.
