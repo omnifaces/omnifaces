@@ -116,6 +116,9 @@ public final class Servlets {
 	private static final String FACES_AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
 
+	private static final String WEB_XML = "/WEB-INF/web.xml";
+	private static final String QUARKUS_WEB_XML = "META-INF/web.xml";
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private static Boolean facesDevelopment;
@@ -903,6 +906,20 @@ public final class Servlets {
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	// web.xml --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns URL of <code>web.xml</code> file used in current application.
+	 * This also takes into account the Quarkus location in <code>META-INF</code> folder.
+	 * @param context The involved servlet context.
+	 * @return URL of <code>web.xml</code> file used in current application.
+	 * @since 3.14
+	 */
+	public static URL getWebXmlURL(ServletContext context) throws IOException {
+		URL webXml = context.getResource(WEB_XML);
+		return webXml != null ? webXml : Thread.currentThread().getContextClassLoader().getResource(QUARKUS_WEB_XML);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Xml.getNodeTextContents;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,6 +74,7 @@ import org.omnifaces.ApplicationListener;
 import org.omnifaces.ApplicationProcessor;
 import org.omnifaces.cdi.Param;
 import org.omnifaces.component.output.PathParam;
+import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -398,9 +399,9 @@ public final class FacesViews {
 		URL webXml;
 
 		try {
-			webXml = servletContext.getResource("/WEB-INF/web.xml");
+			webXml = Servlets.getWebXmlURL(servletContext);
 		}
-		catch (MalformedURLException e) {
+		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 
