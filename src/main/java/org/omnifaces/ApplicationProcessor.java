@@ -73,7 +73,7 @@ public class ApplicationProcessor implements SystemEventListener {
 		try {
 			Application application = (Application) event.getSource();
 			checkDuplicateResourceHandler();
-			FacesViews.registerViewHander(servletContext, application);
+			FacesViews.registerViewHandler(servletContext, application);
 			MessagesKeywordResolver.register(application);
 		}
 		catch (Exception | LinkageError e) {
