@@ -12,6 +12,7 @@
  */
 package org.omnifaces;
 
+import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 
 import java.util.Set;
@@ -47,8 +48,10 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 
 	private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
 
+	static final String WARNING_OMNIFACES_INITIALIZATION_FAIL =
+			"OmniFaces failed to initialize! %s";
 	static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
-		"OmniFaces failed to initialize! Report an issue to OmniFaces.";
+			"OmniFaces failed to initialize! Report an issue to OmniFaces.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -62,7 +65,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		}
 		catch (Exception | LinkageError e) {
 			if (OmniFaces.skipDeploymentException(servletContext)) {
-				logger.log(WARNING, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
 			}
 			else {
 				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
