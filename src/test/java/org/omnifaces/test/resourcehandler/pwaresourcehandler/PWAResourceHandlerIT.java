@@ -32,7 +32,7 @@ import org.openqa.selenium.support.FindBy;
 public class PWAResourceHandlerIT extends OmniFacesIT {
 
 	private static final String EXPECTED_MANIFEST = "{\"categories\":[],\"dir\":\"auto\",\"display\":\"browser\","
-		+ "\"icons\":[{\"sizes\":\"512x512\",\"src\":\"\\/PWAResourceHandlerIT\\/javax.faces.resource\\/icon.png.xhtml?v=1\",\"type\":\"image\\/png\"}],"
+		+ "\"icons\":[{\"sizes\":\"512x512\",\"src\":\"\\/PWAResourceHandlerIT\\/jakarta.faces.resource\\/icon.png.xhtml?v=1\",\"type\":\"image\\/png\"}],"
 		+ "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"orientation\":\"any\",\"prefer_related_applications\":false,\"related_applications\":[],"
 		+ "\"start_url\":\"http:\\/\\/localhost:8080\\/PWAResourceHandlerIT\\/\"}";
 
