@@ -122,7 +122,7 @@ public abstract class OmniFacesIT {
 
 
 	protected static boolean isFaces4Used() {
-		return isOneOf(System.getProperty("profile.id"), "wildfly27", "glassfish7", "tomcat-mojarra4", "tomcat-myfaces4");
+		return isOneOf(System.getProperty("profile.id"), "wildfly27", "glassfish7", "tomcat-mojarra4", "tomcat-myfaces4", "payara");
 	}
 
 	protected static boolean isMojarraUsed() {
