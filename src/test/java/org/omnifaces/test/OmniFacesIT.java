@@ -28,7 +28,6 @@ import java.util.Set;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
@@ -160,7 +159,7 @@ public abstract class OmniFacesIT {
 			archive = create(WebArchive.class, warName)
 				.addPackage(packageName)
 				.deleteClass(testClass)
-				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+				.addAsWebInfResource("WEB-INF/beans.xml", "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
 
 			String warLibraries = System.getProperty("war.libraries");
