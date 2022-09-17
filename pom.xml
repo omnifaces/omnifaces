@@ -96,6 +96,14 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>jakarta-staging</id>
+			<snapshots />
+			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for tyrus-bom:pom:2.1.0-M3 which is required by GlassFish 7.0.0-M4 -->
+		</repository>
+	</repositories>
+
 	<dependencies>
 
 		<!-- Required Jakarta EE 9 dependencies. -->
