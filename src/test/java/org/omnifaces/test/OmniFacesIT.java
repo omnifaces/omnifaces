@@ -18,6 +18,7 @@ import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.io.File;
 import java.net.URL;
@@ -121,11 +122,11 @@ public abstract class OmniFacesIT {
 
 
 	protected static boolean isFaces4Used() {
-		return isOneOf(System.getProperty("profile.id"), "tomcat-mojarra4");
+		return isOneOf(System.getProperty("profile.id"), "wildfly27", "glassfish7", "tomcat-mojarra4", "tomcat-myfaces4");
 	}
 
 	protected static boolean isMojarraUsed() {
-		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra3", "tomcat-mojarra4", "piranha");
+		return startsWithOneOf(System.getProperty("profile.id"), "wildfly", "glassfish", "payara", "tomcat-mojarra", "piranha");
 	}
 
 	protected static boolean isBValUsed() {

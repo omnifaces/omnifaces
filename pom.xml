@@ -68,23 +68,27 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>26.1.1.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly27.version>27.0.0.Alpha5</test.wildfly27.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly26.version>26.1.2.Final</test.wildfly26.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
 		<test.liberty.version>21.0.0.10-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta and newer couldn't be found by Arquillian? -->
-		<test.glassfish.version>6.2.5</test.glassfish.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.tomcat.version>10.0.22</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.glassfish7.version>7.0.0-M4</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.tomcat.version>10.1.0-M17</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 		<test.piranha.version>21.12.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
-		<test.tomee.version>9.0.0-M7</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) https://issues.apache.org/jira/browse/TOMEE-3824 -->
-		<test.payara.version>6.2022.1.Alpha2</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
+		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) https://issues.apache.org/jira/browse/TOMEE-3824 -->
+		<test.payara.version>6.2022.1.Alpha4</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
 		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
 		<test.mojarra3.version>3.0.2</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces.version>3.0.2</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld.version>4.0.3.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>7.0.4.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.myfaces4.version>4.0.0-RC1</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: uses .xml instead of .xhtml as default suffix ?! -->
+		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld5.version>5.0.1.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator.version>7.0.5.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
-		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>2.0.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.jstl.version>3.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<test.tyrus.version>2.1.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Sonar config. -->
 		<sonar.organization>balusc-github</sonar.organization>
@@ -493,9 +497,9 @@
 		<!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
 		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
 
-		<!-- WildFly integration test profile: mvn verify -P wildfly -->
+		<!-- WildFly integration test profile: mvn verify -P wildfly27 -->
 		<profile>
-			<id>wildfly</id>
+			<id>wildfly27</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -519,7 +523,7 @@
 										<artifactItem>
 											<groupId>org.wildfly</groupId>
 											<artifactId>wildfly-preview-dist</artifactId>
-											<version>${test.wildfly.version}</version>
+											<version>${test.wildfly27.version}</version>
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
@@ -532,7 +536,52 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly.version}</jboss.home>
+								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly27.version}</jboss.home>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- WildFly integration test profile: mvn verify -P wildfly26 -->
+		<profile>
+			<id>wildfly26</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly.arquillian</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<version>3.0.1.Final</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.wildfly</groupId>
+											<artifactId>wildfly-preview-dist</artifactId>
+											<version>${test.wildfly26.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly26.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
 						</configuration>
@@ -619,9 +668,9 @@
 			</build>
 		</profile>
 
-		<!-- GlassFish integration test profile: mvn verify -P glassfish -->
+		<!-- GlassFish 7.x integration test profile: mvn verify -P glassfish7 -->
 		<profile>
-			<id>glassfish</id>
+			<id>glassfish7</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
@@ -642,7 +691,51 @@
 										<artifactItem>
 											<groupId>org.glassfish.main.distributions</groupId>
 											<artifactId>glassfish</artifactId>
-											<version>${test.glassfish.version}</version>
+											<version>${test.glassfish7.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<environmentVariables>
+								<GLASSFISH_HOME>${project.build.directory}/glassfish7</GLASSFISH_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- GlassFish 6.x integration test profile: mvn verify -P glassfish6 -->
+		<profile>
+			<id>glassfish6</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
+					<version>1.0.2</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish.main.distributions</groupId>
+											<artifactId>glassfish</artifactId>
+											<version>${test.glassfish6.version}</version>
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
@@ -728,7 +821,7 @@
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra4.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
@@ -808,7 +901,7 @@
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra3.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
@@ -823,9 +916,9 @@
 			</build>
 		</profile>
 
-		<!-- Tomcat-MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
+		<!-- Tomcat-MyFaces 4.x integration test profile: mvn verify -P tomcat-myfaces4 -->
 		<profile>
-			<id>tomcat-myfaces</id>
+			<id>tomcat-myfaces4</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
@@ -887,8 +980,88 @@
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
-									org.apache.myfaces.core:myfaces-impl:${test.myfaces.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.apache.myfaces.core:myfaces-impl:${test.myfaces4.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.jsonp.version},
+									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
+								</war.libraries>
+							</systemProperties>
+							<environmentVariables>
+								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Tomcat-MyFaces 3.x integration test profile: mvn verify -P tomcat-myfaces3 -->
+		<profile>
+			<id>tomcat-myfaces3</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-tomcat-managed-8</artifactId>
+					<version>1.2.0.Alpha1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomcat</groupId>
+											<artifactId>tomcat</artifactId>
+											<version>${test.tomcat.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
+											<includes>
+												<include>tomcat-users.xml</include>
+											</includes>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemProperties>
+								<arquillian.launch>tomcat</arquillian.launch>
+								<war.libraries>
+									org.apache.myfaces.core:myfaces-impl:${test.myfaces3.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}

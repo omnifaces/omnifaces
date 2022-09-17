@@ -120,7 +120,7 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage.xhtml");
 		verify404("FacesViewsITNonExistingPage.xhtml");
 
-		if (!isFaces4Used()) { // Since Mojarra 4 this one incorrectly throws 500.
+		if (!isFaces4Used()) { // Since Mojarra 4 this one incorrectly throws 500 caused by ViewHandlingStrategyNotFoundException
 			open("FacesViewsITNonExistingPage.jsf");
 			verify404("FacesViewsITNonExistingPage.jsf");
 		}
