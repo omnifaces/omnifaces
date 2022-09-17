@@ -85,7 +85,8 @@
 		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
 		<test.weld5.version>5.0.1.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>7.0.5.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.hibernateValidator8.version>8.0.0.Final</test.hibernateValidator8.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<test.tyrus.version>2.1.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
@@ -822,7 +823,7 @@
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra4.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
@@ -902,7 +903,7 @@
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra3.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
@@ -982,7 +983,7 @@
 								<war.libraries>
 									org.apache.myfaces.core:myfaces-impl:${test.myfaces4.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
@@ -1062,7 +1063,7 @@
 								<war.libraries>
 									org.apache.myfaces.core:myfaces-impl:${test.myfaces3.version},
 									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
@@ -1108,7 +1109,7 @@
 								<piranha.rootIsWarName>true</piranha.rootIsWarName>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra3.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.tyrus:tyrus-core:${test.tyrus.version}
 								</war.libraries>
