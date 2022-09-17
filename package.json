@@ -2,6 +2,11 @@
   "name": "omnifaces",
   "version": "4.0.0",
   "description": "Build omnifaces.unminified.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omnifaces/omnifaces.git"
+  },
   "scripts": {
     "compile": "tsc",
     "pack": "browserify target/tsc/OmniFaces.js -o target/tsc/omnifaces.unminified.js -s OmniFaces",
