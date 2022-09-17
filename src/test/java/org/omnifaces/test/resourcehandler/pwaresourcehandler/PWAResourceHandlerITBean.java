@@ -15,8 +15,8 @@ package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Named;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
 
