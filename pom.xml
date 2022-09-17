@@ -821,7 +821,7 @@
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra4.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
