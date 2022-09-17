@@ -15,6 +15,7 @@ package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 import static java.util.Arrays.asList;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -36,6 +37,11 @@ public class PWAResourceHandlerITManifest extends WebAppManifest {
     @Override
     protected Collection<String> getCacheableViewIds() {
     	return asList("/PWAResourceHandlerIT.xhtml");
+    }
+
+    @Override
+    public String getLang() {
+    	return Locale.ENGLISH.getLanguage();
     }
 
 }
