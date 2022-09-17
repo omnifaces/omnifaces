@@ -26,6 +26,7 @@ import jakarta.enterprise.context.spi.AlterableContext;
 import jakarta.enterprise.context.spi.Context;
 import jakarta.enterprise.context.spi.Contextual;
 import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.event.Event;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.Stereotype;
 import jakarta.enterprise.inject.Typed;
@@ -422,7 +423,9 @@ public final class Beans {
 	 * @param event The event object.
 	 * @param qualifiers The event qualifiers, if any.
 	 * @since 2.3
-	 * @see BeanManager#fireEvent(Object, Annotation...)
+	 * @see BeanManager#getEvent()
+	 * @see Event#select(Annotation...)
+	 * @see Event#fire(Object)
 	 */
 	public static void fireEvent(Object event, Annotation... qualifiers) {
 		BeansLocal.fireEvent(getManager(), event, qualifiers);

@@ -302,7 +302,7 @@ public final class BeansLocal {
 	 * @see Beans#fireEvent(Object, Annotation...)
 	 */
 	public static void fireEvent(BeanManager beanManager, Object event, Annotation... qualifiers) {
-		beanManager.fireEvent(event, qualifiers);
+		beanManager.getEvent().select(qualifiers).fire(event);
 	}
 
 }
