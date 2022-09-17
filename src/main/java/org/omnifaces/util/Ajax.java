@@ -190,7 +190,7 @@ public final class Ajax {
 
 	private static void updateRowCells(UIData table, int index) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getClientId(context);
+		String parentId = table.getParent().getNamingContainer().getClientId(context);
 		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
@@ -260,7 +260,7 @@ public final class Ajax {
 
 	private static void updateColumnCells(UIData table, int index, int rowCount) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getClientId(context);
+		String parentId = table.getParent().getNamingContainer().getClientId(context);
 		String tableId = table.getId();
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
