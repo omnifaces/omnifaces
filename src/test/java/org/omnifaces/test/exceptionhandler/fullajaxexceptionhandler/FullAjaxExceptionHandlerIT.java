@@ -225,7 +225,10 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 		try {
 			stylesheets.addAll(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : ("[href*='ln=" + library + "']")))));
-			stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
+
+			if (!browser.findElements(By.tagName("style")).isEmpty()) {
+				stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
+			}
 		}
 		catch (InvalidSelectorException e) {
 			System.out.println(browser.getPageSource());
