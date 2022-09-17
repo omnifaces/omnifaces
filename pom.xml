@@ -87,7 +87,7 @@
 		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.hibernateValidator.version>7.0.5.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
-		<test.jstl.version>3.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<test.tyrus.version>2.1.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Sonar config. -->
