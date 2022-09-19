@@ -90,10 +90,15 @@ public class ApplicationListener extends DefaultServletContextListener {
 		try {
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			FacesViews.addFacesServletMappings(servletContext);
+			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
+
+			if (skipDeploymentException) {
+				checkCDIImplAvailable(); // Because below three initializations require CDI impl being available.
+			}
+
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
-			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
 			if (skipDeploymentException) {
