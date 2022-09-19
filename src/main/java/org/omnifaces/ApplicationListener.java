@@ -12,8 +12,10 @@
  */
 package org.omnifaces;
 
+import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
+import static org.omnifaces.ApplicationInitializer.WARNING_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Reflection.toClass;
 
 import java.util.logging.Logger;
@@ -83,15 +85,20 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 		try {
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
 			FacesViews.addFacesServletMappings(servletContext);
+			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
+
+			if (skipDeploymentException) {
+				checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
+			}
+
+			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
-			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
 			if (skipDeploymentException) {
-				logger.log(WARNING, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
 			}
 			else {
 				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);

@@ -15,6 +15,7 @@ package org.omnifaces;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
+import static org.omnifaces.ApplicationInitializer.WARNING_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Faces.getServletContext;
 
 import java.util.HashSet;
@@ -78,7 +79,7 @@ public class ApplicationProcessor implements SystemEventListener {
 		}
 		catch (Exception | LinkageError e) {
 			if (OmniFaces.skipDeploymentException(servletContext)) {
-				logger.log(WARNING, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
 			}
 			else {
 				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
