@@ -93,7 +93,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 
 			if (skipDeploymentException) {
-				checkCDIImplAvailable(); // Because below three initializations require CDI impl being available.
+				checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
 			}
 
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
