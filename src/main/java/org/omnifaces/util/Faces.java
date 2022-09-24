@@ -77,6 +77,8 @@ import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.filter.MutableRequestFilter;
+import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
@@ -1250,6 +1252,18 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the mutable request parameter map. This requires installation of {@link MutableRequestFilter}.
+	 * @return The mutable request parameter map.
+	 * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
+	 * @since 3.14
+	 * @see MutableRequestFilter#getMutableRequest(HttpServletRequest)
+	 * @see MutableRequest#getMutableParameterMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestParameterMap() {
+		return FacesLocal.getMutableRequestParameterMap(getContext());
+	}
+
+	/**
 	 * Returns the HTTP request parameter value associated with the given name.
 	 * @param name The HTTP request parameter name.
 	 * @return The HTTP request parameter value associated with the given name.
@@ -1404,6 +1418,18 @@ public final class Faces {
 	 */
 	public static Map<String, String> getRequestHeaderMap() {
 		return FacesLocal.getRequestHeaderMap(getContext());
+	}
+
+	/**
+	 * Returns the mutable request header map. This requires installation of {@link MutableRequestFilter}.
+	 * @return The mutable request header map.
+	 * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
+	 * @since 3.14
+	 * @see MutableRequestFilter#getMutableRequest(HttpServletRequest)
+	 * @see MutableRequest#getMutableHeaderMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestHeaderMap() {
+		return FacesLocal.getMutableRequestHeaderMap(getContext());
 	}
 
 	/**
