@@ -77,6 +77,8 @@ import jakarta.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.filter.MutableRequestFilter;
+import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
 
 /**
  * <p>
@@ -257,6 +259,19 @@ public final class Servlets {
 		}
 
 		return parameterMap;
+	}
+
+	/**
+	 * Returns the mutable request parameter map. This requires installation of {@link MutableRequestFilter}.
+	 * @param request The involved HTTP servlet request.
+	 * @return The mutable request parameter map.
+	 * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
+	 * @since 3.14
+	 * @see MutableRequestFilter#getMutableRequest(HttpServletRequest)
+	 * @see MutableRequest#getMutableParameterMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestParameterMap(HttpServletRequest request) {
+		return MutableRequestFilter.getMutableRequest(request).getMutableParameterMap();
 	}
 
 	/**
@@ -548,6 +563,19 @@ public final class Servlets {
 		}
 
 		return unmodifiableMap(map);
+	}
+
+	/**
+	 * Returns the mutable request header map. This requires installation of {@link MutableRequestFilter}.
+	 * @param request The involved HTTP servlet request.
+	 * @return The mutable request header map.
+	 * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
+	 * @since 3.14
+	 * @see MutableRequestFilter#getMutableRequest(HttpServletRequest)
+	 * @see MutableRequest#getMutableHeaderMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestHeaderMap(HttpServletRequest request) {
+		return MutableRequestFilter.getMutableRequest(request).getMutableHeaderMap();
 	}
 
 	// HttpServletResponse --------------------------------------------------------------------------------------------

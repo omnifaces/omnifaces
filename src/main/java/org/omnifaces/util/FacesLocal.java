@@ -905,6 +905,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getMutableRequestParameterMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestParameterMap(FacesContext context) {
+		return Servlets.getMutableRequestParameterMap(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#getRequestParameter(String)
 	 */
 	public static String getRequestParameter(FacesContext context, String name) {
@@ -1022,6 +1029,13 @@ public final class FacesLocal {
 	 */
 	public static Map<String, String> getRequestHeaderMap(FacesContext context) {
 		return context.getExternalContext().getRequestHeaderMap();
+	}
+
+	/**
+	 * @see Faces#getMutableRequestHeaderMap()
+	 */
+	public static Map<String, List<String>> getMutableRequestHeaderMap(FacesContext context) {
+		return Servlets.getMutableRequestHeaderMap(getRequest(context));
 	}
 
 	/**
