@@ -69,7 +69,7 @@ import org.omnifaces.util.Servlets;
  * {@link Faces#getMutableRequestParameterMap()}.
  * Or when having only a {@link HttpServletRequest} at hands, use
  * {@link Servlets#getMutableRequestHeaderMap(HttpServletRequest)} or
- * {@link Servlets#getMutableRequestParameterMap(HttpServletRequest).
+ * {@link Servlets#getMutableRequestParameterMap(HttpServletRequest)}.
  *
  * @author Bauke Scholtz
  * @since 3.14
