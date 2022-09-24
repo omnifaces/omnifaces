@@ -120,12 +120,7 @@ public class MutableRequestFilter extends HttpFilter {
 		MutableRequest mutableRequest = (MutableRequest) request.getAttribute(MUTABLE_REQUEST);
 
 		if (mutableRequest == null) {
-			if (installed) {
-				throw new IllegalStateException(ERROR_NOT_AVAILABLE);
-			}
-			else {
-				throw new IllegalStateException(ERROR_NOT_INSTALLED);
-			}
+			throw new IllegalStateException(installed ? ERROR_NOT_AVAILABLE : ERROR_NOT_INSTALLED);
 		}
 
 		return mutableRequest;
