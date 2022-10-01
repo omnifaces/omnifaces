@@ -14,6 +14,8 @@ package org.omnifaces.facesviews;
 
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.omnifaces.facesviews.ExtensionAction.PROCEED;
+import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
@@ -215,16 +217,18 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		Map<String, String> resources = getMappedResources(getServletContext());
 
 		if (resources.containsKey(resource)) {
-			switch (extensionAction) {
-				case REDIRECT_TO_EXTENSIONLESS:
+			if (resources.get(resource) != null) {
+				if (extensionAction == REDIRECT_TO_EXTENSIONLESS) {
 					redirectPermanent(response, getExtensionlessURLWithQuery(request, resource));
 					return true;
-				case SEND_404:
-					response.sendError(SC_NOT_FOUND);
-					return true;
-				case PROCEED:
-					break;
+				}
+				else if (extensionAction == PROCEED) {
+					return false;
+				}
 			}
+
+			response.sendError(SC_NOT_FOUND);
+			return true;
 		}
 
 		return false;

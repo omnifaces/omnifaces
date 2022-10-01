@@ -400,7 +400,16 @@ public final class FacesViews {
 
 		if (!collectedViews.isEmpty()) {
 			if (isLowercasedRequestURI(servletContext)) {
-				collectedViews = collectedViews.entrySet().stream().collect(toMap(e -> e.getKey().toLowerCase(), e -> e.getValue()));
+				for (Entry<String, String> mapping : new HashSet<>(collectedViews.entrySet())) {
+					collectedViews.put(mapping.getKey().toLowerCase(), mapping.getValue());
+
+					if (isExtensionless(mapping.getKey())) {
+						collectedViews.remove(mapping.getKey());
+					}
+					else {
+						mapping.setValue(null);
+					}
+				}
 			}
 
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));

@@ -58,7 +58,13 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
+		guardHttp(formSubmit).click();
+		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+
 		open("lowercasedrequesturiit.xhtml");
+		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+
+		guardHttp(formSubmit).click();
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
 		guardHttp(formSubmit).click();
@@ -67,16 +73,22 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		open("lowercasedrequesturiit/");
 		verify404("lowercasedrequesturiit/");
 
+		open("LowercasedRequestURIIT");
+		verify404("LowercasedRequestURIIT");
+
 		open("LowercasedRequestURIIT/");
 		verify404("LowercasedRequestURIIT/");
 
-		open("LowercasedRequestURIIT");
-		verify404("LowercasedRequestURIIT");
+		open("LowercasedRequestURIIT.xhtml");
+		verify404("LowercasedRequestURIIT.xhtml");
 	}
 
 	@Test
 	public void testSubFolder() {
 		open("subfolder/lowercasedrequesturiit");
+		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+
+		guardHttp(formSubmit).click();
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
 		guardHttp(formSubmit).click();
@@ -93,6 +105,15 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 
 		open("subfolder/lowercasedrequesturiit/");
 		verify404("subfolder/lowercasedrequesturiit/");
+
+		open("subfolder/LowercasedRequestURIIT");
+		verify404("subfolder/LowercasedRequestURIIT");
+
+		open("subfolder/LowercasedRequestURIIT/");
+		verify404("subfolder/LowercasedRequestURIIT/");
+
+		open("subfolder/LowercasedRequestURIIT.xhtml");
+		verify404("subfolder/LowercasedRequestURIIT.xhtml");
 	}
 
 	private void verify200(String title, String path) {
