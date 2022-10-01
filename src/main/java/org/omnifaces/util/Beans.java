@@ -237,8 +237,8 @@ public final class Beans {
 	 * @see BeanManager#getBeans(String)
 	 * @see BeanManager#resolve(java.util.Set)
 	 * @see BeanManager#getContext(Class)
-	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
-	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
+	 * @see BeanManager#createCreationalContext(jakarta.enterprise.context.spi.Contextual)
+	 * @see Context#get(jakarta.enterprise.context.spi.Contextual, jakarta.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getInstance(String name, boolean create) {
 		return BeansLocal.getInstance(getManager(), name, create);
@@ -254,8 +254,8 @@ public final class Beans {
 	 * @see BeanManager#getBeans(String)
 	 * @see BeanManager#resolve(java.util.Set)
 	 * @see BeanManager#getContext(Class)
-	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
-	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
+	 * @see BeanManager#createCreationalContext(jakarta.enterprise.context.spi.Contextual)
+	 * @see Context#get(jakarta.enterprise.context.spi.Contextual, jakarta.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getInstance(String name) {
 		return BeansLocal.getInstance(getManager(), name);
