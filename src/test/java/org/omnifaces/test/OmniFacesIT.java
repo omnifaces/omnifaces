@@ -203,6 +203,7 @@ public abstract class OmniFacesIT {
 					archive.addAsWebInfResource("WEB-INF/500.xhtml");
 					break;
 				case withFacesViews:
+				case withFacesViewsLowercasedRequestURI:
 				case withMultiViews:
 					archive.addAsWebInfResource("WEB-INF/404.xhtml");
 					break;
@@ -255,6 +256,7 @@ public abstract class OmniFacesIT {
 		withDevelopmentStage,
 		withErrorPage,
 		withFacesViews,
+		withFacesViewsLowercasedRequestURI,
 		withMultiViews,
 		withThreeViewsInSession,
 		withSocket,
