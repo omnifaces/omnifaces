@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.joining;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
+import static org.omnifaces.facesviews.FacesViews.isLowercasedRequestURI;
 import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
@@ -83,6 +84,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		"MultiViews was not configured for the view id '%s', but path parameters were defined for it.";
 
 	private final boolean extensionless;
+	private final boolean lowercasedRequestURI;
 
 	/**
 	 * Construct faces views view handler.
@@ -90,7 +92,9 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	 */
 	public FacesViewsViewHandler(ViewHandler wrapped) {
 		super(wrapped);
-		extensionless = isScannedViewsAlwaysExtensionless(getServletContext());
+		ServletContext servletContext = getServletContext();
+		extensionless = isScannedViewsAlwaysExtensionless(servletContext);
+		lowercasedRequestURI = isLowercasedRequestURI(servletContext);
 	}
 
 	@Override
@@ -111,11 +115,12 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		String actionURL = super.getActionURL(context, viewId);
 		ServletContext servletContext = getServletContext(context);
 		Map<String, String> mappedResources = getMappedResources(servletContext);
+		String resourceName = lowercasedRequestURI ? viewId.toLowerCase() : viewId;
 
-		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
+		if (mappedResources.containsKey(resourceName) && (extensionless || isOriginalViewExtensionless(context))) {
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
-			String[] uriAndRest = actionURL.split("(?=[?#;])", 2);
+			String[] uriAndRest = (lowercasedRequestURI ? actionURL.replaceFirst(viewId, resourceName) : actionURL).split("(?=[?#;])", 2);
 			String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndRest[0], viewId));
 			String rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
 			String pathInfo = context.getViewRoot() != null && context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";

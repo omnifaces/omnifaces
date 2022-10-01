@@ -17,6 +17,7 @@ import static org.omnifaces.facesviews.FacesViews.isFacesViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.FacesLocal.getServletContext;
+import static org.omnifaces.util.Utils.coalesce;
 
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ResourceHandlerWrapper;
@@ -53,16 +54,20 @@ public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 			return super.createViewResource(context, path);
 		}
 
-		ViewResource resource = super.createViewResource(context, getMappedPath(path));
+		ViewResource resource = createMappedViewResource(context, path);
 
 		if (resource == null && isDevelopment()) {
 			// If resource is null it means it wasn't found.
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
 			scanAndStoreViews(getServletContext(context), false);
-			resource = super.createViewResource(context, getMappedPath(path));
+			resource = createMappedViewResource(context, path);
 		}
 
 		return resource;
+	}
+
+	private ViewResource createMappedViewResource(FacesContext context, String path) {
+		return super.createViewResource(context, coalesce(getMappedPath(path), path));
 	}
 
 }

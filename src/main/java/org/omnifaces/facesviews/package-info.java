@@ -338,6 +338,15 @@
  * </td>
  * </tr>
  *
+ * <tr>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_LOWERCASED_REQUEST_URI_PARAM_NAME}</code></td>
+ * <td>Used to set whether the request URI should only match the lowercased form of the file name.
+ * By default, a scanned view of for example <code>/TitleCasedFileName.xhtml</code> will listen to a request URI of <code>/TitleCasedFileName</code>,
+ * but when this setting is set to true, then it will instead listen to a lowercased request URI of <code>/titlecasedfilename</code>.
+ * <br>Default value: <code>false</code> (the request URI must exactly match the letter case of the file name)
+ * </td>
+ * </tr>
+ *
  * </table>
  *
  *
