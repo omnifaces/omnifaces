@@ -141,7 +141,7 @@ import org.omnifaces.util.Servlets;
  *
  * <h3>PrettyFaces</h3>
  * <p>
- * Note that there is some overlap between this feature and <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
+ * Note that there is some overlap between this feature and <a href="https://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  * The difference is that FacesViews has a focus on zero- or very minimal config, where PrettyFaces has a focus on very
  * powerful mapping mechanisms, which of course need some level of configuration. As such FacesViews will only focus on
  * auto discovering views and mapping them to both <code>.xhtml</code> and to no-extension without needing to explicitly
@@ -149,7 +149,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * Specifically, FacesViews will thus <em>not</em> become a general URL rewriting tool (e.g. one that maps path segments
  * to parameters, or that totally changes the name of the URL). For this the user is advised to look at the
- * aforementioned <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
+ * aforementioned <a href="https://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  *
  * @author Arjan Tijms
  * @see FacesViewsResourceHandler
@@ -212,6 +212,16 @@ public final class FacesViews {
 	 * {@link FacesViewsForwardingFilter} should match before declared filters (false) or after declared filters (true).
 	 */
 	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS";
+
+	/**
+	 * The name of the boolean context parameter via which the user can set whether the request URI should only match
+	 * the lowercased form of the file name. By default, a scanned view of for example
+	 * <code>/TitleCasedFileName.xhtml</code> will listen to a request URI of <code>/TitleCasedFileName</code>, but when
+	 * this setting is set to true, then it will instead listen to a lowercased request URI of
+	 * <code>/titlecasedfilename</code>.
+	 * @since 3.14
+	 */
+	public static final String FACES_VIEWS_LOWERCASED_REQUEST_URI_PARAM_NAME = "org.omnifaces.FACES_VIEWS_LOWERCASED_REQUEST_URI";
 
 
 	// Request attributes ---------------------------------------------------------------------------------------------
@@ -389,6 +399,10 @@ public final class FacesViews {
 		collectedViews.keySet().removeIf(collectedView -> excludedPaths.stream().anyMatch(collectedView::startsWith));
 
 		if (!collectedViews.isEmpty()) {
+			if (isLowercasedRequestURI(servletContext)) {
+				collectedViews = collectedViews.entrySet().stream().collect(toMap(e -> e.getKey().toLowerCase(), e -> e.getValue()));
+			}
+
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
 			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(collectedViews.entrySet().stream()
 				.filter(e -> isExtensionless(e.getKey())).collect(toMap(Entry::getValue, Entry::getKey, (l, r) -> l))));
@@ -663,6 +677,10 @@ public final class FacesViews {
 	static boolean isScannedViewsAlwaysExtensionless(ServletContext servletContext) {
 		String alwaysExtensionless = servletContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME);
 		return isEmpty(alwaysExtensionless) || parseBoolean(alwaysExtensionless);
+	}
+
+	static boolean isLowercasedRequestURI(ServletContext servletContext) {
+		return parseBoolean(servletContext.getInitParameter(FACES_VIEWS_LOWERCASED_REQUEST_URI_PARAM_NAME));
 	}
 
 	@SuppressWarnings("unchecked")
