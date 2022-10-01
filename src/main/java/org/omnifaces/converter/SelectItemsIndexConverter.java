@@ -18,13 +18,16 @@ import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
+import javax.faces.event.PhaseId;
 
 import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
@@ -107,12 +110,15 @@ public class SelectItemsIndexConverter implements Converter {
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
 		String key = format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
-		List<Object> selectItemValues = getContextAttribute(key);
+		Entry<PhaseId, List<Object>> selectItemValuesByPhaseId = getContextAttribute(key);
 
-		if (selectItemValues == null) {
-			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
-			setContextAttribute(key, selectItemValues); // Cache it as it's a rather expensive job.
+		if (selectItemValuesByPhaseId == null || selectItemValuesByPhaseId.getKey() != context.getCurrentPhaseId()) {
+			List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
+			selectItemValuesByPhaseId = new SimpleEntry<>(context.getCurrentPhaseId(), selectItemValues);
+			setContextAttribute(key, selectItemValuesByPhaseId); // Cache it as it's a rather expensive job.
 		}
+
+		List<Object> selectItemValues = selectItemValuesByPhaseId.getValue();
 
 		for (int i = 0; i < selectItemValues.size(); i++) {
 			Object selectItemValue = selectItemValues.get(i);
