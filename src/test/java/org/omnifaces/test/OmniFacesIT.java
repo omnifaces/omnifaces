@@ -140,6 +140,12 @@ public abstract class OmniFacesIT {
 		return buildWebArchive(testClass).createDeployment();
 	}
 
+	protected static WebArchive createEmptyWebArchive() {
+		return create(WebArchive.class, "empty.war")
+			.addAsWebInfResource("WEB-INF/beans.xml", "beans.xml")
+			.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
+	}
+
 	protected static <T extends OmniFacesIT> ArchiveBuilder buildWebArchive(Class<T> testClass) {
 		return new ArchiveBuilder(testClass);
 	}
