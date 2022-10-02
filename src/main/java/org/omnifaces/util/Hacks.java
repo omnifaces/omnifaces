@@ -22,6 +22,7 @@ import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getPackage;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
@@ -47,7 +48,6 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.FacesContextWrapper;
 import jakarta.faces.render.ResponseStateManager;
 import jakarta.websocket.Session;
 
@@ -121,11 +121,7 @@ public final class Hacks {
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			if (context != null) {
-				while (context instanceof FacesContextWrapper) {
-					context = ((FacesContextWrapper) context).getWrapped();
-				}
-
-				mojarraUsed = context.getClass().getPackage().getName().startsWith(MOJARRA_PACKAGE_PREFIX);
+				mojarraUsed = getPackage(context).getName().startsWith(MOJARRA_PACKAGE_PREFIX);
 			}
 			else {
 				return false;
@@ -145,11 +141,7 @@ public final class Hacks {
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			if (context != null) {
-				while (context instanceof FacesContextWrapper) {
-					context = ((FacesContextWrapper) context).getWrapped();
-				}
-
-				myFacesUsed = context.getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);
+				myFacesUsed = getPackage(context).getName().startsWith(MYFACES_PACKAGE_PREFIX);
 			}
 			else {
 				return false;

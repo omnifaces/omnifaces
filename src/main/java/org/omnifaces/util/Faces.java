@@ -294,6 +294,17 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the package of the currently loaded Faces implementation.
+	 * <p>
+	 * This is also available in EL as <code>#{faces['package']}</code>.
+	 * @return The package of the currently loaded Faces implementation.
+	 * @since 3.14
+	 */
+	public static Package getPackage() {
+		return FacesLocal.getPackage(getContext());
+	}
+
+	/**
 	 * Returns the implementation information of currently loaded Faces implementation. E.g. "Mojarra 2.1.7-FCS".
 	 * <p>
 	 * This is also available in EL as <code>#{faces.implInfo}</code>.
@@ -302,8 +313,7 @@ public final class Faces {
 	 * @see Package#getImplementationVersion()
 	 */
 	public static String getImplInfo() {
-		Package jsfPackage = FacesContext.class.getPackage();
-		return jsfPackage.getImplementationTitle() + " " + jsfPackage.getImplementationVersion();
+		return FacesLocal.getImplInfo(getContext());
 	}
 
 	/**
