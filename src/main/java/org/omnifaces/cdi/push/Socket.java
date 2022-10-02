@@ -19,6 +19,8 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -739,7 +741,7 @@ import org.omnifaces.util.State;
  */
 @FacesComponent(Socket.COMPONENT_TYPE)
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
 public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
