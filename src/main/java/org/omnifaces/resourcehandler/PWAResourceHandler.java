@@ -402,7 +402,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			});
 		}
 
-		cacheableResources.add(getResourceUrl(context, Faces_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : Faces_SCRIPT_RESOURCE_NAME));
+		cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
 		cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
 		return cacheableResources;
 	}
