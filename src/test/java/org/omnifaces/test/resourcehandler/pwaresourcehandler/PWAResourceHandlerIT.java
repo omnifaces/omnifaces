@@ -60,7 +60,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 		assertEquals("1", instances, "This is the first time the page is opened, so there should be only 1 view scoped bean instance");
 		assertEquals("use-credentials", manifest.getAttribute("crossorigin"));
 
-		open(manifest.getAttribute("href").split("/PWAResourceHandlerIT", 2)[1]);
+		browser.get(manifest.getAttribute("href"));
 		assertEquals(EXPECTED_MANIFEST, browser.getPageSource().trim()
 			.replaceAll("\\?v=[0-9]{13,}", "?v=1") // Normalize any version query string on icon resource.
 			.replace("127.0.0.1", "localhost")); // Depends on server used. We don't want to be dependent on that.
@@ -72,7 +72,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 		String instances = viewScopedBeanInstances.getText();
 		assertEquals("2", instances, "This is the second time the page is opened, so there should be 2 view scoped bean instances");
 
-		open(manifest.getAttribute("href").split("/PWAResourceHandlerIT", 2)[1].replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
+		browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
 		String serviceWorkerScript = browser.getPageSource();
 		assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
 	}
