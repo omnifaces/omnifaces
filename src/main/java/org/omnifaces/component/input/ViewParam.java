@@ -70,7 +70,7 @@ import org.omnifaces.util.Utils;
  *
  * <h2>Default value when no parameter is set</h2>
  * <p>
- * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the new <code>default</code>
+ * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the <code>default</code>
  * attribute. When the parameter is not available, then the value specified in <code>default</code> attribute will be
  * set in the model instead. The support was added in OmniFaces 2.2.
  *

@@ -37,11 +37,7 @@ import org.omnifaces.event.PreInvokeActionEvent;
  * <p>
  * The {@link InvokeActionEventListener} will add support for new <code>&lt;f:event&gt;</code> types
  * <code>preInvokeAction</code> and <code>postInvokeAction</code>. Those events are published during the beforephase and
- * afterphase of <code>INVOKE_APPLICATION</code> respectively. This actually offers a better hook on invoking actions
- * after the <code>&lt;f:viewParam&gt;</code> values been set than the <code>preRenderView</code> event. In some
- * circumstances the <code>preRenderView</code> event might be too late. For example, when you need to set a faces
- * message in the flash scope and send a redirect. Also, it won't be invoked when the validations phase has failed for
- * one of the <code>&lt;f:viewParam&gt;</code> values, in contrary to the <code>preRenderView</code> event.
+ * afterphase of <code>INVOKE_APPLICATION</code> respectively.
  * <p>
  * This event is supported on any {@link UIComponent}, including {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and
  * {@link UICommand} components. This thus also provides the possibility to invoke multiple action listeners on a single

@@ -42,14 +42,11 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard Faces one.
  * <p>
- * In standard JSF 2.0/2.1, the <code>&#64;</code>{@link PreDestroy} annotated method on a view scoped bean was never
- * invoked when the session expires. Since OmniFaces 1.6, this CDI view scope annotation will guarantee that the
- * <code>&#64;PreDestroy</code> annotated method is also invoked on session expire. Since JSF 2.2, this problem is
- * solved on native Faces view scoped beans, hereby making this annotation superflous in JSF 2.2.
- * <p>
+ * In standard Faces, the <code>&#64;</code>{@link PreDestroy} annotated method on a view scoped bean is only
+ * invoked when the session expires.
  * However, there may be cases when it's desirable to immediately destroy a view scoped bean as well when the browser
  * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
- * None of the both JSF 2.2 view scope annotations support this. Since OmniFaces 2.2, this CDI view scope annotation
+ * The standard Faces view scope does not support this. Since OmniFaces 2.2, this CDI view scope annotation
  * will guarantee that the <code>&#64;PreDestroy</code> annotated method is also invoked on browser unload. This trick
  * is done by <code>navigator.sendBeacon</code>. For browsers not supporting <code>navigator.sendBeacon</code>, it will
  * fallback to a synchronous XHR request.
@@ -65,9 +62,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * instances annotated with this annotation in the Faces view state instead of in the HTTP session. For more detail, see
  * the {@link #saveInViewState()}.
  * <p>
- * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
- * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
- * annotation. Or, if you're on JSF 2.2 already, and you want the <code>&#64;PreDestroy</code> to be invoked on browser
+ * In a nutshell: if you want the <code>&#64;PreDestroy</code> to be invoked on browser
  * unload too, then use OmniFaces 2.2+ with this view scope annotation. Or, if you want to store whole view scoped beans
  * in the Faces view state when using client side state saving, then use OmniFaces 2.6+ with this view scope annotation
  * and the <code>saveInViewState</code> attribute set to <code>true</code>.

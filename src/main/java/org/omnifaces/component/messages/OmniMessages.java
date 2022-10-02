@@ -83,14 +83,14 @@ import org.omnifaces.util.State;
  * </pre>
  *
  * <h2>HTML escaping</h2>
- * <p>Control HTML escaping by the new <code>escape</code> attribute.
+ * <p>Control HTML escaping by the <code>escape</code> attribute.
  * <pre>
  * &lt;o:messages escape="false" /&gt;
  * </pre>
  * <p>Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
  *
  * <h2>Iteration markup control</h2>
- * <p>Control iteration markup fully by the new <code>var</code> attribute which sets the current {@link FacesMessage}
+ * <p>Control iteration markup fully by the <code>var</code> attribute which sets the current {@link FacesMessage}
  * in the request scope and disables the default table/list rendering. For example,
  * <pre>
  * &lt;dl&gt;

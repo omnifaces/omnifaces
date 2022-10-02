@@ -44,12 +44,6 @@ import org.omnifaces.util.Utils;
  * <code>of:setToList()</code>, <code>of:mapToList()</code>, <code>of:joinArray()</code>, <code>of:joinCollection()</code>,
  * <code>of:joinMap()</code>, <code>of:splitArray()</code>, <code>of:splitList()</code>, and <code>of:toJson()</code>.
  * <p>
- * Regarding the <code>of:xxxToList()</code> functions; <code>&lt;ui:repeat&gt;</code> (and <code>&lt;h:dataTable&gt;</code>)
- * doesn't support <code>Iterable</code> (such as <code>Set</code>) and <code>Map</code> directly, so those functions may be
- * handy for them. If however EL 2.2 is used, then e.g. <code>#{bean.set.toArray()}</code> (for {@link Collection} types) and
- * <code>#{bean.map.entrySet().toArray()}</code> could be used instead.
- * But if EL 2.2 is not supported or for a general <code>Iterable</code> the provided EL functions can be used.
- * <p>
  * The <code>of:joinXxx()</code> functions basically joins the elements of the array, collection or map to a string using the given separator.
  * This may be helpful if you want to display the contents of a collection as a commaseparated string without the need for an <code>&lt;ui:repeat&gt;</code>.
  * <p>
@@ -58,11 +52,6 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>of:toJson()</code> function encodes any object to a string in JSON format according the rules of
  * {@link Json#encode(Object)}.
- * <p>
- * Note that since JSF 2.2 it should be possible to use <code>#{bean.set}</code> directly in <code>&lt;h:dataTable&gt;</code>, but not
- * in <code>&lt;ui:repeat&gt;</code>.
- * The <code>of:setToList()</code> thus remains useful for JSF 2.0 and 2.1 in all cases, but is not needed for
- * <code>&lt;h:dataTable&gt;</code> in JSF 2.2.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -86,8 +75,7 @@ public final class Converters {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over a
-	 * <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
+	 * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>.
 	 * @param <E> The generic set element type.
 	 * @param set The set to be converted to list of its entries.
 	 * @return The converted list.
@@ -101,8 +89,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Useful when you want
-	 * to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the entries has the
+	 * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Each of the entries has the
 	 * usual <code>getKey()</code> and <code>getValue()</code> methods.
 	 * @param <K> The generic map key type.
 	 * @param <V> The generic map value type.
@@ -118,9 +105,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts a <code>Iterable&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over an
-	 * <code>Iterable</code>, which includes any type of <code>Collection</code> (which includes e.g. a <code>Set</code>)
-	 * in for example <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:dataTable&gt;</code>.
+	 * Converts a <code>Iterable&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>.
 	 * <p>
 	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is
 	 * an alternative to this.
@@ -140,9 +125,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts an <code>Iterable&lt;E&gt;</code> to a <code>DataModel&lt;E&gt;</code>. Useful when you want to iterate over an
-	 * <code>Iterable</code>, which includes any type of <code>Collection</code> (which includes e.g. a <code>Set</code>)
-	 * in for example <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:dataTable&gt;</code>.
+	 * Converts an <code>Iterable&lt;E&gt;</code> to a <code>DataModel&lt;E&gt;</code>.
 	 * <p>
 	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is
 	 * an alternative to this. Use this for more general cases or when the exact collection type is unknown.

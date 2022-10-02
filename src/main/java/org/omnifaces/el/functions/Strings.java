@@ -72,7 +72,7 @@ public final class Strings {
 
 	/**
 	 * Concatenate the string representation of the given objects. This is useful when you don't know beforehand if one
-	 * of the both hands is a string or is <code>null</code>, otherwise the new EL 2.2
+	 * of the both hands is a string or is <code>null</code>, otherwise the EL
 	 * <code>#{bean.string1.concat(bean.string2)}</code> can just be used.
 	 * @param left The left hand.
 	 * @param right The right hand.

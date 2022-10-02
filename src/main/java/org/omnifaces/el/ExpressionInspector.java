@@ -73,10 +73,6 @@ public final class ExpressionInspector {
 	 * Gets the ValueReference from a ValueExpression, without any checks whether the property is actually
 	 * a property or if it isn't a "MethodSuffix". The property is stored as it appears in the expression,
 	 * and may thus not actually exists. It's up to the caller how to interpret this.
-	 * <p>
-	 * This is also a workaround for the fact that a ValueReference can't
-	 * be obtained from a TagValueExpression in JSF 2.x (since it doesn't implement getValueReference and its super
-	 * class just returns null).
 	 *
 	 * @param context the context of this evaluation
 	 * @param valueExpression the value expression being evaluated
