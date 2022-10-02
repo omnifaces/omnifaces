@@ -1478,16 +1478,14 @@ public final class FacesLocal {
 	 * @see Faces#getSessionMaxInactiveInterval()
 	 */
 	public static int getSessionMaxInactiveInterval(FacesContext context) {
-		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
-		return getSession(context).getMaxInactiveInterval();
+		return context.getExternalContext().getSessionMaxInactiveInterval();
 	}
 
 	/**
 	 * @see Faces#setSessionMaxInactiveInterval(int)
 	 */
 	public static void setSessionMaxInactiveInterval(FacesContext context, int seconds) {
-		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
-		getSession(context).setMaxInactiveInterval(seconds);
+		context.getExternalContext().setSessionMaxInactiveInterval(seconds);
 	}
 
 	/**

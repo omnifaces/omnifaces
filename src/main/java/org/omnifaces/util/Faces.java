@@ -2269,7 +2269,7 @@ public final class Faces {
 	 * Returns the HTTP session timeout in seconds. This implicitly creates the session if one doesn't exist.
 	 * @return The HTTP session timeout in seconds.
 	 * @throws NullPointerException When faces context is unavailable.
-	 * @see HttpSession#getMaxInactiveInterval()
+	 * @see ExternalContext#getSessionMaxInactiveInterval()
 	 * @since 1.1
 	 */
 	public static int getSessionMaxInactiveInterval() {
@@ -2281,7 +2281,7 @@ public final class Faces {
 	 * This implicitly creates the session if one doesn't exist.
 	 * @param seconds The HTTP session timeout in seconds.
 	 * @throws NullPointerException When faces context is unavailable.
-	 * @see HttpSession#setMaxInactiveInterval(int)
+	 * @see ExternalContext#setSessionMaxInactiveInterval(int)
 	 * @since 1.1
 	 */
 	public static void setSessionMaxInactiveInterval(int seconds) {

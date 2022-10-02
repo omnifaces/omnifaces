@@ -147,11 +147,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		return true;
 	}
 
-	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
-	public void setPartialRequest(boolean partialRequest) {
-		getWrapped().setPartialRequest(partialRequest);
-	}
-
 	/**
 	 * Add an argument to the partial response. This is as JSON object available by <code>OmniFaces.Ajax.data</code>.
 	 * For supported argument value types, read {@link Json#encode(Object)}. If a given argument type is not supported,
