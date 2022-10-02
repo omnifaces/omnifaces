@@ -52,8 +52,8 @@ public class ResourceIdentifier {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create a new instance based on given standard JSF resource identifier string format <code>library:name</code>.
-	 * @param resourceIdentifier The standard JSF resource identifier.
+	 * Create a new instance based on given standard Faces resource identifier string format <code>library:name</code>.
+	 * @param resourceIdentifier The standard Faces resource identifier.
 	 */
 	public ResourceIdentifier(String resourceIdentifier) {
 		String[] parts = resourceIdentifier.split(":");
@@ -156,7 +156,7 @@ public class ResourceIdentifier {
 	}
 
 	/**
-	 * Returns the resource identifier as string in standard JSF resource identifier format <code>library:name</code>.
+	 * Returns the resource identifier as string in standard Faces resource identifier format <code>library:name</code>.
 	 * If there is no library, then only the name is returned without the colon separator like so <code>name</code>.
 	 */
 	@Override

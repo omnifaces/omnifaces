@@ -44,7 +44,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * The <code>@FacesValidator</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
  * There is a <a href="https://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
  * for EJB, but this is nasty and doesn't work out for CDI. <a href="https://stackoverflow.com/q/7572335/157882">Another way</a>
- * would be to make it a JSF or CDI managed bean, however this doesn't register the validator instance into the JSF application context,
+ * would be to make it a Faces or CDI managed bean, however this doesn't register the validator instance into the Faces application context,
  * and hence you won't be able to make use of {@link Application#createValidator(String)} on it.
  * <p>
  * Initially, this should be solved in JSF 2.2 which comes with new support for dependency injection in among others all
@@ -83,7 +83,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * When the validator is parameterized as in <code>implements Validator&lt;T&gt;</code>, then you need to use
  * at least OmniFaces 3.1 wherein the incompatibility was fixed. When the validator is managed with the new JSF 2.3
  * <code>managed=true</code> attribute set on the {@link FacesValidator} annotation, then the validator won't be
- * managed by OmniFaces and will continue to work fine for JSF. But the &lt;o:validator&gt; tag won't be able to
+ * managed by OmniFaces and will continue to work fine for Faces. But the &lt;o:validator&gt; tag won't be able to
  * set attributes on it.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
@@ -107,7 +107,7 @@ public class ValidatorManager {
 	/**
 	 * Returns the validator instance associated with the given validator ID,
 	 * or <code>null</code> if there is none.
-	 * @param application The involved JSF application.
+	 * @param application The involved Faces application.
 	 * @param validatorId The validator ID of the desired validator instance.
 	 * @return the validator instance associated with the given validator ID,
 	 * or <code>null</code> if there is none.

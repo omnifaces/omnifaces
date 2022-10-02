@@ -86,7 +86,7 @@ import org.omnifaces.util.State;
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
  * <p>
- * Declare <strong><code>&lt;o:socket&gt;</code></strong> tag in the JSF view with at least a
+ * Declare <strong><code>&lt;o:socket&gt;</code></strong> tag in the Faces view with at least a
  * <strong><code>channel</code></strong> name and an <strong><code>onmessage</code></strong> JavaScript listener
  * function. The channel name may not be an EL expression and it may only contain alphanumeric characters, hyphens,
  * underscores and periods.
@@ -160,8 +160,8 @@ import org.omnifaces.util.State;
  * <p>
  * Although web sockets support two-way communication, the <code>&lt;o:socket&gt;</code> push is designed for one-way
  * communication, from server to client. In case you intend to send some data from client to server, just continue
- * using JSF ajax the usual way, if necessary from JavaScript on with <code>&lt;o:commandScript&gt;</code> or perhaps
- * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
+ * using Faces ajax the usual way, if necessary from JavaScript on with <code>&lt;o:commandScript&gt;</code> or perhaps
+ * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the Faces view
  * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those
  * security constraints are not available during an incoming web socket message per se. See also a.o.
  * <a href="https://github.com/javaee/websocket-spec/issues/238">WS spec issue 238</a>.
@@ -252,7 +252,7 @@ import org.omnifaces.util.State;
  * You can declare multiple push channels on different scopes with or without user target throughout the application.
  * Be however aware that the same channel name can easily be reused across multiple views, even if it's view scoped.
  * It's more efficient if you use as few different channel names as possible and tie the channel name to a specific
- * push socket scope/user combination, not to a specific JSF view. In case you intend to have multiple view scoped
+ * push socket scope/user combination, not to a specific Faces view. In case you intend to have multiple view scoped
  * channels for different purposes, best is to use only one view scoped channel and have a global JavaScript listener
  * which can distinguish its task based on the delivered message. E.g. by sending the message in server as below:
  * <pre>
@@ -321,7 +321,7 @@ import org.omnifaces.util.State;
  * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in
  * <code>connected</code> attribute, or the client side way of explicitly setting <code>connected="false"</code> and
  * manually invoking <code>OmniFaces.Push</code> functions. Mixing them ends up in undefined behavior because the
- * associated JSF view state in the server side can't be notified if a socket is manually opened in client side.
+ * associated Faces view state in the server side can't be notified if a socket is manually opened in client side.
  *
  *
  * <h2 id="events-client"><a href="#events-client">Events (client)</a></h2>
@@ -416,7 +416,7 @@ import org.omnifaces.util.State;
  * "Session expired" message and/or immediately redirect to the login page via <code>window.location</code>. In case of
  * a view scoped socket the handling depends on the reason of the view expiration. A view can be expired when the
  * associated session has expired, but it can also be expired as result of (accidental) navigation or rebuild, or when
- * the JSF "views per session" configuration setting is set relatively low and the client has many views (windows/tabs)
+ * the Faces "views per session" configuration setting is set relatively low and the client has many views (windows/tabs)
  * open in the same session. You might take the opportunity to warn the client and/or let JavaScript reload the page as
  * submitting any form in it would throw <code>ViewExpiredException</code> anyway.
  *
@@ -541,7 +541,7 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * Note that OmniFaces own {@link Beans#fireEvent(Object, java.lang.annotation.Annotation...)} utility method is
- * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like JSF and OmniFaces in EAR/EJB
+ * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like Faces and OmniFaces in EAR/EJB
  * (back end) side.
  * <p>
  * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and
@@ -557,7 +557,7 @@ import org.omnifaces.util.State;
  * <p>
  * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
  * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
- * would not work (as they require respectively the JSF view state and HTTP session which can only be identified by a
+ * would not work (as they require respectively the Faces view state and HTTP session which can only be identified by a
  * HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be
  * application scoped. The {@link FacesContext} will also be unavailable in the above event listener method.
  * <p>
@@ -612,7 +612,7 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * Note that OmniFaces own {@link Callback} interfaces are insuitable as it is not allowed to use WAR (front end)
- * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
+ * frameworks and libraries like Faces and OmniFaces in EAR/EJB (back end) side.
  *
  *
  * <h2 id="cluster"><a href="#cluster">Cluster design hints</a></h2>

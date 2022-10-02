@@ -94,7 +94,7 @@ public final class EditableValueHolderStateHelper {
 	public static void restore(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
 		while (children.hasNext()) {
 			UIComponent child = children.next();
-			child.setId(child.getId()); // This implicitly resets the cached client ID. See JSF spec 3.1.6.
+			child.setId(child.getId()); // This implicitly resets the cached client ID. See Faces spec 3.1.6.
 
 			if (child instanceof EditableValueHolder && !child.isTransient()) {
 				get(stateHelper, child.getClientId(context)).restore((EditableValueHolder) child);

@@ -59,11 +59,11 @@ import org.omnifaces.util.State;
  * Set <code>dataURI</code> attribute to <code>true</code> in order to render image in
  * <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">data URI format</a>.
  * <pre>
- * &lt;o:graphicImage name="icon.png" dataURI="true" /&gt; &lt;!-- JSF resource as data URI --&gt;
+ * &lt;o:graphicImage name="icon.png" dataURI="true" /&gt; &lt;!-- Faces resource as data URI --&gt;
  * &lt;o:graphicImage value="#{bean.icon}" dataURI="true" /&gt; &lt;!-- byte[]/InputStream property as data URI --&gt;
  * </pre>
  * <p>
- * This basically renders the image inline in HTML output immediately during JSF render response phase. This approach
+ * This basically renders the image inline in HTML output immediately during Faces render response phase. This approach
  * is very useful for a "preview" feature of uploaded images and works also in combination with view scoped beans. This
  * approach is however <em>not</em> recommended for "permanent" and/or "large" images as it doesn't offer the browser
  * any opportunity to cache the images for reuse, ~10KB would typically be the max even less so if there are more such
@@ -75,7 +75,7 @@ import org.omnifaces.util.State;
  * a <em>stateless</em> <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean.
  * The property will namely be evaluated at the moment the browser
  * requests the image content based on the URL as specified in HTML <code>&lt;img src&gt;</code>, which is usually a
- * different request than the one which rendered the JSF page. E.g.
+ * different request than the one which rendered the Faces page. E.g.
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -118,7 +118,7 @@ import org.omnifaces.util.State;
  * <p>
  * A <code>@RequestScoped</code> and <code>@SessionScoped</code> bean would theoretically work, but this is wrong design
  * (a servlet is inherently also application scoped and stateless, not without reason). A <code>@ViewScoped</code>
- * wouldn't work because the image request doesn't share the JSF view state.
+ * wouldn't work because the image request doesn't share the Faces view state.
  * <p>
  * In case the property is a method expression taking arguments, each of those arguments will be converted to a string
  * HTTP request parameter and back to actual objects using the converters registered by class as available via
@@ -189,7 +189,7 @@ import org.omnifaces.util.State;
  * not tamperable by hackers, you might want to choose a "sensible" class and method name for this purpose.
  * <p>
  * Like <code>&lt;h:graphicImage&gt;</code>, the <code>value</code> attribute is <strong>ignored</strong>
- * when the <code>name</code> attribute is specified (for JSF resources). And, the <code>value</code> attribute of
+ * when the <code>name</code> attribute is specified (for Faces resources). And, the <code>value</code> attribute of
  * <code>&lt;o:graphicImage&gt;</code> does <strong>not</strong> support URLs anymore. For that, just keep using
  * <code>&lt;h:graphicImage&gt;</code> or even plain <code>&lt;img&gt;</code>.
  *

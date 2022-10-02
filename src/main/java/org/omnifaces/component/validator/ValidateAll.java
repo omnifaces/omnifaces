@@ -27,7 +27,7 @@ import org.omnifaces.validator.MultiFieldValidator;
  * The <code>&lt;o:validateAll&gt;</code> validates if ALL of the given {@link UIInput} components have been filled out.
  * One could of course also just put <code>required="true"</code> on all of those {@link UIInput} components, but
  * sometimes it's desireable to invalidate all of those fields and/or to have just only one message for it, which isn't
- * possible with the standard JSF API.
+ * possible with the standard Faces API.
  * <p>
  * The default message is
  * <blockquote>{0}: Please fill out all of those fields</blockquote>

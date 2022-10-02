@@ -92,8 +92,8 @@ public final class Validators {
 	}
 
 	/**
-	 * Returns the bean validator which is aware of the JSF locale.
-	 * @return The bean validator which is aware of the JSF locale.
+	 * Returns the bean validator which is aware of the Faces locale.
+	 * @return The bean validator which is aware of the Faces locale.
 	 * @see Faces#getLocale()
 	 */
 	public static Validator getBeanValidator() {

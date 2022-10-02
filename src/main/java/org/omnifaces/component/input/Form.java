@@ -47,7 +47,7 @@ import org.omnifaces.util.State;
 /**
  * <p>
  * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to
- * exactly the request URI with query string as seen in browser's address. Standard JSF <code>&lt;h:form&gt;</code>
+ * exactly the request URI with query string as seen in browser's address. Standard Faces <code>&lt;h:form&gt;</code>
  * submits to the view ID and does not include any query string parameters or path parameters and may therefore fail
  * in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters
  * or path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or

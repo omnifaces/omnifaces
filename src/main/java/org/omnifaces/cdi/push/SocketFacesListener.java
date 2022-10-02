@@ -38,7 +38,7 @@ import jakarta.faces.event.SystemEventListener;
 
 /**
  * <p>
- * This JSF listener for {@link UIViewRoot} ensures that the necessary JavaScript code to open or close the
+ * This Faces listener for {@link UIViewRoot} ensures that the necessary JavaScript code to open or close the
  * <code>WebSocket</code> is properly rendered.
  *
  * @author Bauke Scholtz

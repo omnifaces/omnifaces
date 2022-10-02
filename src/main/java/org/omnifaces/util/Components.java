@@ -119,7 +119,7 @@ import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>
- * Collection of utility methods for the JSF API with respect to working with {@link UIComponent}. There are several
+ * Collection of utility methods for the Faces API with respect to working with {@link UIComponent}. There are several
  * traversal/lookup methods, there are several {@link UIForm} and {@link UIInput} related methods which makes it easier
  * to deal with forms and inputs.
  *
@@ -139,7 +139,7 @@ import org.omnifaces.el.ScopedRunner;
  * UICommand command = Components.getCurrentCommand();
  * </pre>
  * <pre>
- * // Get the label of the given UIInput component as JSF uses for validation messages.
+ * // Get the label of the given UIInput component as Faces uses for validation messages.
  * String label = Components.getLabel(someUIInputComponent);
  * </pre>
  * <pre>
@@ -470,7 +470,7 @@ public final class Components {
 	}
 
 	/**
-	 * Builder class used to collect a number of query parameters for a visit (for each) of components in the JSF
+	 * Builder class used to collect a number of query parameters for a visit (for each) of components in the Faces
 	 * component tree. The chain of collecting parameters is terminated by calling one of the invoke methods.
 	 *
 	 * @since 2.0
@@ -856,7 +856,7 @@ public final class Components {
 	 * faces context will be available as well, including request scoped ones. But, depending on the nature of the
 	 * provided component, the state of the faces context may be affected because the attributes of the context,
 	 * request, view, session and application scope could be (in)directly manipulated during the encode. This may or may
-	 * not have the desired effect. If the given view does not have any component resources, JSF forms, dynamically
+	 * not have the desired effect. If the given view does not have any component resources, Faces forms, dynamically
 	 * added components, component event listeners, then it should mostly be safe.
 	 * In other words, use this at most for "simple templates" only, e.g. a HTML based mail template, which usually
 	 * already doesn't have a HTML head nor body.
@@ -1328,7 +1328,7 @@ public final class Components {
 
 	/**
 	 * Add an {@link UIForm} to the current view if absent.
-	 * This might be needed for scripts which rely on JSF view state identifier and/or on functioning of jsf.ajax.request().
+	 * This might be needed for scripts which rely on Faces view state identifier and/or on functioning of jsf.ajax.request().
 	 * @since 3.6
 	 */
 	public static void addFormIfNecessary() {

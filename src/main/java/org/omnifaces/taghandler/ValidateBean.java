@@ -163,7 +163,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * <h2>Class level validation details</h2>
  * <p>
  * In order to validate a bean at the class level, all values from input components should first be actually set on that bean
- * and only thereafter should the bean be validated. This however does not play well with the JSF approach where a model
+ * and only thereafter should the bean be validated. This however does not play well with the Faces approach where a model
  * is only updated when validation passes. But for class level validation we seemingly can not validate until the model
  * is updated. To break this tie, a <em>copy</em> of the model bean is made first, and then values are stored in this copy
  * and validated there. If validation passes, the original bean is updated.
@@ -732,14 +732,14 @@ public class ValidateBean extends TagHandler {
 				invoke();
 			}
 			catch (Exception e) {
-				// Explicitly log since exceptions in PhaseListeners will be largely swallowed and ignored by JSF runtime.
+				// Explicitly log since exceptions in PhaseListeners will be largely swallowed and ignored by Faces runtime.
 				logger.log(SEVERE, "Exception occured while doing validation.", e);
 
 				// Set validation failed and proceed to render response.
 				validationFailed();
 				renderResponse();
 
-				throw new FacesException(e); // Rethrow, but JSF runtime will do little with it.
+				throw new FacesException(e); // Rethrow, but Faces runtime will do little with it.
 			}
 
 		}

@@ -55,7 +55,7 @@ public abstract class OnloadParam extends UIViewParameter {
 	// Init -----------------------------------------------------------------------------------------------------------
 
 	/**
-	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
+	 * The constructor instructs Faces to register all scripts during the render response phase if necessary.
 	 */
 	protected OnloadParam() {
 		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
@@ -69,8 +69,8 @@ public abstract class OnloadParam extends UIViewParameter {
 
 			// This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
 			// ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
-			// Also,  JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
-			addFacesScriptResource(); // Required for jsf.ajax.request.
+			// Also, JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
+			addFacesScriptResource(); // Required for faces.ajax.request.
 			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 
 			if (!isAjaxRequestWithPartialRendering(context)) {
@@ -170,7 +170,7 @@ public abstract class OnloadParam extends UIViewParameter {
 	}
 
 	/**
-	 * This override which does effectively nothing prevents JSF from performing validation during non-onloadparam postbacks.
+	 * This override which does effectively nothing prevents Faces from performing validation during non-onloadparam postbacks.
 	 */
 	@Override
 	public void processValidators(FacesContext context) {
@@ -178,7 +178,7 @@ public abstract class OnloadParam extends UIViewParameter {
 	}
 
 	/**
-	 * This override which does effectively nothing prevents JSF from performing update during non-onloadparam postbacks.
+	 * This override which does effectively nothing prevents Faces from performing update during non-onloadparam postbacks.
 	 */
 	@Override
 	public void processUpdates(FacesContext context) {

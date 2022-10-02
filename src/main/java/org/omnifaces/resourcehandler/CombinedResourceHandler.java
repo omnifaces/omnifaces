@@ -86,7 +86,7 @@ import org.omnifaces.util.cache.Cache;
  * &lt;/h:head&gt;
  * </pre>
  * <p>
- * If you want them to appear <em>after</em> any auto-included resources of standard JSF implementation or JSF component
+ * If you want them to appear <em>after</em> any auto-included resources of standard Faces implementation or Faces component
  * libraries, then move the declarations to top of the <code>&lt;h:body&gt;</code>. This is not necessary for
  * <code>&lt;o:deferredScript&gt;</code>.
  * <pre>
@@ -115,7 +115,7 @@ import org.omnifaces.util.cache.Cache;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * This is only considered when the JSF project stage is <strong>not</strong> set to <code>Development</code> as per
+ * This is only considered when the Faces project stage is <strong>not</strong> set to <code>Development</code> as per
  * {@link Faces#isDevelopment()}.
  * <p>
  * This can speed up the initial page load considerably. In general, subsequent page loads are served from the browser
@@ -160,7 +160,7 @@ import org.omnifaces.util.cache.Cache;
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CACHE_TTL}</code>
  * </td><td>
  * Set with a value greater than 0 to activate server-side caching of the combined resource files. The value is
- * interpreted as cache TTL (time to live) in seconds and is only effective when the JSF project stage is
+ * interpreted as cache TTL (time to live) in seconds and is only effective when the Faces project stage is
  * <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}. Combined resource files
  * are removed from the cache if they are older than this parameter indicates (and regenerated if newly requested).
  * The default value is 0 (i.e. not cached). For global cache settings refer {@link Cache} javadoc.
@@ -445,8 +445,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			if (resourceToRemove != null) {
 				UIComponent container = coalesce(isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove);
 
-				// setInView(false) forces JSF to not save dynamic remove action in state.
-				// Otherwise JSF will re-execute dynamic remove during restore view phase.
+				// setInView(false) forces Faces to not save dynamic remove action in state.
+				// Otherwise Faces will re-execute dynamic remove during restore view phase.
 				// This is unnecessary as CombinedResourceHandler already takes care of it.
 				// See also https://github.com/omnifaces/omnifaces/issues/135
 				container.setInView(false);

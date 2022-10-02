@@ -24,7 +24,7 @@ import org.omnifaces.component.input.HashParam;
  * This is particularly useful in case you intend to (re)run some action based on the new hash parameters, before
  * rendering takes place.
  * <p>
- * Noted should be that the <code>&lt;o:hashParam&gt;</code> fires this as a CDI event, not as a JSF event.
+ * Noted should be that the <code>&lt;o:hashParam&gt;</code> fires this as a CDI event, not as a Faces event.
  *
  * @author Bauke Scholtz
  * @since 3.2

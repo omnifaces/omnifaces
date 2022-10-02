@@ -28,7 +28,7 @@ import jakarta.faces.application.ProjectStage;
  * Utility class for simplifying some web related tasks that use JNDI under the hood, such as getting the
  * <code>&lt;env-entry&gt;</code> from <code>web.xml</code>.
  * <p>
- * Note that the JSF spec defines one parameter that can optionally be defined via an env entry instead of the typical
+ * Note that the Faces spec defines one parameter that can optionally be defined via an env entry instead of the typical
  * context/init parameter; {@link ProjectStage#PROJECT_STAGE_JNDI_NAME}. Mojarra defines an additional proprietary one:
  * "java:comp/env/ClientStateSavingPassword".
  *

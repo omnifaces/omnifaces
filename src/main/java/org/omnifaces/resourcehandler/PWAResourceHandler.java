@@ -187,7 +187,7 @@ import org.omnifaces.util.Json;
  * &lt;p&gt;Please check your connection and then try refreshing this page.&lt;/p&gt;
  * </pre>
  * <p>
- * For each of those "cacheable view IDs" and "offline view IDs", the JSF view briefly will be built in in order to
+ * For each of those "cacheable view IDs" and "offline view IDs", the Faces view briefly will be built in in order to
  * extract all <code>&lt;x:outputStylesheet&gt;</code>,<code>&lt;x:outputScript&gt;</code> and
  * <code>&lt;x:graphicImage&gt;</code> resources and add them to cacheable resources of the service worker as well.
  * <p>
@@ -402,7 +402,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			});
 		}
 
-		cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
+		cacheableResources.add(getResourceUrl(context, Faces_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : Faces_SCRIPT_RESOURCE_NAME));
 		cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
 		return cacheableResources;
 	}

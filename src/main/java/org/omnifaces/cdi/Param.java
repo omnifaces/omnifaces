@@ -113,7 +113,7 @@ import org.omnifaces.util.Utils;
  *
  * <h2>Conversion and validation</h2>
  * <p>
- * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
+ * Standard types for which Faces already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
  * specifying a converter.
  * <pre>
@@ -180,7 +180,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * If conversion or validation fails, <code>null</code> is injected if the injection target is <b>NOT</b>
  * {@link ParamValue}. Otherwise a {@link ParamValue} instance is injected, but it will contain a <code>null</code>
- * value. In both cases, the conversion and validation messages (if any) will be set in the JSF context then, and
+ * value. In both cases, the conversion and validation messages (if any) will be set in the Faces context then, and
  * {@link FacesContext#isValidationFailed()} will return <code>true</code>.
  *
  * <h2>Historical note</h2>
@@ -381,7 +381,7 @@ public @interface Param {
 	 * If <code>true</code> bean validation will be performed for this instance (given that bean validation is available) despite
 	 * it globally being disabled. If <code>false</code> (the default) no specific action is taken.
 	 *
-	 * @return Whether to override that JSF bean validation is globally disabled.
+	 * @return Whether to override that Faces bean validation is globally disabled.
 	 */
 	@Nonbinding boolean overrideGlobalBeanValidationDisabled() default false;
 

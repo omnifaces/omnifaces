@@ -25,7 +25,7 @@ import org.omnifaces.cdi.config.FacesConfigXmlProducer;
  * <p>
  * This configuration interface parses the <code>/WEB-INF/faces-config.xml</code> and all
  * <code>/META-INF/faces-config.xml</code> files found in the classpath and offers methods to obtain information from
- * them which is not available by the standard JSF API.
+ * them which is not available by the standard Faces API.
  *
  * <h2>Usage</h2>
  * <p>

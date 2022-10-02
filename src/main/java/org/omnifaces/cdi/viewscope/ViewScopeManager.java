@@ -51,7 +51,7 @@ import org.omnifaces.cdi.ViewScoped;
  * <p>
  * Depending on {@link ViewScoped#saveInViewState()}, this view scope manager will delegate the creation and destroy
  * further to either {@link ViewScopeStorageInSession} or {@link ViewScopeStorageInViewState} which saves the concrete
- * bean instances in respectively HTTP session or JSF view state.
+ * bean instances in respectively HTTP session or Faces view state.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -108,21 +108,21 @@ public class ViewScopeManager {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create and returns the CDI view scoped managed bean from the current JSF view scope.
+	 * Create and returns the CDI view scoped managed bean from the current Faces view scope.
 	 * @param <T> The expected return type.
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param context The CDI context to create the CDI managed bean in.
-	 * @return The created CDI view scoped managed bean from the current JSF view scope.
+	 * @return The created CDI view scoped managed bean from the current Faces view scope.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		return getBeanStorage(type).createBean(type, context);
 	}
 
 	/**
-	 * Returns the CDI view scoped managed bean from the current JSF view scope.
+	 * Returns the CDI view scoped managed bean from the current Faces view scope.
 	 * @param <T> The expected return type.
 	 * @param type The contextual type of the CDI managed bean.
-	 * @return The CDI view scoped managed bean from the current JSF view scope.
+	 * @return The CDI view scoped managed bean from the current Faces view scope.
 	 */
 	public <T> T getBean(Contextual<T> type) {
 		return getBeanStorage(type).getBean(type);
@@ -159,7 +159,7 @@ public class ViewScopeManager {
 			}
 		}
 
-		// View scoped beans stored in client side JSF view state are per definition undestroyable, therefore storageInViewState is ignored here.
+		// View scoped beans stored in client side Faces view state are per definition undestroyable, therefore storageInViewState is ignored here.
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

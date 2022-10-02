@@ -35,7 +35,7 @@ import org.omnifaces.eventlistener.DefaultSystemEventListener;
 
 /**
  * <p>
- * Collection of utility methods for the JSF API with respect to working with system and phase events.
+ * Collection of utility methods for the Faces API with respect to working with system and phase events.
  *
  * <h2>Usage</h2>
  * <p>
@@ -218,7 +218,7 @@ public final class Events {
 	 * Subscribe the given callback instance to the given component that get invoked only in the current request when
 	 * the given component system event type is published on the given component. The difference with
 	 * {@link UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)} is that this listener is request
-	 * scoped instead of view scoped as component system event listeners are by default saved in JSF state and thus
+	 * scoped instead of view scoped as component system event listeners are by default saved in Faces state and thus
 	 * inherently view scoped.
 	 * @param component The component to subscribe the given callback instance to.
 	 * @param type The system event type to be observed.
@@ -234,7 +234,7 @@ public final class Events {
 
 			@Override
 			public void processEvent(ComponentSystemEvent event) {
-				unsubscribeFromComponentEvent(component, type, this); // Prevent it from being saved in JSF state.
+				unsubscribeFromComponentEvent(component, type, this); // Prevent it from being saved in Faces state.
 				callback.accept(event);
 			}
 		});
@@ -304,7 +304,7 @@ public final class Events {
 	 * Unsubscribe the given event listener on the given event from the given component. Normally, you would use
 	 * {@link UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)} for this, but this wouldn't work
 	 * when executed inside {@link ComponentSystemEventListener#processEvent(jakarta.faces.event.ComponentSystemEvent)},
-	 * as it would otherwise end up in a <code>ConcurrentModificationException</code> while JSF is iterating over all
+	 * as it would otherwise end up in a <code>ConcurrentModificationException</code> while Faces is iterating over all
 	 * system event listeners. The trick is to perform the unsubscribe during the after phase of the current request
 	 * phase {@link #subscribeToRequestAfterPhase(PhaseId, Runnable)}.
 	 * @param component The component to unsubscribe the given event listener from.

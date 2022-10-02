@@ -35,7 +35,7 @@ import org.omnifaces.el.ScopedRunner;
  * <p>
  * The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a
  * nested collection representing groups of select items. This is basically the {@link UIComponent} counterpart of
- * <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the standard JSF API. Currently the
+ * <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the standard Faces API. Currently the
  * only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which
  * can end up to be quite verbose.
  *

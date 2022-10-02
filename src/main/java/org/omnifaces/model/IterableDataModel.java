@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.faces.model.CollectionDataModel;
 import jakarta.faces.model.DataModel;
 import jakarta.faces.model.DataModelEvent;
 import jakarta.faces.model.DataModelListener;
@@ -28,7 +29,7 @@ import jakarta.faces.model.ListDataModel;
  * <p>
  * This can be used to encapsulate nearly every collection type, including {@link Collection} derived types such as
  * {@link List} and {@link Set}. As such this specific DataModel can be used instead of more specific DataModels like
- * {@link ListDataModel} and JSF 2.2's CollectionDataModel.
+ * {@link ListDataModel} and {@link CollectionDataModel}.
  *
  * @since 1.5
  * @author Arjan.Tijms

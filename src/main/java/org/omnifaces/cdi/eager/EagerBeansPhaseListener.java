@@ -22,7 +22,7 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
  * <p>
- * A PhaseListener that instantiates eager request/view beans by JSF view ID.
+ * A PhaseListener that instantiates eager request/view beans by Faces view ID.
  * <p>
  * This instantiates beans relatively late during request processing but at a point that faces context and the view root
  * corresponding to the current view ID are available to the bean.

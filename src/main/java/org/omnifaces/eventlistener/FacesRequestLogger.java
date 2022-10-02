@@ -75,12 +75,12 @@ import org.omnifaces.util.Faces;
  *     <li><code>ip</code>: the user IP, as obtained by {@link Faces#getRemoteAddr()}.</li>
  *     <li><code>login</code>: the user login, as obtained by {@link Faces#getRemoteUser()}.</li>
  *     <li><code>session</code>: the session ID, as obtained by {@link Faces#getSessionId()}.</li>
- *     <li><code>viewState</code>: the server side JSF view state identifier, if any.</li></ul>
+ *     <li><code>viewState</code>: the server side Faces view state identifier, if any.</li></ul>
  * <li><code>action</code>: the action detail, composed of:<ul>
  *     <li><code>source</code>: the action source, as obtained by {@link Components#getCurrentActionSource()}.</li>
  *     <li><code>event</code>: the action event name, if any.</li>
  *     <li><code>methods</code>: the action methods, as obtained by {@link Components#getActionExpressionsAndListeners(UIComponent)}</li>
- *     <li><code>validationFailed</code>: whether JSF validation has failed.</li></ul></li>
+ *     <li><code>validationFailed</code>: whether Faces validation has failed.</li></ul></li>
  * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>jakarta.faces.*</code> are skipped,
  * and whose name ends with <code>password</code> or <code>token</code> are masked with value <code>********</code>.</li>
  * <li><code>messages</code>: all Faces messages added so far.</li>
@@ -210,7 +210,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 			String name = entry.getKey();
 
 			if (name.startsWith("jakarta.faces.")) {
-				continue; // JSF internal stuff is not interesting.
+				continue; // Faces internal stuff is not interesting.
 			}
 
 			String[] values = entry.getValue();

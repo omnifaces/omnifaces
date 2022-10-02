@@ -37,7 +37,7 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or JSF view ID as a bookmarkable
+ * The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or Faces view ID as a bookmarkable
  * URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
  * and <code>&lt;o:param&gt;</code>, and for exposing it into the request scope by the variable name as specified by
  * the <code>var</code> attribute instead of rendering it.
@@ -76,7 +76,7 @@ import org.omnifaces.util.State;
  * <h2>Request and view parameters</h2>
  * <p>
  * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
- * You can optionally include all GET request query string parameters or only JSF view parameters in the resulting URL via
+ * You can optionally include all GET request query string parameters or only Faces view parameters in the resulting URL via
  * <code>includeRequestParams="true"</code> or <code>includeViewParams="true"</code>.
  * The <code>includeViewParams</code> is ignored when <code>includeRequestParams="true"</code>.
  * The <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name.

@@ -215,10 +215,10 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Returns a collection of JSF view IDs which should be cached via the service worker so that they are available offline.
-	 * The default implementation returns JSF view IDs derived from {@link WebXml#getWelcomeFiles()}.
+	 * Returns a collection of Faces view IDs which should be cached via the service worker so that they are available offline.
+	 * The default implementation returns Faces view IDs derived from {@link WebXml#getWelcomeFiles()}.
 	 * If this method returns an empty collection, then no service worker will be generated.
-	 * @return A collection of JSF view IDs which should be cached via the service worker so that they are available offline.
+	 * @return A collection of Faces view IDs which should be cached via the service worker so that they are available offline.
 	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
 	 * @since 3.7
 	 */
@@ -238,10 +238,10 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Returns the JSF view ID which should represent the "You're offline!" error page.
+	 * Returns the Faces view ID which should represent the "You're offline!" error page.
 	 * The default implementation returns <code>null</code>, meaning that there is no such one.
 	 * If {@link #getCacheableViewIds()} returns an empty collection, then this method will be ignored.
-	 * @return the JSF view ID which should represent the "You're offline!" error page.
+	 * @return the Faces view ID which should represent the "You're offline!" error page.
 	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
 	 * @since 3.7
 	 */
@@ -368,7 +368,7 @@ public abstract class WebAppManifest {
 
 		/**
 		 * Creates image resource of given resource identifier and sizes.
-		 * @param resourceIdentifier The JSF resource identifier. E.g. <code>library:path/name.png</code>
+		 * @param resourceIdentifier The Faces resource identifier. E.g. <code>library:path/name.png</code>
 		 * @param sizes The supported sizes of this image resource.
 		 * @return Image resource of given resource identifier and sizes.
 		 * @throws NullPointerException When resource identifier is null.

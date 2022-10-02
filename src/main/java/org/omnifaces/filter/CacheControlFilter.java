@@ -65,7 +65,7 @@ import org.omnifaces.util.Servlets;
  * along with refresh button or F5, then the webbrowser will perform a fresh new request and purge any cached resource.
  * </ul>
  * <p>
- * <strong>Important notice</strong>: this filter automatically skips JSF resources, such as the ones served by
+ * <strong>Important notice</strong>: this filter automatically skips Faces resources, such as the ones served by
  * <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>, <code>@ResourceDependency</code>, etc.
  * Their cache-related headers are namely <a href="https://stackoverflow.com/q/15057932/157882">already</a> controlled
  * by the <code>ResourceHandler</code> implementation. In Mojarra and MyFaces, the default expiration time is 1 week
@@ -133,7 +133,7 @@ import org.omnifaces.util.Servlets;
  * Note: put the more specific URL patterns in the end of filter mappings. Due to the way how filters work, there's
  * unfortunately no simple way to skip the filter on <code>/*</code> when e.g. <code>*.pdf</code> is matched. You can
  * always map the no cache filter specifically to <code>FacesServlet</code> if you intend to disable caching on
- * <strong>all</strong> JSF pages. Here's an example assuming that you've configured the <code>FacesServlet</code> with
+ * <strong>all</strong> Faces pages. Here's an example assuming that you've configured the <code>FacesServlet</code> with
  * a servlet name of <code>facesServlet</code>:
  * <pre>
  * &lt;filter-mapping&gt;
@@ -157,8 +157,8 @@ import org.omnifaces.util.Servlets;
  * <li><code>Pragma: no-cache</code></li>
  * </ul>
  *
- * <h2>JSF development stage</h2>
- * <p>To speed up development, caching by this filter is <strong>disabled</strong> when JSF project stage is set to
+ * <h2>Faces development stage</h2>
+ * <p>To speed up development, caching by this filter is <strong>disabled</strong> when Faces project stage is set to
  * <code>Development</code> as per {@link Servlets#isFacesDevelopment(jakarta.servlet.ServletContext)}.
  *
  * @author Bauke Scholtz

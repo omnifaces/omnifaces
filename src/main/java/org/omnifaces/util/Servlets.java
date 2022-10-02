@@ -85,19 +85,19 @@ import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
  * Collection of utility methods for the Servlet API in general. Most of them are internally used by {@link Faces}
  * and {@link FacesLocal}, however they may also be useful in a "plain vanilla" servlet or servlet filter.
  * <p>
- * There are as of now also five special methods related to JSF without needing a {@link FacesContext}:
+ * There are as of now also five special methods related to Faces without needing a {@link FacesContext}:
  * <ul>
- * <li>The {@link #getFacesLifecycle(ServletContext)} which returns the JSF lifecycle, allowing you a.o. to
- * programmatically register JSF application's phase listeners.
- * <li>The {@link #isFacesAjaxRequest(HttpServletRequest)} which is capable of checking if the current request is a JSF
+ * <li>The {@link #getFacesLifecycle(ServletContext)} which returns the Faces lifecycle, allowing you a.o. to
+ * programmatically register Faces application's phase listeners.
+ * <li>The {@link #isFacesAjaxRequest(HttpServletRequest)} which is capable of checking if the current request is a Faces
  * ajax request.
  * <li>The {@link #isFacesResourceRequest(HttpServletRequest)} which is capable of checking if the current request is a
- * JSF resource request.
+ * Faces resource request.
  * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, Object...)} which is capable
- * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
+ * of distinguishing Faces ajax requests from regular requests and altering the redirect logic on it, exactly like as
  * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
  * {@link Faces#redirect(String, Object...)}.
- * <li>The {@link #isFacesDevelopment(ServletContext)} which is capable of checking if the current JSF application
+ * <li>The {@link #isFacesDevelopment(ServletContext)} which is capable of checking if the current Faces application
  * configuration is set to development project stage.
  * </ul>
  * <p>
@@ -781,7 +781,7 @@ public final class Servlets {
 
 	/**
 	 * Returns the servlet context.
-	 * If the JSF context is available, then return it from there.
+	 * If the Faces context is available, then return it from there.
 	 * Else if the CDI bean manager is available, then return it from there.
 	 * @return The servlet context.
 	 * @since 3.10
@@ -821,7 +821,7 @@ public final class Servlets {
 		return (T) context.getAttribute(name);
 	}
 
-	// JSF ------------------------------------------------------------------------------------------------------------
+	// Faces ------------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns The {@link Lifecycle} associated with current Faces application.
@@ -836,11 +836,11 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given HTTP servlet request is a JSF ajax request. This does exactly the same as
+	 * Returns <code>true</code> if the given HTTP servlet request is a Faces ajax request. This does exactly the same as
 	 * {@link Faces#isAjaxRequest()}, but then without the need for a {@link FacesContext}. The major advantage is that
 	 * you can perform the job inside a servlet filter, where the {@link FacesContext} is normally not available.
 	 * @param request The involved HTTP servlet request.
-	 * @return <code>true</code> if the given HTTP servlet request is a JSF ajax request.
+	 * @return <code>true</code> if the given HTTP servlet request is a Faces ajax request.
 	 * @since 2.0
 	 */
 	public static boolean isFacesAjaxRequest(HttpServletRequest request) {
@@ -848,10 +848,10 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given HTTP servlet request is a JSF resource request. I.e. this request will
-	 * trigger the JSF {@link ResourceHandler} for among others CSS/JS/image resources.
+	 * Returns <code>true</code> if the given HTTP servlet request is a Faces resource request. I.e. this request will
+	 * trigger the Faces {@link ResourceHandler} for among others CSS/JS/image resources.
 	 * @param request The involved HTTP servlet request.
-	 * @return <code>true</code> if the given HTTP servlet request is a JSF resource request.
+	 * @return <code>true</code> if the given HTTP servlet request is a Faces resource request.
 	 * @since 2.0
 	 * @see ResourceHandler#RESOURCE_IDENTIFIER
 	 */
@@ -860,7 +860,7 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns <code>true</code> if we're in JSF development stage. This will be the case when the
+	 * Returns <code>true</code> if we're in Faces development stage. This will be the case when the
 	 * <code>jakarta.faces.PROJECT_STAGE</code> context parameter in <code>web.xml</code> is set to
 	 * <code>Development</code>.
 	 * @param context The involved servlet context.
@@ -891,10 +891,10 @@ public final class Servlets {
 	}
 
 	/**
-	 * Sends a temporary (302) JSF redirect to the given URL, supporting JSF ajax requests. This does exactly the same
+	 * Sends a temporary (302) Faces redirect to the given URL, supporting Faces ajax requests. This does exactly the same
 	 * as {@link Faces#redirect(String, Object...)}, but without the need for a {@link FacesContext}. The major
 	 * advantage is that you can perform the job inside a servlet filter or even a plain vanilla servlet, where the
-	 * {@link FacesContext} is normally not available. This method also recognizes JSF ajax requests which requires a
+	 * {@link FacesContext} is normally not available. This method also recognizes Faces ajax requests which requires a
 	 * special XML response in order to successfully perform the redirect.
 	 * <p>
 	 * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then

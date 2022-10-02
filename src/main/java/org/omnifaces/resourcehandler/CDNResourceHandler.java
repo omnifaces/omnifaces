@@ -27,8 +27,8 @@ import jakarta.faces.application.ResourceHandler;
 /**
  * <p>
  * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the
- * default local URLs for JSF resources. This also works on auto-included resources provided as
- * {@link ResourceDependency} by the JSF implementation and/or component libraries. For example, JSF's own
+ * default local URLs for Faces resources. This also works on auto-included resources provided as
+ * {@link ResourceDependency} by the Faces implementation and/or component libraries. For example, Faces's own
  * <code>jakarta.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
  * pointed to a CDN.
  *
@@ -46,7 +46,7 @@ import jakarta.faces.application.ResourceHandler;
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
  * <code>libraryName:resourceName=https://cdn.example.com/url</code> key=value pairs. The key represents the default
- * JSF resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
+ * Faces resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
  * by this resource handler, so you need to make absolutely sure yourself that it is valid.
  * <p>
  * Here is an example configuration:
@@ -216,7 +216,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	/**
 	 * If the given resource is not <code>null</code> and the CDN resource handler is not (conditionally) disabled for
 	 * the current request, then the CDN resources will be consulted if any CDN URL is available for the given resource.
-	 * If there is none, then just return the JSF default resource, otherwise return a wrapped resource whose
+	 * If there is none, then just return the Faces default resource, otherwise return a wrapped resource whose
 	 * {@link Resource#getRequestPath()} returns the CDN URL as is been set in the
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
 	 */

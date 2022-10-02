@@ -21,7 +21,7 @@ import jakarta.faces.validator.Validator;
 
 /**
  * <p>
- * By default, JSF validators run on every request, regardless of whether the submitted value has changed or not. In
+ * By default, Faces validators run on every request, regardless of whether the submitted value has changed or not. In
  * case of validation against the DB on complex objects which are already stored in the model in a broader scope, such
  * as the view scope, this may result in unnecessarily expensive service/DAO calls. In such case, you'd like to perform
  * the expensive service/DAO call only when the submitted value is really changed as compared to the model value.

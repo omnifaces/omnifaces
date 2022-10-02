@@ -18,12 +18,12 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.MappingMatch;
 
 /**
- * This wraps a request to an extensionless JSF view and provides an extension for
+ * This wraps a request to an extensionless Faces view and provides an extension for
  * all methods that reveal the servlet path. Additional the path info is set to null.
  * <p>
- * This is needed since JSF implementations inspect the request to determine if a
+ * This is needed since Faces implementations inspect the request to determine if a
  * prefix (path) or suffix (extension) mapping was used. If the request is neither
- * (in effect, an "exact and extensionless mapping), JSF will get confused and not
+ * (in effect, an "exact and extensionless mapping), Faces will get confused and not
  * be able to derive view IDs etc correctly.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.

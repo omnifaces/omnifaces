@@ -28,8 +28,8 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * <p>This filter will set the request body character encoding when not already set by the client. Even though
- * JSF2/Facelets uses by default UTF-8 everywhere, which is the best charset choice these days, JSF2/Facelets might
- * fail to set it to UTF-8 when something else has set it to a different value before JSF2/Facelets gets the chance to
+ * Faces/Facelets uses by default UTF-8 everywhere, which is the best charset choice these days, Faces/Facelets might
+ * fail to set it to UTF-8 when something else has set it to a different value before Faces/Facelets gets the chance to
  * set it during the restore view phase. PrimeFaces 3.x for example is known to do that. During ajax requests, it will
  * call {@link ExternalContext#getRequestParameterMap()} inside {@link PartialViewContext#isAjaxRequest()} right before
  * building/restoring the view, which will implicitly set the request body character encoding to the server-default
@@ -50,7 +50,7 @@ import jakarta.servlet.http.HttpSession;
  * </pre>
  *
  * <h2>Configuration (optional)</h2>
- * <p>As JSF2/Facelets uses by default UTF-8 everywhere, the default charset is also set to UTF-8. When really
+ * <p>As Faces/Facelets uses by default UTF-8 everywhere, the default charset is also set to UTF-8. When really
  * necessary for some reason, then it can be overridden by specifying the <code>encoding</code> initialization
  * parameter in the <code>&lt;filter&gt;</code> element as follows:
  * <pre>

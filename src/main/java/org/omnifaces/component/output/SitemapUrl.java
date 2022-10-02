@@ -42,13 +42,13 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or JSF view ID as a sitemap
+ * The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or Faces view ID as a sitemap
  * URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
  * and <code>&lt;o:param&gt;</code>.
  * <p>
  * This component is largely based off the {@link Url} component behind <code>&lt;o:url&gt;</code>, but then tailored
  * specifically for usage in <code>sitemap.xml</code> file. The {@link ViewResourceHandler} must be registered in
- * <code>faces-config.xml</code> in order to get JSF components to run in <code>/sitemap.xml</code>.
+ * <code>faces-config.xml</code> in order to get Faces components to run in <code>/sitemap.xml</code>.
  *
  * <h2>Values</h2>
  * <p>
@@ -83,7 +83,7 @@ import org.omnifaces.util.State;
  *
  * <h2>Usage</h2>
  * <p>
- * Usage example of <code>/sitemap.xml</code> as a JSF view:
+ * Usage example of <code>/sitemap.xml</code> as a Faces view:
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;urlset

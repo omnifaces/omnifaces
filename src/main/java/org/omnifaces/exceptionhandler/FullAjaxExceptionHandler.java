@@ -71,7 +71,7 @@ import org.omnifaces.util.Hacks;
  * The {@link FullAjaxExceptionHandler} will transparently handle exceptions during ajax requests exactly the same way
  * as exceptions during synchronous (non-ajax) requests.
  * <p>
- * By default, when an exception occurs during a JSF ajax request, the enduser would not get any form of feedback if the
+ * By default, when an exception occurs during a Faces ajax request, the enduser would not get any form of feedback if the
  * action was successfully performed or not. In Mojarra, only when the project stage is set to <code>Development</code>,
  * the enduser would see a bare JavaScript alert with only the exception type and message. It would make sense if
  * exceptions during ajax requests are handled the same way as exceptions during synchronous requests, which is
@@ -143,7 +143,7 @@ import org.omnifaces.util.Hacks;
  * <h2>Normal requests</h2>
  * <p>
  * Note that the {@link FullAjaxExceptionHandler} does not deal with normal (non-ajax) requests at all. To properly
- * handle JSF and EL exceptions on normal requests as well, you need an additional {@link FacesExceptionFilter}. This
+ * handle Faces and EL exceptions on normal requests as well, you need an additional {@link FacesExceptionFilter}. This
  * will extract the root cause from a wrapped {@link FacesException} and {@link ELException} before delegating the
  * {@link ServletException} further to the container (the container will namely use the first root cause of
  * {@link ServletException} to match an error page by exception in web.xml).
@@ -176,9 +176,9 @@ import org.omnifaces.util.Hacks;
  * <p>
  * This context parameter will also be read and used by {@link FacesExceptionFilter}.
  * <p>
- * This context parameter will <strong>not</strong> suppress standard JSF and/or container builtin logging. This will
+ * This context parameter will <strong>not</strong> suppress standard Faces and/or container builtin logging. This will
  * only suppress <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that
- * standard JSF and/or container will still log it. This may need to be configured separately.
+ * standard Faces and/or container will still log it. This may need to be configured separately.
  *
  * <h2>Customizing <code>FullAjaxExceptionHandler</code></h2>
  * <p>
@@ -239,13 +239,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @since 2.4
 	 */
 	protected enum LogReason {
-		/** An exception occurred during processing JSF ajax request. Error page will be shown. */
+		/** An exception occurred during processing Faces ajax request. Error page will be shown. */
 		EXCEPTION_HANDLED(LOG_EXCEPTION_HANDLED),
 
-		/** An exception occurred during rendering JSF ajax request. Error page will be shown. */
+		/** An exception occurred during rendering Faces ajax request. Error page will be shown. */
 		RENDER_EXCEPTION_HANDLED(LOG_RENDER_EXCEPTION_HANDLED),
 
-		/** An exception occurred during rendering JSF ajax request. Error page CANNOT be shown as response is already committed. */
+		/** An exception occurred during rendering Faces ajax request. Error page CANNOT be shown as response is already committed. */
 		RENDER_EXCEPTION_UNHANDLED(LOG_RENDER_EXCEPTION_UNHANDLED),
 
 		/** Another exception occurred during rendering error page. A hardcoded error page will be shown. */
@@ -279,13 +279,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
 			+ " Neither was found.";
 	private static final String LOG_EXCEPTION_HANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during processing JSF ajax request."
+		"FullAjaxExceptionHandler: An exception occurred during processing Faces ajax request."
 			+ " Error page '%s' will be shown.";
 	private static final String LOG_RENDER_EXCEPTION_HANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
+		"FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
 			+ " Error page '%s' will be shown.";
 	private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
+		"FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
 			+ " Error page '%s' CANNOT be shown as response is already committed."
 			+ " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
 	private static final String LOG_ERROR_PAGE_ERROR =
@@ -373,7 +373,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 *   <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
 	 *   <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
 	 *   <li>Set the standard servlet error request attributes.
-	 *   <li>Force JSF to render the full error page in its entirety.
+	 *   <li>Force Faces to render the full error page in its entirety.
 	 * </ul>
 	 * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
 	 */
@@ -385,7 +385,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private void handleAjaxException(FacesContext context) {
 		if (context == null) {
-			return; // Unexpected, most likely buggy JSF implementation or parent exception handler.
+			return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
 		}
 
 		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
@@ -397,7 +397,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
 
 		if (exception instanceof AbortProcessingException) {
-			return; // Let JSF handle it itself.
+			return; // Let Faces handle it itself.
 		}
 
 		exception = findExceptionRootCause(context, exception);
@@ -526,7 +526,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 		else if (!context.getExternalContext().isResponseCommitted()) {
 			logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_HANDLED);
-			resetResponse(context); // If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
+			resetResponse(context); // If the exception was thrown in midst of rendering the Faces response, then reset (partial) response.
 			return true;
 		}
 		else {

@@ -34,7 +34,7 @@ import jakarta.faces.application.ResourceWrapper;
  * </pre>
  * <p>
  * The web browser will then attempt to resolve this against the current request URL, but this would fail with a 404
- * error because the JSF mapping such as <code>*.xhtml</code> is missing.
+ * error because the Faces mapping such as <code>*.xhtml</code> is missing.
  * <p>
  * In order to sovle that, first configure your minifier to disable writing the <code># sourceMappingURL</code> comment,
  * otherwise that would still take precedence over the <code>SourceMap</code> response header, and register the

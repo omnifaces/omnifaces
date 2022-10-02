@@ -52,7 +52,7 @@ import jakarta.faces.render.ResponseStateManager;
 import jakarta.websocket.Session;
 
 /**
- * Collection of JSF implementation and/or JSF component library and/or server specific hacks.
+ * Collection of Faces implementation and/or Faces component library and/or server specific hacks.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -109,7 +109,7 @@ public final class Hacks {
 		//
 	}
 
-	// JSF impl related -----------------------------------------------------------------------------------------------
+	// Faces impl related ---------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns true if Mojarra is used. That is, when the FacesContext instance is from the Mojarra specific package.
@@ -159,7 +159,7 @@ public final class Hacks {
 		return myFacesUsed;
 	}
 
-	// JSF resource handling related ----------------------------------------------------------------------------------
+	// Faces resource handling related --------------------------------------------------------------------------------
 
 	/**
 	 * Returns the default resource maximum age in milliseconds.
@@ -267,10 +267,10 @@ public final class Hacks {
 		return facesScriptResourceAvailable;
 	}
 
-	//  JSF state saving related --------------------------------------------------------------------------------------
+	//  Faces state saving related ------------------------------------------------------------------------------------
 
 	/**
-	 * Remove server side JSF view state (and view scoped beans) associated with current request.
+	 * Remove server side Faces view state (and view scoped beans) associated with current request.
 	 * @param context The involved faces context.
 	 * @param manager The involved response state manager.
 	 * @param viewId The view ID of the involved view.
@@ -355,7 +355,7 @@ public final class Hacks {
 		return invokeMethod(component, "getStateHelper");
 	}
 
-	// JSF component related ------------------------------------------------------------------------------------------
+	// Faces component related ----------------------------------------------------------------------------------------
 
 	/**
 	 * Returns f:metadata facet from UIViewRoot.

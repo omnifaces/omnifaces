@@ -39,7 +39,7 @@ import org.omnifaces.util.Hacks;
 
 /**
  * <p>
- * This {@link ResourceHandler} implementation allows the developer to map JSF resources on an URL pattern of
+ * This {@link ResourceHandler} implementation allows the developer to map Faces resources on an URL pattern of
  * <code>/jakarta.faces.resource/*</code> (basically, the value of {@link ResourceHandler#RESOURCE_IDENTIFIER}) without
  * the need for an additional {@link FacesServlet} prefix or suffix URL pattern in the default produced resource URLs,
  * such as <code>/jakarta.faces.resource/faces/css/style.css</code> or

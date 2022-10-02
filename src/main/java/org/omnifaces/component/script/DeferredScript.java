@@ -82,7 +82,7 @@ public class DeferredScript extends ScriptFamily {
 
 	/**
 	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}. If successfully moved,
-	 * then set the script resource as rendered, so that JSF won't auto-include it.
+	 * then set the script resource as rendered, so that Faces won't auto-include it.
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) {

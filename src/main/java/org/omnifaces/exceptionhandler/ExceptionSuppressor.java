@@ -128,7 +128,7 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 
 	private void handleSuppressedException(FacesContext context) {
 		if (context == null) {
-			return; // Unexpected, most likely buggy JSF implementation or parent exception handler.
+			return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
 		}
 
 		Optional<Throwable> suppressedException = findSuppressedException();

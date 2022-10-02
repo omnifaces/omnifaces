@@ -239,9 +239,9 @@ public class SocketChannelManager implements Serializable {
 
 	/**
 	 * For internal usage only. This makes it possible to reference view scope channel IDs during injection time of
-	 * {@link SocketPushContext} (the JSF view scope is not necessarily active during push send time).
+	 * {@link SocketPushContext} (the Faces view scope is not necessarily active during push send time).
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
-	 * @param create Whether or not to auto-create the entry in JSF view scope.
+	 * @param create Whether or not to auto-create the entry in Faces view scope.
 	 * @return View scope channel IDs.
 	 */
 	protected Map<String, String> getViewScopedChannels(boolean create) {
@@ -250,7 +250,7 @@ public class SocketChannelManager implements Serializable {
 	}
 
 	/**
-	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in JSF components and listeners.
+	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in Faces components and listeners.
 	 */
 	static SocketChannelManager getInstance() {
 		return getReference(SocketChannelManager.class);

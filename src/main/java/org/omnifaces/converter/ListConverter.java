@@ -27,7 +27,7 @@ import jakarta.faces.model.SelectItem;
  * use {@link SelectItem}s as the source for their selectable items, but work directly via a {@link List} of entities,
  * and therefore the {@link SelectItemsConverter} isn't usable on them.
  * <p>
- * This converter allows you to populate a selection component with complex Java objects and have JSF convert those
+ * This converter allows you to populate a selection component with complex Java objects and have Faces convert those
  * automatically back without the need to provide a custom converter which may need to do the job based on possibly
  * expensive service/DAO operations. This converter automatically converts based on the {@link #toString()} of the
  * selected item.

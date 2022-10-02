@@ -24,7 +24,7 @@ import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.Renderer;
 
 /**
- * Collection of utility methods for the JSF API with respect to working with {@link Renderer}.
+ * Collection of utility methods for the Faces API with respect to working with {@link Renderer}.
  *
  * @author Bauke Scholtz
  * @since 1.5
@@ -33,10 +33,10 @@ public final class Renderers {
 
 	// Constants --------------------------------------------------------------------------------------------------
 
-	/** Renderer type of standard JSF stylesheet component resource. */
+	/** Renderer type of standard Faces stylesheet component resource. */
 	public static final String RENDERER_TYPE_CSS = "jakarta.faces.resource.Stylesheet";
 
-	/** Renderer type of standard JSF script component resource. */
+	/** Renderer type of standard Faces script component resource. */
 	public static final String RENDERER_TYPE_JS = "jakarta.faces.resource.Script";
 
 	// Constructors ---------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ import jakarta.faces.convert.Converter;
 
 /**
  * This class provides a basic and default implementation of the {@link ParamHolder} interface. Ultimately, this class
- * can be used as a simple key-value pair holder (parameter name-value) which uses an explicit/implicit JSF converter
+ * can be used as a simple key-value pair holder (parameter name-value) which uses an explicit/implicit Faces converter
  * to convert the object value to string.
  *
  * @author Bauke Scholtz

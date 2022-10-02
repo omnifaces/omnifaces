@@ -22,9 +22,9 @@ import jakarta.servlet.ServletRegistration;
 import org.omnifaces.ApplicationInitializer;
 
 /**
- * This class provides access to (Java EE 6) platform services from the view point of JSF.
+ * This class provides access to (Java EE 6) platform services from the view point of Faces.
  * <p>
- * Note that this utility class can only be used in a JSF environment and is thus not
+ * Note that this utility class can only be used in a Faces environment and is thus not
  * a Java EE general way to obtain platform services.
  *
  * @since 1.6
@@ -76,8 +76,8 @@ public final class Platform {
 
 	/**
 	 * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)}
-	 * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If JSF is prefix mapped (e.g.
-	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
+	 * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If Faces is prefix mapped (e.g.
+	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If Faces
 	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>). If
 	 * none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
 	 * {@link ApplicationInitializer} and cached in the {@link ServletContext}.

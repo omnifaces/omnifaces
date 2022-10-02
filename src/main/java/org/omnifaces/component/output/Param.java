@@ -38,7 +38,7 @@ import org.omnifaces.component.ParamHolder;
  * already registered for the target class via <code>@FacesConverter(forClass)</code>.
  * <p>
  * Also, if no value is specified, but children are present, then the encoded output of children will be returned as
- * param value. This is useful when you want to supply JSF components or HTML as parameter of an unescaped
+ * param value. This is useful when you want to supply Faces components or HTML as parameter of an unescaped
  * <code>&lt;h:outputFormat&gt;</code>. For example,
  * <pre>
  * &lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
@@ -139,7 +139,7 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		// This override which does nothing effectively blocks the children from being encoded during JSF render.
+		// This override which does nothing effectively blocks the children from being encoded during Faces render.
 	}
 
 }

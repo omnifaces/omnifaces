@@ -38,7 +38,7 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
- * This {@link ResourceHandler} basically turns any concrete non-Facelets file into a JSF view, so that you can use EL expressions and even JSF components in them.
+ * This {@link ResourceHandler} basically turns any concrete non-Facelets file into a Faces view, so that you can use EL expressions and even Faces components in them.
  * The response content type will default to {@link Faces#getMimeType(String)} which is configureable in <code>web.xml</code> and overrideable via <code>&lt;f:view contentType="..."&gt;</code>.
  * <p>
  * Real world examples are <code>/sitemap.xml</code> and <code>/robots.txt</code>.
@@ -52,7 +52,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;/application&gt;
  * </pre>
  * <p>
- * To configure the JSF view resources, a {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
+ * To configure the Faces view resources, a {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
  * context parameter has to be provided wherein the view resources are specified as a comma separated string of context-relative URIs.
  * <p>
  * Here is an example configuration:
@@ -75,7 +75,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  */
 public class ViewResourceHandler extends DefaultResourceHandler {
 
-	/** The context parameter name to specify URIs to treat as JSF views. */
+	/** The context parameter name to specify URIs to treat as Faces views. */
 	public static final String PARAM_NAME_VIEW_RESOURCES = "org.omnifaces.VIEW_RESOURCE_HANDLER_URIS";
 
 	private static final String ERROR_MISSING_FORWARD_SLASH = "View resource '%s' must start with a forward slash '/'.";

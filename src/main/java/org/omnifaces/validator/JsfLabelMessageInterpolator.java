@@ -25,19 +25,19 @@ import jakarta.validation.MessageInterpolator;
 
 /**
  * <p>
- * Unlike native JSF validation error messages, in a bean validation message by default the label of the component where
+ * Unlike native Faces validation error messages, in a bean validation message by default the label of the component where
  * a validation constraint violation originated from can not be displayed in the middle of a message. Using the
  * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
  * message, but that's it. With this {@link JsfLabelMessageInterpolator} a label can appear in the middle of a message,
  * by using the special placeholder <code>{jsf.label}</code> in bean validation messages.
  * <p>
- * Note that Bean Validation is not only called from within JSF, and as such JSF might not be available. If JSF
+ * Note that Bean Validation is not only called from within Faces, and as such Faces might not be available. If Faces
  * is not available occurrences of <code>{jsf.label}</code> will be replaced by an empty string. The user should take
  * care that messages are compatible with both situations if needed.
  * <p>
  * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean
- * validation message. That functionality is already provided by JSF itself via the
- * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to JSF.
+ * validation message. That functionality is already provided by Faces itself via the
+ * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to Faces.
  *
  * <h2>Installation</h2>
  * <p>

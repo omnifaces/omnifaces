@@ -101,7 +101,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
- * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the provided
+ * Collection of utility methods for the Faces API that are mainly shortcuts for obtaining stuff from the provided
  * {@link FacesContext} argument. In effect, it 'flattens' the hierarchy of nested objects.
  * <p>
  * The difference with {@link Faces} is that no one method of {@link FacesLocal} obtains the {@link FacesContext} from
@@ -158,7 +158,7 @@ public final class FacesLocal {
 		// Hide constructor.
 	}
 
-	// JSF general ----------------------------------------------------------------------------------------------------
+	// Faces general ----------------------------------------------------------------------------------------------------
 
 	/**
 	 * @see Faces#getServerInfo()
@@ -420,7 +420,7 @@ public final class FacesLocal {
 		return Servlets.getFacesLifecycle(getServletContext(context));
 	}
 
-	// JSF views ------------------------------------------------------------------------------------------------------
+	// Faces views ------------------------------------------------------------------------------------------------------
 
 	/**
 	 * @see Faces#setViewRoot(String)
@@ -656,7 +656,7 @@ public final class FacesLocal {
 				}
 			}
 
-			// Then the JSF default locale.
+			// Then the Faces default locale.
 			if (locale == null) {
 				locale = context.getApplication().getDefaultLocale();
 			}
@@ -1255,7 +1255,7 @@ public final class FacesLocal {
 
 		// Below is a workaround for disappearing FacesContext in WildFly/Undertow. It disappears because Undertow
 		// immediately performs a forward to error page instead of waiting until servlet's service is finished. When
-		// the error page is a JSF page as well, then it implicitly invokes FacesServlet once again, which in turn
+		// the error page is a Faces page as well, then it implicitly invokes FacesServlet once again, which in turn
 		// creates another FacesContext which overrides the current FacesContext in the same thread! So, when the
 		// FacesContext which is created during the forward is released, it leaves the current FacesContext as null,
 		// causing NPE over all place which is relying on FacesContext#getCurrentInstance().

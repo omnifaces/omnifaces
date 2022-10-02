@@ -83,7 +83,7 @@ public class ParamValue<V> implements Serializable {
 	 * <p>
 	 * <b>Note</b>: if this instance was injected into a passivating scope and passivation has
 	 * indeed taken place and the converted value was <em>not</em> serializable, this will attempt to reconvert
-	 * the submitted value again. Conversion can only be done when in a JSF context!
+	 * the submitted value again. Conversion can only be done when in a Faces context!
 	 *
 	 * @return The converted value.
 	 */

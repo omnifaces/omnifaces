@@ -42,24 +42,24 @@ import jakarta.faces.event.SystemEventListener;
  * because of a validation failure during a previous request. This is very useful for cases where you need to update one
  * form from another form by for example a modal dialog, or when you need a cancel/clear button.
  * <p>
- * How does it work? First, here are some JSF facts:
+ * How does it work? First, here are some Faces facts:
  * <ul>
- * <li>When JSF validation succeeds for a particular input component during the validations phase, then the submitted
+ * <li>When Faces validation succeeds for a particular input component during the validations phase, then the submitted
  * value is set to <code>null</code> and the validated value is set as local value of the input component.
- * <li>When JSF validation fails for a particular input component during the validations phase, then the submitted
+ * <li>When Faces validation fails for a particular input component during the validations phase, then the submitted
  * value is kept in the input component.
- * <li>When at least one input component is invalid after the validations phase, then JSF will not update the model
- * values for any of the input components. JSF will directly proceed to render response phase.
- * <li>When JSF renders input components, then it will first test if the submitted value is not <code>null</code> and
+ * <li>When at least one input component is invalid after the validations phase, then Faces will not update the model
+ * values for any of the input components. Faces will directly proceed to render response phase.
+ * <li>When Faces renders input components, then it will first test if the submitted value is not <code>null</code> and
  * then display it, else if the local value is not <code>null</code> and then display it, else it will display the
  * model value.
- * <li>As long as you're interacting with the same JSF view, you're dealing with the same component state.
+ * <li>As long as you're interacting with the same Faces view, you're dealing with the same component state.
  * </ul>
  * <p>
  * So, when the validation has failed for a particular form submit and you happen to need to update the values of input
  * fields by a different ajax action or even a different ajax form (e.g. populating a field depending on a dropdown
  * selection or the result of some modal dialog form, etc), then you basically need to reset the target input
- * components in order to get JSF to display the model value which was edited during invoke action. Otherwise JSF will
+ * components in order to get Faces to display the model value which was edited during invoke action. Otherwise Faces will
  * still display its local value as it was during the validation failure and keep them in an invalidated state.
  * <p>
  * The {@link ResetInputAjaxActionListener} is designed to solve exactly this problem. There are basically three ways
@@ -83,7 +83,7 @@ import jakarta.faces.event.SystemEventListener;
  * </pre>
  * <li><p><i>Or</i> register it as <code>&lt;f:actionListener&gt;</code> on the invidivual <code>UICommand</code>
  * components where this action listener is absolutely necessary to solve the concrete problem. Note that it isn't
- * possible to register it on the individual <code>UIInput</code> components using the standard JSF tags.
+ * possible to register it on the individual <code>UIInput</code> components using the standard Faces tags.
  * <pre>
  * &lt;h:commandButton value="Update" action="#{bean.updateOtherInputs}"&gt;
  *     &lt;f:ajax execute="currentInputs" render="otherInputs" /&gt;
@@ -92,18 +92,18 @@ import jakarta.faces.event.SystemEventListener;
  * </pre>
  * </ul>
  * <p>
- * This works with standard JSF, PrimeFaces and RichFaces actions. Only for RichFaces there's a reflection hack,
+ * This works with standard Faces, PrimeFaces and RichFaces actions. Only for RichFaces there's a reflection hack,
  * because its <code>ExtendedPartialViewContextImpl</code> <i>always</i> returns an empty collection for render IDs.
  * See also <a href="https://issues.jboss.org/browse/RF-11112">RF issue 11112</a>.
  * <p>
  * Design notice: being a phase listener was mandatory in order to be able to hook on every single ajax action as
- * standard JSF API does not (seem to?) offer any ways to register some kind of {@link AjaxBehaviorListener} in an
+ * standard Faces API does not (seem to?) offer any ways to register some kind of {@link AjaxBehaviorListener} in an
  * application wide basis, let alone on a per <code>&lt;f:ajax&gt;</code> tag basis, so that it also get applied to
  * ajax actions in <code>UIInput</code> components. There are ways with help of {@link SystemEventListener}, but it
  * ended up to be too clumsy.
  *
  * <p><strong>See also</strong>:
- * <br><a href="https://github.com/javaee/javaserverfaces-spec/issues/1060">JSF spec issue 1060</a>
+ * <br><a href="https://github.com/javaee/javaserverfaces-spec/issues/1060">Faces spec issue 1060</a>
  *
  * @author Bauke Scholtz
  */

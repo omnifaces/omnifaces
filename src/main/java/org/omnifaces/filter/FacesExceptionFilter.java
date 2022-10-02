@@ -42,7 +42,7 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 
 /**
  * <p>
- * The {@link FacesExceptionFilter} will solve 2 problems with exceptions thrown in JSF methods.
+ * The {@link FacesExceptionFilter} will solve 2 problems with exceptions thrown in Faces methods.
  * <ol>
  * <li>Mojarra's <code>FacesFileNotFoundException</code> needs to be interpreted as 404.
  * <li>Root cause needs to be unwrapped from {@link FacesException} and {@link ELException} to utilize standard
@@ -118,7 +118,7 @@ public class FacesExceptionFilter extends HttpFilter {
 			chain.doFilter(request, response);
 		}
 		catch (FileNotFoundException ignore) {
-			logger.log(FINEST, "Ignoring thrown exception; this is a JSF quirk and it should be interpreted as 404.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; this is a Faces quirk and it should be interpreted as 404.", ignore);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
 		catch (Throwable exception) {

@@ -29,7 +29,7 @@ import jakarta.faces.convert.FacesConverter;
 /**
  * <p>
  * The <code>omnifaces.GenericEnumConverter</code> is intended for use in {@link UISelectMany} components whose value is
- * been bound to a <code>List&lt;E&gt;</code> property where <code>E</code> is an enum. Even though JSF has already a
+ * been bound to a <code>List&lt;E&gt;</code> property where <code>E</code> is an enum. Even though Faces has already a
  * built-in {@link EnumConverter}, this doesn't work for a <code>List&lt;E&gt;</code> property as the generic type
  * information <code>E</code> is lost during runtime. The list would be filled with unconverted <code>String</code>
  * values instead which may in turn cause <code>ClassCastException</code> during postprocessing in the business logic.

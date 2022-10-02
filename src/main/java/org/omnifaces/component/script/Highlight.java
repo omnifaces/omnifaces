@@ -106,7 +106,7 @@ public class Highlight extends OnloadScript {
 	// Init -----------------------------------------------------------------------------------------------------------
 
 	/**
-	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
+	 * The constructor instructs Faces to register all scripts during the render response phase if necessary.
 	 */
 	public Highlight() {
 		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);

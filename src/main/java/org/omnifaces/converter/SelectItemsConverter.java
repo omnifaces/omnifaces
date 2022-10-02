@@ -23,7 +23,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
 /**
  * <p>
  * The <code>omnifaces.SelectItemsConverter</code> allows you to populate a selection component with complex Java
- * model objects (entities) as value of <code>&lt;f:selectItems&gt;</code> and have JSF convert those
+ * model objects (entities) as value of <code>&lt;f:selectItems&gt;</code> and have Faces convert those
  * automatically back without the need to provide a custom converter which may need to do the job based on
  * possibly expensive service/DAO operations. This converter automatically converts based on the {@link #toString()}
  * of the selected item.
@@ -51,7 +51,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * </pre>
  * <p>
  * By the way, <a href="https://stackoverflow.com/a/17343582/157882">you should also make sure that your entity
- * has a good <code>equals()</code> and <code>hashCode()</code> implementation</a>, otherwise JSF won't be able
+ * has a good <code>equals()</code> and <code>hashCode()</code> implementation</a>, otherwise Faces won't be able
  * to set the right entity back in the model. Please note that this problem is in turn unrelated to the
  * <code>SelectItemsConverter</code>, you would have faced the same problem when using any other converter.
  *

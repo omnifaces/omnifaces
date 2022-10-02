@@ -83,7 +83,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
- * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the thread local
+ * Collection of utility methods for the Faces API that are mainly shortcuts for obtaining stuff from the thread local
  * {@link FacesContext}. In effects, it 'flattens' the hierarchy of nested objects. Do note that using the hierarchy is
  * actually a better software design practice, but can lead to verbose code.
  * <p>
@@ -191,7 +191,7 @@ public final class Faces {
 		// Hide constructor.
 	}
 
-	// JSF general ----------------------------------------------------------------------------------------------------
+	// Faces general ----------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the current faces context.
@@ -214,7 +214,7 @@ public final class Faces {
 	/**
 	 * Returns the faces context that's stored in an ELContext.
 	 * <p>
-	 * Note that this only works for an ELContext that is created in the context of JSF.
+	 * Note that this only works for an ELContext that is created in the context of Faces.
 	 *
 	 * @param elContext the EL context to obtain the faces context from.
 	 * @return the faces context that's stored in the given ELContext.
@@ -282,7 +282,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Gets the JSF Application singleton from the FactoryFinder.
+	 * Gets the Faces Application singleton from the FactoryFinder.
 	 * <p>
 	 * This method is an alternative for {@link Faces#getApplication()} for those situations where the
 	 * {@link FacesContext} isn't available.
@@ -294,10 +294,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
+	 * Returns the implementation information of currently loaded Faces implementation. E.g. "Mojarra 2.1.7-FCS".
 	 * <p>
 	 * This is also available in EL as <code>#{faces.implInfo}</code>.
-	 * @return The implementation information of currently loaded JSF implementation.
+	 * @return The implementation information of currently loaded Faces implementation.
 	 * @see Package#getImplementationTitle()
 	 * @see Package#getImplementationVersion()
 	 */
@@ -372,8 +372,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
-	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
+	 * Determines and returns the faces servlet mapping used in the current request. If Faces is prefix mapped (e.g.
+	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If Faces
 	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>).
 	 * <p>
 	 * This is also available in EL as <code>#{faces.mapping}</code>.
@@ -423,7 +423,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Signals JSF that the validations phase of the current request has failed. This can be invoked in any other
+	 * Signals Faces that the validations phase of the current request has failed. This can be invoked in any other
 	 * phase than the validations phase. The value can be read by {@link #isValidationFailed()} in Java and by
 	 * <code>#{facesContext.validationFailed}</code> in EL.
 	 * @throws NullPointerException When faces context is unavailable.
@@ -702,7 +702,7 @@ public final class Faces {
 		return FacesLocal.getLifecycle(getContext());
 	}
 
-	// JSF views ------------------------------------------------------------------------------------------------------
+	// Faces views ------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the current view root.
@@ -938,8 +938,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the current locale. If the locale set in the JSF view root is not null, then return it. Else if the
-	 * client preferred locale is not null and is among supported locales, then return it. Else if the JSF default
+	 * Returns the current locale. If the locale set in the Faces view root is not null, then return it. Else if the
+	 * client preferred locale is not null and is among supported locales, then return it. Else if the Faces default
 	 * locale is not null, then return it. Else return the system default locale.
 	 * @return The current locale.
 	 * @throws NullPointerException When faces context is unavailable.
@@ -979,7 +979,7 @@ public final class Faces {
 	 * @param locale The locale of the current view.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
-	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * method is called at the wrong moment in the Faces lifecycle, e.g. before the view has been restored/created.
 	 * @see UIViewRoot#setLocale(Locale)
 	 * @since 1.2
 	 */
@@ -1053,7 +1053,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Perform the JSF navigation to the given outcome.
+	 * Perform the Faces navigation to the given outcome.
 	 * @param outcome The navigation outcome.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @see Application#getNavigationHandler()
@@ -1073,7 +1073,7 @@ public final class Faces {
 	 * @return The concrete domain-relative URL to the current view.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
-	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * method is called at the wrong moment in the Faces lifecycle, e.g. before the view has been restored/created.
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.6
 	 */
@@ -1110,7 +1110,7 @@ public final class Faces {
 	 * @return The concrete domain-relative URL to the current view.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
-	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * method is called at the wrong moment in the Faces lifecycle, e.g. before the view has been restored/created.
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
@@ -1483,8 +1483,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns
-	 * the whole prefix mapping (e.g. <code>/faces</code>). If JSF is suffix mapped (e.g. <code>*.xhtml</code>), then
+	 * Returns the HTTP request servlet path. If Faces is prefix mapped (e.g. <code>/faces/*</code>), then this returns
+	 * the whole prefix mapping (e.g. <code>/faces</code>). If Faces is suffix mapped (e.g. <code>*.xhtml</code>), then
 	 * this returns the whole part after the context path, with a leading slash.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.requestServletPath}</code>.
@@ -1789,7 +1789,7 @@ public final class Faces {
 	 * </pre>
 	 * <p>
 	 * This method does by design not work on ajax requests. It is not possible to return a "permanent redirect" via
-	 * JSF ajax XML response.
+	 * Faces ajax XML response.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws NullPointerException When faces context is unavailable or given url is <code>null</code>.
@@ -1881,7 +1881,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Signals JSF that, as soon as the current phase of the lifecycle has been completed, control should be passed to
+	 * Signals Faces that, as soon as the current phase of the lifecycle has been completed, control should be passed to
 	 * the Render Response phase, bypassing any phases that have not been executed yet.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @see FacesContext#renderResponse()
@@ -1907,7 +1907,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Signals JSF that the response for this request has already been generated (such as providing a file download),
+	 * Signals Faces that the response for this request has already been generated (such as providing a file download),
 	 * and that the lifecycle should be terminated as soon as the current phase is completed.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @see FacesContext#responseComplete()
@@ -1932,7 +1932,7 @@ public final class Faces {
 
 	/**
 	 * Perform programmatic login for container managed FORM based authentication. Note that configuration is container
-	 * specific and unrelated to JSF. Refer the documentation of the servletcontainer using the keyword "realm".
+	 * specific and unrelated to Faces. Refer the documentation of the servletcontainer using the keyword "realm".
 	 * @param username The login username.
 	 * @param password The login password.
 	 * @throws NullPointerException When faces context is unavailable.
@@ -2273,7 +2273,6 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static int getSessionMaxInactiveInterval() {
-		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
 		return FacesLocal.getSessionMaxInactiveInterval(getContext());
 	}
 
@@ -2286,7 +2285,6 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void setSessionMaxInactiveInterval(int seconds) {
-		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
 		FacesLocal.setSessionMaxInactiveInterval(getContext(), seconds);
 	}
 

@@ -33,7 +33,7 @@ import jakarta.faces.context.FacesContext;
  * <p>
  * Use case 2: Imagine a form with an <code>UIInput</code> or <code>UICommand</code> component whose
  * <code>rendered</code> attribute relies on a request scoped bean property which is retained for the next request
- * through a <code>&lt;h:inputHidden&gt;</code>. However, when JSF needs to decode the <code>UIInput</code> or
+ * through a <code>&lt;h:inputHidden&gt;</code>. However, when Faces needs to decode the <code>UIInput</code> or
  * <code>UICommand</code> component during the postback, the <code>rendered</code> attribute has defaulted back to
  * <code>false</code> because the <code>&lt;h:inputHidden&gt;</code> hasn't yet updated the request scoped bean property
  * yet.
@@ -82,7 +82,7 @@ public class InputHidden extends HtmlInputHidden {
 	}
 
 	/**
-	 * This override which does effectively nothing prevents JSF from performing validation for second time.
+	 * This override which does effectively nothing prevents Faces from performing validation for second time.
 	 */
 	@Override
 	public void processValidators(FacesContext context) {
@@ -90,7 +90,7 @@ public class InputHidden extends HtmlInputHidden {
 	}
 
 	/**
-	 * This override which does effectively nothing prevents JSF from performing update for second time.
+	 * This override which does effectively nothing prevents Faces from performing update for second time.
 	 */
 	@Override
 	public void processUpdates(FacesContext context) {

@@ -32,11 +32,11 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
  * e.g. render only a specific row in a table. For specific cases, it's possible to render only the parent
  * component and omit any children.
  * <p>
- * Among the use cases for this is creating simple mashups from various JSF based views, and scripts needing to obtain
+ * Among the use cases for this is creating simple mashups from various Faces based views, and scripts needing to obtain
  * markup for specific components on an initial (non-faces) request.
  * <p>
  * Note that this is a rather specialized component and for many common use cases the user is advised to investigate if the existing
- * AJAX and partial page requests in JSF don't already cover the requirements. For the moment this component only supports the
+ * AJAX and partial page requests in Faces don't already cover the requirements. For the moment this component only supports the
  * direct output of the original markup and does not wrap it into any "partial response" envelope.
  *
  * @since 1.1

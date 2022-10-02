@@ -24,7 +24,7 @@ import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Stores view scoped bean instances in JSF view state itself.
+ * Stores view scoped bean instances in Faces view state itself.
  *
  * @author Bauke Scholtz
  * @see ViewScoped
@@ -51,7 +51,7 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
 		UIViewRoot viewRoot = getViewRoot();
 
 		if (!viewRoot.initialStateMarked()) {
-			viewRoot.markInitialState(); // Forces JSF to start recording changes in view state.
+			viewRoot.markInitialState(); // Forces Faces to start recording changes in view state.
 		}
 
 		Map<String, Object> viewState = viewRoot.getAttributes();

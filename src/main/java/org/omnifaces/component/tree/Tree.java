@@ -48,7 +48,7 @@ import org.omnifaces.util.State;
 /**
  * <p>
  * The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
- * hierarchy by declaring the appropriate JSF components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
+ * hierarchy by declaring the appropriate Faces components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
  * does namely not render any HTML markup by itself.
  * <p>
  * The component value must point to a tree of data objects represented by a {@link TreeModel} instance, typically

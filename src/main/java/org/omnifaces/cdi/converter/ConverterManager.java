@@ -51,9 +51,9 @@ import org.omnifaces.application.OmniApplicationFactory;
  * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
  * There is a <a href="https://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
  * for EJB, but this is nasty and doesn't work out for CDI. <a href="https://stackoverflow.com/q/7531449/157882">Another way</a>
- * would be to make it a JSF or CDI managed bean, however this doesn't register the converter instance into the JSF application context,
+ * would be to make it a Faces or CDI managed bean, however this doesn't register the converter instance into the Faces application context,
  * and hence you won't be able to make use of {@link Application#createConverter(String)} on it. Further it also breaks
- * the power of <code>forClass</code> attribute, i.e. you can't register a JSF converter for a specific type anymore and
+ * the power of <code>forClass</code> attribute, i.e. you can't register a Faces converter for a specific type anymore and
  * you'd need to explicitly declare it everytime.
  * <p>
  * Initially, this should be solved in JSF 2.2 which comes with new support for dependency injection in among others all
@@ -93,14 +93,14 @@ import org.omnifaces.application.OmniApplicationFactory;
  * {@link Class} instance, then this converter will <strong>not</strong> be made eligible for CDI. This change was added
  * in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
  *
- * <h2>JSF 2.3 compatibility</h2>
+ * <h2>Faces 2.3 compatibility</h2>
  * <p>
  * OmniFaces 3.0 continued to work fine with regard to managed converters which are initially developed for JSF 2.2.
  * However, JSF 2.3 introduced two new features for converters: parameterized converters and managed converters.
  * When the converter is parameterized as in <code>implements Converter&lt;T&gt;</code>, then you need to use
  * at least OmniFaces 3.1 wherein the incompatibility was fixed. When the converter is managed with the new JSF 2.3
  * <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, then the converter won't be
- * managed by OmniFaces and will continue to work fine for JSF. But the &lt;o:converter&gt; tag won't be able to
+ * managed by OmniFaces and will continue to work fine for Faces. But the &lt;o:converter&gt; tag won't be able to
  * set attributes on it.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
@@ -139,7 +139,7 @@ public class ConverterManager {
 	/**
 	 * Returns the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
-	 * @param application The involved JSF application.
+	 * @param application The involved Faces application.
 	 * @param converterId The converter ID of the desired converter instance.
 	 * @return the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
@@ -171,7 +171,7 @@ public class ConverterManager {
 	/**
 	 * Returns the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.
-	 * @param application The involved JSF application.
+	 * @param application The involved Faces application.
 	 * @param converterForClass The converter for-class of the desired converter instance.
 	 * @return the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.

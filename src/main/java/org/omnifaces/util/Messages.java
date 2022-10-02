@@ -35,7 +35,7 @@ import org.omnifaces.cdi.Startup;
 
 /**
  * <p>
- * Collection of utility methods for the JSF API with respect to working with {@link FacesMessage}.
+ * Collection of utility methods for the Faces API with respect to working with {@link FacesMessage}.
  *
  * <h2>Usage</h2>
  * <p>

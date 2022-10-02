@@ -40,12 +40,12 @@ import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>
- * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard JSF one.
+ * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard Faces one.
  * <p>
  * In standard JSF 2.0/2.1, the <code>&#64;</code>{@link PreDestroy} annotated method on a view scoped bean was never
  * invoked when the session expires. Since OmniFaces 1.6, this CDI view scope annotation will guarantee that the
  * <code>&#64;PreDestroy</code> annotated method is also invoked on session expire. Since JSF 2.2, this problem is
- * solved on native JSF view scoped beans, hereby making this annotation superflous in JSF 2.2.
+ * solved on native Faces view scoped beans, hereby making this annotation superflous in JSF 2.2.
  * <p>
  * However, there may be cases when it's desirable to immediately destroy a view scoped bean as well when the browser
  * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
@@ -54,35 +54,35 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * is done by <code>navigator.sendBeacon</code>. For browsers not supporting <code>navigator.sendBeacon</code>, it will
  * fallback to a synchronous XHR request.
  * <p>
- * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
- * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
+ * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated Faces view state
+ * from Faces implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
  * at <code>ViewExpiredException</code> on the other views which were created/opened earlier. As side effect of this
- * change, the <code>&#64;PreDestroy</code> annotated method of any standard JSF view scoped beans referenced in the
+ * change, the <code>&#64;PreDestroy</code> annotated method of any standard Faces view scoped beans referenced in the
  * same view as the OmniFaces CDI view scoped bean will also guaranteed be invoked on browser unload.
  * <p>
  * Since OmniFaces 2.6, this annotation got a new attribute: <code>saveInViewState</code>. When using client side state
- * saving, this attribute can be set to <code>true</code> in order to force JSF to store whole view scoped bean
- * instances annotated with this annotation in the JSF view state instead of in the HTTP session. For more detail, see
+ * saving, this attribute can be set to <code>true</code> in order to force Faces to store whole view scoped bean
+ * instances annotated with this annotation in the Faces view state instead of in the HTTP session. For more detail, see
  * the {@link #saveInViewState()}.
  * <p>
  * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
  * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
  * annotation. Or, if you're on JSF 2.2 already, and you want the <code>&#64;PreDestroy</code> to be invoked on browser
  * unload too, then use OmniFaces 2.2+ with this view scope annotation. Or, if you want to store whole view scoped beans
- * in the JSF view state when using client side state saving, then use OmniFaces 2.6+ with this view scope annotation
+ * in the Faces view state when using client side state saving, then use OmniFaces 2.6+ with this view scope annotation
  * and the <code>saveInViewState</code> attribute set to <code>true</code>.
  * <p>
- * Related JSF issues:
+ * Related Faces issues:
  * <ul>
  * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1355">Mojarra issue 1355</a>
  * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1843">Mojarra issue 1843</a>
- * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
+ * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">Faces spec issue 905</a>
  * </ul>
  *
  * <h2>Usage</h2>
  * <p>
  * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't
- * accidentally import standard JSF's own one.
+ * accidentally import standard Faces own one.
  * <pre>
  * import jakarta.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
@@ -96,8 +96,8 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * will throw an exception about the bean not being passivation capable.
  * <p>
  * Under the covers, CDI managed beans with this scope are via {@link ViewScopeManager} by default stored in the session
- * scope by an {@link UUID} based key which is referenced in JSF's own view map as available by
- * {@link UIViewRoot#getViewMap()}. They are not stored in the JSF view state itself as that would be rather expensive
+ * scope by an {@link UUID} based key which is referenced in Faces own view map as available by
+ * {@link UIViewRoot#getViewMap()}. They are not stored in the Faces view state itself as that would be rather expensive
  * in case of client side state saving.
  * <p>
  * In case you are using client side state saving by having the <code>jakarta.faces.STATE_SAVING_METHOD</code> context
@@ -115,7 +115,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;/env-entry&gt;
  * </pre>
  * <p>
- * And you explicitly want to store the whole view scoped bean instance in the JSF view state, then set the annotation's
+ * And you explicitly want to store the whole view scoped bean instance in the Faces view state, then set the annotation's
  * <code>saveInViewState</code> attribute to <code>true</code>.
  * <pre>
  * import jakarta.inject.Named;
@@ -126,7 +126,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * public class OmniCDIViewScopedBean implements Serializable {}
  * </pre>
  * <p>
- * It's very important that you understand that this setting has potentially a major impact in the size of the JSF view
+ * It's very important that you understand that this setting has potentially a major impact in the size of the Faces view
  * state, certainly when the view scoped bean instance holds "too much" data, such as a collection of entities for a
  * data table, and that such beans will in fact <strong>never</strong> expire as they are stored entirely in the
  * <code>jakarta.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
@@ -245,13 +245,13 @@ public @interface ViewScoped {
 
 	/**
 	 * <p>
-	 * Sets whether to save the view scoped bean instance in JSF view state instead of in HTTP session. By default,
+	 * Sets whether to save the view scoped bean instance in Faces view state instead of in HTTP session. By default,
 	 * concrete view scoped bean instances are saved in HTTP session, also when client side state saving is enabled.
 	 * This means, when the HTTP session expires, then the view scoped bean instances will also implicitly expire and
 	 * be newly recreated upon a request in a new session. This may be undesirable when using client side state saving
-	 * as it's intuitively expected that concrete view scoped beans are also saved in JSF view state.
+	 * as it's intuitively expected that concrete view scoped beans are also saved in Faces view state.
 	 *
-	 * @return Whether to save the view scoped bean instance in JSF view state instead of in HTTP session.
+	 * @return Whether to save the view scoped bean instance in Faces view state instead of in HTTP session.
 	 * @throws IllegalStateException When enabled while not using client side state saving.
 	 * @since 2.6
 	 */

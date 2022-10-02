@@ -242,7 +242,7 @@ public class GraphicResource extends DynamicResource {
 		}
 		catch (Exception ignore) {
 			logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
-			return null; // I'd rather return 400 here, but JSF spec doesn't support it.
+			return null; // I'd rather return 400 here, but Faces spec doesn't support it.
 		}
 
 		Object content;

@@ -25,10 +25,10 @@ import org.omnifaces.cdi.validator.ValidatorManager;
 
 /**
  * <p>
- * This OmniFaces application extends the standard JSF application as follows:
+ * This OmniFaces application extends the standard Faces application as follows:
  * <ul>
  * <li>Support for CDI in {@link Converter}s and {@link Validator}s, so that e.g. <code>@Inject</code> and
- * <code>@EJB</code> work directly in JSF converters and validators without any further modification.</li>
+ * <code>@EJB</code> work directly in Faces converters and validators without any further modification.</li>
  * </ul>
  * <p>
  * This application is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
@@ -65,7 +65,7 @@ public class OmniApplication extends ApplicationWrapper {
 
 	/**
 	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
+	 * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
@@ -74,7 +74,7 @@ public class OmniApplication extends ApplicationWrapper {
 
 	/**
 	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
+	 * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
 	 */
 	@Override
 	public Converter createConverter(Class<?> forClass) {
@@ -84,7 +84,7 @@ public class OmniApplication extends ApplicationWrapper {
 
 	/**
 	 * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
+	 * {@link #getWrapped()} which may return the Faces managed {@link Validator} instance.
 	 */
 	@Override
 	public Validator createValidator(String validatorId) {

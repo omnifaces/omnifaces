@@ -43,10 +43,6 @@ import org.omnifaces.event.PreInvokeActionEvent;
  * message in the flash scope and send a redirect. Also, it won't be invoked when the validations phase has failed for
  * one of the <code>&lt;f:viewParam&gt;</code> values, in contrary to the <code>preRenderView</code> event.
  * <p>
- * Note that the upcoming JSF 2.2 will come with a <code>&lt;f:viewAction&gt;</code> tag which should actually solve
- * the concrete functional requirement for which a <code>&lt;f:event type="preRenderView"&gt;</code> workaround is often
- * been used in JSF 2.0 and 2.1.
- * <p>
  * This event is supported on any {@link UIComponent}, including {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and
  * {@link UICommand} components. This thus also provides the possibility to invoke multiple action listeners on a single
  * {@link UIInput} and {@link UICommand} component on an easy manner.

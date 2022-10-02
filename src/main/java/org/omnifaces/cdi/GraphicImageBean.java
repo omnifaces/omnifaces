@@ -54,8 +54,8 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * }
  * </pre>
  * <p>
- * When using <code>@Named @ApplicationScoped</code> instead, serving graphic images via a JSF page will continue to
- * work, but when the server restarts, then hotlinking/bookmarking will stop working until the JSF page referencing the
+ * When using <code>@Named @ApplicationScoped</code> instead, serving graphic images via a Faces page will continue to
+ * work, but when the server restarts, then hotlinking/bookmarking will stop working until the Faces page referencing the
  * same bean method is requested for the first time. This is caused by a security restriction which should prevent users
  * from invoking arbitrary bean methods by manipulating the URL. The <code>@GraphicImageBean</code> basically enables
  * endusers to invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just

@@ -28,7 +28,7 @@
  * <p>
  * With FacesViews, there is thus no need to list all Facelets views that should be accessed without an extension in
  * some configuration file. Additionally, it thus automatically maps Facelets files to their original file extension,
- * which prevents exposing the source code of those Facelets that happens with the default JSF mapping.
+ * which prevents exposing the source code of those Facelets that happens with the default Faces mapping.
  *
  * <p>
  * Scanning is done automatically and thus no further configuration is needed. The feature is compatible with
@@ -234,10 +234,10 @@
  * <h2>Dispatch methods</h2>
  *
  * <p>
- * JSF normally inspects the request URI to derive a logical view id from it. It assumes the FacesServlet is either
+ * Faces normally inspects the request URI to derive a logical view id from it. It assumes the FacesServlet is either
  * mapped on a prefix path or an extension, and will get confused when an extensionless "exactly mapped" request is
  * encountered. To counter this, FacesViews makes use of a filter that intercepts each request and makes it appear to
- * JSF that the request was a normal extension mapped one.
+ * Faces that the request was a normal extension mapped one.
  *
  * <p>
  * In order to do this dispatching, two methods are provided; forwarding, and wrapping the request and continuing the
@@ -299,7 +299,7 @@
  *
  * <tr>
  * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
- * <td>Used to set how scanned views should be rendered in JSF controlled links.
+ * <td>Used to set how scanned views should be rendered in Faces controlled links.
  * With this setting set to <code>false</code>, it depends on whether the request URI uses an extension or not.
  * If it doesn't, links are also rendered without one, otherwise they are rendered with an extension.
  * When set to <code>true</code> links are always rendered without an extension.

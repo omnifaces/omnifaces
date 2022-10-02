@@ -136,7 +136,7 @@ import org.omnifaces.util.Faces;
  * You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
  * is not the documented approach and only the first one would be used.
  * <p>
- * You can <strong>not</strong> change the HTTP status code of a redirect. This is not a JSF limitation, but an HTTP
+ * You can <strong>not</strong> change the HTTP status code of a redirect. This is not a Faces limitation, but an HTTP
  * limitation. The status code of a redirect will <strong>always</strong> end up as the one of the redirected response.
  * If you intend to "redirect" with a different HTTP status code, then you should be using <code>sendError</code>
  * instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.

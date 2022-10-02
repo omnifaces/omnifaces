@@ -20,7 +20,7 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.ViewMapListener;
 
 /**
- * Listener for JSF view scope destroy events so that view scope manager can be notified.
+ * Listener for Faces view scope destroy events so that view scope manager can be notified.
  *
  * @author Bauke Scholtz
  * @see ViewScopeManager
@@ -39,7 +39,7 @@ public class ViewScopeEventListener implements ViewMapListener {
 	}
 
 	/**
-	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
+	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the Faces view scope is about to
 	 * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
 	 * {@link ViewScopeManager#preDestroyView()} method.
 	 */

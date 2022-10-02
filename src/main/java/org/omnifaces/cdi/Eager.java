@@ -40,7 +40,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * <p>
  * The CDI annotation <code>&#64;</code>{@link Eager} specifies that a scoped bean is to be eagerly instantiated.
  * <p>
- * JSF's own native managed beans are being deprecated in favor of CDI managed beans. One feature that those native JSF
+ * Faces native managed beans have been deprecated in favor of CDI managed beans. One feature that those Faces native
  * managed beans had that's not directly available for CDI managed beans is the ability to eagerly instantiate
  * application scoped beans.
  * <p>
@@ -144,7 +144,7 @@ public @interface Eager {
 	 * request scoped bean should be instantiated. When this attribute is specified the bean will be instantiated very
 	 * early during request processing, namely just before the first Servlet Filter is invoked, but after a SAM.
 	 * <p>
-	 * JSF services will not be available (yet) when the bean is instantiated this way.
+	 * Faces services will not be available (yet) when the bean is instantiated this way.
 	 * <p>
 	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
 	 * This attribute <b>can not</b> be used for <code>ViewScoped</code> beans.
@@ -160,7 +160,7 @@ public @interface Eager {
 	 * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
 	 *
 	 * <p>
-	 * JSF services are available when the bean is instantiated this way.
+	 * Faces services are available when the bean is instantiated this way.
 	 *
 	 * <p>
 	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the

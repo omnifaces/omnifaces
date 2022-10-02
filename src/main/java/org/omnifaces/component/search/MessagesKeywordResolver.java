@@ -57,8 +57,8 @@ import org.omnifaces.util.Components;
  * </pre>
  * <p>
  * This has only one prerequirement: the message component must have a fixed <code>id</code> attribute set as demonstrated above. Otherwise
- * JSF won't render anything to the client side when there are no messages and ultimately JavaScript won't be able to find it when
- * processing the JSF Ajax response.
+ * Faces won't render anything to the client side when there are no messages and ultimately JavaScript won't be able to find it when
+ * processing the Faces Ajax response.
  * <p>
  * This keyword resolver is already registered by OmniFaces own <code>faces-config.xml</code> and thus gets auto-initialized when the
  * OmniFaces JAR is bundled in a web application, so end-users do not need to register this keyword resolver explicitly themselves.

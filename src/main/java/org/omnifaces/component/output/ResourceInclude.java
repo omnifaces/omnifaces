@@ -33,7 +33,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 /**
  * <p>
  * The <code>&lt;o:resourceInclude&gt;</code> component can be used to catch the output from a JSP or Servlet
- * resource and render it as output to the JSF writer. In effect, this allows you to include both Servlets and
+ * resource and render it as output to the Faces writer. In effect, this allows you to include both Servlets and
  * JSP pages in e.g. Facelets.
  * <p>
  * Note that this isn't recommended as a lasting solution, but it might ease a migration from legacy JSP with
@@ -60,7 +60,7 @@ public class ResourceInclude extends OutputFamily {
 
 	/**
 	 * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to
-	 * the JSF response writer.
+	 * the Faces response writer.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {

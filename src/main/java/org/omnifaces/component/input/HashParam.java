@@ -43,8 +43,8 @@ import org.omnifaces.util.Faces;
  * </pre>
  * <p>
  * This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
- * component will on page load and on every <code>window.onhashchange</code> event send it anyway so that the JSF model
- * gets updated, and on every JSF ajax request update the hash query string in client side when the JSF model value has
+ * component will on page load and on every <code>window.onhashchange</code> event send it anyway so that the Faces model
+ * gets updated, and on every Faces ajax request update the hash query string in client side when the Faces model value has
  * changed.
  *
  * <h2>Usage</h2>

@@ -172,7 +172,7 @@ public final class Ajax {
 	 * Update the row of the given {@link UIData} component at the given zero-based row index. This will basically
 	 * update all direct children of all {@link UIColumn} components at the given row index.
 	 * <p>
-	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy JSF UI component which renders
+	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
 	 * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
 	 * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
 	 * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
@@ -236,7 +236,7 @@ public final class Ajax {
 	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e. it
 	 * is not necessarily the same column index as the enduser sees in the UI).
 	 * <p>
-	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy JSF UI component which renders
+	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
 	 * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
 	 * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
 	 * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.

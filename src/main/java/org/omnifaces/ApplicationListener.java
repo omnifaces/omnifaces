@@ -42,14 +42,14 @@ import org.omnifaces.util.cache.CacheInitializer;
  * OmniFaces application listener. This runs when the servlet context is created.
  * This performs the following tasks:
  * <ol>
- * <li>Check if JSF 3.0 is available, otherwise log and fail.
+ * <li>Check if Faces 3.0 is available, otherwise log and fail.
  * <li>Check if CDI 3.0 is available, otherwise log and fail.
  * <li>Load {@link Cache} provider and register its filter if necessary.
- * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
+ * <li>Add {@link ViewResourceHandler} mapping to FacesServlet if necessary.
+ * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
- * <li>Add {@link ViewResourceHandler} mapping to FacesServlet if necessary.
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
@@ -64,8 +64,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
 
-	private static final String ERROR_JSF_API_UNAVAILABLE =
-		"JSF API is not available in this environment.";
+	private static final String ERROR_FACES_API_UNAVAILABLE =
+		"Faces API is not available in this environment.";
 	private static final String ERROR_CDI_API_UNAVAILABLE =
 		"CDI API is not available in this environment.";
 	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
@@ -79,7 +79,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
 
 		if (!skipDeploymentException) {
-			checkJSFAvailable();
+			checkFacesAvailable();
 			checkCDIAvailable();
 		}
 
@@ -106,9 +106,9 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private void checkJSFAvailable() {
+	private void checkFacesAvailable() {
 		try {
-			checkJSFAPIAvailable();
+			checkFacesAPIAvailable();
 			// No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
 		}
 		catch (Exception | LinkageError e) {
@@ -117,9 +117,9 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ OmniFaces failed to initialize!             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 4.x requires JSF 3.0,             ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 4.x requires minimally Faces 3.0, ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ but none was found on this environment.     ▐"
-				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 2.x or 1.x.          ▐"
+				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 3.x, 2.x or 1.x.     ▐"
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
 			throw e;
@@ -141,11 +141,11 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI,        ▐"
 				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ but none was found on this environment.     ▐"
 				+ "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
-				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐ OmniFaces 4.x requires a minimum of JSF 3.0.▐"
-				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐ Since JSF 2.3, the JSF managed bean facility▐"
-				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐ @ManagedBean is DEPRECATED in favour of CDI ▐"
-				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐ and CDI has become a REQUIRED dependency for▐"
-				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐ JSF.                                        ▐"
+				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐                                             ▐"
+				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐                                             ▐"
+				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐                                             ▐"
+				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐                                             ▐"
+				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐                                             ▐"
 				+ "\n▌     ▓▓░▓██████▓░▓███▓▓▌░█▓     ▐                                             ▐"
 				+ "\n▌    ▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██     ▐                                             ▐"
 				+ "\n▌    ▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌    ▐                                             ▐"
@@ -172,12 +172,12 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void checkJSFAPIAvailable() {
+	private static void checkFacesAPIAvailable() {
 		try {
 			toClass("jakarta.faces.webapp.FacesServlet");
 		}
 		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_JSF_API_UNAVAILABLE, e);
+			throw new IllegalStateException(ERROR_FACES_API_UNAVAILABLE, e);
 		}
 	}
 
