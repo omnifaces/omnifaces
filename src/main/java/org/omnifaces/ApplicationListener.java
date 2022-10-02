@@ -45,14 +45,16 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Check if JSF 2.3 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
  * <li>Load {@link Cache} provider and register its filter if necessary.
- * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
+ * <li>Add {@link ViewResourceHandler} mapping to FacesServlet if necessary.
+ * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
- * <li>Add {@link ViewResourceHandler} mapping to FacesServlet if necessary.
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
+ * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
+ * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
  *
  * @author Bauke Scholtz
  * @since 2.0
