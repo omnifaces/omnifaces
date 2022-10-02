@@ -103,7 +103,7 @@ import jakarta.faces.event.SystemEventListener;
  * ended up to be too clumsy.
  *
  * <p><strong>See also</strong>:
- * <br><a href="https://github.com/javaee/javaserverfaces-spec/issues/1060">Faces spec issue 1060</a>
+ * <br><a href="https://github.com/jakartaee/faces/issues/1060">Faces spec issue 1060</a>
  *
  * @author Bauke Scholtz
  */

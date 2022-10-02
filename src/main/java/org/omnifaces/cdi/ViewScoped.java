@@ -76,7 +76,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <ul>
  * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1355">Mojarra issue 1355</a>
  * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1843">Mojarra issue 1843</a>
- * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">Faces spec issue 905</a>
+ * <li><a href="https://github.com/jakartaee/faces/issues/905">Faces spec issue 905</a>
  * </ul>
  *
  * <h2>Usage</h2>

@@ -73,7 +73,7 @@ import jakarta.faces.convert.FacesConverter;
  * <h2>JSF 2.3</h2>
  * <p>
  * This converter is not necessary anymore since JSF 2.3 thanks to the fixes in
- * <a href="https://github.com/javaee/javaserverfaces-spec/issues/1422">issue 1422</a>.
+ * <a href="https://github.com/jakartaee/faces/issues/1422">issue 1422</a>.
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
