@@ -64,6 +64,7 @@ import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
+import javax.faces.FacesWrapper;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
@@ -160,6 +161,31 @@ public final class FacesLocal {
 	}
 
 	// JSF general ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * @see Faces#getPackage()
+	 */
+	@SuppressWarnings("unchecked")
+	public static Package getPackage(FacesContext context) {
+		if (context != null) {
+			while (context instanceof FacesWrapper) {
+				context = ((FacesWrapper<FacesContext>) context).getWrapped();
+			}
+
+			return context.getClass().getPackage();
+		}
+		else {
+			return FacesContext.class.getPackage();
+		}
+	}
+
+	/**
+	 * @see Faces#getImplInfo()
+	 */
+	public static String getImplInfo(FacesContext context) {
+		Package facesPackage = getPackage(context);
+		return facesPackage.getImplementationTitle() + " " + facesPackage.getImplementationVersion();
+	}
 
 	/**
 	 * @see Faces#getServerInfo()
