@@ -44,6 +44,8 @@ import org.omnifaces.facesviews.FacesViews;
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and {@link ApplicationListener}.
+ * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
+ * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
  *
  * @author Bauke Scholtz
  * @since 3.1

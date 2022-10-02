@@ -38,6 +38,8 @@ import org.omnifaces.util.Platform;
  * </ol>
  * <p>
  * This is invoked <strong>before</strong> {@link ApplicationListener} and {@link ApplicationProcessor}.
+ * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
+ * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
  *
  * @author Bauke Scholtz
  * @since 2.0
