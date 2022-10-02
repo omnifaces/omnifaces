@@ -56,6 +56,6 @@ public class CheckNestedFormsIT extends OmniFacesIT {
 
 	private void verify500(String path) {
 		open(path);
-		assertEquals(isLiberty() ? "" : "500", browser.getTitle()); // TODO: liberty throws org.jboss.weld.contexts.ContextNotActiveException: WELD-001303: No active contexts for scope type jakarta.enterprise.context.SessionScoped while rendering error page and then returns a blank document
+		assertEquals("500", browser.getTitle());
 	}
 }
