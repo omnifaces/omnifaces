@@ -70,7 +70,7 @@
 		<!-- Test server versions. -->
 		<test.wildfly27.version>27.0.0.Alpha5</test.wildfly27.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
 		<test.wildfly26.version>26.1.2.Final</test.wildfly26.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.liberty.version>21.0.0.10-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta and newer couldn't be found by Arquillian? -->
+		<test.liberty.version>21.0.0.12-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta and newer couldn't be found by Arquillian? -->
 		<test.glassfish7.version>7.0.0-M4</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.0-M17</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
@@ -606,7 +606,7 @@
 				<dependency>
 					<groupId>io.openliberty.arquillian</groupId>
 					<artifactId>arquillian-liberty-managed-jakarta</artifactId>
-					<version>2.0.1</version>
+					<version>2.1.0</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -628,7 +628,7 @@
 										<artifactItem>
 											<groupId>io.openliberty.arquillian</groupId>
 											<artifactId>arquillian-liberty-support-jakarta</artifactId>
-											<version>2.0.1</version>
+											<version>2.1.0</version>
 											<type>zip</type>
 											<classifier>feature</classifier>
 											<outputDirectory>${project.build.directory}/wlp/usr</outputDirectory>
