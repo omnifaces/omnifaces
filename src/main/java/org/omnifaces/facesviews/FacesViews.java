@@ -401,13 +401,18 @@ public final class FacesViews {
 		if (!collectedViews.isEmpty()) {
 			if (isLowercasedRequestURI(servletContext)) {
 				for (Entry<String, String> mapping : new HashSet<>(collectedViews.entrySet())) {
-					collectedViews.put(mapping.getKey().toLowerCase(), mapping.getValue());
+					String resourceName = mapping.getKey();
+					String lowercasedResourceName = resourceName.toLowerCase();
 
-					if (isExtensionless(mapping.getKey())) {
-						collectedViews.remove(mapping.getKey());
-					}
-					else {
-						mapping.setValue(null);
+					if (!resourceName.equals(lowercasedResourceName)) {
+						collectedViews.put(lowercasedResourceName, mapping.getValue());
+
+						if (isExtensionless(resourceName)) {
+							collectedViews.remove(resourceName);
+						}
+						else {
+							mapping.setValue(null);
+						}
 					}
 				}
 			}
