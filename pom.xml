@@ -74,14 +74,14 @@
 		<test.glassfish7.version>7.0.0-M4</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.0</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>22.9.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
+		<test.piranha.version>22.9.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
 		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
 		<test.payara.version>6.2022.1.Alpha4</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
 		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
 		<test.mojarra3.version>3.0.2</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces4.version>4.0.0-RC1</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: uses .xml instead of .xhtml as default suffix ?! -->
+		<test.myfaces4.version>4.0.0-RC1</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
 		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
 		<test.weld5.version>5.1.0.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
@@ -1181,7 +1181,7 @@
 				<dependency>
 					<groupId>org.omnifaces.arquillian</groupId>
 					<artifactId>arquillian-glassfish-server-managed</artifactId>
-					<version>1.1</version>
+					<version>1.2</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
