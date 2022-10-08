@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import org.junit.jupiter.api.Test;
+import org.omnifaces.cdi.config.DateProducer;
 import org.omnifaces.el.functions.Dates;
 import org.omnifaces.util.Utils;
 
@@ -75,6 +76,7 @@ public class TestDates {
 		testZonedDateTimeUtilities(LocalTime.now(UTC));
 		testZonedDateTimeUtilities(LocalTime.now(ZP2));
 		testZonedDateTimeUtilities(LocalTime.now(CUR));
+		testZonedDateTimeUtilities(new DateProducer().getNow());
 	}
 
 	private static <D> void testZonedDateTimeUtilities(D date) {
