@@ -74,7 +74,7 @@
 		<test.glassfish7.version>7.0.0-M4</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.0-M17</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>21.12.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
+		<test.piranha.version>22.9.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
 		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
 		<test.payara.version>6.2022.1.Alpha4</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
