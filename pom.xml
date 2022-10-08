@@ -75,7 +75,7 @@
 		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.0-M17</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
 		<test.piranha.version>21.12.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: not all tests pass yet, uses JDK 17 to run tests -->
-		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M7 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) https://issues.apache.org/jira/browse/TOMEE-3824 -->
+		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
 		<test.payara.version>6.2022.1.Alpha4</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
@@ -1136,7 +1136,7 @@
 				<dependency>
 					<groupId>org.apache.tomee</groupId>
 					<artifactId>arquillian-tomee-remote</artifactId>
-					<version>8.0.9</version>
+					<version>${test.tomee.version}</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
