@@ -91,6 +91,8 @@ import jakarta.faces.application.Resource;
 import jakarta.faces.context.FacesContext;
 import jakarta.servlet.http.Part;
 
+import org.omnifaces.cdi.config.DateProducer.TemporalDate;
+
 /**
  * <p>
  * Collection of general utility methods that do not fit in one of the more specific classes.
@@ -957,6 +959,9 @@ public final class Utils {
 		else if (date instanceof LocalTime) {
 			return (((LocalTime) date).atDate(LocalDate.now())).atZone(zone);
 		}
+		else if (date instanceof TemporalDate) {
+			return ((TemporalDate) date).getZonedDateTime();
+		}
 		else if (date instanceof Temporal) {
 			return fromTemporalToZonedDateTime((Temporal) date, zone);
 		}
@@ -1036,6 +1041,9 @@ public final class Utils {
 		}
 		else if (type == LocalTime.class) {
 			return (D) zonedDateTime.toLocalDateTime().toLocalTime();
+		}
+		else if (TemporalDate.class.isAssignableFrom(type)) {
+			return (D) new TemporalDate(zonedDateTime);
 		}
 		else if (Temporal.class.isAssignableFrom(type)) {
 			return fromZonedDateTimeToTemporal(zonedDateTime, type);

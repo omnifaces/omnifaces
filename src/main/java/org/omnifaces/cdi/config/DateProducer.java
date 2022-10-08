@@ -103,6 +103,7 @@ public class DateProducer {
 		/**
 		 * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
 		 * @param zonedDateTime ZonedDateTime to initialize with.
+		 * @throws NullPointerException when given ZonedDateTime is {@code null}.
 		 */
 		public TemporalDate(ZonedDateTime zonedDateTime) {
 			this.zonedDateTime = zonedDateTime;
@@ -151,7 +152,8 @@ public class DateProducer {
 		 */
 		@Override
 		public boolean equals(Object other) {
-			return zonedDateTime.equals(other);
+			return other == this
+				|| (other instanceof TemporalDate && zonedDateTime.equals(((TemporalDate) other).getZonedDateTime()));
 		}
 
 		/**
