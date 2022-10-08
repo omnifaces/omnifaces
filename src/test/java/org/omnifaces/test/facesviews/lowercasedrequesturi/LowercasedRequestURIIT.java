@@ -116,6 +116,30 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		verify404("subfolder/LowercasedRequestURIIT.xhtml");
 	}
 
+	@Test
+	public void testAlreadyLowercasedViewId() {
+		open("alreadylowercasedviewid");
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		guardHttp(formSubmit).click();
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		guardHttp(formSubmit).click();
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		open("alreadylowercasedviewid.xhtml");
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		guardHttp(formSubmit).click();
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		guardHttp(formSubmit).click();
+		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+
+		open("alreadylowercasedviewid/");
+		verify404("alreadylowercasedviewid/");
+	}
+
 	private void verify200(String title, String path) {
 		assertEquals(title, browser.getTitle());
 		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
