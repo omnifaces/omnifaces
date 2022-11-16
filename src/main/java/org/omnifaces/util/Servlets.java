@@ -358,8 +358,8 @@ public final class Servlets {
 					continue;
 				}
 
-				String key = decodeURL(pair[0]);
-				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
+				String key = decodeURLWithFallback(pair[0]);
+				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURLWithFallback(pair[1]) : "";
 				List<String> values = parameterMap.get(key);
 
 				if (values == null) {
@@ -372,6 +372,15 @@ public final class Servlets {
 		}
 
 		return parameterMap;
+	}
+
+	private static String decodeURLWithFallback(String string) {
+		try {
+			return decodeURL(string);
+		}
+		catch (IllegalArgumentException e) {
+			return string;
+		}
 	}
 
 	/**
