@@ -240,7 +240,7 @@ public final class BeansLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> void destroy(BeanManager beanManager, T instance) {
 		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
-			destroy(beanManager, (Class<T>) instance);
+			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
 		}
 		else {
 			for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {
