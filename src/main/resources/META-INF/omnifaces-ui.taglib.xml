@@ -3933,7 +3933,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 		<attribute>
 			<description>
 				<![CDATA[
-					The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+					The image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
 					This attribute is ignored when 'name' attribute is specified.
 				]]>
 			</description>

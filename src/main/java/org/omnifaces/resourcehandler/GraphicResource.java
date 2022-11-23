@@ -129,7 +129,7 @@ public class GraphicResource extends DynamicResource {
 	 * This constructor is called during render time of <code>&lt;o:graphicImage ... dataURI="true"&gt;</code>.
 	 * @param content The graphic resource content, to be represented as data URI.
 	 * @param contentType The graphic resource content type. If this is <code>null</code>, then it will be guessed
-	 * based on the content type signature in the content header. So far, JPEG, PNG, GIF, ICO, SVG, BMP and TIFF are
+	 * based on the content type signature in the content header. So far, WEBP, JPEG, PNG, GIF, ICO, SVG, BMP and TIFF are
 	 * recognized. Else if this represents the file extension, then it will be resolved based on mime mappings.
 	 */
 	public GraphicResource(Object content, String contentType) {
@@ -177,7 +177,7 @@ public class GraphicResource extends DynamicResource {
 	 * Create a new graphic resource based on the given value expression.
 	 * @param context The involved faces context.
 	 * @param value The value expression representing content to create a new graphic resource for.
-	 * @param type The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp",
+	 * @param type The image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp",
 	 * "tiff", etc.
 	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
 	 * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}.
@@ -272,6 +272,7 @@ public class GraphicResource extends DynamicResource {
 	 */
 	private static Map<String, String> createContentTypesByBase64Header() {
 		Map<String, String> contentTypesByBase64Header = new HashMap<>();
+		contentTypesByBase64Header.put("UklGR", "image/webp");
 		contentTypesByBase64Header.put("/9j/", "image/jpeg");
 		contentTypesByBase64Header.put("iVBORw", "image/png");
 		contentTypesByBase64Header.put("R0lGOD", "image/gif");
