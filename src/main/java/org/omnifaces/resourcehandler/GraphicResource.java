@@ -92,7 +92,7 @@ public class GraphicResource extends DynamicResource {
 		byte[].class
 	};
 
-	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<>() {
+	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
 		private static final long serialVersionUID = 1L;
 	};
 
