@@ -90,7 +90,7 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * you would use in <code>&lt;o:graphicImage&gt;</code> and that it must be a quoted string. Any nested quotes can be
  * escaped with backslash.
  * <p>
- * The <code>type</code> argument/attribute is the image type represented as file extension. E.g. "jpg", "png", "gif",
+ * The <code>type</code> argument/attribute is the image type represented as file extension. E.g. "webp", "jpg", "png", "gif",
  * "ico", "svg", "bmp", "tiff", etc. When unspecified then the content type will default to <code>"image"</code>
  * without any subtype. This should work for most images in most browsers. This may however fail on newer images or in
  * older browsers. In that case, you can explicitly specify the image type via the <code>type</code> argument/attribute

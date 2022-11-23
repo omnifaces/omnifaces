@@ -139,7 +139,7 @@ import org.omnifaces.util.Faces;
  *
  * <h3>Image types</h3>
  * <p>
- * When rendered as data URI, the content type will be guessed based on content header. So far, JPEG, PNG, GIF, ICO,
+ * When rendered as data URI, the content type will be guessed based on content header. So far, WEBP, JPEG, PNG, GIF, ICO,
  * SVG, BMP and TIFF are recognized. If the content header is unrecognized, or when the image is rendered as regular
  * image source, then the content type will default to <code>"image"</code> without any subtype. This should work for
  * most images in most browsers. This may however fail on newer images or in older browsers. In that case, you can
