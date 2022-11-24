@@ -15,6 +15,7 @@ package org.omnifaces.test.el.functions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.el.functions.Numbers;
@@ -40,13 +41,88 @@ public class TestNumbers {
 		{ "-12858", "-12.9k" },
 	};
 
+	private static final String[][] NUMBERS_FORMATTED_AS_BYTES = {
+		{ "1023", "1023 B" },
+		{ "1024", "1.0 KiB" },
+		{ "1075", "1.0 KiB" },
+		{ "1076", "1.1 KiB" },
+		{ "500000", "488.3 KiB" },
+		{ "1048576", "1.0 MiB" }
+	};
+
 	@Test
-	public void testFormatThousands() {
-		for (String[] numberFormattedAsThousands : NUMBERS_FORMATTED_AS_THOUSANDS) {
-			BigDecimal number = new BigDecimal(numberFormattedAsThousands[0]);
-			String expectedResult = numberFormattedAsThousands[1];
-			String actualResult = Numbers.formatThousands(number);
-			assertEquals(expectedResult, actualResult);
+	public void testFormatThousandsInEnglish() {
+		Locale originalLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault(Locale.ENGLISH);
+
+			for (String[] numberFormattedAsThousands : NUMBERS_FORMATTED_AS_THOUSANDS) {
+				BigDecimal number = new BigDecimal(numberFormattedAsThousands[0]);
+				String expectedResult = numberFormattedAsThousands[1];
+				String actualResult = Numbers.formatThousands(number);
+				assertEquals(expectedResult, actualResult);
+			}
+		}
+		finally {
+			Locale.setDefault(originalLocale);
+		}
+	}
+
+	@Test
+	public void testFormatThousandsInGerman() {
+		Locale originalLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault(Locale.GERMAN);
+
+			for (String[] numberFormattedAsThousands : NUMBERS_FORMATTED_AS_THOUSANDS) {
+				BigDecimal number = new BigDecimal(numberFormattedAsThousands[0]);
+				String expectedResult = numberFormattedAsThousands[1].replace('.', ',');
+				String actualResult = Numbers.formatThousands(number);
+				assertEquals(expectedResult, actualResult);
+			}
+		}
+		finally {
+			Locale.setDefault(originalLocale);
+		}
+	}
+
+	@Test
+	public void testFormatBytesInEnglish() {
+		Locale originalLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault(Locale.ENGLISH);
+
+			for (String[] numberFormattedAsBytes : NUMBERS_FORMATTED_AS_BYTES) {
+				Long number = Long.valueOf(numberFormattedAsBytes[0]);
+				String expectedResult = numberFormattedAsBytes[1];
+				String actualResult = Numbers.formatBytes(number);
+				assertEquals(expectedResult, actualResult);
+			}
+		}
+		finally {
+			Locale.setDefault(originalLocale);
+		}
+	}
+
+	@Test
+	public void testFormatBytesInGerman() {
+		Locale originalLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault(Locale.GERMAN);
+
+			for (String[] numberFormattedAsBytes : NUMBERS_FORMATTED_AS_BYTES) {
+				Long number = Long.valueOf(numberFormattedAsBytes[0]);
+				String expectedResult = numberFormattedAsBytes[1].replace('.', ',');
+				String actualResult = Numbers.formatBytes(number);
+				assertEquals(expectedResult, actualResult);
+			}
+		}
+		finally {
+			Locale.setDefault(originalLocale);
 		}
 	}
 

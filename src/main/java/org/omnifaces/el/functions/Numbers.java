@@ -250,29 +250,28 @@ public final class Numbers {
 		BigDecimal divisor = BigDecimal.valueOf(Math.pow(base, exponent));
 		BigDecimal divided = (divisor.signum() == 0) ? divisor : decimal.divide(divisor);
 		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.abs().longValue()).length());
-		BigDecimal formatted;
+		String format = "%." + maxfractions + "f";
+		String formatted = format(getLocale(), format, divided);
+		BigDecimal reparsed;
 
 		try {
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
 			formatter.setParseBigDecimal(true);
-			String format = "%." + maxfractions + "f";
-			formatted = (BigDecimal) formatter.parse(format(getLocale(), format, divided));
+			reparsed = (BigDecimal) formatter.parse(formatted);
 		}
 		catch (ParseException e) {
 			throw new IllegalStateException(e);
 		}
 
-		if (formatted.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
-			return formatBase(formatted, base, fractions, iec, unit);
+		if (reparsed.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
+			return formatBase(reparsed, base, fractions, iec, unit);
 		}
 		else {
-			return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && fractions == null);
+			return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && (fractions == null || (iec && exponent == 0)));
 		}
 	}
 
-	private static String formatUnit(BigDecimal decimal, boolean iec, String unit, int exponent, boolean stripZeroes) {
-		String formatted = decimal.toString();
-
+	private static String formatUnit(String formatted, boolean iec, String unit, int exponent, boolean stripZeroes) {
 		if (stripZeroes) {
 			formatted = formatted.replaceAll("\\D?0+$", "");
 		}
