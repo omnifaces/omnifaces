@@ -155,7 +155,7 @@ public class InputFileIT extends OmniFacesIT {
 		triggerOnchange(uploadSingleMaxsizeClientFile, messages);
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
 		String message = messages.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10.0 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name.
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeClientFile.sendKeys(gifFile.getAbsolutePath());
@@ -170,7 +170,7 @@ public class InputFileIT extends OmniFacesIT {
 		uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleMaxsizeServerSubmit).click();
 		assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
-		assertEquals("label: " + txtFile.getName() + " larger than 10.0 B", messages.getText());
+		assertEquals("label: " + txtFile.getName() + " larger than 10 B", messages.getText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeServerFile.sendKeys(gifFile.getAbsolutePath());
