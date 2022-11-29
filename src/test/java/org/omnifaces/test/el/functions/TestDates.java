@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -67,6 +68,10 @@ public class TestDates {
 		testZonedDateTimeUtilities(LocalDate.now(UTC));
 		testZonedDateTimeUtilities(LocalDate.now(ZP2));
 		testZonedDateTimeUtilities(LocalDate.now(CUR));
+		testZonedDateTimeUtilities(YearMonth.now());
+		testZonedDateTimeUtilities(YearMonth.now(UTC));
+		testZonedDateTimeUtilities(YearMonth.now(ZP2));
+		testZonedDateTimeUtilities(YearMonth.now(CUR));
 		testZonedDateTimeUtilities(OffsetTime.now());
 		testZonedDateTimeUtilities(OffsetTime.now(UTC));
 		testZonedDateTimeUtilities(OffsetTime.now(ZP2));
