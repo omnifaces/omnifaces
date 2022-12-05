@@ -236,7 +236,7 @@ public class InputFileIT extends OmniFacesIT {
 		triggerOnchange(uploadMultipleMaxsizeClientFile1, uploadMultipleMaxsizeClientMessage);
 		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
 		String message = uploadMultipleMaxsizeClientMessage.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10.0 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
 
 		txtFile1 = createTempFile("file1", "txt", "hello");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
