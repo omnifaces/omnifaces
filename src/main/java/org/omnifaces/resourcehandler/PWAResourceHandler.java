@@ -53,6 +53,7 @@ import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.view.ViewScoped;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Faces;
@@ -454,7 +455,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 	 * @return <code>true</code> if the given request is triggered by a sw.js request.
 	 * @since 4.1
 	 */
-	public static boolean isServiceWorkerRequest(jakarta.servlet.http.HttpServletRequest request) {
+	public static boolean isServiceWorkerRequest(HttpServletRequest request) {
 		return SERVICEWORKER_RESOURCE_NAME.equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
 	}
 
