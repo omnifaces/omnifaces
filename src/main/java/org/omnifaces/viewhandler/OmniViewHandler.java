@@ -15,6 +15,7 @@ package org.omnifaces.viewhandler;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
+import static org.omnifaces.resourcehandler.PWAResourceHandler.isServiceWorkerRequest;
 import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
@@ -51,6 +52,7 @@ import jakarta.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.resourcehandler.PWAResourceHandler;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Hacks;
@@ -96,6 +98,19 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * If the current request is a sw.js request from {@link PWAResourceHandler}, then create a dummy view and trigger
+	 * {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
+	 */
+	@Override
+	public UIViewRoot createView(FacesContext context, String viewId) {
+		if (isServiceWorkerRequest(context)) {
+			return createServiceWorkerView(context, viewId);
+		}
+
+		return super.createView(context, viewId);
+	}
 
 	/**
 	 * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the
@@ -153,13 +168,22 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	/**
+	 * Create a dummy view and trigger {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
+	 */
+	private UIViewRoot createServiceWorkerView(FacesContext context, String viewId) {
+		UIViewRoot createdView = super.createView(context, viewId);
+		context.responseComplete();
+		return createdView;
+	}
+
+	/**
 	 * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
 	 * view state. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send
 	 * a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
 	 * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
-		UIViewRoot createdView = createView(context, viewId);
+		UIViewRoot createdView = super.createView(context, viewId);
 		ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
 
 		if (restoreViewRootState(context, manager, createdView)) {

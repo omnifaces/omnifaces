@@ -22,7 +22,7 @@
  * @see PWAResourceHandler
  * @see <a href="https://css-tricks.com/serviceworker-for-offline/">https://css-tricks.com/serviceworker-for-offline/</a>
  */
-var cacheName = "omnifaces.4.0"; // Should be bumped every time this sw.unminified.js logic is changed.
+var cacheName = "omnifaces.4.1"; // Should be bumped every time this sw.unminified.js logic is changed.
 var cacheableResources = $cacheableResources;
 var offlineResource = $offlineResource;
 
@@ -101,7 +101,7 @@ self.addEventListener("fetch", function(event) {
 		}
 	}
 	else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with JSF because its POST requests are by default postback.
-		fetch(url).then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
+		fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "omnifaces.event=sw.js").then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
 	}
 });
 

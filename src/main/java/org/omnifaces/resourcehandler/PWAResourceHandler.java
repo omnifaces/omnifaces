@@ -16,6 +16,7 @@ import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.addFacesScriptResource;
@@ -25,6 +26,7 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 
@@ -434,6 +436,26 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 		}
 
 		return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
+	}
+
+	/**
+	 * Returns <code>true</code> if the current request is triggered by a sw.js request.
+	 * @param context The involved faces context.
+	 * @return <code>true</code> if the current request is triggered by a sw.js request.
+	 * @since 4.1
+	 */
+	public static boolean isServiceWorkerRequest(FacesContext context) {
+		return isServiceWorkerRequest(getRequest(context));
+	}
+
+	/**
+	 * Returns <code>true</code> if the given request is triggered by a sw.js request.
+	 * @param request The involved request.
+	 * @return <code>true</code> if the given request is triggered by a sw.js request.
+	 * @since 4.1
+	 */
+	public static boolean isServiceWorkerRequest(jakarta.servlet.http.HttpServletRequest request) {
+		return SERVICEWORKER_RESOURCE_NAME.equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
 	}
 
 }
