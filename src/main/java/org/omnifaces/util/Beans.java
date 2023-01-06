@@ -80,7 +80,9 @@ public final class Beans {
 
 	private static final String[] PROXY_INTERFACE_NAMES = {
 		"org.jboss.weld.proxy.WeldConstruct",
-		"org.apache.webbeans.proxy.OwbNormalScopeProxy"
+		"org.apache.webbeans.proxy.OwbNormalScopeProxy",
+		"io.quarkus.arc.ClientProxy",
+		"io.quarkus.arc.Subclass"
 	};
 
 	// Both Weld and OWB generate proxy class names as "BeanClassName[...]$$[...]Proxy[...]" with a "$$" and "Proxy" in it.
