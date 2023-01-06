@@ -255,7 +255,7 @@ public class InputFileIT extends OmniFacesIT {
 		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
-		assertEquals("label: " + txtFile2.getName() + " larger than 10.0 B", messages.getText());
+		assertEquals("label: " + txtFile2.getName() + " larger than 10 B", messages.getText());
 
 		txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
