@@ -389,6 +389,7 @@ public final class Faces {
 	 * This is also available in EL as <code>#{faces.mapping}</code>.
 	 * @return The faces servlet mapping (without the wildcard).
 	 * @throws NullPointerException When faces context is unavailable.
+	 * @throws IllegalStateException When mapping could not be determined.
 	 * @see #getRequestPathInfo()
 	 * @see #getRequestServletPath()
 	 */

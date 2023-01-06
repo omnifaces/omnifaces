@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static jakarta.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
@@ -153,13 +154,36 @@ public final class FacesLocal {
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 	private static final String ERROR_NO_VIEW = "There is no view.";
 
+	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
+
+	private static Boolean extensionlessMappingEnabled;
+	private static String faceletsSuffix;
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private FacesLocal() {
 		// Hide constructor.
 	}
 
-	// Faces general ----------------------------------------------------------------------------------------------------
+	// Lazy init ------------------------------------------------------------------------------------------------------
+
+	private static boolean isExtensionlessMappingEnabled(FacesContext context) {
+		if (extensionlessMappingEnabled == null) {
+			extensionlessMappingEnabled = parseBoolean(getInitParameter(context, "jakarta.faces.AUTOMATIC_EXTENSIONLESS_MAPPING"));
+		}
+
+		return extensionlessMappingEnabled;
+	}
+
+	private static String getFaceletsSuffix(FacesContext context) {
+		if (faceletsSuffix == null) {
+			faceletsSuffix = coalesce(getInitParameter(context, ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
+		}
+
+		return faceletsSuffix;
+	}
+
+	// Faces general --------------------------------------------------------------------------------------------------
 
 	/**
 	 * @see Faces#getPackage()
@@ -229,7 +253,17 @@ public final class FacesLocal {
 
 		if (externalContext.getRequestPathInfo() == null) {
 			String path = externalContext.getRequestServletPath();
-			return path.substring(path.lastIndexOf('.'));
+			int suffixPos = path.lastIndexOf('.');
+
+			if (suffixPos > -1) {
+				return path.substring(suffixPos);
+			}
+			else if (isExtensionlessMappingEnabled(context)) {
+				return getFaceletsSuffix(context);
+			}
+			else {
+				throw new IllegalStateException();
+			}
 		}
 		else {
 			return externalContext.getRequestServletPath();
@@ -531,8 +565,7 @@ public final class FacesLocal {
 			}
 		}
 		else if (path.endsWith(mapping)) {
-			return path.substring(0, path.lastIndexOf('.')) + Utils.coalesce(
-				getInitParameter(context, ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
+			return path.substring(0, path.lastIndexOf('.')) + getFaceletsSuffix(context);
 		}
 
 		return path;
