@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -28,25 +29,27 @@ import java.util.function.Supplier;
  * }
  * </pre>
  * <p>
- * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/LazyExample.java" target="_blank">Example Code (GitHub)</a>
+ * <a href="https://github.com/flowlogix/flowlogix/blob/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/LazyExample.java" target="_blank">Example Code (GitHub)</a>
  *
  * @param <T> Type of object.
  * @author Lenny Primak
  * @since 3.9
  */
-public final class Lazy<T> {
+public final class Lazy<T> implements Serializable {
 
-	private T delegate;
-	private volatile boolean initialized;
+	private static final long serialVersionUID = 1L;
+	private transient T delegate;
+	private transient volatile boolean initialized;
 	private final Supplier<T> initFunction;
 	private final Lock lock = new ReentrantLock();
 
-	public Lazy(Supplier<T> initFunction) {
+	public interface SerializableSupplier<T> extends Supplier<T>, Serializable { }
+
+	public Lazy(SerializableSupplier<T> initFunction) {
 		this.initFunction = initFunction;
 	}
 
 	/**
-	 * Returns underlying object, initialize when necessary.
 	 * @return Underlying object, initialize when necessary.
 	 */
 	public T get() {

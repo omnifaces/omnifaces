@@ -238,10 +238,10 @@ public class JNDIObjectLocator implements Serializable {
 	private final boolean noCaching;
 	private final boolean cacheRemote;
 
-	private final transient Lazy<InitialContext> initialContext;
-	private final transient Lock initialContextLock;
-	private final transient Lazy<Map<String, Object>> jndiObjectCache;
-	private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
+	private final Lazy<InitialContext> initialContext;
+	private final Lock initialContextLock;
+	private final Lazy<Map<String, Object>> jndiObjectCache;
+	private final Lazy<Class<? extends Annotation>> remoteAnnotation;
 
 	private JNDIObjectLocator(Map<String, String> environment, String namespace, boolean noCaching, boolean cacheRemote) {
 		this.environment = environment;
@@ -381,13 +381,6 @@ public class JNDIObjectLocator implements Serializable {
 				clearCache();
 			}
 		}
-	}
-
-	/**
-	 * This deals with transient final fields correctly.
-	 */
-	protected Object readResolve() {
-		return new JNDIObjectLocator(environment, namespace, noCaching, cacheRemote);
 	}
 
 }
