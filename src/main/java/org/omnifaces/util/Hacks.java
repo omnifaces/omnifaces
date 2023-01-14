@@ -315,7 +315,11 @@ public final class Hacks {
 
 				if (count < 1) {
 					viewScopeIdCounts.remove(viewScopeId);
-					invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
+					Object viewScopeProvider = getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER);
+
+					if (viewScopeProvider != null) { // This was removed in MyFaces 4.x and leveraged to CDI, see #729.
+						invokeMethod(viewScopeProvider, "destroyViewScopeMap", context, viewScopeId);
+					}
 				}
 				else {
 					viewScopeIdCounts.put(viewScopeId, count);
