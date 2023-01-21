@@ -46,7 +46,7 @@ import org.omnifaces.util.Servlets;
  * that the developer can mutate the headers and parameters in such way that the outcome of among others
  * {@link HttpServletRequest#getHeader(String)} and {@link HttpServletRequest#getParameter(String)} are influenced.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
  * <pre>
@@ -63,7 +63,7 @@ import org.omnifaces.util.Servlets;
  * The ordering of the <code>&lt;filter-mapping&gt;</code> is significant. The {@link MutableRequest} is not available
  * in any filter which is mapped <em>before</em> the {@link MutableRequestFilter}.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * When inside {@link FacesContext}, use {@link Faces#getMutableRequestHeaderMap()} or
  * {@link Faces#getMutableRequestParameterMap()}.

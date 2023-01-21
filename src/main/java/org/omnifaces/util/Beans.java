@@ -68,7 +68,6 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  * // Fire a CDI event.
  * Beans.fireEvent(someEvent);
  * </pre>
- * <p>
  *
  * @author Bauke Scholtz
  * @since 1.6.1
