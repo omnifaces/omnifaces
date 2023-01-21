@@ -69,7 +69,7 @@ export module HashParam {
 				const url = location.href.split(/#/, 2)[0] + (newHashQueryString ? "#" : "") + newHashQueryString;
 				history.pushState(null, document.title, url);
 			}
-			else {
+			if (location.hash != newHashQueryString) { // Not only used when there's no window.history but also as a work around for buggy window.history implementations.
 				location.hash = newHashQueryString;
 			}
 		}
