@@ -68,20 +68,20 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly27.version>27.0.0.Beta1</test.wildfly27.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.wildfly26.version>26.1.2.Final</test.wildfly26.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.liberty.version>21.0.0.12-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: version 11-beta and newer couldn't be found by Arquillian? -->
-		<test.glassfish7.version>7.0.0-M4</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.wildfly27.version>27.0.1.Final</test.wildfly27.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly26.version>26.1.3.Final</test.wildfly26.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.liberty.version>21.0.0.12-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
+		<test.glassfish7.version>7.0.0</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.tomcat.version>10.1.0</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>22.9.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
-		<test.tomee.version>9.0.0-M8</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
-		<test.payara.version>6.2022.1.Alpha4</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
+		<test.tomcat.version>10.1.5</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.piranha.version>23.1.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
+		<test.tomee.version>9.0.0</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
+		<test.payara.version>6.2023.1</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
 		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.mojarra3.version>3.0.2</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces4.version>4.0.0-RC1</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
+		<test.mojarra3.version>3.0.3</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces4.version>4.0.0-RC3</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
 		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
 		<test.weld5.version>5.1.0.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
@@ -89,7 +89,7 @@
 		<test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
 		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>2.1.0</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.tyrus.version>2.1.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Sonar config. -->
 		<sonar.organization>balusc-github</sonar.organization>
