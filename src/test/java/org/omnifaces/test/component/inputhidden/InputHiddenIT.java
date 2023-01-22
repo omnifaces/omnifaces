@@ -24,11 +24,14 @@ import org.openqa.selenium.support.FindBy;
 
 public class InputHiddenIT extends OmniFacesIT {
 
-	@FindBy(id="form:toggle")
+	@FindBy(id="form1:toggle")
 	private WebElement toggle;
 
-	@FindBy(id="form:submit")
+	@FindBy(id="form1:submit")
 	private WebElement submit;
+
+	@FindBy(id="form2:validate")
+	private WebElement validate;
 
 	@FindBy(id="messages")
 	private WebElement messages;
@@ -43,6 +46,12 @@ public class InputHiddenIT extends OmniFacesIT {
 		guardAjax(toggle).click();
 		guardAjax(submit).click();
 		assertEquals("submitted", messages.getText());
+	}
+
+	@Test
+	public void testInputHiddenReadonlyValidation() {
+		guardAjax(validate).click();
+		assertEquals("validated readonly", messages.getText());
 	}
 
 }

@@ -25,7 +25,7 @@
 	<h:head />
 
 	<h:body>
-		<o:form id="form">
+		<o:form id="form1">
 			<h:commandButton id="toggle" value="toggle" action="#{inputHiddenITBean.toggle}">
 				<f:ajax render="panel" />
 			</h:commandButton>
@@ -35,6 +35,13 @@
 					<f:ajax execute="panel" render=":messages" />
 				</h:commandButton>
 			</h:panelGroup>
+		</o:form>
+
+		<o:form id="form2">
+			<o:inputHidden value="#{inputHiddenITBean.readonly}" readonly="true" validator="#{inputHiddenITBean.validate}" />
+			<h:commandButton id="validate" value="validate">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
 		</o:form>
 
 		<h:messages id="messages" />

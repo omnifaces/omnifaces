@@ -15,6 +15,8 @@ package org.omnifaces.test.component.inputhidden;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
 @Named
@@ -22,6 +24,7 @@ import jakarta.inject.Named;
 public class InputHiddenITBean {
 
     private boolean toggled;
+    private String readonly = "readonly";
 
     public void toggle() {
         this.toggled = !toggled;
@@ -31,6 +34,10 @@ public class InputHiddenITBean {
         addGlobalInfo("submitted");
     }
 
+    public void validate(FacesContext context, UIComponent component, Object value) {
+        addGlobalInfo("validated " + value);
+    }
+
     public void setToggled(boolean toggled) {
 		this.toggled = toggled;
 	}
@@ -38,5 +45,9 @@ public class InputHiddenITBean {
     public boolean isToggled() {
         return toggled;
     }
+
+    public String getReadonly() { // No setter!
+		return readonly;
+	}
 
 }
