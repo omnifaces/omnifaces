@@ -2280,7 +2280,8 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					Flag indicating that this component will prohibit changes by the user.
 					A value of false causes no attribute to be rendered,
 					while a value of true causes the attribute to be rendered as readonly="readonly".
-					Even when set to true, all validators associated with this input component will be invoked.
+					Even when set to true, all associated validators will be invoked based on the model value, not on the submitted value.
+					Also the setter won't be invoked.
 				]]>
 			</description>
 			<name>readonly</name>
