@@ -385,83 +385,83 @@ public class ValidateBeanIT extends OmniFacesIT {
 	public void validateByCommand() {
 		input.sendKeys("x");
 		guardAjax(validateDefaultByCommand).click();
-		assertEquals("inputLabel: default", messages.getText());
+		assertEquals("inputLabel: default", getMessagesText());
 
 		input.clear();
 		input.sendKeys("xx");
 		guardAjax(validateDefaultByCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		input.clear();
 		input.sendKeys("x");
 		guardAjax(validateGroupByCommand).click();
-		assertEquals("inputLabel: group", messages.getText());
+		assertEquals("inputLabel: group", getMessagesText());
 
 		input.clear();
 		input.sendKeys("xx");
 		guardAjax(validateGroupByCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		input.clear();
 		input.sendKeys("x");
 		guardAjax(validateDefaultAndGroupByCommand).click();
-		String message = messages.getText();
+		String message = getMessagesText();
 		assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group")); // It's unordered.
 
 		input.clear();
 		input.sendKeys("xx");
 		guardAjax(validateDefaultAndGroupByCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		input.clear();
 		input.sendKeys("x");
 		guardAjax(validateDisabledByCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		input.clear();
 		input.sendKeys("xx");
 		guardAjax(validateDisabledByCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
 	public void validateByInput() {
 		validateDefaultByInput.sendKeys("x");
 		triggerOnchange(validateDefaultByInput, messages);
-		assertEquals("validateDefaultByInputLabel: default", messages.getText());
+		assertEquals("validateDefaultByInputLabel: default", getMessagesText());
 
 		validateDefaultByInput.clear();
 		validateDefaultByInput.sendKeys("xx");
 		triggerOnchange(validateDefaultByInput, messages);
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		validateGroupByInput.sendKeys("x");
 		triggerOnchange(validateGroupByInput, messages);
-		assertEquals("validateGroupByInputLabel: group", messages.getText());
+		assertEquals("validateGroupByInputLabel: group", getMessagesText());
 
 		validateGroupByInput.clear();
 		validateGroupByInput.sendKeys("xx");
 		triggerOnchange(validateGroupByInput, messages);
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		validateDefaultAndGroupByInput.sendKeys("x");
 		triggerOnchange(validateDefaultAndGroupByInput, messages);
-		String message = messages.getText();
+		String message = getMessagesText();
 		assertTrue(message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group")); // It's unordered.
 
 		validateDefaultAndGroupByInput.clear();
 		validateDefaultAndGroupByInput.sendKeys("xx");
 		triggerOnchange(validateDefaultAndGroupByInput, messages);
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		validateDisabledByInput.sendKeys("x");
 		triggerOnchange(validateDisabledByInput, messages);
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 
 		validateDisabledByInput.clear();
 		validateDisabledByInput.sendKeys("xx");
 		triggerOnchange(validateDisabledByInput, messages);
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -474,7 +474,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateDefaultWithMessageForViolatingInput.clear();
 		validateDefaultWithMessageForViolatingInput.sendKeys("xx");
 		guardAjax(validateDefaultWithMessageForViolatingCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -482,11 +482,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelDefaultNumber1.sendKeys("2");
 		validateClassLevelDefaultNumber2.sendKeys("1");
 		guardAjax(validateClassLevelDefaultCommand).click();
-		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", getMessagesText());
 
 		validateClassLevelDefaultNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelDefaultCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -494,11 +494,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelActualNumber1.sendKeys("2");
 		validateClassLevelActualNumber2.sendKeys("1");
 		guardAjax(validateClassLevelActualCommand).click();
-		assertEquals("invalidEntity actionValidationFailed", messages.getText());
+		assertEquals("invalidEntity actionValidationFailed", getMessagesText());
 
 		validateClassLevelActualNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelActualCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -506,11 +506,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelByCopierNumber1.sendKeys("2");
 		validateClassLevelByCopierNumber2.sendKeys("1");
 		guardAjax(validateClassLevelByCopierCommand).click();
-		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", getMessagesText());
 
 		validateClassLevelByCopierNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelByCopierCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -518,11 +518,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithMessageFormatNumber1.sendKeys("2");
 		validateClassLevelWithMessageFormatNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithMessageFormatCommand).click();
-		assertEquals("Numbers: invalidEntity", messages.getText());
+		assertEquals("Numbers: invalidEntity", getMessagesText());
 
 		validateClassLevelWithMessageFormatNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageFormatCommand).click();
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -571,14 +571,14 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateClassLevelWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -589,14 +589,14 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateClassLevelActualWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelActualWithMessageForViolatingCommand).click();
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -607,14 +607,14 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateNestedClassLevelWithMessageForViolatingCommand).click();
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -625,14 +625,14 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateNestedClassLevelActualWithMessageForViolatingCommand).click();
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -647,7 +647,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -657,7 +657,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -672,7 +672,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -682,7 +682,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -697,7 +697,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -707,7 +707,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -722,7 +722,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -732,7 +732,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -747,7 +747,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -757,7 +757,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -772,7 +772,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("number2Label: invalidEntity", validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -782,7 +782,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -797,7 +797,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -807,7 +807,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -822,7 +822,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("number2Label: invalidEntity", validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionValidationFailed", messages.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
 
 		validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
 		validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
@@ -832,7 +832,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateDoubleNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -843,14 +843,14 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithInputEntityCompositeCommand).click();
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
 	}
 
 	@Test
@@ -861,14 +861,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label: invalidEntity", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
-		assertEquals("", messages.getText());
+		assertEquals("", getMessagesText());
 
 		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithFormEntityCompositeCommand).click();
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
-		assertEquals("actionSuccess", messages.getText());
+		assertEquals("actionSuccess", getMessagesText());
+	}
+
+	private String getMessagesText() {
+		return messages.getText().replaceAll("\\s+", " ");
 	}
 
 }

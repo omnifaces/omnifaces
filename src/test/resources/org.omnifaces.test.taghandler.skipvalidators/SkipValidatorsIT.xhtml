@@ -38,7 +38,7 @@
 			<h:inputText id="input" required="#{viewScope.required}" requiredMessage="required!" />
 			<h:message id="message" for="input" />
 
-			<h:commandButton id="submit">
+			<h:commandButton id="submit" value="submit">
 				<f:ajax execute="@form" render="@form" />
 			</h:commandButton>
 

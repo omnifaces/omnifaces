@@ -26,7 +26,7 @@
 	</h:head>
 	<h:body>
 		<o:form id="form">
-			<h:commandButton id="ajaxSubmit" action="#{pWAResourceHandlerITBean.submit}">
+			<h:commandButton id="ajaxSubmit" value="ajaxSubmit" action="#{pWAResourceHandlerITBean.submit}">
 				<f:ajax execute="@form" render="@form" />
 			</h:commandButton>
 			<h:outputText id="viewScopedBeanHashCode" value="#{pWAResourceHandlerITBean.hashCode()}" />

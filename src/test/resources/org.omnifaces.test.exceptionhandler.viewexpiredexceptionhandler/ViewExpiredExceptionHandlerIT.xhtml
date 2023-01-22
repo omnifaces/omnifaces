@@ -31,7 +31,7 @@
 				<f:ajax render="@form" />
 			</h:commandButton>
 
-			<input type="button" id="expire" onclick="
+			<input type="button" id="expire" value="expire" onclick="
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', '#{request.contextPath}/expire?' + new Date().getTime());
 				xhr.send();

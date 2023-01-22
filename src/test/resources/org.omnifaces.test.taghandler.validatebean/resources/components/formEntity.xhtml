@@ -34,7 +34,7 @@
 
 			<h:message id="formMessage" for="form" />
 
-			<h:commandButton id="command" action="#{cc.attrs.action}">
+			<h:commandButton id="command" value="command" action="#{cc.attrs.action}">
 				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 

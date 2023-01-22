@@ -29,14 +29,14 @@
 			<h:inputText id="input" label="inputLabel" value="#{validateBeanITDefaultBean.input}" />
 
 			<f:ajax execute="@form" render=":messages">
-				<h:commandButton id="validateDefaultByCommand" action="#{validateBeanITDefaultBean.action}" />
-				<h:commandButton id="validateGroupByCommand" action="#{validateBeanITDefaultBean.action}">
+				<h:commandButton id="validateDefaultByCommand" value="validateDefaultByCommand" action="#{validateBeanITDefaultBean.action}" />
+				<h:commandButton id="validateGroupByCommand" value="validateGroupByCommand" action="#{validateBeanITDefaultBean.action}">
 					<o:validateBean validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
 				</h:commandButton>
-				<h:commandButton id="validateDefaultAndGroupByCommand" action="#{validateBeanITDefaultBean.action}">
+				<h:commandButton id="validateDefaultAndGroupByCommand" value="validateDefaultAndGroupByCommand" action="#{validateBeanITDefaultBean.action}">
 					<o:validateBean validationGroups="jakarta.validation.groups.Default,org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
 				</h:commandButton>
-				<h:commandButton id="validateDisabledByCommand" action="#{validateBeanITDefaultBean.action}">
+				<h:commandButton id="validateDisabledByCommand" value="validateDisabledByCommand" action="#{validateBeanITDefaultBean.action}">
 					<o:validateBean disabled="true" />
 				</h:commandButton>
 			</f:ajax>
@@ -62,7 +62,7 @@
 			<h:message id="inputMessage" for="input" />
 			<h:message id="formMessage" for="validateDefaultWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITDefaultBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITDefaultBean.action}">
 				<f:ajax execute="@form" render="inputMessage formMessage :messages" />
 				<o:validateBean value="#{validateBeanITDefaultBean}" showMessageFor="@violating" />
 			</h:commandButton>
@@ -72,7 +72,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 
@@ -83,7 +83,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 
@@ -95,7 +95,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 
@@ -107,7 +107,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 
@@ -118,7 +118,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="formMessage :messages" />
 			</h:commandButton>
 
@@ -134,7 +134,7 @@
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 			<h:message id="number2Message" for="number2" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="number1Message number2Message :messages" />
 			</h:commandButton>
 
@@ -146,7 +146,7 @@
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="globalMessage" />
 			</h:commandButton>
 
@@ -164,7 +164,7 @@
 
 			<h:message id="formMessage" for="validateClassLevelWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 
@@ -180,7 +180,7 @@
 
 			<h:message id="formMessage" for="validateClassLevelActualWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 
@@ -196,7 +196,7 @@
 
 			<h:message id="formMessage" for="validateNestedClassLevelWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITNestedClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITNestedClassLevelBean.action}">
 				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 
@@ -212,7 +212,7 @@
 
 			<h:message id="formMessage" for="validateNestedClassLevelActualWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITNestedClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITNestedClassLevelBean.action}">
 				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 
@@ -230,7 +230,7 @@
 
 			<h:message id="formMessage" for="validateNestedListClassLevelWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITNestedListClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITNestedListClassLevelBean.action}">
 				<f:ajax execute="@form" render="@messages :messages" />
 			</h:commandButton>
 
@@ -248,7 +248,7 @@
 
 			<h:message id="formMessage" for="validateNestedListClassLevelActualWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITNestedListClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITNestedListClassLevelBean.action}">
 				<f:ajax execute="@form" render="@messages :messages" />
 			</h:commandButton>
 
@@ -268,7 +268,7 @@
 
 			<h:message id="formMessage" for="validateDoubleNestedListClassLevelWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
 				<f:ajax execute="@form" render="@messages :messages" />
 			</h:commandButton>
 
@@ -288,7 +288,7 @@
 
 			<h:message id="formMessage" for="validateDoubleNestedListClassLevelActualWithMessageForViolating" />
 
-			<h:commandButton id="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
 				<f:ajax execute="@form" render="@messages :messages" />
 			</h:commandButton>
 
@@ -301,7 +301,7 @@
 
 			<h:message id="formMessage" for="validateClassLevelWithInputEntityComposite" />
 
-			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+			<h:commandButton id="command" value="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="composite:number1Message composite:number2Message formMessage :messages" />
 			</h:commandButton>
 

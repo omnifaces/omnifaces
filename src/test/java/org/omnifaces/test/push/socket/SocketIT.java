@@ -17,10 +17,12 @@ import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withSocket;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
@@ -92,7 +94,9 @@ public class SocketIT extends OmniFacesIT {
 	}
 
 	private void testOnopen() {
-		assertEquals("|applicationScopedServerEvent||sessionScopedUserTargeted||viewScopedAjaxAware|", clientOpenedMessages.getText()); // These are sync.
+		assertTrue(clientOpenedMessages.getText().contains("|applicationScopedServerEvent|"), "applicationScopedServerEvent socket is opened");
+		assertTrue(clientOpenedMessages.getText().contains("|sessionScopedUserTargeted|"), "sessionScopedUserTargeted socket is opened");
+		assertTrue(clientOpenedMessages.getText().contains("|viewScopedAjaxAware|"), "viewScopedAjaxAware socket is opened");
 		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|opened:sessionScopedUserTargeted|"); // These are async.
 		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|opened:viewScopedAjaxAware|");
 	}

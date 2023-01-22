@@ -61,7 +61,7 @@
 
 	<h:body>
 		<h:messages id="messages" />	
-		<h:link id="newtab" target="_blank" />
+		<h:link id="newtab" value="newtab" target="_blank" />
 
 		<div id="clientOpenedMessages" />
 		<div id="applicationScopedServerEventMessage" />
@@ -71,13 +71,13 @@
 
 		<o:form id="push">
 			<f:ajax onevent="clearMessages" render=":messages">
-				<h:commandButton id="applicationScopedServerEvent" action="#{socketITBean.pushApplicationScopedServerEvent}" />
-				<h:commandButton id="sessionScopedUserTargeted" action="#{socketITBean.pushSessionScopedUserTargeted('42')}" />
-				<h:commandButton id="viewScopedAjaxAware" action="#{socketITBean.pushViewScopedAjaxAware}" />
+				<h:commandButton id="applicationScopedServerEvent" value="applicationScopedServerEvent" action="#{socketITBean.pushApplicationScopedServerEvent}" />
+				<h:commandButton id="sessionScopedUserTargeted" value="sessionScopedUserTargeted" action="#{socketITBean.pushSessionScopedUserTargeted('42')}" />
+				<h:commandButton id="viewScopedAjaxAware" value="viewScopedAjaxAware" action="#{socketITBean.pushViewScopedAjaxAware}" />
 			</f:ajax>
 		</o:form>
 
-		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
+		<h:link id="closeAllSockets" value="closeAllSockets" onclick="closeAllSockets();return false;" />
 
 		<o:socket channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
 		<o:socket channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />

@@ -21,10 +21,12 @@ import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -119,6 +121,17 @@ public abstract class OmniFacesIT {
 		return url.split(";jsessionid=", 2)[0];
 	}
 
+	protected static String stripHostAndJsessionid(String url) {
+		try {
+			URIBuilder builder = new URIBuilder(url);
+			builder.setScheme(null);
+			builder.setHost(null);
+			return stripJsessionid(builder.toString());
+		}
+		catch (URISyntaxException e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
 
 	protected static boolean isFaces4Used() {
 		return isOneOf(System.getProperty("profile.id"), "wildfly27", "glassfish7", "tomcat-mojarra4", "tomcat-myfaces4", "payara");

@@ -28,44 +28,44 @@
 
 	<h:body>
 		<o:form id="form1">
-			<h:commandButton id="throwDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
+			<h:commandButton id="throwDuringInvokeApplication" value="throwDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
 				<f:ajax />
 			</h:commandButton>
-			<p:commandButton id="throwPrimeFacesDuringInvokeApplication" process="@this" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
-			<h:commandButton id="throwMixedDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
+			<p:commandButton id="throwPrimeFacesDuringInvokeApplication" value="throwPrimeFacesDuringInvokeApplication" process="@this" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
+			<h:commandButton id="throwMixedDuringInvokeApplication" value="throwMixedDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
 				<p:ajax />
 			</h:commandButton>
 
 			<h:inputText id="input" value="#{fullAjaxExceptionHandlerITBean.throwDuringUpdateModelValues}" />
-			<h:commandButton id="throwDuringUpdateModelValues">
+			<h:commandButton id="throwDuringUpdateModelValues" value="throwDuringUpdateModelValues">
 				<f:ajax execute="input" />
 			</h:commandButton>
-			<p:commandButton id="throwPrimeFacesDuringUpdateModelValues" process="input" />
+			<p:commandButton id="throwPrimeFacesDuringUpdateModelValues" value="throwPrimeFacesDuringUpdateModelValues" process="input" />
 
-			<h:commandButton id="throwDuringRenderResponse">
+			<h:commandButton id="throwDuringRenderResponse" value="throwDuringRenderResponse">
 				<f:ajax render="output" />
 			</h:commandButton>
-			<h:commandButton id="throwDuringSecondUpdateOfRenderResponse">
+			<h:commandButton id="throwDuringSecondUpdateOfRenderResponse" value="throwDuringSecondUpdateOfRenderResponse">
 				<f:ajax render="before output" />
 			</h:commandButton>
-			<h:commandButton id="throwDuringTreeVisitingOnRenderResponse">
+			<h:commandButton id="throwDuringTreeVisitingOnRenderResponse" value="throwDuringTreeVisitingOnRenderResponse">
 				<f:ajax render="before data" />
 			</h:commandButton>
-			<p:commandButton id="throwPrimeFacesDuringRenderResponse" process="@this" update="output" />
-			<p:commandButton id="throwPrimeFacesDuringSecondUpdateOfRenderResponse" process="@this" update="before output" />
-			<p:commandButton id="throwPrimeFacesDuringTreeVisitingOnRenderResponse" process="@this" update="before data" />
+			<p:commandButton id="throwPrimeFacesDuringRenderResponse" value="throwPrimeFacesDuringRenderResponse" process="@this" update="output" />
+			<p:commandButton id="throwPrimeFacesDuringSecondUpdateOfRenderResponse" value="throwPrimeFacesDuringSecondUpdateOfRenderResponse" process="@this" update="before output" />
+			<p:commandButton id="throwPrimeFacesDuringTreeVisitingOnRenderResponse" value="throwPrimeFacesDuringTreeVisitingOnRenderResponse" process="@this" update="before data" />
 			<h:outputText id="before" />
 			<h:panelGroup id="output">
 				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
 			</h:panelGroup>
 			<h:dataTable id="data" value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
-			<h:commandButton id="throwNonAjaxDuringUpdateModelValues" />
+			<h:commandButton id="throwNonAjaxDuringUpdateModelValues" value="throwNonAjaxDuringUpdateModelValues" />
 		</o:form>
 		<o:form id="form2">
-			<h:commandButton id="throwNonAjaxDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
+			<h:commandButton id="throwNonAjaxDuringInvokeApplication" value="throwNonAjaxDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
 		</o:form>
 		<o:form id="form3">
-			<h:commandButton id="throwNonAjaxDuringRenderResponse" />
+			<h:commandButton id="throwNonAjaxDuringRenderResponse" value="throwNonAjaxDuringRenderResponse" />
 			<h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
 		</o:form>
 	</h:body>

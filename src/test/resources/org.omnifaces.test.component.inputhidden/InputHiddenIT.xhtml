@@ -26,12 +26,12 @@
 
 	<h:body>
 		<o:form id="form">
-			<h:commandButton id="toggle" action="#{inputHiddenITBean.toggle}">
+			<h:commandButton id="toggle" value="toggle" action="#{inputHiddenITBean.toggle}">
 				<f:ajax render="panel" />
 			</h:commandButton>
 			<h:panelGroup id="panel">
 				<o:inputHidden value="#{inputHiddenITBean.toggled}" />
-				<h:commandButton id="submit" action="#{inputHiddenITBean.submit}" rendered="#{inputHiddenITBean.toggled}">
+				<h:commandButton id="submit" value="submit" action="#{inputHiddenITBean.submit}" rendered="#{inputHiddenITBean.toggled}">
 					<f:ajax execute="panel" render=":messages" />
 				</h:commandButton>
 			</h:panelGroup>

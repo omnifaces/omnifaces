@@ -32,7 +32,7 @@
 			<h:message id="input2_m" for="input2" />
 			<h:inputText id="input3" label="Input3" />
 			<h:message id="input3_m" for="input3" />
-			<h:commandButton id="submit">
+			<h:commandButton id="submit" value="submit">
 				<f:ajax execute="@form" render="@form" />
 			</h:commandButton>
 			<h:message id="all_m" for="all" />
@@ -47,7 +47,7 @@
 					<h:message id="input#{i}_m" for="input#{i}" />
 				</c:forEach>
 			</h:panelGroup>
-			<h:commandButton id="submit">
+			<h:commandButton id="submit" value="submit">
 				<f:ajax execute="@form" render="@form" />
 			</h:commandButton>
 			<h:message id="all_m" for="all" />

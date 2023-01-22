@@ -26,13 +26,13 @@
 	</h:head>
 
 	<h:body>
-		<h:link id="linkWithExtensionOutcome" outcome="/SubFolder/LowercasedRequestURIIT.xhtml" />
-		<h:link id="linkWithExtensionlessOutcome" outcome="/SubFolder/LowercasedRequestURIIT" />
-		<h:link id="lowercasedLinkWithExtensionOutcome" outcome="/subfolder/lowercasedrequesturiit.xhtml" />
-		<h:link id="lowercasedLinkWithExtensionlessOutcome" outcome="/subfolder/lowercasedrequesturiit" />
+		<h:link id="linkWithExtensionOutcome" value="linkWithExtensionOutcome" outcome="/SubFolder/LowercasedRequestURIIT.xhtml" />
+		<h:link id="linkWithExtensionlessOutcome" value="linkWithExtensionlessOutcome" outcome="/SubFolder/LowercasedRequestURIIT" />
+		<h:link id="lowercasedLinkWithExtensionOutcome" value="lowercasedLinkWithExtensionOutcome" outcome="/subfolder/lowercasedrequesturiit.xhtml" />
+		<h:link id="lowercasedLinkWithExtensionlessOutcome" value="lowercasedLinkWithExtensionlessOutcome" outcome="/subfolder/lowercasedrequesturiit" />
 
 		<o:form id="form">
-			<h:commandButton id="submit" />
+			<h:commandButton id="submit" value="submit" />
 		</o:form>
 	</h:body>
 </html>

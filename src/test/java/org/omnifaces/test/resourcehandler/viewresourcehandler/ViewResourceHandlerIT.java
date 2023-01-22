@@ -37,10 +37,10 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	private static final String EXPECTED_XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	private static final String EXPECTED_XML_BODY = ""
 		+ "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10" + ZoneId.systemDefault().getRules().getOffset(Instant.now()) + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>{baseURL}entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>{baseURL}entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>{baseURL}entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10" + ZoneId.systemDefault().getRules().getOffset(Instant.now()) + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>{baseURL}entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
 		+ "</urlset>";
 
 	@Deployment(testable=false)
@@ -76,11 +76,10 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 			String actualXmlBody = actualPageSource
 				.substring(actualPageSource.indexOf("-->") + 3)
 				.replaceAll(">\\s+<", "><") // Get rid of whitespace between tags. This isn't consistent among servers.
-				.replace("127.0.0.1", "localhost") // Depends on server used. We don't want to be dependent on that.
 				.trim();
 
 			assertEquals(EXPECTED_XML_PROLOG, actualXmlProlog, "XML prolog");
-			assertEquals(EXPECTED_XML_BODY, actualXmlBody, "Page source");
+			assertEquals(EXPECTED_XML_BODY.replace("{baseURL}", baseURL.toString()), actualXmlBody, "Page source");
 		}
 		catch (Exception e) {
 			fail("Exception thrown: " + e);

@@ -20,6 +20,8 @@ import static org.omnifaces.resourcehandler.PWAResourceHandler.SERVICEWORKER_RES
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -61,7 +63,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 		assertEquals("use-credentials", manifest.getAttribute("crossorigin"));
 
 		browser.get(manifest.getAttribute("href"));
-		assertEquals(EXPECTED_MANIFEST, browser.getPageSource().trim()
+		assertEquals(EXPECTED_MANIFEST, Jsoup.clean(browser.getPageSource(), Whitelist.none())
 			.replaceAll("\\?v=[0-9]{13,}", "?v=1") // Normalize any version query string on icon resource.
 			.replace("127.0.0.1", "localhost")); // Depends on server used. We don't want to be dependent on that.
 	}

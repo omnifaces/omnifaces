@@ -70,121 +70,121 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 
 	@Test @Order(1)
 	public void nonAjax() {
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
 
 		// Unload.
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Submit then unload.
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Navigate then unload.
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Submit then navigate then unload.
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Navigate then submit then unload.
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 	}
 
 	@Test @Order(2)
 	public void ajax() {
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
 
 		// Submit then unload.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Navigate then unload.
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Submit then navigate then unload.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 
 
 		// Navigate then submit then unload.
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate init", messages.getText());
+		assertEquals("navigate init", getMessagesText());
 
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 	}
 
 	@Test @Order(3)
 	public void copyViewState() {
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		String firstBean = bean.getText();
 		String firstViewState = ajaxViewState.getAttribute("value");
 		String firstTab = browser.getWindowHandle();
@@ -193,14 +193,14 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 		openNewTab(newtab);
 		String secondBean = bean.getText();
 		String secondViewState = nonAjaxViewState.getAttribute("value");
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		assertNotEquals(secondBean, firstBean);
 		assertNotEquals(secondViewState, firstViewState);
 
 		executeScript("document.querySelectorAll(\"#ajax > [name='jakarta.faces.ViewState']\")[0].value='" + firstViewState + "'");
 		guardAjax(ajaxSubmit).click();
 		assertEquals(firstBean, bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 
 		// Close second tab, copy view state from second tab into first tab and re-execute via non-ajax.
@@ -208,7 +208,11 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 		executeScript("document.querySelectorAll(\"#non-ajax > [name='jakarta.faces.ViewState']\")[0].value='" + secondViewState + "'");
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(secondBean, bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
+	}
+
+	private String getMessagesText() {
+		return messages.getText().replaceAll("\\s+", " ");
 	}
 
 }

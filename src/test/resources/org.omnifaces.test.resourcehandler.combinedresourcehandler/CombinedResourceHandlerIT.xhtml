@@ -46,14 +46,14 @@
 		<div id="deferredInBody" />
 		
 		<o:form id="nonAjax">
-			<h:commandButton id="submit" />
-			<h:commandButton id="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
+			<h:commandButton id="submit" value="submit" />
+			<h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
 		</o:form>
 
 		<o:form id="ajax">
 			<f:ajax>
-				<h:commandButton id="submit" />
-				<h:commandButton id="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
+				<h:commandButton id="submit" value="submit" />
+				<h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
 			</f:ajax>
 		</o:form>
 

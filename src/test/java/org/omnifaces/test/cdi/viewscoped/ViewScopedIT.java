@@ -64,140 +64,140 @@ public class ViewScopedIT extends OmniFacesIT {
 
 	@Test @Order(1)
 	public void nonAjax() {
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
 		// Unload.
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then unload.
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then unload.
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then navigate then unload.
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then submit then unload.
 		guardHttp(nonAjaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 	}
 
 	@Test @Order(2)
 	public void ajax() {
 
 		// Unloaded bean is from previous test.
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 		String previousBean = bean.getText();
 
 
 		// Submit then unload.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then unload.
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then navigate then unload.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then submit then unload.
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("navigate destroy init", messages.getText());
+		assertEquals("navigate destroy init", getMessagesText());
 
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
+		assertEquals("submit", getMessagesText());
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 	}
 
 	@Test @Order(3)
 	public void destroyViewState() {
 
 		// Unloaded bean is from previous test.
-		assertEquals("unload init", messages.getText());
+		assertEquals("unload init", getMessagesText());
 		String firstBean = bean.getText();
 		String firstTab = browser.getWindowHandle();
 
 		// Open three new tabs and close them immediately.
 		openNewTab(newtab);
-		assertEquals("init", messages.getText());
+		assertEquals("init", getMessagesText());
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
 		openNewTab(newtab);
-		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
+		assertEquals("unload init", getMessagesText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
 		openNewTab(newtab);
-		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
+		assertEquals("unload init", getMessagesText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
@@ -206,7 +206,11 @@ public class ViewScopedIT extends OmniFacesIT {
 		// destroy the view state, the submit in first tab should not throw ViewExpiredException.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(firstBean, bean.getText());
-		assertEquals("unload submit", messages.getText()); // Unload was from previous tab.
+		assertEquals("unload submit", getMessagesText()); // Unload was from previous tab.
+	}
+
+	private String getMessagesText() {
+		return messages.getText().replaceAll("\\s+", " ");
 	}
 
 }

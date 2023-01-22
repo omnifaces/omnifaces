@@ -30,7 +30,7 @@
 			<h:inputText id="input2" />
 			<h:inputText id="input3" />
 			<h:inputText id="input4" />
-			<h:commandButton id="submit">
+			<h:commandButton id="submit" value="submit">
 				<f:ajax execute="input2 input3" render="@form" />
 			</h:commandButton>
 			<h:outputText id="params" value="#{request.parameterMap.keySet()}" />
@@ -40,7 +40,7 @@
 			<h:inputText id="input2" />
 			<h:inputText id="input3" />
 			<h:inputText id="input4" />
-			<h:commandButton id="submit">
+			<h:commandButton id="submit" value="submit">
 				<f:ajax execute="input2 input3" render="@form" />
 			</h:commandButton>
 			<h:outputText id="params" value="#{request.parameterMap.keySet()}" />

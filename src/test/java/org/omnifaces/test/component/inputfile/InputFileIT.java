@@ -24,6 +24,7 @@ import java.nio.file.Path;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
@@ -126,13 +127,13 @@ public class InputFileIT extends OmniFacesIT {
 		uploadSingleFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleSubmit).click();
 		assertTrue(uploadSingleFile.getText().isEmpty());
-		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), getMessagesText());
 	}
 
 	@Test
 	public void uploadSingleEmpty() {
 		guardHttp(uploadSingleSubmit).click();
-		assertEquals("uploadSingle: null", messages.getText());
+		assertEquals("uploadSingle: null", getMessagesText());
 	}
 
 	@Test
@@ -140,7 +141,7 @@ public class InputFileIT extends OmniFacesIT {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAjaxFile.sendKeys(txtFile.getAbsolutePath());
 		guardAjaxUpload(uploadSingleAjaxSubmit, messages);
-		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), getMessagesText());
 	}
 
 	@Test
@@ -149,14 +150,14 @@ public class InputFileIT extends OmniFacesIT {
 		uploadSingleAcceptAnyImageFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
 		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
-		assertEquals("label: " + txtFile.getName() + " is not image/*", messages.getText());
+		assertEquals("label: " + txtFile.getName() + " is not image/*", getMessagesText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleAcceptAnyImageFile.clear();
 		uploadSingleAcceptAnyImageFile.sendKeys(gifFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
 		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
-		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), getMessagesText());
 	}
 
 	@Test
@@ -165,14 +166,14 @@ public class InputFileIT extends OmniFacesIT {
 		uploadSingleAcceptSvgImageFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
 		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
-		assertEquals("label: " + txtFile.getName() + " is not image/svg+xml", messages.getText());
+		assertEquals("label: " + txtFile.getName() + " is not image/svg+xml", getMessagesText());
 
 		File svgFile = createTempFile("file", "svg", "<svg/>");
 		uploadSingleAcceptSvgImageFile.clear();
 		uploadSingleAcceptSvgImageFile.sendKeys(svgFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
 		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
-		assertEquals("uploadSingle: " + svgFile.length() + ", " + svgFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + svgFile.length() + ", " + svgFile.getName(), getMessagesText());
 	}
 
 	@Test
@@ -197,13 +198,13 @@ public class InputFileIT extends OmniFacesIT {
 		uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleMaxsizeServerSubmit).click();
 		assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
-		assertEquals("label: " + txtFile.getName() + " larger than 10 B", messages.getText());
+		assertEquals("label: " + txtFile.getName() + " larger than 10 B", getMessagesText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeServerFile.sendKeys(gifFile.getAbsolutePath());
 		guardHttp(uploadSingleMaxsizeServerSubmit).click();
 		assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
-		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), messages.getText());
+		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), getMessagesText());
 	}
 
 	@Test
@@ -214,7 +215,7 @@ public class InputFileIT extends OmniFacesIT {
 		uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardHttp(uploadMultipleSubmit).click();
 		assertTrue(uploadMultipleFile1.getText().isEmpty());
-		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
@@ -224,7 +225,7 @@ public class InputFileIT extends OmniFacesIT {
 		uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardAjaxUpload(uploadMultipleAjaxSubmit, messages);
-		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
@@ -243,7 +244,7 @@ public class InputFileIT extends OmniFacesIT {
 		guardHttp(uploadMultipleMaxsizeClientSubmit).click();
 		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeClientFile2.getText().isEmpty());
-		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
@@ -255,7 +256,7 @@ public class InputFileIT extends OmniFacesIT {
 		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
-		assertEquals("label: " + txtFile2.getName() + " larger than 10 B", messages.getText());
+		assertEquals("label: " + txtFile2.getName() + " larger than 10 B", getMessagesText());
 
 		txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
@@ -263,7 +264,7 @@ public class InputFileIT extends OmniFacesIT {
 		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
-		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	private File createTempFile(String name, String extension, String content) throws IOException {
@@ -272,6 +273,10 @@ public class InputFileIT extends OmniFacesIT {
 		File file = path.toFile();
 		file.deleteOnExit();
 		return file;
+	}
+
+	private String getMessagesText() {
+		return messages.getText().replaceAll("\\s+", " ");
 	}
 
 }

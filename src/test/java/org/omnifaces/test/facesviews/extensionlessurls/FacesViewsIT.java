@@ -143,15 +143,15 @@ public class FacesViewsIT extends OmniFacesIT {
 
 	private void verify200(String title, String path) {
 		assertEquals(title, browser.getTitle());
-		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
-		assertEquals(baseURL + path, stripJsessionid(linkWithExtensionOutcome.getAttribute("href")));
-		assertEquals(baseURL + path, stripJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
-		assertEquals("/FacesViewsIT/" + path, stripJsessionid(form.getAttribute("action")));
+		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionOutcome.getAttribute("href")));
+		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
+		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
 	}
 
 	private void verify404(String path) {
 		assertEquals("404", browser.getTitle());
-		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
+		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
 	}
 
 }

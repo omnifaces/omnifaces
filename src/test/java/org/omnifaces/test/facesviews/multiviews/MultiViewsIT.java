@@ -193,15 +193,15 @@ public class MultiViewsIT extends OmniFacesIT {
 
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {
 		assertEquals(title, browser.getTitle());
-		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
+		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
 		assertEquals(firstPathParam, firstPathParamAsString.getText());
 		assertEquals(secondPathParam, secondPathParamAsInteger.getText());
-		assertEquals("/MultiViewsIT/" + path, stripJsessionid(form.getAttribute("action")));
-		assertEquals(baseURL + "MultiViewsITOtherPage/pathParam/471", stripJsessionid(link.getAttribute("href")));
+		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
+		assertEquals("/MultiViewsIT/MultiViewsITOtherPage/pathParam/471", stripHostAndJsessionid(link.getAttribute("href")));
 	}
 
 	private void verify404(String path) {
 		assertEquals("404", browser.getTitle());
-		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
+		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
 	}
 }
