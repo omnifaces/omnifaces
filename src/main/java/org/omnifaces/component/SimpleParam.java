@@ -12,8 +12,10 @@
  */
 package org.omnifaces.component;
 
+import static org.omnifaces.util.Components.convertToString;
+import static org.omnifaces.util.Faces.getContext;
+
 import jakarta.faces.component.UIParameter;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 
 /**
@@ -113,23 +115,8 @@ public class SimpleParam<T> implements ParamHolder<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Application#createConverter()
 	public String getValue() {
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (converter == null && value != null) {
-			converter = context.getApplication().createConverter(value.getClass());
-		}
-
-		if (converter != null) {
-			UIParameter component = new UIParameter();
-			component.setName(name);
-			component.setValue(value);
-			return converter.getAsString(context, component, value);
-		}
-		else {
-			return value != null ? value.toString() : null;
-		}
+		return convertToString(getContext(), this, value);
 	}
 
 	/**

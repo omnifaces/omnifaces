@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.util.FacesLocal.createConverter;
+import static org.omnifaces.util.Components.convertToString;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -99,7 +99,6 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
 	@SuppressWarnings("unchecked")
 	public String getValue() {
 		FacesContext context = getFacesContext();
-		Converter<T> converter = getConverter();
 		Object value = getLocalValue();
 
 		if (value == null && getChildCount() > 0) {
@@ -120,16 +119,7 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
 			value = output.toString();
 		}
 
-		if (converter == null && value != null) {
-			converter = createConverter(context, value.getClass());
-		}
-
-		if (converter != null) {
-			return converter.getAsString(context, this, (T) value);
-		}
-		else {
-			return value != null ? value.toString() : null;
-		}
+		return convertToString(context, this, (T) value);
 	}
 
 	@Override

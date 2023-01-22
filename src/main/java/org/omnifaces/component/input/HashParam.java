@@ -14,10 +14,12 @@ package org.omnifaces.component.input;
 
 import static java.lang.String.format;
 import static org.omnifaces.util.Beans.fireEvent;
+import static org.omnifaces.util.Components.convertToString;
 import static org.omnifaces.util.FacesLocal.getHashParameters;
 import static org.omnifaces.util.FacesLocal.getHashQueryString;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Servlets.toParameterMap;
+import static org.omnifaces.util.Utils.coalesce;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,6 @@ import java.util.Objects;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
 
 import org.omnifaces.event.HashChangeEvent;
 import org.omnifaces.util.Faces;
@@ -182,23 +183,18 @@ public class HashParam extends OnloadParam {
 	 * @param context The involved faces context.
 	 * @return The rendered value.
 	 */
-	@SuppressWarnings("unchecked")
 	public String getRenderedValue(FacesContext context) {
 		if (!isValid()) {
 			return "";
 		}
 
 		Object value = getValue();
-		Converter<Object> converter = getConverter();
 
 		if (Objects.equals(value, getDefault())) {
 			value = null;
 		}
-		else if (converter != null) {
-			value = converter.getAsString(context, this, value);
-		}
 
-		return (value == null) ? "" : value.toString();
+		return coalesce(convertToString(context, this, value), "");
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------

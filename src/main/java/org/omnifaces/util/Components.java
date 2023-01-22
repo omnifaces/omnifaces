@@ -43,6 +43,7 @@ import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
@@ -72,6 +73,7 @@ import java.util.logging.Logger;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
+import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.ActionSource2;
@@ -88,6 +90,7 @@ import jakarta.faces.component.UINamingContainer;
 import jakarta.faces.component.UIOutput;
 import jakarta.faces.component.UIParameter;
 import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.component.ValueHolder;
 import jakarta.faces.component.behavior.AjaxBehavior;
 import jakarta.faces.component.behavior.BehaviorBase;
 import jakarta.faces.component.behavior.ClientBehavior;
@@ -102,6 +105,7 @@ import jakarta.faces.component.visit.VisitResult;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.FacesContextWrapper;
 import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.convert.Converter;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.event.ActionListener;
 import jakarta.faces.event.AjaxBehaviorEvent;
@@ -1361,6 +1365,48 @@ public final class Components {
 		form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
 		form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
 		body.get().getChildren().add(form);
+	}
+
+	/**
+	 * Convert given value of given value holder to string using either the converter attached to the given value holder
+	 * or the one obtained via {@link Application#createConverter(Class)} based on the type of the given value.
+	 * @param <T> The generic value type.
+	 * @param context The involved faces context.
+	 * @param holder The value holder.
+	 * @param value The value to be converted to string.
+	 * @return The conversion result, may be {@code null}, depending on the value and the converter implementation.
+	 * @since 4.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> String convertToString(FacesContext context, ValueHolder holder, T value) {
+		Converter<T> converter = holder.getConverter();
+
+		if (converter == null && value != null) {
+			converter = createConverter(context, value.getClass());
+		}
+
+		if (converter != null) {
+			UIComponent component = null;
+
+			if (holder instanceof UIComponent) {
+				component = (UIComponent) holder;
+			}
+			else if (holder instanceof ParamHolder) {
+				UIParameter parameter = new UIParameter();
+				parameter.setName(((ParamHolder<T>) holder).getName());
+				parameter.setValue(value);
+				component = parameter;
+			}
+			else {
+				UIOutput output = new UIOutput();
+				output.setValue(value);
+				component = output;
+			}
+
+			return converter.getAsString(context, component, value);
+		}
+
+		return (value == null) ? null : value.toString();
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------
