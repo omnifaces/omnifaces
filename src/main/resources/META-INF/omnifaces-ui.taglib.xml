@@ -2276,6 +2276,19 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		</attribute>
 		<attribute>
 			<description>
+				<![CDATA[
+					Flag indicating that this component will prohibit changes by the user.
+					A value of false causes no attribute to be rendered,
+					while a value of true causes the attribute to be rendered as readonly="readonly".
+					Even when set to true, all validators associated with this input component will be invoked.
+				]]>
+			</description>
+			<name>readonly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[Converter instance	registered with	this component.]]>
 			</description>
 			<name>converter</name>

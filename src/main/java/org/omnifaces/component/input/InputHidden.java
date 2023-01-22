@@ -12,9 +12,14 @@
  */
 package org.omnifaces.component.input;
 
+import static java.lang.Boolean.FALSE;
+import static org.omnifaces.util.Components.convertToString;
+
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlInputHidden;
 import jakarta.faces.context.FacesContext;
+
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -41,6 +46,11 @@ import jakarta.faces.context.FacesContext;
  * This behavior cannot be achieved by using <code>immediate="true"</code> on <code>&lt;h:inputHidden&gt;</code>. It
  * would only move the conversion/validation into the apply request values phase. The model still won't be updated on
  * time.
+ * <p>
+ * Also, the <code>&lt;h:inputHidden&gt;</code> didn't support the <code>readonly</code> attribute. This is however
+ * useful when used in combination with a validator which should block the form submit. Since version 4.1, the
+ * <code>&lt;o:inputHidden&gt;</code> supports this use case by simply grabbing and validating the model value during
+ * the apply request values phase. The setter method associated with the model won't be invoked.
  *
  * <h2>Usage</h2>
  * <p>
@@ -66,6 +76,14 @@ public class InputHidden extends HtmlInputHidden {
 	/** The component type, which is {@value org.omnifaces.component.input.InputHidden#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputHidden";
 
+	enum PropertyKeys {
+		readonly
+	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -73,10 +91,16 @@ public class InputHidden extends HtmlInputHidden {
 	 */
 	@Override
 	public void decode(FacesContext context) {
-		super.decode(context);
+		if (isRendered() && isReadonly()) {
+			setSubmittedValue(convertToString(context, this, getValue()));
+		}
+		else {
+			super.decode(context);
+		}
+
 		validate(context);
 
-		if (isValid()) {
+		if (!isReadonly() && isValid()) {
 			updateModel(context);
 		}
 	}
@@ -95,6 +119,28 @@ public class InputHidden extends HtmlInputHidden {
 	@Override
 	public void processUpdates(FacesContext context) {
 		// NOOP.
+	}
+
+	// Attribute getters/setters --------------------------------------------------------------------------------------
+
+	/**
+	 * Returns whether this component is readonly. Defaults to <code>false</code>. Note that even when this component is
+	 * readonly, all associated validators will be invoked based on the model value, not on the submitted value. Also
+	 * the setter won't be invoked.
+	 * @return Whether this component is readonly.
+	 * @since 4.1
+	 */
+	public boolean isReadonly() {
+		return state.get(PropertyKeys.readonly, FALSE);
+	}
+
+	/**
+	 * Set whether this component is readonly.
+	 * @param readonly Whether this component is readonly.
+	 * @since 4.1
+	 */
+	public void setReadonly(boolean readonly) {
+		state.put(PropertyKeys.readonly, readonly);
 	}
 
 }
