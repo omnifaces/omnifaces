@@ -91,6 +91,9 @@
 		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<test.tyrus.version>2.1.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
+		<!-- Arquillian config. -->
+		<arquillian.browser>htmlunit</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=phantomjs -->
+
 		<!-- Sonar config. -->
 		<sonar.organization>balusc-github</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -156,7 +159,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.8.2</version>
+			<version>5.9.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -494,6 +497,7 @@
 						<systemPropertyVariables>
 							<profile.id>${project.activeProfiles[0].id}</profile.id>
 							<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
+							<arquillian.browser>${arquillian.browser}</arquillian.browser>
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
@@ -826,7 +830,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<systemProperties>
+							<systemPropertyVariables>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra4.version},
@@ -835,7 +839,7 @@
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
-							</systemProperties>
+							</systemPropertyVariables>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
 							</environmentVariables>
@@ -906,7 +910,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<systemProperties>
+							<systemPropertyVariables>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.glassfish:jakarta.faces:${test.mojarra3.version},
@@ -915,7 +919,7 @@
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
-							</systemProperties>
+							</systemPropertyVariables>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
 							</environmentVariables>
@@ -986,7 +990,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<systemProperties>
+							<systemPropertyVariables>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.apache.myfaces.core:myfaces-impl:${test.myfaces4.version},
@@ -995,7 +999,7 @@
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
-							</systemProperties>
+							</systemPropertyVariables>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
 							</environmentVariables>
@@ -1066,7 +1070,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<systemProperties>
+							<systemPropertyVariables>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
 									org.apache.myfaces.core:myfaces-impl:${test.myfaces3.version},
@@ -1075,7 +1079,7 @@
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
 								</war.libraries>
-							</systemProperties>
+							</systemPropertyVariables>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
 							</environmentVariables>
