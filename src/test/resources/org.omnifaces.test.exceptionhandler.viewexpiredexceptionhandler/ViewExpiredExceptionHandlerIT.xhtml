@@ -34,6 +34,12 @@
 			<input type="button" id="expire" value="expire" onclick="
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', '#{request.contextPath}/expire?' + new Date().getTime());
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4) {
+						document.getElementById('form:wasViewExpired').innerHTML = 'expired';
+						xhr.onreadystatechange = null;
+					}
+				};
 				xhr.send();
 			" />
 		</o:form>

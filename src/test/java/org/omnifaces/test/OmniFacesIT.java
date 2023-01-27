@@ -114,7 +114,7 @@ public abstract class OmniFacesIT {
 		return (T) ((JavascriptExecutor) browser).executeScript(script);
 	}
 
-	private void clearMessages(WebElement messages) {
+	protected void clearMessages(WebElement messages) {
 		executeScript("document.getElementById('" + messages.getAttribute("id") + "').innerHTML='';");
 	}
 
