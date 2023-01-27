@@ -13,3 +13,4 @@ rebel.xml
 /.idea
 node_modules/
 npm-debug.log
+phantomjsdriver.log
