@@ -92,7 +92,7 @@
 		<test.tyrus.version>2.1.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Arquillian config. -->
-		<arquillian.browser>htmlunit</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=phantomjs -->
+		<arquillian.browser>htmlUnit</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=phantomjs -->
 
 		<!-- Sonar config. -->
 		<sonar.organization>balusc-github</sonar.organization>
