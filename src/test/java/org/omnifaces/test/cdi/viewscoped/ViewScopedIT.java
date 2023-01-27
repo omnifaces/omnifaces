@@ -192,7 +192,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		closeCurrentTabAndSwitchTo(firstTab);
 
 		openNewTab(newtab);
-		assertEquals("unload init", getMessagesText()); // Unload was from previous tab.
+		assertEquals("unload init", getMessagesText()); // Unload was from previous tab. TODO: this fails in phantomjs because closing tab didn't seem to trigger unload.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
