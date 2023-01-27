@@ -13,6 +13,7 @@
 package org.omnifaces.test.exceptionhandler.viewexpiredexceptionhandler;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withViewExpiredExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.distributable;
@@ -44,13 +45,14 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws InterruptedException {
 		assertEquals("false", wasViewExpired.getText());
 
 		guardAjax(submit).click();
 		assertEquals("false", wasViewExpired.getText());
 
 		guardAjax(expire).click();
+		waitGui(browser);
 		guardAjax(submit).click();
 		assertEquals("true", wasViewExpired.getText());
 

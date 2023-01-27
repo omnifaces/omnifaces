@@ -13,7 +13,6 @@
 package org.omnifaces.test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
@@ -64,7 +63,8 @@ public abstract class OmniFacesIT {
 
 	protected String openNewTab(WebElement elementWhichOpensNewTab) {
 		Set<String> oldTabs = browser.getWindowHandles();
-		guardNoRequest(elementWhichOpensNewTab).click();
+		elementWhichOpensNewTab.click();
+		waitGui(browser);
 		Set<String> newTabs = new HashSet<>(browser.getWindowHandles());
 		newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
 		String newTab = newTabs.iterator().next();
@@ -84,6 +84,7 @@ public abstract class OmniFacesIT {
 	protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
 		browser.close();
 		browser.switchTo().window(tabToSwitch);
+		waitGui(browser);
 	}
 
 	/**
