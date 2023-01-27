@@ -24,6 +24,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -178,6 +179,7 @@ public class ViewScopedIT extends OmniFacesIT {
 	}
 
 	@Test @Order(3)
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "closeCurrentTabAndSwitchTo() doesn't seem to trigger unload in PhantomJS")
 	public void destroyViewState() {
 
 		// Unloaded bean is from previous test.
@@ -192,7 +194,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		closeCurrentTabAndSwitchTo(firstTab);
 
 		openNewTab(newtab);
-		assertEquals("unload init", getMessagesText()); // Unload was from previous tab. TODO: this fails in phantomjs because closing tab didn't seem to trigger unload.
+		assertEquals("unload init", getMessagesText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 

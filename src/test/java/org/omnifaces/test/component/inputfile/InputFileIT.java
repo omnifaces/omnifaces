@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -174,13 +175,14 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "HTMLInputElement.files returns null in PhantomJS")
 	public void uploadSingleMaxsizeClient() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeClientFile.sendKeys(txtFile.getAbsolutePath());
-		triggerOnchange(uploadSingleMaxsizeClientFile, uploadSingleMaxsizeClientMessage); // TODO: this fails in phantomjs because element.files is null.
+		triggerOnchange(uploadSingleMaxsizeClientFile, uploadSingleMaxsizeClientMessage);
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
 		String message = uploadSingleMaxsizeClientMessage.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // HtmlUnit doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeClientFile.sendKeys(gifFile.getAbsolutePath());
@@ -205,36 +207,39 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	public void uploadMultiple() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleFile1.sendKeys(txtFile1.getAbsolutePath());
-		uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath()); // TODO: this hangs when phantomjs is used.
+		uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardHttp(uploadMultipleSubmit).click();
 		assertTrue(uploadMultipleFile1.getText().isEmpty());
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	public void uploadMultipleAjax() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
-		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath()); // TODO: this hangs when phantomjs is used.
+		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardAjaxUpload(uploadMultipleAjaxSubmit, messages);
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	public void uploadMultipleMaxsizeClient() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
-		uploadMultipleMaxsizeClientFile2.sendKeys(txtFile2.getAbsolutePath()); // TODO: this hangs when phantomjs is used.
+		uploadMultipleMaxsizeClientFile2.sendKeys(txtFile2.getAbsolutePath());
 		triggerOnchange(uploadMultipleMaxsizeClientFile1, uploadMultipleMaxsizeClientMessage);
 		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
 		String message = uploadMultipleMaxsizeClientMessage.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // Selenium JS engine doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // HtmlUnit doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
 
 		txtFile1 = createTempFile("file1", "txt", "hello");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
@@ -245,11 +250,12 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	public void uploadMultipleMaxsizeServer() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
-		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath()); // TODO: this hangs when phantomjs is used.
+		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
