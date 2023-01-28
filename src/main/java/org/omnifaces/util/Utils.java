@@ -1003,7 +1003,23 @@ public final class Utils {
 		if (zonedDateTime == null) {
 			return null;
 		}
-		else if (java.sql.Timestamp.class.isAssignableFrom(type)) {
+		else if (java.util.Date.class.isAssignableFrom(type)) {
+			return fromZonedDateTimeToDate(zonedDateTime, (Class<Date>) type);
+		}
+		else if (Calendar.class.isAssignableFrom(type)) {
+			return fromZonedDateTimeToCalendar(zonedDateTime, (Class<Calendar>) type);
+		}
+		else if (Temporal.class.isAssignableFrom(type)) {
+			return fromZonedDateTimeToTemporal(zonedDateTime, (Class<Temporal>) type);
+		}
+		else {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <D> D fromZonedDateTimeToDate(ZonedDateTime zonedDateTime, Class<? extends Date> type) {
+		if (java.sql.Timestamp.class.isAssignableFrom(type)) {
 			return (D) new java.sql.Timestamp(zonedDateTime.toInstant().toEpochMilli());
 		}
 		else if (java.sql.Date.class.isAssignableFrom(type)) {
@@ -1012,48 +1028,45 @@ public final class Utils {
 		else if (java.sql.Time.class.isAssignableFrom(type)) {
 			return (D) new java.sql.Time(zonedDateTime.toInstant().toEpochMilli());
 		}
-		else if (java.util.Date.class.isAssignableFrom(type)) {
-			return (D) java.util.Date.from(zonedDateTime.toInstant());
-		}
-		else if (Calendar.class.isAssignableFrom(type)) {
-			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
-			calendar.setTime(java.util.Date.from(zonedDateTime.toInstant()));
-			return (D) calendar;
-		}
-		else if (type == Instant.class) {
-			return (D) zonedDateTime.toInstant();
-		}
-		else if (type == ZonedDateTime.class) {
-			return (D) zonedDateTime;
-		}
-		else if (type == OffsetDateTime.class) {
-			return (D) zonedDateTime.toOffsetDateTime();
-		}
-		else if (type == LocalDateTime.class) {
-			return (D) zonedDateTime.toLocalDateTime();
-		}
-		else if (type == LocalDate.class) {
-			return (D) zonedDateTime.toLocalDate();
-		}
-		else if (type == OffsetTime.class) {
-			return (D) zonedDateTime.toOffsetDateTime().toOffsetTime();
-		}
-		else if (type == LocalTime.class) {
-			return (D) zonedDateTime.toLocalDateTime().toLocalTime();
-		}
-		else if (TemporalDate.class.isAssignableFrom(type)) {
-			return (D) new TemporalDate(zonedDateTime);
-		}
-		else if (Temporal.class.isAssignableFrom(type)) {
-			return fromZonedDateTimeToTemporal(zonedDateTime, type);
-		}
 		else {
-			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+			return (D) java.util.Date.from(zonedDateTime.toInstant());
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends Temporal> T fromZonedDateTimeToTemporal(ZonedDateTime zonedDateTime, Class<?> type) {
+	private static <C> C fromZonedDateTimeToCalendar(ZonedDateTime zonedDateTime, Class<? extends Calendar> type) {
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
+		calendar.setTime(java.util.Date.from(zonedDateTime.toInstant()));
+		return (C) calendar;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T fromZonedDateTimeToTemporal(ZonedDateTime zonedDateTime, Class<? extends Temporal> type) {
+		if (type == Instant.class) {
+			return (T) zonedDateTime.toInstant();
+		}
+		else if (type == ZonedDateTime.class) {
+			return (T) zonedDateTime;
+		}
+		else if (type == OffsetDateTime.class) {
+			return (T) zonedDateTime.toOffsetDateTime();
+		}
+		else if (type == LocalDateTime.class) {
+			return (T) zonedDateTime.toLocalDateTime();
+		}
+		else if (type == LocalDate.class) {
+			return (T) zonedDateTime.toLocalDate();
+		}
+		else if (type == OffsetTime.class) {
+			return (T) zonedDateTime.toOffsetDateTime().toOffsetTime();
+		}
+		else if (type == LocalTime.class) {
+			return (T) zonedDateTime.toLocalDateTime().toLocalTime();
+		}
+		else if (TemporalDate.class.isAssignableFrom(type)) {
+			return (T) new TemporalDate(zonedDateTime);
+		}
+
 		// Basically finds public static method in T which takes 1 argument of Temporal.class and returns T.
 		// This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
 		// There might be custom implementations supporting this as well although this is undocumented.
