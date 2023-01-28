@@ -1007,7 +1007,7 @@ public final class Utils {
 			return fromZonedDateTimeToDate(zonedDateTime, (Class<Date>) type);
 		}
 		else if (Calendar.class.isAssignableFrom(type)) {
-			return fromZonedDateTimeToCalendar(zonedDateTime, (Class<Calendar>) type);
+			return fromZonedDateTimeToCalendar(zonedDateTime);
 		}
 		else if (Temporal.class.isAssignableFrom(type)) {
 			return fromZonedDateTimeToTemporal(zonedDateTime, (Class<Temporal>) type);
@@ -1034,7 +1034,7 @@ public final class Utils {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <C> C fromZonedDateTimeToCalendar(ZonedDateTime zonedDateTime, Class<? extends Calendar> type) {
+	private static <C> C fromZonedDateTimeToCalendar(ZonedDateTime zonedDateTime) {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
 		calendar.setTime(java.util.Date.from(zonedDateTime.toInstant()));
 		return (C) calendar;
