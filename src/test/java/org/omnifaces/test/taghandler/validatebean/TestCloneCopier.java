@@ -20,7 +20,7 @@ import org.omnifaces.util.copier.CloneCopier;
 public class TestCloneCopier {
 
 	@Test
-	public void testDoesNotImplementCloneable() {
+	void testDoesNotImplementCloneable() {
 		try {
 			new CloneCopier().copy(new DoesNotImplementCloneable());
 			fail();
@@ -30,7 +30,7 @@ public class TestCloneCopier {
 	}
 
 	@Test
-	public void testImplementsCloneableButDoesNotOverrideClone() {
+	void testImplementsCloneableButDoesNotOverrideClone() {
 		try {
 			new CloneCopier().copy(new ImplementsCloneableButDoesNotOverrideClone());
 			fail();
@@ -40,7 +40,7 @@ public class TestCloneCopier {
 	}
 
 	@Test
-	public void testImplementsCloneableButHasProtectedClone() {
+	void testImplementsCloneableButHasProtectedClone() {
 		try {
 			new CloneCopier().copy(new ImplementsCloneableButHasProtectedClone());
 			fail();
@@ -50,7 +50,7 @@ public class TestCloneCopier {
 	}
 
 	@Test
-	public void testImplementsCloneable() {
+	void testImplementsCloneable() {
 		try {
 			new CloneCopier().copy(new ImplementsCloneable());
 		}

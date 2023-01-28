@@ -46,7 +46,7 @@ public class SkipValidatorsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		guardAjax(submit).click();
 		assertEquals("required!", message.getText());
 		assertEquals("true", validationFailed.getText());

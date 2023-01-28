@@ -26,7 +26,7 @@ public class TestUtils {
 	};
 
 	@Test
-	public void testSerializeURLSafe() {
+	void testSerializeURLSafe() {
 		for (String[] test : URL_SAFE_SERIALIZED_STRINGS) {
 			String id = test[0];
 			String serialized = test[1];

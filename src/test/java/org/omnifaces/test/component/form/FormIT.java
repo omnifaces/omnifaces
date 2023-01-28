@@ -47,7 +47,7 @@ public class FormIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testFormDefault() {
+	void testFormDefault() {
 		guardAjax(formDefaultSubmit).click();
 		String params = formDefaultParams.getText();
 		assertTrue(params.contains("formDefault"), "formDefault");
@@ -64,7 +64,7 @@ public class FormIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testFormDisabledPartialSubmit() {
+	void testFormDisabledPartialSubmit() {
 		guardAjax(formDisabledSubmit).click();
 		String params = formDisabledParams.getText();
 		assertTrue(params.contains("formDisabled"), "formDisabled");

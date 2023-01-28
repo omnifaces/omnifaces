@@ -86,7 +86,7 @@ public class ValidateAllIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testForm1() {
+	void testForm1() {
 		guardAjax(form1Submit).click();
 
 		assertEquals("", form1Input1Message.getText());
@@ -124,7 +124,7 @@ public class ValidateAllIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testForm2() {
+	void testForm2() {
 		guardAjax(form2Submit).click();
 
 		assertEquals("", form2Input1Message.getText());

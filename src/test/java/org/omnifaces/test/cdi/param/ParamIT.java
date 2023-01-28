@@ -70,7 +70,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testStringParam() {
+	void testStringParam() {
 		openWithQueryString("stringParam=foo");
 		assertEquals("foo", stringParam.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -78,7 +78,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidStringParam() {
+	void testInvalidStringParam() {
 		openWithQueryString("stringParam=f");
 		assertEquals("", stringParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -86,7 +86,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testRequiredStringParam() {
+	void testRequiredStringParam() {
 		open("ParamITRequired.xhtml?requiredStringParam=foo");
 		assertEquals("foo", requiredStringParam.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -94,7 +94,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testMissingRequiredStringParam() {
+	void testMissingRequiredStringParam() {
 		open("ParamITRequired.xhtml");
 		assertEquals("", requiredStringParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -102,7 +102,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testEmptyRequiredStringParam() {
+	void testEmptyRequiredStringParam() {
 		open("ParamITRequired.xhtml?requiredStringParam=");
 		assertEquals("", requiredStringParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -111,7 +111,7 @@ public class ParamIT extends OmniFacesIT {
 
 
 	@Test
-	public void testStringParamOnBeanWithCustomAnnotation() {
+	void testStringParamOnBeanWithCustomAnnotation() {
 		if (isBValUsed()) {
 			return; // BVal doesn't support this. You really have to add @Inject to @Param.
 		}
@@ -123,7 +123,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidStringParamOnBeanWithCustomAnnotation() {
+	void testInvalidStringParamOnBeanWithCustomAnnotation() {
 		open("ParamITCustomAnnotation.xhtml?stringParam=f");
 		assertEquals("", stringParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -131,7 +131,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testStringParamArray() {
+	void testStringParamArray() {
 		openWithQueryString("stringParamArray=foo&stringParamArray=bar");
 		assertEquals("[foo, bar]", stringParamArray.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -139,7 +139,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidStringParamArray() {
+	void testInvalidStringParamArray() {
 		openWithQueryString("stringParamArray=foo&stringParamArray=b");
 		assertEquals("", stringParamArray.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -147,7 +147,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testStringParamList() {
+	void testStringParamList() {
 		openWithQueryString("stringParamList=foo&stringParamList=bar");
 		assertEquals("[foo, bar]", stringParamList.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -155,7 +155,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidStringParamList() {
+	void testInvalidStringParamList() {
 		openWithQueryString("stringParamList=f&stringParamArray=bar");
 		assertEquals("", stringParamList.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -163,7 +163,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testLongParam() {
+	void testLongParam() {
 		openWithQueryString("longParam=42");
 		assertEquals("42", longParam.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -171,7 +171,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamValue() {
+	void testInvalidLongParamValue() {
 		openWithQueryString("longParam=foo");
 		assertEquals("", longParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -179,7 +179,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamRange() {
+	void testInvalidLongParamRange() {
 		openWithQueryString("longParam=13");
 		assertEquals("", longParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -187,7 +187,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testLongParamArray() {
+	void testLongParamArray() {
 		openWithQueryString("longParamArray=42&longParamArray=64");
 		assertEquals("[42, 64]", longParamArray.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -195,7 +195,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamArrayValue() {
+	void testInvalidLongParamArrayValue() {
 		openWithQueryString("longParamArray=42&longParamArray=foo");
 		assertEquals("", longParamArray.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -203,7 +203,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamArrayRange() {
+	void testInvalidLongParamArrayRange() {
 		openWithQueryString("longParamArray=24&longParamArray=64");
 		assertEquals("", longParamArray.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -211,7 +211,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testLongParamList() {
+	void testLongParamList() {
 		openWithQueryString("longParamList=42&longParamList=64");
 		assertEquals("[42, 64]", longParamList.getText());
 		assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit JSF converters are also invoked when List<T> is used instead of T[].
@@ -220,7 +220,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamListValue() {
+	void testInvalidLongParamListValue() {
 		openWithQueryString("longParamList=42&longParamList=foo");
 		assertEquals("", longParamList.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -228,7 +228,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidLongParamListRange() {
+	void testInvalidLongParamListRange() {
 		openWithQueryString("longParamList=24&longParamList=64");
 		assertEquals("", longParamList.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -236,7 +236,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testDateParam() {
+	void testDateParam() {
 		openWithQueryString("dateParam=19780326");
 		assertEquals("1978-03-26", dateParam.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -244,7 +244,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidDateParam() {
+	void testInvalidDateParam() {
 		openWithQueryString("dateParam=foo");
 		assertEquals("", dateParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -252,7 +252,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testEntityParam() {
+	void testEntityParam() {
 		openWithQueryString("entityParam=42");
 		assertEquals("ParamITEntity[42]", entityParam.getText());
 		assertEquals("initSuccess", initResult.getText());
@@ -260,7 +260,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidEntityParamValue() {
+	void testInvalidEntityParamValue() {
 		openWithQueryString("entityParam=foo");
 		assertEquals("", entityParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -268,7 +268,7 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInvalidEntityParamRange() {
+	void testInvalidEntityParamRange() {
 		openWithQueryString("entityParam=24");
 		assertEquals("", entityParam.getText());
 		assertEquals("initValidationFailed", initResult.getText());
@@ -276,21 +276,21 @@ public class ParamIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testEntityViewParam() { // This basically ensures that the "generic entity converter" is reusable across @Param and UIViewParameter.
+	void testEntityViewParam() { // This basically ensures that the "generic entity converter" is reusable across @Param and UIViewParameter.
 		openWithQueryString("entityViewParam=42");
 		assertEquals("ParamITEntity[42]", entityViewParam.getText());
 		assertEquals("", messages.getText());
 	}
 
 	@Test
-	public void testInvalidEntityViewParamValue() {
+	void testInvalidEntityViewParamValue() {
 		openWithQueryString("entityViewParam=bar");
 		assertEquals("", entityViewParam.getText());
 		assertEquals("Cannot convert because it threw java.lang.NumberFormatException: For input string: \"bar\"", messages.getText());
 	}
 
 	@Test
-	public void testInvalidEntityViewParamRange() {
+	void testInvalidEntityViewParamRange() {
 		openWithQueryString("entityViewParam=24");
 		assertEquals("", entityViewParam.getText());
 		assertEquals("That's not the right answer", messages.getText());

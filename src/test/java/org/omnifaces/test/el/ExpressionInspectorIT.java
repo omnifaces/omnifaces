@@ -101,7 +101,7 @@ public class ExpressionInspectorIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		assertEquals("Bar", valueReferenceBase.getText(), "valueReferenceBase is 'Bar'");
 		assertEquals("selected", valueReferenceProperty.getText(), "valueReferenceProperty is 'selected'");
 

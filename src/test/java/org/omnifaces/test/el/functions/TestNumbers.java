@@ -51,7 +51,7 @@ public class TestNumbers {
 	};
 
 	@Test
-	public void testFormatThousandsInEnglish() {
+	void testFormatThousandsInEnglish() {
 		Locale originalLocale = Locale.getDefault();
 
 		try {
@@ -70,7 +70,7 @@ public class TestNumbers {
 	}
 
 	@Test
-	public void testFormatThousandsInGerman() {
+	void testFormatThousandsInGerman() {
 		Locale originalLocale = Locale.getDefault();
 
 		try {
@@ -89,7 +89,7 @@ public class TestNumbers {
 	}
 
 	@Test
-	public void testFormatBytesInEnglish() {
+	void testFormatBytesInEnglish() {
 		Locale originalLocale = Locale.getDefault();
 
 		try {
@@ -108,7 +108,7 @@ public class TestNumbers {
 	}
 
 	@Test
-	public void testFormatBytesInGerman() {
+	void testFormatBytesInGerman() {
 		Locale originalLocale = Locale.getDefault();
 
 		try {

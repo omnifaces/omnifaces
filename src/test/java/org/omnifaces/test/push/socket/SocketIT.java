@@ -72,7 +72,7 @@ public class SocketIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		testOnopen();
 
 		assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());

@@ -44,7 +44,7 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		assertEquals("false", wasViewExpired.getText());
 
 		guardAjax(submit).click();

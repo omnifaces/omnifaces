@@ -45,7 +45,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testWelcomeFile() {
+	void testWelcomeFile() {
 		verify200("FacesViewsIT", "");
 
 		guardHttp(formSubmit).click();
@@ -65,7 +65,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testOtherPage() {
+	void testOtherPage() {
 		open("FacesViewsITOtherPage");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
@@ -89,7 +89,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testFolderWithPeriod() {
+	void testFolderWithPeriod() {
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
@@ -113,7 +113,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testNonExistingPage() {
+	void testNonExistingPage() {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
@@ -127,7 +127,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testExcludedFolder() {
+	void testExcludedFolder() {
 		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
 		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
 

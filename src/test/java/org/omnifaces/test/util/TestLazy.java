@@ -41,7 +41,7 @@ public class TestLazy {
 	}
 
 	@Test
-	public void lazy() {
+	void lazy() {
 		Expensive expensive = new Expensive();
 		Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
 		assertEquals(1, numCreations.get());

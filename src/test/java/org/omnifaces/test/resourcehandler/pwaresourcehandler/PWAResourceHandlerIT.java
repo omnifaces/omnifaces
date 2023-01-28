@@ -57,7 +57,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
 	@Test
 	@Order(1)
-	public void verifyManifest() {
+	void verifyManifest() {
 		String instances = viewScopedBeanInstances.getText();
 		assertEquals("1", instances, "This is the first time the page is opened, so there should be only 1 view scoped bean instance");
 		assertEquals("use-credentials", manifest.getAttribute("crossorigin"));
@@ -70,7 +70,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
 	@Test
 	@Order(2)
-	public void verifyServiceWorkerScript() {
+	void verifyServiceWorkerScript() {
 		String instances = viewScopedBeanInstances.getText();
 		assertEquals("2", instances, "This is the second time the page is opened, so there should be 2 view scoped bean instances");
 
@@ -81,7 +81,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
 	@Test
 	@Order(3)
-	public void verifyViewScopedBeanAfterAjaxSubmit() {
+	void verifyViewScopedBeanAfterAjaxSubmit() {
 		String instances = viewScopedBeanInstances.getText();
 		assertEquals("3", instances, "This is the third time the page is opened, so there should be 3 view scoped bean instances");
 

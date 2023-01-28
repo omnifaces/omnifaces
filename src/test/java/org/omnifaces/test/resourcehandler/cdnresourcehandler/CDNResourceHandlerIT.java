@@ -40,7 +40,7 @@ public class CDNResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void cdnResources() {
+	void cdnResources() {
 		assertEquals("https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", cdnStylesheet.getAttribute("href"));
 		assertEquals("https://code.jquery.com/jquery-2.2.4.min.js", cdnScript.getAttribute("src"));
 	}

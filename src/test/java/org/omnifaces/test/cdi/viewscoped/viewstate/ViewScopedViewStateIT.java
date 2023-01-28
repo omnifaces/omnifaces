@@ -69,7 +69,7 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 	}
 
 	@Test @Order(1)
-	public void nonAjax() {
+	void nonAjax() {
 		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
@@ -129,7 +129,7 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 	}
 
 	@Test @Order(2)
-	public void ajax() {
+	void ajax() {
 		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
@@ -183,7 +183,7 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 	}
 
 	@Test @Order(3)
-	public void copyViewState() {
+	void copyViewState() {
 		assertEquals("init", getMessagesText());
 		String firstBean = bean.getText();
 		String firstViewState = ajaxViewState.getAttribute("value");

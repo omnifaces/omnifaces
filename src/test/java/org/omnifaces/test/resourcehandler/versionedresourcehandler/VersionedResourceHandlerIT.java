@@ -37,7 +37,7 @@ public class VersionedResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		String[] parts = someCss.getAttribute("href").split("\\?", 2);
 		String resourceName = parts[0].split(quote(RESOURCE_IDENTIFIER + "/"), 2)[1].split("\\.xhtml", 2)[0];
 		String queryString = parts[1];

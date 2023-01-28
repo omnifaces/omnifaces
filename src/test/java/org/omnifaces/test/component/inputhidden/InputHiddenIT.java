@@ -42,14 +42,14 @@ public class InputHiddenIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testInputHidden() {
+	void testInputHidden() {
 		guardAjax(toggle).click();
 		guardAjax(submit).click();
 		assertEquals("submitted", messages.getText());
 	}
 
 	@Test
-	public void testInputHiddenReadonlyValidation() {
+	void testInputHiddenReadonlyValidation() {
 		guardAjax(validate).click();
 		assertEquals("validated readonly", messages.getText());
 	}

@@ -49,7 +49,7 @@ public class TestDateProducer {
 	}
 
 	@Test
-	public void testNow() {
+	void testNow() {
 		Date oldNow = new Date();
 		TemporalDate newNow = new DateProducer.TemporalDate();
 		String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
@@ -60,7 +60,7 @@ public class TestDateProducer {
 	}
 
 	@Test
-	public void testZonedDateTime() {
+	void testZonedDateTime() {
 		Date oldNow = new Date();
 		ZonedDateTime newNowAsZoned = new DateProducer.TemporalDate().getZonedDateTime();
 		String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
@@ -71,7 +71,7 @@ public class TestDateProducer {
 	}
 
 	@Test
-	public void testInstant() {
+	void testInstant() {
 		Date oldNow = new Date();
 		Instant newNowAsInstant = new DateProducer.TemporalDate().getInstant();
 		long oldTime = oldNow.getTime();
@@ -82,7 +82,7 @@ public class TestDateProducer {
 	}
 
 	@Test
-	public void testTime() {
+	void testTime() {
 		Date oldNow = new Date();
 		TemporalDate newNow = new DateProducer.TemporalDate();
 		long oldTime = oldNow.getTime();

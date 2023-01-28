@@ -51,7 +51,7 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		open("lowercasedrequesturiit");
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
@@ -84,7 +84,7 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testSubFolder() {
+	void testSubFolder() {
 		open("subfolder/lowercasedrequesturiit");
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
@@ -117,7 +117,7 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testAlreadyLowercasedViewId() {
+	void testAlreadyLowercasedViewId() {
 		open("alreadylowercasedviewid");
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 

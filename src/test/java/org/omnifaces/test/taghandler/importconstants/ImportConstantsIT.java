@@ -45,27 +45,27 @@ public class ImportConstantsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testParent() {
+	void testParent() {
 		assertEquals("parent", parent.getText());
 	}
 
 	@Test
-	public void testChild() {
+	void testChild() {
 		assertEquals("child", child.getText());
 	}
 
 	@Test
-	public void testInterface() {
+	void testInterface() {
 		assertEquals("interface", iface.getText());
 	}
 
 	@Test
-	public void testEnum() {
+	void testEnum() {
 		assertEquals("[ONE, TWO, THREE]", enumValues.getText());
 	}
 
 	@Test
-	public void testEnumImplementingInterface() {
+	void testEnumImplementingInterface() {
 		assertEquals("[ONE, TWO, THREE, interface]", enumInterfaceValues.getText());
 	}
 

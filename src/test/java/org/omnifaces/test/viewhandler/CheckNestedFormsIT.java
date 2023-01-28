@@ -30,22 +30,22 @@ public class CheckNestedFormsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testProperMarkup() {
+	void testProperMarkup() {
 		verify200("ProperMarkup.xhtml");
 	}
 
 	@Test
-	public void testCornercaseMarkup() {
+	void testCornercaseMarkup() {
 		verify200("CornercaseMarkup.xhtml");
 	}
 
 	@Test
-	public void testNestedForm() {
+	void testNestedForm() {
 		verify500("NestedForm.xhtml");
 	}
 
 	@Test
-	public void testNestedDialogForm() {
+	void testNestedDialogForm() {
 		verify500("NestedDialogForm.xhtml");
 	}
 

@@ -22,7 +22,7 @@ import org.omnifaces.model.tree.TreeModel;
 public class TestTreeModel {
 
 	@Test
-	public void testTree() {
+	void testTree() {
 		TreeModel<String> tree = new ListTreeModel<>();
 		TreeModel<String> one = tree.addChild("One");
 		TreeModel<String> two = one.addChild("Two");

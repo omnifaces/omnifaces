@@ -89,7 +89,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwDuringInvokeApplication() {
+	void throwDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardAjax(throwDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
@@ -97,7 +97,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwDuringUpdateModelValues() {
+	void throwDuringUpdateModelValues() {
 		assertAllResourcesRendered();
 		guardAjax(throwDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
@@ -105,7 +105,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwDuringRenderResponse() {
+	void throwDuringRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -113,7 +113,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwDuringSecondUpdateOfRenderResponse() {
+	void throwDuringSecondUpdateOfRenderResponse() {
 		refresh(); // TODO: fix so that this is not necessary anymore -- PrimeFaces will unnecessarily render duplicate CSS resources in error page because existing ones have JSESSIONID path param appended and new ones not.
 		assertAllResourcesRendered();
 		guardAjax(throwDuringSecondUpdateOfRenderResponse).click();
@@ -122,7 +122,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwDuringTreeVisitingOnRenderResponse() {
+	void throwDuringTreeVisitingOnRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwDuringTreeVisitingOnRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -130,7 +130,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwPrimeFacesDuringInvokeApplication() {
+	void throwPrimeFacesDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
@@ -138,7 +138,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwMixedDuringInvokeApplication() {
+	void throwMixedDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardAjax(throwMixedDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
@@ -146,7 +146,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwPrimeFacesDuringUpdateModelValues() {
+	void throwPrimeFacesDuringUpdateModelValues() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
@@ -154,7 +154,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwPrimeFacesDuringRenderResponse() {
+	void throwPrimeFacesDuringRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -162,7 +162,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwPrimeFacesDuringSecondUpdateOfRenderResponse() {
+	void throwPrimeFacesDuringSecondUpdateOfRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringSecondUpdateOfRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -170,7 +170,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwPrimeFacesDuringTreeVisitingOnRenderResponse() {
+	void throwPrimeFacesDuringTreeVisitingOnRenderResponse() {
 		assertAllResourcesRendered();
 		guardAjax(throwPrimeFacesDuringTreeVisitingOnRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -178,7 +178,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwNonAjaxDuringInvokeApplication() {
+	void throwNonAjaxDuringInvokeApplication() {
 		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringInvokeApplication).click();
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
@@ -186,7 +186,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwNonAjaxDuringUpdateModelValues() {
+	void throwNonAjaxDuringUpdateModelValues() {
 		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringUpdateModelValues).click();
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
@@ -194,7 +194,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void throwNonAjaxDuringRenderResponse() {
+	void throwNonAjaxDuringRenderResponse() {
 		if (isLiberty()) {
 			return;
 			// It's known to fail with below exception:

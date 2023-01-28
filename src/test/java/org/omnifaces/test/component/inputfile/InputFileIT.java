@@ -122,7 +122,7 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingle() throws IOException {
+	void uploadSingle() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleSubmit).click();
@@ -131,13 +131,13 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleEmpty() {
+	void uploadSingleEmpty() {
 		guardHttp(uploadSingleSubmit).click();
 		assertEquals("uploadSingle: null", getMessagesText());
 	}
 
 	@Test
-	public void uploadSingleAjax() throws IOException {
+	void uploadSingleAjax() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAjaxFile.sendKeys(txtFile.getAbsolutePath());
 		guardAjaxUpload(uploadSingleAjaxSubmit, messages);
@@ -145,7 +145,7 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleAcceptAnyImage() throws IOException {
+	void uploadSingleAcceptAnyImage() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAcceptAnyImageFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
@@ -160,7 +160,7 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleAcceptSvgImage() throws IOException {
+	void uploadSingleAcceptSvgImage() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAcceptSvgImageFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
@@ -176,7 +176,7 @@ public class InputFileIT extends OmniFacesIT {
 
 	@Test
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "HTMLInputElement.files returns null in PhantomJS")
-	public void uploadSingleMaxsizeClient() throws IOException {
+	void uploadSingleMaxsizeClient() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeClientFile.sendKeys(txtFile.getAbsolutePath());
 		triggerOnchange(uploadSingleMaxsizeClientFile, uploadSingleMaxsizeClientMessage);
@@ -192,7 +192,7 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleMaxsizeServer() throws IOException {
+	void uploadSingleMaxsizeServer() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
 		guardHttp(uploadSingleMaxsizeServerSubmit).click();
@@ -208,7 +208,7 @@ public class InputFileIT extends OmniFacesIT {
 
 	@Test
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
-	public void uploadMultiple() throws IOException {
+	void uploadMultiple() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleFile1.sendKeys(txtFile1.getAbsolutePath());
@@ -220,7 +220,7 @@ public class InputFileIT extends OmniFacesIT {
 
 	@Test
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
-	public void uploadMultipleAjax() throws IOException {
+	void uploadMultipleAjax() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
@@ -231,7 +231,7 @@ public class InputFileIT extends OmniFacesIT {
 
 	@Test
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
-	public void uploadMultipleMaxsizeClient() throws IOException {
+	void uploadMultipleMaxsizeClient() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
@@ -251,7 +251,7 @@ public class InputFileIT extends OmniFacesIT {
 
 	@Test
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
-	public void uploadMultipleMaxsizeServer() throws IOException {
+	void uploadMultipleMaxsizeServer() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());

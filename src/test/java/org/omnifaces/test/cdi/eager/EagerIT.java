@@ -58,7 +58,7 @@ public class EagerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		assertTrue(parseLong(lazyApplicationScopedBean.getText()) > parseLong(eagerApplicationScopedBean.getText()));
 		assertTrue(parseLong(lazySessionScopedBean.getText()) > parseLong(eagerSessionScopedBean.getText()));
 		assertTrue(parseLong(lazyViewScopedBean.getText()) > parseLong(eagerViewScopedBean.getText()));

@@ -48,7 +48,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testWelcomeFileOnEmptyPath() {
+	void testWelcomeFileOnEmptyPath() {
 		open("");
 		verify200("MultiViewsITWelcomeFile", "", "", "");
 
@@ -60,7 +60,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testWelcomeFileOnNamedPath() {
+	void testWelcomeFileOnNamedPath() {
 		open("MultiViewsITWelcomeFile");
 		verify200("MultiViewsITWelcomeFile", "", "", ""); // So it should have autoredirected back to empty path.
 
@@ -72,7 +72,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testWelcomeFileWithPathParameters() {
+	void testWelcomeFileWithPathParameters() {
 		open("foo/42");
 		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
@@ -87,7 +87,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testSubfolderWelcomeFileOnEmptyPath() {
+	void testSubfolderWelcomeFileOnEmptyPath() {
 		open("subfolder/");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
@@ -99,7 +99,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testSubfolderWelcomeFileOnNamedPath() {
+	void testSubfolderWelcomeFileOnNamedPath() {
 		open("subfolder/MultiViewsITWelcomeFile");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to subfolder.
 
@@ -111,7 +111,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testSubfolderWelcomeFileWithPathParameters() {
+	void testSubfolderWelcomeFileWithPathParameters() {
 		open("subfolder/foo/42");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
@@ -126,7 +126,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testOtherPage() {
+	void testOtherPage() {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
@@ -156,7 +156,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testNonExistingPage() {
+	void testNonExistingPage() {
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
 
@@ -168,7 +168,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testExcludedFolder() {
+	void testExcludedFolder() {
 		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
 		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
 

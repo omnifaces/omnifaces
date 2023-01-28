@@ -88,7 +88,7 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void nonAjax() {
+	void nonAjax() {
 		verifyElements();
 		guardHttp(nonAjaxSubmit).click();
 		verifyElements();
@@ -97,7 +97,7 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void ajax() {
+	void ajax() {
 		verifyElements();
 		guardAjax(ajaxSubmit).click();
 		verifyElements();
@@ -106,7 +106,7 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void mixed() {
+	void mixed() {
 		verifyElements();
 		guardHttp(nonAjaxSubmit).click();
 		verifyElements();

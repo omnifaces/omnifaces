@@ -50,31 +50,31 @@ public class ComponentsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void testCommandButtonAction() {
+	void testCommandButtonAction() {
 		guardAjax(commandButtonAction).click();
 		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
 	}
 
 	@Test
-	public void testCommandButtonActionListener() {
+	void testCommandButtonActionListener() {
 		guardAjax(commandButtonActionListener).click();
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}
 
 	@Test
-	public void testCommandButtonAjaxListener() {
+	void testCommandButtonAjaxListener() {
 		guardAjax(commandButtonAjaxListener).click();
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}
 
 	@Test
-	public void testPrimeFacesCommandButtonAction() {
+	void testPrimeFacesCommandButtonAction() {
 		guardAjax(primeFacesCommandButtonAction).click();
 		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
 	}
 
 	@Test
-	public void testPrimeFacesCommandButtonActionListener() {
+	void testPrimeFacesCommandButtonActionListener() {
 		guardAjax(primeFacesCommandButtonActionListener).click();
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}

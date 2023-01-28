@@ -58,7 +58,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
 			assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");

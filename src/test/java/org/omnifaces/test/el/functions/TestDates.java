@@ -50,7 +50,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithDate() {
+	void testZonedDateTimeUtilitiesWithDate() {
 		testZonedDateTimeUtilities(new java.sql.Date(System.currentTimeMillis()));
 		testZonedDateTimeUtilities(new java.sql.Time(System.currentTimeMillis()));
 		testZonedDateTimeUtilities(new java.sql.Timestamp(System.currentTimeMillis()));
@@ -58,7 +58,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithCalendar() {
+	void testZonedDateTimeUtilitiesWithCalendar() {
 		testZonedDateTimeUtilities(Calendar.getInstance());
 		testZonedDateTimeUtilities(Calendar.getInstance(TimeZone.getTimeZone(UTC)));
 		testZonedDateTimeUtilities(Calendar.getInstance(TimeZone.getTimeZone(ZP2)));
@@ -66,12 +66,12 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithInstant() {
+	void testZonedDateTimeUtilitiesWithInstant() {
 		testZonedDateTimeUtilities(Instant.now());
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithZonedDateTime() {
+	void testZonedDateTimeUtilitiesWithZonedDateTime() {
 		testZonedDateTimeUtilities(ZonedDateTime.now());
 		testZonedDateTimeUtilities(ZonedDateTime.now(UTC));
 		testZonedDateTimeUtilities(ZonedDateTime.now(ZP2));
@@ -79,7 +79,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithOffsetDateTime() {
+	void testZonedDateTimeUtilitiesWithOffsetDateTime() {
 		testZonedDateTimeUtilities(OffsetDateTime.now());
 		testZonedDateTimeUtilities(OffsetDateTime.now(UTC));
 		testZonedDateTimeUtilities(OffsetDateTime.now(ZP2));
@@ -87,7 +87,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithLocalDateTime() {
+	void testZonedDateTimeUtilitiesWithLocalDateTime() {
 		testZonedDateTimeUtilities(LocalDateTime.now());
 		testZonedDateTimeUtilities(LocalDateTime.now(UTC));
 		testZonedDateTimeUtilities(LocalDateTime.now(ZP2));
@@ -95,7 +95,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithLocalDate() {
+	void testZonedDateTimeUtilitiesWithLocalDate() {
 		testZonedDateTimeUtilities(LocalDate.now());
 		testZonedDateTimeUtilities(LocalDate.now(UTC));
 		testZonedDateTimeUtilities(LocalDate.now(ZP2));
@@ -103,7 +103,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithYearMonth() {
+	void testZonedDateTimeUtilitiesWithYearMonth() {
 		testZonedDateTimeUtilities(YearMonth.now());
 		testZonedDateTimeUtilities(YearMonth.now(UTC));
 		testZonedDateTimeUtilities(YearMonth.now(ZP2));
@@ -111,7 +111,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithOffsetTime() {
+	void testZonedDateTimeUtilitiesWithOffsetTime() {
 		testZonedDateTimeUtilities(OffsetTime.now());
 		testZonedDateTimeUtilities(OffsetTime.now(UTC));
 		testZonedDateTimeUtilities(OffsetTime.now(ZP2));
@@ -119,7 +119,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithLocalTime() {
+	void testZonedDateTimeUtilitiesWithLocalTime() {
 		testZonedDateTimeUtilities(LocalTime.now());
 		testZonedDateTimeUtilities(LocalTime.now(UTC));
 		testZonedDateTimeUtilities(LocalTime.now(ZP2));
@@ -127,7 +127,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testZonedDateTimeUtilitiesWithTemporalDate() {
+	void testZonedDateTimeUtilitiesWithTemporalDate() {
 		testZonedDateTimeUtilities(new DateProducer().getNow());
 	}
 
@@ -138,7 +138,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testFormatDateWithDate() {
+	void testFormatDateWithDate() {
 		long myBirthDateAsEpochMilli = MY_BIRTH_DATE.toInstant().toEpochMilli();
 		testFormatDate(new java.sql.Date(myBirthDateAsEpochMilli), null);
 		testFormatDate(new java.sql.Date(myBirthDateAsEpochMilli), ZP2);
@@ -155,7 +155,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testFormatDateWithCalendar() {
+	void testFormatDateWithCalendar() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(MY_BIRTH_DATE.toInstant().toEpochMilli());
 		testFormatDate(calendar, null);
@@ -164,49 +164,49 @@ public class TestDates {
 	}
 
 	@Test
-	public void testFormatDateWithInstant() {
+	void testFormatDateWithInstant() {
 		testFormatDate(MY_BIRTH_DATE.toInstant(), null);
 		testFormatDate(MY_BIRTH_DATE.toInstant(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toInstant(), CUR);
 	}
 
 	@Test
-	public void testFormatDateWithZonedDateTime() {
+	void testFormatDateWithZonedDateTime() {
 		testFormatDate(MY_BIRTH_DATE, null);
 		testFormatDate(MY_BIRTH_DATE, ZP2);
 		testFormatDate(MY_BIRTH_DATE, CUR);
 	}
 
 	@Test
-	public void testFormatDateWithOffsetDateTime() {
+	void testFormatDateWithOffsetDateTime() {
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime(), null);
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime(), CUR);
 	}
 
 	@Test
-	public void testFormatDateWithLocalDateTime() {
+	void testFormatDateWithLocalDateTime() {
 		testFormatDate(MY_BIRTH_DATE.toLocalDateTime(), null);
 		testFormatDate(MY_BIRTH_DATE.toLocalDateTime(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toLocalDateTime(), CUR);
 	}
 
 	@Test
-	public void testFormatDateWithLocalDate() {
+	void testFormatDateWithLocalDate() {
 		testFormatDate(MY_BIRTH_DATE.toLocalDate(), null);
 		testFormatDate(MY_BIRTH_DATE.toLocalDate(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toLocalDate(), CUR);
 	}
 
 	@Test
-	public void testFormatDateWithOffsetTime() {
+	void testFormatDateWithOffsetTime() {
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime().toOffsetTime(), null);
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime().toOffsetTime(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toOffsetDateTime().toOffsetTime(), CUR);
 	}
 
 	@Test
-	public void testFormatDateWithLocalTime() {
+	void testFormatDateWithLocalTime() {
 		testFormatDate(MY_BIRTH_DATE.toLocalTime(), null);
 		testFormatDate(MY_BIRTH_DATE.toLocalTime(), ZP2);
 		testFormatDate(MY_BIRTH_DATE.toLocalTime(), CUR);
@@ -243,7 +243,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testAddWeeks() {
+	void testAddWeeks() {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime expectedResult = now.plusWeeks(10);
 		LocalDateTime actualResult = Dates.addWeeks(now, 10);
@@ -251,7 +251,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testWeeksBetween() {
+	void testWeeksBetween() {
 		LocalDateTime start = LocalDateTime.now();
 		LocalDateTime end = start.plusWeeks(10);
 		int weeksBetween = Dates.weeksBetween(start, end);
@@ -263,7 +263,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testAddMinutes() {
+	void testAddMinutes() {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime expectedResult = now.plusMinutes(10);
 		LocalDateTime actualResult = Dates.addMinutes(now, 10);
@@ -271,7 +271,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testMinutesBetween() {
+	void testMinutesBetween() {
 		LocalDateTime start = LocalDateTime.now();
 		LocalDateTime end = start.plusMinutes(10);
 		long minutesBetween = Dates.minutesBetween(start, end);
@@ -283,7 +283,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testMonths() {
+	void testMonths() {
 		assertEquals(12, Dates.getMonths().size(), "There are 12 months");
 
 		int index = 1;
@@ -293,7 +293,7 @@ public class TestDates {
 	}
 
 	@Test
-	public void testDaysOfWeek() {
+	void testDaysOfWeek() {
 		assertEquals(7, Dates.getDaysOfWeek().size(), "There are 7 days of week");
 
 		int index = 1;

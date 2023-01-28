@@ -57,7 +57,7 @@ public class FacesConverterIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		waitUntilTextContent(loaded); // Wait until "load" event is finished because of resource dependencies.
 
 		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITConverter");

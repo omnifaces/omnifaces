@@ -64,7 +64,7 @@ public class ViewScopedIT extends OmniFacesIT {
 	}
 
 	@Test @Order(1)
-	public void nonAjax() {
+	void nonAjax() {
 		assertEquals("init", getMessagesText());
 		String previousBean = bean.getText();
 
@@ -123,7 +123,7 @@ public class ViewScopedIT extends OmniFacesIT {
 	}
 
 	@Test @Order(2)
-	public void ajax() {
+	void ajax() {
 
 		// Unloaded bean is from previous test.
 		assertEquals("unload init", getMessagesText());
@@ -180,7 +180,7 @@ public class ViewScopedIT extends OmniFacesIT {
 
 	@Test @Order(3)
 	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "closeCurrentTabAndSwitchTo() doesn't seem to trigger unload in PhantomJS")
-	public void destroyViewState() {
+	void destroyViewState() {
 
 		// Unloaded bean is from previous test.
 		assertEquals("unload init", getMessagesText());
