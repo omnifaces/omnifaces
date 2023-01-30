@@ -81,7 +81,7 @@
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
 		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
 		<test.mojarra3.version>3.0.3</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces4.version>4.0.0-RC3</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
+		<test.myfaces4.version>4.0.0-RC4</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
 		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
 		<test.weld5.version>5.1.0.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
 		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
