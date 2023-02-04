@@ -250,7 +250,8 @@ public final class Beans {
 	 * exist.
 	 * @param <T> The expected return type.
 	 * @param name The CDI managed bean name.
-	 * @return The CDI managed bean instance (actual) associated with the given bean name.
+	 * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there
+	 * is none.
 	 * @since 3.14
 	 * @see BeanManager#getBeans(String)
 	 * @see BeanManager#resolve(java.util.Set)

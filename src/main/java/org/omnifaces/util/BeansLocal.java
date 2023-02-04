@@ -142,7 +142,7 @@ public final class BeansLocal {
 	public static <T> T getInstance(BeanManager beanManager, String name, boolean create) {
 		Set<Bean<?>> beans = beanManager.getBeans(name);
 		Bean<?> bean = beanManager.resolve(beans);
-		return (T) getInstance(beanManager, bean, create);
+		return (bean != null) ? (T) getInstance(beanManager, bean, create) : null;
 	}
 
 	/**
