@@ -60,7 +60,7 @@ jobs:
         server-password: OSSRH_PASSWORD
     - name: Extract project version
       id: project
-      run: echo ::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+      run: echo name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) >> $GITHUB_OUTPUT
     - name: Deploy with Maven
       if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
       run: mvn -B deploy -Dmaven.test.skip=true
