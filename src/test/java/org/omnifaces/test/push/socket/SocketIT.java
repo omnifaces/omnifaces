@@ -23,12 +23,10 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withSocket;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Web sockets don't seem to work in Selenium+PhantomJS")
 public class SocketIT extends OmniFacesIT {
 
 	@FindBy(id="messages")
