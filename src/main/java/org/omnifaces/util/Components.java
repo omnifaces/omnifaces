@@ -950,7 +950,7 @@ public final class Components {
 	 * @return <code>true</code> if the given UI input component is editable.
 	 */
 	public static boolean isEditable(UIInput input) {
-		return input.isRendered()
+		return isRendered(input)
 			&& !Boolean.TRUE.equals(input.getAttributes().get("disabled"))
 			&& !Boolean.TRUE.equals(input.getAttributes().get("readonly"));
 	}
