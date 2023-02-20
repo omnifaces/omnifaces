@@ -185,7 +185,7 @@ public final class Platform {
 		ServletRegistration facesServletRegistration = null;
 
 		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
-			if (registration.getClassName().equals(FacesServlet.class.getName())) {
+			if (FacesServlet.class.getName().equals(registration.getClassName())) {
 				facesServletRegistration = registration;
 				break;
 			}
