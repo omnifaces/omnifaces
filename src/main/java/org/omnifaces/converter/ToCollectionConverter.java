@@ -114,7 +114,7 @@ public class ToCollectionConverter extends TrimConverter {
 
 		Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
-		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER).trim()))) {
+		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER)))) {
 			String trimmed = (String) super.getAsObject(context, component, item);
 			collection.add(converter == null ? trimmed : converter.getAsObject(context, component, trimmed));
 		}
