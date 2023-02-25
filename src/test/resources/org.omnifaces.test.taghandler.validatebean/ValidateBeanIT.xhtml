@@ -188,6 +188,19 @@
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
+		<h:form id="validateConvertedEntityActualWithMessageForViolating">
+			<h:inputText id="input" label="inputLabel" value="#{validateBeanITConvertedEntityBean.entity}" />
+			<h:message id="inputMessage" for="input" />
+			<h:message id="formMessage" for="validateConvertedEntityActualWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITConvertedEntityBean.action}">
+				<f:ajax execute="@form" render="inputMessage formMessage :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITConvertedEntityBean}"
+				showMessageFor="@violating" method="validateActual" />
+		</h:form>
+
 		<o:form id="validateNestedClassLevelWithMessageForViolating">
 			<h:inputText id="number1" label="number1Label" value="#{validateBeanITNestedClassLevelBean.entity.number1}" />
 			<h:message id="number1Message" for="number1" />

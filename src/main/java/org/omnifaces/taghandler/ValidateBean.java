@@ -21,6 +21,7 @@ import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singleton;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
@@ -40,6 +41,7 @@ import static org.omnifaces.util.Faces.getMessageBundle;
 import static org.omnifaces.util.Faces.renderResponse;
 import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
+import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
 import static org.omnifaces.util.Reflection.getBaseBeanPropertyPaths;
@@ -49,8 +51,7 @@ import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Validators.resolveViolatedBase;
-import static org.omnifaces.util.Validators.resolveViolatedProperty;
+import static org.omnifaces.util.Validators.resolveViolatedBasesAndProperties;
 import static org.omnifaces.util.Validators.validateBean;
 
 import java.beans.Introspector;
@@ -65,6 +66,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -307,6 +309,8 @@ public class ValidateBean extends TagHandler {
 		"o:validateBean must be nested in an UIForm.";
 	private static final String ERROR_INVALID_PARENT =
 		"o:validateBean parent must be an instance of UIInput or UICommand.";
+	private static final String WARN_UNDISPLAYED_VIOLATION =
+		"o:validateBean could not display violation message '%s' for property path '%s'.";
 
 	// Enums ----------------------------------------------------------------------------------------------------------
 
@@ -598,16 +602,31 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, String messageFormat) {
-		for (ConstraintViolation<?> violation : violations) {
-			Object base = resolveViolatedBase(bean, violation);
-			String property = resolveViolatedProperty(violation);
+		Set<ConstraintViolation<?>> undisplayed = new HashSet<>(violations);
 
-			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
-				context.validationFailed();
-				input.setValid(false);
-				String clientId = input.getClientId(context);
-				addError(clientId, formatMessage(violation.getMessage(), getLabel(input), messageFormat));
-			});
+		for (ConstraintViolation<?> violation : violations) {
+			for (Entry<Object, String> baseAndProperty : resolveViolatedBasesAndProperties(bean, violation)) {
+				boolean[] displayed = { false };
+
+				forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), baseAndProperty.getValue(), input -> {
+					context.validationFailed();
+					input.setValid(false);
+					String clientId = input.getClientId(context);
+					addError(clientId, formatMessage(violation.getMessage(), getLabel(input), messageFormat));
+					undisplayed.remove(violation);
+					displayed[0] = true;
+				});
+
+				if (displayed[0]) {
+					break;
+				}
+			}
+		}
+
+		if (isDevelopment(context)) {
+			for (ConstraintViolation<?> violation : undisplayed) {
+				logger.log(WARNING, String.format(WARN_UNDISPLAYED_VIOLATION, violation.getMessage(), violation.getPropertyPath()));
+			}
 		}
 	}
 

@@ -182,6 +182,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelActualWithMessageForViolating:command")
 	private WebElement validateClassLevelActualWithMessageForViolatingCommand;
 
+	@FindBy(id="validateConvertedEntityActualWithMessageForViolating:input")
+	private WebElement validateConvertedEntityActualWithMessageForViolatingInput;
+
+	@FindBy(id="validateConvertedEntityActualWithMessageForViolating:inputMessage")
+	private WebElement validateConvertedEntityActualWithMessageForViolatingInputMessage;
+
+	@FindBy(id="validateConvertedEntityActualWithMessageForViolating:formMessage")
+	private WebElement validateConvertedEntityActualWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateConvertedEntityActualWithMessageForViolating:command")
+	private WebElement validateConvertedEntityActualWithMessageForViolatingCommand;
+
 	@FindBy(id="validateNestedClassLevelWithMessageForViolating:number1")
 	private WebElement validateNestedClassLevelWithMessageForViolatingNumber1;
 
@@ -596,6 +608,20 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", getMessagesText());
+	}
+
+	@Test
+	public void validateConvertedEntityActualWithMessageForViolating() {
+		guardAjax(validateConvertedEntityActualWithMessageForViolatingCommand).click();
+		assertEquals("inputLabel: please fill out", validateConvertedEntityActualWithMessageForViolatingInputMessage.getText());
+		assertEquals("", validateConvertedEntityActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionValidationFailed", getMessagesText());
+
+		validateConvertedEntityActualWithMessageForViolatingInput.sendKeys("value");
+		guardAjax(validateConvertedEntityActualWithMessageForViolatingCommand).click();
+		assertEquals("", validateConvertedEntityActualWithMessageForViolatingInputMessage.getText());
+		assertEquals("", validateConvertedEntityActualWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionSuccess", getMessagesText());
 	}
 

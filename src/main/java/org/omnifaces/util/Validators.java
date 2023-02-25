@@ -22,11 +22,15 @@ import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Reflection.getBeanProperty;
 
 import java.lang.reflect.Array;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
@@ -138,27 +142,72 @@ public final class Validators {
 	 * @return Violated base from given bean based on given violation.
 	 */
 	public static Object resolveViolatedBase(Object bean, ConstraintViolation<?> violation) {
+		List<Entry<Object, String>> basesAndProperties = resolveViolatedBasesAndProperties(bean, violation);
+		return basesAndProperties.isEmpty() ? null : basesAndProperties.iterator().next().getKey();
+	}
+
+	/**
+	 * Resolve violated bases and properties from given bean based on given violation in reverse order.
+	 * @param bean Bean to resolve violated base on.
+	 * @param violation Constraint violation to resolve violated base from.
+	 * @return Violated bases and properties from given bean based on given violation in reverse order.
+	 * @since 3.14.2
+	 */
+	public static List<Entry<Object, String>> resolveViolatedBasesAndProperties(Object bean, ConstraintViolation<?> violation) {
+		List<Entry<Object, String>> basesAndProperties = new ArrayList<>();
+		BiConsumer<Object, String> add = (base, property) -> basesAndProperties.add(0, new AbstractMap.SimpleEntry<>(base, property));
+
 		try {
 			Object base = bean;
 
 			for (Iterator<Node> iterator = violation.getPropertyPath().iterator(); iterator.hasNext();) {
+				Node node = iterator.next();
+				add.accept(base, node.toString());
+
 				if (base == null) {
-					return null;
+					break;
 				}
 
-				Node node = iterator.next();
 				boolean last = !iterator.hasNext();
 				base = resolveProperty(node, base, last);
-			}
 
-			return base;
+				if (last) {
+					add.accept(base, resolveViolatedProperty(violation));
+				}
+			}
 		}
 		catch (Exception e) {
 			String propertyPath = getPropertyNodes(violation).stream().map(Node::toString).collect(joining("."));
 			logger.log(WARNING, format(ERROR_RESOLVE_BASE, propertyPath, bean == null ? "null" : bean.getClass()), e);
-			return violation.getLeafBean(); // Fall back.
+
+			if (violation.getLeafBean() != null) {
+				add.accept(violation.getLeafBean(), resolveViolatedProperty(violation)); // Fall back.
+			}
 		}
+
+		return basesAndProperties;
 	}
+
+	/**
+	 * Resolve violated property from given violation.
+	 * @param violation Constraint violation to resolve violated property from.
+	 * @return Violated property from given violation.
+	 */
+	public static String resolveViolatedProperty(ConstraintViolation<?> violation) {
+		List<Node> propertyNodes = getPropertyNodes(violation);
+		return propertyNodes.get(propertyNodes.size() - 1).getName();
+	}
+
+	/**
+	 * Returns a list of property path nodes from the given constraint violation.
+	 * @param violation The constraint violation to return a list of property path nodes from.
+	 * @return A list of property path nodes from the given constraint violation.
+	 */
+	public static List<Node> getPropertyNodes(ConstraintViolation<?> violation) {
+		return StreamSupport.stream(violation.getPropertyPath().spliterator(), false).collect(toList());
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Object resolveProperty(Node node, Object base, boolean last) {
 		ElementKind kind = node.getKind();
@@ -188,27 +237,6 @@ public final class Validators {
 				throw new UnsupportedOperationException(node + " kind " + kind + " is not supported.");
 		}
 	}
-
-	/**
-	 * Resolve violated property from given violation.
-	 * @param violation Constraint violation to resolve violated property from.
-	 * @return Violated property from given violation.
-	 */
-	public static String resolveViolatedProperty(ConstraintViolation<?> violation) {
-		List<Node> propertyNodes = getPropertyNodes(violation);
-		return propertyNodes.get(propertyNodes.size() - 1).getName();
-	}
-
-	/**
-	 * Returns a list of property path nodes from the given constraint violation.
-	 * @param violation The constraint violation to return a list of property path nodes from.
-	 * @return A list of property path nodes from the given constraint violation.
-	 */
-	public static List<Node> getPropertyNodes(ConstraintViolation<?> violation) {
-		return StreamSupport.stream(violation.getPropertyPath().spliterator(), false).collect(toList());
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Object resolveProperty(Object base, Node node, boolean last) {
 		Object value;
