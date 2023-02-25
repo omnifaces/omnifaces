@@ -92,7 +92,6 @@ import javax.validation.Valid;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Reflection.PropertyPath;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
