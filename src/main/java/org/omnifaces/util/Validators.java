@@ -17,6 +17,7 @@ import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
+import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Reflection.getBeanProperty;
@@ -155,7 +156,7 @@ public final class Validators {
 	 */
 	public static List<Entry<Object, String>> resolveViolatedBasesAndProperties(Object bean, ConstraintViolation<?> violation) {
 		List<Entry<Object, String>> basesAndProperties = new ArrayList<>();
-		BiConsumer<Object, String> add = (base, property) -> basesAndProperties.add(0, new AbstractMap.SimpleEntry<>(base, property));
+		BiConsumer<Object, String> add = (base, property) -> basesAndProperties.add(0, new AbstractMap.SimpleEntry<>(unwrapIfNecessary(base), property));
 
 		try {
 			Object base = bean;
