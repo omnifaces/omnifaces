@@ -66,6 +66,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -1408,6 +1409,42 @@ public final class Components {
 
 		return (value == null) ? null : value.toString();
 	}
+
+	/**
+	 * Get the rendered value of given value holder. If the given value holder is an instance of
+	 * {@link EditableValueHolder}, and its {@link EditableValueHolder#getSubmittedValue()} is non-{@code null}, then
+	 * return it, or if its {@link EditableValueHolder#isLocalValueSet()} is true, then use
+	 * {@link EditableValueHolder#getLocalValue()} as base value. Else use {@link ValueHolder#getValue()} as base value.
+	 * Finally return the result of {@link #convertToString(FacesContext, ValueHolder, Object)} with base value as value
+	 * argument. The result should be exactly the same as displayed during the render response phase.
+	 * @param context The involved faces context.
+	 * @param holder The value holder.
+	 * @return The rendered value, never {@code null}. If the final result was {@code null}, then an empty string is
+	 * returned.
+	 * @since 4.2
+	 */
+	public static String getRenderedValue(FacesContext context, ValueHolder holder) {
+		Object value = null;
+
+		if (holder instanceof EditableValueHolder) {
+			EditableValueHolder editableValueHolder = (EditableValueHolder) holder;
+			Object submittedValue = editableValueHolder.getSubmittedValue();
+
+			if (submittedValue != null) {
+				return submittedValue.toString();
+			}
+
+			if (editableValueHolder.isLocalValueSet()) {
+				value = editableValueHolder.getLocalValue();
+			}
+		}
+		else {
+			value = holder.getValue();
+		}
+
+		return Objects.toString(convertToString(context, holder, value), "");
+	}
+
 
 	// Expressions ----------------------------------------------------------------------------------------------------
 
