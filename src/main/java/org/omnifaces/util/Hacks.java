@@ -62,7 +62,8 @@ public final class Hacks {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String PRIMEFACES_PACKAGE_PREFIX = "org.primefaces.";
+	private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS =
+		toClassOrNull("org.primefaces.component.api.AjaxSource");
 	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
@@ -400,7 +401,7 @@ public final class Hacks {
 			return false;
 		}
 
-		if (isPrimeFacesClass(actionSource)) {
+		if (isPrimeFacesAjaxSource(actionSource)) {
 			return true;
 		}
 
@@ -416,15 +417,15 @@ public final class Hacks {
 
 		ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
 
-		if (ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesClass)) {
+		if (ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesAjaxSource)) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private static boolean isPrimeFacesClass(Object object) {
-		return object.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
+	private static boolean isPrimeFacesAjaxSource(Object object) {
+		return PRIMEFACES_AJAX_SOURCE_CLASS != null && PRIMEFACES_AJAX_SOURCE_CLASS.isInstance(object);
 	}
 
 	/**
