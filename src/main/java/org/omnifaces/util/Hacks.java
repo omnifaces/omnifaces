@@ -79,7 +79,8 @@ public final class Hacks {
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
 
-	private static final String PRIMEFACES_PACKAGE_PREFIX = "org.primefaces.";
+	private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS =
+		toClassOrNull("org.primefaces.component.api.AjaxSource");
 	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
@@ -555,7 +556,7 @@ public final class Hacks {
 			return false;
 		}
 
-		if (isPrimeFacesClass(actionSource)) {
+		if (isPrimeFacesAjaxSource(actionSource)) {
 			return true;
 		}
 
@@ -572,7 +573,7 @@ public final class Hacks {
 		ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
 
 		for (ClientBehavior ajaxBehavior : ajaxSource.getClientBehaviors().get(ajaxEvent)) {
-			if (isPrimeFacesClass(ajaxBehavior)) {
+			if (isPrimeFacesAjaxSource(ajaxBehavior)) {
 				return true;
 			}
 		}
@@ -580,8 +581,8 @@ public final class Hacks {
 		return false;
 	}
 
-	private static boolean isPrimeFacesClass(Object object) {
-		return object.getClass().getPackage().getName().startsWith(PRIMEFACES_PACKAGE_PREFIX);
+	private static boolean isPrimeFacesAjaxSource(Object object) {
+		return PRIMEFACES_AJAX_SOURCE_CLASS != null && PRIMEFACES_AJAX_SOURCE_CLASS.isInstance(object);
 	}
 
 	/**
