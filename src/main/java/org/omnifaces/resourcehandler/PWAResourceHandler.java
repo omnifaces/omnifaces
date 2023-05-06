@@ -53,6 +53,7 @@ import jakarta.faces.component.UIOutput;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PreRenderViewEvent;
+import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.ViewScoped;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -249,6 +250,10 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
 	private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
 			"WebAppManifest#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
+	private static final String WARNING_INVALID_CACHEABLE_VIEW_ID =
+			"Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the WebAppManifest#getCacheableViewIds() returned a typo?";
+	private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
+			"Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the WebAppManifest#getOfflineViewId() returned a typo?";
 
 	/** The resource name <code>manifest.json</code>. */
 	public static final String MANIFEST_RESOURCE_NAME = "manifest.json";
@@ -393,12 +398,19 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 		}
 
 		for (String viewId : viewIds) {
+			ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
+
+			if (!viewDeclarationLanguage.viewExists(context, viewId)) {
+				logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId));
+				continue;
+			}
+
 			cacheableResources.add(viewHandler.getActionURL(context, viewId));
 			UIViewRoot view = viewHandler.createView(context, viewId);
 
 			try {
 				context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
-				viewHandler.getViewDeclarationLanguage(context, viewId).buildView(context, view);
+				viewDeclarationLanguage.buildView(context, view);
 				context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
 			}
 			catch (Exception e) {
