@@ -48,7 +48,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code>
  * caching requests, hereby improving browser caching. This servlet also properly deals with <code>Range</code> and
- * <code>If-Range</code> ranging requests (<a href="https://tools.ietf.org/html/rfc7233">RFC7233</a>), which is required
+ * <code>If-Range</code> ranging requests (<a href="https://datatracker.ietf.org/doc/html/rfc7233">RFC 7233</a>), which is required
  * by most media players for proper audio/video streaming, and by webbrowsers and for a proper resume of an paused
  * download, and by download accelerators to be able to request smaller parts simultaneously. This servlet is ideal when
  * you have large files like media files placed outside the web application and you can't use the default servlet.

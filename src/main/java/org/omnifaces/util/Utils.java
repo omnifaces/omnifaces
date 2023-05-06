@@ -824,9 +824,9 @@ public final class Utils {
 	// Dates ----------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Formats the given {@link Date} to a string in RFC1123 format. This format is used in HTTP headers and in
-	 * JavaScript <code>Date</code> constructor.
-	 * @param date The <code>Date</code> to be formatted to a string in RFC1123 format.
+	 * Formats the given {@link Date} to a string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a>
+	 * format. This format is used in HTTP headers and in JavaScript <code>Date</code> constructor.
+	 * @param date The <code>Date</code> to be formatted to a string in RFC 1123 format.
 	 * @return The formatted string.
 	 * @since 1.2
 	 */
@@ -837,10 +837,11 @@ public final class Utils {
 	}
 
 	/**
-	 * Parses the given string in RFC1123 format to a {@link Date} object.
-	 * @param string The string in RFC1123 format to be parsed to a <code>Date</code> object.
+	 * Parses the given string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format to a
+	 * {@link Date} object.
+	 * @param string The string in RFC 1123 format to be parsed to a <code>Date</code> object.
 	 * @return The parsed <code>Date</code>.
-	 * @throws ParseException When the given string is not in RFC1123 format.
+	 * @throws ParseException When the given string is not in RFC 1123 format.
 	 * @since 1.2
 	 */
 	public static Date parseRFC1123(String string) throws ParseException {

@@ -371,8 +371,8 @@ import org.omnifaces.util.State;
  * The <code>onerror</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
  * <li><code>code</code>: the close reason code as integer. See also
- * <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API for
- * an elaborate list of all close codes.</li>
+ * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
+ * {@link CloseCodes} API for an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
@@ -403,8 +403,8 @@ import org.omnifaces.util.State;
  * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket
  * is simply not <a href="https://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>,
  * then it was normally closed due to an expired session or view. Else if this is not <code>1000</code>, then there may
- * be an error. See also <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
- * {@link CloseCodes} API for an elaborate list of all close codes.</li>
+ * be an error. See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a>
+ * and {@link CloseCodes} API for an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
@@ -1047,7 +1047,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	 * socket will attempt to reconnect. The function will be invoked with three arguments: the error reason code, the
 	 * channel name and the raw <code>CloseEvent</code> itself. Note that this will not be invoked on final close of the
 	 * web socket, even when the final close is caused by an error. See also
-	 * <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
+	 * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
 	 * for an elaborate list of all close codes.
 	 * @param onerror The JavaScript event handler function that is invoked when a reconnection error has occurred.
 	 * @since 3.4
@@ -1071,7 +1071,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	 * attempt to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
 	 * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
 	 * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
-	 * when the code is not 1000 or 1008). See also <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455
+	 * when the code is not 1000 or 1008). See also <a https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
 	 * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
 	 * @param onclose The JavaScript event handler function that is invoked when the web socket is closed.
 	 */

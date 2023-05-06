@@ -31,7 +31,7 @@ public class TestServlets {
 
 	private static final String[][] CONTENT_DISPOSITIONS = {
 
-		// https://tools.ietf.org/html/rfc6266#section-5
+		// https://datatracker.ietf.org/doc/html/rfc6266#section-5
 		{ "form-data; filename=example.html", "example.html" },
 		{ "form-data; FILENAME= \"an example.html\"", "an example.html" },
 		{ "form-data; filename*= UTF-8''%e2%82%ac%20rates", "€ rates" },

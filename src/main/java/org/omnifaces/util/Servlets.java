@@ -495,8 +495,9 @@ public final class Servlets {
 
 	/**
 	 * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers
-	 * are known to incorrectly include the client side path along with it. Since version 2.6.7, RFC-2231/5987 encoded
-	 * file names are also supported.
+	 * are known to incorrectly include the client side path along with it. Since version 2.6.7,
+	 * <a href="https://datatracker.ietf.org/doc/html/rfc2231">RFC 2231</a>/<a href="https://datatracker.ietf.org/doc/html/rfc5987">5987</a>
+	 * encoded file names are also supported.
 	 * @param part The part of a multipart/form-data request.
 	 * @return The submitted file name of the given part, or null if there is none.
 	 * @since 2.5

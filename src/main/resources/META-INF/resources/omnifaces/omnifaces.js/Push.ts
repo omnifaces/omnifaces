@@ -161,13 +161,13 @@ export module Push {
 	 * occurred and the web socket will attempt to reconnect. The function will be invoked with three arguments: the
 	 * error reason code, the channel name and the raw <code>CloseEvent</code> itself. Note that this will not be
 	 * invoked on final close of the web socket, even when the final close is caused by an error. See also
-	 * <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
+	 * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
 	 * for an elaborate list of all close codes.
 	 * @param onclose The function to be invoked when the web socket is closed and will not anymore attempt
 	 * to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
 	 * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
 	 * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
-	 * when the code is not 1000 or 1008). See also <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455
+	 * when the code is not 1000 or 1008). See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
 	 * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
 	 * @param behaviors Client behavior functions to be invoked when specific message is received.
 	 * @param autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.

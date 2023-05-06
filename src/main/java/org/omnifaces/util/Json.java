@@ -54,7 +54,8 @@ public final class Json {
 	 * object type does not match any of them, then it will attempt to inspect the object as a javabean whereby the
 	 * public properties (with public getters) will be encoded as a JS object. It also supports {@link Collection}s,
 	 * {@link Map}s and arrays of them, even nested ones. The {@link Date} and {@link Temporal} are formatted in
-	 * RFC 1123 format, so you can if necessary just pass it straight to <code>new Date()</code> in JavaScript.
+	 * <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format, so you can if necessary just pass it
+	 * straight to <code>new Date()</code> in JavaScript.
 	 * @param object The object to be encoded as JSON.
 	 * @return The JSON-encoded representation of the given object.
 	 * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
