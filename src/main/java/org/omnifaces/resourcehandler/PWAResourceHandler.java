@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -175,6 +176,9 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
+ * If this method returns an empty collection, i.e. there are no cacheable resources at all, and thus also no offline
+ * resources at all, then no service worker file will be generated as it won't have any use then.
+ * <p>
  * In case you want to show a custom page as "You are offline!" error page, then you can specify it by overriding
  * the {@link WebAppManifest#getOfflineViewId()}.
  * <pre>
@@ -241,6 +245,11 @@ import org.omnifaces.util.Json;
  */
 public class PWAResourceHandler extends DefaultResourceHandler {
 
+	private static final Logger logger = Logger.getLogger(PWAResourceHandler.class.getName());
+
+	private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
+			"WebAppManifest#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
+
 	/** The resource name <code>manifest.json</code>. */
 	public static final String MANIFEST_RESOURCE_NAME = "manifest.json";
 
@@ -295,10 +304,15 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 		}
 
 		if (manifestResourceRequest) {
-			if (!resourceContentsRequest && !manifest.getCacheableViewIds().isEmpty()) {
-				addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
-				addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-				addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+			if (!resourceContentsRequest) {
+				if (!manifest.getCacheableViewIds().isEmpty()) {
+					addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
+					addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+					addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+				}
+				else {
+					logger.warning(WARNING_NO_CACHEABLE_VIEW_IDS);
+				}
 			}
 
 			return createManifestResource();
