@@ -1071,7 +1071,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	 * attempt to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
 	 * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
 	 * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
-	 * when the code is not 1000 or 1008). See also <a https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
+	 * when the code is not 1000 or 1008). See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
 	 * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
 	 * @param onclose The JavaScript event handler function that is invoked when the web socket is closed.
 	 */
