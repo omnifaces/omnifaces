@@ -1226,6 +1226,10 @@ public final class Utils {
 	 * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
 	 * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
 	 * the space has to be %20 and some chars doesn't necessarily need to be encoded.
+	 * <p>
+	 * Since version 4.2 this method is using <a href="https://datatracker.ietf.org/doc/html/rfc3986">RFC 3986</a> rules.
+	 * Previously it was using <a href="https://datatracker.ietf.org/doc/html/rfc2396">RFC 2396</a> rules. The result is
+	 * therefore not per definition exactly the same, but this is supposed to be backwards compatible in modern clients.
 	 * @param string The string to be URI-encoded using UTF-8.
 	 * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -1238,10 +1242,7 @@ public final class Utils {
 
 		return encodeURL(string)
 			.replace("+", "%20")
-			.replace("%21", "!")
-			.replace("%27", "'")
-			.replace("%28", "(")
-			.replace("%29", ")")
+			.replace("*", "%2A")
 			.replace("%7E", "~");
 	}
 

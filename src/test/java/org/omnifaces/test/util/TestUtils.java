@@ -25,6 +25,10 @@ public class TestUtils {
 		{ "jakarta.faces:faces.js|omnifaces:omnifaces.js", "eNrLSsxOLCpJ1EtLTE4ttgKTelnFNfm5eZkQITgLKAwAkVERgQ" }, // 2-padded
 	};
 
+	private static final String RFC_3986_RESERVED_CHARACTERS = ":/?#[]@!$&'()*+,;=";
+	private static final String RFC_3986_RESERVED_CHARACTERS_ENCODED = "%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D";
+	private static final String RFC_3986_UNRESERVED_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+
 	@Test
 	void testSerializeURLSafe() {
 		for (String[] test : URL_SAFE_SERIALIZED_STRINGS) {
@@ -33,6 +37,11 @@ public class TestUtils {
 			assertEquals(serialized, Utils.serializeURLSafe(id));
 			assertEquals(id, Utils.unserializeURLSafe(serialized));
 		}
+	}
+
+	void testEncodeURI() {
+		assertEquals(RFC_3986_RESERVED_CHARACTERS_ENCODED, Utils.encodeURI(RFC_3986_RESERVED_CHARACTERS));
+		assertEquals(RFC_3986_UNRESERVED_CHARACTERS, Utils.encodeURI(RFC_3986_UNRESERVED_CHARACTERS));
 	}
 
 }
