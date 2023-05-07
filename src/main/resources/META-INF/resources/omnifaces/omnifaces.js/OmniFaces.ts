@@ -23,6 +23,7 @@ export const VIEW_STATE_PARAM = "jakarta.faces.ViewState";
 export const CLIENT_WINDOW_PARAM = "jakarta.faces.ClientWindow";
 
 export { Util } from "./Util";
+export { Highlight } from "./Highlight";
 export { DeferredScript } from "./DeferredScript";
 export { Unload } from "./Unload";
 export { Push } from "./Push";
