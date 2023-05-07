@@ -76,7 +76,7 @@ import org.omnifaces.util.Json;
  * {@link RequestScoped} (note that a {@link ViewScoped} won't work).</li>
  * <li>Override properties accordingly conform javadoc and the rules in
  * <a href="https://www.w3.org/TR/appmanifest/">the W3 spec</a>.</li>
- * <li>Reference it as <code>#{resource['omnifaces:manifest.json']}</code> in your template.
+ * <li>Reference it as <code>#{resource['omnifaces:manifest.webmanifest']}</code> in your template.
  * </ol>
  * <p>
  * Here's a concrete example:
@@ -144,9 +144,9 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Reference it in your template exactly as follows, with the exact library name of <code>omnifaces</code> and
- * exact resource name of <code>manifest.json</code>. You cannot change these values.
+ * exact resource name of <code>manifest.webmanifest</code>. You cannot change these values.
  * <pre>
- * &lt;link rel="manifest" href="#{resource['omnifaces:manifest.json']}" crossorigin="use-credentials" /&gt;
+ * &lt;link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" crossorigin="use-credentials" /&gt;
  * </pre>
  * <p>
  * The <code>crossorigin</code> attribute is optional, you can drop it, but it's mandatory if you've put the
@@ -154,7 +154,24 @@ import org.omnifaces.util.Json;
  * cookies while downloading the <code>manifest.json</code> and then this resource handler won't be able to maintain the
  * server side cache, see also next section.
  * <p>
- * Note: you do not need to explicitly register this resource handler. It's already automatically registered.
+ * For backwards compatibility with earlier OmniFaces versions, the resource name of <code>manifest.json</code> is also
+ * supported. The default resource name has changed fo <code>manifest.webmanifest</code> since version 4.2 in order to
+ * comply the new change in <a href="https://w3c.github.io/manifest/#using-a-link-element-to-link-to-a-manifest">W3C spec</a>.
+ * The resource will use the <code>application/manifest+json</code> content type. In case you face the following warning
+ * in server logs or something similar,
+ * <blockquote>WARNING: JSF1091: No mime type could be found for file manifest.webmanifest.
+ * To resolve this, add a mime-type mapping to the applications web.xml.
+ * </blockquote>
+ * then take action accordingly by adding the following entry to your <code>web.xml</code>:
+ * <pre>
+ * &lt;mime-mapping&gt;
+ *     &lt;extension&gt;webmanifest&lt;/extension&gt;
+ *     &lt;mime-type&gt;application/manifest+json&lt;/mime-type&gt;
+ * &lt;/mime-mapping&gt;
+ * </pre>
+ * <p>
+ * Note: you do not need to explicitly register this resource handler in your <code>faces-config.xml</code>. It's
+ * already automatically registered.
  *
  * <h2>Server side caching</h2>
  * <p>
@@ -255,8 +272,14 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 	private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
 			"Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the WebAppManifest#getOfflineViewId() returned a typo?";
 
-	/** The resource name <code>manifest.json</code>. */
-	public static final String MANIFEST_RESOURCE_NAME = "manifest.json";
+	/** The resource name <code>manifest.webmanifest</code>. */
+	public static final String MANIFEST_RESOURCE_NAME = "manifest.webmanifest";
+
+	/** The alternative resource name <code>manifest.json</code>. */
+	private static final String ALTERNATIVE_MANIFEST_RESOURCE_NAME = "manifest.json";
+
+	/** The content type <code>application/manifest+json</code>. */
+	private static final String MANIFEST_CONTENT_TYPE = "application/manifest+json";
 
 	/** The resource name <code>sw.js</code>. */
 	public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
@@ -285,7 +308,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		boolean manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName);
+		boolean manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName) || ALTERNATIVE_MANIFEST_RESOURCE_NAME.equals(resourceName);
 		boolean serviceWorkerResourceRequest = SERVICEWORKER_RESOURCE_NAME.equals(resourceName);
 
 		if (!(manifestResourceRequest || serviceWorkerResourceRequest)) {
@@ -320,15 +343,15 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 				}
 			}
 
-			return createManifestResource();
+			return createManifestResource(resourceName);
 		}
 		else {
 			return createServiceWorkerResource();
 		}
 	}
 
-	private DynamicResource createManifestResource() {
-		return new DynamicResource(MANIFEST_RESOURCE_NAME, OMNIFACES_LIBRARY_NAME, "application/json") {
+	private DynamicResource createManifestResource(String resourceName) {
+		return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, "application/json") {
 			@Override
 			public InputStream getInputStream() throws IOException {
 				return new ByteArrayInputStream(manifestContents);
@@ -337,6 +360,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			@Override
 			public long getLastModified() {
 				return lastModified;
+			}
+
+			@Override
+			public String getContentType() {
+				return MANIFEST_CONTENT_TYPE;
 			}
 		};
 	}
