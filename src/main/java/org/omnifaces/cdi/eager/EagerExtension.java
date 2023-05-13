@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.eager;
 
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.BeansLocal.getAnnotation;
 import static org.omnifaces.util.BeansLocal.getReference;
 
@@ -87,8 +88,12 @@ public class EagerExtension implements Extension {
 		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
 
 		if (eagerBeansRepository == null) {
-			logger.warning(ERROR_EAGER_UNAVAILABLE);
-			return;
+			eagerBeansRepository = getReference(EagerBeansRepository.class); // #744: Work around for Payara. Apparently its beanManager instance has become "stale" somehow?
+
+			if (eagerBeansRepository == null) {
+				logger.warning(ERROR_EAGER_UNAVAILABLE);
+				return;
+			}
 		}
 
 		eagerBeansRepository.setEagerBeans(eagerBeans);
