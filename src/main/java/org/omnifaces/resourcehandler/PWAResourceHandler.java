@@ -266,11 +266,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 	private static final Logger logger = Logger.getLogger(PWAResourceHandler.class.getName());
 
 	private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
-			"WebAppManifest#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
+			"%s#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
 	private static final String WARNING_INVALID_CACHEABLE_VIEW_ID =
-			"Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the WebAppManifest#getCacheableViewIds() returned a typo?";
+			"Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getCacheableViewIds() returned a typo?";
 	private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
-			"Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the WebAppManifest#getOfflineViewId() returned a typo?";
+			"Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getOfflineViewId() returned a typo?";
 
 	/** The resource name <code>manifest.webmanifest</code>. */
 	public static final String MANIFEST_RESOURCE_NAME = "manifest.webmanifest";
@@ -339,7 +339,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 					addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
 				}
 				else {
-					logger.warning(WARNING_NO_CACHEABLE_VIEW_IDS);
+					logger.warning(format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
 				}
 			}
 
@@ -429,7 +429,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
 
 			if (!viewDeclarationLanguage.viewExists(context, viewId)) {
-				logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId));
+				logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
 				continue;
 			}
 
