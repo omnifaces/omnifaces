@@ -15,6 +15,7 @@ package org.omnifaces.cdi.config;
 import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
@@ -28,6 +29,7 @@ import org.omnifaces.cdi.Eager;
  * @author Bauke Scholtz
  * @since 3.6
  */
+@Dependent
 public class DateProducer {
 
 	/**
