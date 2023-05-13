@@ -23,6 +23,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Named;
@@ -56,6 +57,7 @@ import org.omnifaces.cdi.Eager;
  * @author Bauke Scholtz
  * @since 3.6
  */
+@Dependent
 public class DateProducer {
 
 	/**
