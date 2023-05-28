@@ -312,6 +312,7 @@
 						<manifestEntries>
 							<URL>${project.url}</URL>
 							<Extension-Name>${project.artifactId}</Extension-Name>
+							<Automatic-Module-Name>${project.groupId}</Automatic-Module-Name>
 						</manifestEntries>
 					</archive>
 				</configuration>
