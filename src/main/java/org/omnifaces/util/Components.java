@@ -28,6 +28,7 @@ import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
@@ -36,6 +37,7 @@ import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
+import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
@@ -43,6 +45,7 @@ import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
@@ -50,7 +53,9 @@ import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
+import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
@@ -64,6 +69,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,6 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
@@ -200,6 +207,8 @@ public final class Components {
 		"Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
 	private static final String ERROR_CHILDREN_DISALLOWED =
 		"Component '%s' may not have any children. Encountered children of types '%s'.";
+	private static final String ERROR_ILLEGAL_UIINPUT =
+		"Relative client ID '%s' must represent an UIInput component, but encountered '%s'.";
 
 	private static final Set<SearchExpressionHint> RESOLVE_LABEL_FOR = EnumSet.of(RESOLVE_SINGLE_COMPONENT, IGNORE_NO_RESULT);
 
@@ -1445,6 +1454,66 @@ public final class Components {
 		return Objects.toString(convertToString(context, holder, value), "");
 	}
 
+	/**
+	 * Invalidate {@link UIInput} components identified by given relative client IDs. They will first be searched using
+	 * {@link #findComponentRelatively(UIComponent, String)} within the {@link UIForm} returned by
+	 * {@link #getCurrentForm()} with a fallback to the {@link UIViewRoot}.
+	 * Then the {@link EditableValueHolder#setValid(boolean)} will be set with {@code false}.
+	 * @param relativeClientIds The relative client IDs of {@link UIInput} components to be invalidated.
+	 * @throws IllegalArgumentException When a relative client ID does not represent an {@link UIInput} component.
+	 * @since 4.2
+	 */
+	public static void invalidateInputs(String... relativeClientIds) {
+		findAndInvalidateInputs(relativeClientIds);
+	}
+
+	/**
+	 * Invalidate {@link UIInput} component identified by given relative client ID via {@link #invalidateInputs(String...)}
+	 * and calls {@link Messages#addError(String, String, Object...)} on it with the given message body which is
+	 * formatted with the given parameters.
+	 * @param relativeClientId The relative client ID of {@link UIInput} component to be invalidated.
+	 * @param message The message to be added to the invalidated {@link UIInput} component.
+	 * @param params The message format parameters, if any.
+	 * @throws IllegalArgumentException When the relative client ID does not represent an {@link UIInput} component.
+	 * @since 4.2
+	 */
+	public static void invalidateInput(String relativeClientId, String message, Object... params) {
+		addError(findAndInvalidateInputs(relativeClientId).iterator().next(), message, params);
+	}
+
+	private static Set<String> findAndInvalidateInputs(String... relativeClientIds) {
+		UIComponent root = coalesce(getCurrentForm(), getViewRoot());
+		boolean needsVisit = stream(relativeClientIds).anyMatch(Components::containsIterationIndex);
+		Set<String> fullClientIds = new LinkedHashSet<>();
+
+		for (String relativeClientId : relativeClientIds) {
+			UIComponent component = findComponentRelatively(root, relativeClientId);
+
+			if (!(component instanceof UIInput)) {
+				String type = (component == null) ? "null" : component.getClass().getName();
+				throw new IllegalArgumentException(format(ERROR_ILLEGAL_UIINPUT, relativeClientId, type));
+			}
+
+			UIInput input = (UIInput) component;
+			String fullClientId = input.getClientId();
+
+			if (!needsVisit) {
+				fullClientIds.add(fullClientId);
+				input.setValid(false);
+			}
+			else {
+				fullClientIds.add(stripIterationIndex(fullClientId).replaceAll(quote(stripIterationIndex(relativeClientId)) + "$", relativeClientId));
+			}
+		}
+
+		if (needsVisit) {
+			forEachComponent().havingIds(fullClientIds).<UIInput>invoke(input -> input.setValid(false));
+		}
+
+		validationFailed();
+		return fullClientIds;
+	}
+
 
 	// Expressions ----------------------------------------------------------------------------------------------------
 
@@ -1737,9 +1806,22 @@ public final class Components {
 	/**
 	 * Strip UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code> from given component client ID.
 	 */
-	private static String stripIterationIndexFromClientId(String clientId) {
-		String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
-		return clientId.replaceAll(quote(separatorChar) + "[0-9]+" + quote(separatorChar), separatorChar);
+	private static String stripIterationIndex(String clientId) {
+		return getIterationIndexPattern().matcher(clientId).replaceAll(result -> result.group(1) + result.group(3));
+	}
+
+	/**
+	 * Checks if given component client ID contains UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code>.
+	 */
+	private static boolean containsIterationIndex(String clientId) {
+		return getIterationIndexPattern().matcher(clientId).matches();
+	}
+
+	private static Pattern getIterationIndexPattern() {
+		return getApplicationAttribute("omnifaces.IterationIndexPattern", () -> {
+			String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
+			return Pattern.compile("(^|.*" + quote(separatorChar) + ")([0-9]+" + quote(separatorChar) + ")(.*)");
+		});
 	}
 
 	/**
@@ -1748,7 +1830,7 @@ public final class Components {
 	 */
 	private static UIComponent findComponentIgnoringIAE(UIComponent parent, String clientId) {
 		try {
-			return parent.findComponent(stripIterationIndexFromClientId(clientId));
+			return parent.findComponent(stripIterationIndex(clientId));
 		}
 		catch (IllegalArgumentException ignore) {
 			logger.log(FINEST, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
