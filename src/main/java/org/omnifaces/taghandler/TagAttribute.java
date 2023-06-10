@@ -72,6 +72,9 @@ import org.omnifaces.el.DelegatingVariableMapper;
  */
 public class TagAttribute extends TagHandler {
 
+	private static final String ID_ATTRIBUTE = "id";
+	private static final String ID_PREFIX = "j_ido";
+
 	private final String name;
 	private final javax.faces.view.facelets.TagAttribute defaultValue;
 
@@ -90,8 +93,8 @@ public class TagAttribute extends TagHandler {
 			if (defaultValue != null) {
 				valueExpression = defaultValue.getValueExpression(context, Object.class);
 			}
-			else if ("id".equals(name)) {
-				valueExpression = createValueExpression("#{'j_ido" + context.generateUniqueId(this.tagId) + "'}", String.class);
+			else if (ID_ATTRIBUTE.equals(name)) {
+				valueExpression = createValueExpression("#{'" + ID_PREFIX + context.generateUniqueId(this.tagId) + "'}", String.class);
 				variableMapper.setWrappedVariable(name, valueExpression);
 				return;
 			}
@@ -108,6 +111,12 @@ public class TagAttribute extends TagHandler {
 		}
 
 		DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+		ValueExpression valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
+
+		if (valueExpression != null && valueExpression.getExpressionString().startsWith("#{'" + ID_PREFIX)) {
+			variableMapper.setVariable(ID_ATTRIBUTE, null);
+		}
+
 		context.setVariableMapper(delegatingVariableMapper);
 		return delegatingVariableMapper;
 	}
