@@ -287,7 +287,8 @@ public abstract class OmniFacesIT {
 		withCDNResources,
 		withInterpretEmptyStringSubmittedValuesAsNull,
 		withVersionedResourceHandler,
-		withViewResources;
+		withViewResources,
+		withTaglib;
 	}
 
 }
