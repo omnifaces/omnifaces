@@ -13,13 +13,10 @@
 package org.omnifaces.util;
 
 import static java.text.MessageFormat.format;
-import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlash;
-import static org.omnifaces.util.Utils.stream;
 
 import java.text.MessageFormat;
-import java.util.Iterator;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.application.FacesMessage;
@@ -449,7 +446,7 @@ public final class Messages {
 	 * @see FacesContext#addMessage(String, FacesMessage)
 	 */
 	public static void add(String clientId, FacesMessage message) {
-		getContext().addMessage(clientId, message);
+		MessagesLocal.add(getContext(), clientId, message);
 	}
 
 	/**
@@ -463,7 +460,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void add(FacesMessage.Severity severity, String clientId, String message, Object... params) {
-		add(clientId, create(severity, message, params));
+		MessagesLocal.add(getContext(), severity, clientId, message, params);
 	}
 
 	/**
@@ -476,7 +473,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addInfo(String clientId, String message, Object... params) {
-		add(clientId, createInfo(message, params));
+		MessagesLocal.addInfo(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -489,7 +486,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addWarn(String clientId, String message, Object... params) {
-		add(clientId, createWarn(message, params));
+		MessagesLocal.addWarn(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -502,7 +499,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addError(String clientId, String message, Object... params) {
-		add(clientId, createError(message, params));
+		MessagesLocal.addError(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -515,7 +512,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addFatal(String clientId, String message, Object... params) {
-		add(clientId, createFatal(message, params));
+		MessagesLocal.addFatal(getContext(), clientId, message, params);
 	}
 
 	// Shortcuts - add global message ---------------------------------------------------------------------------------
@@ -526,7 +523,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addGlobal(FacesMessage message) {
-		add(null, message);
+		MessagesLocal.addGlobal(getContext(), message);
 	}
 
 	/**
@@ -539,7 +536,7 @@ public final class Messages {
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobal(FacesMessage.Severity severity, String message, Object... params) {
-		addGlobal(create(severity, message, params));
+		MessagesLocal.addGlobal(getContext(), severity, message, params);
 	}
 
 	/**
@@ -550,7 +547,7 @@ public final class Messages {
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalInfo(String message, Object... params) {
-		addGlobal(createInfo(message, params));
+		MessagesLocal.addGlobalInfo(getContext(), message, params);
 	}
 
 	/**
@@ -561,7 +558,7 @@ public final class Messages {
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalWarn(String message, Object... params) {
-		addGlobal(createWarn(message, params));
+		MessagesLocal.addGlobalWarn(getContext(), message, params);
 	}
 
 	/**
@@ -572,7 +569,7 @@ public final class Messages {
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalError(String message, Object... params) {
-		addGlobal(createError(message, params));
+		MessagesLocal.addGlobalError(getContext(), message, params);
 	}
 
 	/**
@@ -583,7 +580,7 @@ public final class Messages {
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalFatal(String message, Object... params) {
-		addGlobal(createFatal(message, params));
+		MessagesLocal.addGlobalFatal(getContext(), message, params);
 	}
 
 	// Shortcuts - add flash message ----------------------------------------------------------------------------------
@@ -601,8 +598,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addFlash(String clientId, FacesMessage message) {
-		getFlash().setKeepMessages(true);
-		add(clientId, message);
+		MessagesLocal.addFlash(getContext(), clientId, message);
 	}
 
 	/**
@@ -616,7 +612,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlash(FacesMessage.Severity severity, String clientId, String message, Object... params) {
-		addFlash(clientId, create(severity, message, params));
+		MessagesLocal.addFlash(getContext(), severity, clientId, message, params);
 	}
 
 	/**
@@ -629,7 +625,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashInfo(String clientId, String message, Object... params) {
-		addFlash(clientId, createInfo(message, params));
+		MessagesLocal.addFlashInfo(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -642,7 +638,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashWarn(String clientId, String message, Object... params) {
-		addFlash(clientId, createWarn(message, params));
+		MessagesLocal.addFlashWarn(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -655,7 +651,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashError(String clientId, String message, Object... params) {
-		addFlash(clientId, createError(message, params));
+		MessagesLocal.addFlashError(getContext(), clientId, message, params);
 	}
 
 	/**
@@ -668,7 +664,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashFatal(String clientId, String message, Object... params) {
-		addFlash(clientId, createFatal(message, params));
+		MessagesLocal.addFlashFatal(getContext(), clientId, message, params);
 	}
 
 	// Shortcuts - add global flash message ---------------------------------------------------------------------------
@@ -680,7 +676,7 @@ public final class Messages {
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashGlobal(FacesMessage message) {
-		addFlash(null, message);
+		MessagesLocal.addFlashGlobal(getContext(), message);
 	}
 
 	/**
@@ -692,7 +688,7 @@ public final class Messages {
 	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalInfo(String message, Object... params) {
-		addFlashGlobal(createInfo(message, params));
+		MessagesLocal.addFlashGlobalInfo(getContext(), message, params);
 	}
 
 	/**
@@ -704,7 +700,7 @@ public final class Messages {
 	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalWarn(String message, Object... params) {
-		addFlashGlobal(createWarn(message, params));
+		MessagesLocal.addFlashGlobalWarn(getContext(), message, params);
 	}
 
 	/**
@@ -716,7 +712,7 @@ public final class Messages {
 	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalError(String message, Object... params) {
-		addFlashGlobal(createError(message, params));
+		MessagesLocal.addFlashGlobalError(getContext(), message, params);
 	}
 
 	/**
@@ -728,7 +724,7 @@ public final class Messages {
 	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalFatal(String message, Object... params) {
-		addFlashGlobal(createFatal(message, params));
+		MessagesLocal.addFlashGlobalFatal(getContext(), message, params);
 	}
 
 	// Shortcuts - check messages -------------------------------------------------------------------------------------
@@ -740,7 +736,7 @@ public final class Messages {
 	 * @since 2.2
 	 */
 	public static boolean isEmpty() {
-		return getContext().getMessageList().isEmpty();
+		return MessagesLocal.isEmpty(getContext());
 	}
 
 	/**
@@ -751,7 +747,7 @@ public final class Messages {
 	 * @since 2.2
 	 */
 	public static boolean isEmpty(String clientId) {
-		return getContext().getMessageList(clientId).isEmpty();
+		return MessagesLocal.isEmpty(getContext(), clientId);
 	}
 
 	/**
@@ -761,7 +757,7 @@ public final class Messages {
 	 * @since 2.2
 	 */
 	public static boolean isGlobalEmpty() {
-		return isEmpty(null);
+		return MessagesLocal.isGlobalEmpty(getContext());
 	}
 
 	// Shortcuts - clear messages -------------------------------------------------------------------------------------
@@ -778,27 +774,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clear(FacesMessage.Severity severity, String... clientIds) {
-		if (Utils.isEmpty(clientIds)) {
-			return clear(getContext().getMessages(), severity);
-		}
-		else {
-			return stream(clientIds).map(clientId -> clear(getContext().getMessages(clientId), severity)).collect(toSet()).contains(true);
-		}
-	}
-
-	private static boolean clear(Iterator<FacesMessage> iterator, FacesMessage.Severity severity) {
-		boolean atLeastOneCleared = false;
-
-		while (iterator.hasNext()) {
-			FacesMessage facesMessage = iterator.next();
-
-			if (severity == null || severity.equals(facesMessage.getSeverity())) {
-				iterator.remove();
-				atLeastOneCleared = true;
-			}
-		}
-
-		return atLeastOneCleared;
+		return MessagesLocal.clear(getContext(), severity, clientIds);
 	}
 
 	/**
@@ -810,7 +786,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clear(String... clientIds) {
-		return clear(null, clientIds);
+		return MessagesLocal.clear(getContext(), clientIds);
 	}
 
 	/**
@@ -822,7 +798,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearInfo(String... clientIds) {
-		return clear(FacesMessage.SEVERITY_INFO, clientIds);
+		return MessagesLocal.clearInfo(getContext(), clientIds);
 	}
 
 	/**
@@ -834,7 +810,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearWarn(String... clientIds) {
-		return clear(FacesMessage.SEVERITY_WARN, clientIds);
+		return MessagesLocal.clearWarn(getContext(), clientIds);
 	}
 
 	/**
@@ -846,7 +822,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearError(String... clientIds) {
-		return clear(FacesMessage.SEVERITY_ERROR, clientIds);
+		return MessagesLocal.clearError(getContext(), clientIds);
 	}
 
 	/**
@@ -858,7 +834,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearFatal(String... clientIds) {
-		return clear(FacesMessage.SEVERITY_FATAL, clientIds);
+		return MessagesLocal.clearFatal(getContext(), clientIds);
 	}
 
 	/**
@@ -869,7 +845,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobal(FacesMessage.Severity severity) {
-		return clear(severity, (String) null);
+		return MessagesLocal.clearGlobal(getContext(), severity);
 	}
 
 	/**
@@ -879,7 +855,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobal() {
-		return clear((FacesMessage.Severity) null, (String) null);
+		return MessagesLocal.clearGlobal(getContext());
 	}
 
 	/**
@@ -889,7 +865,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobalInfo() {
-		return clearInfo((String) null);
+		return MessagesLocal.clearGlobalInfo(getContext());
 	}
 
 	/**
@@ -899,7 +875,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobalWarn() {
-		return clearWarn((String) null);
+		return MessagesLocal.clearGlobalWarn(getContext());
 	}
 
 	/**
@@ -909,7 +885,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobalError() {
-		return clearError((String) null);
+		return MessagesLocal.clearGlobalError(getContext());
 	}
 
 	/**
@@ -919,7 +895,7 @@ public final class Messages {
 	 * @since 3.5
 	 */
 	public static boolean clearGlobalFatal() {
-		return clearFatal((String) null);
+		return MessagesLocal.clearGlobalFatal(getContext());
 	}
 
 }
