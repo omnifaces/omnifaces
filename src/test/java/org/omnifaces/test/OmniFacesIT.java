@@ -37,6 +37,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.google.common.base.Predicate;
+
 @ExtendWith(ArquillianExtension.class)
 public abstract class OmniFacesIT {
 
@@ -104,6 +106,11 @@ public abstract class OmniFacesIT {
 
 	protected void waitUntilTextContent(WebElement element) {
 		waitGui(browser).withTimeout(3, SECONDS).until().element(element).text().not().equalTo("");
+	}
+
+	protected void waitUntilPrimeFacesReady() {
+		Predicate<WebDriver> primeFacesReady = $ -> executeScript("return !!window.PrimeFaces && PrimeFaces.ajax.Queue.isEmpty()");
+		waitGui(browser).withTimeout(3, SECONDS).until(primeFacesReady);
 	}
 
 	@SuppressWarnings("unchecked")

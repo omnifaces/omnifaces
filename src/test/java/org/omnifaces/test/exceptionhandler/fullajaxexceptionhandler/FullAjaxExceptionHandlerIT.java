@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -202,6 +201,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	private void assertAllResourcesRendered() {
+		waitUntilPrimeFacesReady();
 		assertStylesheetResourceRendered("primefaces-saga", "theme.css");
 		assertStylesheetResourceRendered("primefaces", "components.css");
 		assertStylesheetResourceRendered(null, "style.css");
@@ -214,15 +214,8 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 	private void assertStylesheetResourceRendered(String library, String name) {
 		List<WebElement> stylesheets = new ArrayList<>();
-
-		try {
-			stylesheets.addAll(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : ("[href*='ln=" + library + "']")))));
-			stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
-		}
-		catch (InvalidSelectorException e) {
-			System.out.println(browser.getPageSource());
-			fail("Unselectable stylesheet " + new ResourceIdentifier(library, name) + ": " + e);
-		}
+		stylesheets.addAll(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : ("[href*='ln=" + library + "']")))));
+		stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
 
 		if (stylesheets.isEmpty()) {
 			fail("Missing stylesheet " + new ResourceIdentifier(library, name));
