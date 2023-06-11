@@ -201,6 +201,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	private void assertAllResourcesRendered() {
+		waitUntilPrimeFacesReady();
 		assertStylesheetResourceRendered("primefaces-aristo", "theme.css");
 		assertStylesheetResourceRendered("primefaces", "components.css");
 		assertStylesheetResourceRendered(null, "style.css");
