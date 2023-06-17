@@ -215,7 +215,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		return messages.getText().replaceAll("\\s+", " ");
 	}
 
-	@Test @InSequence(4)
+	@Test @Order(4)
 	public void destroyViewStateWithJsfMapping() {
 		open("ViewScopedIT.jsf");
 		destroyViewState();
