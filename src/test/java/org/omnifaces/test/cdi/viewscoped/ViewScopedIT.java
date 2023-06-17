@@ -209,7 +209,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertEquals("unload submit", messages.getText()); // Unload was from previous tab.
 	}
 
-	@Test @InSequence(4)
+	@Test @Order(4)
 	public void destroyViewStateWithJsfMapping() {
 		open("ViewScopedIT.jsf");
 		destroyViewState();
