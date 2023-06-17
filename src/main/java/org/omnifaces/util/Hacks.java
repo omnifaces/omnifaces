@@ -24,6 +24,7 @@ import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isRenderResponse;
+import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.instance;
@@ -462,7 +463,7 @@ public final class Hacks {
 
 			Object stateCache = invokeMethod(manager, "getStateCache", context);
 			Object stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
+			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
 
 			List<Serializable> keys = accessField(viewCollection, "_keys");
 			Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
