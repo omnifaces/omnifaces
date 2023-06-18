@@ -173,7 +173,7 @@ public class TestServlets {
 	}
 
 	@Test
-	public void testToParameterMap() {
+	void testToParameterMap() {
 		assertEquals(Collections.emptyMap(), Servlets.toParameterMap("="));
 		assertEquals(ImmutableMap.of("foo", asList("%")), Servlets.toParameterMap("foo=%"));
 		assertEquals(ImmutableMap.of("myParam", asList("123"), "anotherParam", asList("x")), Servlets.toParameterMap("myParam=123&=&anotherParam=x"));
