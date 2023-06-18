@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class TestServlets {
 
-	private static final String[][] CONTENT_DISPOSITIONS = {
+	private static final String[][] MULTIPART_CONTENT_DISPOSITIONS = {
 
 		// https://datatracker.ietf.org/doc/html/rfc6266#section-5
 		{ "form-data; filename=example.html", "example.html" },
@@ -73,13 +73,42 @@ public class TestServlets {
 		{ "form-data; filename=\"C:/fakepath/foo.html\"", "foo.html" },
 	};
 
+	private static final String[][] DOWNLOAD_CONTENT_DISPOSITIONS = {
+		{ "example.html", "attachment;filename=\"example.html\"; filename*=UTF-8''example.html" },
+		{ "an example.html", "attachment;filename=\"an%20example.html\"; filename*=UTF-8''an%20example.html" },
+		{ "€ rates", "attachment;filename=\"%E2%82%AC%20rates\"; filename*=UTF-8''%E2%82%AC%20rates" },
+		{ "foo.html", "attachment;filename=\"foo.html\"; filename*=UTF-8''foo.html" },
+		{ "\"quoting\" tested.html", "attachment;filename=\"%22quoting%22%20tested.html\"; filename*=UTF-8''%22quoting%22%20tested.html" },
+		{ "Here's a semicolon;.html", "attachment;filename=\"Here%27s%20a%20semicolon%3B.html\"; filename*=UTF-8''Here%27s%20a%20semicolon%3B.html" },
+		{ "'foo.bar'", "attachment;filename=\"%27foo.bar%27\"; filename*=UTF-8''%27foo.bar%27" },
+		{ "foo-ä.html", "attachment;filename=\"foo-%C3%A4.html\"; filename*=UTF-8''foo-%C3%A4.html" },
+		{ "foo-Ã¤.html", "attachment;filename=\"foo-%C3%83%C2%A4.html\"; filename*=UTF-8''foo-%C3%83%C2%A4.html" },
+		{ "foo-%41.html", "attachment;filename=\"foo-%2541.html\"; filename*=UTF-8''foo-%2541.html" },
+		{ "50%.html", "attachment;filename=\"50%25.html\"; filename*=UTF-8''50%25.html" },
+		{ "foo-%41.html", "attachment;filename=\"foo-%2541.html\"; filename*=UTF-8''foo-%2541.html" },
+		{ "ä-%41.html", "attachment;filename=\"%C3%A4-%2541.html\"; filename*=UTF-8''%C3%A4-%2541.html" },
+		{ "foo-ä-€.html", "attachment;filename=\"foo-%C3%A4-%E2%82%AC.html\"; filename*=UTF-8''foo-%C3%A4-%E2%82%AC.html" },
+		{ "A-%41.html", "attachment;filename=\"A-%2541.html\"; filename*=UTF-8''A-%2541.html" },
+		{ "currency-sign=¤", "attachment;filename=\"currency-sign%3D%C2%A4\"; filename*=UTF-8''currency-sign%3D%C2%A4" },
+	};
+
 	@Test
-	void testGetSubmittedFileName() {
-		for (String[] test : CONTENT_DISPOSITIONS) {
+	public void testGetSubmittedFileName() {
+		for (String[] test : MULTIPART_CONTENT_DISPOSITIONS) {
 			String header = test[0];
 			String expectedFilename = test[1];
 			String actualFilename = Servlets.getSubmittedFileName(new MockPartHeader(header));
 			assertEquals(expectedFilename, actualFilename);
+		}
+	}
+
+	@Test
+	public void testFormatContentDisposition() {
+		for (String[] test : DOWNLOAD_CONTENT_DISPOSITIONS) {
+			String filename = test[0];
+			String expectedHeader = test[1];
+			String actualHeader = Servlets.formatContentDispositionHeader(filename, true);
+			assertEquals(expectedHeader, actualHeader);
 		}
 	}
 
@@ -144,7 +173,7 @@ public class TestServlets {
 	}
 
 	@Test
-	void testToParameterMap() {
+	public void testToParameterMap() {
 		assertEquals(Collections.emptyMap(), Servlets.toParameterMap("="));
 		assertEquals(ImmutableMap.of("foo", asList("%")), Servlets.toParameterMap("foo=%"));
 		assertEquals(ImmutableMap.of("myParam", asList("123"), "anotherParam", asList("x")), Servlets.toParameterMap("myParam=123&=&anotherParam=x"));
