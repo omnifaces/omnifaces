@@ -93,7 +93,7 @@ public class TestServlets {
 	};
 
 	@Test
-	public void testGetSubmittedFileName() {
+	void testGetSubmittedFileName() {
 		for (String[] test : MULTIPART_CONTENT_DISPOSITIONS) {
 			String header = test[0];
 			String expectedFilename = test[1];
@@ -103,7 +103,7 @@ public class TestServlets {
 	}
 
 	@Test
-	public void testFormatContentDisposition() {
+	void testFormatContentDisposition() {
 		for (String[] test : DOWNLOAD_CONTENT_DISPOSITIONS) {
 			String filename = test[0];
 			String expectedHeader = test[1];
