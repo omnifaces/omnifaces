@@ -68,28 +68,28 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly27.version>27.0.1.Final</test.wildfly27.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.wildfly26.version>26.1.3.Final</test.wildfly26.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.liberty.version>21.0.0.12-beta</test.liberty.version> <!-- https://search.maven.org/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
-		<test.glassfish7.version>7.0.0</test.glassfish7.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://search.maven.org/artifact/org.glassfish.main.distributions/glassfish -->
-		<test.tomcat.version>10.1.5</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>23.1.0</test.piranha.version> <!-- https://search.maven.org/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
-		<test.tomee.version>9.0.0</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
-		<test.payara.version>6.2023.1</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
+		<test.wildfly27.version>29.0.0.Alpha1</test.wildfly27.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.wildfly26.version>26.1.3.Final</test.wildfly26.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+		<test.liberty.version>21.0.0.12-beta</test.liberty.version> <!-- https://mvnrepository.com/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
+		<test.glassfish7.version>7.0.5</test.glassfish7.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.glassfish6.version>6.2.5</test.glassfish6.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+		<test.tomcat.version>10.1.10</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+		<test.piranha.version>23.6.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
+		<test.tomee.version>9.1.0</test.tomee.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+		<test.payara.version>6.2023.6</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-		<test.mojarra4.version>4.0.0</test.mojarra4.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.mojarra3.version>3.0.3</test.mojarra3.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces4.version>4.0.0-RC4</test.myfaces4.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
-		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld5.version>5.1.0.Final</test.weld5.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator8.version>8.0.0.Final</test.hibernateValidator8.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
-		<test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
-		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
-		<test.jstl.version>2.0.0</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>2.1.2</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.mojarra4.version>4.0.2</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+		<test.mojarra3.version>3.0.4</test.mojarra3.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces4.version>4.0.1</test.myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl TODO: subsequent Ajax submits on same view isn't seen as type=XHR but as type=NONE by RequestGuard -->
+		<test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld5.version>5.1.1.Final</test.weld5.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator8.version>8.0.1.Final</test.hibernateValidator8.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
+		<test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<test.tyrus.version>2.1.3</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 
 		<!-- Arquillian config. -->
 		<arquillian.browser>htmlUnit</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=phantomjs -->
