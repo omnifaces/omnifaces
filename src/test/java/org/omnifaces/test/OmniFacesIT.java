@@ -16,7 +16,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
-import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.io.File;
@@ -142,19 +141,23 @@ public abstract class OmniFacesIT {
 	}
 
 	protected static boolean isFaces4Used() {
-		return isOneOf(System.getProperty("profile.id"), "wildfly27", "glassfish7", "tomcat-mojarra4", "tomcat-myfaces4", "payara");
+		return System.getProperty("profile.id").endsWith("4");
 	}
 
 	protected static boolean isMojarraUsed() {
-		return startsWithOneOf(System.getProperty("profile.id"), "wildfly", "glassfish", "payara", "tomcat-mojarra", "piranha");
+		return startsWithOneOf(System.getProperty("profile.id"), "wildfly", "glassfish", "tomcat-mojarra", "piranha");
+	}
+
+	protected static boolean isMyFacesUsed() {
+		return startsWithOneOf(System.getProperty("profile.id"), "tomee", "liberty", "tomcat-myfaces");
 	}
 
 	protected static boolean isBValUsed() {
-		return isOneOf(System.getProperty("profile.id"), "tomee");
+		return startsWithOneOf(System.getProperty("profile.id"), "tomee");
 	}
 
 	protected static boolean isLiberty() {
-		return isOneOf(System.getProperty("profile.id"), "liberty");
+		return startsWithOneOf(System.getProperty("profile.id"), "liberty");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {

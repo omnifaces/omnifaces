@@ -70,13 +70,12 @@
 		<!-- Test server versions. -->
 		<test.wildfly-faces4.version>28.0.1.Final</test.wildfly-faces4.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
 		<test.wildfly-faces3.version>26.1.3.Final</test.wildfly-faces3.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
-		<test.liberty-faces3.version>21.0.0.12-beta</test.liberty-faces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty.beta/openliberty-jakartaee9 -->
+		<test.liberty-faces3.version>21.0.0.12-beta</test.liberty-faces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty.beta/openliberty-jakartaee9 TODO: EagerIT causes deployment exception -->
 		<test.glassfish-faces4.version>7.0.5</test.glassfish-faces4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.glassfish-faces3.version>6.2.5</test.glassfish-faces3.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.10</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>23.6.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
+		<test.piranha-faces4.version>23.6.0</test.piranha-faces4.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
 		<test.tomee-faces3.version>9.1.0</test.tomee-faces3.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
-		<test.payara.version>6.2023.6</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
 		<test.mojarra4.version>4.0.2</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
@@ -1103,7 +1102,7 @@
 			</build>
 		</profile>
 
-		<!-- Piranha integration test profile: mvn verify -P piranha -->
+		<!-- Piranha - Faces 4.x integration test profile: mvn verify -P piranha-faces4 -->
 		<!-- 
 				Note1: Piranha must be run using JDK 16, so the entire test suite should be run with JDK 16.
 				There's no need to compile OmniFaces with JDK 16. JDK 11 is fine for that.
@@ -1114,7 +1113,7 @@
 				Tests run: 93, Failures: 6, Errors: 7, Skipped: 0
 		 -->
 		<profile>
-			<id>piranha</id>
+			<id>piranha-faces4</id>
 			<dependencies>
 				<dependency>
 					<groupId>cloud.piranha.arquillian</groupId>
@@ -1134,8 +1133,8 @@
 								<javaEEServer>piranha-embedded</javaEEServer>
 								<piranha.rootIsWarName>true</piranha.rootIsWarName>
 								<war.libraries>
-									org.glassfish:jakarta.faces:${test.mojarra3.version},
-									org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
+									org.glassfish:jakarta.faces:${test.mojarra4.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
 									org.glassfish.tyrus:tyrus-core:${test.tyrus.version}
 								</war.libraries>
@@ -1185,50 +1184,6 @@
 						<configuration>
 							<systemPropertyVariables>
 								<tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee-faces3.version}</tomee.dir>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Payara integration test profile: mvn verify -P payara -->
-		<profile>
-			<id>payara</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.omnifaces.arquillian</groupId>
-					<artifactId>arquillian-glassfish-server-managed</artifactId>
-					<version>1.2</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>fish.payara.distributions</groupId>
-											<artifactId>payara-web</artifactId>
-											<version>${test.payara.version}</version>
-											<type>zip</type>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<configuration>
-							<systemPropertyVariables>
-								<glassfish.home>${project.build.directory}/payara6</glassfish.home>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
