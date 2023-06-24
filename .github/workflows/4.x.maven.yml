@@ -32,7 +32,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        server: [ wildfly27, wildfly26, glassfish7, glassfish6, tomee, tomcat-mojarra4, tomcat-mojarra3, tomcat-myfaces3 ]
+        server: [ wildfly-faces4, wildfly-faces3, glassfish-faces4, glassfish-faces3, tomee-faces4, tomcat-mojarra4, tomcat-mojarra3, tomcat-myfaces3 ]
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
