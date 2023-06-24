@@ -43,6 +43,15 @@ import org.xml.sax.SAXParseException;
  * <p>
  * Collection of utility methods for the JAXP API in general.
  *
+ * <h2>This class is not listed in showcase! Should I use it?</h2>
+ * <p>
+ * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * <p>
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but there is no
+ * guarantee that method signatures will be changed without notice. This utility class exists because OmniFaces intends
+ * to be free of 3rd party dependencies.
+ *
  * @author Bauke Scholtz
  * @since 2.1
  */
