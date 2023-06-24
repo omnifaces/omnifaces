@@ -36,7 +36,7 @@ import org.omnifaces.cdi.Startup;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // In a validator.
  * Messages.throwValidatorException("Invalid input.");
@@ -77,6 +77,8 @@ import org.omnifaces.cdi.Startup;
  * Messages.create("New item with id {0} is successfully added.", item.getId()).flash().add();
  * return "items?faces-redirect=true";
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * <h2>Message resolver</h2>
  * <p>
@@ -111,6 +113,17 @@ import org.omnifaces.cdi.Startup;
  * <p>
  * To create a {@link FacesMessage} with a message detail as well, use the {@link Message} builder as you can obtain by
  * {@link Messages#create(String, Object...)}.
+ *
+ * <h2>MessagesLocal</h2>
+ * <p>
+ * Note that there's normally a minor overhead in obtaining the thread local {@link FacesContext}. In case client code
+ * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead
+ * the {@link FacesContext} is obtained once and the required methods are called on that, although the difference is
+ * practically negligible when used in modern server hardware.
+ * <p>
+ * In such case, consider using {@link MessagesLocal} instead. The difference with {@link Messages} is that no one method of
+ * {@link MessagesLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
  * @author Bauke Scholtz
  */

@@ -102,6 +102,8 @@ import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
  * </ul>
  * <p>
  * Those methods can be used in for example a servlet filter.
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

@@ -128,7 +128,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples (for the full list, check the API documentation):
+ * Here are <strong>some</strong> examples:
  * <pre>
  * FacesContext context = Faces.getContext();
  * User user = FacesLocal.getSessionAttribute(context, "user");
@@ -138,6 +138,8 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  * FacesLocal.invalidateSession(context);
  * FacesLocal.redirect(context, "login.xhtml");
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

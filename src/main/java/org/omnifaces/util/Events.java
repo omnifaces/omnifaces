@@ -39,7 +39,7 @@ import org.omnifaces.eventlistener.DefaultSystemEventListener;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
  * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -&gt; {
@@ -59,7 +59,7 @@ import org.omnifaces.eventlistener.DefaultSystemEventListener;
  * });
  * </pre>
  * <p>
- * Note that you can specify any phase ID or system event to your choice.
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

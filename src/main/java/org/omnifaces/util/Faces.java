@@ -96,7 +96,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Get a session attribute (no explicit cast necessary!).
  * User user = Faces.getSessionAttribute("user");
@@ -150,6 +150,8 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  *     });
  * }
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * <h2>FacesLocal</h2>
  * <p>

@@ -62,7 +62,7 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Update specific component on complete of ajax.
  * Ajax.update("formId:someId");
@@ -79,6 +79,8 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * // Execute script on complete of ajax.
  * Ajax.oncomplete("alert(OmniFaces.Ajax.data.foo)");
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  * @since 1.2

@@ -25,7 +25,7 @@ import jakarta.servlet.ServletException;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Check if the caught exception has a ConstraintViolationException in its hierarchy.
  * catch (PersistenceException e) {
@@ -41,6 +41,8 @@ import jakarta.servlet.ServletException;
  *     // ...
  * }
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  */

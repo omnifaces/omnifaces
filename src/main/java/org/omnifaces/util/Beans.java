@@ -43,7 +43,7 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Get the CDI managed bean reference (proxy) of the given bean class.
  * SomeBean someBean = Beans.getReference(SomeBean.class);
@@ -68,6 +68,8 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  * // Fire a CDI event.
  * Beans.fireEvent(someEvent);
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  * @since 1.6.1

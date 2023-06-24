@@ -19,8 +19,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.omnifaces.el.ReadOnlyValueExpression;
+
 /**
  * Collection of callback interfaces. Useful in (mini) visitor and strategy patterns.
+ * <p>
+ * Currently used by:
+ * <ul>
+ * <li>{@link ReadOnlyValueExpression}
+ * <li>{@link Events}
+ * <li>{@link Faces#sendFile(String, boolean, Output)}
+ * </ul>
  *
  * @author Bauke Scholtz
  */

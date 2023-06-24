@@ -137,7 +137,7 @@ import org.omnifaces.el.ScopedRunner;
  *
  * <h2>Usage</h2>
  * <p>
- * Some examples:
+ * Here are <strong>some</strong> examples:
  * <pre>
  * // Get closest parent of given type.
  * UIForm form = Components.getClosestParent(someUIInputComponent, UIForm.class);
@@ -179,6 +179,8 @@ import org.omnifaces.el.ScopedRunner;
  * // Collecting all queued actions and action listeners as method expression strings in a logging phase listener.
  * List&lt;String&gt; actions = Components.getActionExpressionsAndListeners(Components.getCurrentActionSource());
  * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
