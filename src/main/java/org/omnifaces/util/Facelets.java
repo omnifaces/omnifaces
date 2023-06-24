@@ -21,11 +21,13 @@ import jakarta.faces.view.facelets.TagAttribute;
 
 /**
  * <p>
- * Collection of utility methods for Facelets code.
+ * Collection of utility methods for working with Facelets.
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
- *@author Arjan Tijms
- *@since 2.0
-*/
+ * @author Arjan Tijms
+ * @since 2.0
+ */
 @Typed
 public final class Facelets {
 

@@ -25,6 +25,8 @@ import jakarta.faces.render.Renderer;
 
 /**
  * Collection of utility methods for the Faces API with respect to working with {@link Renderer}.
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  * @since 1.5

@@ -44,6 +44,30 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 /**
+ * <p>
+ * Collection of utility methods for the Bean Validation API in general.
+ *
+ * <h2>Usage</h2>
+ * <p>
+ * Here are <strong>some</strong> examples:
+ * <pre>
+ * // Check if Bean Validation is available.
+ * boolean available = Validators.isBeanValidationAvailable();
+ * </pre>
+ * <pre>
+ * // Check if Bean Validation is available.
+ * boolean available = Validators.isBeanValidationAvailable();
+ * </pre>
+ * <pre>
+ * // Validate whole bean with Bean Validation.
+ * Set&lt;ConstraintViolation&lt;?&gt;&gt; violations = Validators.validateBean(bean);
+ * </pre>
+ * <pre>
+ * // Validate only a bean property with Bean Validation.
+ * Set&lt;ConstraintViolation&lt;?&gt;&gt; violations = Validators.validateBeanProperty(bean, "propertyName", propertyValue);
+ * </pre>
+ * <p>
+ * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * @author Bauke Scholtz
  * @author Andre Wachsmuth

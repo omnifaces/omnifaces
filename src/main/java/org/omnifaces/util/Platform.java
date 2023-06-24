@@ -22,10 +22,12 @@ import jakarta.servlet.ServletRegistration;
 import org.omnifaces.ApplicationInitializer;
 
 /**
- * This class provides access to (Java EE 6) platform services from the view point of Faces.
+ * This class provides access to Jakarta platform services from the view point of Faces.
  * <p>
  * Note that this utility class can only be used in a Faces environment and is thus not
- * a Java EE general way to obtain platform services.
+ * a Jakarta general way to obtain platform services.
+ * <p>
+ * For a full list of utility methods, check the <a href="#method.summary">method summary</a>.
  *
  * @since 1.6
  * @author Arjan Tijms
