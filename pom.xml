@@ -563,7 +563,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly27.version}</jboss.home>
+								<jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly-faces4.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
 						</configuration>
@@ -731,7 +731,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/glassfish-faces4</GLASSFISH_HOME>
+								<GLASSFISH_HOME>${project.build.directory}/glassfish7</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>
@@ -775,7 +775,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/glassfish-faces3</GLASSFISH_HOME>
+								<GLASSFISH_HOME>${project.build.directory}/glassfish6</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>
