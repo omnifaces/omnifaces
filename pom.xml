@@ -69,19 +69,19 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>26.1.3.Final</test.wildfly.version> <!-- https://search.maven.org/artifact/org.wildfly/wildfly-dist -->
-		<test.tomee.version>8.0.14</test.tomee.version> <!-- https://search.maven.org/artifact/org.apache.tomee/apache-tomee -->
-		<test.payara.version>5.2022.5</test.payara.version> <!-- https://search.maven.org/artifact/fish.payara.distributions/payara-web -->
-		<test.tomcat.version>9.0.71</test.tomcat.version> <!-- https://search.maven.org/artifact/org.apache.tomcat/tomcat -->
+		<test.wildfly.version>26.1.3.Final</test.wildfly.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-dist -->
+		<test.tomee.version>8.0.15</test.tomee.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+		<test.payara.version>5.2022.5</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
+		<test.tomcat.version>9.0.76</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat). -->
-		<test.mojarra.version>2.3.18</test.mojarra.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.faces -->
-		<test.myfaces.version>2.3.10</test.myfaces.version> <!-- https://search.maven.org/artifact/org.apache.myfaces.core/myfaces-impl -->
-		<test.weld.version>3.1.9.Final</test.weld.version> <!-- https://search.maven.org/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-		<test.hibernateValidator.version>6.2.5.Final</test.hibernateValidator.version> <!-- https://search.maven.org/artifact/org.hibernate.validator/hibernate-validator -->
-		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://search.maven.org/artifact/org.glassfish/jakarta.json -->
-		<test.jstl.version>1.2.6</test.jstl.version> <!-- https://search.maven.org/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-		<test.tyrus.version>1.19</test.tyrus.version> <!-- https://search.maven.org/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+		<test.mojarra.version>2.3.19</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+		<test.myfaces.version>2.3.10</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
+		<test.weld.version>3.1.9.Final</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+		<test.hibernateValidator.version>6.2.5.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+		<test.jsonp.version>1.1.6</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
+		<test.jstl.version>1.2.6</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<test.tyrus.version>1.19</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
 	</properties>
 
 	<dependencies>
