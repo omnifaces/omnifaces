@@ -323,7 +323,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 		}
 
 		FacesContext context = Faces.getContext();
-		boolean resourceContentsRequest = super.isResourceRequest(context);
+		boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
 
 		if (resourceContentsRequest && lastModified == 0) {
 			manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
