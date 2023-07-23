@@ -18,6 +18,7 @@
 	xmlns:o="http://omnifaces.org/ui"
 >
   <o:tagAttribute name="id"/>
+  <o:tagAttribute name="styleClass"/>
 
-  <span class="id">#{id}</span>
+  <span class="#{styleClass}">#{id}</span>
 </ui:composition>

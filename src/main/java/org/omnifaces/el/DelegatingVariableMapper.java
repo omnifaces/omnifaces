@@ -12,12 +12,14 @@
  */
 package org.omnifaces.el;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
+import javax.faces.FacesWrapper;
 
 /**
  *
@@ -69,7 +71,48 @@ public class DelegatingVariableMapper extends VariableMapper {
 	}
 
 	public ValueExpression setWrappedVariable(String name, ValueExpression expression) {
-		return wrapped.setVariable(name, expression);
+		ValueExpression previous = wrapped.setVariable(name, expression);
+
+		if (expression == null) {
+			clearWrappedVariableMapperIfNecessary(wrapped, name);
+		}
+
+		return previous;
 	}
+
+	private static void clearWrappedVariableMapperIfNecessary(VariableMapper mapper, String name) {
+		VariableMapper wrapped = findWrappedVariableMapper(mapper);
+
+		if (wrapped != null) {
+			wrapped.setVariable(name, null);
+			clearWrappedVariableMapperIfNecessary(wrapped, name);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static VariableMapper findWrappedVariableMapper(VariableMapper mapper) {
+		if (mapper instanceof FacesWrapper) { // MyFaces
+			return ((FacesWrapper<VariableMapper>) mapper).getWrapped();
+		}
+
+		for (Class<?> type = mapper.getClass(); type != Object.class; type = type.getSuperclass()) { // Mojarra
+			for (Field field : type.getDeclaredFields()) {
+				if (VariableMapper.class.isAssignableFrom(field.getType())) {
+					try {
+						field.setAccessible(true);
+						return (VariableMapper) field.get(mapper);
+					}
+					catch (IllegalAccessException e) {
+						throw new IllegalStateException(e);
+					}
+
+				}
+			}
+		}
+
+		return null;
+	}
+
+
 
 }
