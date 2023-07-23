@@ -118,7 +118,7 @@ public class TagAttribute extends TagHandler {
 		ValueExpression valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
 
 		if (valueExpression != null && valueExpression.getExpressionString().startsWith("#{'" + ID_PREFIX)) {
-			variableMapper.setVariable(ID_ATTRIBUTE, null);
+			delegatingVariableMapper.setWrappedVariable(ID_ATTRIBUTE, null);
 		}
 
 		context.setVariableMapper(delegatingVariableMapper);
