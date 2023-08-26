@@ -5063,6 +5063,60 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
+				The <code>&lt;o:loadBundle&gt;</code> taghandler basically extends the standard <code>&lt;f:loadBundle&gt;</code>
+				with a new <code>loader</code> attribute allowing you to explicitly set the desired {@link ClassLoader} where
+				the resource bundle should be looked up. Also the {@link Locale} of the bundle is obtained with better default values
+				than the default Faces implementation.
+				<p>
+                You can use the <code>loader</code> attribute to specify an object whose class loader will be used to load the
+                resource bundle specified in the <code>basename</code> attribute. The class loader of the given object is resolved as
+                specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific resource
+                bundle when there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+				<p>
+				The locale of the resource bundle is obtained as specified in {@link Faces#getLocale()}.
+				<h2>Usage</h2>
+				<p>
+				You can use it the same way as <code>&lt;f:loadBundle&gt;</code>, you only need to change <code>f:</code> into
+				<code>o:</code> to get the extra support for <code>loader</code> attribute and the improved locale resolving.
+			]]>
+		</description>
+		<tag-name>loadBundle</tag-name>
+		<handler-class>org.omnifaces.taghandler.LoadBundle</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+				   Base name of the resource bundle to be loaded.
+				]]>
+			</description>
+			<name>basename</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The name of the request attribute which exposes the loaded resource bundle in the request scope.
+				]]>
+			</description>
+			<name>var</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The object to be used as source of the class loader to load the resource bundle specified in <code>basename</code> attribute.
+				   Can be an instance of <code>ClassLoader</code>, <code>Class</code> or any object.
+				]]>
+			</description>
+			<name>loader</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
 				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when
 				executing an <code>UICommand</code> action. This taghandler must be placed inside an <code>UICommand</code> component and the
 				parent <code>UIForm</code> must be an <code>&lt;o:form&gt;</code>.
