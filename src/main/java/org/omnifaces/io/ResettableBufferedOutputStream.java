@@ -155,12 +155,13 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 			return;
 		}
 
+		closed = true;
+
 		if (isResettable()) {
 			flushBuffer(false);
 		}
 
 		output.close();
-		closed = true;
 	}
 
 	@Override
