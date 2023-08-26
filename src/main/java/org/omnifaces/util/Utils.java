@@ -426,6 +426,31 @@ public final class Utils {
 		return cls.isPrimitive() ? cls : PRIMITIVE_TYPES.get(cls);
 	}
 
+	/**
+	 * Returns the class loader associated with given object.
+	 * If the given object is {@code null}, then just return {@link Thread#getContextClassLoader()} of {@link Thread#currentThread()}.
+	 * Else if the given object is an instance of {@link ClassLoader} already, return it right away.
+	 * Else if the given object is an instance of {@link Class}, then return {@link Class#getClassLoader()}.
+	 * Else return the {@link ClassLoader} of {@link Object#getClass()}.
+	 * @param object The object to return associated class loader for.
+	 * @return The class loader associated with given object.
+	 * @since 4.3
+	 */
+	public static ClassLoader getClassLoader(Object object) {
+		if (object == null) {
+			return Thread.currentThread().getContextClassLoader();
+		}
+		else if (object instanceof ClassLoader) {
+			return (ClassLoader) object;
+		}
+		else if (object instanceof Class) {
+			return ((Class<?>) object).getClassLoader();
+		}
+		else {
+			return object.getClass().getClassLoader();
+		}
+	}
+
 	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**

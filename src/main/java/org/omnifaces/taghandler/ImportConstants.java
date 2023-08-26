@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static org.omnifaces.taghandler.ImportFunctions.getClassLoader;
 import static org.omnifaces.taghandler.ImportFunctions.toClass;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 import static org.omnifaces.util.Utils.isOneOf;
@@ -35,6 +36,7 @@ import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.util.MapWrapper;
+import org.omnifaces.util.Utils;
 
 /**
  * <p>
@@ -75,7 +77,12 @@ import org.omnifaces.util.MapWrapper;
  * The resolved constants are by reference stored in the cache to improve retrieving performance. There is also a
  * runtime (no, not compiletime as that's just not possible in EL) check during retrieving the constant value.
  * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
- *
+ * <p>
+ * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used
+ * to load the class specified in the <code>type</code> attribute. The class loader of the given object is resolved as
+ * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific class when
+ * there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+
  * <h2>JSF 2.3</h2>
  * <p>
  * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in
@@ -97,6 +104,7 @@ public class ImportConstants extends TagHandler {
 
 	private String varValue;
 	private TagAttribute typeAttribute;
+	private TagAttribute loaderAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -108,6 +116,7 @@ public class ImportConstants extends TagHandler {
 		super(config);
 		varValue = getStringLiteral(getAttribute("var"), "var");
 		typeAttribute = getRequiredAttribute("type");
+		loaderAttribute = getAttribute("loader");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -124,7 +133,8 @@ public class ImportConstants extends TagHandler {
 		Map<String, Object> constants = CONSTANTS_CACHE.get(type);
 
 		if (constants == null) {
-			constants = collectConstants(type);
+			ClassLoader loader = getClassLoader(context, loaderAttribute);
+			constants = collectConstants(type, loader);
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
@@ -146,10 +156,10 @@ public class ImportConstants extends TagHandler {
 	 * @param type The fully qualified name of the type to collect constants for.
 	 * @return Constants of the given type.
 	 */
-	private static Map<String, Object> collectConstants(String type) {
+	private static Map<String, Object> collectConstants(String type, ClassLoader loader) {
 		Map<String, Object> constants = new LinkedHashMap<>();
 
-		for (Class<?> declaredType : getDeclaredTypes(toClass(type))) {
+		for (Class<?> declaredType : getDeclaredTypes(toClass(type, loader))) {
 			for (Field field : declaredType.getDeclaredFields()) {
 				if (isPublicStaticFinal(field)) {
 					try {

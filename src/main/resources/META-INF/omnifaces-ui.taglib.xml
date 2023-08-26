@@ -4982,6 +4982,17 @@ public enum Baz {
 			<name>var</name>
 			<required>false</required>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The object to be used as source of the class loader to load the class specified in the <code>type</code> attribute.
+				   Can be an instance of <code>ClassLoader</code>, <code>Class</code> or any object.
+				]]>
+			</description>
+			<name>loader</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -5035,6 +5046,17 @@ public enum Baz {
 			</description>
 			<name>var</name>
 			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The object to be used as source of the class loader to load the class specified in the <code>type</code> attribute.
+				   Can be an instance of <code>ClassLoader</code>, <code>Class</code> or any object.
+				]]>
+			</description>
+			<name>loader</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
 		</attribute>
 	</tag>
 

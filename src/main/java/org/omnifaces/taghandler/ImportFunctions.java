@@ -32,6 +32,8 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.util.Utils;
+
 /**
  * <p>
  * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the
@@ -65,6 +67,11 @@ import jakarta.faces.view.facelets.TagHandler;
  * then the choice is unspecified (technically, JVM-dependent, the first one in the methods array as found by reflection
  * would be picked up) and should not be relied upon. So if you absolutely need to differentiate functions in such case,
  * give them each a different name.
+ * <p>
+ * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used
+ * to load the class specified in the <code>type</code> attribute. The class loader of the given object is resolved as
+ * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific class when
+ * there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
  *
  * <h2>Design notes</h2>
  * <p>
@@ -92,6 +99,7 @@ public class ImportFunctions extends TagHandler {
 
 	private String varValue;
 	private TagAttribute typeAttribute;
+	private TagAttribute loaderAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -103,6 +111,7 @@ public class ImportFunctions extends TagHandler {
 		super(config);
 		varValue = getStringLiteral(getAttribute("var"), "var");
 		typeAttribute = getRequiredAttribute("type");
+		loaderAttribute = getAttribute("loader");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -115,11 +124,22 @@ public class ImportFunctions extends TagHandler {
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		String type = typeAttribute.getValue(context);
 		String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		ClassLoader loader = getClassLoader(context, loaderAttribute);
 		FunctionMapper originalFunctionMapper = context.getFunctionMapper();
-		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type)));
+		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type, loader)));
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the class loader associated with the object specified in given tag attribute, if any.
+	 * @param context The involved facelet context.
+	 * @param attribute The optional tag attribute to obtain the class loader from.
+	 * @return The class loader associated with the object specified in given tag attribute, if any.
+	 */
+	static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants can also use it.
+		return Utils.getClassLoader(attribute == null ? null : attribute.getObject(context));
+	}
 
 	/**
 	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
@@ -127,9 +147,9 @@ public class ImportFunctions extends TagHandler {
 	 * @return The concrete {@link Class} instance.
 	 * @throws IllegalArgumentException When it is missing in the classpath.
 	 */
-	static Class<?> toClass(String type) { // Package-private so that ImportConstants can also use it.
+	static Class<?> toClass(String type, ClassLoader loader) { // Package-private so that ImportConstants can also use it.
 		try {
-			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
+			return Class.forName(type, true, loader);
 		}
 		catch (ClassNotFoundException e) {
 			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
@@ -138,7 +158,7 @@ public class ImportFunctions extends TagHandler {
 
 			if (i > 0) {
 				try {
-					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
+					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString(), loader);
 				}
 				catch (Exception ignore) {
 					logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
