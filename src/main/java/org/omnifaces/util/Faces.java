@@ -1973,6 +1973,17 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns whether the current request is authenticated, i.e. it has a logged-in user.
+	 * @return <code>true</code> if the current request is authenticated, otherwise <code>false</code>.
+	 * @throws NullPointerException When faces context is unavailable.
+	 * @see ExternalContext#getRemoteUser()
+	 * @since 4.3
+	 */
+	public static boolean isAuthenticated() {
+		return FacesLocal.isAuthenticated(getContext());
+	}
+
+	/**
 	 * Perform programmatic logout for container managed FORM based authentication. Note that this basically removes
 	 * the user principal from the session. It's however better practice to just invalidate the session altogether,
 	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note

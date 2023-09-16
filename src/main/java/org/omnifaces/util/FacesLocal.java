@@ -1376,6 +1376,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#isAuthenticated()
+	 */
+	public static boolean isAuthenticated(FacesContext context) {
+		return getRemoteUser(context) != null;
+	}
+
+	/**
 	 * @see Faces#logout()
 	 */
 	public static void logout(FacesContext context) throws ServletException {
