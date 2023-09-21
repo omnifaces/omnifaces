@@ -122,7 +122,7 @@ export module Push {
 				}
 				else {
 					self.onerror(event.code, self.channel, event);
-					setTimeout(open, RECONNECT_INTERVAL * self.reconnectAttempts++);
+					setTimeout(self.open.bind(self), RECONNECT_INTERVAL * self.reconnectAttempts++);
 				}
 			}
 		}
