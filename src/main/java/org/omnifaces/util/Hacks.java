@@ -35,6 +35,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.el.VariableMapper;
+import jakarta.faces.FacesWrapper;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.component.StateHelper;
 import jakarta.faces.component.UIComponent;
@@ -381,6 +384,40 @@ public final class Hacks {
 
 		return metadataFacet;
 	}
+
+
+	// EL related -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Finds the wrapped variable mapper of the given variable mapper.
+	 * @param mapper The variable mapper to find wrapped variable mapper for.
+	 * @return The wrapped variable mapper of the given variable mapper.
+	 * @since 3.14.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static VariableMapper findWrappedVariableMapper(VariableMapper mapper) {
+		if (mapper instanceof FacesWrapper) { // MyFaces
+			return ((FacesWrapper<VariableMapper>) mapper).getWrapped();
+		}
+
+		for (Class<?> type = mapper.getClass(); type != Object.class; type = type.getSuperclass()) { // Mojarra
+			for (Field field : type.getDeclaredFields()) {
+				if (VariableMapper.class.isAssignableFrom(field.getType())) {
+					try {
+						field.setAccessible(true);
+						return (VariableMapper) field.get(mapper);
+					}
+					catch (IllegalAccessException e) {
+						throw new IllegalStateException(e);
+					}
+
+				}
+			}
+		}
+
+		return null;
+	}
+
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------
 

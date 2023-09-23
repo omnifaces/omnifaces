@@ -12,14 +12,14 @@
  */
 package org.omnifaces.el;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
-import jakarta.faces.FacesWrapper;
+
+import org.omnifaces.util.Hacks;
 
 /**
  *
@@ -96,38 +96,12 @@ public class DelegatingVariableMapper extends VariableMapper {
 	}
 
 	private static void clearWrappedVariableMapperIfNecessary(VariableMapper mapper, String name) {
-		VariableMapper wrapped = findWrappedVariableMapper(mapper);
+		VariableMapper wrapped = Hacks.findWrappedVariableMapper(mapper);
 
 		if (wrapped != null) {
 			wrapped.setVariable(name, null);
 			clearWrappedVariableMapperIfNecessary(wrapped, name);
 		}
 	}
-
-	@SuppressWarnings("unchecked")
-	private static VariableMapper findWrappedVariableMapper(VariableMapper mapper) {
-		if (mapper instanceof FacesWrapper) { // MyFaces
-			return ((FacesWrapper<VariableMapper>) mapper).getWrapped();
-		}
-
-		for (Class<?> type = mapper.getClass(); type != Object.class; type = type.getSuperclass()) { // Mojarra
-			for (Field field : type.getDeclaredFields()) {
-				if (VariableMapper.class.isAssignableFrom(field.getType())) {
-					try {
-						field.setAccessible(true);
-						return (VariableMapper) field.get(mapper);
-					}
-					catch (IllegalAccessException e) {
-						throw new IllegalStateException(e);
-					}
-
-				}
-			}
-		}
-
-		return null;
-	}
-
-
 
 }
