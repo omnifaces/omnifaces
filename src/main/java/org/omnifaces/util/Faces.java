@@ -1974,6 +1974,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is authenticated, i.e. it has a logged-in user.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.authenticated}</code>.
 	 * @return <code>true</code> if the current request is authenticated, otherwise <code>false</code>.
 	 * @throws NullPointerException When faces context is unavailable.
 	 * @see ExternalContext#getRemoteUser()
