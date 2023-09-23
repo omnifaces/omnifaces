@@ -798,6 +798,56 @@ public final class Reflection {
 	}
 
 	/**
+	 * Returns the value of the field of the given instance on the given field type. Note that this returns only the
+	 * first encountered field of the given type and thus the result is undetermined when there are multiple fields of
+	 * the given type.
+	 * @param <T> The expected return type.
+	 * @param instance The instance to access the given field on.
+	 * @param fieldType The type of the field to be accessed on the given instance.
+	 * @return The value of the field of the given instance on the given field type.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws IllegalStateException If the field cannot be accessed.
+	 * @since 4.3
+	 */
+	public static <T> T accessField(Object instance, Class<T> fieldType) {
+		return accessField(instance, instance.getClass(), fieldType);
+	}
+
+	/**
+	 * Returns the value of the field of the given class type on the given field type from the given instance. Note that
+	 * this returns only the first encountered field of the given type and thus the result is undetermined when there
+	 * are multiple fields of the given type. The difference with {@link #accessField(Object, Class)} is that any
+	 * subclass of the given class type are not searched in might the given instance being such one subclass with its
+	 * own field.
+	 * @param <T> The expected return type.
+	 * @param instance The instance to access the given field on.
+	 * @param classType The type of the class to find the given field in.
+	 * @param fieldType The type of the field to be accessed on the given instance.
+	 * @return The value of the field of the given class type on the given field type from the given instance.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws IllegalStateException If the field cannot be accessed.
+	 * @since 4.3
+	 */
+	@SuppressWarnings("unchecked")
+	public static <C, T> T accessField(C instance, Class<? extends C> classType, Class<T> fieldType) {
+		try {
+			for (Class<?> type = classType; type != Object.class; type = type.getSuperclass()) {
+				for (Field field : type.getDeclaredFields()) {
+					if (fieldType.isAssignableFrom(field.getType())) {
+						field.setAccessible(true);
+						return (T) field.get(instance);
+					}
+				}
+			}
+
+			throw new NoSuchFieldException();
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldType, instance.getClass()), e);
+		}
+	}
+
+	/**
 	 * Modifies the value of the field of the given instance on the given field name with the given value.
 	 * @param <T> The field type.
 	 * @param instance The instance to access the given field on.

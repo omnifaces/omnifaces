@@ -54,6 +54,7 @@ import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 import static org.omnifaces.util.Messages.addError;
+import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -62,7 +63,6 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1878,24 +1878,18 @@ public final class Components {
 	 * (this is a rather specific helper for getBehaviorListeners() and getActionExpressionsAndListeners() and may not
 	 * work in other cases).
 	 */
-	@SuppressWarnings("unchecked")
 	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {
-		for (Class<?> type = classType; type != Object.class; type = type.getSuperclass()) {
-			for (Field field : type.getDeclaredFields()) {
-				if (fieldType.isAssignableFrom(field.getType())) {
-					field.setAccessible(true);
-
-					try {
-						return (F) field.get(instance);
-					}
-					catch (IllegalAccessException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-			}
+		try {
+			return accessField(instance, classType, fieldType);
 		}
+		catch (IllegalStateException e) {
+			if (e.getCause() instanceof NoSuchFieldException) {
+				logger.log(FINEST, format("Ignoring thrown exception; '%s' is apparently customized and simply doesn't have a field of type '%s'", classType, fieldType), e);
+				return null;
+			}
 
-		return null;
+			throw e;
+		}
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

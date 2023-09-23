@@ -35,7 +35,6 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -399,23 +398,9 @@ public final class Hacks {
 		if (mapper instanceof FacesWrapper) { // MyFaces
 			return ((FacesWrapper<VariableMapper>) mapper).getWrapped();
 		}
-
-		for (Class<?> type = mapper.getClass(); type != Object.class; type = type.getSuperclass()) { // Mojarra
-			for (Field field : type.getDeclaredFields()) {
-				if (VariableMapper.class.isAssignableFrom(field.getType())) {
-					try {
-						field.setAccessible(true);
-						return (VariableMapper) field.get(mapper);
-					}
-					catch (IllegalAccessException e) {
-						throw new IllegalStateException(e);
-					}
-
-				}
-			}
+		else { // Mojarra
+			return accessField(mapper, VariableMapper.class);
 		}
-
-		return null;
 	}
 
 
