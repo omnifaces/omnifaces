@@ -804,7 +804,8 @@ public final class Reflection {
 	 * @param <T> The expected return type.
 	 * @param instance The instance to access the given field on.
 	 * @param fieldType The type of the field to be accessed on the given instance.
-	 * @return The value of the field of the given instance on the given field type.
+	 * @return The value of the field of the given instance on the given field type, or <code>null</code> when there is
+	 * no such field.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @throws IllegalStateException If the field cannot be accessed.
 	 * @since 4.3
@@ -823,7 +824,8 @@ public final class Reflection {
 	 * @param instance The instance to access the given field on.
 	 * @param classType The type of the class to find the given field in.
 	 * @param fieldType The type of the field to be accessed on the given instance.
-	 * @return The value of the field of the given class type on the given field type from the given instance.
+	 * @return The value of the field of the given class type on the given field type from the given instance, or
+	 * <code>null</code> when there is no such field.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @throws IllegalStateException If the field cannot be accessed.
 	 * @since 4.3
@@ -840,7 +842,7 @@ public final class Reflection {
 				}
 			}
 
-			throw new NoSuchFieldException();
+			return null;
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldType, instance.getClass()), e);

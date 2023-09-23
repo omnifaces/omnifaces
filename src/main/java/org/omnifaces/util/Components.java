@@ -1653,7 +1653,7 @@ public final class Components {
 			addExpressionStringIfNotNull(source.getActionExpression(), actions);
 
 			for (ActionListener listener : source.getActionListeners()) {
-				addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
+				addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
 			}
 		}
 
@@ -1662,7 +1662,7 @@ public final class Components {
 
 			if (behaviorEvent != null) {
 				for (BehaviorListener listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {
-					addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
+					addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
 				}
 			}
 		}
@@ -1863,7 +1863,7 @@ public final class Components {
 		List<BehaviorListener> allListeners = new ArrayList<>();
 
 		for (ClientBehavior behavior : behaviors) {
-			List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+			List<BehaviorListener> listeners = accessField(behavior, BehaviorBase.class, List.class);
 
 			if (listeners != null) {
 				allListeners.addAll(listeners);
@@ -1871,25 +1871,6 @@ public final class Components {
 		}
 
 		return allListeners;
-	}
-
-	/**
-	 * Get first matching field of given field type from the given class type and get the value from the given instance.
-	 * (this is a rather specific helper for getBehaviorListeners() and getActionExpressionsAndListeners() and may not
-	 * work in other cases).
-	 */
-	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {
-		try {
-			return accessField(instance, classType, fieldType);
-		}
-		catch (IllegalStateException e) {
-			if (e.getCause() instanceof NoSuchFieldException) {
-				logger.log(FINEST, format("Ignoring thrown exception; '%s' is apparently customized and simply doesn't have a field of type '%s'", classType, fieldType), e);
-				return null;
-			}
-
-			throw e;
-		}
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
