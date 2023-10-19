@@ -261,6 +261,13 @@
 					<nosuffix>true</nosuffix>
 					<jsEngine>CLOSURE</jsEngine>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+						<version>3.5.0</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>minify-omnifaces</id>
