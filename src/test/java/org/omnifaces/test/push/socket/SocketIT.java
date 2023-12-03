@@ -13,7 +13,6 @@
 package org.omnifaces.test.push.socket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withSocket;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -89,16 +88,16 @@ public class SocketIT extends OmniFacesIT {
 	}
 
 	private void testOnopen() {
-		assertTrue(clientOpenedMessages.getText().contains("|applicationScopedServerEvent|"), "applicationScopedServerEvent socket is opened");
-		assertTrue(clientOpenedMessages.getText().contains("|sessionScopedUserTargeted|"), "sessionScopedUserTargeted socket is opened");
-		assertTrue(clientOpenedMessages.getText().contains("|viewScopedAjaxAware|"), "viewScopedAjaxAware socket is opened");
-		waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|"); // These are async.
+		waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
+		waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
+		waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
+		waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
 		waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
 	}
 
 	private void testOnclose(String tabToSwitch) {
 		closeAllSockets.click();
-		waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|"); // These are async.
+		waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
 		waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
 		closeCurrentTabAndSwitchTo(tabToSwitch);
 	}
