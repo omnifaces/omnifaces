@@ -59,7 +59,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "tomcat-myfaces4", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
+	@DisabledIfSystemProperty(named = "profile.id", matches = "*.myfaces4", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
 	void test() {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();

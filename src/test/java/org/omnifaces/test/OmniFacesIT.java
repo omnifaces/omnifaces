@@ -134,9 +134,9 @@ public abstract class OmniFacesIT {
 
 	protected void guardAjax(Runnable action) {
 		String uuid = UUID.randomUUID().toString();
-		executeScript("window.$ajax=true;(jsf||faces).ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
+		executeScript("window.$ajax=true;(window.jsf?jsf:faces).ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
 		action.run();
-		waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || !window.$ajax")); // window.$ajax will be falsey when ajax redirect has occurred.
+		waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be falsey when ajax redirect has occurred.
 	}
 
 	protected void guardPrimeFacesAjax(Runnable action) {
