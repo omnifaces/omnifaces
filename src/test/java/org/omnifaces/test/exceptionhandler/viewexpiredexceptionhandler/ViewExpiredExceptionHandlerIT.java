@@ -45,8 +45,7 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	void test() throws Exception {
-		Thread.sleep(5000);
+	void test() {
 		assertEquals("false", wasViewExpired.getText());
 
 		guardAjax(submit::click);
@@ -59,8 +58,6 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 
 		guardAjax(submit::click);
 		assertEquals("true", wasViewExpired.getText());
-
-		Thread.sleep(60000);
 
 		guardAjax(submit::click);
 		assertEquals("false", wasViewExpired.getText());
