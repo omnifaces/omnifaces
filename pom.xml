@@ -993,13 +993,14 @@
 
 		<!-- Piranha - Mojarra 4.x integration test profile: mvn verify -P piranha-mojarra4 -->
 		<!-- 
-				Note1: Piranha must be run using JDK 16, so the entire test suite should be run with JDK 16.
-				There's no need to compile OmniFaces with JDK 16. JDK 11 is fine for that.
+				Note1: Piranha must be run using JDK 21, so the entire test suite should be run with JDK 16.
+				There's no need to compile OmniFaces with JDK 21. JDK 11 is fine for that.
 			
 				Note2: Piranha is still in development, and at the moment not everything is implemented.
-				The following is the current status as-of Piranha 21.4:
+				The following is the current status as-of Piranha 23.11.0:
 
-				Tests run: 93, Failures: 6, Errors: 7, Skipped: 0
+				[WARNING] Tests run: 141, Failures: 0, Errors: 0, Skipped: 40
+				The skipped ones can be found via @DisabledIfSystemProperty
 		 -->
 		<profile>
 			<id>piranha-mojarra4</id>
