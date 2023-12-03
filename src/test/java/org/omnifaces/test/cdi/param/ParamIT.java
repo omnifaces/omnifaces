@@ -112,7 +112,7 @@ public class ParamIT extends OmniFacesIT {
 
 
 	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "tomee.*", disabledReason = "BVal doesn't support this. You really have to add @Inject to @Param.")
+	@DisabledIfSystemProperty(named = "profile.id", matches = "tomee-.*", disabledReason = "BVal doesn't support this. You really have to add @Inject to @Param.")
 	void testStringParamOnBeanWithCustomAnnotation() {
 		open("ParamITCustomAnnotation.xhtml?stringParam=foo");
 		assertEquals("foo", stringParam.getText());

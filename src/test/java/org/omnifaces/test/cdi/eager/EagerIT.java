@@ -24,7 +24,7 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "liberty.*", disabledReason = "It fails with deployment timeout. Strangely it works when ParamIT is removed/disabled.")
+@DisabledIfSystemProperty(named = "profile.id", matches = "liberty-.*", disabledReason = "It fails with deployment timeout. Strangely it works when ParamIT is removed/disabled.")
 public class EagerIT extends OmniFacesIT {
 
 	@FindBy(id="lazyApplicationScopedBean")

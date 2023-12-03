@@ -192,7 +192,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "liberty.*", disabledReason = "It fails with java.lang.IllegalStateException: setBufferSize() called after first write to Output Stream/Writer")
+	@DisabledIfSystemProperty(named = "profile.id", matches = "liberty-.*", disabledReason = "It fails with java.lang.IllegalStateException: setBufferSize() called after first write to Output Stream/Writer")
 	void throwNonAjaxDuringRenderResponse() {
 		assertAllResourcesRendered();
 		guardHttp(throwNonAjaxDuringRenderResponse::click);
