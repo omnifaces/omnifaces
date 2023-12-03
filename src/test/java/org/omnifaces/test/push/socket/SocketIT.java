@@ -65,10 +65,7 @@ public class SocketIT extends OmniFacesIT {
 	}
 
 	@Test
-	void test() throws Exception {
-
-		Thread.sleep(5000);
-
+	void test() {
 		testOnopen();
 
 		assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
