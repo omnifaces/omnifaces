@@ -72,7 +72,7 @@
 		<test.liberty-myfaces3.version>23.0.0.11</test.liberty-myfaces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
 		<test.glassfish-mojarra4.version>7.0.10</test.glassfish-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
 		<test.tomcat.version>10.1.16</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
-		<test.piranha.version>23.11.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server TODO: requires newer Arquillian version but then other servers will fail their tests -->
+		<test.piranha.version>23.11.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server -->
 		<test.tomee-myfaces3.version>9.1.1</test.tomee-myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
 
 		<!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
@@ -1025,9 +1025,8 @@
 									org.glassfish:jakarta.faces:${test.mojarra4.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
-									org.glassfish.tyrus:tyrus-core:${test.tyrus.version}
+									org.glassfish.tyrus:tyrus-container-servlet:${test.tyrus.version}
 								</war.libraries>
-								<!-- tyrus-core should actually be tyrus-container-servlet, but it currently fails to init in Piranha -->
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>

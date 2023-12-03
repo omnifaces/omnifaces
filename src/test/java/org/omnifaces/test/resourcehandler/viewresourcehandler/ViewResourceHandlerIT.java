@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 
+@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha returns different baseURL on getRequestURL (view-localhost instead of localhost)")
 public class ViewResourceHandlerIT extends OmniFacesIT {
 
 	private static final String EXPECTED_CONTENT_TYPE = "text/xml;charset=UTF-8";

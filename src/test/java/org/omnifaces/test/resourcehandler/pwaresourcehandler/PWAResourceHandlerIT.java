@@ -24,17 +24,19 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha returns different baseURL on getRequestURL (ip6-localhost instead of localhost)")
 public class PWAResourceHandlerIT extends OmniFacesIT {
 
 	private static final String EXPECTED_MANIFEST = "{\"categories\":[],\"dir\":\"auto\",\"display\":\"browser\","
 		+ "\"icons\":[{\"sizes\":\"512x512\",\"src\":\"\\/PWAResourceHandlerIT\\/jakarta.faces.resource\\/icon.png.xhtml?v=1\",\"type\":\"image\\/png\"}],"
 		+ "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"orientation\":\"any\",\"prefer_related_applications\":false,\"related_applications\":[],"
-		+ "\"start_url\":\"http:\\/\\/localhost:8080\\/PWAResourceHandlerIT\\/\"}";
+		+ "\"start_url\":\"{baseURL}\"}";
 
 	@FindBy(css="link[rel=manifest]")
 	private WebElement manifest;
@@ -62,7 +64,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
 		browser.get(manifest.getAttribute("href"));
 
-		assertEquals(EXPECTED_MANIFEST, stripTags(browser.getPageSource())
+		assertEquals(EXPECTED_MANIFEST.replace("{baseURL}", baseURL.toString()), stripTags(browser.getPageSource())
 			.replaceAll("\\?v=[0-9]{13,}", "?v=1") // Normalize any version query string on icon resource.
 			.replace("127.0.0.1", "localhost")); // Depends on server used. We don't want to be dependent on that.
 	}

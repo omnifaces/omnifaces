@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 
 public class CheckNestedFormsIT extends OmniFacesIT {
@@ -40,11 +41,13 @@ public class CheckNestedFormsIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 	void testNestedForm() {
 		verify500("NestedForm.xhtml");
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 	void testNestedDialogForm() {
 		verify500("NestedDialogForm.xhtml");
 	}

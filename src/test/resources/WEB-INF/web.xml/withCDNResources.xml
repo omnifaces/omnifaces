@@ -21,10 +21,8 @@
 >
 	<context-param>
 		<param-name>org.omnifaces.CDN_RESOURCE_HANDLER_URLS</param-name>
-		<param-value>
-			cdn:jquery-ui.css=https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css,
-			cdn:jquery.js=https://code.jquery.com/jquery-2.2.4.min.js
-		</param-value>
+		<param-value>cdn:jquery-ui.css=https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css,cdn:jquery.js=https://code.jquery.com/jquery-2.2.4.min.js</param-value>
+		<!-- NOTE: we can't add whitespace/newlines for clarity as piranha would fail parsing these -->
 	</context-param>
 	<context-param>
 		<param-name>org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED</param-name>

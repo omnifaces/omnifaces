@@ -18,10 +18,12 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withMultiViews;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file in web.xml, the servlet path returns wrong value")
 public class MultiViewsIT extends OmniFacesIT {
 
 	@FindBy(id="firstPathParamAsString")
@@ -155,6 +157,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 	void testNonExistingPage() {
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
@@ -167,6 +170,7 @@ public class MultiViewsIT extends OmniFacesIT {
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 	void testExcludedFolder() {
 		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
 		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");

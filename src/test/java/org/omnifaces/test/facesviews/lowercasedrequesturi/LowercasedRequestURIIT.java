@@ -18,10 +18,12 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withFacesViewsLowercasedRequ
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 public class LowercasedRequestURIIT extends OmniFacesIT {
 
 	@FindBy(id="linkWithExtensionOutcome")
