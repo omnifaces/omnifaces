@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.faces.FacesException;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
@@ -39,6 +40,12 @@ public class ViewScopedITBean implements Serializable {
 
 	@PostConstruct
 	public void init() {
+		try {
+			Thread.sleep(500);  // Give unload opportunity to hit server.
+		}catch (InterruptedException e) {
+			throw new FacesException(e);
+		}
+
 		checkUnloadedOrDestroyed();
 		addGlobalInfo("init ");
 	}
