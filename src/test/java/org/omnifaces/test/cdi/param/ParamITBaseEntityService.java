@@ -12,11 +12,11 @@
  */
 package org.omnifaces.test.cdi.param;
 
-import jakarta.ejb.Stateless;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.omnifaces.util.Reflection;
 
-@Stateless
+@ApplicationScoped
 public class ParamITBaseEntityService {
 
 	public ParamITBaseEntity find(Class<? extends ParamITBaseEntity> type, Long id) {

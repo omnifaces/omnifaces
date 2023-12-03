@@ -25,10 +25,10 @@ import jakarta.inject.Inject;
 public class FacesConverterITExtendedConverter extends FacesConverterITBaseConverter {
 
 	@Inject
-	private FacesConverterITSomeEJB ejb;
+	private FacesConverterITSomeService service;
 
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return ejb == null ? "null" : ejb.getClass().getSimpleName();
+		return service == null ? "null" : service.getClass().getSimpleName();
 	}
 }

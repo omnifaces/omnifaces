@@ -60,25 +60,25 @@ public class FacesConverterIT extends OmniFacesIT {
 	void test() {
 		waitUntilTextContent(loaded); // Wait until "load" event is finished because of resource dependencies.
 
-		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITConverter");
+		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITConverter");
 		assertEquals("facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITConverter");
-		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITManagedConverter");
+		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITManagedConverter");
 		assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITManagedConverter");
-		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITExtendedConverter");
+		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedConverter");
 		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedConverter");
-		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is injected in facesConverterITExtendedManagedConverter");
+		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedManagedConverter");
 		assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedManagedConverter");
 
 		init(); // This basically refreshes the page.
 		waitUntilTextContent(loaded);
 
-		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITConverter after page refresh");
+		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITConverter after page refresh");
 		assertEquals("facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITConverter after page refresh");
-		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITManagedConverter after page refresh");
+		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITManagedConverter after page refresh");
 		assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITManagedConverter after page refresh");
-		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITExtendedConverter after page refresh");
+		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedConverter after page refresh");
 		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh");
-		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"), "EJB is still injected in facesConverterITExtendedManagedConverter after page refresh");
+		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedManagedConverter after page refresh");
 		assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh");
 	}
 

@@ -12,9 +12,9 @@
  */
 package org.omnifaces.test.cdi.facesconverter;
 
-import jakarta.ejb.Stateless;
+import jakarta.enterprise.context.ApplicationScoped;
 
-@Stateless
-public class FacesConverterITSomeEJB {
+@ApplicationScoped
+public class FacesConverterITSomeService {
 	//
 }

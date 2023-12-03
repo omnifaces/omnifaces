@@ -19,12 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "liberty-.*", disabledReason = "It fails with deployment timeout. Strangely it works when ParamIT is removed/disabled.")
 public class EagerIT extends OmniFacesIT {
 
 	@FindBy(id="lazyApplicationScopedBean")
@@ -51,8 +49,8 @@ public class EagerIT extends OmniFacesIT {
 	@FindBy(id="eagerRequestScopedBean")
 	private WebElement eagerRequestScopedBean;
 
-	@FindBy(id="ejbInjectedInStartupBean")
-	private WebElement ejbInjectedInStartupBean;
+	@FindBy(id="beanInjectedInStartupBean")
+	private WebElement beanInjectedInStartupBean;
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
@@ -65,7 +63,7 @@ public class EagerIT extends OmniFacesIT {
 		assertTrue(parseLong(lazySessionScopedBean.getText()) > parseLong(eagerSessionScopedBean.getText()));
 		assertTrue(parseLong(lazyViewScopedBean.getText()) > parseLong(eagerViewScopedBean.getText()));
 		assertTrue(parseLong(lazyRequestScopedBean.getText()) > parseLong(eagerRequestScopedBean.getText()));
-		assertTrue(parseBoolean(ejbInjectedInStartupBean.getText()));
+		assertTrue(parseBoolean(beanInjectedInStartupBean.getText()));
 	}
 
 }

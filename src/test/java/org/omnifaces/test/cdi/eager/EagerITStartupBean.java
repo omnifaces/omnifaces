@@ -23,17 +23,17 @@ import org.omnifaces.cdi.Startup;
 public class EagerITStartupBean {
 
 	@Inject
-	private EagerITSomeEJB ejb;
+	private EagerITLazyApplicationScopedBean bean;
 
-	private boolean ejbInjectedInStartupBean;
+	private boolean beanInjectedInStartupBean;
 
 	@PostConstruct
 	public void init() {
-		ejbInjectedInStartupBean = (ejb != null);
+		beanInjectedInStartupBean = (bean != null);
 	}
 
-	public boolean isEjbInjectedInStartupBean() {
-		return ejbInjectedInStartupBean;
+	public boolean isBeanInjectedInStartupBean() {
+		return beanInjectedInStartupBean;
 	}
 
 }
