@@ -49,7 +49,7 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 		guardAjax(submit::click);
 		assertEquals("false", wasViewExpired.getText());
 
-		clearMessages(wasViewExpired);
+		clearTextContent(wasViewExpired);
 		expire.click();
 		waitUntilTextContent(wasViewExpired);
 		assertEquals("expired", wasViewExpired.getText());

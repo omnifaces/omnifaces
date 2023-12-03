@@ -122,7 +122,7 @@ public abstract class OmniFacesIT {
 	 * Work around because Selenium WebDriver API doesn't support triggering JS events.
 	 */
 	protected void triggerOnchange(WebElement input, String messagesId) {
-		clearMessages(messagesId);
+		clearTextContent(messagesId);
 		guardAjax(() -> executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();"));
 		waitUntilTextContent(messagesId);
 	}
@@ -148,7 +148,7 @@ public abstract class OmniFacesIT {
 	 * Work around because Selenium WebDriver API doesn't recognize iframe based ajax upload in guard.
 	 */
 	protected void guardAjaxUpload(Runnable action, WebElement messages) {
-		clearMessages(messages);
+		clearTextContent(messages);
 		guardAjax(action);
 		waitUntilTextContent(messages);
 	}
@@ -181,11 +181,11 @@ public abstract class OmniFacesIT {
 		return (T) ((JavascriptExecutor) browser).executeScript(script);
 	}
 
-	protected void clearMessages(WebElement messages) {
-		clearMessages(messages.getAttribute("id"));
+	protected void clearTextContent(WebElement messages) {
+		clearTextContent(messages.getAttribute("id"));
 	}
 
-	protected void clearMessages(String messagesId) {
+	protected void clearTextContent(String messagesId) {
 		executeScript("document.getElementById('" + messagesId + "').innerHTML='';");
 	}
 
@@ -207,6 +207,10 @@ public abstract class OmniFacesIT {
 
 	protected static boolean isFaces4Used() {
 		return System.getProperty("profile.id").endsWith("4");
+	}
+
+	protected static boolean isLibertyUsed() {
+		return System.getProperty("profile.id").startsWith("liberty-");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {

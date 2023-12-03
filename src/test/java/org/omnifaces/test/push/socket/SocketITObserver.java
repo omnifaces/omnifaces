@@ -30,18 +30,11 @@ public class SocketITObserver {
 
 	public void onopen(@Observes @Opened SocketEvent event) {
 		String channel = event.getChannel();
-
-		if (!"applicationScopedServerEvent".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
-			applicationScopedServerEvent.send("opened:" + channel);
-		}
+		applicationScopedServerEvent.send("opened:" + channel);
 	}
 
 	public void onclose(@Observes @Closed SocketEvent event) {
 		String channel = event.getChannel();
-
-		if (!"applicationScopedServerEvent".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
-			applicationScopedServerEvent.send("closed:" + channel);
-		}
+		applicationScopedServerEvent.send("closed:" + channel);
 	}
-
 }
