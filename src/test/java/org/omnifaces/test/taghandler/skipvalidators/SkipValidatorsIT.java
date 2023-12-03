@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.taghandler.skipvalidators;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -47,35 +46,35 @@ public class SkipValidatorsIT extends OmniFacesIT {
 
 	@Test
 	void test() {
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("required!", message.getText());
 		assertEquals("true", validationFailed.getText());
 
-		guardAjax(toggleRequired).click();
+		guardAjax(toggleRequired::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
 
-		guardAjax(toggleRequired).click();
+		guardAjax(toggleRequired::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("required!", message.getText());
 		assertEquals("true", validationFailed.getText());
 
-		guardAjax(toggleRequired).click();
+		guardAjax(toggleRequired::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
 
-		guardAjax(toggleRequired).click();
+		guardAjax(toggleRequired::click);
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("required!", message.getText());
 		assertEquals("true", validationFailed.getText());
 	}

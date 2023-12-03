@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.facesviews.multiviews;
 
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withMultiViews;
 
@@ -52,10 +51,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("");
 		verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(link).click();
+		guardHttp(link::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 
@@ -64,10 +63,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("MultiViewsITWelcomeFile");
 		verify200("MultiViewsITWelcomeFile", "", "", ""); // So it should have autoredirected back to empty path.
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(link).click();
+		guardHttp(link::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 
@@ -76,13 +75,13 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("foo/42");
 		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
 		open("foo/42/bar/");
 		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
 	}
 
@@ -91,10 +90,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("subfolder/");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(link).click();
+		guardHttp(link::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 
@@ -103,10 +102,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("subfolder/MultiViewsITWelcomeFile");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to subfolder.
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(link).click();
+		guardHttp(link::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 
@@ -115,13 +114,13 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("subfolder/foo/42");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
 		open("subfolder/foo/42/bar/");
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
 	}
 
@@ -130,28 +129,28 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
 		open("MultiViewsITOtherPage.xhtml");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
 		open("MultiViewsITOtherPage/foo/42");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
 
 		open("MultiViewsITOtherPage/foo/42/bar/");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
-		guardHttp(link).click();
+		guardHttp(link::click);
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
 	}
 

@@ -12,8 +12,6 @@
  */
 package org.omnifaces.test.cdi.viewscoped;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSession;
@@ -24,7 +22,6 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -69,55 +66,55 @@ public class ViewScopedIT extends OmniFacesIT {
 		String previousBean = bean.getText();
 
 		// Unload.
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then unload.
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then unload.
-		guardHttp(nonAjaxNavigate).click();
+		guardHttp(nonAjaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then navigate then unload.
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardHttp(nonAjaxNavigate).click();
+		guardHttp(nonAjaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then submit then unload.
-		guardHttp(nonAjaxNavigate).click();
+		guardHttp(nonAjaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 	}
@@ -131,55 +128,54 @@ public class ViewScopedIT extends OmniFacesIT {
 
 
 		// Submit then unload.
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then unload.
-		guardAjax(ajaxNavigate).click();
+		guardAjax(ajaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Submit then navigate then unload.
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardAjax(ajaxNavigate).click();
+		guardAjax(ajaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 
 
 		// Navigate then submit then unload.
-		guardAjax(ajaxNavigate).click();
+		guardAjax(ajaxNavigate::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", getMessagesText());
 
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", getMessagesText());
 
-		guardHttp(unload).click();
+		guardHttp(unload::click);
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", getMessagesText());
 	}
 
 	@Test @Order(3)
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "closeCurrentTabAndSwitchTo() doesn't seem to trigger unload in PhantomJS")
 	void destroyViewState() {
 
 		// Unloaded bean is from previous test.
@@ -206,7 +202,7 @@ public class ViewScopedIT extends OmniFacesIT {
 		// Submit form in first tab. As JSF is instructed to store only 3 views in session,
 		// and the @ViewScoped unload in three previously opened tabs should also physically
 		// destroy the view state, the submit in first tab should not throw ViewExpiredException.
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		assertEquals(firstBean, bean.getText());
 		assertEquals("unload submit", getMessagesText()); // Unload was from previous tab.
 	}

@@ -18,10 +18,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
 >
-	<extension qualifier="webdriver">
-		<property name="browser">${arquillian.browser}</property>
-	</extension>
-
 	<container qualifier="liberty">
 		<configuration>
 			<property name="wlpHome">target/wlp</property>

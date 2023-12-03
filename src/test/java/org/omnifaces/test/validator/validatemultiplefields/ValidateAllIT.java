@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.validator.validatemultiplefields;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -87,7 +86,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 	@Test
 	void testForm1() {
-		guardAjax(form1Submit).click();
+		guardAjax(form1Submit::click);
 
 		assertEquals("", form1Input1Message.getText());
 		assertEquals("", form1Input2Message.getText());
@@ -97,7 +96,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form1Input1.sendKeys("bruh");
 
-		guardAjax(form1Submit).click();
+		guardAjax(form1Submit::click);
 		assertEquals("", form1Input1Message.getText());
 		assertEquals("", form1Input2Message.getText());
 		assertEquals("", form1Input3Message.getText());
@@ -106,7 +105,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form1Input2.sendKeys("bruh");
 
-		guardAjax(form1Submit).click();
+		guardAjax(form1Submit::click);
 		assertEquals("", form1Input1Message.getText());
 		assertEquals("", form1Input2Message.getText());
 		assertEquals("", form1Input3Message.getText());
@@ -115,7 +114,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form1Input3.sendKeys("bruh");
 
-		guardAjax(form1Submit).click();
+		guardAjax(form1Submit::click);
 		assertEquals("", form1Input1Message.getText());
 		assertEquals("", form1Input2Message.getText());
 		assertEquals("", form1Input3Message.getText());
@@ -125,7 +124,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 	@Test
 	void testForm2() {
-		guardAjax(form2Submit).click();
+		guardAjax(form2Submit::click);
 
 		assertEquals("", form2Input1Message.getText());
 		assertEquals("", form2Input2Message.getText());
@@ -135,7 +134,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form2Input1.sendKeys("bruh");
 
-		guardAjax(form2Submit).click();
+		guardAjax(form2Submit::click);
 		assertEquals("", form2Input1Message.getText());
 		assertEquals("", form2Input2Message.getText());
 		assertEquals("", form2Input3Message.getText());
@@ -144,7 +143,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form2Input2.sendKeys("bruh");
 
-		guardAjax(form2Submit).click();
+		guardAjax(form2Submit::click);
 		assertEquals("", form2Input1Message.getText());
 		assertEquals("", form2Input2Message.getText());
 		assertEquals("", form2Input3Message.getText());
@@ -153,7 +152,7 @@ public class ValidateAllIT extends OmniFacesIT {
 
 		form2Input3.sendKeys("bruh");
 
-		guardAjax(form2Submit).click();
+		guardAjax(form2Submit::click);
 		assertEquals("", form2Input1Message.getText());
 		assertEquals("", form2Input2Message.getText());
 		assertEquals("", form2Input3Message.getText());

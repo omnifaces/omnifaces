@@ -12,8 +12,6 @@
  */
 package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
@@ -25,6 +23,7 @@ import java.util.List;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.By;
@@ -90,7 +89,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwDuringInvokeApplication() {
 		assertAllResourcesRendered();
-		guardAjax(throwDuringInvokeApplication).click();
+		guardAjax(throwDuringInvokeApplication::click);
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
 		assertAllResourcesRendered();
 	}
@@ -98,7 +97,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwDuringUpdateModelValues() {
 		assertAllResourcesRendered();
-		guardAjax(throwDuringUpdateModelValues).click();
+		guardAjax(throwDuringUpdateModelValues::click);
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
 		assertAllResourcesRendered();
 	}
@@ -106,7 +105,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwDuringRenderResponse() {
 		assertAllResourcesRendered();
-		guardAjax(throwDuringRenderResponse).click();
+		guardAjax(throwDuringRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -115,7 +114,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	void throwDuringSecondUpdateOfRenderResponse() {
 		refresh(); // TODO: fix so that this is not necessary anymore -- PrimeFaces will unnecessarily render duplicate CSS resources in error page because existing ones have JSESSIONID path param appended and new ones not.
 		assertAllResourcesRendered();
-		guardAjax(throwDuringSecondUpdateOfRenderResponse).click();
+		guardAjax(throwDuringSecondUpdateOfRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -123,7 +122,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwDuringTreeVisitingOnRenderResponse() {
 		assertAllResourcesRendered();
-		guardAjax(throwDuringTreeVisitingOnRenderResponse).click();
+		guardAjax(throwDuringTreeVisitingOnRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -131,7 +130,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwPrimeFacesDuringInvokeApplication() {
 		assertAllResourcesRendered();
-		guardAjax(throwPrimeFacesDuringInvokeApplication).click();
+		guardPrimeFacesAjax(throwPrimeFacesDuringInvokeApplication::click);
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
 		assertAllResourcesRendered();
 	}
@@ -139,7 +138,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwMixedDuringInvokeApplication() {
 		assertAllResourcesRendered();
-		guardAjax(throwMixedDuringInvokeApplication).click();
+		guardPrimeFacesAjax(throwMixedDuringInvokeApplication::click);
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
 		assertAllResourcesRendered();
 	}
@@ -147,7 +146,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwPrimeFacesDuringUpdateModelValues() {
 		assertAllResourcesRendered();
-		guardAjax(throwPrimeFacesDuringUpdateModelValues).click();
+		guardPrimeFacesAjax(throwPrimeFacesDuringUpdateModelValues::click);
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
 		assertAllResourcesRendered();
 	}
@@ -155,7 +154,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwPrimeFacesDuringRenderResponse() {
 		assertAllResourcesRendered();
-		guardAjax(throwPrimeFacesDuringRenderResponse).click();
+		guardPrimeFacesAjax(throwPrimeFacesDuringRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -163,7 +162,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwPrimeFacesDuringSecondUpdateOfRenderResponse() {
 		assertAllResourcesRendered();
-		guardAjax(throwPrimeFacesDuringSecondUpdateOfRenderResponse).click();
+		guardPrimeFacesAjax(throwPrimeFacesDuringSecondUpdateOfRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -171,7 +170,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwPrimeFacesDuringTreeVisitingOnRenderResponse() {
 		assertAllResourcesRendered();
-		guardAjax(throwPrimeFacesDuringTreeVisitingOnRenderResponse).click();
+		guardPrimeFacesAjax(throwPrimeFacesDuringTreeVisitingOnRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
@@ -179,7 +178,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwNonAjaxDuringInvokeApplication() {
 		assertAllResourcesRendered();
-		guardHttp(throwNonAjaxDuringInvokeApplication).click();
+		guardHttp(throwNonAjaxDuringInvokeApplication::click);
 		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
 		assertAllResourcesRendered();
 	}
@@ -187,29 +186,21 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	void throwNonAjaxDuringUpdateModelValues() {
 		assertAllResourcesRendered();
-		guardHttp(throwNonAjaxDuringUpdateModelValues).click();
+		guardHttp(throwNonAjaxDuringUpdateModelValues::click);
 		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
 		assertAllResourcesRendered();
 	}
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "liberty.*", disabledReason = "It fails with java.lang.IllegalStateException: setBufferSize() called after first write to Output Stream/Writer")
 	void throwNonAjaxDuringRenderResponse() {
-		if (isLiberty()) {
-			return;
-			// It's known to fail with below exception:
-			// Caused by: java.lang.IllegalStateException: setBufferSize() called after first write to Output Stream/Writer
-			//     at com.ibm.ws.webcontainer.srt.SRTServletResponse.setBufferSize(SRTServletResponse.java:605)
-			// TODO: investigate and fix.
-		}
-
 		assertAllResourcesRendered();
-		guardHttp(throwNonAjaxDuringRenderResponse).click();
+		guardHttp(throwNonAjaxDuringRenderResponse::click);
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 		assertAllResourcesRendered();
 	}
 
 	private void assertAllResourcesRendered() {
-		waitUntilPrimeFacesReady();
 		assertStylesheetResourceRendered("primefaces-saga", "theme.css");
 		assertStylesheetResourceRendered("primefaces", "components.css");
 		assertStylesheetResourceRendered(null, "style.css");

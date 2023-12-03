@@ -13,7 +13,6 @@
 package org.omnifaces.test.component.inputfile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -125,14 +124,14 @@ public class InputFileIT extends OmniFacesIT {
 	void uploadSingle() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleFile.sendKeys(txtFile.getAbsolutePath());
-		guardHttp(uploadSingleSubmit).click();
+		guardHttp(uploadSingleSubmit::click);
 		assertTrue(uploadSingleFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), getMessagesText());
 	}
 
 	@Test
 	void uploadSingleEmpty() {
-		guardHttp(uploadSingleSubmit).click();
+		guardHttp(uploadSingleSubmit::click);
 		assertEquals("uploadSingle: null", getMessagesText());
 	}
 
@@ -140,7 +139,7 @@ public class InputFileIT extends OmniFacesIT {
 	void uploadSingleAjax() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAjaxFile.sendKeys(txtFile.getAbsolutePath());
-		guardAjaxUpload(uploadSingleAjaxSubmit, messages);
+		guardAjaxUpload(uploadSingleAjaxSubmit::click, messages);
 		assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), getMessagesText());
 	}
 
@@ -148,13 +147,13 @@ public class InputFileIT extends OmniFacesIT {
 	void uploadSingleAcceptAnyImage() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAcceptAnyImageFile.sendKeys(txtFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
+		guardHttp(uploadSingleAcceptAnyImageSubmit::click);
 		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
 		assertEquals("label: " + txtFile.getName() + " is not image/*", getMessagesText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleAcceptAnyImageFile.sendKeys(gifFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptAnyImageSubmit).click();
+		guardHttp(uploadSingleAcceptAnyImageSubmit::click);
 		assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), getMessagesText());
 	}
@@ -163,30 +162,30 @@ public class InputFileIT extends OmniFacesIT {
 	void uploadSingleAcceptSvgImage() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAcceptSvgImageFile.sendKeys(txtFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
+		guardHttp(uploadSingleAcceptSvgImageSubmit::click);
 		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
 		assertEquals("label: " + txtFile.getName() + " is not image/svg+xml", getMessagesText());
 
 		File svgFile = createTempFile("file", "svg", "<svg/>");
 		uploadSingleAcceptSvgImageFile.sendKeys(svgFile.getAbsolutePath());
-		guardHttp(uploadSingleAcceptSvgImageSubmit).click();
+		guardHttp(uploadSingleAcceptSvgImageSubmit::click);
 		assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + svgFile.length() + ", " + svgFile.getName(), getMessagesText());
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "HTMLInputElement.files returns null in PhantomJS")
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "chrome", disabledReason = "triggerOnchange doesn't work?")
 	void uploadSingleMaxsizeClient() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeClientFile.sendKeys(txtFile.getAbsolutePath());
-		triggerOnchange(uploadSingleMaxsizeClientFile, uploadSingleMaxsizeClientMessage);
+		triggerOnchange(uploadSingleMaxsizeClientFile, "uploadSingleMaxsizeClient:message");
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
 		String message = uploadSingleMaxsizeClientMessage.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // HtmlUnit doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B"));
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeClientFile.sendKeys(gifFile.getAbsolutePath());
-		guardHttp(uploadSingleMaxsizeClientSubmit).click();
+		guardHttp(uploadSingleMaxsizeClientSubmit::click);
 		assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), uploadSingleMaxsizeClientMessage.getText());
 	}
@@ -195,68 +194,65 @@ public class InputFileIT extends OmniFacesIT {
 	void uploadSingleMaxsizeServer() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
-		guardHttp(uploadSingleMaxsizeServerSubmit).click();
+		guardHttp(uploadSingleMaxsizeServerSubmit::click);
 		assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
 		assertEquals("label: " + txtFile.getName() + " larger than 10 B", getMessagesText());
 
 		File gifFile = createTempFile("file", "gif", "GIF89a");
 		uploadSingleMaxsizeServerFile.sendKeys(gifFile.getAbsolutePath());
-		guardHttp(uploadSingleMaxsizeServerSubmit).click();
+		guardHttp(uploadSingleMaxsizeServerSubmit::click);
 		assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
 		assertEquals("uploadSingle: " + gifFile.length() + ", " + gifFile.getName(), getMessagesText());
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	void uploadMultiple() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath());
-		guardHttp(uploadMultipleSubmit).click();
+		guardHttp(uploadMultipleSubmit::click);
 		assertTrue(uploadMultipleFile1.getText().isEmpty());
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	void uploadMultipleAjax() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
-		guardAjaxUpload(uploadMultipleAjaxSubmit, messages);
+		guardAjaxUpload(uploadMultipleAjaxSubmit::click, messages);
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
+	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "chrome", disabledReason = "triggerOnchange doesn't work?")
 	void uploadMultipleMaxsizeClient() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello hello");
 		File txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleMaxsizeClientFile2.sendKeys(txtFile2.getAbsolutePath());
-		triggerOnchange(uploadMultipleMaxsizeClientFile1, uploadMultipleMaxsizeClientMessage);
+		triggerOnchange(uploadMultipleMaxsizeClientFile1, "uploadMultipleMaxsizeClient:message");
 		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
 		String message = uploadMultipleMaxsizeClientMessage.getText();
-		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B")); // HtmlUnit doesn't correctly implement HTML5 File API as to obtaining file name so we cannot assert file name but only custom label.
+		assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B"));
 
 		txtFile1 = createTempFile("file1", "txt", "hello");
 		uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
-		guardHttp(uploadMultipleMaxsizeClientSubmit).click();
+		guardHttp(uploadMultipleMaxsizeClientSubmit::click);
 		assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeClientFile2.getText().isEmpty());
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
 	}
 
 	@Test
-	@DisabledIfSystemProperty(named = "arquillian.browser", matches = "phantomjs", disabledReason = "Second input type=file with same name hangs in PhantomJS")
 	void uploadMultipleMaxsizeServer() throws IOException {
 		File txtFile1 = createTempFile("file1", "txt", "hello");
 		File txtFile2 = createTempFile("file2", "txt", "world world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
-		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
+		guardHttp(uploadMultipleMaxsizeServerSubmit::click);
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
 		assertEquals("label: " + txtFile2.getName() + " larger than 10 B", getMessagesText());
@@ -264,7 +260,7 @@ public class InputFileIT extends OmniFacesIT {
 		txtFile2 = createTempFile("file2", "txt", "world");
 		uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
 		uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
-		guardHttp(uploadMultipleMaxsizeServerSubmit).click();
+		guardHttp(uploadMultipleMaxsizeServerSubmit::click);
 		assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
 		assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());

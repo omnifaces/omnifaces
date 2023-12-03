@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.util.components;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -51,31 +50,31 @@ public class ComponentsIT extends OmniFacesIT {
 
 	@Test
 	void testCommandButtonAction() {
-		guardAjax(commandButtonAction).click();
+		guardAjax(commandButtonAction::click);
 		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
 	}
 
 	@Test
 	void testCommandButtonActionListener() {
-		guardAjax(commandButtonActionListener).click();
+		guardAjax(commandButtonActionListener::click);
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}
 
 	@Test
 	void testCommandButtonAjaxListener() {
-		guardAjax(commandButtonAjaxListener).click();
+		guardAjax(commandButtonAjaxListener::click);
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}
 
 	@Test
 	void testPrimeFacesCommandButtonAction() {
-		guardAjax(primeFacesCommandButtonAction).click();
+		guardPrimeFacesAjax(primeFacesCommandButtonAction::click);
 		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
 	}
 
 	@Test
 	void testPrimeFacesCommandButtonActionListener() {
-		guardAjax(primeFacesCommandButtonActionListener).click();
+		guardPrimeFacesAjax(primeFacesCommandButtonActionListener::click);
 		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
 	}
 

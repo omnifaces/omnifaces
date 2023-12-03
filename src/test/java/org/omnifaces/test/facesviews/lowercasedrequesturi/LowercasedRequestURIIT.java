@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.facesviews.lowercasedrequesturi;
 
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withFacesViewsLowercasedRequestURI;
 
@@ -55,19 +54,19 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		open("lowercasedrequesturiit");
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
 		open("lowercasedrequesturiit.xhtml");
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
 		open("lowercasedrequesturiit/");
@@ -88,19 +87,19 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		open("subfolder/lowercasedrequesturiit");
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
 		open("subfolder/lowercasedrequesturiit.xhtml");
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
 		open("subfolder/lowercasedrequesturiit/");
@@ -121,19 +120,19 @@ public class LowercasedRequestURIIT extends OmniFacesIT {
 		open("alreadylowercasedviewid");
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
 		open("alreadylowercasedviewid.xhtml");
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
 		open("alreadylowercasedviewid/");

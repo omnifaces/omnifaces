@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.converter.selectitemsconverter;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -45,7 +44,7 @@ public class SelectItemsConverterIT extends OmniFacesIT {
 	@Test
 	void test() {
 		new Select(input).selectByIndex(2);
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertEquals("Entity[3]", output.getText());
 		assertEquals("", messages.getText());
 	}

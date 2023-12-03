@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -111,11 +112,8 @@ public class ParamIT extends OmniFacesIT {
 
 
 	@Test
+	@DisabledIfSystemProperty(named = "profile.id", matches = "tomee.*", disabledReason = "BVal doesn't support this. You really have to add @Inject to @Param.")
 	void testStringParamOnBeanWithCustomAnnotation() {
-		if (isBValUsed()) {
-			return; // BVal doesn't support this. You really have to add @Inject to @Param.
-		}
-
 		open("ParamITCustomAnnotation.xhtml?stringParam=foo");
 		assertEquals("foo", stringParam.getText());
 		assertEquals("initSuccess", initResult.getText());

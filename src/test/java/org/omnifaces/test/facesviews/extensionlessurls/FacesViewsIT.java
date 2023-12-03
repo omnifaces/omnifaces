@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.facesviews.extensionlessurls;
 
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withFacesViews;
 
@@ -48,7 +47,7 @@ public class FacesViewsIT extends OmniFacesIT {
 	void testWelcomeFile() {
 		verify200("FacesViewsIT", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsIT", "");
 
 		open("FacesViewsIT.xhtml");
@@ -57,7 +56,7 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsIT.jsf");
 		verify200("FacesViewsIT", "");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsIT", "");
 
 		open("FacesViewsIT/");
@@ -69,19 +68,19 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITOtherPage");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
 		open("FacesViewsITOtherPage.xhtml");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
 		open("FacesViewsITOtherPage.jsf");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
 		open("FacesViewsITOtherPage/");
@@ -93,19 +92,19 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.xhtml");
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.jsf");
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit).click();
+		guardHttp(formSubmit::click);
 		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
 		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");

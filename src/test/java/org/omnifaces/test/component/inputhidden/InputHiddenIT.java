@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.component.inputhidden;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -43,14 +42,14 @@ public class InputHiddenIT extends OmniFacesIT {
 
 	@Test
 	void testInputHidden() {
-		guardAjax(toggle).click();
-		guardAjax(submit).click();
+		guardAjax(toggle::click);
+		guardAjax(submit::click);
 		assertEquals("submitted", messages.getText());
 	}
 
 	@Test
 	void testInputHiddenReadonlyValidation() {
-		guardAjax(validate).click();
+		guardAjax(validate::click);
 		assertEquals("validated readonly", messages.getText());
 	}
 

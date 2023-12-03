@@ -12,46 +12,79 @@
  */
 package org.omnifaces.test;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
+import static java.time.Duration.ofSeconds;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
-import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.base.Predicate;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 @ExtendWith(ArquillianExtension.class)
+@TestInstance(Lifecycle.PER_CLASS)
 public abstract class OmniFacesIT {
 
-	@Drone
 	protected WebDriver browser;
 
 	@ArquillianResource
 	protected URL baseURL;
 
+	@BeforeAll
+	public void setup() {
+		String arquillianBrowser = System.getProperty("arquillian.browser");
+
+		switch (arquillianBrowser) {
+			case "chrome":
+				WebDriverManager.chromedriver().setup();
+				ChromeDriver chrome = new ChromeDriver(new ChromeOptions().addArguments("--no-sandbox", "--headless"));
+				chrome.setLogLevel(Level.INFO);
+				browser = chrome;
+				break;
+			default:
+				throw new UnsupportedOperationException("arquillian.browser='" + arquillianBrowser + "' is not yet supported");
+		}
+
+		PageFactory.initElements(browser, this);
+	}
+
 	@BeforeEach
 	public void init() {
-		open(getClass().getSimpleName() + ".xhtml");
+        open(getClass().getSimpleName() + ".xhtml");
 	}
+
+    @AfterAll
+    public void teardown() {
+    	browser.quit();
+    }
 
 	protected void refresh() {
 		init();
@@ -59,18 +92,15 @@ public abstract class OmniFacesIT {
 
 	protected void open(String pageName) {
 		browser.get(baseURL + pageName);
-		waitGui(browser);
 	}
 
 	protected String openNewTab(WebElement elementWhichOpensNewTab) {
 		Set<String> oldTabs = browser.getWindowHandles();
 		elementWhichOpensNewTab.click();
-		waitGui(browser);
 		Set<String> newTabs = new HashSet<>(browser.getWindowHandles());
 		newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
 		String newTab = newTabs.iterator().next();
 		browser.switchTo().window(newTab);
-		waitGui(browser);
 		return newTab;
 	}
 
@@ -83,36 +113,67 @@ public abstract class OmniFacesIT {
 	}
 
 	protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
+		open(null); // This trick gives @ViewScoped unload opportunity to hit server.
 		browser.close();
 		browser.switchTo().window(tabToSwitch);
-		waitGui(browser);
 	}
 
 	/**
 	 * Work around because Selenium WebDriver API doesn't support triggering JS events.
 	 */
-	protected void triggerOnchange(WebElement input, WebElement messages) {
-		clearMessages(messages);
-		executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();");
-		waitUntilTextContent(messages);
+	protected void triggerOnchange(WebElement input, String messagesId) {
+		clearMessages(messagesId);
+		guardAjax(() -> executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();"));
+		waitUntilTextContent(messagesId);
+	}
+
+	protected void guardHttp(Runnable action) {
+		action.run();
+		waitUntil(() -> executeScript("return document.readyState=='complete'"));
+	}
+
+	protected void guardAjax(Runnable action) {
+		String uuid = UUID.randomUUID().toString();
+		executeScript("window.$ajax=true;(jsf||faces).ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
+		action.run();
+		waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || !window.$ajax")); // window.$ajax will be falsey when ajax redirect has occurred.
+	}
+
+	protected void guardPrimeFacesAjax(Runnable action) {
+		action.run();
+		waitUntil(() -> executeScript("return !!window.PrimeFaces && PrimeFaces.ajax.Queue.isEmpty()"));
 	}
 
 	/**
 	 * Work around because Selenium WebDriver API doesn't recognize iframe based ajax upload in guard.
 	 */
-	protected void guardAjaxUpload(WebElement submit, WebElement messages) {
+	protected void guardAjaxUpload(Runnable action, WebElement messages) {
 		clearMessages(messages);
-		submit.click();
+		guardAjax(action);
 		waitUntilTextContent(messages);
 	}
 
-	protected void waitUntilTextContent(WebElement element) {
-		waitGui(browser).withTimeout(3, SECONDS).until().element(element).text().not().equalTo("");
+	private void waitUntil(Supplier<Boolean> predicate) {
+		new WebDriverWait(browser, ofSeconds(3)).until($ -> predicate.get());
 	}
 
-	protected void waitUntilPrimeFacesReady() {
-		Predicate<WebDriver> primeFacesReady = $ -> executeScript("return !!window.PrimeFaces && PrimeFaces.ajax.Queue.isEmpty()");
-		waitGui(browser).withTimeout(3, SECONDS).until(primeFacesReady);
+	protected void waitUntilTextContent(String elementId) {
+		waitUntil(() -> {
+			try {
+				return !browser.findElement(By.id(elementId)).getText().isBlank();
+			}
+			catch (StaleElementReferenceException ignore) {
+				return false; // Will retry next.
+			}
+		});
+	}
+
+	protected void waitUntilTextContent(WebElement element) {
+		waitUntil(() -> !element.getText().isBlank());
+	}
+
+	protected void waitUntilTextContains(WebElement element, String expectedString) {
+		waitUntil(() -> element.getText().contains(expectedString));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -121,7 +182,11 @@ public abstract class OmniFacesIT {
 	}
 
 	protected void clearMessages(WebElement messages) {
-		executeScript("document.getElementById('" + messages.getAttribute("id") + "').innerHTML='';");
+		clearMessages(messages.getAttribute("id"));
+	}
+
+	protected void clearMessages(String messagesId) {
+		executeScript("document.getElementById('" + messagesId + "').innerHTML='';");
 	}
 
 	protected static String stripJsessionid(String url) {
@@ -142,22 +207,6 @@ public abstract class OmniFacesIT {
 
 	protected static boolean isFaces4Used() {
 		return System.getProperty("profile.id").endsWith("4");
-	}
-
-	protected static boolean isMojarraUsed() {
-		return startsWithOneOf(System.getProperty("profile.id"), "wildfly", "glassfish", "tomcat-mojarra", "piranha");
-	}
-
-	protected static boolean isMyFacesUsed() {
-		return startsWithOneOf(System.getProperty("profile.id"), "tomee", "liberty", "tomcat-myfaces");
-	}
-
-	protected static boolean isBValUsed() {
-		return startsWithOneOf(System.getProperty("profile.id"), "tomee");
-	}
-
-	protected static boolean isLiberty() {
-		return startsWithOneOf(System.getProperty("profile.id"), "liberty");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
@@ -254,7 +303,7 @@ public abstract class OmniFacesIT {
 			}
 
 			MavenResolverSystem maven = Maven.resolver();
-			archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:10.0.0").withTransitivity().asFile());
+			archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
 			primeFacesSet = true;
 			return this;
 		}

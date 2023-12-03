@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.component.hashparam;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -47,7 +46,7 @@ public class HashParamIT extends OmniFacesIT {
 	@Test
 	void testHashParam() {
 		openWithHashString("foo=baz&bar=kaz");
-		waitUntilTextContent(this.hashLoadTimestamp); // TODO: should not have been necessary.
+		waitUntilTextContent("hashLoadTimestamp");
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
 		long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
@@ -55,35 +54,35 @@ public class HashParamIT extends OmniFacesIT {
 
 		foo.sendKeys("");
 		bar.sendKeys("bar");
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertTrue(browser.getCurrentUrl().endsWith("#bar=bar"), browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("foo");
 		bar.sendKeys("");
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo"), browser.getCurrentUrl() + " ends with #foo=foo");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("foo");
 		bar.sendKeys("bar");
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"), browser.getCurrentUrl() + " ends with #foo=foo&bar=bar");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("def");
 		bar.sendKeys("def");
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertTrue(browser.getCurrentUrl().endsWith("#foo=def"), browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)");
 
 		foo.clear();
 		bar.clear();
 		foo.sendKeys("");
 		bar.sendKeys("");
-		guardAjax(submit).click();
+		guardAjax(submit::click);
 		assertTrue(!browser.getCurrentUrl().contains("#"), browser.getCurrentUrl() + " ends with no hash param");
 	}
 

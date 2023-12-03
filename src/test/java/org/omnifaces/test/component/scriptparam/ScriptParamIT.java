@@ -44,7 +44,7 @@ public class ScriptParamIT extends OmniFacesIT {
 
 	@Test
 	void testScriptParam() {
-		waitUntilTextContent(this.scriptLoadTimestamp);
+		waitUntilTextContent("scriptLoadTimestamp");
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
 		long scriptLoadTimestamp = Long.valueOf(this.scriptLoadTimestamp.getText());

@@ -12,10 +12,6 @@
  */
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.jboss.arquillian.graphene.Graphene.guardHttp;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedResourceHandler;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -90,44 +86,44 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	@Test
 	void nonAjax() {
 		verifyElements();
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		verifyElements();
-		guardHttp(nonAjaxRebuild).click();
+		guardHttp(nonAjaxRebuild::click);
 		verifyElements();
 	}
 
 	@Test
 	void ajax() {
 		verifyElements();
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		verifyElements();
-		guardAjax(ajaxRebuild).click();
+		guardAjax(ajaxRebuild::click);
 		verifyElements();
 	}
 
 	@Test
 	void mixed() {
 		verifyElements();
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		verifyElements();
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		verifyElements();
-		guardHttp(nonAjaxRebuild).click();
+		guardHttp(nonAjaxRebuild::click);
 		verifyElements();
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		verifyElements();
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		verifyElements();
-		guardAjax(ajaxRebuild).click();
+		guardAjax(ajaxRebuild::click);
 		verifyElements();
-		guardHttp(nonAjaxSubmit).click();
+		guardHttp(nonAjaxSubmit::click);
 		verifyElements();
-		guardAjax(ajaxSubmit).click();
+		guardAjax(ajaxSubmit::click);
 		verifyElements();
 	}
 
 	private void verifyElements() {
-		waitGui(browser).withTimeout(3, SECONDS).until().element(deferredInBody).text().not().equalTo(""); // Wait until last o:deferredScript is finished.
+		waitUntilTextContent(deferredInBody); // Wait until last o:deferredScript is finished.
 
 		assertEquals(2, combinedScripts.size());
 		assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);

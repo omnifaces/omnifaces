@@ -12,7 +12,6 @@
  */
 package org.omnifaces.test.component.form;
 
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,7 +47,7 @@ public class FormIT extends OmniFacesIT {
 
 	@Test
 	void testFormDefault() {
-		guardAjax(formDefaultSubmit).click();
+		guardAjax(formDefaultSubmit::click);
 		String params = formDefaultParams.getText();
 		assertTrue(params.contains("formDefault"), "formDefault");
 		assertFalse(params.contains("formDefault:input1"), "formDefault:input1");
@@ -65,7 +64,7 @@ public class FormIT extends OmniFacesIT {
 
 	@Test
 	void testFormDisabledPartialSubmit() {
-		guardAjax(formDisabledSubmit).click();
+		guardAjax(formDisabledSubmit::click);
 		String params = formDisabledParams.getText();
 		assertTrue(params.contains("formDisabled"), "formDisabled");
 		assertTrue(params.contains("formDisabled:input1"), "formDisabled:input1");

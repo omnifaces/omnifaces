@@ -12,10 +12,6 @@
  */
 package org.omnifaces.test.push.socket;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withSocket;
@@ -96,33 +92,33 @@ public class SocketIT extends OmniFacesIT {
 		assertTrue(clientOpenedMessages.getText().contains("|applicationScopedServerEvent|"), "applicationScopedServerEvent socket is opened");
 		assertTrue(clientOpenedMessages.getText().contains("|sessionScopedUserTargeted|"), "sessionScopedUserTargeted socket is opened");
 		assertTrue(clientOpenedMessages.getText().contains("|viewScopedAjaxAware|"), "viewScopedAjaxAware socket is opened");
-		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|opened:sessionScopedUserTargeted|"); // These are async.
-		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().contains("|opened:viewScopedAjaxAware|");
+		waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|"); // These are async.
+		waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
 	}
 
 	private void testOnclose(String tabToSwitch) {
-		guardNoRequest(closeAllSockets).click();
-		waitGui(browser).withTimeout(3, SECONDS).until().element(clientClosedMessages).text().contains("|sessionScopedUserTargeted|"); // These are async.
-		waitGui(browser).withTimeout(3, SECONDS).until().element(clientClosedMessages).text().contains("|viewScopedAjaxAware|");
+		closeAllSockets.click();
+		waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|"); // These are async.
+		waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
 		closeCurrentTabAndSwitchTo(tabToSwitch);
 	}
 
 	private String pushApplicationScopedServerEvent() {
-		guardAjax(pushApplicationScopedServerEvent).click();
+		guardAjax(pushApplicationScopedServerEvent::click);
 		String message = messages.getText();
 		waitUntilTextContent(applicationScopedServerEventMessage);
 		return message;
 	}
 
 	private String pushSessionScopedUserTargeted() {
-		guardAjax(pushSessionScopedUserTargeted).click();
+		guardAjax(pushSessionScopedUserTargeted::click);
 		String message = messages.getText();
 		waitUntilTextContent(sessionScopedUserTargetedMessage);
 		return message;
 	}
 
 	private String pushViewScopedAjaxAware() {
-		guardAjax(pushViewScopedAjaxAware).click();
+		guardAjax(pushViewScopedAjaxAware::click);
 		String message = messages.getText();
 		waitUntilTextContent(viewScopedAjaxAwareMessage);
 		return message;
