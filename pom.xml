@@ -1000,7 +1000,11 @@
 				The following is the current status as-of Piranha 23.11.0:
 
 				[WARNING] Tests run: 141, Failures: 0, Errors: 0, Skipped: 40
-				The skipped ones can be found via @DisabledIfSystemProperty
+				The skipped ones can be found via @DisabledIfSystemProperty and they all boil down to following 4 pending issues:
+				- welcome-file not correctly interpreted (servlet path returns wrong value)
+				- error-page not correctly interpreted (probably because of being in /WEB-INF or using FacesServlet mapping)
+				- request.getRequestURL returns different domain (e.g. 'view-localhost' or 'ip6-localhost' instead of 'localhost')
+				- flash cookie hangs one request too long
 		 -->
 		<profile>
 			<id>piranha-mojarra4</id>
