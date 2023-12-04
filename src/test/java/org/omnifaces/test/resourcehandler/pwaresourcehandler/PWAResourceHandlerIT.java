@@ -64,9 +64,8 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
 		browser.get(manifest.getAttribute("href"));
 
-		assertEquals(EXPECTED_MANIFEST.replace("{baseURL}", baseURL.toString()), stripTags(browser.getPageSource())
-			.replaceAll("\\?v=[0-9]{13,}", "?v=1") // Normalize any version query string on icon resource.
-			.replace("127.0.0.1", "localhost")); // Depends on server used. We don't want to be dependent on that.
+		assertEquals(EXPECTED_MANIFEST.replace("{baseURL}", baseURL.toString().replace("/", "\\/")), stripTags(browser.getPageSource())
+			.replaceAll("\\?v=[0-9]{13,}", "?v=1")); // Normalize any version query string on icon resource.
 	}
 
 	@Test
