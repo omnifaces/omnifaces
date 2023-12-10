@@ -140,10 +140,10 @@ public class LoadBundle extends TagHandler {
 
 		private static final long serialVersionUID = 1L;
 
-		private ResourceBundle bundle;
+		private transient ResourceBundle bundle;
 
 		public BundleMap(ResourceBundle bundle) {
-			super(list(bundle.getKeys()).stream().collect(toUnmodifiableMap(identity(), key -> bundle.getString(key))));
+			super(list(bundle.getKeys()).stream().collect(toUnmodifiableMap(identity(), bundle::getString)));
 			this.bundle = bundle;
 		}
 
