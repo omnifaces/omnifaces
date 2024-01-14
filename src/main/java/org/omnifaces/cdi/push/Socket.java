@@ -158,7 +158,7 @@ import org.omnifaces.util.State;
  * <p>
  * Although web sockets support two-way communication, the <code>&lt;o:socket&gt;</code> push is designed for one-way
  * communication, from server to client. In case you intend to send some data from client to server, just continue
- * using JSF ajax the usual way, if necessary from JavaScript on with <code>&lt;o:commandScript&gt;</code> or perhaps
+ * using JSF ajax the usual way, if necessary from JavaScript on with <code>&lt;h:commandScript&gt;</code> or perhaps
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those
  * security constraints are not available during an incoming web socket message per se. See also a.o.
@@ -709,7 +709,7 @@ import org.omnifaces.util.State;
  * someChannel.send("someEvent");
  * </pre>
  * <p>
- * An alternative is to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code>. E.g.
+ * An alternative is to combine <code>&lt;o:socket&gt;</code> with <code>&lt;h:commandScript&gt;</code>. E.g.
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -717,7 +717,7 @@ import org.omnifaces.util.State;
  *
  * &lt;o:socket channel="someChannel" scope="view" onmessage="someCommandScript" /&gt;
  * &lt;h:form&gt;
- *     &lt;o:commandScript name="someCommandScript" action="#{bean.pushed}" render=":foo" /&gt;
+ *     &lt;h:commandScript name="someCommandScript" action="#{bean.pushed}" render=":foo" /&gt;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
