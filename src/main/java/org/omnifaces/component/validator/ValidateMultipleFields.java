@@ -38,6 +38,7 @@ import jakarta.faces.component.UISelectBoolean;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -222,7 +223,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			int i = 0;
 
 			for (UIInput input : inputs) {
-				input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+				if (Components.isRendered(input)) {
+					input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+				}
 				i++;
 			}
 
@@ -234,9 +237,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	}
 
 	/**
-	 * Collect the input components. Only those which are an instance of {@link UIInput}, are rendered, not disabled nor
-	 * readonly will be returned. If at least one of them has already been validated and is been marked invalid, then an
-	 * empty collection will be returned.
+	 * Collect the input components. Only those which are an instance of {@link UIInput} will be returned. If at least
+	 * one of them has already been validated and is been marked invalid, then an empty collection will be returned.
 	 * @return The input components.
 	 * @throws IllegalArgumentException When the <code>components</code> attribute is missing, or when it references an
 	 * non-existing component, or when it references a non-input component.
