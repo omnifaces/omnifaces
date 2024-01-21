@@ -1291,6 +1291,31 @@ public final class Utils {
 		return normalizedURL + (normalizedURL.contains("?") ? "&" : "?") + queryString;
 	}
 
+	/**
+	 * Returns {@code true} when given URL contains a query string parameter with given name.
+	 * @param url URL to be checked.
+	 * @param parameterName Parameter name to be checked.
+	 * @return {@code true} when given URL contains a query string parameter with given name.
+	 * @since 3.14.5
+	 */
+    public static boolean containsQueryStringParameter(String url, String parameterName) {
+        String[] pathAndQueryString = url.split(quote("?"));
+
+        if (pathAndQueryString.length > 1) {
+            String[] parameters = pathAndQueryString[1].split(quote("&"));
+
+            for (String parameter : parameters) {
+                String[] nameAndValue = parameter.split(quote("="));
+
+                if (nameAndValue.length > 0 && parameterName.equals(decodeURL(nameAndValue[0]))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 	// Escaping/unescaping --------------------------------------------------------------------------------------------
 
 	/**
