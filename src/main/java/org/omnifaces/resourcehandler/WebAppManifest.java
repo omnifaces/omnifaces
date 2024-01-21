@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.containsQueryStringParameter;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 import static org.omnifaces.util.Utils.openConnection;
 
@@ -355,10 +356,13 @@ public abstract class WebAppManifest {
 			}
 
 			String requestPath = resource.getRequestPath();
-			URLConnection connection = openConnection(context, resource);
 
-			if (connection != null) {
-				requestPath = formatURLWithQueryString(requestPath, "v=" + connection.getLastModified());
+			if (!containsQueryStringParameter(requestPath, "v")) {
+			    URLConnection connection = openConnection(context, resource);
+
+			    if (connection != null) {
+			        requestPath = formatURLWithQueryString(requestPath, "v=" + connection.getLastModified());
+			    }
 			}
 
 			this.src = requestPath;
