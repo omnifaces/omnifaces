@@ -1771,6 +1771,16 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+		<attribute>
+			<description>
+                                <![CDATA[
+                                        List to keep the source data, which it can use for conversion.
+                                ]]>
+			</description>
+			<name>list</name>
+			<required>false</required>
+			<type>java.util.List</type>
+		</attribute>
 	</tag>
 
 	<tag>
