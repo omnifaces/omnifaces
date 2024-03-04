@@ -12,15 +12,14 @@
  */
 package org.omnifaces.util.cache;
 
-import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been
  * configured.
  * <p>
- * This will create a Cache instance that uses a repackaged {@link ConcurrentLinkedHashMap} for the actual implementation.
+ * This will create a Cache instance that uses a repackaged {@link com.github.benmanes.caffeine.cache.Cache} for the actual implementation.
  * <p>
- * <b>See:</b> <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>
+ * <b>See:</b> <a href="https://github.com/ben-manes/caffeine">https://github.com/ben-manes/caffeine</a>
  *
  * @since 1.1
  * @author Arjan Tijms

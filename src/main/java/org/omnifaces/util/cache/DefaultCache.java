@@ -12,22 +12,21 @@
  */
 package org.omnifaces.util.cache;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * An in-memory cache implementation that's used if the user did not configure an explicit caching provider.
  * <p>
- * For the actual implementation, a repackaged {@link ConcurrentLinkedHashMap} is used if a maximum capacity is requested,
+ * For the actual implementation, {@link com.github.benmanes.caffeine.cache.Cache} is used if a maximum capacity is requested,
  * otherwise a plain {@link ConcurrentHashMap} is used.
  * <p>
- * <b>See:</b> <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>
+ * <b>See:</b> <a href="https://github.com/ben-manes/caffeine">https://github.com/ben-manes/caffeine</a>
  *
- * @since 1.1
  * @author Arjan Tijms
- *
+ * @since 1.1
  */
 public class DefaultCache extends TimeToLiveCache {
 
@@ -40,9 +39,10 @@ public class DefaultCache extends TimeToLiveCache {
 
 	private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
-			return new ConcurrentLinkedHashMap.Builder<String, CacheEntry>()
-							.maximumWeightedCapacity(maxCapacity)
-							.build();
+			return (Map) Caffeine.newBuilder()
+					.maximumSize(maxCapacity)
+					.build()
+					.asMap();
 		} else {
 			return new ConcurrentHashMap<>();
 		}

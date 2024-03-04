@@ -12,6 +12,19 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.SessionScoped;
+import org.omnifaces.cdi.BeanStorage;
+import org.omnifaces.cdi.ViewScoped;
+
+import java.io.Serializable;
+import java.util.UUID;
+
 import static java.lang.String.format;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES;
@@ -20,19 +33,6 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NU
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
-
-import java.io.Serializable;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.context.SessionScoped;
-
-import org.omnifaces.cdi.BeanStorage;
-import org.omnifaces.cdi.ViewScoped;
-import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
 
 /**
  * Stores view scoped bean instances in a LRU map in HTTP session.
@@ -60,7 +60,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
+	private Cache<UUID, BeanStorage> activeViewScopes;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -70,21 +70,21 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 */
 	@PostConstruct
 	public void postConstructSession() {
-		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanStorage>()
-			.maximumWeightedCapacity(getMaxActiveViewScopes())
-			.listener(new BeanStorageEvictionListener())
+		activeViewScopes = Caffeine.newBuilder()
+			.maximumSize(getMaxActiveViewScopes())
+			.evictionListener(new BeanStorageEvictionListener())
 			.build();
 	}
 
 	@Override
 	public UUID getBeanStorageId() {
 		UUID beanStorageId = getViewAttribute(getClass().getName());
-		return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+		return beanStorageId != null && activeViewScopes.getIfPresent(beanStorageId) != null ? beanStorageId : null;
 	}
 
 	@Override
 	public BeanStorage getBeanStorage(UUID beanStorageId) {
-		return activeViewScopes.get(beanStorageId);
+		return activeViewScopes.getIfPresent(beanStorageId);
 	}
 
 	@Override
@@ -98,10 +98,11 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 * @param beanStorageId The bean storage identifier.
 	 */
 	public void destroyBeans(UUID beanStorageId) {
-		BeanStorage storage = activeViewScopes.remove(beanStorageId);
+		BeanStorage storage = activeViewScopes.getIfPresent(beanStorageId);
 
 		if (storage != null) {
 			storage.destroyBeans();
+			activeViewScopes.invalidate(beanStorageId);
 		}
 	}
 
@@ -110,7 +111,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 */
 	@PreDestroy
 	public void preDestroySession() {
-		for (BeanStorage storage : activeViewScopes.values()) {
+		for (BeanStorage storage : activeViewScopes.asMap().values()) {
 			storage.destroyBeans();
 		}
 	}
@@ -148,15 +149,15 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
+	 * Listener for {@link Cache} which will be invoked when an entry is evicted. It will in turn
 	 * invoke {@link BeanStorage#destroyBeans()}.
 	 */
-	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage>, Serializable {
+	private static final class BeanStorageEvictionListener implements RemovalListener<UUID, BeanStorage>, Serializable {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void onEviction(UUID id, BeanStorage storage) {
+		public void onRemoval(UUID id, BeanStorage storage, RemovalCause cause) {
 			storage.destroyBeans();
 		}
 
