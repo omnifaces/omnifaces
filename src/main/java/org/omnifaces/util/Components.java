@@ -1873,6 +1873,33 @@ public final class Components {
 		return allListeners;
 	}
 
+	// Creation -------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Creates a new component
+	 * 
+	 * @param <C> The generic component type
+	 * @param componentType The component type to create
+	 * @return the newly created UIComponent
+	 * @see Application#createComponent(String)
+	 */
+	public static <C extends UIComponent> C createComponent(String componentType) {
+		return createComponent(getContext(), componentType);
+	}
+
+	/**
+	 * Creates a new component
+	 * 
+	 * @param <C> The generic component type
+	 * @param context The current FacesContext instance
+	 * @param componentType The component type to create
+	 * @return the newly created UIComponent
+	 * @see Application#createComponent(String)
+	 */
+	public static <C extends UIComponent> C createComponent(FacesContext context, String componentType) {
+		return (C) context.getApplication().createComponent(componentType);
+	}
+
 	// Inner classes --------------------------------------------------------------------------------------------------
 
 	/**
