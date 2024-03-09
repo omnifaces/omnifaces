@@ -23,6 +23,7 @@ import java.util.AbstractCollection;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,8 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.omnifaces.util.Callback.SerializableBiConsumer;
@@ -59,8 +59,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 	private transient Lazy<Set<K>> keySet;
 	private transient Lazy<Collection<V>> values;
 	private transient Lazy<Set<Entry<K, V>>> entrySet;
-	private transient Lock readLock;
-	private transient Lock writeLock;
+	private transient Lock lock;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -70,7 +69,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 	 * @throws IllegalArgumentException when maximum capacity is less than 2.
 	 */
 	public LruCache(int maximumCapacity) {
-		construct(maximumCapacity, null);
+		construct(maximumCapacity, (key, value) -> {});
 	}
 
 	/**
@@ -97,13 +96,10 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		this.keySet = new Lazy<>(KeySet::new);
 		this.values = new Lazy<>(Values::new);
 		this.entrySet = new Lazy<>(EntrySet::new);
-
-		ReadWriteLock lock = new ReentrantReadWriteLock();
-		this.readLock = lock.readLock();
-		this.writeLock = lock.writeLock();
+		this.lock = new ReentrantLock();
 	}
 
-	private V performConcurrently(Lock lock, Supplier<V> valueSupplier) {
+	private V performConcurrently(Supplier<V> valueSupplier) {
 		lock.lock();
 
 		try {
@@ -119,7 +115,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 	@Override
 	@SuppressWarnings("unchecked")
 	public V get(Object key) {
-		return performConcurrently(readLock, () -> {
+		return performConcurrently(() -> {
 			recentlyUsedKeys.remove(key);
 			recentlyUsedKeys.add((K) key);
 			return entries.get(key);
@@ -138,31 +134,27 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		return put(key, value, true);
 	}
 
-	@SuppressWarnings("unchecked")
 	private V put(K key, V value, boolean onlyIfAbsent) {
-		Entry<K, V>[] evictedEntry = new Entry[1];
-		V previousValue = performConcurrently(writeLock, () -> {
+		Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
+		V previousValue = performConcurrently(() -> {
 			recentlyUsedKeys.remove(key);
 
-			if (recentlyUsedKeys.size() == maximumCapacity) {
+			while (recentlyUsedKeys.size() >= maximumCapacity) {
 				K leastRecentlyUsedKey = recentlyUsedKeys.poll();
-				evictedEntry[0] = new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey));
+				evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
 			}
 
 			recentlyUsedKeys.add(key);
 			return (onlyIfAbsent && containsKey(key)) ? entries.get(key) : entries.put(key, value);
 		});
 
-		if (evictedEntry[0] != null) {
-			evictionListener.accept(evictedEntry[0].getKey(), evictedEntry[0].getValue());
-		}
-
+		evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
 		return previousValue;
 	}
 
 	@Override
 	public V remove(Object key) {
-		return performConcurrently(writeLock, () -> {
+		return performConcurrently(() -> {
 			recentlyUsedKeys.remove(key);
 			return entries.remove(key);
 		});
@@ -170,7 +162,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 
 	@Override
 	public void clear() {
-		performConcurrently(writeLock, () -> {
+		performConcurrently(() -> {
 			recentlyUsedKeys.clear();
 			entries.clear();
 			return null;
