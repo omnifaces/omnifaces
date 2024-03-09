@@ -31,8 +31,7 @@ import jakarta.enterprise.context.SessionScoped;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
-import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
+import org.omnifaces.util.cache.LruCache;
 
 /**
  * Stores view scoped bean instances in a LRU map in HTTP session.
@@ -70,10 +69,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 */
 	@PostConstruct
 	public void postConstructSession() {
-		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanStorage>()
-			.maximumWeightedCapacity(getMaxActiveViewScopes())
-			.listener(new BeanStorageEvictionListener())
-			.build();
+		activeViewScopes = new LruCache<>(getMaxActiveViewScopes(), (uuid, storage) -> storage.destroyBeans());
 	}
 
 	@Override
@@ -143,23 +139,6 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 		maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
 		return maxActiveViewScopes;
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
-	 * invoke {@link BeanStorage#destroyBeans()}.
-	 */
-	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage>, Serializable {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void onEviction(UUID id, BeanStorage storage) {
-			storage.destroyBeans();
-		}
-
 	}
 
 }

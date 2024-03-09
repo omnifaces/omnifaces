@@ -55,6 +55,7 @@ import org.omnifaces.util.cache.CacheInstancePerScopeProvider;
 import org.omnifaces.util.cache.CacheProvider;
 import org.omnifaces.util.cache.DefaultCache;
 import org.omnifaces.util.cache.DefaultCacheProvider;
+import org.omnifaces.util.cache.LruCache;
 import org.omnifaces.util.cache.TimeToLiveCache;
 
 /**
@@ -73,7 +74,7 @@ import org.omnifaces.util.cache.TimeToLiveCache;
  * removed following a least recently used policy (LRU).
  * <p>
  * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
- * cache is based on <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>.
+ * cache is based on {@link LruCache}.
  *
  * <h2>Setting a custom caching provider</h2>
  * <p>
