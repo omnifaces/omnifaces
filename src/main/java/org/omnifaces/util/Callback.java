@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -203,5 +204,14 @@ public final class Callback {
 		void writeTo(OutputStream output) throws IOException;
 
 	}
+
+	/**
+	 * Use this if you need a serializable bi-consumer.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 4.4
+	 */
+	@FunctionalInterface
+	public interface SerializableBiConsumer<T, U> extends BiConsumer<T, U>, Serializable {}
 
 }
