@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util.cache;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractMap.SimpleEntry;
@@ -114,6 +116,8 @@ public class LruCache2<K, V> implements ConcurrentMap<K, V>, Serializable {
 	}
 
 	private V put(K key, V value, boolean onlyIfAbsent) {
+		requireNonNull(key, "key");
+		requireNonNull(value, "value");
 		Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
 		V previousValue = withLock(() -> {
 			V existingValue = entries.remove(key);

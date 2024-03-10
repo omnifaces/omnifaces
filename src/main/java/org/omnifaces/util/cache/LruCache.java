@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util.cache;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -27,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,10 +38,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.omnifaces.util.Callback.SerializableBiConsumer;
-import org.omnifaces.util.Lazy;
 
 /**
- * Minimal implementation of LRU cache with support for eviction listener.
+ * Minimal implementation of thread safe LRU cache with support for eviction listener.
  * Inspired by <a href="https://github.com/ben-manes/concurrentlinkedhashmap">ConcurrentLinkedHashMap</a>.
  *
  * @author Bauke Scholtz
@@ -54,12 +55,10 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 	private int maximumCapacity;
 	private SerializableBiConsumer<K, V> evictionListener;
 
-	private transient ConcurrentLinkedQueue<K> recentlyUsedKeys;
-	private transient ConcurrentHashMap<K, V> entries;
-	private transient Lazy<Set<K>> keySet;
-	private transient Lazy<Collection<V>> values;
-	private transient Lazy<Set<Entry<K, V>>> entrySet;
-	private transient Lock lock;
+	private transient Queue<K> recentlyUsedKeys;
+	private transient ConcurrentMap<K, V> entries;
+
+	private final transient Lock lock = new ReentrantLock();
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -93,13 +92,9 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		this.evictionListener = evictionListener;
 		this.recentlyUsedKeys = new ConcurrentLinkedQueue<>();
 		this.entries = new ConcurrentHashMap<>(maximumCapacity);
-		this.keySet = new Lazy<>(KeySet::new);
-		this.values = new Lazy<>(Values::new);
-		this.entrySet = new Lazy<>(EntrySet::new);
-		this.lock = new ReentrantLock();
 	}
 
-	private V performConcurrently(Supplier<V> valueSupplier) {
+	private V withLock(Supplier<V> valueSupplier) {
 		lock.lock();
 
 		try {
@@ -110,19 +105,17 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		}
 	}
 
-	// Read methods ---------------------------------------------------------------------------------------------------
+	// Mutation methods -----------------------------------------------------------------------------------------------
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public V get(Object key) {
-		return performConcurrently(() -> {
+		return withLock(() -> {
 			recentlyUsedKeys.remove(key);
 			recentlyUsedKeys.add((K) key);
 			return entries.get(key);
 		});
 	}
-
-	// Write methods --------------------------------------------------------------------------------------------------
 
 	@Override
 	public V put(K key, V value) {
@@ -135,9 +128,11 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 	}
 
 	private V put(K key, V value, boolean onlyIfAbsent) {
+		requireNonNull(key, "key");
+		requireNonNull(value, "value");
 		Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-		V previousValue = performConcurrently(() -> {
-			recentlyUsedKeys.remove(key);
+		V previousValue = withLock(() -> {
+			boolean notAbsent = recentlyUsedKeys.remove(key);
 
 			while (recentlyUsedKeys.size() >= maximumCapacity) {
 				K leastRecentlyUsedKey = recentlyUsedKeys.poll();
@@ -145,7 +140,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 			}
 
 			recentlyUsedKeys.add(key);
-			return (onlyIfAbsent && containsKey(key)) ? entries.get(key) : entries.put(key, value);
+			return (onlyIfAbsent && notAbsent) ? entries.get(key) : entries.put(key, value);
 		});
 
 		evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
@@ -154,7 +149,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 
 	@Override
 	public V remove(Object key) {
-		return performConcurrently(() -> {
+		return withLock(() -> {
 			recentlyUsedKeys.remove(key);
 			return entries.remove(key);
 		});
@@ -162,14 +157,14 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 
 	@Override
 	public void clear() {
-		performConcurrently(() -> {
+		withLock(() -> {
 			recentlyUsedKeys.clear();
 			entries.clear();
 			return null;
 		});
 	}
 
-	// Delegate methods -----------------------------------------------------------------------------------------------
+	// Readonly methods -----------------------------------------------------------------------------------------------
 
 	@Override
 	public int size() {
@@ -196,19 +191,21 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		map.forEach(this::put);
 	}
 
+	// Readonly views -------------------------------------------------------------------------------------------------
+
 	@Override
 	public Set<K> keySet() {
-		return keySet.get();
+		return new ReadOnlyKeySet();
 	}
 
 	@Override
 	public Collection<V> values() {
-		return values.get();
+		return new ReadOnlyValues();
 	}
 
 	@Override
 	public Set<Entry<K, V>> entrySet() {
-		return entrySet.get();
+		return new ReadOnlyEntrySet();
 	}
 
 	// We won't support these internally unused methods to keep it simple ---------------------------------------------
@@ -239,7 +236,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 
 	// Inner classes --------------------------------------------------------------------------------------------------
 
-	private final class KeySet extends AbstractSet<K> {
+	private final class ReadOnlyKeySet extends AbstractSet<K> {
 
 		@Override
 		public int size() {
@@ -267,7 +264,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		}
 	}
 
-	private final class Values extends AbstractCollection<V> {
+	private final class ReadOnlyValues extends AbstractCollection<V> {
 
 		@Override
 		public int size() {
@@ -295,7 +292,7 @@ public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 		}
 	}
 
-	private final class EntrySet extends AbstractSet<Entry<K, V>> {
+	private final class ReadOnlyEntrySet extends AbstractSet<Entry<K, V>> {
 
 		@Override
 		public int size() {
