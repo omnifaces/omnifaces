@@ -651,6 +651,37 @@ public final class Components {
 	}
 
 
+	// Creation -------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Creates a new component.
+	 * @param <C> The generic component type.
+	 * @param componentType The component type to create.
+	 * @return The newly created component.
+	 * @see Application#createComponent(String)
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
+	 * @since 4.4
+	 */
+	public static <C extends UIComponent> C createComponent(String componentType) {
+		return createComponent(getContext(), componentType);
+	}
+
+	/**
+	 * Creates a new component.
+	 * @param <C> The generic component type.
+	 * @param context The involved faces context.
+	 * @param componentType The component type to create.
+	 * @return The newly created component.
+	 * @see Application#createComponent(String)
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
+	 * @since 4.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <C extends UIComponent> C createComponent(FacesContext context, String componentType) {
+		return (C) context.getApplication().createComponent(componentType);
+	}
+
+
 	// Manipulation ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -1871,33 +1902,6 @@ public final class Components {
 		}
 
 		return allListeners;
-	}
-
-	// Creation -------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Creates a new component
-	 * 
-	 * @param <C> The generic component type
-	 * @param componentType The component type to create
-	 * @return the newly created UIComponent
-	 * @see Application#createComponent(String)
-	 */
-	public static <C extends UIComponent> C createComponent(String componentType) {
-		return createComponent(getContext(), componentType);
-	}
-
-	/**
-	 * Creates a new component
-	 * 
-	 * @param <C> The generic component type
-	 * @param context The current FacesContext instance
-	 * @param componentType The component type to create
-	 * @return the newly created UIComponent
-	 * @see Application#createComponent(String)
-	 */
-	public static <C extends UIComponent> C createComponent(FacesContext context, String componentType) {
-		return (C) context.getApplication().createComponent(componentType);
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
