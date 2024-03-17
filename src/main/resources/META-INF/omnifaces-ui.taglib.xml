@@ -4706,9 +4706,8 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 		   		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
 		   		<p>
 		   		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
-		   		If no such provider is installed, a default caching implementation is used that's based on
-		   		<a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a> in case
-		   		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
+		   		If no such provider is installed, a default caching implementation is used that's based on <code>LruCache</code> in case
+		   		a maximum cache capacity is set, or on a plain <code>ConcurrentHashMap</code> if no capacity is set.
 		   		<hr>
 				<h2>Setting a custom caching provider</h2>
 				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context

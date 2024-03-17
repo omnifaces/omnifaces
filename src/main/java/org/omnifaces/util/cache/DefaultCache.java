@@ -15,15 +15,11 @@ package org.omnifaces.util.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-
 /**
  * An in-memory cache implementation that's used if the user did not configure an explicit caching provider.
  * <p>
- * For the actual implementation, a repackaged {@link ConcurrentLinkedHashMap} is used if a maximum capacity is requested,
+ * For the actual implementation, a {@link LruCache} is used if a maximum capacity is requested,
  * otherwise a plain {@link ConcurrentHashMap} is used.
- * <p>
- * <b>See:</b> <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -40,9 +36,7 @@ public class DefaultCache extends TimeToLiveCache {
 
 	private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
-			return new ConcurrentLinkedHashMap.Builder<String, CacheEntry>()
-							.maximumWeightedCapacity(maxCapacity)
-							.build();
+			return new LruCache<>(maxCapacity);
 		} else {
 			return new ConcurrentHashMap<>();
 		}
