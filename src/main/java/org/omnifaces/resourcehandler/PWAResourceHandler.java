@@ -315,24 +315,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return resource;
         }
 
-        WebAppManifest manifest = Beans.getInstance(manifestBean, false);
-
-        if (manifest == null) {
-            manifest = Beans.getInstance(manifestBean, true);
-            lastModified = 0;
-        }
-
         FacesContext context = Faces.getContext();
-        boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
-
-        if (resourceContentsRequest && lastModified == 0) {
-            manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
-            serviceWorkerContents = getServiceWorkerContents(manifest).getBytes(UTF_8);
-            lastModified = System.currentTimeMillis();
-        }
+        WebAppManifest manifest = loadWebAppManifest(context);
 
         if (manifestResourceRequest) {
-            if (!resourceContentsRequest) {
+            if (manifest != null) {
                 if (!manifest.getCacheableViewIds().isEmpty()) {
                     addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
                     addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
@@ -349,6 +336,25 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return createServiceWorkerResource();
         }
     }
+
+	private WebAppManifest loadWebAppManifest(FacesContext context) {
+		WebAppManifest manifest = Beans.getInstance(manifestBean, false);
+
+        if (manifest == null) {
+            manifest = Beans.getInstance(manifestBean, true);
+            lastModified = 0;
+        }
+
+        boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
+
+        if (resourceContentsRequest && lastModified == 0) {
+            manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
+            serviceWorkerContents = getServiceWorkerContents(manifest).getBytes(UTF_8);
+            lastModified = System.currentTimeMillis();
+        }
+
+        return resourceContentsRequest ? null : manifest;
+	}
 
     private DynamicResource createManifestResource(String resourceName) {
         return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, "application/json") {
@@ -426,43 +432,47 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
 
         for (String viewId : viewIds) {
-            ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
+    		ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
 
-            if (!viewDeclarationLanguage.viewExists(context, viewId)) {
-                logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
-                continue;
-            }
-
-            cacheableResources.add(viewHandler.getActionURL(context, viewId));
-            UIViewRoot view = viewHandler.createView(context, viewId);
-
-            try {
-                context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
-                viewDeclarationLanguage.buildView(context, view);
-                context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
-            }
-            catch (Exception e) {
-                throw new FacesException("Cannot build the view " + viewId, e);
-            }
-
-            forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
-                if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
-                    cacheableResources.add(((UIGraphic) component).getValue().toString());
-                }
-                else if (component.getAttributes().get("name") != null) {
-                    String url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
-
-                    if (url != null) {
-                        cacheableResources.add(url);
-                    }
-                }
-            });
+    		if (viewDeclarationLanguage.viewExists(context, viewId)) {
+    			collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
+    		}
+    		else {
+    			logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
+    		}
         }
 
         cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
         cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
         return cacheableResources;
     }
+
+	private static void collectCacheableResources(FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage, Collection<String> cacheableResources) {
+		cacheableResources.add(viewHandler.getActionURL(context, viewId));
+		UIViewRoot view = viewHandler.createView(context, viewId);
+
+		try {
+		    context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
+		    viewDeclarationLanguage.buildView(context, view);
+		    context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
+		}
+		catch (Exception e) {
+		    throw new FacesException("Cannot build the view " + viewId, e);
+		}
+
+		forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
+		    if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
+		        cacheableResources.add(((UIGraphic) component).getValue().toString());
+		    }
+		    else if (component.getAttributes().get("name") != null) {
+		        String url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
+
+		        if (url != null) {
+		            cacheableResources.add(url);
+		        }
+		    }
+		});
+	}
 
     private static String getOfflineResource(WebAppManifest manifest) {
         if (manifest.getOfflineViewId() != null) {
