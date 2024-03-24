@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Utils;
 
-public class TestUtils {
+class TestUtils {
 
     private static final String[][] URL_SAFE_SERIALIZED_STRINGS = {
         { "omnifaces:omnifaces.js", "eNrLz83LTEtMTi22yoex9LKKAWWHCLA" }, // 1-padded

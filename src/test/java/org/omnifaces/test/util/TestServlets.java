@@ -27,7 +27,7 @@ import org.omnifaces.util.Servlets;
 
 import com.google.common.collect.ImmutableMap;
 
-public class TestServlets {
+class TestServlets {
 
     private static final String[][] MULTIPART_CONTENT_DISPOSITIONS = {
 

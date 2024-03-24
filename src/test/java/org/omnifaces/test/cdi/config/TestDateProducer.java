@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.omnifaces.cdi.config.DateProducer;
 import org.omnifaces.cdi.config.DateProducer.TemporalDate;
 
-public class TestDateProducer {
+class TestDateProducer {
 
     private static TimeZone originalTimeZone;
     private static ZoneOffset testZoneOffset;

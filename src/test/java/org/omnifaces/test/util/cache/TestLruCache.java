@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.cache.LruCache;
 
-public class TestLruCache {
+class TestLruCache {
 
     private static final int SIZE = 1000;
     private static final int ITERATIONS = (SIZE * SIZE) + 1;

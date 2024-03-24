@@ -20,7 +20,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.el.functions.Numbers;
 
-public class TestNumbers {
+class TestNumbers {
 
     private static final String[][] NUMBERS_FORMATTED_AS_THOUSANDS = {
         { "1.6666", "1.67" },
