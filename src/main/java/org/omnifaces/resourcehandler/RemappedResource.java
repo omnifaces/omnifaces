@@ -39,173 +39,173 @@ import jakarta.faces.context.FacesContext;
  */
 public class RemappedResource extends ResourceWrapper implements Externalizable {
 
-	private Serializable serializableResource;
-	private transient Resource resource;
-	private String resourceName;
-	private String libraryName;
-	private String requestPath;
+    private Serializable serializableResource;
+    private transient Resource resource;
+    private String resourceName;
+    private String libraryName;
+    private String requestPath;
 
-	/**
-	 * Do not use this constructor. It's merely there for {@link Externalizable}.
-	 */
-	@SuppressWarnings("deprecation")
-	public RemappedResource() {
-		// Keep default c'tor alive for Externalizable.
-	}
+    /**
+     * Do not use this constructor. It's merely there for {@link Externalizable}.
+     */
+    @SuppressWarnings("deprecation")
+    public RemappedResource() {
+        // Keep default c'tor alive for Externalizable.
+    }
 
-	/**
-	 * Constructs a new resource which remaps the given wrapped resource to the given request path.
-	 * @param resource The resource to be remapped.
-	 * @param requestPath The remapped request path.
-	 */
-	public RemappedResource(Resource resource, String requestPath) {
-		super(resource);
+    /**
+     * Constructs a new resource which remaps the given wrapped resource to the given request path.
+     * @param resource The resource to be remapped.
+     * @param requestPath The remapped request path.
+     */
+    public RemappedResource(Resource resource, String requestPath) {
+        super(resource);
 
-		if (resource instanceof Serializable) {
-			serializableResource = (Serializable) resource;
-		}
+        if (resource instanceof Serializable) {
+            serializableResource = (Serializable) resource;
+        }
 
-		this.resource = resource;
-		this.requestPath = requestPath;
-	}
+        this.resource = resource;
+        this.requestPath = requestPath;
+    }
 
-	/**
-	 * Constructs a new resource which remaps the given requested resource and library name to the given request path.
-	 * @param resourceName The requested resource name.
-	 * @param libraryName The requested library name.
-	 * @param requestPath The remapped request path.
-	 */
-	public RemappedResource(String resourceName, String libraryName, String requestPath) {
-		super(null);
-		this.resourceName = resourceName;
-		this.libraryName = libraryName;
-		this.requestPath = requestPath;
-	}
+    /**
+     * Constructs a new resource which remaps the given requested resource and library name to the given request path.
+     * @param resourceName The requested resource name.
+     * @param libraryName The requested library name.
+     * @param requestPath The remapped request path.
+     */
+    public RemappedResource(String resourceName, String libraryName, String requestPath) {
+        super(null);
+        this.resourceName = resourceName;
+        this.libraryName = libraryName;
+        this.requestPath = requestPath;
+    }
 
-	@Override
-	public Resource getWrapped() {
-		return resource;
-	}
+    @Override
+    public Resource getWrapped() {
+        return resource;
+    }
 
-	@Override
-	public String getResourceName() {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.getResourceName() : resourceName;
-	}
+    @Override
+    public String getResourceName() {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) ? wrapped.getResourceName() : resourceName;
+    }
 
-	@Override
-	public void setResourceName(String resourceName) {
-		String previousResourceName = getResourceName();
-		Resource wrapped = getWrapped();
+    @Override
+    public void setResourceName(String resourceName) {
+        String previousResourceName = getResourceName();
+        Resource wrapped = getWrapped();
 
-		if (wrapped != null) {
-			wrapped.setResourceName(resourceName);
-		}
-		else {
-			this.resourceName = resourceName;
-		}
+        if (wrapped != null) {
+            wrapped.setResourceName(resourceName);
+        }
+        else {
+            this.resourceName = resourceName;
+        }
 
-		requestPath = requestPath.replaceFirst(quote("/" + previousResourceName), "/" + resourceName);
-	}
+        requestPath = requestPath.replaceFirst(quote("/" + previousResourceName), "/" + resourceName);
+    }
 
-	@Override
-	public String getLibraryName() {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
-	}
+    @Override
+    public String getLibraryName() {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
+    }
 
-	@Override
-	public void setLibraryName(String libraryName) {
-		String previousLibraryName = getLibraryName();
-		Resource wrapped = getWrapped();
+    @Override
+    public void setLibraryName(String libraryName) {
+        String previousLibraryName = getLibraryName();
+        Resource wrapped = getWrapped();
 
-		if (wrapped != null) {
-			wrapped.setLibraryName(libraryName);
-		}
-		else {
-			this.libraryName = libraryName;
-		}
+        if (wrapped != null) {
+            wrapped.setLibraryName(libraryName);
+        }
+        else {
+            this.libraryName = libraryName;
+        }
 
-		String queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
-		requestPath = requestPath.replaceFirst(quote(queryParam + previousLibraryName), queryParam + libraryName);
-	}
+        String queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
+        requestPath = requestPath.replaceFirst(quote(queryParam + previousLibraryName), queryParam + libraryName);
+    }
 
-	@Override
-	public String getContentType() {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.getContentType() : null;
-	}
+    @Override
+    public String getContentType() {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) ? wrapped.getContentType() : null;
+    }
 
-	@Override
-	public String getRequestPath() {
-		return requestPath;
-	}
+    @Override
+    public String getRequestPath() {
+        return requestPath;
+    }
 
-	@Override
-	public InputStream getInputStream() throws IOException {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.getInputStream() : getURL().openStream();
-	}
+    @Override
+    public InputStream getInputStream() throws IOException {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) ? wrapped.getInputStream() : getURL().openStream();
+    }
 
-	@Override
-	public Map<String, String> getResponseHeaders() {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
-	}
+    @Override
+    public Map<String, String> getResponseHeaders() {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
+    }
 
-	@Override
-	public URL getURL() {
-		try {
-			Resource wrapped = getWrapped();
-			return (wrapped != null) ? wrapped.getURL() : new URL(requestPath);
-		}
-		catch (MalformedURLException e) {
-			throw new FacesException(e);
-		}
-	}
+    @Override
+    public URL getURL() {
+        try {
+            Resource wrapped = getWrapped();
+            return (wrapped != null) ? wrapped.getURL() : new URL(requestPath);
+        }
+        catch (MalformedURLException e) {
+            throw new FacesException(e);
+        }
+    }
 
-	@Override
-	public boolean userAgentNeedsUpdate(FacesContext context) {
-		Resource wrapped = getWrapped();
-		return (wrapped != null) && wrapped.userAgentNeedsUpdate(context);
-	}
+    @Override
+    public boolean userAgentNeedsUpdate(FacesContext context) {
+        Resource wrapped = getWrapped();
+        return (wrapped != null) && wrapped.userAgentNeedsUpdate(context);
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		if (object == this) {
-			return true;
-		}
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
 
-		if (object == null || getClass() != object.getClass()) {
-			return false;
-		}
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
-		RemappedResource other = (RemappedResource) object;
-		Resource wrapped = getWrapped();
-		return Objects.equals(wrapped, other.getWrapped()) && requestPath.equals(other.requestPath);
-	}
+        RemappedResource other = (RemappedResource) object;
+        Resource wrapped = getWrapped();
+        return Objects.equals(wrapped, other.getWrapped()) && requestPath.equals(other.requestPath);
+    }
 
-	@Override
-	public int hashCode() {
-		Resource wrapped = getWrapped();
-		return Objects.hash(wrapped, requestPath);
-	}
+    @Override
+    public int hashCode() {
+        Resource wrapped = getWrapped();
+        return Objects.hash(wrapped, requestPath);
+    }
 
-	@Override
-	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
-		serializableResource = (Serializable) input.readObject();
-		resource = (Resource) serializableResource;
-		resourceName = (String) input.readObject();
-		libraryName = (String) input.readObject();
-		requestPath = (String) input.readObject();
-	}
+    @Override
+    public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
+        serializableResource = (Serializable) input.readObject();
+        resource = (Resource) serializableResource;
+        resourceName = (String) input.readObject();
+        libraryName = (String) input.readObject();
+        requestPath = (String) input.readObject();
+    }
 
-	@Override
-	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeObject(serializableResource);
-		output.writeObject(resourceName);
-		output.writeObject(libraryName);
-		output.writeObject(requestPath);
-	}
+    @Override
+    public void writeExternal(ObjectOutput output) throws IOException {
+        output.writeObject(serializableResource);
+        output.writeObject(resourceName);
+        output.writeObject(libraryName);
+        output.writeObject(requestPath);
+    }
 
 }

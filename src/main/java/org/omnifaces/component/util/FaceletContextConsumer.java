@@ -29,10 +29,10 @@ import org.omnifaces.taghandler.ComponentExtraHandler;
  */
 public interface FaceletContextConsumer {
 
-	/**
-	 * Sets the Facelet context.
-	 * @param faceletContext The involved Facelet context.
-	 */
-	void setFaceletContext(FaceletContext faceletContext);
+    /**
+     * Sets the Facelet context.
+     * @param faceletContext The involved Facelet context.
+     */
+    void setFaceletContext(FaceletContext faceletContext);
 
 }

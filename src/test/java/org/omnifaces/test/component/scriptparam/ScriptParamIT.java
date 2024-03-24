@@ -25,36 +25,36 @@ import org.openqa.selenium.support.FindBy;
 
 public class ScriptParamIT extends OmniFacesIT {
 
-	@FindBy(id="pageLoadTimestamp")
-	private WebElement pageLoadTimestamp;
+    @FindBy(id="pageLoadTimestamp")
+    private WebElement pageLoadTimestamp;
 
-	@FindBy(id="scriptLoadTimestamp")
-	private WebElement scriptLoadTimestamp;
+    @FindBy(id="scriptLoadTimestamp")
+    private WebElement scriptLoadTimestamp;
 
-	@FindBy(id="clientTimeZoneOffset")
-	private WebElement clientTimeZoneOffset;
+    @FindBy(id="clientTimeZoneOffset")
+    private WebElement clientTimeZoneOffset;
 
-	@FindBy(id="appName")
-	private WebElement appName;
+    @FindBy(id="appName")
+    private WebElement appName;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(ScriptParamIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(ScriptParamIT.class);
+    }
 
-	@Test
-	void testScriptParam() {
-		waitUntilTextContent("scriptLoadTimestamp");
+    @Test
+    void testScriptParam() {
+        waitUntilTextContent("scriptLoadTimestamp");
 
-		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
-		long scriptLoadTimestamp = Long.valueOf(this.scriptLoadTimestamp.getText());
-		assertTrue(scriptLoadTimestamp > pageLoadTimestamp, "Script param is set later");
+        long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
+        long scriptLoadTimestamp = Long.valueOf(this.scriptLoadTimestamp.getText());
+        assertTrue(scriptLoadTimestamp > pageLoadTimestamp, "Script param is set later");
 
-		String clientTimeZoneOffset = this.clientTimeZoneOffset.getText();
-		assertTrue(Utils.isNumber(clientTimeZoneOffset), "Client time zone offset is a number");
+        String clientTimeZoneOffset = this.clientTimeZoneOffset.getText();
+        assertTrue(Utils.isNumber(clientTimeZoneOffset), "Client time zone offset is a number");
 
-		String appName = this.appName.getText();
-		assertEquals("Netscape", appName, "navigator.appName is 'Netscape'");
-	}
+        String appName = this.appName.getText();
+        assertEquals("Netscape", appName, "navigator.appName is 'Netscape'");
+    }
 
 }

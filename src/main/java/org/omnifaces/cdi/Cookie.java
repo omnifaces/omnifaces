@@ -58,11 +58,11 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
 @Target({ METHOD, FIELD, PARAMETER })
 public @interface Cookie {
 
-	/**
-	 * (Optional) The name of the request cookie. If not specified the name of the injection target field will be used.
-	 *
-	 * @return The name of the request cookie.
-	 */
-	@Nonbinding	String name() default "";
+    /**
+     * (Optional) The name of the request cookie. If not specified the name of the injection target field will be used.
+     *
+     * @return The name of the request cookie.
+     */
+    @Nonbinding    String name() default "";
 
 }

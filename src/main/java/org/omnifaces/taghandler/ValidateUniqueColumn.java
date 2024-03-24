@@ -76,205 +76,205 @@ import jakarta.faces.view.facelets.TagHandler;
  */
 public class ValidateUniqueColumn extends TagHandler implements ValueChangeListener {
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE =
-		"{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}";
+    private static final String DEFAULT_MESSAGE =
+        "{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}";
 
-	private static final String ERROR_INVALID_PARENT =
-		"Parent component of o:validateUniqueColumn must be an instance of UIInput. Encountered invalid type '%s'.";
-	private static final String ERROR_INVALID_PARENT_PARENT =
-		"Parent component of o:validateUniqueColumn must be enclosed in an UIData component.";
+    private static final String ERROR_INVALID_PARENT =
+        "Parent component of o:validateUniqueColumn must be an instance of UIInput. Encountered invalid type '%s'.";
+    private static final String ERROR_INVALID_PARENT_PARENT =
+        "Parent component of o:validateUniqueColumn must be enclosed in an UIData component.";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private ValueExpression message;
-	private ValueExpression disabled;
+    private ValueExpression message;
+    private ValueExpression disabled;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public ValidateUniqueColumn(TagConfig config) {
-		super(config);
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public ValidateUniqueColumn(TagConfig config) {
+        super(config);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the component is new, check if it's an instance of {@link UIInput} and then register this tag as a value
-	 * change listener on it. If the component is not new, check if there's an {@link UIData} parent.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent)) {
-			if (getClosestParent(parent, UIData.class) == null) {
-				throw new IllegalArgumentException(ERROR_INVALID_PARENT_PARENT);
-			}
+    /**
+     * If the component is new, check if it's an instance of {@link UIInput} and then register this tag as a value
+     * change listener on it. If the component is not new, check if there's an {@link UIData} parent.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        if (!ComponentHandler.isNew(parent)) {
+            if (getClosestParent(parent, UIData.class) == null) {
+                throw new IllegalArgumentException(ERROR_INVALID_PARENT_PARENT);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		if (!(parent instanceof UIInput)) {
-			throw new IllegalArgumentException(format(ERROR_INVALID_PARENT, parent.getClass().getName()));
-		}
+        if (!(parent instanceof UIInput)) {
+            throw new IllegalArgumentException(format(ERROR_INVALID_PARENT, parent.getClass().getName()));
+        }
 
-		// Get the tag attributes as value expressions instead of the immediately evaluated values. This allows us to
-		// re-evaluate them on a per-row basis which in turn allows the developer to use the currently iterated row
-		// object in the message and/or the disabled attribute.
-		message = getValueExpression("message", context);
-		disabled = getValueExpression("disabled", context);
+        // Get the tag attributes as value expressions instead of the immediately evaluated values. This allows us to
+        // re-evaluate them on a per-row basis which in turn allows the developer to use the currently iterated row
+        // object in the message and/or the disabled attribute.
+        message = getValueExpression("message", context);
+        disabled = getValueExpression("disabled", context);
 
-		// This validator is registered as a value change listener, which thus does only a full UIData tree visit when
-		// the value is really changed. If it were a normal validator, then if would have performed the same visit on
-		// every single row which would have been very inefficient.
-		((UIInput) parent).addValueChangeListener(this);
-	}
+        // This validator is registered as a value change listener, which thus does only a full UIData tree visit when
+        // the value is really changed. If it were a normal validator, then if would have performed the same visit on
+        // every single row which would have been very inefficient.
+        ((UIInput) parent).addValueChangeListener(this);
+    }
 
-	/**
-	 * Get the value of the tag attribute associated with the given attribute name as a value expression.
-	 */
-	private ValueExpression getValueExpression(String attributeName, FaceletContext context) {
-		TagAttribute attribute = getAttribute(attributeName);
+    /**
+     * Get the value of the tag attribute associated with the given attribute name as a value expression.
+     */
+    private ValueExpression getValueExpression(String attributeName, FaceletContext context) {
+        TagAttribute attribute = getAttribute(attributeName);
 
-		if (attribute != null) {
-			return attribute.getValueExpression(context, Object.class);
-		}
+        if (attribute != null) {
+            return attribute.getValueExpression(context, Object.class);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * When this tag is not disabled, the input value is changed, the input component is valid and the input component's
-	 * local value is not null, then check for a duplicate value by visiting all rows of the parent {@link UIData}
-	 * component.
-	 */
-	@Override
-	public void processValueChange(ValueChangeEvent event) {
-		if (isDisabled()) {
-			return;
-		}
+    /**
+     * When this tag is not disabled, the input value is changed, the input component is valid and the input component's
+     * local value is not null, then check for a duplicate value by visiting all rows of the parent {@link UIData}
+     * component.
+     */
+    @Override
+    public void processValueChange(ValueChangeEvent event) {
+        if (isDisabled()) {
+            return;
+        }
 
-		UIInput input = (UIInput) event.getComponent();
+        UIInput input = (UIInput) event.getComponent();
 
-		if (!input.isValid() || input.getLocalValue() == null) {
-			return;
-		}
+        if (!input.isValid() || input.getLocalValue() == null) {
+            return;
+        }
 
-		UIData table = getClosestParent(input, UIData.class);
-		int originalRows = table.getRows();
-		table.setRows(0); // We want to visit all rows.
+        UIData table = getClosestParent(input, UIData.class);
+        int originalRows = table.getRows();
+        table.setRows(0); // We want to visit all rows.
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		UniqueColumnValueChecker checker = new UniqueColumnValueChecker(table, input);
-		table.visitTree(VisitContext.createVisitContext(context), checker);
-		table.setRows(originalRows);
+        FacesContext context = FacesContext.getCurrentInstance();
+        UniqueColumnValueChecker checker = new UniqueColumnValueChecker(table, input);
+        table.visitTree(VisitContext.createVisitContext(context), checker);
+        table.setRows(originalRows);
 
-		if (checker.isDuplicate()) {
-			input.setValid(false);
-			context.validationFailed();
-			addError(input.getClientId(context), getMessage(), getLabel(input), checker.getDuplicateIndex() + 1);
-		}
-	}
+        if (checker.isDuplicate()) {
+            input.setValid(false);
+            context.validationFailed();
+            addError(input.getClientId(context), getMessage(), getLabel(input), checker.getDuplicateIndex() + 1);
+        }
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the runtime evaluated value of the message attribute.
-	 * @return The runtime evaluated value of the message attribute.
-	 */
-	public String getMessage() {
-		return getValue(message, DEFAULT_MESSAGE);
-	}
+    /**
+     * Returns the runtime evaluated value of the message attribute.
+     * @return The runtime evaluated value of the message attribute.
+     */
+    public String getMessage() {
+        return getValue(message, DEFAULT_MESSAGE);
+    }
 
-	/**
-	 * Returns the runtime evaluated value of the disabled attribute.
-	 * @return The runtime evaluated value of the disabled attribute.
-	 */
-	public boolean isDisabled() {
-		if (disabled == null) {
-			return false;
-		}
+    /**
+     * Returns the runtime evaluated value of the disabled attribute.
+     * @return The runtime evaluated value of the disabled attribute.
+     */
+    public boolean isDisabled() {
+        if (disabled == null) {
+            return false;
+        }
 
-		if (disabled.isLiteralText()) {
-			return parseBoolean(disabled.getExpressionString());
-		}
+        if (disabled.isLiteralText()) {
+            return parseBoolean(disabled.getExpressionString());
+        }
 
-		return getValue(disabled, false);
-	}
+        return getValue(disabled, false);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the evaluated value of the given value expression, or the given default value if the given value
-	 * expression itself or its evaluated value is <code>null</code>.
-	 * @param expression The value expression to return the value for.
-	 * @param defaultValue The default value to return if the value expression itself or its evaluated value is
-	 * <code>null</code>.
-	 * @return The evaluated value of the given value expression, or the given default value if the given value
-	 * expression itself or its evaluated value is <code>null</code>.
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> T getValue(ValueExpression expression, T defaultValue) {
-		if (expression != null) {
-			T value = (T) expression.getValue(getELContext());
+    /**
+     * Returns the evaluated value of the given value expression, or the given default value if the given value
+     * expression itself or its evaluated value is <code>null</code>.
+     * @param expression The value expression to return the value for.
+     * @param defaultValue The default value to return if the value expression itself or its evaluated value is
+     * <code>null</code>.
+     * @return The evaluated value of the given value expression, or the given default value if the given value
+     * expression itself or its evaluated value is <code>null</code>.
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T getValue(ValueExpression expression, T defaultValue) {
+        if (expression != null) {
+            T value = (T) expression.getValue(getELContext());
 
-			if (value != null) {
-				return value;
-			}
-		}
+            if (value != null) {
+                return value;
+            }
+        }
 
-		return defaultValue;
-	}
+        return defaultValue;
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * The unique column value checker as tree visit callback.
-	 * @author Bauke Scholtz
-	 */
-	private static class UniqueColumnValueChecker implements VisitCallback {
+    /**
+     * The unique column value checker as tree visit callback.
+     * @author Bauke Scholtz
+     */
+    private static class UniqueColumnValueChecker implements VisitCallback {
 
-		private UIData table;
-		private int rowIndex;
-		private UIInput input;
-		private Object value;
-		private boolean duplicate;
-		private int duplicateIndex;
+        private UIData table;
+        private int rowIndex;
+        private UIInput input;
+        private Object value;
+        private boolean duplicate;
+        private int duplicateIndex;
 
-		public UniqueColumnValueChecker(UIData table, UIInput input) {
-			this.table = table;
-			rowIndex = table.getRowIndex();
-			this.input = input;
-			value = input.getLocalValue();
-		}
+        public UniqueColumnValueChecker(UIData table, UIInput input) {
+            this.table = table;
+            rowIndex = table.getRowIndex();
+            this.input = input;
+            value = input.getLocalValue();
+        }
 
-		@Override
-		public VisitResult visit(VisitContext context, UIComponent target) {
-			// Yes, this check does look a bit strange, but really physically the very same single UIInput component is
-			// been reused in all rows of the UIData component. It's only its internal state which changes on a per-row
-			// basis, as would happen during the tree visit. Those changes are reflected in the "input" reference.
-			if (target == input && rowIndex != table.getRowIndex()
-				&& input.isValid() && value.equals(input.getLocalValue()))
-			{
-				duplicate = true;
-				duplicateIndex = table.getRowIndex();
-				return VisitResult.COMPLETE;
-			}
+        @Override
+        public VisitResult visit(VisitContext context, UIComponent target) {
+            // Yes, this check does look a bit strange, but really physically the very same single UIInput component is
+            // been reused in all rows of the UIData component. It's only its internal state which changes on a per-row
+            // basis, as would happen during the tree visit. Those changes are reflected in the "input" reference.
+            if (target == input && rowIndex != table.getRowIndex()
+                && input.isValid() && value.equals(input.getLocalValue()))
+            {
+                duplicate = true;
+                duplicateIndex = table.getRowIndex();
+                return VisitResult.COMPLETE;
+            }
 
-			return VisitResult.ACCEPT;
-		}
+            return VisitResult.ACCEPT;
+        }
 
-		public boolean isDuplicate() {
-			return duplicate;
-		}
+        public boolean isDuplicate() {
+            return duplicate;
+        }
 
-		public int getDuplicateIndex() {
-			return duplicateIndex;
-		}
+        public int getDuplicateIndex() {
+            return duplicateIndex;
+        }
 
-	}
+    }
 
 }

@@ -51,147 +51,147 @@ import org.xml.sax.SAXException;
  */
 enum FacesConfigXmlSingleton implements FacesConfigXml {
 
-	// Enum singleton -------------------------------------------------------------------------------------------------
+    // Enum singleton -------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the lazily loaded enum singleton instance.
-	 */
-	INSTANCE;
+    /**
+     * Returns the lazily loaded enum singleton instance.
+     */
+    INSTANCE;
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String APP_FACES_CONFIG_XML =
-		"/WEB-INF/faces-config.xml";
-	private static final String LIB_FACES_CONFIG_XML =
-		"META-INF/faces-config.xml";
-	private static final String XPATH_RESOURCE_BUNDLE =
-		"application/resource-bundle";
-	private static final String XPATH_DEFAULT_LOCALE =
-		"application/locale-config/default-locale";
-	private static final String XPATH_SUPPORTED_LOCALE =
-		"application/locale-config/supported-locale";
-	private static final String XPATH_RESOURCE_HANDLER =
-		"application/resource-handler";
-	private static final String XPATH_VAR =
-		"var";
-	private static final String XPATH_BASE_NAME =
-		"base-name";
-	private static final String ERROR_INITIALIZATION_FAIL =
-		"FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
+    private static final String APP_FACES_CONFIG_XML =
+        "/WEB-INF/faces-config.xml";
+    private static final String LIB_FACES_CONFIG_XML =
+        "META-INF/faces-config.xml";
+    private static final String XPATH_RESOURCE_BUNDLE =
+        "application/resource-bundle";
+    private static final String XPATH_DEFAULT_LOCALE =
+        "application/locale-config/default-locale";
+    private static final String XPATH_SUPPORTED_LOCALE =
+        "application/locale-config/supported-locale";
+    private static final String XPATH_RESOURCE_HANDLER =
+        "application/resource-handler";
+    private static final String XPATH_VAR =
+        "var";
+    private static final String XPATH_BASE_NAME =
+        "base-name";
+    private static final String ERROR_INITIALIZATION_FAIL =
+        "FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private Map<String, String> resourceBundles;
-	private List<Locale> supportedLocales;
-	private List<Class<? extends ResourceHandler>> resourceHandlers;
+    private Map<String, String> resourceBundles;
+    private List<Locale> supportedLocales;
+    private List<Class<? extends ResourceHandler>> resourceHandlers;
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Perform automatic initialization whereby the servlet context is obtained from CDI.
-	 */
-	private FacesConfigXmlSingleton() {
-		try {
-			ServletContext servletContext = Servlets.getContext();
-			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			resourceBundles = parseResourceBundles(facesConfigXml, xpath);
-			supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
-			resourceHandlers = parseResourceHandlers(facesConfigXml, xpath);
-		}
-		catch (Exception e) {
-			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
-		}
-	}
+    /**
+     * Perform automatic initialization whereby the servlet context is obtained from CDI.
+     */
+    private FacesConfigXmlSingleton() {
+        try {
+            ServletContext servletContext = Servlets.getContext();
+            Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            resourceBundles = parseResourceBundles(facesConfigXml, xpath);
+            supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
+            resourceHandlers = parseResourceHandlers(facesConfigXml, xpath);
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
+        }
+    }
 
-	// Getters --------------------------------------------------------------------------------------------------------
+    // Getters --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public Map<String, String> getResourceBundles() {
-		return resourceBundles;
-	}
+    @Override
+    public Map<String, String> getResourceBundles() {
+        return resourceBundles;
+    }
 
-	@Override
-	public List<Locale> getSupportedLocales() {
-		return supportedLocales;
-	}
+    @Override
+    public List<Locale> getSupportedLocales() {
+        return supportedLocales;
+    }
 
-	@Override
-	public List<Class<? extends ResourceHandler>> getResourceHandlers() {
-		return resourceHandlers;
-	}
+    @Override
+    public List<Class<? extends ResourceHandler>> getResourceHandlers() {
+        return resourceHandlers;
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
-	 * into a single {@link Document}.
-	 */
-	private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
-		List<URL> facesConfigURLs = new ArrayList<>();
-		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
-		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
-		return createDocument(facesConfigURLs);
-	}
+    /**
+     * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
+     * into a single {@link Document}.
+     */
+    private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
+        List<URL> facesConfigURLs = new ArrayList<>();
+        facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
+        facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
+        return createDocument(facesConfigURLs);
+    }
 
-	/**
-	 * Create and return a mapping of all resource bundle base names by var found in the given document.
-	 * @throws XPathExpressionException
-	 */
-	private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-		Map<String, String> resourceBundles = new LinkedHashMap<>();
-		NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
+    /**
+     * Create and return a mapping of all resource bundle base names by var found in the given document.
+     * @throws XPathExpressionException
+     */
+    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+        Map<String, String> resourceBundles = new LinkedHashMap<>();
+        NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
 
-		for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
-			Node node = resourceBundleNodes.item(i);
+        for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
+            Node node = resourceBundleNodes.item(i);
 
-			String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
-			String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
-			resourceBundles.computeIfAbsent(var, k -> baseName);
-		}
+            String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
+            String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
+            resourceBundles.computeIfAbsent(var, k -> baseName);
+        }
 
-		return Collections.unmodifiableMap(resourceBundles);
-	}
+        return Collections.unmodifiableMap(resourceBundles);
+    }
 
-	/**
-	 * Create and return a list of default locale and all supported locales in same order as in the given document.
-	 * @throws XPathExpressionException
-	 */
-	private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-		List<Locale> supportedLocales = new ArrayList<>();
-		String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
+    /**
+     * Create and return a list of default locale and all supported locales in same order as in the given document.
+     * @throws XPathExpressionException
+     */
+    private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+        List<Locale> supportedLocales = new ArrayList<>();
+        String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
 
-		if (!isEmpty(defaultLocale)) {
-			supportedLocales.add(parseLocale(defaultLocale));
-		}
+        if (!isEmpty(defaultLocale)) {
+            supportedLocales.add(parseLocale(defaultLocale));
+        }
 
-		NodeList supportedLocaleNodes = getNodeList(facesConfigXml, xpath, XPATH_SUPPORTED_LOCALE);
+        NodeList supportedLocaleNodes = getNodeList(facesConfigXml, xpath, XPATH_SUPPORTED_LOCALE);
 
-		for (int i = 0; i < supportedLocaleNodes.getLength(); i++) {
-			Locale supportedLocale = parseLocale(getTextContent(supportedLocaleNodes.item(i)));
+        for (int i = 0; i < supportedLocaleNodes.getLength(); i++) {
+            Locale supportedLocale = parseLocale(getTextContent(supportedLocaleNodes.item(i)));
 
-			if (!supportedLocales.contains(supportedLocale)) {
-				supportedLocales.add(supportedLocale);
-			}
-		}
+            if (!supportedLocales.contains(supportedLocale)) {
+                supportedLocales.add(supportedLocale);
+            }
+        }
 
-		return Collections.unmodifiableList(supportedLocales);
-	}
+        return Collections.unmodifiableList(supportedLocales);
+    }
 
-	/**
-	 * Create and return a list of all resource handlers in same order as in the given document.
-	 * @throws XPathExpressionException
-	 */
-	private static List<Class<? extends ResourceHandler>> parseResourceHandlers(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-		List<Class<? extends ResourceHandler>> resourceHandlers = new ArrayList<>();
-		NodeList resourceHandlerNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_HANDLER);
+    /**
+     * Create and return a list of all resource handlers in same order as in the given document.
+     * @throws XPathExpressionException
+     */
+    private static List<Class<? extends ResourceHandler>> parseResourceHandlers(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+        List<Class<? extends ResourceHandler>> resourceHandlers = new ArrayList<>();
+        NodeList resourceHandlerNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_HANDLER);
 
-		for (int i = 0; i < resourceHandlerNodes.getLength(); i++) {
-			Class<? extends ResourceHandler> resourceHandler = toClass(getTextContent(resourceHandlerNodes.item(i)));
-			resourceHandlers.add(resourceHandler);
-		}
+        for (int i = 0; i < resourceHandlerNodes.getLength(); i++) {
+            Class<? extends ResourceHandler> resourceHandler = toClass(getTextContent(resourceHandlerNodes.item(i)));
+            resourceHandlers.add(resourceHandler);
+        }
 
-		return Collections.unmodifiableList(resourceHandlers);
-	}
+        return Collections.unmodifiableList(resourceHandlers);
+    }
 
 }

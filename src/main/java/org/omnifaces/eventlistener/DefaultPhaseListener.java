@@ -27,40 +27,40 @@ import jakarta.faces.event.PhaseListener;
  */
 public abstract class DefaultPhaseListener implements PhaseListener {
 
-	private static final long serialVersionUID = 1L;
-	private	transient PhaseId phaseId; // PhaseId is not serializable
+    private static final long serialVersionUID = 1L;
+    private    transient PhaseId phaseId; // PhaseId is not serializable
 
-	/**
-	 * Construct default phase listener for given phase ID.
-	 * @param phaseId Phase ID to create new default phase listener for.
-	 */
-	protected DefaultPhaseListener(PhaseId phaseId) {
-		this.phaseId = phaseId;
-	}
+    /**
+     * Construct default phase listener for given phase ID.
+     * @param phaseId Phase ID to create new default phase listener for.
+     */
+    protected DefaultPhaseListener(PhaseId phaseId) {
+        this.phaseId = phaseId;
+    }
 
-	@Override
-	public PhaseId getPhaseId() {
-		return phaseId;
-	}
+    @Override
+    public PhaseId getPhaseId() {
+        return phaseId;
+    }
 
-	@Override
-	public void afterPhase(PhaseEvent event) {
-		// NOOP.
-	}
+    @Override
+    public void afterPhase(PhaseEvent event) {
+        // NOOP.
+    }
 
-	@Override
-	public void beforePhase(PhaseEvent event) {
-		// NOOP.
-	}
+    @Override
+    public void beforePhase(PhaseEvent event) {
+        // NOOP.
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.defaultWriteObject();
-		out.writeObject(phaseId.getName());
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(phaseId.getName());
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
-		phaseId = PhaseId.phaseIdValueOf((String) in.readObject());
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        phaseId = PhaseId.phaseIdValueOf((String) in.readObject());
+    }
 
 }

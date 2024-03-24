@@ -24,62 +24,62 @@ import org.openqa.selenium.support.FindBy;
 
 public class FacesConverterIT extends OmniFacesIT {
 
-	@FindBy(id="facesConverterITConverter")
-	private WebElement facesConverterITConverter;
+    @FindBy(id="facesConverterITConverter")
+    private WebElement facesConverterITConverter;
 
-	@FindBy(id="facesConverterITManagedConverter")
-	private WebElement facesConverterITManagedConverter;
+    @FindBy(id="facesConverterITManagedConverter")
+    private WebElement facesConverterITManagedConverter;
 
-	@FindBy(id="facesConverterITConverterResourceDependency")
-	private WebElement facesConverterITConverterResourceDependency;
+    @FindBy(id="facesConverterITConverterResourceDependency")
+    private WebElement facesConverterITConverterResourceDependency;
 
-	@FindBy(id="facesConverterITManagedConverterResourceDependency")
-	private WebElement facesConverterITManagedConverterResourceDependency;
+    @FindBy(id="facesConverterITManagedConverterResourceDependency")
+    private WebElement facesConverterITManagedConverterResourceDependency;
 
-	@FindBy(id="facesConverterITExtendedConverter")
-	private WebElement facesConverterITExtendedConverter;
+    @FindBy(id="facesConverterITExtendedConverter")
+    private WebElement facesConverterITExtendedConverter;
 
-	@FindBy(id="facesConverterITExtendedManagedConverter")
-	private WebElement facesConverterITExtendedManagedConverter;
+    @FindBy(id="facesConverterITExtendedManagedConverter")
+    private WebElement facesConverterITExtendedManagedConverter;
 
-	@FindBy(id="facesConverterITExtendedConverterResourceDependency")
-	private WebElement facesConverterITExtendedConverterResourceDependency;
+    @FindBy(id="facesConverterITExtendedConverterResourceDependency")
+    private WebElement facesConverterITExtendedConverterResourceDependency;
 
-	@FindBy(id="facesConverterITExtendedManagedConverterResourceDependency")
-	private WebElement facesConverterITExtendedManagedConverterResourceDependency;
+    @FindBy(id="facesConverterITExtendedManagedConverterResourceDependency")
+    private WebElement facesConverterITExtendedManagedConverterResourceDependency;
 
-	@FindBy(id="loaded")
-	private WebElement loaded;
+    @FindBy(id="loaded")
+    private WebElement loaded;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(FacesConverterIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(FacesConverterIT.class);
+    }
 
-	@Test
-	void test() {
-		waitUntilTextContent(loaded); // Wait until "load" event is finished because of resource dependencies.
+    @Test
+    void test() {
+        waitUntilTextContent(loaded); // Wait until "load" event is finished because of resource dependencies.
 
-		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITConverter");
-		assertEquals("facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITConverter");
-		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITManagedConverter");
-		assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITManagedConverter");
-		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedConverter");
-		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedConverter");
-		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedManagedConverter");
-		assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedManagedConverter");
+        assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITConverter");
+        assertEquals("facesConverterITConverterResourceDependency" ,facesConverterITConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITConverter");
+        assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITManagedConverter");
+        assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITManagedConverter");
+        assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedConverter");
+        assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedConverter");
+        assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is injected in facesConverterITExtendedManagedConverter");
+        assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is injected in facesConverterITExtendedManagedConverter");
 
-		init(); // This basically refreshes the page.
-		waitUntilTextContent(loaded);
+        init(); // This basically refreshes the page.
+        waitUntilTextContent(loaded);
 
-		assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITConverter after page refresh");
-		assertEquals("facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITConverter after page refresh");
-		assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITManagedConverter after page refresh");
-		assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITManagedConverter after page refresh");
-		assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedConverter after page refresh");
-		assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh");
-		assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedManagedConverter after page refresh");
-		assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh");
-	}
+        assertTrue(facesConverterITConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITConverter after page refresh");
+        assertEquals("facesConverterITConverterResourceDependency", facesConverterITConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITConverter after page refresh");
+        assertTrue(facesConverterITManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITManagedConverter after page refresh");
+        assertEquals("facesConverterITManagedConverterResourceDependency", facesConverterITManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITManagedConverter after page refresh");
+        assertTrue(facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedConverter after page refresh");
+        assertEquals("facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedConverter after page refresh");
+        assertTrue(facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeService"), "Service is still injected in facesConverterITExtendedManagedConverter after page refresh");
+        assertEquals("facesConverterITExtendedManagedConverterResourceDependency", facesConverterITExtendedManagedConverterResourceDependency.getText(), "ResourceDependency is still injected in facesConverterITExtendedManagedConverter after page refresh");
+    }
 
 }

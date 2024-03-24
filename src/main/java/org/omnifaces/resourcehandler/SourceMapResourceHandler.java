@@ -63,57 +63,57 @@ import jakarta.faces.application.ResourceWrapper;
  */
 public class SourceMapResourceHandler extends DefaultResourceHandler {
 
-	/** The context parameter name to configure the source map pattern. */
-	public static final String PARAM_NAME_SOURCE_MAP_PATTERN =
-		"org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN";
+    /** The context parameter name to configure the source map pattern. */
+    public static final String PARAM_NAME_SOURCE_MAP_PATTERN =
+        "org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN";
 
-	private static final Map<ResourceIdentifier, String> SOURCE_MAPS = new ConcurrentHashMap<>();
+    private static final Map<ResourceIdentifier, String> SOURCE_MAPS = new ConcurrentHashMap<>();
 
-	private static final String DEFAULT_SOURCE_MAP_PATTERN = "*.map";
-	private static final String EXTENSION_JS = ".js";
-	private static final String EXTENSION_CSS = ".css";
-	private static final String HEADER_SOURCE_MAP = "SourceMap";
+    private static final String DEFAULT_SOURCE_MAP_PATTERN = "*.map";
+    private static final String EXTENSION_JS = ".js";
+    private static final String EXTENSION_CSS = ".css";
+    private static final String HEADER_SOURCE_MAP = "SourceMap";
 
-	private String sourceMapPattern;
+    private String sourceMapPattern;
 
-	/**
-	 * Creates a new instance of this source map resource handler which wraps the given resource handler.
-	 * This will also initialize the source map pattern based on the context parameter.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public SourceMapResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-		sourceMapPattern = getInitParameterOrDefault(PARAM_NAME_SOURCE_MAP_PATTERN, DEFAULT_SOURCE_MAP_PATTERN);
-	}
+    /**
+     * Creates a new instance of this source map resource handler which wraps the given resource handler.
+     * This will also initialize the source map pattern based on the context parameter.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public SourceMapResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+        sourceMapPattern = getInitParameterOrDefault(PARAM_NAME_SOURCE_MAP_PATTERN, DEFAULT_SOURCE_MAP_PATTERN);
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
-		if (resource == null) {
-			return null;
-		}
+    @Override
+    public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
+        if (resource == null) {
+            return null;
+        }
 
-		String sourceMap = SOURCE_MAPS.computeIfAbsent(new ResourceIdentifier(libraryName, resourceName), this::computeSourceMap);
+        String sourceMap = SOURCE_MAPS.computeIfAbsent(new ResourceIdentifier(libraryName, resourceName), this::computeSourceMap);
 
-		return super.decorateResource(sourceMap.isEmpty() ? resource : new ResourceWrapper(resource) {
-			@Override
-			public Map<String, String> getResponseHeaders() {
-				Map<String, String> responseHeaders = super.getResponseHeaders();
-				responseHeaders.put(HEADER_SOURCE_MAP, sourceMap);
-				return responseHeaders;
-			}
-		}, resourceName, libraryName);
-	}
+        return super.decorateResource(sourceMap.isEmpty() ? resource : new ResourceWrapper(resource) {
+            @Override
+            public Map<String, String> getResponseHeaders() {
+                Map<String, String> responseHeaders = super.getResponseHeaders();
+                responseHeaders.put(HEADER_SOURCE_MAP, sourceMap);
+                return responseHeaders;
+            }
+        }, resourceName, libraryName);
+    }
 
-	private String computeSourceMap(ResourceIdentifier resourceIdentifier) {
-		if (endsWithOneOf(resourceIdentifier.getName(), EXTENSION_JS, EXTENSION_CSS)) {
-			Resource sourceMapResource = createResource(sourceMapPattern.replace("*", resourceIdentifier.getName()), resourceIdentifier.getLibrary());
+    private String computeSourceMap(ResourceIdentifier resourceIdentifier) {
+        if (endsWithOneOf(resourceIdentifier.getName(), EXTENSION_JS, EXTENSION_CSS)) {
+            Resource sourceMapResource = createResource(sourceMapPattern.replace("*", resourceIdentifier.getName()), resourceIdentifier.getLibrary());
 
-			if (sourceMapResource != null) {
-				return sourceMapResource.getRequestPath();
-			}
-		}
+            if (sourceMapResource != null) {
+                return sourceMapResource.getRequestPath();
+            }
+        }
 
-		return "";
-	}
+        return "";
+    }
 
 }

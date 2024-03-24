@@ -34,69 +34,69 @@ import org.omnifaces.ApplicationInitializer;
  */
 public final class Platform {
 
-	private static final String DEFAULT_FACES_SERVLET_MAPPING_KEY = "org.omnifaces.DEFAULT_FACES_SERVLET_MAPPING";
-	private static final String DEFAULT_FACES_SERVLET_MAPPING_VALUE = ".xhtml";
+    private static final String DEFAULT_FACES_SERVLET_MAPPING_KEY = "org.omnifaces.DEFAULT_FACES_SERVLET_MAPPING";
+    private static final String DEFAULT_FACES_SERVLET_MAPPING_VALUE = ".xhtml";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Platform() {
-		// Hide constructor.
-	}
+    private Platform() {
+        // Hide constructor.
+    }
 
 
-	// FacesServlet ---------------------------------------------------------------------------------------------------
+    // FacesServlet ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
-	 * @param servletContext The context to get the ServletRegistration from.
-	 * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
-	 * @since 1.8
-	 */
-	public static ServletRegistration getFacesServletRegistration(ServletContext servletContext) {
-		ServletRegistration facesServletRegistration = null;
+    /**
+     * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
+     * @param servletContext The context to get the ServletRegistration from.
+     * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
+     * @since 1.8
+     */
+    public static ServletRegistration getFacesServletRegistration(ServletContext servletContext) {
+        ServletRegistration facesServletRegistration = null;
 
-		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
-			if (FacesServlet.class.getName().equals(registration.getClassName())) {
-				facesServletRegistration = registration;
-				break;
-			}
-		}
+        for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
+            if (FacesServlet.class.getName().equals(registration.getClassName())) {
+                facesServletRegistration = registration;
+                break;
+            }
+        }
 
-		return facesServletRegistration;
-	}
+        return facesServletRegistration;
+    }
 
-	/**
-	 * Returns the mappings associated with the {@link FacesServlet}.
-	 * @param servletContext The context to get the {@link FacesServlet} from.
-	 * @return The mappings associated with the {@link FacesServlet}, or an empty set.
-	 * @since 2.5
-	 */
-	public static Collection<String> getFacesServletMappings(ServletContext servletContext) {
-		ServletRegistration facesServlet = getFacesServletRegistration(servletContext);
-		return (facesServlet != null) ? facesServlet.getMappings() : Collections.<String>emptySet();
-	}
+    /**
+     * Returns the mappings associated with the {@link FacesServlet}.
+     * @param servletContext The context to get the {@link FacesServlet} from.
+     * @return The mappings associated with the {@link FacesServlet}, or an empty set.
+     * @since 2.5
+     */
+    public static Collection<String> getFacesServletMappings(ServletContext servletContext) {
+        ServletRegistration facesServlet = getFacesServletRegistration(servletContext);
+        return (facesServlet != null) ? facesServlet.getMappings() : Collections.<String>emptySet();
+    }
 
-	/**
-	 * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)}
-	 * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If Faces is prefix mapped (e.g.
-	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If Faces
-	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>). If
-	 * none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
-	 * {@link ApplicationInitializer} and cached in the {@link ServletContext}.
-	 * @return The default faces servlet mapping (without the wildcard).
-	 * @since 3.10
-	 */
-	public static String getDefaultFacesServletMapping(ServletContext servletContext) {
-		String defaultFacesServletMapping = (String) servletContext.getAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY);
+    /**
+     * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)}
+     * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If Faces is prefix mapped (e.g.
+     * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If Faces
+     * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>). If
+     * none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
+     * {@link ApplicationInitializer} and cached in the {@link ServletContext}.
+     * @return The default faces servlet mapping (without the wildcard).
+     * @since 3.10
+     */
+    public static String getDefaultFacesServletMapping(ServletContext servletContext) {
+        String defaultFacesServletMapping = (String) servletContext.getAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY);
 
-		if (defaultFacesServletMapping == null) {
-			defaultFacesServletMapping = getFacesServletMappings(servletContext).stream()
-				.filter(mapping -> mapping.startsWith("*.") || mapping.endsWith("/*"))
-				.findFirst().orElse(DEFAULT_FACES_SERVLET_MAPPING_VALUE).replace("*", "");
-			servletContext.setAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY, defaultFacesServletMapping);
-		}
+        if (defaultFacesServletMapping == null) {
+            defaultFacesServletMapping = getFacesServletMappings(servletContext).stream()
+                .filter(mapping -> mapping.startsWith("*.") || mapping.endsWith("/*"))
+                .findFirst().orElse(DEFAULT_FACES_SERVLET_MAPPING_VALUE).replace("*", "");
+            servletContext.setAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY, defaultFacesServletMapping);
+        }
 
-		return defaultFacesServletMapping;
-	}
+        return defaultFacesServletMapping;
+    }
 
 }

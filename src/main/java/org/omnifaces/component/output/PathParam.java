@@ -64,41 +64,41 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
 @FacesComponent(PathParam.COMPONENT_TYPE)
 public class PathParam<T> extends Param<T> {
 
-	// Constants
+    // Constants
 
-	/** The component type, which is {@value org.omnifaces.component.output.PathParam#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.PathParam";
+    /** The component type, which is {@value org.omnifaces.component.output.PathParam#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.PathParam";
 
-	/** The predefined value of the <code>name</code> attribute of this component. */
-	public static final String PATH_PARAM_NAME_ATTRIBUTE_VALUE = "org.omnifaces.pathparam";
+    /** The predefined value of the <code>name</code> attribute of this component. */
+    public static final String PATH_PARAM_NAME_ATTRIBUTE_VALUE = "org.omnifaces.pathparam";
 
-	// Actions
-	@Override
-	@SuppressWarnings("unchecked")
-	public String getValue() {
-		FacesContext context = getFacesContext();
-		Converter<T> converter = getConverter();
-		Object value = getLocalValue();
+    // Actions
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getValue() {
+        FacesContext context = getFacesContext();
+        Converter<T> converter = getConverter();
+        Object value = getLocalValue();
 
-		if (converter == null && value != null) {
-			converter = createConverter(context, value.getClass());
-		}
+        if (converter == null && value != null) {
+            converter = createConverter(context, value.getClass());
+        }
 
-		if (converter != null) {
-			return converter.getAsString(context, this, (T) value);
-		}
+        if (converter != null) {
+            return converter.getAsString(context, this, (T) value);
+        }
 
-		return value != null ? value.toString() : null;
-	}
+        return value != null ? value.toString() : null;
+    }
 
-	@Override
-	public void setName(String name) {
-		// Do nothing.
-	}
+    @Override
+    public void setName(String name) {
+        // Do nothing.
+    }
 
-	@Override
-	public String getName() {
-		return PATH_PARAM_NAME_ATTRIBUTE_VALUE; // Always return a predefined name.
-	}
+    @Override
+    public String getName() {
+        return PATH_PARAM_NAME_ATTRIBUTE_VALUE; // Always return a predefined name.
+    }
 
 }

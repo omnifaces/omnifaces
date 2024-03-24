@@ -33,49 +33,49 @@ import jakarta.faces.FacesWrapper;
  */
 public class InjectionTargetWrapper<T> implements InjectionTarget<T>, FacesWrapper<InjectionTarget<T>> {
 
-	private final InjectionTarget<T> wrapped;
+    private final InjectionTarget<T> wrapped;
 
-	/**
-	 * Construct a injection target wrapper which wraps the given injection target.
-	 * @param wrapped The injection target to be wrapped.
-	 */
-	public InjectionTargetWrapper(InjectionTarget<T> wrapped) {
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct a injection target wrapper which wraps the given injection target.
+     * @param wrapped The injection target to be wrapped.
+     */
+    public InjectionTargetWrapper(InjectionTarget<T> wrapped) {
+        this.wrapped = wrapped;
+    }
 
-	@Override
-	public InjectionTarget<T> getWrapped() {
-		return wrapped;
-	}
+    @Override
+    public InjectionTarget<T> getWrapped() {
+        return wrapped;
+    }
 
-	@Override
-	public T produce(CreationalContext<T> ctx) {
-		return getWrapped().produce(ctx);
-	}
+    @Override
+    public T produce(CreationalContext<T> ctx) {
+        return getWrapped().produce(ctx);
+    }
 
-	@Override
-	public void dispose(T instance) {
-		getWrapped().dispose(instance);
-	}
+    @Override
+    public void dispose(T instance) {
+        getWrapped().dispose(instance);
+    }
 
-	@Override
-	public Set<InjectionPoint> getInjectionPoints() {
-		return getWrapped().getInjectionPoints();
-	}
+    @Override
+    public Set<InjectionPoint> getInjectionPoints() {
+        return getWrapped().getInjectionPoints();
+    }
 
-	@Override
-	public void inject(T instance, CreationalContext<T> ctx) {
-		getWrapped().inject(instance, ctx);
-	}
+    @Override
+    public void inject(T instance, CreationalContext<T> ctx) {
+        getWrapped().inject(instance, ctx);
+    }
 
-	@Override
-	public void postConstruct(T instance) {
-		getWrapped().postConstruct(instance);
-	}
+    @Override
+    public void postConstruct(T instance) {
+        getWrapped().postConstruct(instance);
+    }
 
-	@Override
-	public void preDestroy(T instance) {
-		getWrapped().preDestroy(instance);
-	}
+    @Override
+    public void preDestroy(T instance) {
+        getWrapped().preDestroy(instance);
+    }
 
 }

@@ -24,29 +24,29 @@ import org.openqa.selenium.support.ui.Select;
 
 public class SelectItemsConverterIT extends OmniFacesIT {
 
-	@FindBy(id="form:input")
-	private WebElement input;
+    @FindBy(id="form:input")
+    private WebElement input;
 
-	@FindBy(id="form:submit")
-	private WebElement submit;
+    @FindBy(id="form:submit")
+    private WebElement submit;
 
-	@FindBy(id="form:output")
-	private WebElement output;
+    @FindBy(id="form:output")
+    private WebElement output;
 
-	@FindBy(id="form:messages")
-	private WebElement messages;
+    @FindBy(id="form:messages")
+    private WebElement messages;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(SelectItemsConverterIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(SelectItemsConverterIT.class);
+    }
 
-	@Test
-	void test() {
-		new Select(input).selectByIndex(2);
-		guardAjax(submit::click);
-		assertEquals("Entity[3]", output.getText());
-		assertEquals("", messages.getText());
-	}
+    @Test
+    void test() {
+        new Select(input).selectByIndex(2);
+        guardAjax(submit::click);
+        assertEquals("Entity[3]", output.getText());
+        assertEquals("", messages.getText());
+    }
 
 }

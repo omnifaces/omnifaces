@@ -33,24 +33,24 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
  */
 public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private boolean hasAnyViewIdBeans;
+    private boolean hasAnyViewIdBeans;
 
-	/**
-	 * Construct eager beans phase listener.
-	 */
-	public EagerBeansPhaseListener() {
-		super(RESTORE_VIEW);
-		EagerBeansRepository eagerBeansRepository = getReference(EagerBeansRepository.class);
-		hasAnyViewIdBeans = (eagerBeansRepository != null) && eagerBeansRepository.hasAnyViewIdBeans();
-	}
+    /**
+     * Construct eager beans phase listener.
+     */
+    public EagerBeansPhaseListener() {
+        super(RESTORE_VIEW);
+        EagerBeansRepository eagerBeansRepository = getReference(EagerBeansRepository.class);
+        hasAnyViewIdBeans = (eagerBeansRepository != null) && eagerBeansRepository.hasAnyViewIdBeans();
+    }
 
-	@Override
-	public void afterPhase(PhaseEvent event) {
-		if (hasAnyViewIdBeans) {
-			getReference(EagerBeansRepository.class).instantiateByViewID(getViewId(event.getFacesContext()));
-		}
-	}
+    @Override
+    public void afterPhase(PhaseEvent event) {
+        if (hasAnyViewIdBeans) {
+            getReference(EagerBeansRepository.class).instantiateByViewID(getViewId(event.getFacesContext()));
+        }
+    }
 
 }

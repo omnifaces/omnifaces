@@ -14,46 +14,46 @@
 
 -->
 <faces-config 
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd"
-	version="3.0"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd"
+    version="3.0"
 >
-	<name>omnifaces</name>
+    <name>omnifaces</name>
 
-	<ordering>
-		<after>
-			<others />
-		</after>
-	</ordering>
+    <ordering>
+        <after>
+            <others />
+        </after>
+    </ordering>
 
-	<application>
-		<view-handler>org.omnifaces.viewhandler.OmniViewHandler</view-handler>
-		<resource-handler>org.omnifaces.facesviews.FacesViewsResourceHandler</resource-handler>
-		<resource-handler>org.omnifaces.resourcehandler.GraphicResourceHandler</resource-handler>
-		<resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
-		<resource-handler>org.omnifaces.resourcehandler.PWAResourceHandler</resource-handler>
-		<system-event-listener>
-			<system-event-listener-class>org.omnifaces.ApplicationProcessor</system-event-listener-class>
-			<system-event-class>jakarta.faces.event.PostConstructApplicationEvent</system-event-class>
-		</system-event-listener>
-		<system-event-listener>
-			<system-event-listener-class>org.omnifaces.cdi.viewscope.ViewScopeEventListener</system-event-listener-class>
-			<system-event-class>jakarta.faces.event.PreDestroyViewMapEvent</system-event-class>
-			<source-class>jakarta.faces.component.UIViewRoot</source-class>
-		</system-event-listener>
-		<el-resolver>org.omnifaces.el.FacesELResolver</el-resolver>
-	</application>
+    <application>
+        <view-handler>org.omnifaces.viewhandler.OmniViewHandler</view-handler>
+        <resource-handler>org.omnifaces.facesviews.FacesViewsResourceHandler</resource-handler>
+        <resource-handler>org.omnifaces.resourcehandler.GraphicResourceHandler</resource-handler>
+        <resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
+        <resource-handler>org.omnifaces.resourcehandler.PWAResourceHandler</resource-handler>
+        <system-event-listener>
+            <system-event-listener-class>org.omnifaces.ApplicationProcessor</system-event-listener-class>
+            <system-event-class>jakarta.faces.event.PostConstructApplicationEvent</system-event-class>
+        </system-event-listener>
+        <system-event-listener>
+            <system-event-listener-class>org.omnifaces.cdi.viewscope.ViewScopeEventListener</system-event-listener-class>
+            <system-event-class>jakarta.faces.event.PreDestroyViewMapEvent</system-event-class>
+            <source-class>jakarta.faces.component.UIViewRoot</source-class>
+        </system-event-listener>
+        <el-resolver>org.omnifaces.el.FacesELResolver</el-resolver>
+    </application>
 
-	<lifecycle>
-		<phase-listener>org.omnifaces.eventlistener.InvokeActionEventListener</phase-listener>
-		<phase-listener>org.omnifaces.eventlistener.CallbackPhaseListener</phase-listener>
-		<phase-listener>org.omnifaces.cdi.eager.EagerBeansPhaseListener</phase-listener>
-	</lifecycle>
+    <lifecycle>
+        <phase-listener>org.omnifaces.eventlistener.InvokeActionEventListener</phase-listener>
+        <phase-listener>org.omnifaces.eventlistener.CallbackPhaseListener</phase-listener>
+        <phase-listener>org.omnifaces.cdi.eager.EagerBeansPhaseListener</phase-listener>
+    </lifecycle>
 
-	<factory>
-		<application-factory>org.omnifaces.application.OmniApplicationFactory</application-factory>
-		<external-context-factory>org.omnifaces.context.OmniExternalContextFactory</external-context-factory>
-		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
-	</factory>
+    <factory>
+        <application-factory>org.omnifaces.application.OmniApplicationFactory</application-factory>
+        <external-context-factory>org.omnifaces.context.OmniExternalContextFactory</external-context-factory>
+        <partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
+    </factory>
 </faces-config>

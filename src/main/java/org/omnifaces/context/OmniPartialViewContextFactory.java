@@ -25,24 +25,24 @@ import jakarta.faces.context.PartialViewContextFactory;
  */
 public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces partial view context factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public OmniPartialViewContextFactory(PartialViewContextFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new OmniFaces partial view context factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public OmniPartialViewContextFactory(PartialViewContextFactory wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new instance of {@link OmniPartialViewContext} which wraps the original partial view context.
-	 */
-	@Override
-	public PartialViewContext getPartialViewContext(FacesContext context) {
-		return new OmniPartialViewContext(getWrapped().getPartialViewContext(context));
-	}
+    /**
+     * Returns a new instance of {@link OmniPartialViewContext} which wraps the original partial view context.
+     */
+    @Override
+    public PartialViewContext getPartialViewContext(FacesContext context) {
+        return new OmniPartialViewContext(getWrapped().getPartialViewContext(context));
+    }
 
 }

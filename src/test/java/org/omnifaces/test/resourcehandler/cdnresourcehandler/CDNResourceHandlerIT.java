@@ -25,24 +25,24 @@ import org.openqa.selenium.support.FindBy;
 
 public class CDNResourceHandlerIT extends OmniFacesIT {
 
-	@FindBy(css="head link[rel=stylesheet]")
-	private WebElement cdnStylesheet;
+    @FindBy(css="head link[rel=stylesheet]")
+    private WebElement cdnStylesheet;
 
-	@FindBy(css="head script")
-	private WebElement cdnScript;
+    @FindBy(css="head script")
+    private WebElement cdnScript;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(CDNResourceHandlerIT.class)
-			.withWebXml(withCDNResources)
-			.withFacesConfig(withCDNResourceHandler)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(CDNResourceHandlerIT.class)
+            .withWebXml(withCDNResources)
+            .withFacesConfig(withCDNResourceHandler)
+            .createDeployment();
+    }
 
-	@Test
-	void cdnResources() {
-		assertEquals("https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", cdnStylesheet.getAttribute("href"));
-		assertEquals("https://code.jquery.com/jquery-2.2.4.min.js", cdnScript.getAttribute("src"));
-	}
+    @Test
+    void cdnResources() {
+        assertEquals("https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", cdnStylesheet.getAttribute("href"));
+        assertEquals("https://code.jquery.com/jquery-2.2.4.min.js", cdnScript.getAttribute("src"));
+    }
 
 }

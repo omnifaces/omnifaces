@@ -25,36 +25,36 @@ import jakarta.validation.constraints.Size;
 @RequestScoped
 public class ValidateBeanITDefaultBean {
 
-	@Pattern(regexp=".{2,}", message="default")
-	@Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
-	private String input;
+    @Pattern(regexp=".{2,}", message="default")
+    @Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
+    private String input;
 
-	@NotNull
-	private String unused; // This one is not referenced in JSF form and should therefore not trigger validation fail on it.
+    @NotNull
+    private String unused; // This one is not referenced in JSF form and should therefore not trigger validation fail on it.
 
-	public void action() {
-		if (isValidationFailed()) {
-			addGlobalWarn("actionValidationFailed");
-		}
-		else {
-			addGlobalInfo("actionSuccess");
-		}
-	}
+    public void action() {
+        if (isValidationFailed()) {
+            addGlobalWarn("actionValidationFailed");
+        }
+        else {
+            addGlobalInfo("actionSuccess");
+        }
+    }
 
-	public String getInput() {
-		return input;
-	}
+    public String getInput() {
+        return input;
+    }
 
-	public void setInput(String input) {
-		this.input = input;
-	}
+    public void setInput(String input) {
+        this.input = input;
+    }
 
-	public String getUnused() {
-		return unused;
-	}
+    public String getUnused() {
+        return unused;
+    }
 
-	public void setUnused(String unused) {
-		this.unused = unused;
-	}
+    public void setUnused(String unused) {
+        this.unused = unused;
+    }
 
 }

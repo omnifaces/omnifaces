@@ -50,162 +50,162 @@ import org.omnifaces.cdi.Param;
 @Typed
 public class DynamicParamValueProducer implements Bean<Object>, PassivationCapable {
 
-	private Set<Type> types;
+    private Set<Type> types;
 
-	/**
-	 * Construct dynamic param value producer for given type.
-	 * @param type Type to construct dynamic param value producer for.
-	 */
-	public DynamicParamValueProducer(Type type) {
-		types = new HashSet<>(asList(type, Object.class));
-	}
+    /**
+     * Construct dynamic param value producer for given type.
+     * @param type Type to construct dynamic param value producer for.
+     */
+    public DynamicParamValueProducer(Type type) {
+        types = new HashSet<>(asList(type, Object.class));
+    }
 
-	@Override
-	public Class<?> getBeanClass() {
-		return ParamProducer.class;
-	}
+    @Override
+    public Class<?> getBeanClass() {
+        return ParamProducer.class;
+    }
 
-	@Override
-	public Set<Type> getTypes() {
-		return types;
-	}
+    @Override
+    public Set<Type> getTypes() {
+        return types;
+    }
 
-	@Override
-	public Object create(CreationalContext<Object> creationalContext) {
-		InjectionPoint injectionPoint = getCurrentInjectionPoint(creationalContext);
-		ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
-		return paramValue.getValue();
-	}
+    @Override
+    public Object create(CreationalContext<Object> creationalContext) {
+        InjectionPoint injectionPoint = getCurrentInjectionPoint(creationalContext);
+        ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
+        return paramValue.getValue();
+    }
 
-	@Override
-	public Set<Annotation> getQualifiers() {
-		return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
-	}
+    @Override
+    public Set<Annotation> getQualifiers() {
+        return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
+    }
 
-	@Override
-	public Class<? extends Annotation> getScope() {
-		return Dependent.class;
-	}
+    @Override
+    public Class<? extends Annotation> getScope() {
+        return Dependent.class;
+    }
 
-	@Override
-	public Set<Class<? extends Annotation>> getStereotypes() {
-		return emptySet();
-	}
+    @Override
+    public Set<Class<? extends Annotation>> getStereotypes() {
+        return emptySet();
+    }
 
-	@Override
-	public Set<InjectionPoint> getInjectionPoints() {
-		return emptySet();
-	}
+    @Override
+    public Set<InjectionPoint> getInjectionPoints() {
+        return emptySet();
+    }
 
-	@Override
-	public boolean isAlternative() {
-		return false;
-	}
+    @Override
+    public boolean isAlternative() {
+        return false;
+    }
 
-	@Override
-	public boolean isNullable() {
-		return false;
-	}
+    @Override
+    public boolean isNullable() {
+        return false;
+    }
 
-	@Override
-	public String getName() {
-		return null;
-	}
+    @Override
+    public String getName() {
+        return null;
+    }
 
-	@Override
-	public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-		// NOOP
-	}
+    @Override
+    public void destroy(Object instance, CreationalContext<Object> creationalContext) {
+        // NOOP
+    }
 
-	@Override
-	public String getId() {
-		return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
-	}
+    @Override
+    public String getId() {
+        return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
+    }
 
-	/**
-	 * {@link AnnotationLiteral} for {@link Param}.
-	 */
-	@SuppressWarnings("all")
-	public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
-		private static final long serialVersionUID = 1L;
+    /**
+     * {@link AnnotationLiteral} for {@link Param}.
+     */
+    @SuppressWarnings("all")
+    public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
+        private static final long serialVersionUID = 1L;
 
-		private static final String[] EMPTY_STRING_ARRAY = {};
-		private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
-		private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
+        private static final String[] EMPTY_STRING_ARRAY = {};
+        private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
+        private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
 
-		@Override
-		public String name() {
-			return "";
-		}
+        @Override
+        public String name() {
+            return "";
+        }
 
-		@Override
-		public int pathIndex() {
-			return -1;
-		}
+        @Override
+        public int pathIndex() {
+            return -1;
+        }
 
-		@Override
-		public String label() {
-			return "";
-		}
+        @Override
+        public String label() {
+            return "";
+        }
 
-		@Override
-		public String converter() {
-			return "";
-		}
+        @Override
+        public String converter() {
+            return "";
+        }
 
-		@Override
-		public boolean required() {
-			return false;
-		}
+        @Override
+        public boolean required() {
+            return false;
+        }
 
-		@Override
-		public String[] validators() {
-			return EMPTY_STRING_ARRAY;
-		}
+        @Override
+        public String[] validators() {
+            return EMPTY_STRING_ARRAY;
+        }
 
-		@Override
-		public Class<? extends Converter> converterClass() {
-			return Converter.class;
-		}
+        @Override
+        public Class<? extends Converter> converterClass() {
+            return Converter.class;
+        }
 
-		@Override
-		public Class<? extends Validator>[] validatorClasses() {
-			return EMPTY_VALIDATOR_ARRAY;
-		}
+        @Override
+        public Class<? extends Validator>[] validatorClasses() {
+            return EMPTY_VALIDATOR_ARRAY;
+        }
 
-		@Override
-		public Attribute[] converterAttributes() {
-			return EMPTY_ATTRIBUTE_ARRAY;
-		}
+        @Override
+        public Attribute[] converterAttributes() {
+            return EMPTY_ATTRIBUTE_ARRAY;
+        }
 
-		@Override
-		public Attribute[] validatorAttributes() {
-			return EMPTY_ATTRIBUTE_ARRAY;
-		}
+        @Override
+        public Attribute[] validatorAttributes() {
+            return EMPTY_ATTRIBUTE_ARRAY;
+        }
 
-		@Override
-		public String converterMessage() {
-			return "";
-		}
+        @Override
+        public String converterMessage() {
+            return "";
+        }
 
-		@Override
-		public String validatorMessage() {
-			return "";
-		}
+        @Override
+        public String validatorMessage() {
+            return "";
+        }
 
-		@Override
-		public String requiredMessage() {
-			return "";
-		}
+        @Override
+        public String requiredMessage() {
+            return "";
+        }
 
-		@Override
-		public boolean disableBeanValidation() {
-			return false;
-		}
+        @Override
+        public boolean disableBeanValidation() {
+            return false;
+        }
 
-		@Override
-		public boolean overrideGlobalBeanValidationDisabled() {
-			return false;
-		}
-	}
+        @Override
+        public boolean overrideGlobalBeanValidationDisabled() {
+            return false;
+        }
+    }
 }

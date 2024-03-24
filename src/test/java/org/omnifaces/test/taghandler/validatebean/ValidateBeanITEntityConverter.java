@@ -20,16 +20,16 @@ import jakarta.faces.convert.FacesConverter;
 @FacesConverter(forClass=ValidateBeanITConvertedEntity.class)
 public class ValidateBeanITEntityConverter implements Converter<ValidateBeanITConvertedEntity> {
 
-	@Override
-	public ValidateBeanITConvertedEntity getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		ValidateBeanITConvertedEntity entity = new ValidateBeanITConvertedEntity();
-		entity.setValue(submittedValue);
-		return entity;
-	}
+    @Override
+    public ValidateBeanITConvertedEntity getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        ValidateBeanITConvertedEntity entity = new ValidateBeanITConvertedEntity();
+        entity.setValue(submittedValue);
+        return entity;
+    }
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, ValidateBeanITConvertedEntity entity) {
-		return entity == null ? "" : entity.getValue();
-	}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, ValidateBeanITConvertedEntity entity) {
+        return entity == null ? "" : entity.getValue();
+    }
 
 }

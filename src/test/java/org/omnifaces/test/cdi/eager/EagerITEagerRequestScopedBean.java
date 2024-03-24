@@ -25,15 +25,15 @@ import org.omnifaces.cdi.Eager;
 @RequestScoped
 public class EagerITEagerRequestScopedBean {
 
-	private Long initTime;
+    private Long initTime;
 
-	@PostConstruct
-	public void init() {
-		initTime = nanoTime();
-	}
+    @PostConstruct
+    public void init() {
+        initTime = nanoTime();
+    }
 
-	public Long getInitTime() {
-		return initTime;
-	}
+    public Long getInitTime() {
+        return initTime;
+    }
 
 }

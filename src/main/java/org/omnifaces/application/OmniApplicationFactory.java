@@ -26,59 +26,59 @@ import jakarta.faces.application.ApplicationWrapper;
  */
 public class OmniApplicationFactory extends ApplicationFactory {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private Application application;
+    private Application application;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces application factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public OmniApplicationFactory(ApplicationFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new OmniFaces application factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public OmniApplicationFactory(ApplicationFactory wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns an instance of {@link OmniApplication} which wraps the original application.
-	 */
-	@Override
-	public Application getApplication() {
-		return (application == null) ? createOmniApplication(getWrapped().getApplication()) : application;
-	}
+    /**
+     * Returns an instance of {@link OmniApplication} which wraps the original application.
+     */
+    @Override
+    public Application getApplication() {
+        return (application == null) ? createOmniApplication(getWrapped().getApplication()) : application;
+    }
 
-	/**
-	 * Sets the given application instance as the current instance. If it's not an instance of {@link OmniApplication},
-	 * nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of {@link OmniApplication}.
-	 */
-	@Override
-	public void setApplication(Application application) {
-		getWrapped().setApplication(createOmniApplication(application));
-	}
+    /**
+     * Sets the given application instance as the current instance. If it's not an instance of {@link OmniApplication},
+     * nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of {@link OmniApplication}.
+     */
+    @Override
+    public void setApplication(Application application) {
+        getWrapped().setApplication(createOmniApplication(application));
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
-	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
-	 * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
-	 */
-	private synchronized Application createOmniApplication(Application application) {
-		Application newApplication = application;
+    /**
+     * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
+     * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
+     * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
+     */
+    private synchronized Application createOmniApplication(Application application) {
+        Application newApplication = application;
 
-		while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {
-			newApplication = ((ApplicationWrapper) newApplication).getWrapped();
-		}
+        while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {
+            newApplication = ((ApplicationWrapper) newApplication).getWrapped();
+        }
 
-		if (!(newApplication instanceof OmniApplication)) {
-			newApplication = new OmniApplication(application);
-		}
+        if (!(newApplication instanceof OmniApplication)) {
+            newApplication = new OmniApplication(application);
+        }
 
-		this.application = newApplication;
-		return this.application;
-	}
+        this.application = newApplication;
+        return this.application;
+    }
 
 }

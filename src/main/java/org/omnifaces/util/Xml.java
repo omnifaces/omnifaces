@@ -57,143 +57,143 @@ import org.xml.sax.SAXParseException;
  */
 public final class Xml {
 
-	private static final Logger logger = Logger.getLogger(Xml.class.getName());
+    private static final Logger logger = Logger.getLogger(Xml.class.getName());
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Xml() {
-		// Hide constructor.
-	}
+    private Xml() {
+        // Hide constructor.
+    }
 
-	// Create ---------------------------------------------------------------------------------------------------------
+    // Create ---------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates a single XML {@link Document} based on given URLs representing XML documents. All those XML documents
-	 * are merged into a single root element named <code>root</code>.
-	 * @param urls The URLs representing XML documents.
-	 * @return A single XML document containing all given XML documents.
-	 * @throws IOException When an I/O error occurs.
-	 * @throws SAXException When a XML parsing error occurs.
-	 */
-	public static Document createDocument(List<URL> urls) throws IOException, SAXException {
-		DocumentBuilder builder = createDocumentBuilder();
-		Document document = builder.newDocument();
-		document.appendChild(document.createElement("root"));
-		parseAndAppendChildren(builder, document, urls);
-		return document;
-	}
+    /**
+     * Creates a single XML {@link Document} based on given URLs representing XML documents. All those XML documents
+     * are merged into a single root element named <code>root</code>.
+     * @param urls The URLs representing XML documents.
+     * @return A single XML document containing all given XML documents.
+     * @throws IOException When an I/O error occurs.
+     * @throws SAXException When a XML parsing error occurs.
+     */
+    public static Document createDocument(List<URL> urls) throws IOException, SAXException {
+        DocumentBuilder builder = createDocumentBuilder();
+        Document document = builder.newDocument();
+        document.appendChild(document.createElement("root"));
+        parseAndAppendChildren(builder, document, urls);
+        return document;
+    }
 
-	/**
-	 * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-	 * references and disables external entity processing (to keep it as lenient and secure as possible).
-	 * @return A lenient instance of {@link DocumentBuilder}.
-	 */
-	public static DocumentBuilder createDocumentBuilder() {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(false);
-		factory.setNamespaceAware(false);
-		factory.setExpandEntityReferences(false);
+    /**
+     * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
+     * references and disables external entity processing (to keep it as lenient and secure as possible).
+     * @return A lenient instance of {@link DocumentBuilder}.
+     */
+    public static DocumentBuilder createDocumentBuilder() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(false);
+        factory.setExpandEntityReferences(false);
 
-		try {
-			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
-			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
-			return factory.newDocumentBuilder();
-		}
-		catch (ParserConfigurationException e) {
-			throw new UnsupportedOperationException(e);
-		}
-	}
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
+            unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
+            return factory.newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
 
-	private static void unsetAttributeIgnoringIAE(DocumentBuilderFactory factory, String name) {
-		try {
-			factory.setAttribute(name, "");
-		}
-		catch (IllegalArgumentException e) {
-			logger.log(FINE, format("Cannot unset attribute '%s'; falling back to default.", name), e);
-		}
-	}
+    private static void unsetAttributeIgnoringIAE(DocumentBuilderFactory factory, String name) {
+        try {
+            factory.setAttribute(name, "");
+        }
+        catch (IllegalArgumentException e) {
+            logger.log(FINE, format("Cannot unset attribute '%s'; falling back to default.", name), e);
+        }
+    }
 
-	// Manipulate -----------------------------------------------------------------------------------------------------
+    // Manipulate -----------------------------------------------------------------------------------------------------
 
-	/**
-	 * Parse the given URLs as a document using the given builder and then append all its child nodes to the given
-	 * document.
-	 * @param builder The document builder.
-	 * @param document The document.
-	 * @param urls The URLs representing XML documents.
-	 * @throws IOException When an I/O error occurs.
-	 * @throws SAXException When a XML parsing error occurs.
-	 */
-	public static void parseAndAppendChildren(DocumentBuilder builder, Document document, List<URL> urls) throws IOException, SAXException {
-		for (URL url : urls) {
-			if (url == null) {
-				continue;
-			}
+    /**
+     * Parse the given URLs as a document using the given builder and then append all its child nodes to the given
+     * document.
+     * @param builder The document builder.
+     * @param document The document.
+     * @param urls The URLs representing XML documents.
+     * @throws IOException When an I/O error occurs.
+     * @throws SAXException When a XML parsing error occurs.
+     */
+    public static void parseAndAppendChildren(DocumentBuilder builder, Document document, List<URL> urls) throws IOException, SAXException {
+        for (URL url : urls) {
+            if (url == null) {
+                continue;
+            }
 
-			URLConnection connection = url.openConnection();
-			connection.setUseCaches(false);
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
 
-			try (InputStream input = connection.getInputStream()) {
-				NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
+            try (InputStream input = connection.getInputStream()) {
+                NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
 
-				for (int i = 0; i < children.getLength(); i++) {
-					document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
-				}
-			}
-			catch (SAXParseException e) {
-				throw new SAXException("Cannot parse " + url.toExternalForm(), e);
-			}
-		}
-	}
+                for (int i = 0; i < children.getLength(); i++) {
+                    document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
+                }
+            }
+            catch (SAXParseException e) {
+                throw new SAXException("Cannot parse " + url.toExternalForm(), e);
+            }
+        }
+    }
 
-	// Traverse -------------------------------------------------------------------------------------------------------
+    // Traverse -------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Convenience method to return a node list matching given XPath expression.
-	 * @param node The node to return node list matching given XPath expression for.
-	 * @param xpath The XPath instance.
-	 * @param expression The XPath expression to match node list.
-	 * @return A node list matching given XPath expression
-	 * @throws XPathExpressionException When the XPath expression contains a syntax error.
-	 */
-	public static NodeList getNodeList(Node node, XPath xpath, String expression) throws XPathExpressionException {
-		return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
-	}
+    /**
+     * Convenience method to return a node list matching given XPath expression.
+     * @param node The node to return node list matching given XPath expression for.
+     * @param xpath The XPath instance.
+     * @param expression The XPath expression to match node list.
+     * @return A node list matching given XPath expression
+     * @throws XPathExpressionException When the XPath expression contains a syntax error.
+     */
+    public static NodeList getNodeList(Node node, XPath xpath, String expression) throws XPathExpressionException {
+        return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
+    }
 
-	/**
-	 * Convenience method to return trimmed text content of given node. This uses
-	 * <code>getFirstChild().getNodeValue()</code> instead of <code>getTextContent()</code> to workaround some buggy
-	 * JAXP implementations.
-	 * @param node The node to return text content for.
-	 * @return Trimmed text content of given node.
-	 */
-	public static String getTextContent(Node node) {
-		return node.getFirstChild().getNodeValue().trim();
-	}
+    /**
+     * Convenience method to return trimmed text content of given node. This uses
+     * <code>getFirstChild().getNodeValue()</code> instead of <code>getTextContent()</code> to workaround some buggy
+     * JAXP implementations.
+     * @param node The node to return text content for.
+     * @return Trimmed text content of given node.
+     */
+    public static String getTextContent(Node node) {
+        return node.getFirstChild().getNodeValue().trim();
+    }
 
-	/**
-	 * Convenience method to return a list of node text contents for given URL representing XML document matching given
-	 * XPath expression.
-	 * @param url The URL representing XML document.
-	 * @param expression The XPath expression to match node list whose text content has to be collected.
-	 * @return A list of node text contents.
-	 * @since 2.6.3
-	 */
-	public static List<String> getNodeTextContents(URL url, String expression) {
-		try {
-			NodeList nodeList = getNodeList(createDocument(asList(url)).getDocumentElement(), XPathFactory.newInstance().newXPath(), expression);
-			List<String> nodeTextContents = new ArrayList<>(nodeList.getLength());
+    /**
+     * Convenience method to return a list of node text contents for given URL representing XML document matching given
+     * XPath expression.
+     * @param url The URL representing XML document.
+     * @param expression The XPath expression to match node list whose text content has to be collected.
+     * @return A list of node text contents.
+     * @since 2.6.3
+     */
+    public static List<String> getNodeTextContents(URL url, String expression) {
+        try {
+            NodeList nodeList = getNodeList(createDocument(asList(url)).getDocumentElement(), XPathFactory.newInstance().newXPath(), expression);
+            List<String> nodeTextContents = new ArrayList<>(nodeList.getLength());
 
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				nodeTextContents.add(getTextContent(nodeList.item(i)));
-			}
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                nodeTextContents.add(getTextContent(nodeList.item(i)));
+            }
 
-			return nodeTextContents;
-		}
-		catch (IOException | SAXException | XPathExpressionException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+            return nodeTextContents;
+        }
+        catch (IOException | SAXException | XPathExpressionException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
 }

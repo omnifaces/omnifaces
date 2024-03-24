@@ -32,54 +32,54 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELResolver> {
 
-	private ELResolver wrapped;
+    private ELResolver wrapped;
 
-	/**
-	 * Construct EL resolver wrapper.
-	 * @param wrapped The EL resolver to be wrapped.
-	 */
-	public ELResolverWrapper(ELResolver wrapped) {
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct EL resolver wrapper.
+     * @param wrapped The EL resolver to be wrapped.
+     */
+    public ELResolverWrapper(ELResolver wrapped) {
+        this.wrapped = wrapped;
+    }
 
-	@Override
-	public ELResolver getWrapped() {
-		return wrapped;
-	}
+    @Override
+    public ELResolver getWrapped() {
+        return wrapped;
+    }
 
-	@Override
-	public Object getValue(ELContext context, Object base, Object property) {
-		return getWrapped().getValue(context, base, property);
-	}
+    @Override
+    public Object getValue(ELContext context, Object base, Object property) {
+        return getWrapped().getValue(context, base, property);
+    }
 
-	@Override
-	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-		return getWrapped().invoke(context, base, method, paramTypes, params);
-	}
+    @Override
+    public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+        return getWrapped().invoke(context, base, method, paramTypes, params);
+    }
 
-	@Override
-	public Class<?> getType(ELContext context, Object base, Object property) {
-		return getWrapped().getType(context, base, property);
-	}
+    @Override
+    public Class<?> getType(ELContext context, Object base, Object property) {
+        return getWrapped().getType(context, base, property);
+    }
 
-	@Override
-	public void setValue(ELContext context, Object base, Object property, Object value) {
-		getWrapped().setValue(context, base, property, value);
-	}
+    @Override
+    public void setValue(ELContext context, Object base, Object property, Object value) {
+        getWrapped().setValue(context, base, property, value);
+    }
 
-	@Override
-	public boolean isReadOnly(ELContext context, Object base, Object property) {
-		return getWrapped().isReadOnly(context, base, property);
-	}
+    @Override
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
+        return getWrapped().isReadOnly(context, base, property);
+    }
 
-	@Override
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		return getWrapped().getFeatureDescriptors(context, base);
-	}
+    @Override
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+        return getWrapped().getFeatureDescriptors(context, base);
+    }
 
-	@Override
-	public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		return getWrapped().getCommonPropertyType(context, base);
-	}
+    @Override
+    public Class<?> getCommonPropertyType(ELContext context, Object base) {
+        return getWrapped().getCommonPropertyType(context, base);
+    }
 
 }

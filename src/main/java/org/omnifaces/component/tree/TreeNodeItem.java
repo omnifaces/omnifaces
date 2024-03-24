@@ -46,114 +46,114 @@ import org.omnifaces.model.tree.TreeModel;
 @FacesComponent(TreeNodeItem.COMPONENT_TYPE)
 public class TreeNodeItem extends TreeFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.tree.TreeNodeItem#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
+    /** The component type, which is {@value org.omnifaces.component.tree.TreeNodeItem#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate the component hierarchy.
-	 * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is
-	 * nested in another {@link TreeNodeItem}.
-	 */
-	@Override
-	protected void validateHierarchy() {
-		validateHasParent(this, TreeNode.class);
-		validateHasNoParent(this, TreeNodeItem.class);
-	}
+    /**
+     * Validate the component hierarchy.
+     * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is
+     * nested in another {@link TreeNodeItem}.
+     */
+    @Override
+    protected void validateHierarchy() {
+        validateHasParent(this, TreeNode.class);
+        validateHasNoParent(this, TreeNodeItem.class);
+    }
 
-	/**
-	 * Suppress default behavior of {@link #encodeAll(FacesContext)} (which also checks {@link #isRendered()}) by
-	 * delegating directly to {@link #encodeChildren(FacesContext)}.
-	 */
-	@Override
-	public void encodeAll(FacesContext context) throws IOException {
-		encodeChildren(context);
-	}
+    /**
+     * Suppress default behavior of {@link #encodeAll(FacesContext)} (which also checks {@link #isRendered()}) by
+     * delegating directly to {@link #encodeChildren(FacesContext)}.
+     */
+    @Override
+    public void encodeAll(FacesContext context) throws IOException {
+        encodeChildren(context);
+    }
 
-	/**
-	 * Loop over children of the current model node, set the child as the current model node and continue processing
-	 * this component according to the rules of the given phase ID.
-	 * @param context The faces context to work with.
-	 * @param phaseId The current phase ID.
-	 * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
-	 */
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	protected void process(FacesContext context, PhaseId phaseId) {
-		if (getChildCount() == 0) {
-			return;
-		}
+    /**
+     * Loop over children of the current model node, set the child as the current model node and continue processing
+     * this component according to the rules of the given phase ID.
+     * @param context The faces context to work with.
+     * @param phaseId The current phase ID.
+     * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
+     */
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
+    protected void process(FacesContext context, PhaseId phaseId) {
+        if (getChildCount() == 0) {
+            return;
+        }
 
-		process(context, tree -> {
-			if (tree.getCurrentModelNode() != null) {
-				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-					tree.setCurrentModelNode(context, childModelNode);
+        process(context, tree -> {
+            if (tree.getCurrentModelNode() != null) {
+                for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+                    tree.setCurrentModelNode(context, childModelNode);
 
-					if (isRendered()) {
-						processSuper(context, phaseId);
-					}
-				}
-			}
+                    if (isRendered()) {
+                        processSuper(context, phaseId);
+                    }
+                }
+            }
 
-			return null;
-		});
-	}
+            return null;
+        });
+    }
 
-	/**
-	 * Loop over children of the current model node, set the child as the current model node and continue visiting
-	 * this component according to the given visit context and callback.
-	 * @param context The visit context to work with.
-	 * @param callback The visit callback to work with.
-	 * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
-	 */
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	public boolean visitTree(VisitContext context, VisitCallback callback) {
-		if (context.getHints().contains(SKIP_ITERATION)) {
-			return super.visitTree(context, callback);
-		}
+    /**
+     * Loop over children of the current model node, set the child as the current model node and continue visiting
+     * this component according to the given visit context and callback.
+     * @param context The visit context to work with.
+     * @param callback The visit callback to work with.
+     * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
+     */
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
+    public boolean visitTree(VisitContext context, VisitCallback callback) {
+        if (context.getHints().contains(SKIP_ITERATION)) {
+            return super.visitTree(context, callback);
+        }
 
-		if (!isVisitable(context) || getChildCount() == 0) {
-			return false;
-		}
+        if (!isVisitable(context) || getChildCount() == 0) {
+            return false;
+        }
 
-		return process(context.getFacesContext(), tree -> {
-			if (tree.getCurrentModelNode() != null) {
-				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-					tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+        return process(context.getFacesContext(), tree -> {
+            if (tree.getCurrentModelNode() != null) {
+                for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+                    tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
-					if (TreeNodeItem.super.visitTree(context, callback)) {
-						return true;
-					}
-				}
-			}
+                    if (TreeNodeItem.super.visitTree(context, callback)) {
+                        return true;
+                    }
+                }
+            }
 
-			return false;
-		});
-	}
+            return false;
+        });
+    }
 
-	/**
-	 * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
-	 * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
-	 * @param context The faces context to work with.
-	 * @param phaseId The current phase ID (not used so far in this implementation).
-	 * @param callback The callback to be invoked.
-	 * @return The callback result.
-	 */
-	@SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
-	private <R> R process(FacesContext context, Function<Tree, R> callback) {
-		Tree tree = getClosestParent(this, Tree.class);
-		TreeModel originalModelNode = tree.getCurrentModelNode();
+    /**
+     * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
+     * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+     * @param context The faces context to work with.
+     * @param phaseId The current phase ID (not used so far in this implementation).
+     * @param callback The callback to be invoked.
+     * @return The callback result.
+     */
+    @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
+    private <R> R process(FacesContext context, Function<Tree, R> callback) {
+        Tree tree = getClosestParent(this, Tree.class);
+        TreeModel originalModelNode = tree.getCurrentModelNode();
 
-		try {
-			return callback.apply(tree);
-		}
-		finally {
-			tree.setCurrentModelNode(context, originalModelNode);
-		}
-	}
+        try {
+            return callback.apply(tree);
+        }
+        finally {
+            tree.setCurrentModelNode(context, originalModelNode);
+        }
+    }
 
 }

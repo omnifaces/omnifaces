@@ -25,45 +25,45 @@ import org.openqa.selenium.support.FindBy;
 
 public class EagerIT extends OmniFacesIT {
 
-	@FindBy(id="lazyApplicationScopedBean")
-	private WebElement lazyApplicationScopedBean;
+    @FindBy(id="lazyApplicationScopedBean")
+    private WebElement lazyApplicationScopedBean;
 
-	@FindBy(id="eagerApplicationScopedBean")
-	private WebElement eagerApplicationScopedBean;
+    @FindBy(id="eagerApplicationScopedBean")
+    private WebElement eagerApplicationScopedBean;
 
-	@FindBy(id="lazySessionScopedBean")
-	private WebElement lazySessionScopedBean;
+    @FindBy(id="lazySessionScopedBean")
+    private WebElement lazySessionScopedBean;
 
-	@FindBy(id="eagerSessionScopedBean")
-	private WebElement eagerSessionScopedBean;
+    @FindBy(id="eagerSessionScopedBean")
+    private WebElement eagerSessionScopedBean;
 
-	@FindBy(id="lazyViewScopedBean")
-	private WebElement lazyViewScopedBean;
+    @FindBy(id="lazyViewScopedBean")
+    private WebElement lazyViewScopedBean;
 
-	@FindBy(id="eagerViewScopedBean")
-	private WebElement eagerViewScopedBean;
+    @FindBy(id="eagerViewScopedBean")
+    private WebElement eagerViewScopedBean;
 
-	@FindBy(id="lazyRequestScopedBean")
-	private WebElement lazyRequestScopedBean;
+    @FindBy(id="lazyRequestScopedBean")
+    private WebElement lazyRequestScopedBean;
 
-	@FindBy(id="eagerRequestScopedBean")
-	private WebElement eagerRequestScopedBean;
+    @FindBy(id="eagerRequestScopedBean")
+    private WebElement eagerRequestScopedBean;
 
-	@FindBy(id="beanInjectedInStartupBean")
-	private WebElement beanInjectedInStartupBean;
+    @FindBy(id="beanInjectedInStartupBean")
+    private WebElement beanInjectedInStartupBean;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(EagerIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(EagerIT.class);
+    }
 
-	@Test
-	void test() {
-		assertTrue(parseLong(lazyApplicationScopedBean.getText()) > parseLong(eagerApplicationScopedBean.getText()));
-		assertTrue(parseLong(lazySessionScopedBean.getText()) > parseLong(eagerSessionScopedBean.getText()));
-		assertTrue(parseLong(lazyViewScopedBean.getText()) > parseLong(eagerViewScopedBean.getText()));
-		assertTrue(parseLong(lazyRequestScopedBean.getText()) > parseLong(eagerRequestScopedBean.getText()));
-		assertTrue(parseBoolean(beanInjectedInStartupBean.getText()));
-	}
+    @Test
+    void test() {
+        assertTrue(parseLong(lazyApplicationScopedBean.getText()) > parseLong(eagerApplicationScopedBean.getText()));
+        assertTrue(parseLong(lazySessionScopedBean.getText()) > parseLong(eagerSessionScopedBean.getText()));
+        assertTrue(parseLong(lazyViewScopedBean.getText()) > parseLong(eagerViewScopedBean.getText()));
+        assertTrue(parseLong(lazyRequestScopedBean.getText()) > parseLong(eagerRequestScopedBean.getText()));
+        assertTrue(parseBoolean(beanInjectedInStartupBean.getText()));
+    }
 
 }

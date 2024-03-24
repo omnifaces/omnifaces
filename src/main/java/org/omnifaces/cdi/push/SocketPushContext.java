@@ -43,63 +43,63 @@ import org.omnifaces.util.Json;
  */
 public class SocketPushContext implements PushContext {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private String channel;
-	private Map<String, String> sessionScopedChannels;
-	private Map<String, String> viewScopedChannels;
-	private SocketSessionManager socketSessions;
-	private SocketUserManager socketUsers;
+    private String channel;
+    private Map<String, String> sessionScopedChannels;
+    private Map<String, String> viewScopedChannels;
+    private SocketSessionManager socketSessions;
+    private SocketUserManager socketUsers;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates a socket push context whereby the mutable map of session and view scope channel identifiers is
-	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
-	 * and view scope is not necessarily active anymore.
-	 */
-	SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
-		this.channel = channel;
-		boolean hasSession = isActive(SessionScoped.class);
-		sessionScopedChannels = hasSession ? socketChannels.getSessionScopedChannels() : EMPTY_SCOPE;
-		viewScopedChannels = hasSession && hasContext() ? socketChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
-		this.socketSessions = socketSessions;
-		this.socketUsers = socketUsers;
-	}
+    /**
+     * Creates a socket push context whereby the mutable map of session and view scope channel identifiers is
+     * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
+     * and view scope is not necessarily active anymore.
+     */
+    SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
+        this.channel = channel;
+        boolean hasSession = isActive(SessionScoped.class);
+        sessionScopedChannels = hasSession ? socketChannels.getSessionScopedChannels() : EMPTY_SCOPE;
+        viewScopedChannels = hasSession && hasContext() ? socketChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
+        this.socketSessions = socketSessions;
+        this.socketUsers = socketUsers;
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public Set<Future<Void>> send(Object message) {
-		return socketSessions.send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
-	}
+    @Override
+    public Set<Future<Void>> send(Object message) {
+        return socketSessions.send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
+    }
 
-	@Override
-	public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
-		return send(message, singleton(user)).get(user);
-	}
+    @Override
+    public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
+        return send(message, singleton(user)).get(user);
+    }
 
-	@Override
-	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
-		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
-		String json = Json.encode(message);
+    @Override
+    public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
+        Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
+        String json = Json.encode(message);
 
-		for (S user : users) {
-			Set<String> channelIds = socketUsers.getChannelIds(user, channel);
-			Set<Future<Void>> results = new HashSet<>(channelIds.size());
+        for (S user : users) {
+            Set<String> channelIds = socketUsers.getChannelIds(user, channel);
+            Set<Future<Void>> results = new HashSet<>(channelIds.size());
 
-			for (String channelId : channelIds) {
-				results.addAll(socketSessions.send(channelId, json));
-			}
+            for (String channelId : channelIds) {
+                results.addAll(socketSessions.send(channelId, json));
+            }
 
-			resultsByUser.put(user, results);
-		}
+            resultsByUser.put(user, results);
+        }
 
-		return resultsByUser;
-	}
+        return resultsByUser;
+    }
 
 }

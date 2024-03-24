@@ -22,15 +22,15 @@ import jakarta.servlet.http.HttpSessionListener;
 @WebListener
 public class ViewScopedViewStateITSessionListener implements HttpSessionListener {
 
-	@Override
-	public void sessionCreated(HttpSessionEvent event) {
-		throw new IllegalStateException();
+    @Override
+    public void sessionCreated(HttpSessionEvent event) {
+        throw new IllegalStateException();
 
-	}
+    }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent event) {
-		throw new IllegalStateException();
-	}
+    @Override
+    public void sessionDestroyed(HttpSessionEvent event) {
+        throw new IllegalStateException();
+    }
 
 }

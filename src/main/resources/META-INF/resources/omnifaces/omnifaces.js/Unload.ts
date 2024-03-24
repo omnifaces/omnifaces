@@ -26,83 +26,83 @@ import { Util } from "./Util";
  */
 export module Unload {
 
-	// Private static fields ------------------------------------------------------------------------------------------
+    // Private static fields ------------------------------------------------------------------------------------------
 
-	let id: string;
-	let disabled: boolean;
+    let id: string;
+    let disabled: boolean;
 
-	// Public static functions ----------------------------------------------------------------------------------------
+    // Public static functions ----------------------------------------------------------------------------------------
 
-	/**
-	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-	 * current document has a JSF form with a view state element. If so, then register the <code>unload</code> event to
-	 * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
-	 * parameters. Also register the all JSF <code>submit</code> events to disable the unload event listener.
-	 * @param viewScopeId The OmniFaces view scope ID.
-	 */
-	export function init(viewScopeId: string) {
-		if (!window.XMLHttpRequest) {
-			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
-		}
+    /**
+     * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
+     * current document has a JSF form with a view state element. If so, then register the <code>unload</code> event to
+     * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
+     * parameters. Also register the all JSF <code>submit</code> events to disable the unload event listener.
+     * @param viewScopeId The OmniFaces view scope ID.
+     */
+    export function init(viewScopeId: string) {
+        if (!window.XMLHttpRequest) {
+            return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
+        }
 
-		if (id == null) {
-			const form = Util.getFacesForm();
+        if (id == null) {
+            const form = Util.getFacesForm();
 
-			if (!form) {
-				return;
-			}
+            if (!form) {
+                return;
+            }
 
-			const unloadEvent = ("onbeforeunload" in window && !window.onbeforeunload) ? "beforeunload" : ("onpagehide" in window) ? "pagehide" : "unload";
-			Util.addEventListener(window, unloadEvent, function() {
-				if (disabled) {
-					reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
-					return;
-				}
+            const unloadEvent = ("onbeforeunload" in window && !window.onbeforeunload) ? "beforeunload" : ("onpagehide" in window) ? "pagehide" : "unload";
+            Util.addEventListener(window, unloadEvent, function() {
+                if (disabled) {
+                    reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+                    return;
+                }
 
-				try {
-					const url = form.action;
-					const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
-					const contentType = "application/x-www-form-urlencoded";
+                try {
+                    const url = form.action;
+                    const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
+                    const contentType = "application/x-www-form-urlencoded";
 
-					if (navigator.sendBeacon) {
-						// Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
-						navigator.sendBeacon(url, new Blob([query], {type: contentType}));
-					}
-					else {
-						const xhr = new XMLHttpRequest();
-						xhr.open("POST", url, false);
-						xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-						xhr.setRequestHeader("Content-Type", contentType);
-						xhr.send(query);
-					}
-				}
-				catch (e) {
-					// Fail silently. You never know.
-				}
-			});
+                    if (navigator.sendBeacon) {
+                        // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
+                        navigator.sendBeacon(url, new Blob([query], {type: contentType}));
+                    }
+                    else {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open("POST", url, false);
+                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                        xhr.setRequestHeader("Content-Type", contentType);
+                        xhr.send(query);
+                    }
+                }
+                catch (e) {
+                    // Fail silently. You never know.
+                }
+            });
 
-			Util.addSubmitListener(function() {
-				disable(); // Disable unload event on any submit event.
-			});
-		}
+            Util.addSubmitListener(function() {
+                disable(); // Disable unload event on any submit event.
+            });
+        }
 
-		id = viewScopeId;
-		disabled = false;
-	}
+        id = viewScopeId;
+        disabled = false;
+    }
 
-	/**
-	 * Disable the unload event listener on the current document.
-	 * It will automatically be re-enabled when the DOM has not changed during the unload event.
-	 */
-	export function disable() {
-		disabled = true;
-	}
+    /**
+     * Disable the unload event listener on the current document.
+     * It will automatically be re-enabled when the DOM has not changed during the unload event.
+     */
+    export function disable() {
+        disabled = true;
+    }
 
-	/**
-	 * Re-enable the unload event listener on the current document.
-	 */
-	export function reenable() {
-		disabled = false;
-	}
+    /**
+     * Re-enable the unload event listener on the current document.
+     */
+    export function reenable() {
+        disabled = false;
+    }
 
 }

@@ -39,34 +39,34 @@ import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
  */
 public class MethodParam extends TagHandler {
 
-	private final TagAttribute name;
-	private final TagAttribute value;
+    private final TagAttribute name;
+    private final TagAttribute value;
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public MethodParam(TagConfig config) {
-		super(config);
-		name = getRequiredAttribute("name");
-		value = getRequiredAttribute("value");
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public MethodParam(TagConfig config) {
+        super(config);
+        name = getRequiredAttribute("name");
+        value = getRequiredAttribute("value");
+    }
 
-	@Override
-	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
-		String nameStr = name.getValue(ctx);
+    @Override
+    public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
+        String nameStr = name.getValue(ctx);
 
-		// The original value expression we get inside the Facelets tag, that's actually the method expression passed-in by the user.
-		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
+        // The original value expression we get inside the Facelets tag, that's actually the method expression passed-in by the user.
+        ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
 
-		// A method expression that wraps the value expression and uses its own invoke method to get the value from the wrapped expression.
-		MethodExpression methodExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
+        // A method expression that wraps the value expression and uses its own invoke method to get the value from the wrapped expression.
+        MethodExpression methodExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
 
-		// Using the variable mapper so the expression is scoped to the body of the Facelets tag. Since the variable mapper only accepts
-		// value expressions, we once again wrap it by a value expression that directly returns the method expression.
-		ValueExpression valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
+        // Using the variable mapper so the expression is scoped to the body of the Facelets tag. Since the variable mapper only accepts
+        // value expressions, we once again wrap it by a value expression that directly returns the method expression.
+        ValueExpression valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
 
-		ctx.getVariableMapper().setVariable(nameStr, valueExpressionWrapper);
-	}
+        ctx.getVariableMapper().setVariable(nameStr, valueExpressionWrapper);
+    }
 
 }

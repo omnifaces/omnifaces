@@ -23,14 +23,14 @@ import jakarta.servlet.ServletContextListener;
  */
 public abstract class DefaultServletContextListener implements ServletContextListener {
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		// NOOP
-	}
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        // NOOP
+    }
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// NOOP
-	}
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        // NOOP
+    }
 
 }

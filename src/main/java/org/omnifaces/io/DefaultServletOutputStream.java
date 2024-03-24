@@ -27,49 +27,49 @@ import jakarta.servlet.WriteListener;
  */
 public class DefaultServletOutputStream extends ServletOutputStream {
 
-	private OutputStream output;
+    private OutputStream output;
 
-	/**
-	 * Constructs a default servlet output stream which delegates to given output stream.
-	 * @param output The output stream to let this servlet output stream delegate to.
-	 */
-	public DefaultServletOutputStream(OutputStream output) {
-		this.output = output;
-	}
+    /**
+     * Constructs a default servlet output stream which delegates to given output stream.
+     * @param output The output stream to let this servlet output stream delegate to.
+     */
+    public DefaultServletOutputStream(OutputStream output) {
+        this.output = output;
+    }
 
-	@Override
-	public void setWriteListener(WriteListener listener) {
-		// NOOP.
-	}
+    @Override
+    public void setWriteListener(WriteListener listener) {
+        // NOOP.
+    }
 
-	@Override
-	public boolean isReady() {
-		return true;
-	}
+    @Override
+    public boolean isReady() {
+        return true;
+    }
 
-	@Override
-	public void write(int b) throws IOException {
-		output.write(b);
-	}
+    @Override
+    public void write(int b) throws IOException {
+        output.write(b);
+    }
 
-	@Override
-	public void write(byte[] bytes) throws IOException {
-		output.write(bytes);
-	}
+    @Override
+    public void write(byte[] bytes) throws IOException {
+        output.write(bytes);
+    }
 
-	@Override
-	public void write(byte[] bytes, int offset, int length) throws IOException {
-		output.write(bytes, offset, length);
-	}
+    @Override
+    public void write(byte[] bytes, int offset, int length) throws IOException {
+        output.write(bytes, offset, length);
+    }
 
-	@Override
-	public void flush() throws IOException {
-		output.flush();
-	}
+    @Override
+    public void flush() throws IOException {
+        output.flush();
+    }
 
-	@Override
-	public void close() throws IOException {
-		output.close();
-	}
+    @Override
+    public void close() throws IOException {
+        output.close();
+    }
 
 }

@@ -24,21 +24,21 @@ import org.omnifaces.cdi.ViewScoped;
 @ViewScoped
 public class PWAResourceHandlerITBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final AtomicInteger INSTANCES = new AtomicInteger(); // #707
+    private static final AtomicInteger INSTANCES = new AtomicInteger(); // #707
 
-	@PostConstruct
-	public void init() {
-		INSTANCES.incrementAndGet();
-	}
+    @PostConstruct
+    public void init() {
+        INSTANCES.incrementAndGet();
+    }
 
-	public void submit() {
-		// NOOP
-	}
+    public void submit() {
+        // NOOP
+    }
 
-	public int getInstances() {
-		return INSTANCES.get();
-	}
+    public int getInstances() {
+        return INSTANCES.get();
+    }
 
 }

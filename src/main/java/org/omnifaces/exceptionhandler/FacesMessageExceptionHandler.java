@@ -58,40 +58,40 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  */
 public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new faces message exception handler around the given wrapped exception handler.
-	 * @param wrapped The wrapped exception handler.
-	 */
-	public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new faces message exception handler around the given wrapped exception handler.
+     * @param wrapped The wrapped exception handler.
+     */
+    public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Set every exception as a global FATAL faces message.
-	 */
-	@Override
-	public void handle() {
-		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			addGlobal(new FacesMessage(SEVERITY_FATAL, createFatalMessage(iter.next().getContext().getException()), null));
-			iter.remove();
-		}
+    /**
+     * Set every exception as a global FATAL faces message.
+     */
+    @Override
+    public void handle() {
+        for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
+            addGlobal(new FacesMessage(SEVERITY_FATAL, createFatalMessage(iter.next().getContext().getException()), null));
+            iter.remove();
+        }
 
-		getWrapped().handle();
-	}
+        getWrapped().handle();
+    }
 
-	/**
-	 * Create fatal message based on given exception which will in turn be passed to
-	 * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}.
-	 * The default implementation returns {@link Throwable#toString()}.
-	 * @param exception The exception to create fatal message for.
-	 * @return The fatal message created based on the given exception.
-	 */
-	protected String createFatalMessage(Throwable exception) {
-		return exception.toString();
-	}
+    /**
+     * Create fatal message based on given exception which will in turn be passed to
+     * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}.
+     * The default implementation returns {@link Throwable#toString()}.
+     * @param exception The exception to create fatal message for.
+     * @return The fatal message created based on the given exception.
+     */
+    protected String createFatalMessage(Throwable exception) {
+        return exception.toString();
+    }
 
 }

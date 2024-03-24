@@ -43,10 +43,10 @@ import jakarta.faces.convert.FacesConverter;
 @FacesConverter("omnifaces.ToLowerCaseConverter")
 public class ToLowerCaseConverter extends TrimConverter {
 
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		String trimmed = super.getAsObject(context, component, submittedValue);
-		return (trimmed == null) ? null : trimmed.toLowerCase(getLocale(context));
-	}
+    @Override
+    public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        String trimmed = super.getAsObject(context, component, submittedValue);
+        return (trimmed == null) ? null : trimmed.toLowerCase(getLocale(context));
+    }
 
 }

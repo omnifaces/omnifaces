@@ -27,22 +27,22 @@ package org.omnifaces.facesviews;
  */
 public enum ExtensionAction {
 
-	/**
-	 * Redirects to the same URL, but with the extension removed. E.g. "/foo.xhtml" is redirected to "/foo".
-	 * <p>
-	 * This is the default value.
-	 */
-	REDIRECT_TO_EXTENSIONLESS,
+    /**
+     * Redirects to the same URL, but with the extension removed. E.g. "/foo.xhtml" is redirected to "/foo".
+     * <p>
+     * This is the default value.
+     */
+    REDIRECT_TO_EXTENSIONLESS,
 
-	/**
-	 * Send a 404 (not found), makes it look like e.g. "foo.xhtml" never existed and there's only "foo".
-	 */
-	SEND_404,
+    /**
+     * Send a 404 (not found), makes it look like e.g. "foo.xhtml" never existed and there's only "foo".
+     */
+    SEND_404,
 
-	/**
-	 * No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same
-	 * content).
-	 */
-	PROCEED;
+    /**
+     * No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same
+     * content).
+     */
+    PROCEED;
 
 }

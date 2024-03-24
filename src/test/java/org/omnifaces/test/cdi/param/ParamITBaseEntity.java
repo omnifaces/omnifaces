@@ -14,19 +14,19 @@ package org.omnifaces.test.cdi.param;
 
 public abstract class ParamITBaseEntity {
 
-	private Long id;
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + getId() + "]";
-	}
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + getId() + "]";
+    }
 
 }

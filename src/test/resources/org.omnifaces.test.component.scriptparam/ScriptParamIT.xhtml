@@ -14,29 +14,29 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<f:metadata>
-		<o:scriptParam script="new Date().getTimezoneOffset()" value="#{scriptParamITBean.clientTimeZoneOffset}" render="scriptLoadTimestamp clientTimeZoneOffset" />
-		<o:scriptParam script="window.navigator" value="#{scriptParamITBean.navigator}" render="appName" />
-		<f:viewAction action="#{scriptParamITBean.onload}" />
-	</f:metadata>
+    <f:metadata>
+        <o:scriptParam script="new Date().getTimezoneOffset()" value="#{scriptParamITBean.clientTimeZoneOffset}" render="scriptLoadTimestamp clientTimeZoneOffset" />
+        <o:scriptParam script="window.navigator" value="#{scriptParamITBean.navigator}" render="appName" />
+        <f:viewAction action="#{scriptParamITBean.onload}" />
+    </f:metadata>
 
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<o:form id="thisIsNeededByScriptParam" />
+    <h:body>
+        <o:form id="thisIsNeededByScriptParam" />
 
-		<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
-		<h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{scriptParamITBean.postScriptParamInvoked}" /></h:panelGroup>
-		
-		<h:outputText id="clientTimeZoneOffset" value="#{scriptParamITBean.clientTimeZoneOffset}" />
-		<h:outputText id="appName" value="#{scriptParamITBean.navigator.getString('appName')}" />
-	</h:body>
+        <h:outputText id="pageLoadTimestamp" value="#{now.time}" />
+        <h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{scriptParamITBean.postScriptParamInvoked}" /></h:panelGroup>
+        
+        <h:outputText id="clientTimeZoneOffset" value="#{scriptParamITBean.clientTimeZoneOffset}" />
+        <h:outputText id="appName" value="#{scriptParamITBean.navigator.getString('appName')}" />
+    </h:body>
 </html>

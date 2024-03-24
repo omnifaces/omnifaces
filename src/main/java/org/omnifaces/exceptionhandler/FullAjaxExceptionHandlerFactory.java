@@ -31,24 +31,24 @@ import jakarta.faces.context.ExceptionHandlerFactory;
  */
 public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new full ajax exception handler factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public FullAjaxExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new full ajax exception handler factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public FullAjaxExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new instance of {@link FullAjaxExceptionHandler} which wraps the original exception handler.
-	 */
-	@Override
-	public ExceptionHandler getExceptionHandler() {
-		return new FullAjaxExceptionHandler(getWrapped().getExceptionHandler());
-	}
+    /**
+     * Returns a new instance of {@link FullAjaxExceptionHandler} which wraps the original exception handler.
+     */
+    @Override
+    public ExceptionHandler getExceptionHandler() {
+        return new FullAjaxExceptionHandler(getWrapped().getExceptionHandler());
+    }
 
 }

@@ -44,51 +44,51 @@ import org.omnifaces.cdi.validator.ValidatorManager;
 @SuppressWarnings("rawtypes")
 public class OmniApplication extends ApplicationWrapper {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final ConverterManager converterManager;
-	private final ValidatorManager validatorManager;
+    private final ConverterManager converterManager;
+    private final ValidatorManager validatorManager;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces application around the given wrapped application.
-	 * @param wrapped The wrapped application.
-	 */
-	public OmniApplication(Application wrapped) {
-		super(wrapped);
-		converterManager = getReference(ConverterManager.class);
-		validatorManager = getReference(ValidatorManager.class);
-	}
+    /**
+     * Construct a new OmniFaces application around the given wrapped application.
+     * @param wrapped The wrapped application.
+     */
+    public OmniApplication(Application wrapped) {
+        super(wrapped);
+        converterManager = getReference(ConverterManager.class);
+        validatorManager = getReference(ValidatorManager.class);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
-	 */
-	@Override
-	public Converter createConverter(String converterId) {
-		return converterManager.createConverter(getWrapped(), converterId);
-	}
+    /**
+     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
+     * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
+     */
+    @Override
+    public Converter createConverter(String converterId) {
+        return converterManager.createConverter(getWrapped(), converterId);
+    }
 
-	/**
-	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
-	 */
-	@Override
-	public Converter createConverter(Class<?> forClass) {
-		Class<?> converterForClass = forClass.isPrimitive() ? getDefaultValue(forClass).getClass() : forClass;
-		return converterManager.createConverter(getWrapped(), converterForClass);
-	}
+    /**
+     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
+     * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
+     */
+    @Override
+    public Converter createConverter(Class<?> forClass) {
+        Class<?> converterForClass = forClass.isPrimitive() ? getDefaultValue(forClass).getClass() : forClass;
+        return converterManager.createConverter(getWrapped(), converterForClass);
+    }
 
-	/**
-	 * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
-	 * {@link #getWrapped()} which may return the Faces managed {@link Validator} instance.
-	 */
-	@Override
-	public Validator createValidator(String validatorId) {
-		return validatorManager.createValidator(getWrapped(), validatorId);
-	}
+    /**
+     * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
+     * {@link #getWrapped()} which may return the Faces managed {@link Validator} instance.
+     */
+    @Override
+    public Validator createValidator(String validatorId) {
+        return validatorManager.createValidator(getWrapped(), validatorId);
+    }
 
 }

@@ -38,12 +38,12 @@ export { GraphicImage } from "./GraphicImage";
  * Declare optional global vars for the OmniFaces namespace which is needed by some modules; tsc needs this info.
  */
 declare global {
-	interface Window { 
-		faces: any,
-		jsf: any,
-		mojarra: any, 
-		myfaces: any, 
-		PrimeFaces: any, 
-		jQuery: any 
-	}
+    interface Window { 
+        faces: any,
+        jsf: any,
+        mojarra: any, 
+        myfaces: any, 
+        PrimeFaces: any, 
+        jQuery: any 
+    }
 }

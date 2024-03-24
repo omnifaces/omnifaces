@@ -30,122 +30,122 @@ import org.omnifaces.util.Callback;
  */
 public class ReadOnlyValueExpression extends ValueExpression {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Callback.SerializableReturning<Object> callback;
-	private Class<?> expectedType;
+    private Callback.SerializableReturning<Object> callback;
+    private Class<?> expectedType;
 
-	/**
-	 * Construct a read only value expression.
-	 * @param expectedType The type the result of the expression will be coerced to after evaluation.
-	 * @param callback The functional interface that will be called when the value expression is resolved.
-	 */
-	public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
-		this(expectedType);
-		this.callback = callback;
-	}
+    /**
+     * Construct a read only value expression.
+     * @param expectedType The type the result of the expression will be coerced to after evaluation.
+     * @param callback The functional interface that will be called when the value expression is resolved.
+     */
+    public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
+        this(expectedType);
+        this.callback = callback;
+    }
 
-	/**
-	 * Construct a read only value expression.
-	 * @param expectedType The type the result of the expression will be coerced to after evaluation.
-	 */
-	public ReadOnlyValueExpression(Class<?> expectedType) {
-		this.expectedType = expectedType;
-	}
+    /**
+     * Construct a read only value expression.
+     * @param expectedType The type the result of the expression will be coerced to after evaluation.
+     */
+    public ReadOnlyValueExpression(Class<?> expectedType) {
+        this.expectedType = expectedType;
+    }
 
-	/**
-	 * Construct a read only value expression.
-	 */
-	public ReadOnlyValueExpression() {
-		//
-	}
+    /**
+     * Construct a read only value expression.
+     */
+    public ReadOnlyValueExpression() {
+        //
+    }
 
-	@Override
-	public Object getValue(ELContext context) {
-		if (callback != null) {
-			return callback.invoke();
-		}
+    @Override
+    public Object getValue(ELContext context) {
+        if (callback != null) {
+            return callback.invoke();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void setValue(ELContext context, Object value) {
-		throw new PropertyNotWritableException();
-	}
+    @Override
+    public void setValue(ELContext context, Object value) {
+        throw new PropertyNotWritableException();
+    }
 
-	@Override
-	public boolean isReadOnly(ELContext context) {
-		return true;
-	}
+    @Override
+    public boolean isReadOnly(ELContext context) {
+        return true;
+    }
 
-	@Override
-	public Class<?> getType(ELContext context) {
-		Object value = getValue(context);
-		return value == null ? null : value.getClass();
-	}
+    @Override
+    public Class<?> getType(ELContext context) {
+        Object value = getValue(context);
+        return value == null ? null : value.getClass();
+    }
 
-	@Override
-	public Class<?> getExpectedType() {
-		return expectedType;
-	}
+    @Override
+    public Class<?> getExpectedType() {
+        return expectedType;
+    }
 
-	@Override
-	public String getExpressionString() {
-		return null;
-	}
+    @Override
+    public String getExpressionString() {
+        return null;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		// Basic checks.
-		if (object == this) {
-			return true;
-		}
-		if (object == null || object.getClass() != getClass()) {
-			return false;
-		}
+    @Override
+    public boolean equals(Object object) {
+        // Basic checks.
+        if (object == this) {
+            return true;
+        }
+        if (object == null || object.getClass() != getClass()) {
+            return false;
+        }
 
-		// Property checks.
-		ReadOnlyValueExpression other = (ReadOnlyValueExpression) object;
-		Object value = getValue(null);
-		Object otherValue = other.getValue(null);
-		if (value == null ? otherValue != null : !value.equals(otherValue)) {
-			return false;
-		}
+        // Property checks.
+        ReadOnlyValueExpression other = (ReadOnlyValueExpression) object;
+        Object value = getValue(null);
+        Object otherValue = other.getValue(null);
+        if (value == null ? otherValue != null : !value.equals(otherValue)) {
+            return false;
+        }
 
-		// All passed.
-		return true;
-	}
+        // All passed.
+        return true;
+    }
 
-	@Override
-	public int hashCode() {
-		Object value = getValue(null);
-		return value == null ? 0 : value.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        Object value = getValue(null);
+        return value == null ? 0 : value.hashCode();
+    }
 
-	@Override
-	public boolean isLiteralText() {
-		return true;
-	}
+    @Override
+    public boolean isLiteralText() {
+        return true;
+    }
 
-	/**
-	 * Returns the functional interface that will be called when the value expression is resolved
-	 *
-	 * @return the functional interface that will be called when the value expression is resolved
-	 * @since 2.1
-	 */
-	public Callback.SerializableReturning<Object> getCallbackReturning() {
-		return callback;
-	}
+    /**
+     * Returns the functional interface that will be called when the value expression is resolved
+     *
+     * @return the functional interface that will be called when the value expression is resolved
+     * @since 2.1
+     */
+    public Callback.SerializableReturning<Object> getCallbackReturning() {
+        return callback;
+    }
 
-	/**
-	 * Sets the functional interface that will be called when the value expression is resolved
-	 *
-	 * @param callbackReturning functional interface returning what the value expression will return
-	 * @since 2.1
-	 */
-	public void setCallbackReturning(Callback.SerializableReturning<Object> callbackReturning) {
-		this.callback = callbackReturning;
-	}
+    /**
+     * Sets the functional interface that will be called when the value expression is resolved
+     *
+     * @param callbackReturning functional interface returning what the value expression will return
+     * @since 2.1
+     */
+    public void setCallbackReturning(Callback.SerializableReturning<Object> callbackReturning) {
+        this.callback = callbackReturning;
+    }
 
 }

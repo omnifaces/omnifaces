@@ -74,148 +74,148 @@ import org.omnifaces.component.validator.ValidateMultipleFields;
  */
 public class SkipValidators extends TagHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String UIINPUT_REQUIRED_PROPERTY = "required";
-	private static final String UIINPUT_DISABLED_PROPERTY = "disabled";
+    private static final String UIINPUT_REQUIRED_PROPERTY = "required";
+    private static final String UIINPUT_DISABLED_PROPERTY = "disabled";
 
-	private static final String ERROR_INVALID_PARENT =
-		"Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
+    private static final String ERROR_INVALID_PARENT =
+        "Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public SkipValidators(TagConfig config) {
-		super(config);
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public SkipValidators(TagConfig config) {
+        super(config);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and
-	 * we're in the restore view phase of a postback, then delegate to {@link #processSkipValidators(UIComponent)}.
-	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or
-	 * {@link ClientBehaviorHolder}.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
-			throw new IllegalStateException(ERROR_INVALID_PARENT);
-		}
+    /**
+     * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and
+     * we're in the restore view phase of a postback, then delegate to {@link #processSkipValidators(UIComponent)}.
+     * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or
+     * {@link ClientBehaviorHolder}.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
+            throw new IllegalStateException(ERROR_INVALID_PARENT);
+        }
 
-		FacesContext facesContext = context.getFacesContext();
+        FacesContext facesContext = context.getFacesContext();
 
-		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
-			return;
-		}
+        if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
+            return;
+        }
 
-		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
-		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processSkipValidators(parent));
-	}
+        // We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
+        // Hence, we subscribe this check to after phase of restore view.
+        subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processSkipValidators(parent));
+    }
 
-	/**
-	 * Check if the given component has been invoked during the current request and if so, then register the skip
-	 * validators event listener which removes the validators during {@link PreValidateEvent} and restores them during
-	 * {@link PostValidateEvent}.
-	 * @param parent The parent component of this tag.
-	 */
-	protected void processSkipValidators(UIComponent parent) {
-		if (!hasInvokedSubmit(parent)) {
-			return;
-		}
+    /**
+     * Check if the given component has been invoked during the current request and if so, then register the skip
+     * validators event listener which removes the validators during {@link PreValidateEvent} and restores them during
+     * {@link PostValidateEvent}.
+     * @param parent The parent component of this tag.
+     */
+    protected void processSkipValidators(UIComponent parent) {
+        if (!hasInvokedSubmit(parent)) {
+            return;
+        }
 
-		SkipValidatorsEventListener listener = new SkipValidatorsEventListener();
-		subscribeToViewEvent(PreValidateEvent.class, listener);
-		subscribeToViewEvent(PostValidateEvent.class, listener);
-	}
+        SkipValidatorsEventListener listener = new SkipValidatorsEventListener();
+        subscribeToViewEvent(PreValidateEvent.class, listener);
+        subscribeToViewEvent(PostValidateEvent.class, listener);
+    }
 
-	/**
-	 * Remove validators during prevalidate and restore them during postvalidate.
-	 */
-	static class SkipValidatorsEventListener implements SystemEventListener {
+    /**
+     * Remove validators during prevalidate and restore them during postvalidate.
+     */
+    static class SkipValidatorsEventListener implements SystemEventListener {
 
-		private Map<String, Object> attributes = new HashMap<>();
-		private Map<String, Validator<?>[]> allValidators = new HashMap<>();
+        private Map<String, Object> attributes = new HashMap<>();
+        private Map<String, Validator<?>[]> allValidators = new HashMap<>();
 
-		@Override
-		public boolean isListenerForSource(Object source) {
-			return source instanceof UIInput || source instanceof ValidateMultipleFields;
-		}
+        @Override
+        public boolean isListenerForSource(Object source) {
+            return source instanceof UIInput || source instanceof ValidateMultipleFields;
+        }
 
-		@Override
-		public void processEvent(SystemEvent event) {
-			UIComponent source = (UIComponent) event.getSource();
+        @Override
+        public void processEvent(SystemEvent event) {
+            UIComponent source = (UIComponent) event.getSource();
 
-			if (source instanceof UIInput) {
-				processEventForUIInput(event, (UIInput) source);
-			}
-			else if (source instanceof ValidateMultipleFields) {
-				processEventForValidateMultipleFields(event, (ValidateMultipleFields) source);
-			}
-		}
+            if (source instanceof UIInput) {
+                processEventForUIInput(event, (UIInput) source);
+            }
+            else if (source instanceof ValidateMultipleFields) {
+                processEventForValidateMultipleFields(event, (ValidateMultipleFields) source);
+            }
+        }
 
-		private void processEventForUIInput(SystemEvent event, UIInput input) {
-			String clientId = input.getClientId();
+        private void processEventForUIInput(SystemEvent event, UIInput input) {
+            String clientId = input.getClientId();
 
-			if (event instanceof PreValidateEvent) {
-				ValueExpression requiredExpression = input.getValueExpression(UIINPUT_REQUIRED_PROPERTY);
+            if (event instanceof PreValidateEvent) {
+                ValueExpression requiredExpression = input.getValueExpression(UIINPUT_REQUIRED_PROPERTY);
 
-				if (requiredExpression != null) {
-					attributes.put(clientId, requiredExpression);
-					input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, createValueExpression("#{false}", Boolean.class));
-				}
-				else {
-					attributes.put(clientId, input.isRequired());
-					input.setRequired(false);
-				}
+                if (requiredExpression != null) {
+                    attributes.put(clientId, requiredExpression);
+                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, createValueExpression("#{false}", Boolean.class));
+                }
+                else {
+                    attributes.put(clientId, input.isRequired());
+                    input.setRequired(false);
+                }
 
-				Validator<?>[] validators = input.getValidators();
-				allValidators.put(clientId, validators);
+                Validator<?>[] validators = input.getValidators();
+                allValidators.put(clientId, validators);
 
-				for (Validator<?> validator : validators) {
-					input.removeValidator(validator);
-				}
-			}
-			else if (event instanceof PostValidateEvent) {
-				for (Validator<?> validator : allValidators.remove(clientId)) {
-					input.addValidator(validator);
-				}
+                for (Validator<?> validator : validators) {
+                    input.removeValidator(validator);
+                }
+            }
+            else if (event instanceof PostValidateEvent) {
+                for (Validator<?> validator : allValidators.remove(clientId)) {
+                    input.addValidator(validator);
+                }
 
-				Object requiredValue = attributes.remove(clientId);
+                Object requiredValue = attributes.remove(clientId);
 
-				if (requiredValue instanceof ValueExpression) {
-					input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, (ValueExpression) requiredValue);
-				}
-				else {
-					input.setRequired(TRUE.equals(requiredValue));
-				}
-			}
-		}
+                if (requiredValue instanceof ValueExpression) {
+                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, (ValueExpression) requiredValue);
+                }
+                else {
+                    input.setRequired(TRUE.equals(requiredValue));
+                }
+            }
+        }
 
-		private void processEventForValidateMultipleFields(SystemEvent event, ValidateMultipleFields validator) {
-			String clientId = validator.getClientId();
+        private void processEventForValidateMultipleFields(SystemEvent event, ValidateMultipleFields validator) {
+            String clientId = validator.getClientId();
 
-			if (event instanceof PreValidateEvent) {
-				ValueExpression disabledExpression = validator.getValueExpression(UIINPUT_DISABLED_PROPERTY);
-				attributes.put(clientId, (disabledExpression != null) ? disabledExpression : validator.isDisabled());
-				validator.setDisabled(true);
-			}
-			else if (event instanceof PostValidateEvent) {
-				Object disabledValue = attributes.remove(clientId);
+            if (event instanceof PreValidateEvent) {
+                ValueExpression disabledExpression = validator.getValueExpression(UIINPUT_DISABLED_PROPERTY);
+                attributes.put(clientId, (disabledExpression != null) ? disabledExpression : validator.isDisabled());
+                validator.setDisabled(true);
+            }
+            else if (event instanceof PostValidateEvent) {
+                Object disabledValue = attributes.remove(clientId);
 
-				if (disabledValue instanceof ValueExpression) {
-					validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, (ValueExpression) disabledValue);
-				}
-				else {
-					validator.setDisabled(TRUE.equals(disabledValue));
-				}
-			}
-		}
+                if (disabledValue instanceof ValueExpression) {
+                    validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, (ValueExpression) disabledValue);
+                }
+                else {
+                    validator.setDisabled(TRUE.equals(disabledValue));
+                }
+            }
+        }
 
-	}
+    }
 
 }

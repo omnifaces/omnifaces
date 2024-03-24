@@ -14,21 +14,21 @@
 
 -->
 <facelet-taglib
-	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_3.xsd"
-	version="2.3"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_3.xsd"
+    version="2.3"
 >
-	<namespace>tags</namespace>
-	<short-name>t</short-name>
+    <namespace>tags</namespace>
+    <short-name>t</short-name>
 
-	<tag>
-		<tag-name>test</tag-name>
-		<source>tags/test.xhtml</source>
-    	<attribute>
-			<name>id</name>
-			<required>false</required>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
+    <tag>
+        <tag-name>test</tag-name>
+        <source>tags/test.xhtml</source>
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
 </facelet-taglib>

@@ -22,11 +22,11 @@ import jakarta.inject.Inject;
 @ResourceDependency(library = "omnifaces.test", name = "facesConverterITExtendedManagedConverterResourceDependency.js", target = "head")
 public class FacesConverterITExtendedManagedConverter extends FacesConverterITBaseConverter {
 
-	@Inject
-	private FacesConverterITSomeService service;
+    @Inject
+    private FacesConverterITSomeService service;
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return service == null ? "null" : service.getClass().getSimpleName();
-	}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        return service == null ? "null" : service.getClass().getSimpleName();
+    }
 }

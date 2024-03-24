@@ -28,26 +28,26 @@ import jakarta.validation.Valid;
 @RequestScoped
 public class ValidateBeanITNestedListClassLevelBean {
 
-	private List<@Valid ValidateBeanITEntity> entities;
+    private List<@Valid ValidateBeanITEntity> entities;
 
-	@PostConstruct
-	public void init() {
-		entities = new ArrayList<>();
-		entities.add(new ValidateBeanITEntity());
-		entities.add(new ValidateBeanITEntity());
-	}
+    @PostConstruct
+    public void init() {
+        entities = new ArrayList<>();
+        entities.add(new ValidateBeanITEntity());
+        entities.add(new ValidateBeanITEntity());
+    }
 
-	public void action() {
-		if (isValidationFailed()) {
-			addGlobalWarn(" actionValidationFailed");
-		}
-		else {
-			addGlobalInfo("actionSuccess");
-		}
-	}
+    public void action() {
+        if (isValidationFailed()) {
+            addGlobalWarn(" actionValidationFailed");
+        }
+        else {
+            addGlobalInfo("actionSuccess");
+        }
+    }
 
-	public List<ValidateBeanITEntity> getEntities() {
-		return entities;
-	}
+    public List<ValidateBeanITEntity> getEntities() {
+        return entities;
+    }
 
 }

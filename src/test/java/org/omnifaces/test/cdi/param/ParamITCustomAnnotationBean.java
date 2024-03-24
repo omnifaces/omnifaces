@@ -26,27 +26,27 @@ import org.omnifaces.cdi.Param;
 @ParamITCustomAnnotation
 public class ParamITCustomAnnotationBean {
 
-	@Param @Size(min = 2)
-	private String stringParam;
+    @Param @Size(min = 2)
+    private String stringParam;
 
-	private String initResult;
+    private String initResult;
 
-	@PostConstruct
-	public void init() {
-		if (isValidationFailed()) {
-			initResult = "initValidationFailed";
-		}
-		else {
-			initResult = "initSuccess";
-		}
-	}
+    @PostConstruct
+    public void init() {
+        if (isValidationFailed()) {
+            initResult = "initValidationFailed";
+        }
+        else {
+            initResult = "initSuccess";
+        }
+    }
 
-	public String getStringParam() {
-		return stringParam;
-	}
+    public String getStringParam() {
+        return stringParam;
+    }
 
-	public String getInitResult() {
-		return initResult;
-	}
+    public String getInitResult() {
+        return initResult;
+    }
 
 }

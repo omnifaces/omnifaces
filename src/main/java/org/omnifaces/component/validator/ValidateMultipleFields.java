@@ -147,344 +147,344 @@ import org.omnifaces.validator.MultiFieldValidator;
  */
 public abstract class ValidateMultipleFields extends ValidatorFamily implements MultiFieldValidator {
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
-	private static final Boolean DEFAULT_INVALIDATEALL = TRUE;
-	private static final Boolean DEFAULT_DISABLED = FALSE;
+    private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
+    private static final Boolean DEFAULT_INVALIDATEALL = TRUE;
+    private static final Boolean DEFAULT_DISABLED = FALSE;
 
-	private static final String ERROR_MISSING_COMPONENTS =
-		"%s attribute 'components' must be specified.";
-	private static final String ERROR_UNKNOWN_COMPONENT =
-		"%s attribute '%s' must refer existing client IDs. Client ID '%s' cannot be found.";
-	private static final String ERROR_INVALID_COMPONENT =
-		"%s attribute '%s' must refer UIInput client IDs. Client ID '%s' is of type '%s'.";
-	private static final String ERROR_INVALID_COMPONENTS =
-		"%s attribute '%s' must refer UIInput client IDs or any UIComponent which contains UIInput children."
-			+ " Client ID '%s' is of type '%s' and does not contain UIInput children.";
+    private static final String ERROR_MISSING_COMPONENTS =
+        "%s attribute 'components' must be specified.";
+    private static final String ERROR_UNKNOWN_COMPONENT =
+        "%s attribute '%s' must refer existing client IDs. Client ID '%s' cannot be found.";
+    private static final String ERROR_INVALID_COMPONENT =
+        "%s attribute '%s' must refer UIInput client IDs. Client ID '%s' is of type '%s'.";
+    private static final String ERROR_INVALID_COMPONENTS =
+        "%s attribute '%s' must refer UIInput client IDs or any UIComponent which contains UIInput children."
+            + " Client ID '%s' is of type '%s' and does not contain UIInput children.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		components, invalidateAll, message, showMessageFor, disabled;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        components, invalidateAll, message, showMessageFor, disabled;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private String defaultMessage;
-	private boolean validationFailed;
+    private String defaultMessage;
+    private boolean validationFailed;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The default constructor sets the default message and sets the renderer type to <code>null</code>.
-	 */
-	protected ValidateMultipleFields() {
-		defaultMessage = OmniFaces.getMessage(getClass().getAnnotation(FacesComponent.class).value());
-		setRendererType(null);
-	}
+    /**
+     * The default constructor sets the default message and sets the renderer type to <code>null</code>.
+     */
+    protected ValidateMultipleFields() {
+        defaultMessage = OmniFaces.getMessage(getClass().getAnnotation(FacesComponent.class).value());
+        setRendererType(null);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate our component hierarchy.
-	 * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
-	 */
-	@Override
-	protected void validateHierarchy() {
-		validateHasParent(this, UIForm.class);
-		validateHasNoChildren(this);
-	}
+    /**
+     * Validate our component hierarchy.
+     * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
+     */
+    @Override
+    protected void validateHierarchy() {
+        validateHasParent(this, UIForm.class);
+        validateHasNoChildren(this);
+    }
 
-	/**
-	 * If the validation is not disabled, collect the components, if it is not empty, then collect their values and
-	 * delegate to {@link #validateValues(FacesContext, List, List)}. If it returns <code>false</code>, then mark all
-	 * inputs and the faces context invalid and finally delegate to {@link #showMessage(FacesContext, List)} to show
-	 * the message.
-	 */
-	@Override
-	protected void validateComponents(FacesContext context) {
-		if (isDisabled()) {
-			return;
-		}
+    /**
+     * If the validation is not disabled, collect the components, if it is not empty, then collect their values and
+     * delegate to {@link #validateValues(FacesContext, List, List)}. If it returns <code>false</code>, then mark all
+     * inputs and the faces context invalid and finally delegate to {@link #showMessage(FacesContext, List)} to show
+     * the message.
+     */
+    @Override
+    protected void validateComponents(FacesContext context) {
+        if (isDisabled()) {
+            return;
+        }
 
-		List<UIInput> inputs = collectComponents();
+        List<UIInput> inputs = collectComponents();
 
-		if (inputs.isEmpty()) {
-			return;
-		}
+        if (inputs.isEmpty()) {
+            return;
+        }
 
-		List<Object> values = collectValues(inputs);
+        List<Object> values = collectValues(inputs);
 
-		if (!validateValues(context, inputs, values)) {
-			int i = 0;
+        if (!validateValues(context, inputs, values)) {
+            int i = 0;
 
-			for (UIInput input : inputs) {
-				if (Components.isRendered(input)) {
-					input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
-				}
-				i++;
-			}
+            for (UIInput input : inputs) {
+                if (Components.isRendered(input)) {
+                    input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+                }
+                i++;
+            }
 
-			validationFailed = true;
-			context.validationFailed();
-			showMessage(context, inputs);
-			context.renderResponse();
-		}
-	}
+            validationFailed = true;
+            context.validationFailed();
+            showMessage(context, inputs);
+            context.renderResponse();
+        }
+    }
 
-	/**
-	 * Collect the input components. Only those which are an instance of {@link UIInput} will be returned. If at least
-	 * one of them has already been validated and is been marked invalid, then an empty collection will be returned.
-	 * @return The input components.
-	 * @throws IllegalArgumentException When the <code>components</code> attribute is missing, or when it references an
-	 * non-existing component, or when it references a non-input component.
-	 */
-	protected List<UIInput> collectComponents() {
-		String components = getComponents();
+    /**
+     * Collect the input components. Only those which are an instance of {@link UIInput} will be returned. If at least
+     * one of them has already been validated and is been marked invalid, then an empty collection will be returned.
+     * @return The input components.
+     * @throws IllegalArgumentException When the <code>components</code> attribute is missing, or when it references an
+     * non-existing component, or when it references a non-input component.
+     */
+    protected List<UIInput> collectComponents() {
+        String components = getComponents();
 
-		if (components.isEmpty()) {
-			throw new IllegalArgumentException(format(
-				ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
-		}
+        if (components.isEmpty()) {
+            throw new IllegalArgumentException(format(
+                ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
+        }
 
-		UIComponent namingContainerParent = getNamingContainer();
-		List<UIInput> inputs = new ArrayList<>();
+        UIComponent namingContainerParent = getNamingContainer();
+        List<UIInput> inputs = new ArrayList<>();
 
-		for (String clientId : components.split("\\s+")) {
-			for (UIInput input : findInputComponents(namingContainerParent, clientId, PropertyKeys.components)) {
-				if (!input.isValid()) {
-					return Collections.emptyList();
-				}
+        for (String clientId : components.split("\\s+")) {
+            for (UIInput input : findInputComponents(namingContainerParent, clientId, PropertyKeys.components)) {
+                if (!input.isValid()) {
+                    return Collections.emptyList();
+                }
 
-				inputs.add(input);
-			}
-		}
+                inputs.add(input);
+            }
+        }
 
-		return Collections.unmodifiableList(inputs);
-	}
+        return Collections.unmodifiableList(inputs);
+    }
 
-	/**
-	 * Collect the values of the given input components.
-	 * @param inputs The input components to collect values from.
-	 * @return The values of the given input components.
-	 */
-	protected List<Object> collectValues(List<UIInput> inputs) {
-		List<Object> values = new ArrayList<>(inputs.size());
+    /**
+     * Collect the values of the given input components.
+     * @param inputs The input components to collect values from.
+     * @return The values of the given input components.
+     */
+    protected List<Object> collectValues(List<UIInput> inputs) {
+        List<Object> values = new ArrayList<>(inputs.size());
 
-		for (UIInput input : inputs) {
-			Object value = isEditable(input) ? getValue(input) : input.getValue();
+        for (UIInput input : inputs) {
+            Object value = isEditable(input) ? getValue(input) : input.getValue();
 
-			if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
-				value = null;
-			}
+            if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
+                value = null;
+            }
 
-			values.add(value);
-		}
+            values.add(value);
+        }
 
-		return Collections.unmodifiableList(values);
-	}
+        return Collections.unmodifiableList(values);
+    }
 
-	/**
-	 * Returns whether in in an invalidating case the given input component should be marked invalid. The default
-	 * implementation returns <code>true</code>, meaning that <strong>all</strong> input components should be
-	 * invalidated in an invalidating case. The overriding implementation may choose to return <code>false</code> for
-	 * example when the value is empty, such as {@link ValidateAllOrNone}.
-	 * @param context The faces context to work with.
-	 * @param input The input component which may need to be invalidated.
-	 * @param value The value of the input component.
-	 * @return Whether in in an invalidating case the given input component should be marked invalid
-	 * @since 1.7
-	 */
-	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
-		return true;
-	}
+    /**
+     * Returns whether in in an invalidating case the given input component should be marked invalid. The default
+     * implementation returns <code>true</code>, meaning that <strong>all</strong> input components should be
+     * invalidated in an invalidating case. The overriding implementation may choose to return <code>false</code> for
+     * example when the value is empty, such as {@link ValidateAllOrNone}.
+     * @param context The faces context to work with.
+     * @param input The input component which may need to be invalidated.
+     * @param value The value of the input component.
+     * @return Whether in in an invalidating case the given input component should be marked invalid
+     * @since 1.7
+     */
+    protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
+        return true;
+    }
 
-	/**
-	 * Show the message at the desired place(s) depending on the value of the <code>showMessageFor</code> attribute.
-	 * <ul>
-	 * <li><code>@this</code>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
-	 * <li><code>@all</code>: message will be added to all components as specified in <code>components</code> attribute.
-	 * <li>Any other value in a space separated collection will be treated as client ID of {@link UIInput} component.
-	 * </ul>
-	 * @param context The faces context to work with.
-	 * @param inputs The validated input components.
-	 */
-	protected void showMessage(FacesContext context, List<UIInput> inputs) {
-		StringBuilder labels = new StringBuilder();
+    /**
+     * Show the message at the desired place(s) depending on the value of the <code>showMessageFor</code> attribute.
+     * <ul>
+     * <li><code>@this</code>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
+     * <li><code>@all</code>: message will be added to all components as specified in <code>components</code> attribute.
+     * <li>Any other value in a space separated collection will be treated as client ID of {@link UIInput} component.
+     * </ul>
+     * @param context The faces context to work with.
+     * @param inputs The validated input components.
+     */
+    protected void showMessage(FacesContext context, List<UIInput> inputs) {
+        StringBuilder labels = new StringBuilder();
 
-		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
-			labels.append(getLabel(iterator.next()));
+        for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
+            labels.append(getLabel(iterator.next()));
 
-			if (iterator.hasNext()) {
-				labels.append(", ");
-			}
-		}
+            if (iterator.hasNext()) {
+                labels.append(", ");
+            }
+        }
 
-		addErrorMessage(context, inputs, labels, getMessage(), getShowMessageFor());
-	}
+        addErrorMessage(context, inputs, labels, getMessage(), getShowMessageFor());
+    }
 
-	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
-		UIComponent found = parent.findComponent(clientId);
+    private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
+        UIComponent found = parent.findComponent(clientId);
 
-		if (found == null) {
-			throw new IllegalArgumentException(format(
-				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
-		}
-		else if (!(found instanceof UIInput)) {
-			throw new IllegalArgumentException(format(
-				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
-		}
+        if (found == null) {
+            throw new IllegalArgumentException(format(
+                ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+        }
+        else if (!(found instanceof UIInput)) {
+            throw new IllegalArgumentException(format(
+                ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+        }
 
-		return (UIInput) found;
-	}
+        return (UIInput) found;
+    }
 
-	private List<UIInput> findInputComponents(UIComponent parent, String clientId, PropertyKeys property) {
-		UIComponent found = parent.findComponent(clientId);
+    private List<UIInput> findInputComponents(UIComponent parent, String clientId, PropertyKeys property) {
+        UIComponent found = parent.findComponent(clientId);
 
-		if (found == null) {
-			throw new IllegalArgumentException(format(
-				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
-		}
-		else if (!(found instanceof UIInput)) {
-			List<UIInput> inputs = findComponentsInChildren(found, UIInput.class);
+        if (found == null) {
+            throw new IllegalArgumentException(format(
+                ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+        }
+        else if (!(found instanceof UIInput)) {
+            List<UIInput> inputs = findComponentsInChildren(found, UIInput.class);
 
-			if (inputs.isEmpty()) {
-				throw new IllegalArgumentException(format(
-					ERROR_INVALID_COMPONENTS, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
-			}
+            if (inputs.isEmpty()) {
+                throw new IllegalArgumentException(format(
+                    ERROR_INVALID_COMPONENTS, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+            }
 
-			return inputs;
-		}
+            return inputs;
+        }
 
-		return asList((UIInput) found);
-	}
+        return asList((UIInput) found);
+    }
 
-	private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
-		if ("@this".equals(showMessageFor)) {
-			addError(getClientId(context), message, labels);
-		}
-		else if ("@all".equals(showMessageFor)) {
-			for (UIInput input : inputs) {
-				addError(input.getClientId(context), message, labels);
-			}
-		}
-		else if ("@invalid".equals(showMessageFor)) {
-			for (UIInput input : inputs) {
-				if (!input.isValid()) {
-					addError(input.getClientId(context), message, labels);
-				}
-			}
-		}
-		else if ("@global".equals(showMessageFor)) {
-			addGlobalError(message, labels);
-		}
-		else {
-			UIComponent namingContainerParent = getNamingContainer();
+    private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
+        if ("@this".equals(showMessageFor)) {
+            addError(getClientId(context), message, labels);
+        }
+        else if ("@all".equals(showMessageFor)) {
+            for (UIInput input : inputs) {
+                addError(input.getClientId(context), message, labels);
+            }
+        }
+        else if ("@invalid".equals(showMessageFor)) {
+            for (UIInput input : inputs) {
+                if (!input.isValid()) {
+                    addError(input.getClientId(context), message, labels);
+                }
+            }
+        }
+        else if ("@global".equals(showMessageFor)) {
+            addGlobalError(message, labels);
+        }
+        else {
+            UIComponent namingContainerParent = getNamingContainer();
 
-			for (String clientId : showMessageFor.split("\\s+")) {
-				UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
-				addError(input.getClientId(context), message, labels);
-			}
-		}
-	}
+            for (String clientId : showMessageFor.split("\\s+")) {
+                UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
+                addError(input.getClientId(context), message, labels);
+            }
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the client identifiers of components which are to be validated.
-	 * @return The client identifiers of components which are to be validated.
-	 */
-	public String getComponents() {
-		return state.get(PropertyKeys.components, "");
-	}
+    /**
+     * Returns the client identifiers of components which are to be validated.
+     * @return The client identifiers of components which are to be validated.
+     */
+    public String getComponents() {
+        return state.get(PropertyKeys.components, "");
+    }
 
-	/**
-	 * Sets the client identifiers of components which are to be validated.
-	 * @param components The client identifiers of components which are to be validated.
-	 */
-	public void setComponents(String components) {
-		state.put(PropertyKeys.components, components);
-	}
+    /**
+     * Sets the client identifiers of components which are to be validated.
+     * @param components The client identifiers of components which are to be validated.
+     */
+    public void setComponents(String components) {
+        state.put(PropertyKeys.components, components);
+    }
 
-	/**
-	 * Returns whether to invalidate all fields or only those which are actually invalid as per
-	 * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
-	 * @return Whether to invalidate all fields or only those which are actually invalid.
-	 * @since 1.7
-	 */
-	public boolean isInvalidateAll() {
-		return state.get(PropertyKeys.invalidateAll, DEFAULT_INVALIDATEALL);
-	}
+    /**
+     * Returns whether to invalidate all fields or only those which are actually invalid as per
+     * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
+     * @return Whether to invalidate all fields or only those which are actually invalid.
+     * @since 1.7
+     */
+    public boolean isInvalidateAll() {
+        return state.get(PropertyKeys.invalidateAll, DEFAULT_INVALIDATEALL);
+    }
 
-	/**
-	 * Sets whether to invalidate all fields or only those which are actually invalid as per
-	 * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
-	 * @param invalidateAll Whether to invalidate all fields or only those which are actually invalid.
-	 * @since 1.7
-	 */
-	public void setInvalidateAll(boolean invalidateAll) {
-		state.put(PropertyKeys.invalidateAll, invalidateAll);
-	}
+    /**
+     * Sets whether to invalidate all fields or only those which are actually invalid as per
+     * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
+     * @param invalidateAll Whether to invalidate all fields or only those which are actually invalid.
+     * @since 1.7
+     */
+    public void setInvalidateAll(boolean invalidateAll) {
+        state.put(PropertyKeys.invalidateAll, invalidateAll);
+    }
 
-	/**
-	 * Returns the validation message to be shown.
-	 * @return The validation message to be shown.
-	 */
-	public String getMessage() {
-		return state.get(PropertyKeys.message, defaultMessage);
-	}
+    /**
+     * Returns the validation message to be shown.
+     * @return The validation message to be shown.
+     */
+    public String getMessage() {
+        return state.get(PropertyKeys.message, defaultMessage);
+    }
 
-	/**
-	 * Sets the validation message to be shown.
-	 * @param message The validation message to be shown.
-	 */
-	public void setMessage(String message) {
-		state.put(PropertyKeys.message, message);
-	}
+    /**
+     * Sets the validation message to be shown.
+     * @param message The validation message to be shown.
+     */
+    public void setMessage(String message) {
+        state.put(PropertyKeys.message, message);
+    }
 
-	/**
-	 * Returns the client identifiers to show the validation message for.
-	 * @return The client identifiers to show the validation message for.
-	 */
-	public String getShowMessageFor() {
-		return state.get(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
-	}
+    /**
+     * Returns the client identifiers to show the validation message for.
+     * @return The client identifiers to show the validation message for.
+     */
+    public String getShowMessageFor() {
+        return state.get(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
+    }
 
-	/**
-	 * Sets the client identifiers to show the validation message for.
-	 * @param showMessageFor The client identifiers to show the validation message for.
-	 */
-	public void setShowMessageFor(String showMessageFor) {
-		state.put(PropertyKeys.showMessageFor, showMessageFor);
-	}
+    /**
+     * Sets the client identifiers to show the validation message for.
+     * @param showMessageFor The client identifiers to show the validation message for.
+     */
+    public void setShowMessageFor(String showMessageFor) {
+        state.put(PropertyKeys.showMessageFor, showMessageFor);
+    }
 
-	/**
-	 * Returns whether the validation should be disabled or not.
-	 * @return Whether the validation should be disabled or not.
-	 */
-	public boolean isDisabled() {
-		return state.get(PropertyKeys.disabled, DEFAULT_DISABLED);
-	}
+    /**
+     * Returns whether the validation should be disabled or not.
+     * @return Whether the validation should be disabled or not.
+     */
+    public boolean isDisabled() {
+        return state.get(PropertyKeys.disabled, DEFAULT_DISABLED);
+    }
 
-	/**
-	 * Sets whether the validation should be disabled or not.
-	 * @param disabled Whether the validation should be disabled or not.
-	 */
-	public void setDisabled(boolean disabled) {
-		state.put(PropertyKeys.disabled, disabled);
-	}
+    /**
+     * Sets whether the validation should be disabled or not.
+     * @param disabled Whether the validation should be disabled or not.
+     */
+    public void setDisabled(boolean disabled) {
+        state.put(PropertyKeys.disabled, disabled);
+    }
 
-	/**
-	 * Returns whether the validation has failed or not.
-	 * @return Whether the validation has failed or not.
-	 * @since 1.3
-	 */
-	public boolean isValidationFailed() {
-		return validationFailed;
-	}
+    /**
+     * Returns whether the validation has failed or not.
+     * @return Whether the validation has failed or not.
+     * @since 1.3
+     */
+    public boolean isValidationFailed() {
+        return validationFailed;
+    }
 
 }

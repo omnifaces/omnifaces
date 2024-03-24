@@ -24,48 +24,48 @@ import java.util.TreeSet;
  */
 public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparable<T> {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new {@link TreeSet}.
-	 */
-	@Override
-	protected Collection<TreeModel<T>> createChildren() {
-		return new TreeSet<>();
-	}
+    /**
+     * Returns a new {@link TreeSet}.
+     */
+    @Override
+    protected Collection<TreeModel<T>> createChildren() {
+        return new TreeSet<>();
+    }
 
-	/**
-	 * An override which throws {@link IllegalArgumentException} when given data is not <code>null</code>
-	 * <strong>and</strong> not an instance of {@link Comparable}. In other words, it only accepts <code>null</code>
-	 * or an instance of {@link Comparable}.
-	 */
-	@Override
-	public TreeModel<T> addChild(T data) {
-		if (data != null && !(data instanceof Comparable)) {
-			throw new IllegalArgumentException();
-		}
+    /**
+     * An override which throws {@link IllegalArgumentException} when given data is not <code>null</code>
+     * <strong>and</strong> not an instance of {@link Comparable}. In other words, it only accepts <code>null</code>
+     * or an instance of {@link Comparable}.
+     */
+    @Override
+    public TreeModel<T> addChild(T data) {
+        if (data != null && !(data instanceof Comparable)) {
+            throw new IllegalArgumentException();
+        }
 
-		return super.addChild(data);
-	}
+        return super.addChild(data);
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public int compareTo(T object) {
-		if (getData() == null) {
-			return -1;
-		}
+    @Override
+    @SuppressWarnings("unchecked")
+    public int compareTo(T object) {
+        if (getData() == null) {
+            return -1;
+        }
 
-		SortedTreeModel<T> other = (SortedTreeModel<T>) object;
+        SortedTreeModel<T> other = (SortedTreeModel<T>) object;
 
-		if (other == null || other.getData() == null) {
-			return 1;
-		}
+        if (other == null || other.getData() == null) {
+            return 1;
+        }
 
-		return ((Comparable<T>) getData()).compareTo(other.getData());
-	}
+        return ((Comparable<T>) getData()).compareTo(other.getData());
+    }
 
 }

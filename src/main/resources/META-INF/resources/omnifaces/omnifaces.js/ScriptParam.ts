@@ -23,44 +23,44 @@ import { Util } from "./Util";
  */
 export module ScriptParam {
 
-	// Public static functions ----------------------------------------------------------------------------------------
+    // Public static functions ----------------------------------------------------------------------------------------
 
-	/**
-	 * On page load, send all evaluated script results to the bean.
-	 */
-	export function run(scriptParamId: string, scripts: Record<string, string>) {
-		const form = Util.getFacesForm();
+    /**
+     * On page load, send all evaluated script results to the bean.
+     */
+    export function run(scriptParamId: string, scripts: Record<string, string>) {
+        const form = Util.getFacesForm();
 
-		if (!form) {
-			return;
-		}
-		
-		const params: Record<string, string> = {};
+        if (!form) {
+            return;
+        }
+        
+        const params: Record<string, string> = {};
 
-		for (let clientId in scripts) {
-			params[clientId] = JSON.stringify(clone(scripts[clientId]));
-		}
+        for (let clientId in scripts) {
+            params[clientId] = JSON.stringify(clone(scripts[clientId]));
+        }
 
-		params["execute"] = scriptParamId;
-		params[EVENT] = "setScriptParamValues";
-		const faces = window.faces || window.jsf;
-		faces.ajax.request(form, null, params);
-	}
+        params["execute"] = scriptParamId;
+        params[EVENT] = "setScriptParamValues";
+        const faces = window.faces || window.jsf;
+        faces.ajax.request(form, null, params);
+    }
 
-	// Private static functions ---------------------------------------------------------------------------------------
+    // Private static functions ---------------------------------------------------------------------------------------
 
-	function clone(object: any) {
-		if (!(object instanceof Object)) {
-			return object;
-		}
+    function clone(object: any) {
+        if (!(object instanceof Object)) {
+            return object;
+        }
 
-		const clone: Record<any, any> = {};
+        const clone: Record<any, any> = {};
 
-		for (let property in object) { 
-			object[property] instanceof Function || object[property] instanceof Object || (clone[property] = object[property]);
-		}
+        for (let property in object) { 
+            object[property] instanceof Function || object[property] instanceof Object || (clone[property] = object[property]);
+        }
 
-		return clone;
-	}
+        return clone;
+    }
 
 }

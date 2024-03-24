@@ -40,25 +40,25 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateOneOrMore.COMPONENT_TYPE)
 public class ValidateOneOrMore extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateOneOrMore#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrMore";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateOneOrMore#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrMore";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if at least one is filled out.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		for (Object value : values) {
-			if (!isEmpty(value)) {
-				return true;
-			}
-		}
+    /**
+     * Validate if at least one is filled out.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+        for (Object value : values) {
+            if (!isEmpty(value)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

@@ -22,53 +22,53 @@ import { EVENT } from "./OmniFaces";
  */
 export module InputFile {
 
-	// Public static functions ----------------------------------------------------------------------------------------
+    // Public static functions ----------------------------------------------------------------------------------------
 
-	/**
-	 * Validate size of selected files of given o:inputFile against given maxsize.
-	 * The faces message will be triggered server side.
-	 * @param event Required; The involved DOM event (expected: 'change').
-	 * @param inputFile Required; The involved o:inputFile.
-	 * @param messageClientId Required; The client ID of involved h:message.
-	 * @param maxsize Required; The maximum size for each selected file.
-	 */
-	export function validate(event: Event, inputFile: HTMLInputElement, messageClientId: string, maxsize: number) {
-		if (!window.FileReader) {
-			return true; // File API not supported (IE6-9). End of story. Let standard JSF code continue.
-		}
+    /**
+     * Validate size of selected files of given o:inputFile against given maxsize.
+     * The faces message will be triggered server side.
+     * @param event Required; The involved DOM event (expected: 'change').
+     * @param inputFile Required; The involved o:inputFile.
+     * @param messageClientId Required; The client ID of involved h:message.
+     * @param maxsize Required; The maximum size for each selected file.
+     */
+    export function validate(event: Event, inputFile: HTMLInputElement, messageClientId: string, maxsize: number) {
+        if (!window.FileReader) {
+            return true; // File API not supported (IE6-9). End of story. Let standard JSF code continue.
+        }
 
-		document.getElementById(messageClientId).innerHTML = ""; // Clear out any previously rendered message.
+        document.getElementById(messageClientId).innerHTML = ""; // Clear out any previously rendered message.
 
-		for (var i = 0; i < inputFile.files.length; i++) {
-			const file = inputFile.files[i];
+        for (var i = 0; i < inputFile.files.length; i++) {
+            const file = inputFile.files[i];
 
-			if (file.size > maxsize) {
-				const fileName = file.name;
-				let originalEnctype: string;
+            if (file.size > maxsize) {
+                const fileName = file.name;
+                let originalEnctype: string;
 
-				if (window.mojarra) { // Mojarra doesn't add custom params when using iframe transport.
-					originalEnctype = inputFile.form.enctype;
-					inputFile.form.enctype = "application/x-www-form-urlencoded";
-				}
+                if (window.mojarra) { // Mojarra doesn't add custom params when using iframe transport.
+                    originalEnctype = inputFile.form.enctype;
+                    inputFile.form.enctype = "application/x-www-form-urlencoded";
+                }
 
-				// Clear out selected files. Note: inputFile.value = null doesn't work in IE.
-				inputFile.type = "text";
-				inputFile.type = "file";
-				
-				const params: Record<string, string> = { fileName: fileName };
-				params[EVENT] = "validationFailed";
-				const faces = window.faces || window.jsf;
-				faces.ajax.request(inputFile.id, event, params);
+                // Clear out selected files. Note: inputFile.value = null doesn't work in IE.
+                inputFile.type = "text";
+                inputFile.type = "file";
+                
+                const params: Record<string, string> = { fileName: fileName };
+                params[EVENT] = "validationFailed";
+                const faces = window.faces || window.jsf;
+                faces.ajax.request(inputFile.id, event, params);
 
-				if (originalEnctype) {
-					inputFile.form.enctype = originalEnctype;
-				}
+                if (originalEnctype) {
+                    inputFile.form.enctype = originalEnctype;
+                }
 
-				return false;
-			}
-		}
-		
-		return true;
-	}
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
 }

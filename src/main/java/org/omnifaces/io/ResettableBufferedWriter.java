@@ -30,79 +30,79 @@ import java.nio.charset.Charset;
  */
 public class ResettableBufferedWriter extends Writer implements ResettableBuffer {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private Writer writer;
-	private Charset charset;
-	private CharArrayWriter buffer;
-	private int bufferSize;
-	private int writtenBytes;
+    private Writer writer;
+    private Charset charset;
+    private CharArrayWriter buffer;
+    private int bufferSize;
+    private int writtenBytes;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new resettable buffered writer which wraps the given writer and forcibly buffers everything until
-	 * the given buffer size in bytes, regardless of flush calls. The given character encoding is used to measure the
-	 * amount of already written bytes in the buffer.
-	 * regardless of flush calls.
-	 * @param writer The wrapped writer.
-	 * @param bufferSize The buffer size.
-	 * @param characterEncoding The character encoding.
-	 */
-	public ResettableBufferedWriter(Writer writer, int bufferSize, String characterEncoding) {
-		this.writer = writer;
-		this.bufferSize = bufferSize;
-		charset = Charset.forName(characterEncoding);
-		buffer = new CharArrayWriter(bufferSize);
-	}
+    /**
+     * Construct a new resettable buffered writer which wraps the given writer and forcibly buffers everything until
+     * the given buffer size in bytes, regardless of flush calls. The given character encoding is used to measure the
+     * amount of already written bytes in the buffer.
+     * regardless of flush calls.
+     * @param writer The wrapped writer.
+     * @param bufferSize The buffer size.
+     * @param characterEncoding The character encoding.
+     */
+    public ResettableBufferedWriter(Writer writer, int bufferSize, String characterEncoding) {
+        this.writer = writer;
+        this.bufferSize = bufferSize;
+        charset = Charset.forName(characterEncoding);
+        buffer = new CharArrayWriter(bufferSize);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void write(char[] chars, int offset, int length) throws IOException {
-		if (buffer != null) {
-			writtenBytes += charset.encode(CharBuffer.wrap(chars, offset, length)).limit();
+    @Override
+    public void write(char[] chars, int offset, int length) throws IOException {
+        if (buffer != null) {
+            writtenBytes += charset.encode(CharBuffer.wrap(chars, offset, length)).limit();
 
-			if (writtenBytes > bufferSize) {
-				writer.write(buffer.toCharArray());
-				writer.write(chars, offset, length);
-				buffer = null;
-			}
-			else {
-				buffer.write(chars, offset, length);
-			}
-		}
-		else {
-			writer.write(chars, offset, length);
-		}
-	}
+            if (writtenBytes > bufferSize) {
+                writer.write(buffer.toCharArray());
+                writer.write(chars, offset, length);
+                buffer = null;
+            }
+            else {
+                buffer.write(chars, offset, length);
+            }
+        }
+        else {
+            writer.write(chars, offset, length);
+        }
+    }
 
-	@Override
-	public void reset() {
-		buffer = new CharArrayWriter(bufferSize);
-		writtenBytes = 0;
-	}
+    @Override
+    public void reset() {
+        buffer = new CharArrayWriter(bufferSize);
+        writtenBytes = 0;
+    }
 
-	@Override
-	public void flush() throws IOException {
-		if (buffer == null) {
-			writer.flush();
-		}
-	}
+    @Override
+    public void flush() throws IOException {
+        if (buffer == null) {
+            writer.flush();
+        }
+    }
 
-	@Override
-	public void close() throws IOException {
-		if (buffer != null) {
-			writer.write(buffer.toCharArray());
-			buffer = null;
-		}
+    @Override
+    public void close() throws IOException {
+        if (buffer != null) {
+            writer.write(buffer.toCharArray());
+            buffer = null;
+        }
 
-		writer.close();
-	}
+        writer.close();
+    }
 
-	@Override
-	public boolean isResettable() {
-		return buffer != null;
-	}
+    @Override
+    public boolean isResettable() {
+        return buffer != null;
+    }
 
 }

@@ -25,14 +25,14 @@ import static org.omnifaces.util.Reflection.instance;
  */
 public class NewInstanceCopier implements Copier {
 
-	@Override
-	public Object copy(Object object) {
-		try {
-			return instance(object.getClass());
-		}
-		catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    @Override
+    public Object copy(Object object) {
+        try {
+            return instance(object.getClass());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

@@ -72,57 +72,57 @@ import org.omnifaces.el.DelegatingVariableMapper;
  */
 public class TagAttribute extends TagHandler {
 
-	private static final String ID_ATTRIBUTE = "id";
-	private static final String ID_PREFIX = "j_ido";
+    private static final String ID_ATTRIBUTE = "id";
+    private static final String ID_PREFIX = "j_ido";
 
-	private final String name;
-	private final jakarta.faces.view.facelets.TagAttribute defaultValue;
+    private final String name;
+    private final jakarta.faces.view.facelets.TagAttribute defaultValue;
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public TagAttribute(TagConfig config) {
-		super(config);
-		name = getRequiredAttribute("name").getValue();
-		defaultValue = getAttribute("default");
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public TagAttribute(TagConfig config) {
+        super(config);
+        name = getRequiredAttribute("name").getValue();
+        defaultValue = getAttribute("default");
+    }
 
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		DelegatingVariableMapper variableMapper = getDelegatingVariableMapper(context);
-		ValueExpression valueExpression = variableMapper.resolveWrappedVariable(name);
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        DelegatingVariableMapper variableMapper = getDelegatingVariableMapper(context);
+        ValueExpression valueExpression = variableMapper.resolveWrappedVariable(name);
 
-		if (valueExpression == null) {
-			if (defaultValue != null) {
-				valueExpression = defaultValue.getValueExpression(context, Object.class);
-			}
-			else if (ID_ATTRIBUTE.equals(name)) {
-				valueExpression = createValueExpression("#{'" + ID_PREFIX + context.generateUniqueId(this.tagId) + "'}", String.class);
-				variableMapper.setWrappedVariable(name, valueExpression);
-				return;
-			}
-		}
+        if (valueExpression == null) {
+            if (defaultValue != null) {
+                valueExpression = defaultValue.getValueExpression(context, Object.class);
+            }
+            else if (ID_ATTRIBUTE.equals(name)) {
+                valueExpression = createValueExpression("#{'" + ID_PREFIX + context.generateUniqueId(this.tagId) + "'}", String.class);
+                variableMapper.setWrappedVariable(name, valueExpression);
+                return;
+            }
+        }
 
-		variableMapper.setVariable(name, valueExpression);
-	}
+        variableMapper.setVariable(name, valueExpression);
+    }
 
-	private DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
-		VariableMapper variableMapper = context.getVariableMapper();
+    private DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
+        VariableMapper variableMapper = context.getVariableMapper();
 
-		if (variableMapper instanceof DelegatingVariableMapper) {
-			return (DelegatingVariableMapper) variableMapper;
-		}
+        if (variableMapper instanceof DelegatingVariableMapper) {
+            return (DelegatingVariableMapper) variableMapper;
+        }
 
-		DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
-		ValueExpression valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
+        DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+        ValueExpression valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
 
-		if (valueExpression != null && valueExpression.getExpressionString().startsWith("#{'" + ID_PREFIX)) {
-			delegatingVariableMapper.setWrappedVariable(ID_ATTRIBUTE, null);
-		}
+        if (valueExpression != null && valueExpression.getExpressionString().startsWith("#{'" + ID_PREFIX)) {
+            delegatingVariableMapper.setWrappedVariable(ID_ATTRIBUTE, null);
+        }
 
-		context.setVariableMapper(delegatingVariableMapper);
-		return delegatingVariableMapper;
-	}
+        context.setVariableMapper(delegatingVariableMapper);
+        return delegatingVariableMapper;
+    }
 
 }

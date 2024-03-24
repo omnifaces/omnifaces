@@ -36,42 +36,42 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalWriterListener implements PhaseListener {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final List<String> componentIds;
-	private final List<String> clientIds;
-	private final boolean renderChildren;
+    private final List<String> componentIds;
+    private final List<String> clientIds;
+    private final boolean renderChildren;
 
-	/**
-	 * Construct conditional writer listener.
-	 * @param componentIds Component IDs.
-	 * @param clientIds Client IDs.
-	 * @param renderChildren Whether to render children.
-	 */
-	public ConditionalWriterListener(List<String> componentIds, List<String> clientIds, boolean renderChildren) {
-		this.componentIds = componentIds;
-		this.clientIds = clientIds;
-		this.renderChildren = renderChildren;
-	}
+    /**
+     * Construct conditional writer listener.
+     * @param componentIds Component IDs.
+     * @param clientIds Client IDs.
+     * @param renderChildren Whether to render children.
+     */
+    public ConditionalWriterListener(List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+        this.componentIds = componentIds;
+        this.clientIds = clientIds;
+        this.renderChildren = renderChildren;
+    }
 
-	@Override
-	public PhaseId getPhaseId() {
-		return PhaseId.RENDER_RESPONSE;
-	}
+    @Override
+    public PhaseId getPhaseId() {
+        return PhaseId.RENDER_RESPONSE;
+    }
 
-	@Override
-	public void beforePhase(PhaseEvent event) {
-		FacesContext context = event.getFacesContext();
-		ResponseWriter originalWriter = context.getResponseWriter();
-		setContextAttribute(context, this + "_writer", originalWriter);
-		context.setResponseWriter(new ConditionalResponseWriter(originalWriter, context, componentIds, clientIds, renderChildren));
-	}
+    @Override
+    public void beforePhase(PhaseEvent event) {
+        FacesContext context = event.getFacesContext();
+        ResponseWriter originalWriter = context.getResponseWriter();
+        setContextAttribute(context, this + "_writer", originalWriter);
+        context.setResponseWriter(new ConditionalResponseWriter(originalWriter, context, componentIds, clientIds, renderChildren));
+    }
 
-	@Override
-	public void afterPhase(PhaseEvent event) {
-		FacesContext context = event.getFacesContext();
-		ResponseWriter originalWriter = getContextAttribute(context, this + "_writer");
-		context.setResponseWriter(originalWriter);
-	}
+    @Override
+    public void afterPhase(PhaseEvent event) {
+        FacesContext context = event.getFacesContext();
+        ResponseWriter originalWriter = getContextAttribute(context, this + "_writer");
+        context.setResponseWriter(originalWriter);
+    }
 
 }

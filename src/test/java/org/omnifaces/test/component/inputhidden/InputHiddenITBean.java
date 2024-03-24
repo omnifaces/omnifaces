@@ -39,15 +39,15 @@ public class InputHiddenITBean {
     }
 
     public void setToggled(boolean toggled) {
-		this.toggled = toggled;
-	}
+        this.toggled = toggled;
+    }
 
     public boolean isToggled() {
         return toggled;
     }
 
     public String getReadonly() { // No setter!
-		return readonly;
-	}
+        return readonly;
+    }
 
 }

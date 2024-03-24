@@ -75,60 +75,60 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
 public class SelectItemsIndexConverter implements Converter<Object> {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
+    private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
 
-	private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
-		"Could not determine index for value ''{0}'' in component {1}.";
-	private static final String ERROR_GET_AS_OBJECT =
-		"Could not convert value ''{0}'' for component {1}.";
+    private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
+        "Could not determine index for value ''{0}'' in component {1}.";
+    private static final String ERROR_GET_AS_OBJECT =
+        "Could not convert value ''{0}'' for component {1}.";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (isEmpty(submittedValue)) {
-			return null; // Work around for MyFaces 2.0.x bug.
-		}
+    @Override
+    public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (isEmpty(submittedValue)) {
+            return null; // Work around for MyFaces 2.0.x bug.
+        }
 
-		List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
+        List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 
-		try {
-			return selectItemValues.get(Integer.parseInt(submittedValue));
-		}
-		catch (NumberFormatException e) {
-			throw new ConverterException(
-				createError(ERROR_SELECT_ITEMS_LIST_INDEX, submittedValue, component.getClientId(context)), e);
-		}
-		catch (Exception e) {
-			throw new ConverterException(
-				createError(ERROR_GET_AS_OBJECT, submittedValue, component.getClientId(context)), e);
-		}
-	}
+        try {
+            return selectItemValues.get(Integer.parseInt(submittedValue));
+        }
+        catch (NumberFormatException e) {
+            throw new ConverterException(
+                createError(ERROR_SELECT_ITEMS_LIST_INDEX, submittedValue, component.getClientId(context)), e);
+        }
+        catch (Exception e) {
+            throw new ConverterException(
+                createError(ERROR_GET_AS_OBJECT, submittedValue, component.getClientId(context)), e);
+        }
+    }
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		String key = format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
-		Entry<PhaseId, List<Object>> selectItemValuesByPhaseId = getContextAttribute(key);
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+        String key = format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
+        Entry<PhaseId, List<Object>> selectItemValuesByPhaseId = getContextAttribute(key);
 
-		if (selectItemValuesByPhaseId == null || selectItemValuesByPhaseId.getKey() != context.getCurrentPhaseId()) {
-			List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
-			selectItemValuesByPhaseId = new SimpleEntry<>(context.getCurrentPhaseId(), selectItemValues);
-			setContextAttribute(key, selectItemValuesByPhaseId); // Cache it as it's a rather expensive job.
-		}
+        if (selectItemValuesByPhaseId == null || selectItemValuesByPhaseId.getKey() != context.getCurrentPhaseId()) {
+            List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
+            selectItemValuesByPhaseId = new SimpleEntry<>(context.getCurrentPhaseId(), selectItemValues);
+            setContextAttribute(key, selectItemValuesByPhaseId); // Cache it as it's a rather expensive job.
+        }
 
-		List<Object> selectItemValues = selectItemValuesByPhaseId.getValue();
+        List<Object> selectItemValues = selectItemValuesByPhaseId.getValue();
 
-		for (int i = 0; i < selectItemValues.size(); i++) {
-			Object selectItemValue = selectItemValues.get(i);
+        for (int i = 0; i < selectItemValues.size(); i++) {
+            Object selectItemValue = selectItemValues.get(i);
 
-			if (isEmpty(modelValue) ? isEmpty(selectItemValue) : modelValue.equals(selectItemValue)) {
-				return Integer.toString(i);
-			}
-		}
+            if (isEmpty(modelValue) ? isEmpty(selectItemValue) : modelValue.equals(selectItemValue)) {
+                return Integer.toString(i);
+            }
+        }
 
-		return "";
-	}
+        return "";
+    }
 
 }

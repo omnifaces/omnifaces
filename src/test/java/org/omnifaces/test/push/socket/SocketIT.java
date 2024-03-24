@@ -24,121 +24,121 @@ import org.openqa.selenium.support.FindBy;
 
 public class SocketIT extends OmniFacesIT {
 
-	@FindBy(id="messages")
-	private WebElement messages;
+    @FindBy(id="messages")
+    private WebElement messages;
 
-	@FindBy(id="newtab")
-	private WebElement newtab;
+    @FindBy(id="newtab")
+    private WebElement newtab;
 
-	@FindBy(id="clientOpenedMessages")
-	private WebElement clientOpenedMessages;
+    @FindBy(id="clientOpenedMessages")
+    private WebElement clientOpenedMessages;
 
-	@FindBy(id="applicationScopedServerEventMessage")
-	private WebElement applicationScopedServerEventMessage;
+    @FindBy(id="applicationScopedServerEventMessage")
+    private WebElement applicationScopedServerEventMessage;
 
-	@FindBy(id="push:applicationScopedServerEvent")
-	private WebElement pushApplicationScopedServerEvent;
+    @FindBy(id="push:applicationScopedServerEvent")
+    private WebElement pushApplicationScopedServerEvent;
 
-	@FindBy(id="sessionScopedUserTargetedMessage")
-	private WebElement sessionScopedUserTargetedMessage;
+    @FindBy(id="sessionScopedUserTargetedMessage")
+    private WebElement sessionScopedUserTargetedMessage;
 
-	@FindBy(id="push:sessionScopedUserTargeted")
-	private WebElement pushSessionScopedUserTargeted;
+    @FindBy(id="push:sessionScopedUserTargeted")
+    private WebElement pushSessionScopedUserTargeted;
 
-	@FindBy(id="viewScopedAjaxAwareMessage")
-	private WebElement viewScopedAjaxAwareMessage;
+    @FindBy(id="viewScopedAjaxAwareMessage")
+    private WebElement viewScopedAjaxAwareMessage;
 
-	@FindBy(id="push:viewScopedAjaxAware")
-	private WebElement pushViewScopedAjaxAware;
+    @FindBy(id="push:viewScopedAjaxAware")
+    private WebElement pushViewScopedAjaxAware;
 
-	@FindBy(id="clientClosedMessages")
-	private WebElement clientClosedMessages;
+    @FindBy(id="clientClosedMessages")
+    private WebElement clientClosedMessages;
 
-	@FindBy(id="closeAllSockets")
-	private WebElement closeAllSockets;
+    @FindBy(id="closeAllSockets")
+    private WebElement closeAllSockets;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(SocketIT.class)
-				.withWebXml(withSocket)
-				.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(SocketIT.class)
+                .withWebXml(withSocket)
+                .createDeployment();
+    }
 
-	@Test
-	void test() {
-		testOnopen();
+    @Test
+    void test() {
+        testOnopen();
 
-		assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
-		assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
-		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
+        assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-		assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
-		assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
-		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
+        assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-		String firstTab = browser.getWindowHandle();
-		openNewTab(newtab);
-		testOnopen();
+        String firstTab = browser.getWindowHandle();
+        openNewTab(newtab);
+        testOnopen();
 
-		assertEquals(pushApplicationScopedServerEvent(), "2," + applicationScopedServerEventMessage.getText());
-		assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
-		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "2," + applicationScopedServerEventMessage.getText());
+        assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-		assertEquals(pushApplicationScopedServerEvent(), "2," + applicationScopedServerEventMessage.getText());
-		assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
-		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "2," + applicationScopedServerEventMessage.getText());
+        assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-		// Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT, so
-		// application, session and user sockets can't be tested more extensively. If possible somehow, it's expected
-		// that numbers should equal respectively 3, 2, 1 on first session and 3, 1, 1 on second session.
+        // Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT, so
+        // application, session and user sockets can't be tested more extensively. If possible somehow, it's expected
+        // that numbers should equal respectively 3, 2, 1 on first session and 3, 1, 1 on second session.
 
-		testOnclose(firstTab);
-	}
+        testOnclose(firstTab);
+    }
 
-	private void testOnopen() {
-		waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
-		waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
-		waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
+    private void testOnopen() {
+        waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
+        waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
+        waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
 
-		if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
-			waitUntilTextContains(applicationScopedServerEventMessage, "|opened:applicationScopedServerEvent|");
-			waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
-			waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
-		}
-	}
+        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
+            waitUntilTextContains(applicationScopedServerEventMessage, "|opened:applicationScopedServerEvent|");
+            waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
+            waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
+        }
+    }
 
-	private void testOnclose(String tabToSwitch) {
-		closeAllSockets.click();
-		waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
-		waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
+    private void testOnclose(String tabToSwitch) {
+        closeAllSockets.click();
+        waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
+        waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
 
-		if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
-			waitUntilTextContains(applicationScopedServerEventMessage, "|closed:sessionScopedUserTargeted|");
-			waitUntilTextContains(applicationScopedServerEventMessage, "|closed:viewScopedAjaxAware|");
-		}
+        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
+            waitUntilTextContains(applicationScopedServerEventMessage, "|closed:sessionScopedUserTargeted|");
+            waitUntilTextContains(applicationScopedServerEventMessage, "|closed:viewScopedAjaxAware|");
+        }
 
-		closeCurrentTabAndSwitchTo(tabToSwitch);
-	}
+        closeCurrentTabAndSwitchTo(tabToSwitch);
+    }
 
-	private String pushApplicationScopedServerEvent() {
-		guardAjax(pushApplicationScopedServerEvent::click);
-		String message = messages.getText();
-		waitUntilTextContent(applicationScopedServerEventMessage);
-		return message;
-	}
+    private String pushApplicationScopedServerEvent() {
+        guardAjax(pushApplicationScopedServerEvent::click);
+        String message = messages.getText();
+        waitUntilTextContent(applicationScopedServerEventMessage);
+        return message;
+    }
 
-	private String pushSessionScopedUserTargeted() {
-		guardAjax(pushSessionScopedUserTargeted::click);
-		String message = messages.getText();
-		waitUntilTextContent(sessionScopedUserTargetedMessage);
-		return message;
-	}
+    private String pushSessionScopedUserTargeted() {
+        guardAjax(pushSessionScopedUserTargeted::click);
+        String message = messages.getText();
+        waitUntilTextContent(sessionScopedUserTargetedMessage);
+        return message;
+    }
 
-	private String pushViewScopedAjaxAware() {
-		guardAjax(pushViewScopedAjaxAware::click);
-		String message = messages.getText();
-		waitUntilTextContent(viewScopedAjaxAwareMessage);
-		return message;
-	}
+    private String pushViewScopedAjaxAware() {
+        guardAjax(pushViewScopedAjaxAware::click);
+        String message = messages.getText();
+        waitUntilTextContent(viewScopedAjaxAwareMessage);
+        return message;
+    }
 
 }

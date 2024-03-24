@@ -73,119 +73,119 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  */
 public class Converter extends ConverterHandler implements DeferredTagHandler {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The constructor.
-	 * @param config The converter config.
-	 */
-	public Converter(ConverterConfig config) {
-		super(config);
-	}
+    /**
+     * The constructor.
+     * @param config The converter config.
+     */
+    public Converter(ConverterConfig config) {
+        super(config);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Create a {@link jakarta.faces.convert.Converter} based on the <code>binding</code> and/or <code>converterId</code>
-	 * attributes as per the standard Faces <code>&lt;f:converter&gt;</code> implementation and collect the render time
-	 * attributes. Then create an anonymous <code>Converter</code> implementation which wraps the created
-	 * <code>Converter</code> and delegates the methods to it after setting the render time attributes. Finally set the
-	 * anonymous implementation on the parent component.
-	 * @param context The involved facelet context.
-	 * @param parent The parent component to set the <code>Converter</code> on.
-	 * @throws IOException If something fails at I/O level.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+    /**
+     * Create a {@link jakarta.faces.convert.Converter} based on the <code>binding</code> and/or <code>converterId</code>
+     * attributes as per the standard Faces <code>&lt;f:converter&gt;</code> implementation and collect the render time
+     * attributes. Then create an anonymous <code>Converter</code> implementation which wraps the created
+     * <code>Converter</code> and delegates the methods to it after setting the render time attributes. Finally set the
+     * anonymous implementation on the parent component.
+     * @param context The involved facelet context.
+     * @param parent The parent component to set the <code>Converter</code> on.
+     * @throws IOException If something fails at I/O level.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
 
-		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
-			// If it's not new nor inside a composite component, we're finished.
-			return;
-		}
+        if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
+            // If it's not new nor inside a composite component, we're finished.
+            return;
+        }
 
-		if (!(parent instanceof ValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
-			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
-			super.apply(context, parent);
-			return;
-		}
+        if (!(parent instanceof ValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+            // It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
+            super.apply(context, parent);
+            return;
+        }
 
-		ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
-		ValueExpression id = getValueExpression(context, this, "converterId", String.class);
-		jakarta.faces.convert.Converter<Object> converter = createInstance(context.getFacesContext(), context, binding, id);
-		DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
-		((ValueHolder) parent).setConverter(new DeferredConverter(converter, binding, id, attributes));
-	}
+        ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
+        ValueExpression id = getValueExpression(context, this, "converterId", String.class);
+        jakarta.faces.convert.Converter<Object> converter = createInstance(context.getFacesContext(), context, binding, id);
+        DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
+        ((ValueHolder) parent).setConverter(new DeferredConverter(converter, binding, id, attributes));
+    }
 
-	@Override
-	public TagAttribute getTagAttribute(String name) {
-		return getAttribute(name);
-	}
+    @Override
+    public TagAttribute getTagAttribute(String name) {
+        return getAttribute(name);
+    }
 
-	@Override
-	protected TagHandlerDelegate getTagHandlerDelegate() {
-		return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
-	}
+    @Override
+    protected TagHandlerDelegate getTagHandlerDelegate() {
+        return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
+    }
 
-	@Override
-	public boolean isDisabled(FaceletContext context) {
-		return false; // This attribute isn't supported on converters anyway.
-	}
+    @Override
+    public boolean isDisabled(FaceletContext context) {
+        return false; // This attribute isn't supported on converters anyway.
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	@SuppressWarnings("unchecked")
-	private static jakarta.faces.convert.Converter<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
-		return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createConverter, "converter");
-	}
+    @SuppressWarnings("unchecked")
+    private static jakarta.faces.convert.Converter<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
+        return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createConverter, "converter");
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * So that we can have a serializable converter.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	protected static class DeferredConverter implements jakarta.faces.convert.Converter<Object>, Serializable {
-		private static final long serialVersionUID = 1L;
+    /**
+     * So that we can have a serializable converter.
+     *
+     * @author Bauke Scholtz
+     */
+    protected static class DeferredConverter implements jakarta.faces.convert.Converter<Object>, Serializable {
+        private static final long serialVersionUID = 1L;
 
-		private transient jakarta.faces.convert.Converter<Object> converter;
-		private final ValueExpression binding;
-		private final ValueExpression id;
-		private final DeferredAttributes attributes;
+        private transient jakarta.faces.convert.Converter<Object> converter;
+        private final ValueExpression binding;
+        private final ValueExpression id;
+        private final DeferredAttributes attributes;
 
-		/**
-		 * Construct the deferred converter.
-		 * @param converter The wrapped converter.
-		 * @param binding The binding expression.
-		 * @param id The ID expression.
-		 * @param attributes The deferred attributes.
-		 */
-		public DeferredConverter(jakarta.faces.convert.Converter<Object> converter, ValueExpression binding, ValueExpression id, DeferredAttributes attributes) {
-			this.converter = converter;
-			this.binding = binding;
-			this.id = id;
-			this.attributes = attributes;
-		}
+        /**
+         * Construct the deferred converter.
+         * @param converter The wrapped converter.
+         * @param binding The binding expression.
+         * @param id The ID expression.
+         * @param attributes The deferred attributes.
+         */
+        public DeferredConverter(jakarta.faces.convert.Converter<Object> converter, ValueExpression binding, ValueExpression id, DeferredAttributes attributes) {
+            this.converter = converter;
+            this.binding = binding;
+            this.id = id;
+            this.attributes = attributes;
+        }
 
-		@Override
-		public Object getAsObject(FacesContext context, UIComponent component, String value) {
-			return getConverter(context).getAsObject(context, component, value);
-		}
+        @Override
+        public Object getAsObject(FacesContext context, UIComponent component, String value) {
+            return getConverter(context).getAsObject(context, component, value);
+        }
 
-		@Override
-		public String getAsString(FacesContext context, UIComponent component, Object value) {
-			return getConverter(context).getAsString(context, component, value);
-		}
+        @Override
+        public String getAsString(FacesContext context, UIComponent component, Object value) {
+            return getConverter(context).getAsString(context, component, value);
+        }
 
-		private jakarta.faces.convert.Converter<Object> getConverter(FacesContext context) {
-			if (converter == null) {
-				converter = Converter.createInstance(context, context.getELContext(), binding, id);
-			}
+        private jakarta.faces.convert.Converter<Object> getConverter(FacesContext context) {
+            if (converter == null) {
+                converter = Converter.createInstance(context, context.getELContext(), binding, id);
+            }
 
-			attributes.invokeSetters(context.getELContext(), converter);
-			return converter;
-		}
-	}
+            attributes.invokeSetters(context.getELContext(), converter);
+            return converter;
+        }
+    }
 
 }

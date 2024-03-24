@@ -33,60 +33,60 @@ import org.omnifaces.resourcehandler.CombinedResourceHandler;
 @FacesRenderer(componentFamily=UIOutput.COMPONENT_FAMILY, rendererType=InlineScriptRenderer.RENDERER_TYPE)
 public class InlineScriptRenderer extends InlineResourceRenderer {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The standard renderer type. */
-	public static final String RENDERER_TYPE = "org.omnifaces.InlineScript";
+    /** The standard renderer type. */
+    public static final String RENDERER_TYPE = "org.omnifaces.InlineScript";
 
-	private static final char[] END_SCRIPT = "/script>".toCharArray();
+    private static final char[] END_SCRIPT = "/script>".toCharArray();
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
-		writer.startElement("script", component);
-		writer.writeAttribute("type", "text/javascript", "type");
-		writer.write("//<![CDATA[\n");
-	}
+    @Override
+    public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
+        writer.startElement("script", component);
+        writer.writeAttribute("type", "text/javascript", "type");
+        writer.write("//<![CDATA[\n");
+    }
 
-	@Override
-	public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-		for (int c = reader.read(); c != -1; c = reader.read()) {
-			writer.write(c);
+    @Override
+    public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
+        for (int c = reader.read(); c != -1; c = reader.read()) {
+            writer.write(c);
 
-			if (c == '<') {
-				escapeEndScriptIfNecessary(reader, writer);
-			}
-		}
-	}
+            if (c == '<') {
+                escapeEndScriptIfNecessary(reader, writer);
+            }
+        }
+    }
 
-	private void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
-		int length = 0;
+    private void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
+        int length = 0;
 
-		for (int ch = reader.read(); ch != -1; ch = reader.read()) {
-			if (Character.toLowerCase(ch) != END_SCRIPT[length]) {
-				if (length > 0) {
-					writer.write(END_SCRIPT, 0, length);
-				}
+        for (int ch = reader.read(); ch != -1; ch = reader.read()) {
+            if (Character.toLowerCase(ch) != END_SCRIPT[length]) {
+                if (length > 0) {
+                    writer.write(END_SCRIPT, 0, length);
+                }
 
-				writer.write(ch);
-				return;
-			}
+                writer.write(ch);
+                return;
+            }
 
-			length++;
+            length++;
 
-			if (length == END_SCRIPT.length) {
-				writer.write('\\'); // Escape closing script tags which may occur in JS literals.
-				writer.write(END_SCRIPT);
-				return;
-			}
-		}
-	}
+            if (length == END_SCRIPT.length) {
+                writer.write('\\'); // Escape closing script tags which may occur in JS literals.
+                writer.write(END_SCRIPT);
+                return;
+            }
+        }
+    }
 
-	@Override
-	public void endElement(ResponseWriter writer) throws IOException {
-		writer.write("\n//]]>");
-		writer.endElement("script");
-	}
+    @Override
+    public void endElement(ResponseWriter writer) throws IOException {
+        writer.write("\n//]]>");
+        writer.endElement("script");
+    }
 
 }

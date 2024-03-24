@@ -21,24 +21,24 @@ import { EVENT } from "./OmniFaces";
  * @see PWAResourceHandler
  */
 export module ServiceWorker {
-	
-	// Public static functions ----------------------------------------------------------------------------------------
+    
+    // Public static functions ----------------------------------------------------------------------------------------
 
-	/**
-	 * On page load, register the service worker.
-	 * Also register a message event listener for "omnifaces.event" which in turn delegates to window events.
-	 */
-	export function init(serviceWorkerUrl: string, serviceWorkerScope: string) {
-		if (!navigator.serviceWorker) {
-			return; // Service workers not supported. End of story. https://caniuse.com/#feat=serviceworkers
-		}
+    /**
+     * On page load, register the service worker.
+     * Also register a message event listener for "omnifaces.event" which in turn delegates to window events.
+     */
+    export function init(serviceWorkerUrl: string, serviceWorkerScope: string) {
+        if (!navigator.serviceWorker) {
+            return; // Service workers not supported. End of story. https://caniuse.com/#feat=serviceworkers
+        }
 
-		navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope });
-		navigator.serviceWorker.addEventListener("message", function(event) {
-			if (event.data && event.data.type == EVENT) {
-				window.dispatchEvent(new CustomEvent(event.data.name, { detail: event.data.detail }));
-			}
-		});
-	}
+        navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope });
+        navigator.serviceWorker.addEventListener("message", function(event) {
+            if (event.data && event.data.type == EVENT) {
+                window.dispatchEvent(new CustomEvent(event.data.name, { detail: event.data.detail }));
+            }
+        });
+    }
 
 }

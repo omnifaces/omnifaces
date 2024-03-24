@@ -167,76 +167,76 @@ import org.omnifaces.util.Servlets;
  */
 public class CacheControlFilter extends HttpFilter {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String INIT_PARAM_EXPIRES = "expires";
-	private static final long DEFAULT_EXPIRES = 0;
-	private static final long DAYS_PER_WEEK = 7;
-	private static final String ERROR_EXPIRES = "The 'expires' init param must be a number between 0 and 999999999 with"
-		+ " optionally the 'w', 'd', 'h', 'm' or 's' suffix. For example: '6w' is 6 weeks. Default suffix is 's' for"
-		+ " seconds. For example: '86400' is 86400 seconds. Encountered an invalid value of '%s'.";
+    private static final String INIT_PARAM_EXPIRES = "expires";
+    private static final long DEFAULT_EXPIRES = 0;
+    private static final long DAYS_PER_WEEK = 7;
+    private static final String ERROR_EXPIRES = "The 'expires' init param must be a number between 0 and 999999999 with"
+        + " optionally the 'w', 'd', 'h', 'm' or 's' suffix. For example: '6w' is 6 weeks. Default suffix is 's' for"
+        + " seconds. For example: '86400' is 86400 seconds. Encountered an invalid value of '%s'.";
 
-	private enum Unit {
-		W(DAYS.toSeconds(DAYS_PER_WEEK)), D(DAYS.toSeconds(1)), H(HOURS.toSeconds(1)), M(MINUTES.toSeconds(1)), S(1);
+    private enum Unit {
+        W(DAYS.toSeconds(DAYS_PER_WEEK)), D(DAYS.toSeconds(1)), H(HOURS.toSeconds(1)), M(MINUTES.toSeconds(1)), S(1);
 
-		private long seconds;
+        private long seconds;
 
-		private Unit(long seconds) {
-			this.seconds = seconds;
-		}
+        private Unit(long seconds) {
+            this.seconds = seconds;
+        }
 
-		public long toSeconds(long value) {
-			return value * seconds;
-		}
-	}
+        public long toSeconds(long value) {
+            return value * seconds;
+        }
+    }
 
-	// Vars -----------------------------------------------------------------------------------------------------------
+    // Vars -----------------------------------------------------------------------------------------------------------
 
-	private long expires = DEFAULT_EXPIRES;
+    private long expires = DEFAULT_EXPIRES;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Initialize the <code>expires</code> parameter.
-	 */
-	@Override
-	public void init() throws ServletException {
-		if (isFacesDevelopment(getServletContext())) {
-			return; // Don't cache during development.
-		}
+    /**
+     * Initialize the <code>expires</code> parameter.
+     */
+    @Override
+    public void init() throws ServletException {
+        if (isFacesDevelopment(getServletContext())) {
+            return; // Don't cache during development.
+        }
 
-		String expiresParam = getInitParameter(INIT_PARAM_EXPIRES);
+        String expiresParam = getInitParameter(INIT_PARAM_EXPIRES);
 
-		if (expiresParam != null) {
-			if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
-				throw new ServletException(format(ERROR_EXPIRES, expiresParam));
-			}
+        if (expiresParam != null) {
+            if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
+                throw new ServletException(format(ERROR_EXPIRES, expiresParam));
+            }
 
-			String[] parts = expiresParam.split("(?=[wdhms])");
-			long number = Long.parseLong(parts[0]);
+            String[] parts = expiresParam.split("(?=[wdhms])");
+            long number = Long.parseLong(parts[0]);
 
-			if (parts.length > 1) {
-				String unit = parts[1];
-				number = Unit.valueOf(unit.toUpperCase()).toSeconds(number);
-			}
+            if (parts.length > 1) {
+                String unit = parts[1];
+                number = Unit.valueOf(unit.toUpperCase()).toSeconds(number);
+            }
 
-			expires = number;
-		}
-	}
+            expires = number;
+        }
+    }
 
-	/**
-	 * Set the necessary response headers based on <code>expires</code> initialization parameter.
-	 */
-	@Override
-	public void doFilter
-		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-			throws ServletException, IOException
-	{
-		if (!isFacesResourceRequest(request)) {
-			setCacheHeaders(response, expires);
-		}
+    /**
+     * Set the necessary response headers based on <code>expires</code> initialization parameter.
+     */
+    @Override
+    public void doFilter
+        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+            throws ServletException, IOException
+    {
+        if (!isFacesResourceRequest(request)) {
+            setCacheHeaders(response, expires);
+        }
 
-		chain.doFilter(request, response);
-	}
+        chain.doFilter(request, response);
+    }
 
 }

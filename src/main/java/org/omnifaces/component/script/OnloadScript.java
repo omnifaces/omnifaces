@@ -62,103 +62,103 @@ import org.omnifaces.util.Ajax;
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.script.OnloadScript#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.OnloadScript";
+    /** The component type, which is {@value org.omnifaces.component.script.OnloadScript#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.script.OnloadScript";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}, and if the event is a
-	 * {@link PostRestoreStateEvent}, then subscribe this component to {@link PreRenderViewEvent}, which will invoke
-	 * {@link #processEvent(SystemEvent)}.
-	 */
-	@Override
-	public void processEvent(ComponentSystemEvent event) {
-		moveToBody(event);
+    /**
+     * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}, and if the event is a
+     * {@link PostRestoreStateEvent}, then subscribe this component to {@link PreRenderViewEvent}, which will invoke
+     * {@link #processEvent(SystemEvent)}.
+     */
+    @Override
+    public void processEvent(ComponentSystemEvent event) {
+        moveToBody(event);
 
-		if (event instanceof PostRestoreStateEvent) {
-			subscribeToViewEvent(PreRenderViewEvent.class, this);
-		}
-	}
+        if (event instanceof PostRestoreStateEvent) {
+            subscribeToViewEvent(PreRenderViewEvent.class, this);
+        }
+    }
 
-	/**
-	 * Returns <code>true</code> if the given source is an instance of {@link OnloadScript} or {@link UIViewRoot}.
-	 */
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return source instanceof OnloadScript || source instanceof UIViewRoot;
-	}
+    /**
+     * Returns <code>true</code> if the given source is an instance of {@link OnloadScript} or {@link UIViewRoot}.
+     */
+    @Override
+    public boolean isListenerForSource(Object source) {
+        return source instanceof OnloadScript || source instanceof UIViewRoot;
+    }
 
-	/**
-	 * If the event is a {@link PreRenderViewEvent}, and this component is rendered, and the current request is an ajax
-	 * request with partial rendering, then encode the children as {@link Ajax#oncomplete(String...)}.
-	 */
-	@Override
-	public void processEvent(SystemEvent event) {
-		if (!(event instanceof PreRenderViewEvent) || !isRendered()) {
-			return;
-		}
+    /**
+     * If the event is a {@link PreRenderViewEvent}, and this component is rendered, and the current request is an ajax
+     * request with partial rendering, then encode the children as {@link Ajax#oncomplete(String...)}.
+     */
+    @Override
+    public void processEvent(SystemEvent event) {
+        if (!(event instanceof PreRenderViewEvent) || !isRendered()) {
+            return;
+        }
 
-		FacesContext context = getFacesContext();
+        FacesContext context = getFacesContext();
 
-		if (!isAjaxRequestWithPartialRendering(context)) {
-			return;
-		}
+        if (!isAjaxRequestWithPartialRendering(context)) {
+            return;
+        }
 
-		pushComponentToEL(context, this);
-		StringWriter buffer = new StringWriter();
-		ResponseWriter originalResponseWriter = context.getResponseWriter();
-		String encoding = context.getExternalContext().getRequestCharacterEncoding();
-		context.getExternalContext().setResponseCharacterEncoding(encoding);
-		ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
-		context.setResponseWriter(new ResponseWriterWrapper(writer) {
-			@Override
-			public void writeText(Object text, String property) throws IOException {
-				getWrapped().write(text.toString()); // So, don't escape HTML.
-			}
-		});
+        pushComponentToEL(context, this);
+        StringWriter buffer = new StringWriter();
+        ResponseWriter originalResponseWriter = context.getResponseWriter();
+        String encoding = context.getExternalContext().getRequestCharacterEncoding();
+        context.getExternalContext().setResponseCharacterEncoding(encoding);
+        ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
+        context.setResponseWriter(new ResponseWriterWrapper(writer) {
+            @Override
+            public void writeText(Object text, String property) throws IOException {
+                getWrapped().write(text.toString()); // So, don't escape HTML.
+            }
+        });
 
-		try {
-			encodeChildren(context);
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
-		finally {
-			popComponentFromEL(context);
+        try {
+            encodeChildren(context);
+        }
+        catch (IOException e) {
+            throw new FacesException(e);
+        }
+        finally {
+            popComponentFromEL(context);
 
-			if (originalResponseWriter != null) {
-				context.setResponseWriter(originalResponseWriter);
-			}
-		}
+            if (originalResponseWriter != null) {
+                context.setResponseWriter(originalResponseWriter);
+            }
+        }
 
-		String script = buffer.toString().trim();
+        String script = buffer.toString().trim();
 
-		if (!script.isEmpty()) {
-			oncomplete(script);
-		}
-	}
+        if (!script.isEmpty()) {
+            oncomplete(script);
+        }
+    }
 
-	/**
-	 * If the current request is not an ajax request with partial rendering, then encode begin.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		if (!isAjaxRequestWithPartialRendering(context)) {
-			super.encodeBegin(context);
-		}
-	}
+    /**
+     * If the current request is not an ajax request with partial rendering, then encode begin.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        if (!isAjaxRequestWithPartialRendering(context)) {
+            super.encodeBegin(context);
+        }
+    }
 
-	/**
-	 * If the current request is not an ajax request with partial rendering, then encode end.
-	 */
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		if (!isAjaxRequestWithPartialRendering(context)) {
-			super.encodeEnd(context);
-		}
-	}
+    /**
+     * If the current request is not an ajax request with partial rendering, then encode end.
+     */
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        if (!isAjaxRequestWithPartialRendering(context)) {
+            super.encodeEnd(context);
+        }
+    }
 
 }

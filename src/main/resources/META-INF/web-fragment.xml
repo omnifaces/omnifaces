@@ -14,18 +14,18 @@
 
 -->
 <web-fragment
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
-	version="5.0"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
+    version="5.0"
 >
-	<name>omnifaces</name>
+    <name>omnifaces</name>
 
-	<distributable />
+    <distributable />
 
-	<ordering>
-		<after>
-			<others />
-		</after>
-	</ordering>
+    <ordering>
+        <after>
+            <others />
+        </after>
+    </ordering>
 </web-fragment>

@@ -23,67 +23,67 @@ import org.openqa.selenium.support.FindBy;
 
 public class HashParamIT extends OmniFacesIT {
 
-	@FindBy(id="pageLoadTimestamp")
-	private WebElement pageLoadTimestamp;
+    @FindBy(id="pageLoadTimestamp")
+    private WebElement pageLoadTimestamp;
 
-	@FindBy(id="hashLoadTimestamp")
-	private WebElement hashLoadTimestamp;
+    @FindBy(id="hashLoadTimestamp")
+    private WebElement hashLoadTimestamp;
 
-	@FindBy(id="form:foo")
-	private WebElement foo;
+    @FindBy(id="form:foo")
+    private WebElement foo;
 
-	@FindBy(id="form:bar")
-	private WebElement bar;
+    @FindBy(id="form:bar")
+    private WebElement bar;
 
-	@FindBy(id="form:submit")
-	private WebElement submit;
+    @FindBy(id="form:submit")
+    private WebElement submit;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(HashParamIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(HashParamIT.class);
+    }
 
-	@Test
-	void testHashParam() {
-		openWithHashString("foo=baz&bar=kaz");
-		waitUntilTextContent("hashLoadTimestamp");
+    @Test
+    void testHashParam() {
+        openWithHashString("foo=baz&bar=kaz");
+        waitUntilTextContent("hashLoadTimestamp");
 
-		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
-		long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
-		assertTrue(hashLoadTimestamp > pageLoadTimestamp, "Hash param is set later");
+        long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
+        long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
+        assertTrue(hashLoadTimestamp > pageLoadTimestamp, "Hash param is set later");
 
-		foo.sendKeys("");
-		bar.sendKeys("bar");
-		guardAjax(submit::click);
-		assertTrue(browser.getCurrentUrl().endsWith("#bar=bar"), browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)");
+        foo.sendKeys("");
+        bar.sendKeys("bar");
+        guardAjax(submit::click);
+        assertTrue(browser.getCurrentUrl().endsWith("#bar=bar"), browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)");
 
-		foo.clear();
-		bar.clear();
-		foo.sendKeys("foo");
-		bar.sendKeys("");
-		guardAjax(submit::click);
-		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo"), browser.getCurrentUrl() + " ends with #foo=foo");
+        foo.clear();
+        bar.clear();
+        foo.sendKeys("foo");
+        bar.sendKeys("");
+        guardAjax(submit::click);
+        assertTrue(browser.getCurrentUrl().endsWith("#foo=foo"), browser.getCurrentUrl() + " ends with #foo=foo");
 
-		foo.clear();
-		bar.clear();
-		foo.sendKeys("foo");
-		bar.sendKeys("bar");
-		guardAjax(submit::click);
-		assertTrue(browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"), browser.getCurrentUrl() + " ends with #foo=foo&bar=bar");
+        foo.clear();
+        bar.clear();
+        foo.sendKeys("foo");
+        bar.sendKeys("bar");
+        guardAjax(submit::click);
+        assertTrue(browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"), browser.getCurrentUrl() + " ends with #foo=foo&bar=bar");
 
-		foo.clear();
-		bar.clear();
-		foo.sendKeys("def");
-		bar.sendKeys("def");
-		guardAjax(submit::click);
-		assertTrue(browser.getCurrentUrl().endsWith("#foo=def"), browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)");
+        foo.clear();
+        bar.clear();
+        foo.sendKeys("def");
+        bar.sendKeys("def");
+        guardAjax(submit::click);
+        assertTrue(browser.getCurrentUrl().endsWith("#foo=def"), browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)");
 
-		foo.clear();
-		bar.clear();
-		foo.sendKeys("");
-		bar.sendKeys("");
-		guardAjax(submit::click);
-		assertTrue(!browser.getCurrentUrl().contains("#"), browser.getCurrentUrl() + " ends with no hash param");
-	}
+        foo.clear();
+        bar.clear();
+        foo.sendKeys("");
+        bar.sendKeys("");
+        guardAjax(submit::click);
+        assertTrue(!browser.getCurrentUrl().contains("#"), browser.getCurrentUrl() + " ends with no hash param");
+    }
 
 }

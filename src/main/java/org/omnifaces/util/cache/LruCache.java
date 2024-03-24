@@ -41,220 +41,220 @@ import org.omnifaces.util.Callback.SerializableBiConsumer;
  */
 public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final String ERROR_NULL_KEY_DISALLOWED = "key may not be null";
-	private static final String ERROR_NULL_VALUE_DISALLOWED = "value may not be null";
+    private static final String ERROR_NULL_KEY_DISALLOWED = "key may not be null";
+    private static final String ERROR_NULL_VALUE_DISALLOWED = "value may not be null";
 
-	private int maximumCapacity;
-	private SerializableBiConsumer<K, V> evictionListener;
-	private LinkedHashMap<K, V> entries;
+    private int maximumCapacity;
+    private SerializableBiConsumer<K, V> evictionListener;
+    private LinkedHashMap<K, V> entries;
 
-	private final transient Lock lock = new ReentrantLock();
+    private final transient Lock lock = new ReentrantLock();
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct LRU cache with given maximum capacity.
-	 * @param maximumCapacity The maximum capacity.
-	 * @throws IllegalArgumentException when maximum capacity is less than 2.
-	 */
-	public LruCache(int maximumCapacity) {
-		this(maximumCapacity, (key, value) -> {});
-	}
+    /**
+     * Construct LRU cache with given maximum capacity.
+     * @param maximumCapacity The maximum capacity.
+     * @throws IllegalArgumentException when maximum capacity is less than 2.
+     */
+    public LruCache(int maximumCapacity) {
+        this(maximumCapacity, (key, value) -> {});
+    }
 
-	/**
-	 * Construct LRU cache with given maximum capacity and eviction listener.
-	 * @param maximumCapacity The maximum capacity.
-	 * @param evictionListener The eviction listener.
-	 * @throws IllegalArgumentException when maximum capacity is less than 2.
-	 */
-	public LruCache(int maximumCapacity, SerializableBiConsumer<K, V> evictionListener) {
-		if (maximumCapacity < 2) {
-			throw new IllegalArgumentException("It does not make sense having a maximum capacity less than 2.");
-		}
+    /**
+     * Construct LRU cache with given maximum capacity and eviction listener.
+     * @param maximumCapacity The maximum capacity.
+     * @param evictionListener The eviction listener.
+     * @throws IllegalArgumentException when maximum capacity is less than 2.
+     */
+    public LruCache(int maximumCapacity, SerializableBiConsumer<K, V> evictionListener) {
+        if (maximumCapacity < 2) {
+            throw new IllegalArgumentException("It does not make sense having a maximum capacity less than 2.");
+        }
 
-		requireNonNull(evictionListener, "Use the other constructor when you do not have an eviction listener.");
+        requireNonNull(evictionListener, "Use the other constructor when you do not have an eviction listener.");
 
-		this.maximumCapacity = maximumCapacity;
-		this.evictionListener = evictionListener;
-		this.entries = new LinkedHashMap<>(maximumCapacity);
-	}
+        this.maximumCapacity = maximumCapacity;
+        this.evictionListener = evictionListener;
+        this.entries = new LinkedHashMap<>(maximumCapacity);
+    }
 
-	// Internal -------------------------------------------------------------------------------------------------------
+    // Internal -------------------------------------------------------------------------------------------------------
 
-	private <R> R withLock(Supplier<R> task) {
-		lock.lock();
+    private <R> R withLock(Supplier<R> task) {
+        lock.lock();
 
-		try {
-			return task.get();
-		}
-		finally {
-			lock.unlock();
-		}
-	}
+        try {
+            return task.get();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
 
-	// Mutation methods -----------------------------------------------------------------------------------------------
+    // Mutation methods -----------------------------------------------------------------------------------------------
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public V get(Object key) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		return withLock(() -> {
-			V value = entries.remove(key);
-			if (value != null) {
-				entries.put((K) key, value);
-				return value;
-			}
-			return null;
-		});
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public V get(Object key) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        return withLock(() -> {
+            V value = entries.remove(key);
+            if (value != null) {
+                entries.put((K) key, value);
+                return value;
+            }
+            return null;
+        });
+    }
 
-	@Override
-	public V put(K key, V value) {
-		return put(key, value, false);
-	}
+    @Override
+    public V put(K key, V value) {
+        return put(key, value, false);
+    }
 
-	@Override
-	public V putIfAbsent(K key, V value) {
-		return put(key, value, true);
-	}
+    @Override
+    public V putIfAbsent(K key, V value) {
+        return put(key, value, true);
+    }
 
-	private V put(K key, V value, boolean onlyIfAbsent) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-		Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-		V previousValue = withLock(() -> {
-			V existingValue = entries.remove(key);
+    private V put(K key, V value, boolean onlyIfAbsent) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
+        Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
+        V previousValue = withLock(() -> {
+            V existingValue = entries.remove(key);
 
-			while (entries.size() >= maximumCapacity) {
-				K leastRecentlyUsedKey = entries.keySet().iterator().next();
-				evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
-			}
+            while (entries.size() >= maximumCapacity) {
+                K leastRecentlyUsedKey = entries.keySet().iterator().next();
+                evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
+            }
 
-			entries.put(key, (onlyIfAbsent && existingValue != null) ? existingValue : value);
-			return existingValue;
-		});
+            entries.put(key, (onlyIfAbsent && existingValue != null) ? existingValue : value);
+            return existingValue;
+        });
 
-		evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
-		return previousValue;
-	}
+        evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
+        return previousValue;
+    }
 
-	@Override
-	public void putAll(Map<? extends K, ? extends V> map) {
-		map.forEach(this::put);
-	}
+    @Override
+    public void putAll(Map<? extends K, ? extends V> map) {
+        map.forEach(this::put);
+    }
 
-	@Override
-	public V remove(Object key) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		return withLock(() -> entries.remove(key));
-	}
+    @Override
+    public V remove(Object key) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        return withLock(() -> entries.remove(key));
+    }
 
-	@Override
-	public boolean remove(Object key, Object value) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-		return withLock(() -> value.equals(entries.get(key)) && entries.remove(key) != null);
-	}
+    @Override
+    public boolean remove(Object key, Object value) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
+        return withLock(() -> value.equals(entries.get(key)) && entries.remove(key) != null);
+    }
 
-	@Override
-	public V replace(K key, V value) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-		return withLock(() -> entries.containsKey(key) ? put(key, value, false) : null);
-	}
+    @Override
+    public V replace(K key, V value) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
+        return withLock(() -> entries.containsKey(key) ? put(key, value, false) : null);
+    }
 
-	@Override
-	public boolean replace(K key, V oldValue, V newValue) {
-		requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-		requireNonNull(oldValue, ERROR_NULL_VALUE_DISALLOWED);
-		requireNonNull(newValue, ERROR_NULL_VALUE_DISALLOWED);
-		return withLock(() -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
-	}
+    @Override
+    public boolean replace(K key, V oldValue, V newValue) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        requireNonNull(oldValue, ERROR_NULL_VALUE_DISALLOWED);
+        requireNonNull(newValue, ERROR_NULL_VALUE_DISALLOWED);
+        return withLock(() -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
+    }
 
-	@Override
-	public void clear() {
-		withLock(() -> { entries.clear(); return null; });
-	}
+    @Override
+    public void clear() {
+        withLock(() -> { entries.clear(); return null; });
+    }
 
-	// Readonly methods -----------------------------------------------------------------------------------------------
+    // Readonly methods -----------------------------------------------------------------------------------------------
 
-	@Override
-	public int size() {
-		return entries.size();
-	}
+    @Override
+    public int size() {
+        return entries.size();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return entries.isEmpty();
-	}
+    @Override
+    public boolean isEmpty() {
+        return entries.isEmpty();
+    }
 
-	@Override
-	public boolean containsKey(Object key) {
-		return entries.containsKey(key);
-	}
+    @Override
+    public boolean containsKey(Object key) {
+        return entries.containsKey(key);
+    }
 
-	@Override
-	public boolean containsValue(Object value) {
-		return entries.containsValue(value);
-	}
+    @Override
+    public boolean containsValue(Object value) {
+        return entries.containsValue(value);
+    }
 
-	// Readonly views -------------------------------------------------------------------------------------------------
+    // Readonly views -------------------------------------------------------------------------------------------------
 
-	@Override
-	public Set<K> keySet() {
-		return new ReadOnlyCollection<>(entries::keySet);
-	}
+    @Override
+    public Set<K> keySet() {
+        return new ReadOnlyCollection<>(entries::keySet);
+    }
 
-	@Override
-	public Collection<V> values() {
-		return new ReadOnlyCollection<>(entries::values);
-	}
+    @Override
+    public Collection<V> values() {
+        return new ReadOnlyCollection<>(entries::values);
+    }
 
-	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return new ReadOnlyCollection<>(entries::entrySet);
-	}
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        return new ReadOnlyCollection<>(entries::entrySet);
+    }
 
-	// Inner classes --------------------------------------------------------------------------------------------------
+    // Inner classes --------------------------------------------------------------------------------------------------
 
-	private final class ReadOnlyCollection<E> extends AbstractSet<E> {
+    private final class ReadOnlyCollection<E> extends AbstractSet<E> {
 
-		private final Supplier<Collection<E>> collectionSupplier;
+        private final Supplier<Collection<E>> collectionSupplier;
 
-		public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
-			this.collectionSupplier = collectionSupplier;
-		}
+        public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
+            this.collectionSupplier = collectionSupplier;
+        }
 
-		@Override
-		public int size() {
-			return entries.size();
-		}
+        @Override
+        public int size() {
+            return entries.size();
+        }
 
-		@Override
-		public Iterator<E> iterator() {
-			return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
-		}
-	}
+        @Override
+        public Iterator<E> iterator() {
+            return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
+        }
+    }
 
-	private final class ReadOnlyIterator<E> implements Iterator<E> {
+    private final class ReadOnlyIterator<E> implements Iterator<E> {
 
-		private final Iterator<E> iterator;
+        private final Iterator<E> iterator;
 
-		private ReadOnlyIterator(Iterator<E> iterator) {
-			this.iterator = iterator;
-		}
+        private ReadOnlyIterator(Iterator<E> iterator) {
+            this.iterator = iterator;
+        }
 
-		@Override
-		public boolean hasNext() {
-			return iterator.hasNext();
-		}
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
 
-		@Override
-		public E next() {
-			return iterator.next();
-		}
-	}
+        @Override
+        public E next() {
+            return iterator.next();
+        }
+    }
 
 }

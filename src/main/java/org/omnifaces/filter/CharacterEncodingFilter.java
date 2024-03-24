@@ -78,49 +78,49 @@ import jakarta.servlet.http.HttpSession;
  */
 public class CharacterEncodingFilter extends HttpFilter {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String INIT_PARAM_ENCODING = "encoding";
-	private static final Charset DEFAULT_ENCODING = UTF_8;
-	private static final String ERROR_ENCODING =
-		"The 'encoding' init param must represent a valid charset. Encountered an invalid charset of '%s'.";
+    private static final String INIT_PARAM_ENCODING = "encoding";
+    private static final Charset DEFAULT_ENCODING = UTF_8;
+    private static final String ERROR_ENCODING =
+        "The 'encoding' init param must represent a valid charset. Encountered an invalid charset of '%s'.";
 
-	// Vars -----------------------------------------------------------------------------------------------------------
+    // Vars -----------------------------------------------------------------------------------------------------------
 
-	private Charset encoding = DEFAULT_ENCODING;
+    private Charset encoding = DEFAULT_ENCODING;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Initializes the filter parameters.
-	 */
-	@Override
-	public void init() throws ServletException {
-		String encodingParam = getInitParameter(INIT_PARAM_ENCODING);
+    /**
+     * Initializes the filter parameters.
+     */
+    @Override
+    public void init() throws ServletException {
+        String encodingParam = getInitParameter(INIT_PARAM_ENCODING);
 
-		if (encodingParam != null) {
-			try {
-				encoding = Charset.forName(encodingParam);
-			}
-			catch (Exception e) {
-				throw new ServletException(format(ERROR_ENCODING, encodingParam), e);
-			}
-		}
-	}
+        if (encodingParam != null) {
+            try {
+                encoding = Charset.forName(encodingParam);
+            }
+            catch (Exception e) {
+                throw new ServletException(format(ERROR_ENCODING, encodingParam), e);
+            }
+        }
+    }
 
-	/**
-	 * Perform the filtering job. Only if the request character encoding has not been set yet, then set it.
-	 */
-	@Override
-	public void doFilter
-		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-			throws ServletException, IOException
-	{
-		if (request.getCharacterEncoding() == null) {
-			request.setCharacterEncoding(encoding.name());
-		}
+    /**
+     * Perform the filtering job. Only if the request character encoding has not been set yet, then set it.
+     */
+    @Override
+    public void doFilter
+        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+            throws ServletException, IOException
+    {
+        if (request.getCharacterEncoding() == null) {
+            request.setCharacterEncoding(encoding.name());
+        }
 
-		chain.doFilter(request, response);
-	}
+        chain.doFilter(request, response);
+    }
 
 }

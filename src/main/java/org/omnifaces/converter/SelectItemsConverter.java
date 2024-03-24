@@ -90,18 +90,18 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
 @FacesConverter("omnifaces.SelectItemsConverter")
 public class SelectItemsConverter implements Converter<Object> {
 
-	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String value) {
-		return SelectItemsUtils.findValueByStringConversion(context, component, value, this);
-	}
+    @Override
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+        return SelectItemsUtils.findValueByStringConversion(context, component, value, this);
+    }
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		if (value == null) {
-			return "";
-		}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        if (value == null) {
+            return "";
+        }
 
-		return value.toString();
-	}
+        return value.toString();
+    }
 
 }

@@ -23,15 +23,15 @@ import jakarta.faces.validator.ValidatorException;
 @FacesValidator("paramITEntityValidator")
 public class ParamITEntityValidator implements Validator<ParamITEntity> {
 
-	@Override
-	public void validate(FacesContext context, UIComponent component, ParamITEntity value) throws ValidatorException {
-		if (value == null) {
-			return;
-		}
+    @Override
+    public void validate(FacesContext context, UIComponent component, ParamITEntity value) throws ValidatorException {
+        if (value == null) {
+            return;
+        }
 
-		if (value.getId() != 42L) {
-			throwValidatorException("That's not the right answer");
-		}
-	}
+        if (value.getId() != 42L) {
+            throwValidatorException("That's not the right answer");
+        }
+    }
 
 }

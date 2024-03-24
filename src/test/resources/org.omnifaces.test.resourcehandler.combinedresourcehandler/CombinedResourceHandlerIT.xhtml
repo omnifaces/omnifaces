@@ -14,49 +14,49 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head>
-		<h:outputScript>var i = 0;</h:outputScript>
-		<h:outputScript library="jakarta.faces" name="#{combinedResourceHandlerITBean.facesJsAvailable ? 'faces.js' : 'jsf.js'}" target="head" />
-		<h:outputScript library="omnifaces" name="omnifaces.js" target="head" />
-		<h:outputScript name="headWithTarget.js" target="head" />
-		<h:outputScript name="headWithoutTarget.js" />
-		<o:deferredScript name="deferredInHead.js" />
-		<h:outputStylesheet name="main.css" />
-		<h:outputStylesheet name="screen.css" />
-		<h:outputStylesheet name="print.css" media="print" />
-	</h:head>
-	<h:body>
-		<h:outputScript name="bodyWithTargetHead.js" target="head" />
-		<h:outputScript name="bodyWithTargetBody.js" target="body" />
-		<o:deferredScript name="deferredInBody.js" />
+    <h:head>
+        <h:outputScript>var i = 0;</h:outputScript>
+        <h:outputScript library="jakarta.faces" name="#{combinedResourceHandlerITBean.facesJsAvailable ? 'faces.js' : 'jsf.js'}" target="head" />
+        <h:outputScript library="omnifaces" name="omnifaces.js" target="head" />
+        <h:outputScript name="headWithTarget.js" target="head" />
+        <h:outputScript name="headWithoutTarget.js" />
+        <o:deferredScript name="deferredInHead.js" />
+        <h:outputStylesheet name="main.css" />
+        <h:outputStylesheet name="screen.css" />
+        <h:outputStylesheet name="print.css" media="print" />
+    </h:head>
+    <h:body>
+        <h:outputScript name="bodyWithTargetHead.js" target="head" />
+        <h:outputScript name="bodyWithTargetBody.js" target="body" />
+        <o:deferredScript name="deferredInBody.js" />
 
-		<div id="bodyWithTargetBody" />
-		<div id="headWithoutTarget" />
-		<div id="headWithTarget" />
-		<div id="bodyWithTargetHead" />
-		<div id="bodyWithoutTarget" />
-		<div id="deferredInHead" />
-		<div id="deferredInBody" />
-		
-		<o:form id="nonAjax">
-			<h:commandButton id="submit" value="submit" />
-			<h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
-		</o:form>
+        <div id="bodyWithTargetBody" />
+        <div id="headWithoutTarget" />
+        <div id="headWithTarget" />
+        <div id="bodyWithTargetHead" />
+        <div id="bodyWithoutTarget" />
+        <div id="deferredInHead" />
+        <div id="deferredInBody" />
+        
+        <o:form id="nonAjax">
+            <h:commandButton id="submit" value="submit" />
+            <h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
+        </o:form>
 
-		<o:form id="ajax">
-			<f:ajax>
-				<h:commandButton id="submit" value="submit" />
-				<h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
-			</f:ajax>
-		</o:form>
+        <o:form id="ajax">
+            <f:ajax>
+                <h:commandButton id="submit" value="submit" />
+                <h:commandButton id="rebuild" value="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
+            </f:ajax>
+        </o:form>
 
-		<h:outputScript name="bodyWithoutTarget.js" />
-	</h:body>
+        <h:outputScript name="bodyWithoutTarget.js" />
+    </h:body>
 </html>

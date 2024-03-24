@@ -139,37 +139,37 @@ import org.omnifaces.cdi.eager.EagerExtension;
 @Target({ TYPE, METHOD })
 public @interface Eager {
 
-	/**
-	 * (Required when combined with {@link RequestScoped}) The URI (relative to the root of the web app) for which a
-	 * request scoped bean should be instantiated. When this attribute is specified the bean will be instantiated very
-	 * early during request processing, namely just before the first Servlet Filter is invoked, but after a SAM.
-	 * <p>
-	 * Faces services will not be available (yet) when the bean is instantiated this way.
-	 * <p>
-	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
-	 * This attribute <b>can not</b> be used for <code>ViewScoped</code> beans.
-	 *
-	 * @return The request URI relative to the context root.
-	 */
-	@Nonbinding
-	String requestURI() default "";
+    /**
+     * (Required when combined with {@link RequestScoped}) The URI (relative to the root of the web app) for which a
+     * request scoped bean should be instantiated. When this attribute is specified the bean will be instantiated very
+     * early during request processing, namely just before the first Servlet Filter is invoked, but after a SAM.
+     * <p>
+     * Faces services will not be available (yet) when the bean is instantiated this way.
+     * <p>
+     * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
+     * This attribute <b>can not</b> be used for <code>ViewScoped</code> beans.
+     *
+     * @return The request URI relative to the context root.
+     */
+    @Nonbinding
+    String requestURI() default "";
 
-	/**
-	 * (Required when combined with {@link RequestScoped} or <code>ViewScoped</code>) The id of the view for which a request or view scoped bean
-	 * should be instantiated. When this attribute is specified the bean will be instantiated during invocation of the
-	 * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
-	 *
-	 * <p>
-	 * Faces services are available when the bean is instantiated this way.
-	 *
-	 * <p>
-	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the
-	 * <code>requestURI</code> attribute takes precedence. If the scope is <code>ViewScoped</code> <code>requestURI</code> is ignored and only
-	 * this attribute is considered.
-	 *
-	 * @return The view ID.
-	 */
-	@Nonbinding
-	String viewId() default "";
+    /**
+     * (Required when combined with {@link RequestScoped} or <code>ViewScoped</code>) The id of the view for which a request or view scoped bean
+     * should be instantiated. When this attribute is specified the bean will be instantiated during invocation of the
+     * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
+     *
+     * <p>
+     * Faces services are available when the bean is instantiated this way.
+     *
+     * <p>
+     * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the
+     * <code>requestURI</code> attribute takes precedence. If the scope is <code>ViewScoped</code> <code>requestURI</code> is ignored and only
+     * this attribute is considered.
+     *
+     * @return The view ID.
+     */
+    @Nonbinding
+    String viewId() default "";
 
 }

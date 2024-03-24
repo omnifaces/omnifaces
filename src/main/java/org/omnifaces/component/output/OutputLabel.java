@@ -41,32 +41,32 @@ import jakarta.faces.event.PostRestoreStateEvent;
 @FacesComponent(OutputLabel.COMPONENT_TYPE)
 public class OutputLabel extends HtmlOutputLabel {
 
-	/** The component type, which is {@value org.omnifaces.component.output.OutputLabel#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
+    /** The component type, which is {@value org.omnifaces.component.output.OutputLabel#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
 
-	private static final String ERROR_FOR_COMPONENT_NOT_FOUND =
-		"A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
+    private static final String ERROR_FOR_COMPONENT_NOT_FOUND =
+        "A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
 
-	@Override
-	public void processEvent(ComponentSystemEvent event) {
-		if (event instanceof PostRestoreStateEvent) {
-			String forValue = (String) getAttributes().get("for");
-			if (!isEmpty(forValue)) {
-				UIComponent forComponent = findComponentRelatively(this, forValue);
+    @Override
+    public void processEvent(ComponentSystemEvent event) {
+        if (event instanceof PostRestoreStateEvent) {
+            String forValue = (String) getAttributes().get("for");
+            if (!isEmpty(forValue)) {
+                UIComponent forComponent = findComponentRelatively(this, forValue);
 
-				if (forComponent == null) {
-					throw new IllegalArgumentException(format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
-				}
+                if (forComponent == null) {
+                    throw new IllegalArgumentException(format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
+                }
 
-				// To be sure, check if the target component doesn't have a label already. This
-				// is unlikely, since otherwise people have no need to use this outputLabel component
-				// but check to be sure.
-				if (getOptionalLabel(forComponent) == null) {
-					ValueExpression valueExpression = getValueExpression("value");
-					setLabel(forComponent, valueExpression != null ? valueExpression : getValue());
-				}
-			}
-		}
+                // To be sure, check if the target component doesn't have a label already. This
+                // is unlikely, since otherwise people have no need to use this outputLabel component
+                // but check to be sure.
+                if (getOptionalLabel(forComponent) == null) {
+                    ValueExpression valueExpression = getValueExpression("value");
+                    setLabel(forComponent, valueExpression != null ? valueExpression : getValue());
+                }
+            }
+        }
 
-	}
+    }
 }

@@ -19,20 +19,20 @@ import jakarta.inject.Named;
 @RequestScoped
 public class FullAjaxExceptionHandlerITBean {
 
-	public void throwDuringInvokeApplication() {
-		throw new RuntimeException("throwDuringInvokeApplication");
-	}
+    public void throwDuringInvokeApplication() {
+        throw new RuntimeException("throwDuringInvokeApplication");
+    }
 
-	public Object getThrowDuringUpdateModelValues() {
-		return null;
-	}
+    public Object getThrowDuringUpdateModelValues() {
+        return null;
+    }
 
-	public Object setThrowDuringUpdateModelValues(Object input) {
-		throw new RuntimeException("throwDuringUpdateModelValues");
-	}
+    public Object setThrowDuringUpdateModelValues(Object input) {
+        throw new RuntimeException("throwDuringUpdateModelValues");
+    }
 
-	public Object getThrowDuringRenderResponse() {
-		throw new RuntimeException("throwDuringRenderResponse");
-	}
+    public Object getThrowDuringRenderResponse() {
+        throw new RuntimeException("throwDuringRenderResponse");
+    }
 
 }

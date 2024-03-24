@@ -24,24 +24,24 @@ import jakarta.inject.Named;
 @RequestScoped
 public class ValidateBeanITClassLevelBean {
 
-	private ValidateBeanITEntity entity;
+    private ValidateBeanITEntity entity;
 
-	@PostConstruct
-	public void init() {
-		entity = new ValidateBeanITEntity();
-	}
+    @PostConstruct
+    public void init() {
+        entity = new ValidateBeanITEntity();
+    }
 
-	public void action() {
-		if (isValidationFailed()) {
-			addGlobalWarn(" actionValidationFailed");
-		}
-		else {
-			addGlobalInfo("actionSuccess");
-		}
-	}
+    public void action() {
+        if (isValidationFailed()) {
+            addGlobalWarn(" actionValidationFailed");
+        }
+        else {
+            addGlobalInfo("actionSuccess");
+        }
+    }
 
-	public ValidateBeanITEntity getEntity() {
-		return entity;
-	}
+    public ValidateBeanITEntity getEntity() {
+        return entity;
+    }
 
 }

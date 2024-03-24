@@ -38,114 +38,114 @@ import org.omnifaces.util.Utils;
  */
 public final class CombinedResourceInputStream extends InputStream {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(CombinedResourceInputStream.class.getName());
+    private static final Logger logger = Logger.getLogger(CombinedResourceInputStream.class.getName());
 
-	private static final byte[] CRLF = { '\r', '\n' };
+    private static final byte[] CRLF = { '\r', '\n' };
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private List<InputStream> streams;
-	private Iterator<InputStream> streamIterator;
-	private InputStream currentStream;
+    private List<InputStream> streams;
+    private Iterator<InputStream> streamIterator;
+    private InputStream currentStream;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the
-	 * {@link InputStream} will be obtained and hold in an iterable collection.
-	 * @param resources The resources to be read.
-	 * @throws IOException If something fails at I/O level.
-	 */
-	public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
-		streams = new ArrayList<>();
-		String domainURL = getRequestDomainURL();
+    /**
+     * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the
+     * {@link InputStream} will be obtained and hold in an iterable collection.
+     * @param resources The resources to be read.
+     * @throws IOException If something fails at I/O level.
+     */
+    public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
+        streams = new ArrayList<>();
+        String domainURL = getRequestDomainURL();
 
-		for (Resource resource : resources) {
-			InputStream stream;
+        for (Resource resource : resources) {
+            InputStream stream;
 
-			try {
-				stream = resource.getInputStream();
-			}
-			catch (Exception richFacesDoesNotSupportThis) {
-				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
-				stream = new URL(domainURL + resource.getRequestPath()).openStream();
-			}
+            try {
+                stream = resource.getInputStream();
+            }
+            catch (Exception richFacesDoesNotSupportThis) {
+                logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+                stream = new URL(domainURL + resource.getRequestPath()).openStream();
+            }
 
-			streams.add(stream);
-			streams.add(new ByteArrayInputStream(CRLF));
-		}
+            streams.add(stream);
+            streams.add(new ByteArrayInputStream(CRLF));
+        }
 
-		streamIterator = streams.iterator();
+        streamIterator = streams.iterator();
 
-		if (streamIterator.hasNext()) {
-			currentStream = streamIterator.next();
-		}
-	}
+        if (streamIterator.hasNext()) {
+            currentStream = streamIterator.next();
+        }
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
-	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
-	 */
-	@Override
-	public int read() throws IOException {
-		int read;
+    /**
+     * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
+     * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
+     */
+    @Override
+    public int read() throws IOException {
+        int read;
 
-		while ((read = currentStream.read()) == -1) {
-			if (streamIterator.hasNext()) {
-				currentStream = streamIterator.next();
-			}
-			else {
-				break;
-			}
-		}
+        while ((read = currentStream.read()) == -1) {
+            if (streamIterator.hasNext()) {
+                currentStream = streamIterator.next();
+            }
+            else {
+                break;
+            }
+        }
 
-		return read;
-	}
+        return read;
+    }
 
-	/**
-	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
-	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
-	 */
-	@Override
-	public int read(byte[] b, int offset, int length) throws IOException {
-		int read;
+    /**
+     * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
+     * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
+     */
+    @Override
+    public int read(byte[] b, int offset, int length) throws IOException {
+        int read;
 
-		while ((read = currentStream.read(b, offset, length)) == -1) {
-			if (streamIterator.hasNext()) {
-				currentStream = streamIterator.next();
-			}
-			else {
-				break;
-			}
-		}
+        while ((read = currentStream.read(b, offset, length)) == -1) {
+            if (streamIterator.hasNext()) {
+                currentStream = streamIterator.next();
+            }
+            else {
+                break;
+            }
+        }
 
-		return read;
-	}
+        return read;
+    }
 
-	/**
-	 * Closes the {@link InputStream} of each resource. Whenever the {@link InputStream#close()} throws an
-	 * {@link IOException} for the first time, it will be caught and be thrown after all resources have been closed.
-	 * Any {@link IOException} which is thrown by a subsequent close will be ignored by design.
-	 */
-	@Override
-	public void close() throws IOException {
-		IOException caught = null;
+    /**
+     * Closes the {@link InputStream} of each resource. Whenever the {@link InputStream#close()} throws an
+     * {@link IOException} for the first time, it will be caught and be thrown after all resources have been closed.
+     * Any {@link IOException} which is thrown by a subsequent close will be ignored by design.
+     */
+    @Override
+    public void close() throws IOException {
+        IOException caught = null;
 
-		for (InputStream stream : streams) {
-			IOException e = Utils.close(stream);
+        for (InputStream stream : streams) {
+            IOException e = Utils.close(stream);
 
-			if (caught == null) {
-				caught = e; // Don't throw it yet. We have to continue closing all other streams.
-			}
-		}
+            if (caught == null) {
+                caught = e; // Don't throw it yet. We have to continue closing all other streams.
+            }
+        }
 
-		if (caught != null) {
-			throw caught;
-		}
-	}
+        if (caught != null) {
+            throw caught;
+        }
+    }
 
 }

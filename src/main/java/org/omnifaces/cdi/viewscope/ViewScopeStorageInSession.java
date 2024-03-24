@@ -44,101 +44,101 @@ import org.omnifaces.util.cache.LruCache;
 @SessionScoped
 public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable {
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
-	private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
-		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
-	};
-	private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
-		+ " Encountered an invalid value of '%s'.";
+    private static final long serialVersionUID = 1L;
+    private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
+        PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
+    };
+    private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
+        + " Encountered an invalid value of '%s'.";
 
-	// Static variables -----------------------------------------------------------------------------------------------
+    // Static variables -----------------------------------------------------------------------------------------------
 
-	private static Integer maxActiveViewScopes;
+    private static Integer maxActiveViewScopes;
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
+    private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params.
-	 * See javadoc of {@link ViewScoped} for details.
-	 */
-	@PostConstruct
-	public void postConstructSession() {
-		activeViewScopes = new LruCache<>(getMaxActiveViewScopes(), (uuid, storage) -> storage.destroyBeans());
-	}
+    /**
+     * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params.
+     * See javadoc of {@link ViewScoped} for details.
+     */
+    @PostConstruct
+    public void postConstructSession() {
+        activeViewScopes = new LruCache<>(getMaxActiveViewScopes(), (uuid, storage) -> storage.destroyBeans());
+    }
 
-	@Override
-	public UUID getBeanStorageId() {
-		UUID beanStorageId = getViewAttribute(getClass().getName());
-		return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
-	}
+    @Override
+    public UUID getBeanStorageId() {
+        UUID beanStorageId = getViewAttribute(getClass().getName());
+        return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+    }
 
-	@Override
-	public BeanStorage getBeanStorage(UUID beanStorageId) {
-		return activeViewScopes.get(beanStorageId);
-	}
+    @Override
+    public BeanStorage getBeanStorage(UUID beanStorageId) {
+        return activeViewScopes.get(beanStorageId);
+    }
 
-	@Override
-	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-		activeViewScopes.put(beanStorageId, beanStorage);
-		setViewAttribute(getClass().getName(), beanStorageId);
-	}
+    @Override
+    public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
+        activeViewScopes.put(beanStorageId, beanStorage);
+        setViewAttribute(getClass().getName(), beanStorageId);
+    }
 
-	/**
-	 * Destroys all beans associated with given bean storage identifier.
-	 * @param beanStorageId The bean storage identifier.
-	 */
-	public void destroyBeans(UUID beanStorageId) {
-		BeanStorage storage = activeViewScopes.remove(beanStorageId);
+    /**
+     * Destroys all beans associated with given bean storage identifier.
+     * @param beanStorageId The bean storage identifier.
+     */
+    public void destroyBeans(UUID beanStorageId) {
+        BeanStorage storage = activeViewScopes.remove(beanStorageId);
 
-		if (storage != null) {
-			storage.destroyBeans();
-		}
-	}
+        if (storage != null) {
+            storage.destroyBeans();
+        }
+    }
 
-	/**
-	 * This method is invoked during session destroy, in that case destroy all beans in all active view scopes.
-	 */
-	@PreDestroy
-	public void preDestroySession() {
-		for (BeanStorage storage : activeViewScopes.values()) {
-			storage.destroyBeans();
-		}
-	}
+    /**
+     * This method is invoked during session destroy, in that case destroy all beans in all active view scopes.
+     */
+    @PreDestroy
+    public void preDestroySession() {
+        for (BeanStorage storage : activeViewScopes.values()) {
+            storage.destroyBeans();
+        }
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the max active view scopes depending on available context params. This will be calculated lazily once
-	 * and re-returned everytime; the faces context is namely not available during class' initialization/construction,
-	 * but only during a post construct.
-	 */
-	private static int getMaxActiveViewScopes() {
-		if (maxActiveViewScopes != null) {
-			return maxActiveViewScopes;
-		}
+    /**
+     * Returns the max active view scopes depending on available context params. This will be calculated lazily once
+     * and re-returned everytime; the faces context is namely not available during class' initialization/construction,
+     * but only during a post construct.
+     */
+    private static int getMaxActiveViewScopes() {
+        if (maxActiveViewScopes != null) {
+            return maxActiveViewScopes;
+        }
 
-		for (String name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
-			String value = getInitParameter(name);
+        for (String name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
+            String value = getInitParameter(name);
 
-			if (value != null) {
-				try {
-					maxActiveViewScopes = Integer.valueOf(value);
-					return maxActiveViewScopes;
-				}
-				catch (NumberFormatException e) {
-					throw new IllegalArgumentException(format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
-				}
-			}
-		}
+            if (value != null) {
+                try {
+                    maxActiveViewScopes = Integer.valueOf(value);
+                    return maxActiveViewScopes;
+                }
+                catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
+                }
+            }
+        }
 
-		maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
-		return maxActiveViewScopes;
-	}
+        maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
+        return maxActiveViewScopes;
+    }
 
 }

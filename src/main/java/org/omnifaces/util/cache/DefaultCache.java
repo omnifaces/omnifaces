@@ -27,19 +27,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultCache extends TimeToLiveCache {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
-		super(defaultTimeToLive);
-		setCacheStore(createCacheStore(maxCapacity));
-	}
+    public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
+        super(defaultTimeToLive);
+        setCacheStore(createCacheStore(maxCapacity));
+    }
 
-	private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
-		if (maxCapacity != null) {
-			return new LruCache<>(maxCapacity);
-		} else {
-			return new ConcurrentHashMap<>();
-		}
-	}
+    private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
+        if (maxCapacity != null) {
+            return new LruCache<>(maxCapacity);
+        } else {
+            return new ConcurrentHashMap<>();
+        }
+    }
 
 }

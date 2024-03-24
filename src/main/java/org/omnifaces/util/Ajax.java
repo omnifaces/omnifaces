@@ -90,313 +90,313 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  */
 public final class Ajax {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NO_SCRIPT_RESOURCE =
-		"";
-	private static final String ERROR_NO_PARTIAL_RENDERING =
-		"The current request is not an ajax request with partial rendering."
-			+ " Use Components#addScriptXxx() methods instead.";
-	private static final String ERROR_ARGUMENTS_LENGTH =
-		"The arguments length must be even. Encountered %d items.";
-	private static final String ERROR_ARGUMENT_TYPE =
-		"The argument name must be a String. Encountered type '%s' with value '%s'.";
+    private static final String ERROR_NO_SCRIPT_RESOURCE =
+        "";
+    private static final String ERROR_NO_PARTIAL_RENDERING =
+        "The current request is not an ajax request with partial rendering."
+            + " Use Components#addScriptXxx() methods instead.";
+    private static final String ERROR_ARGUMENTS_LENGTH =
+        "The arguments length must be even. Encountered %d items.";
+    private static final String ERROR_ARGUMENT_TYPE =
+        "The argument name must be a String. Encountered type '%s' with value '%s'.";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Ajax() {
-		// Hide constructor.
-	}
+    private Ajax() {
+        // Hide constructor.
+    }
 
-	// Shortcuts ------------------------------------------------------------------------------------------------------
+    // Shortcuts ------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the current partial view context (the ajax context).
-	 * <p>
-	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
-	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
-	 * task.</i>
-	 * @return The current partial view context.
-	 * @see FacesContext#getPartialViewContext()
-	 */
-	public static PartialViewContext getContext() {
-		return Faces.getContext().getPartialViewContext();
-	}
+    /**
+     * Returns the current partial view context (the ajax context).
+     * <p>
+     * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+     * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+     * task.</i>
+     * @return The current partial view context.
+     * @see FacesContext#getPartialViewContext()
+     */
+    public static PartialViewContext getContext() {
+        return Faces.getContext().getPartialViewContext();
+    }
 
-	/**
-	 * Update the given client IDs in the current ajax response. Note that those client IDs should not start with the
-	 * naming container separator character like <code>:</code>. This method also supports the client ID keywords
-	 * <code>@all</code>, <code>@form</code> and <code>@this</code> which respectively refers the entire view, the
-	 * currently submitted form as obtained by {@link Components#getCurrentForm()} and the currently processed
-	 * component as obtained by {@link UIComponent#getCurrentComponent(FacesContext)}. Any other client ID starting
-	 * with <code>@</code> is by design ignored, including <code>@none</code>.
-	 * @param clientIds The client IDs to be updated in the current ajax response.
-	 * @see PartialViewContext#getRenderIds()
-	 */
-	public static void update(String... clientIds) {
-		PartialViewContext context = getContext();
-		Collection<String> renderIds = context.getRenderIds();
+    /**
+     * Update the given client IDs in the current ajax response. Note that those client IDs should not start with the
+     * naming container separator character like <code>:</code>. This method also supports the client ID keywords
+     * <code>@all</code>, <code>@form</code> and <code>@this</code> which respectively refers the entire view, the
+     * currently submitted form as obtained by {@link Components#getCurrentForm()} and the currently processed
+     * component as obtained by {@link UIComponent#getCurrentComponent(FacesContext)}. Any other client ID starting
+     * with <code>@</code> is by design ignored, including <code>@none</code>.
+     * @param clientIds The client IDs to be updated in the current ajax response.
+     * @see PartialViewContext#getRenderIds()
+     */
+    public static void update(String... clientIds) {
+        PartialViewContext context = getContext();
+        Collection<String> renderIds = context.getRenderIds();
 
-		for (String clientId : clientIds) {
-			if (clientId.charAt(0) != '@') {
-				renderIds.add(clientId);
-			}
-			else if ("@all".equals(clientId)) {
-				context.setRenderAll(true);
-			}
-			else if ("@form".equals(clientId)) {
-				UIComponent currentForm = getCurrentForm();
+        for (String clientId : clientIds) {
+            if (clientId.charAt(0) != '@') {
+                renderIds.add(clientId);
+            }
+            else if ("@all".equals(clientId)) {
+                context.setRenderAll(true);
+            }
+            else if ("@form".equals(clientId)) {
+                UIComponent currentForm = getCurrentForm();
 
-				if (currentForm != null) {
-					renderIds.add(currentForm.getClientId());
-				}
-			}
-			else if ("@this".equals(clientId)) {
-				UIComponent currentComponent = getCurrentComponent();
+                if (currentForm != null) {
+                    renderIds.add(currentForm.getClientId());
+                }
+            }
+            else if ("@this".equals(clientId)) {
+                UIComponent currentComponent = getCurrentComponent();
 
-				if (currentComponent != null) {
-					renderIds.add(currentComponent.getClientId());
-				}
-			}
-		}
-	}
+                if (currentComponent != null) {
+                    renderIds.add(currentComponent.getClientId());
+                }
+            }
+        }
+    }
 
-	/**
-	 * Update the entire view.
-	 * @see PartialViewContext#setRenderAll(boolean)
-	 * @since 1.5
-	 */
-	public static void updateAll() {
-		getContext().setRenderAll(true);
-	}
+    /**
+     * Update the entire view.
+     * @see PartialViewContext#setRenderAll(boolean)
+     * @since 1.5
+     */
+    public static void updateAll() {
+        getContext().setRenderAll(true);
+    }
 
-	/**
-	 * Update the row of the given {@link UIData} component at the given zero-based row index. This will basically
-	 * update all direct children of all {@link UIColumn} components at the given row index.
-	 * <p>
-	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
-	 * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
-	 * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
-	 * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
-	 * @param table The {@link UIData} component.
-	 * @param index The zero-based index of the row to be updated.
-	 * @since 1.3
-	 */
-	public static void updateRow(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
-			return;
-		}
+    /**
+     * Update the row of the given {@link UIData} component at the given zero-based row index. This will basically
+     * update all direct children of all {@link UIColumn} components at the given row index.
+     * <p>
+     * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
+     * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
+     * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
+     * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
+     * @param table The {@link UIData} component.
+     * @param index The zero-based index of the row to be updated.
+     * @since 1.3
+     */
+    public static void updateRow(UIData table, int index) {
+        if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
+            return;
+        }
 
-		updateRowCells(table, index);
-	}
+        updateRowCells(table, index);
+    }
 
-	private static void updateRowCells(UIData table, int index) {
-		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getNamingContainer().getClientId(context);
-		String tableId = table.getId();
-		char separator = UINamingContainer.getSeparatorChar(context);
-		Collection<String> renderIds = getContext().getRenderIds();
+    private static void updateRowCells(UIData table, int index) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        String parentId = table.getParent().getNamingContainer().getClientId(context);
+        String tableId = table.getId();
+        char separator = UINamingContainer.getSeparatorChar(context);
+        Collection<String> renderIds = getContext().getRenderIds();
 
-		for (UIComponent column : table.getChildren()) {
-			if (column instanceof UIColumn) {
-				if (!column.isRendered()) {
-					continue;
-				}
+        for (UIComponent column : table.getChildren()) {
+            if (column instanceof UIColumn) {
+                if (!column.isRendered()) {
+                    continue;
+                }
 
-				for (UIComponent cell : column.getChildren()) {
-					if (!cell.isRendered()) {
-						continue;
-					}
+                for (UIComponent cell : column.getChildren()) {
+                    if (!cell.isRendered()) {
+                        continue;
+                    }
 
-					renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
-				}
-			}
-			else if (column instanceof UIData) { // <p:columns>.
-				updateRowCells((UIData) column, renderIds, tableId, index, separator);
-			}
-		}
-	}
+                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
+                }
+            }
+            else if (column instanceof UIData) { // <p:columns>.
+                updateRowCells((UIData) column, renderIds, tableId, index, separator);
+            }
+        }
+    }
 
-	private static void updateRowCells(UIData columns, Collection<String> renderIds, String tableId, int index, char separator) {
-		String columnId = columns.getId();
-		int columnCount = columns.getRowCount();
+    private static void updateRowCells(UIData columns, Collection<String> renderIds, String tableId, int index, char separator) {
+        String columnId = columns.getId();
+        int columnCount = columns.getRowCount();
 
-		for (UIComponent cell : columns.getChildren()) {
-			if (!cell.isRendered()) {
-				continue;
-			}
+        for (UIComponent cell : columns.getChildren()) {
+            if (!cell.isRendered()) {
+                continue;
+            }
 
-			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-				renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
-			}
-		}
-	}
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
+            }
+        }
+    }
 
-	/**
-	 * Update the column of the given {@link UIData} component at the given zero-based column index. This will basically
-	 * update all direct children of the {@link UIColumn} component at the given column index in all rows. The column
-	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e. it
-	 * is not necessarily the same column index as the enduser sees in the UI).
-	 * <p>
-	 * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
-	 * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
-	 * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
-	 * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
-	 * @param table The {@link UIData} component.
-	 * @param index The zero-based index of the column to be updated.
-	 * @since 1.3
-	 */
-	public static void updateColumn(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1 || index > table.getChildCount()) {
-			return;
-		}
+    /**
+     * Update the column of the given {@link UIData} component at the given zero-based column index. This will basically
+     * update all direct children of the {@link UIColumn} component at the given column index in all rows. The column
+     * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e. it
+     * is not necessarily the same column index as the enduser sees in the UI).
+     * <p>
+     * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders
+     * a concrete HTML element to the output, so that JS/ajax can update it. So if you have due to design restrictions
+     * for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID, then you should give it an ID.
+     * This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
+     * @param table The {@link UIData} component.
+     * @param index The zero-based index of the column to be updated.
+     * @since 1.3
+     */
+    public static void updateColumn(UIData table, int index) {
+        if (index < 0 || table.getRowCount() < 1 || index > table.getChildCount()) {
+            return;
+        }
 
-		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
+        int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
 
-		if (rowCount == 0) {
-			return;
-		}
+        if (rowCount == 0) {
+            return;
+        }
 
-		updateColumnCells(table, index, rowCount);
-	}
+        updateColumnCells(table, index, rowCount);
+    }
 
-	private static void updateColumnCells(UIData table, int index, int rowCount) {
-		FacesContext context = FacesContext.getCurrentInstance();
-		String parentId = table.getParent().getNamingContainer().getClientId(context);
-		String tableId = table.getId();
-		char separator = UINamingContainer.getSeparatorChar(context);
-		Collection<String> renderIds = getContext().getRenderIds();
-		UIColumn column = findColumn(table, index);
+    private static void updateColumnCells(UIData table, int index, int rowCount) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        String parentId = table.getParent().getNamingContainer().getClientId(context);
+        String tableId = table.getId();
+        char separator = UINamingContainer.getSeparatorChar(context);
+        Collection<String> renderIds = getContext().getRenderIds();
+        UIColumn column = findColumn(table, index);
 
-		if (column != null && column.isRendered()) {
-			for (UIComponent cell : column.getChildren()) {
-				if (!cell.isRendered()) {
-					continue;
-				}
+        if (column != null && column.isRendered()) {
+            for (UIComponent cell : column.getChildren()) {
+                if (!cell.isRendered()) {
+                    continue;
+                }
 
-				String cellId = cell.getId();
+                String cellId = cell.getId();
 
-				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, rowIndex, separator, cellId));
-				}
-			}
-		}
-	}
+                for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, rowIndex, separator, cellId));
+                }
+            }
+        }
+    }
 
-	private static UIColumn findColumn(UIData table, int index) {
-		int columnIndex = 0;
+    private static UIColumn findColumn(UIData table, int index) {
+        int columnIndex = 0;
 
-		for (UIComponent column : table.getChildren()) {
-			if (column instanceof UIColumn && columnIndex++ == index) {
-				return (UIColumn) column;
-			}
-		}
+        for (UIComponent column : table.getChildren()) {
+            if (column instanceof UIColumn && columnIndex++ == index) {
+                return (UIColumn) column;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Load given script resource on complete of the current ajax response. Basically, it loads the script resource as
-	 * a {@link String} and then delegates it to {@link #oncomplete(String...)}.
-	 * @param libraryName Library name of the JavaScript resource.
-	 * @param resourceName Resource name of the JavaScript resource.
-	 * @throws IllegalArgumentException When given script resource cannot be found.
-	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * {@link Components#addScriptResource(String, String)} instead.
-	 * @since 2.3
-	 */
-	public static void load(String libraryName, String resourceName) {
-		Resource resource = createResource(libraryName, resourceName);
+    /**
+     * Load given script resource on complete of the current ajax response. Basically, it loads the script resource as
+     * a {@link String} and then delegates it to {@link #oncomplete(String...)}.
+     * @param libraryName Library name of the JavaScript resource.
+     * @param resourceName Resource name of the JavaScript resource.
+     * @throws IllegalArgumentException When given script resource cannot be found.
+     * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+     * {@link Components#addScriptResource(String, String)} instead.
+     * @since 2.3
+     */
+    public static void load(String libraryName, String resourceName) {
+        Resource resource = createResource(libraryName, resourceName);
 
-		if (resource == null) {
-			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
-		}
+        if (resource == null) {
+            throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
+        }
 
-		try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8.name())) {
-			oncomplete(scanner.useDelimiter("\\A").next());
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
-	}
+        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8.name())) {
+            oncomplete(scanner.useDelimiter("\\A").next());
+        }
+        catch (IOException e) {
+            throw new FacesException(e);
+        }
+    }
 
-	/**
-	 * Execute the given scripts on complete of the current ajax response.
-	 * @param scripts The scripts to be executed.
-	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * {@link Components#addScript(String)} instead.
-	 * @see OmniPartialViewContext#addCallbackScript(String)
-	 */
-	public static void oncomplete(String... scripts) {
-		if (!isAjaxRequestWithPartialRendering()) {
-			throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
-		}
+    /**
+     * Execute the given scripts on complete of the current ajax response.
+     * @param scripts The scripts to be executed.
+     * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+     * {@link Components#addScript(String)} instead.
+     * @see OmniPartialViewContext#addCallbackScript(String)
+     */
+    public static void oncomplete(String... scripts) {
+        if (!isAjaxRequestWithPartialRendering()) {
+            throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
+        }
 
-		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
+        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
 
-		for (String script : scripts) {
-			context.addCallbackScript(script);
-		}
-	}
+        for (String script : scripts) {
+            context.addCallbackScript(script);
+        }
+    }
 
-	/**
-	 * Add the given data argument to the current ajax response. They are as JSON object available by
-	 * <code>OmniFaces.Ajax.data</code>.
-	 * @param name The argument name.
-	 * @param value The argument value.
-	 * @see OmniPartialViewContext#addArgument(String, Object)
-	 */
-	public static void data(String name, Object value) {
-		OmniPartialViewContext.getCurrentInstance().addArgument(name, value);
-	}
+    /**
+     * Add the given data argument to the current ajax response. They are as JSON object available by
+     * <code>OmniFaces.Ajax.data</code>.
+     * @param name The argument name.
+     * @param value The argument value.
+     * @see OmniPartialViewContext#addArgument(String, Object)
+     */
+    public static void data(String name, Object value) {
+        OmniPartialViewContext.getCurrentInstance().addArgument(name, value);
+    }
 
-	/**
-	 * Add the given data arguments to the current ajax response. The arguments length must be even. Every first and
-	 * second argument is considered the name and value pair. The name must always be a {@link String}. They are as JSON
-	 * object available by <code>OmniFaces.Ajax.data</code>.
-	 * @param namesValues The argument names and values.
-	 * @throws IllegalArgumentException When the arguments length is not even, or when a name is not a string.
-	 * @see OmniPartialViewContext#addArgument(String, Object)
-	 */
-	public static void data(Object... namesValues) {
-		if (namesValues.length % 2 != 0) {
-			throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
-		}
+    /**
+     * Add the given data arguments to the current ajax response. The arguments length must be even. Every first and
+     * second argument is considered the name and value pair. The name must always be a {@link String}. They are as JSON
+     * object available by <code>OmniFaces.Ajax.data</code>.
+     * @param namesValues The argument names and values.
+     * @throws IllegalArgumentException When the arguments length is not even, or when a name is not a string.
+     * @see OmniPartialViewContext#addArgument(String, Object)
+     */
+    public static void data(Object... namesValues) {
+        if (namesValues.length % 2 != 0) {
+            throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
+        }
 
-		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
+        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
 
-		for (int i = 0; i < namesValues.length; i+= 2) {
-			if (!(namesValues[i] instanceof String)) {
-				String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
-				throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
-			}
+        for (int i = 0; i < namesValues.length; i+= 2) {
+            if (!(namesValues[i] instanceof String)) {
+                String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
+                throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
+            }
 
-			context.addArgument((String) namesValues[i], namesValues[i + 1]);
-		}
-	}
+            context.addArgument((String) namesValues[i], namesValues[i + 1]);
+        }
+    }
 
-	/**
-	 * Add the given mapping of data arguments to the current ajax response. They are as JSON object available by
-	 * <code>OmniFaces.Ajax.data</code>.
-	 * @param data The mapping of data arguments.
-	 * @see OmniPartialViewContext#addArgument(String, Object)
-	 */
-	public static void data(Map<String, Object> data) {
-		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
+    /**
+     * Add the given mapping of data arguments to the current ajax response. They are as JSON object available by
+     * <code>OmniFaces.Ajax.data</code>.
+     * @param data The mapping of data arguments.
+     * @see OmniPartialViewContext#addArgument(String, Object)
+     */
+    public static void data(Map<String, Object> data) {
+        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
 
-		for (Entry<String, Object> entry : data.entrySet()) {
-			context.addArgument(entry.getKey(), entry.getValue());
-		}
-	}
+        for (Entry<String, Object> entry : data.entrySet()) {
+            context.addArgument(entry.getKey(), entry.getValue());
+        }
+    }
 
-	/**
-	 * Returns <code>true</code> if the given client ID was executed in the current ajax request.
-	 * @param clientId The client ID to be checked.
-	 * @return <code>true</code> if the given client ID was executed in the current ajax request.
-	 * @since 3.6
-	 */
-	public static boolean isExecuted(String clientId) {
-		return getContext().getExecuteIds().contains(clientId);
-	}
+    /**
+     * Returns <code>true</code> if the given client ID was executed in the current ajax request.
+     * @param clientId The client ID to be checked.
+     * @return <code>true</code> if the given client ID was executed in the current ajax request.
+     * @since 3.6
+     */
+    public static boolean isExecuted(String clientId) {
+        return getContext().getExecuteIds().contains(clientId);
+    }
 
 }

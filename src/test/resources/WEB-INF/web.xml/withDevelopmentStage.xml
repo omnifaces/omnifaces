@@ -14,32 +14,32 @@
 
 -->
 <web-app
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-	version="5.0"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+    version="5.0"
 >
-	<context-param>
-		<param-name>jakarta.faces.PROJECT_STAGE</param-name>
-		<param-value>Development</param-value>
-	</context-param>
-	<context-param>
-		<param-name>org.apache.myfaces.ERROR_HANDLING</param-name>
-		<param-value>false</param-value> <!-- Disable MyFaces development stage custom error page which completely overrides default 500 error page -->
-	</context-param>
+    <context-param>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.apache.myfaces.ERROR_HANDLING</param-name>
+        <param-value>false</param-value> <!-- Disable MyFaces development stage custom error page which completely overrides default 500 error page -->
+    </context-param>
 
-	<servlet>
-		<servlet-name>facesServlet</servlet-name>
-		<servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>facesServlet</servlet-name>
-		<url-pattern>*.xhtml</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>facesServlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>facesServlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
 
-	<error-page>
-		<error-code>500</error-code>
-		<location>/WEB-INF/500.xhtml</location>
-	</error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/500.xhtml</location>
+    </error-page>
 </web-app>

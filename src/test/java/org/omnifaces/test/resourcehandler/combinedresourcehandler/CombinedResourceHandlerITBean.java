@@ -24,14 +24,14 @@ import org.omnifaces.util.Hacks;
 @ViewScoped // @RequestScoped was been sufficient, this is however explicitly @ViewScoped in order to also test #457.
 public class CombinedResourceHandlerITBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public void rebuild() {
-		Faces.setViewRoot(Faces.getViewId());
-	}
+    public void rebuild() {
+        Faces.setViewRoot(Faces.getViewId());
+    }
 
-	public boolean isFacesJsAvailable() {
-		return Hacks.isFacesScriptResourceAvailable();
-	}
+    public boolean isFacesJsAvailable() {
+        return Hacks.isFacesScriptResourceAvailable();
+    }
 
 }

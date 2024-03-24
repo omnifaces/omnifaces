@@ -26,37 +26,37 @@ import jakarta.servlet.http.Part;
 @RequestScoped
 public class InputFileITBean {
 
-	private Part file;
-	private List<Part> files;
+    private Part file;
+    private List<Part> files;
 
-	public void uploadSingle() {
-		addGlobalInfo("uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
-	}
+    public void uploadSingle() {
+        addGlobalInfo("uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
+    }
 
-	public void uploadSingleAndAddLocalMessage() {
-		addInfo("uploadSingleMaxsizeClient:file", "uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
-	}
+    public void uploadSingleAndAddLocalMessage() {
+        addInfo("uploadSingleMaxsizeClient:file", "uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
+    }
 
-	public void uploadMultiple() {
-		for (Part file : files) {
-			addGlobalInfo(" uploadMultiple: " + file.getSize() + ", " + getSubmittedFileName(file));
-		}
-	}
+    public void uploadMultiple() {
+        for (Part file : files) {
+            addGlobalInfo(" uploadMultiple: " + file.getSize() + ", " + getSubmittedFileName(file));
+        }
+    }
 
-	public Part getFile() {
-		return file;
-	}
+    public Part getFile() {
+        return file;
+    }
 
-	public void setFile(Part file) {
-		this.file = file;
-	}
+    public void setFile(Part file) {
+        this.file = file;
+    }
 
-	public List<Part> getFiles() {
-		return files;
-	}
+    public List<Part> getFiles() {
+        return files;
+    }
 
-	public void setFiles(List<Part> files) {
-		this.files = files;
-	}
+    public void setFiles(List<Part> files) {
+        this.files = files;
+    }
 
 }

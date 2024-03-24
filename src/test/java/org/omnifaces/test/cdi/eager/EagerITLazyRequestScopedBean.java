@@ -22,15 +22,15 @@ import jakarta.inject.Named;
 @RequestScoped
 public class EagerITLazyRequestScopedBean {
 
-	private Long initTime;
+    private Long initTime;
 
-	@PostConstruct
-	public void init() {
-		initTime = nanoTime();
-	}
+    @PostConstruct
+    public void init() {
+        initTime = nanoTime();
+    }
 
-	public Long getInitTime() {
-		return initTime;
-	}
+    public Long getInitTime() {
+        return initTime;
+    }
 
 }

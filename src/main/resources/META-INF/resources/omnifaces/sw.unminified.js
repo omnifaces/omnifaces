@@ -30,90 +30,90 @@ var offlineResource = $offlineResource;
  * Add all cacheable resources.
  */
 self.addEventListener("install", function(event) {
-	event.waitUntil(caches.open(cacheName).then(function(event) {
-		return event.addAll(cacheableResources);
-	}));
+    event.waitUntil(caches.open(cacheName).then(function(event) {
+        return event.addAll(cacheableResources);
+    }));
 });
 
 /**
  * Offline-aware fetch.
  */
 self.addEventListener("fetch", function(event) {
-	var request = event.request;
-	var method = request.method;
-	var url = request.url.replace(new RegExp("([?&])v=.*?([&#]|$)", "i"), "$2"); // Strips the v= parameter indicating the cache bust version.
-	var sendEvent = function(name, detail) {
-		self.clients.matchAll().then(function(clients) {
-			clients.forEach(function(client) {
-				client.postMessage({
-					type: "omnifaces.event",
-					name: name,
-					detail: detail
-				});
-			});
-		});
-	};
+    var request = event.request;
+    var method = request.method;
+    var url = request.url.replace(new RegExp("([?&])v=.*?([&#]|$)", "i"), "$2"); // Strips the v= parameter indicating the cache bust version.
+    var sendEvent = function(name, detail) {
+        self.clients.matchAll().then(function(clients) {
+            clients.forEach(function(client) {
+                client.postMessage({
+                    type: "omnifaces.event",
+                    name: name,
+                    detail: detail
+                });
+            });
+        });
+    };
 
-	function sendOnlineEvent() {
-		sendEvent("omnifaces.online", {
-			method: method,
-			url: url
-		});
-	}
+    function sendOnlineEvent() {
+        sendEvent("omnifaces.online", {
+            method: method,
+            url: url
+        });
+    }
 
-	function sendOfflineEvent(error) {
-		sendEvent("omnifaces.offline", {
-			method: method,
-			url: url,
-			error: error
-		});
-	}
+    function sendOfflineEvent(error) {
+        sendEvent("omnifaces.offline", {
+            method: method,
+            url: url,
+            error: error
+        });
+    }
 
-	if (method == "GET") {
-		var navigated = event.request.mode == "navigate";
-		var resource = url.indexOf("/jakarta.faces.resource/") > -1;
+    if (method == "GET") {
+        var navigated = event.request.mode == "navigate";
+        var resource = url.indexOf("/jakarta.faces.resource/") > -1;
 
-		if (navigated || resource) {
-			event.respondWith(caches.match(url).then(function(cached) {
-				var fetched = fetch(request).then(fetchedFromNetwork, unableToResolve).catch(unableToResolve);
-				return navigated ? fetched : (cached || fetched);
+        if (navigated || resource) {
+            event.respondWith(caches.match(url).then(function(cached) {
+                var fetched = fetch(request).then(fetchedFromNetwork, unableToResolve).catch(unableToResolve);
+                return navigated ? fetched : (cached || fetched);
 
-				function fetchedFromNetwork(response) {
-					if (navigated) {
-						sendOnlineEvent();
-					}
-					
-					return response;
-				}
-				
-				function unableToResolve(error) {
-					if (navigated) {
-						sendOfflineEvent(error);
-						
-						if (offlineResource) {
-							return caches.match(offlineResource);
-						}
-					}
-					
-					return cached;
-				}
-			}));
-		}
-	}
-	else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with JSF because its POST requests are by default postback.
-		fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "omnifaces.event=sw.js").then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
-	}
+                function fetchedFromNetwork(response) {
+                    if (navigated) {
+                        sendOnlineEvent();
+                    }
+                    
+                    return response;
+                }
+                
+                function unableToResolve(error) {
+                    if (navigated) {
+                        sendOfflineEvent(error);
+                        
+                        if (offlineResource) {
+                            return caches.match(offlineResource);
+                        }
+                    }
+                    
+                    return cached;
+                }
+            }));
+        }
+    }
+    else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with JSF because its POST requests are by default postback.
+        fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "omnifaces.event=sw.js").then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
+    }
 });
 
 /**
  * Prune old caches.
  */
 self.addEventListener("activate", function(event) {
-	event.waitUntil(caches.keys().then(function(keys) {
-		return Promise.all(keys.filter(function(key) {
-			return key.startsWith("omnifaces.") && key != cacheName;
-		}).map(function(key) {
-			return caches.delete(key);
-		}));
-	}));
+    event.waitUntil(caches.keys().then(function(keys) {
+        return Promise.all(keys.filter(function(key) {
+            return key.startsWith("omnifaces.") && key != cacheName;
+        }).map(function(key) {
+            return caches.delete(key);
+        }));
+    }));
 });

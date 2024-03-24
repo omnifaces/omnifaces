@@ -23,34 +23,34 @@ import org.openqa.selenium.support.FindBy;
 
 public class InputHiddenIT extends OmniFacesIT {
 
-	@FindBy(id="form1:toggle")
-	private WebElement toggle;
+    @FindBy(id="form1:toggle")
+    private WebElement toggle;
 
-	@FindBy(id="form1:submit")
-	private WebElement submit;
+    @FindBy(id="form1:submit")
+    private WebElement submit;
 
-	@FindBy(id="form2:validate")
-	private WebElement validate;
+    @FindBy(id="form2:validate")
+    private WebElement validate;
 
-	@FindBy(id="messages")
-	private WebElement messages;
+    @FindBy(id="messages")
+    private WebElement messages;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return createWebArchive(InputHiddenIT.class);
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return createWebArchive(InputHiddenIT.class);
+    }
 
-	@Test
-	void testInputHidden() {
-		guardAjax(toggle::click);
-		guardAjax(submit::click);
-		assertEquals("submitted", messages.getText());
-	}
+    @Test
+    void testInputHidden() {
+        guardAjax(toggle::click);
+        guardAjax(submit::click);
+        assertEquals("submitted", messages.getText());
+    }
 
-	@Test
-	void testInputHiddenReadonlyValidation() {
-		guardAjax(validate::click);
-		assertEquals("validated readonly", messages.getText());
-	}
+    @Test
+    void testInputHiddenReadonlyValidation() {
+        guardAjax(validate::click);
+        assertEquals("validated readonly", messages.getText());
+    }
 
 }

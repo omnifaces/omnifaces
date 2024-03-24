@@ -23,43 +23,43 @@ import jakarta.faces.model.SelectItem;
  */
 public class ExtendedSelectItem extends SelectItem {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * <p>Construct a <code>SelectItem</code> with no initialized property
-	 * values.</p>
-	 */
-	public ExtendedSelectItem() {
-		//
-	}
+    /**
+     * <p>Construct a <code>SelectItem</code> with no initialized property
+     * values.</p>
+     */
+    public ExtendedSelectItem() {
+        //
+    }
 
-	/**
-	 * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
-	 * properties on the <code>UISelectItem</code>.
-	 * </p>
-	 * @param uiSelectItem The UI select item.
-	 */
-	public ExtendedSelectItem(UISelectItem uiSelectItem) {
-		super(
-			uiSelectItem.getItemValue(),
-			getItemLabel(uiSelectItem),
-			uiSelectItem.getItemDescription(),
-			uiSelectItem.isItemDisabled(),
-			uiSelectItem.isItemEscaped(),
-			uiSelectItem.isNoSelectionOption()
-		);
-	}
+    /**
+     * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
+     * properties on the <code>UISelectItem</code>.
+     * </p>
+     * @param uiSelectItem The UI select item.
+     */
+    public ExtendedSelectItem(UISelectItem uiSelectItem) {
+        super(
+            uiSelectItem.getItemValue(),
+            getItemLabel(uiSelectItem),
+            uiSelectItem.getItemDescription(),
+            uiSelectItem.isItemDisabled(),
+            uiSelectItem.isItemEscaped(),
+            uiSelectItem.isNoSelectionOption()
+        );
+    }
 
-	private static String getItemLabel(UISelectItem uiSelectItem) {
-		if (uiSelectItem.getItemLabel() != null) {
-			return uiSelectItem.getItemLabel();
-		}
-		else if (uiSelectItem.getItemValue() != null) {
-			return uiSelectItem.getItemValue().toString();
-		}
-		else {
-			return null;
-		}
-	}
+    private static String getItemLabel(UISelectItem uiSelectItem) {
+        if (uiSelectItem.getItemLabel() != null) {
+            return uiSelectItem.getItemLabel();
+        }
+        else if (uiSelectItem.getItemValue() != null) {
+            return uiSelectItem.getItemValue().toString();
+        }
+        else {
+            return null;
+        }
+    }
 
 }

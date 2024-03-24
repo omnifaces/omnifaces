@@ -14,20 +14,20 @@
 
 -->
 <arquillian
-	xmlns="http://jboss.org/schema/arquillian"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
+    xmlns="http://jboss.org/schema/arquillian"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
 >
-	<container qualifier="liberty">
-		<configuration>
-			<property name="wlpHome">target/wlp</property>
-		</configuration>
-	</container>
+    <container qualifier="liberty">
+        <configuration>
+            <property name="wlpHome">target/wlp</property>
+        </configuration>
+    </container>
 
-	<container qualifier="tomcat">
-		<configuration>
-			<property name="user">arquillian</property>
-			<property name="pass">arquillian</property>
-		</configuration>
-	</container>
+    <container qualifier="tomcat">
+        <configuration>
+            <property name="user">arquillian</property>
+            <property name="pass">arquillian</property>
+        </configuration>
+    </container>
 </arquillian>

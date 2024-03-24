@@ -14,45 +14,45 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-	xmlns:o="http://omnifaces.org/ui"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+    xmlns:o="http://omnifaces.org/ui"
 >
-	<h:head />
-	
-	<h:body>
-		<o:form id="form1">
-			<o:validateAll id="all" components="input1 input2 input3" />
-			<h:inputText id="input1" label="Input1" />
-			<h:message id="input1_m" for="input1" />
-			<h:inputText id="input2" label="Input2" />
-			<h:message id="input2_m" for="input2" />
-			<h:inputText id="input3" label="Input3" />
-			<h:message id="input3_m" for="input3" />
-			<h:commandButton id="submit" value="submit">
-				<f:ajax execute="@form" render="@form" />
-			</h:commandButton>
-			<h:message id="all_m" for="all" />
+    <h:head />
+    
+    <h:body>
+        <o:form id="form1">
+            <o:validateAll id="all" components="input1 input2 input3" />
+            <h:inputText id="input1" label="Input1" />
+            <h:message id="input1_m" for="input1" />
+            <h:inputText id="input2" label="Input2" />
+            <h:message id="input2_m" for="input2" />
+            <h:inputText id="input3" label="Input3" />
+            <h:message id="input3_m" for="input3" />
+            <h:commandButton id="submit" value="submit">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <h:message id="all_m" for="all" />
             <h:panelGroup id="ok"><h:outputText value="OK!" rendered="#{facesContext.postback and not facesContext.validationFailed}" /></h:panelGroup>
-		</o:form>
+        </o:form>
 
-		<o:form id="form2">
-			<o:validateAll id="all" components="panel" />
-			<h:panelGroup id="panel" layout="block">
-				<c:forEach begin="1" end="3" var="i">
-					<h:inputText id="input#{i}" label="Input#{i}" />
-					<h:message id="input#{i}_m" for="input#{i}" />
-				</c:forEach>
-			</h:panelGroup>
-			<h:commandButton id="submit" value="submit">
-				<f:ajax execute="@form" render="@form" />
-			</h:commandButton>
-			<h:message id="all_m" for="all" />
+        <o:form id="form2">
+            <o:validateAll id="all" components="panel" />
+            <h:panelGroup id="panel" layout="block">
+                <c:forEach begin="1" end="3" var="i">
+                    <h:inputText id="input#{i}" label="Input#{i}" />
+                    <h:message id="input#{i}_m" for="input#{i}" />
+                </c:forEach>
+            </h:panelGroup>
+            <h:commandButton id="submit" value="submit">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <h:message id="all_m" for="all" />
             <h:panelGroup id="ok"><h:outputText value="OK!" rendered="#{facesContext.postback and not facesContext.validationFailed}" /></h:panelGroup>
-		</o:form>
+        </o:form>
 
-	</h:body>
+    </h:body>
 </html>

@@ -31,13 +31,13 @@ import org.omnifaces.component.util.FaceletContextConsumer;
  * The handler has to be used alongside a component declaration in a Facelets <code>*-taglib.xml</code>, e.g.
  *
  * <pre>
- * 	&lt;tag&gt;
- *		&lt;tag-name&gt;someComponent&lt;/tag-name&gt;
- *		&lt;component&gt;
- *			&lt;component-type&gt;com.example.SomeComponent&lt;/component-type&gt;
- *			&lt;handler-class&gt;org.omnifaces.taghandler.ComponentExtraHandler&lt;/handler-class&gt;
- *		&lt;/component&gt;
- *	&lt;/tag&gt;
+ *     &lt;tag&gt;
+ *        &lt;tag-name&gt;someComponent&lt;/tag-name&gt;
+ *        &lt;component&gt;
+ *            &lt;component-type&gt;com.example.SomeComponent&lt;/component-type&gt;
+ *            &lt;handler-class&gt;org.omnifaces.taghandler.ComponentExtraHandler&lt;/handler-class&gt;
+ *        &lt;/component&gt;
+ *    &lt;/tag&gt;
  * </pre>
  *
  * @since 2.0
@@ -46,24 +46,24 @@ import org.omnifaces.component.util.FaceletContextConsumer;
  */
 public class ComponentExtraHandler extends ComponentHandler {
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public ComponentExtraHandler(ComponentConfig config) {
-		super(config);
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public ComponentExtraHandler(ComponentConfig config) {
+        super(config);
+    }
 
-	@Override
-	public void setAttributes(FaceletContext ctx, Object component) {
-		super.setAttributes(ctx, component);
+    @Override
+    public void setAttributes(FaceletContext ctx, Object component) {
+        super.setAttributes(ctx, component);
 
-		if (component instanceof FaceletContextConsumer) {
-			FaceletContextConsumer faceletContextConsumer = (FaceletContextConsumer) component;
+        if (component instanceof FaceletContextConsumer) {
+            FaceletContextConsumer faceletContextConsumer = (FaceletContextConsumer) component;
 
-			faceletContextConsumer.setFaceletContext(ctx);
-		}
+            faceletContextConsumer.setFaceletContext(ctx);
+        }
 
-	}
+    }
 
 }

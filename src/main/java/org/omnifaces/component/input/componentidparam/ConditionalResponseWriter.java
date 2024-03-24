@@ -37,237 +37,237 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
-	private final FacesContext facesContext;
-	private final List<String> componentIds;
-	private final List<String> clientIds;
-	private final boolean renderChildren;
+    private final FacesContext facesContext;
+    private final List<String> componentIds;
+    private final List<String> clientIds;
+    private final boolean renderChildren;
 
-	private UIComponent lastComponent;
-	private boolean lastRendered;
-	private Map<String, Boolean> renderedIdCache = new HashMap<>();
-	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
+    private UIComponent lastComponent;
+    private boolean lastRendered;
+    private Map<String, Boolean> renderedIdCache = new HashMap<>();
+    private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
-	/**
-	 * Construct conditional response writer.
-	 * @param responseWriter Response writer to be wrapped.
-	 * @param facesContext Involved faces context.
-	 * @param componentIds Component IDs.
-	 * @param clientIds Client IDs.
-	 * @param renderChildren Whether to render children.
-	 */
-	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
-		super(responseWriter);
-		this.facesContext = facesContext;
-		this.componentIds = componentIds;
-		this.clientIds = clientIds;
-		this.renderChildren = renderChildren;
-	}
+    /**
+     * Construct conditional response writer.
+     * @param responseWriter Response writer to be wrapped.
+     * @param facesContext Involved faces context.
+     * @param componentIds Component IDs.
+     * @param clientIds Client IDs.
+     * @param renderChildren Whether to render children.
+     */
+    public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+        super(responseWriter);
+        this.facesContext = facesContext;
+        this.componentIds = componentIds;
+        this.clientIds = clientIds;
+        this.renderChildren = renderChildren;
+    }
 
-	// ResponseWriter overrides that do some kind of writing
+    // ResponseWriter overrides that do some kind of writing
 
-	@Override
-	public void endCDATA() throws IOException {
-		if (isForRenderedComponent()) {
-			super.endCDATA();
-		}
-	}
+    @Override
+    public void endCDATA() throws IOException {
+        if (isForRenderedComponent()) {
+            super.endCDATA();
+        }
+    }
 
-	@Override
-	public void endElement(String name) throws IOException {
-		if (isForRenderedComponent()) {
-			super.endElement(name);
-		}
-	}
+    @Override
+    public void endElement(String name) throws IOException {
+        if (isForRenderedComponent()) {
+            super.endElement(name);
+        }
+    }
 
-	@Override
-	public void endDocument() throws IOException {
-		if (isForRenderedComponent()) {
-			super.endDocument();
-		}
-	}
+    @Override
+    public void endDocument() throws IOException {
+        if (isForRenderedComponent()) {
+            super.endDocument();
+        }
+    }
 
-	@Override
-	public void startCDATA() throws IOException {
-		if (isForRenderedComponent()) {
-			super.startCDATA();
-		}
-	}
+    @Override
+    public void startCDATA() throws IOException {
+        if (isForRenderedComponent()) {
+            super.startCDATA();
+        }
+    }
 
-	@Override
-	public void startDocument() throws IOException {
-		if (isForRenderedComponent()) {
-			super.startDocument();
-		}
-	}
+    @Override
+    public void startDocument() throws IOException {
+        if (isForRenderedComponent()) {
+            super.startDocument();
+        }
+    }
 
-	@Override
-	public void startElement(String name, UIComponent component) throws IOException {
-		if (isForRenderedComponent()) {
-			super.startElement(name, component);
-		}
-	}
+    @Override
+    public void startElement(String name, UIComponent component) throws IOException {
+        if (isForRenderedComponent()) {
+            super.startElement(name, component);
+        }
+    }
 
-	@Override
-	public void write(char[] cbuf, int off, int len) throws IOException {
-		if (isForRenderedComponent()) {
-			super.write(cbuf, off, len);
-		}
-	}
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {
+        if (isForRenderedComponent()) {
+            super.write(cbuf, off, len);
+        }
+    }
 
-	@Override
-	public void writeAttribute(String name, Object value, String property) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeAttribute(name, value, property);
-		}
-	}
+    @Override
+    public void writeAttribute(String name, Object value, String property) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeAttribute(name, value, property);
+        }
+    }
 
-	@Override
-	public void writeComment(Object comment) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeComment(comment);
-		}
-	}
+    @Override
+    public void writeComment(Object comment) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeComment(comment);
+        }
+    }
 
-	@Override
-	public void writeText(char[] text, int off, int len) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeText(text, off, len);
-		}
-	}
+    @Override
+    public void writeText(char[] text, int off, int len) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeText(text, off, len);
+        }
+    }
 
-	@Override
-	public void writeText(Object text, String property) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeText(text, property);
-		}
-	}
+    @Override
+    public void writeText(Object text, String property) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeText(text, property);
+        }
+    }
 
-	@Override
-	public void writeText(Object text, UIComponent component, String property) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeText(text, component, property);
-		}
-	}
+    @Override
+    public void writeText(Object text, UIComponent component, String property) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeText(text, component, property);
+        }
+    }
 
-	@Override
-	public void writeURIAttribute(String name, Object value, String property) throws IOException {
-		if (isForRenderedComponent()) {
-			super.writeURIAttribute(name, value, property);
-		}
-	}
+    @Override
+    public void writeURIAttribute(String name, Object value, String property) throws IOException {
+        if (isForRenderedComponent()) {
+            super.writeURIAttribute(name, value, property);
+        }
+    }
 
-	// Writer overrides
+    // Writer overrides
 
-	@Override
-	public Writer append(char c) throws IOException {
-		if (isForRenderedComponent()) {
-			return super.append(c);
-		}
+    @Override
+    public Writer append(char c) throws IOException {
+        if (isForRenderedComponent()) {
+            return super.append(c);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public Writer append(CharSequence csq) throws IOException {
-		if (isForRenderedComponent()) {
-			return super.append(csq);
-		}
+    @Override
+    public Writer append(CharSequence csq) throws IOException {
+        if (isForRenderedComponent()) {
+            return super.append(csq);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public Writer append(CharSequence csq, int start, int end) throws IOException {
-		if (isForRenderedComponent()) {
-			return super.append(csq, start, end);
-		}
+    @Override
+    public Writer append(CharSequence csq, int start, int end) throws IOException {
+        if (isForRenderedComponent()) {
+            return super.append(csq, start, end);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public void write(char[] cbuf) throws IOException {
-		if (isForRenderedComponent()) {
-			super.write(cbuf);
-		}
-	}
+    @Override
+    public void write(char[] cbuf) throws IOException {
+        if (isForRenderedComponent()) {
+            super.write(cbuf);
+        }
+    }
 
-	@Override
-	public void write(int c) throws IOException {
-		if (isForRenderedComponent()) {
-			super.write(c);
-		}
-	}
+    @Override
+    public void write(int c) throws IOException {
+        if (isForRenderedComponent()) {
+            super.write(c);
+        }
+    }
 
-	@Override
-	public void write(String str) throws IOException {
-		if (isForRenderedComponent()) {
-			super.write(str);
-		}
-	}
+    @Override
+    public void write(String str) throws IOException {
+        if (isForRenderedComponent()) {
+            super.write(str);
+        }
+    }
 
-	@Override
-	public void write(String str, int off, int len) throws IOException {
-		if (isForRenderedComponent()) {
-			super.write(str, off, len);
-		}
-	}
+    @Override
+    public void write(String str, int off, int len) throws IOException {
+        if (isForRenderedComponent()) {
+            super.write(str, off, len);
+        }
+    }
 
-	private boolean isForRenderedComponent() {
-		UIComponent currentComponent = UIComponent.getCurrentComponent(facesContext);
+    private boolean isForRenderedComponent() {
+        UIComponent currentComponent = UIComponent.getCurrentComponent(facesContext);
 
-		// Typically a single component writes multiple times to the response writer in quick succession.
-		// Shortcut id matching by doing a cheaper check on the outcome of the last processed component.
-		if (lastComponent == currentComponent) {
-			return lastRendered;
-		}
+        // Typically a single component writes multiple times to the response writer in quick succession.
+        // Shortcut id matching by doing a cheaper check on the outcome of the last processed component.
+        if (lastComponent == currentComponent) {
+            return lastRendered;
+        }
 
-		lastComponent = currentComponent;
+        lastComponent = currentComponent;
 
-		// Check if a rendering decision already made for this component by checking the cache
-		if (renderedIdCache.containsKey(currentComponent.getClientId())) {
-			lastRendered = renderedIdCache.get(currentComponent.getClientId());
-			return lastRendered;
-		}
+        // Check if a rendering decision already made for this component by checking the cache
+        if (renderedIdCache.containsKey(currentComponent.getClientId())) {
+            lastRendered = renderedIdCache.get(currentComponent.getClientId());
+            return lastRendered;
+        }
 
-		// No decision made, check for an explicit id match
-		lastRendered = componentIds.contains(currentComponent.getId()) || clientIds.contains(currentComponent.getClientId());
+        // No decision made, check for an explicit id match
+        lastRendered = componentIds.contains(currentComponent.getId()) || clientIds.contains(currentComponent.getClientId());
 
-		if (renderChildren) {
-			checkParents(currentComponent);
-		}
+        if (renderChildren) {
+            checkParents(currentComponent);
+        }
 
-		return lastRendered;
-	}
+        return lastRendered;
+    }
 
-	private void checkParents(UIComponent component) {
-		// If current component not rendered because of explicit id match, check if parent is rendered.
-		if (!lastRendered) {
-			boolean found = false;
+    private void checkParents(UIComponent component) {
+        // If current component not rendered because of explicit id match, check if parent is rendered.
+        if (!lastRendered) {
+            boolean found = false;
 
-			for (UIComponent parent = component.getParent(); parent != null; parent = parent.getParent()) {
-				if (renderedIdCache.containsKey(parent.getClientId())) {
-					lastRendered = renderedIdCache.get(parent.getClientId());
-					found = true;
-				}
-				else if (renderedReferenceCache.containsKey(parent)) {
-					lastRendered = renderedReferenceCache.get(parent);
-					found = true;
-				}
+            for (UIComponent parent = component.getParent(); parent != null; parent = parent.getParent()) {
+                if (renderedIdCache.containsKey(parent.getClientId())) {
+                    lastRendered = renderedIdCache.get(parent.getClientId());
+                    found = true;
+                }
+                else if (renderedReferenceCache.containsKey(parent)) {
+                    lastRendered = renderedReferenceCache.get(parent);
+                    found = true;
+                }
 
-				if (found) {
-					break;
-				}
-			}
-		} else {
-			// Explicitly rendered component, remember this by reference, since client-id can change even for components
-			// that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
-			renderedReferenceCache.put(component, lastRendered);
-		}
+                if (found) {
+                    break;
+                }
+            }
+        } else {
+            // Explicitly rendered component, remember this by reference, since client-id can change even for components
+            // that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
+            renderedReferenceCache.put(component, lastRendered);
+        }
 
-		// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
-		// from the same component instance. So components with the same object identity can have different component identities.
-		renderedIdCache.put(component.getClientId(), lastRendered);
-	}
+        // Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
+        // from the same component instance. So components with the same object identity can have different component identities.
+        renderedIdCache.put(component.getClientId(), lastRendered);
+    }
 
 }

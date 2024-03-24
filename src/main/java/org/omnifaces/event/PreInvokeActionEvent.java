@@ -42,18 +42,18 @@ import org.omnifaces.eventlistener.InvokeActionEventListener;
 @NamedEvent(shortName = "preInvokeAction")
 public class PreInvokeActionEvent extends ComponentSystemEvent {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new pre invoke action event on the given component.
-	 * @param component The component to invoke the event on.
-	 */
-	public PreInvokeActionEvent(UIComponent component) {
-		super(component);
-	}
+    /**
+     * Construct a new pre invoke action event on the given component.
+     * @param component The component to invoke the event on.
+     */
+    public PreInvokeActionEvent(UIComponent component) {
+        super(component);
+    }
 
 }

@@ -74,65 +74,65 @@ import org.omnifaces.util.Components;
  */
 public class MessagesKeywordResolver extends SearchKeywordResolver {
 
-	// Constants --------------------------------------------------------------------------------------------------------------------------
+    // Constants --------------------------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(MessagesKeywordResolver.class.getName());
+    private static final Logger logger = Logger.getLogger(MessagesKeywordResolver.class.getName());
 
-	// Init -------------------------------------------------------------------------------------------------------------------------------
+    // Init -------------------------------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Invoked by {@link ApplicationProcessor}.
-	 * @param application Involved faces application.
-	 */
-	public static void register(Application application) {
-		application.addSearchKeywordResolver(new MessagesKeywordResolver());
-	}
+    /**
+     * Invoked by {@link ApplicationProcessor}.
+     * @param application Involved faces application.
+     */
+    public static void register(Application application) {
+        application.addSearchKeywordResolver(new MessagesKeywordResolver());
+    }
 
-	// Actions ----------------------------------------------------------------------------------------------------------------------------
+    // Actions ----------------------------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> when keyword equals "messages".
-	 */
-	@Override
-	public boolean isResolverForKeyword(SearchExpressionContext context, String keyword) {
-		return "messages".equals(keyword);
-	}
+    /**
+     * Returns <code>true</code> when keyword equals "messages".
+     */
+    @Override
+    public boolean isResolverForKeyword(SearchExpressionContext context, String keyword) {
+        return "messages".equals(keyword);
+    }
 
-	/**
-	 * Grab the current {@link UIForm}, visit it and collect client IDs of all {@link UIMessage} and {@link UIMessages} components and
-	 * finally invoke context call back with an {@link UIMessage} component whose client ID returns a space separated collection of found
-	 * client IDs.
-	 */
-	@Override
-	public void resolve(SearchKeywordContext context, UIComponent component, String keyword) {
-		UIForm form = Components.getClosestParent(component, UIForm.class);
+    /**
+     * Grab the current {@link UIForm}, visit it and collect client IDs of all {@link UIMessage} and {@link UIMessages} components and
+     * finally invoke context call back with an {@link UIMessage} component whose client ID returns a space separated collection of found
+     * client IDs.
+     */
+    @Override
+    public void resolve(SearchKeywordContext context, UIComponent component, String keyword) {
+        UIForm form = Components.getClosestParent(component, UIForm.class);
 
-		if (form != null) {
-			Set<String> messageClientIds = new HashSet<>();
-			VisitContext visitContext = VisitContext.createVisitContext(context.getSearchExpressionContext().getFacesContext());
+        if (form != null) {
+            Set<String> messageClientIds = new HashSet<>();
+            VisitContext visitContext = VisitContext.createVisitContext(context.getSearchExpressionContext().getFacesContext());
 
-			form.visitTree(visitContext, (visit, child) -> {
-				if (isOneInstanceOf(child.getClass(), UIMessage.class, UIMessages.class)) {
-					if (child.getId().startsWith(UIViewRoot.UNIQUE_ID_PREFIX)) {
-						logger.warning(String.format("@messages can only target message components with a fixed ID; auto generated ID %s encountered", child.getId()));
-					}
-					else {
-						messageClientIds.add(child.getClientId());
-					}
-				}
-				return VisitResult.ACCEPT;
-			});
+            form.visitTree(visitContext, (visit, child) -> {
+                if (isOneInstanceOf(child.getClass(), UIMessage.class, UIMessages.class)) {
+                    if (child.getId().startsWith(UIViewRoot.UNIQUE_ID_PREFIX)) {
+                        logger.warning(String.format("@messages can only target message components with a fixed ID; auto generated ID %s encountered", child.getId()));
+                    }
+                    else {
+                        messageClientIds.add(child.getClientId());
+                    }
+                }
+                return VisitResult.ACCEPT;
+            });
 
-			if (!messageClientIds.isEmpty()) {
-				context.invokeContextCallback(new UIMessage() {
-					@Override
-					public String getClientId(FacesContext context) {
-						return join(" ", messageClientIds);
-					}
-				});
-			}
-		}
+            if (!messageClientIds.isEmpty()) {
+                context.invokeContextCallback(new UIMessage() {
+                    @Override
+                    public String getClientId(FacesContext context) {
+                        return join(" ", messageClientIds);
+                    }
+                });
+            }
+        }
 
-		context.setKeywordResolved(true);
-	}
+        context.setKeywordResolved(true);
+    }
 }

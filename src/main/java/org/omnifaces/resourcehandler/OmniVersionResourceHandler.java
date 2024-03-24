@@ -27,24 +27,24 @@ import org.omnifaces.config.OmniFaces;
  */
 public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
-	private final String version;
+    private final String version;
 
-	/**
-	 * Creates a new instance of this OmniFaces version resource handler which wraps the given resource handler.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public OmniVersionResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-		version = "&v=" + (OmniFaces.isSnapshot() ? OmniFaces.getStartupTime() : OmniFaces.getVersion());
-	}
+    /**
+     * Creates a new instance of this OmniFaces version resource handler which wraps the given resource handler.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public OmniVersionResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+        version = "&v=" + (OmniFaces.isSnapshot() ? OmniFaces.getStartupTime() : OmniFaces.getVersion());
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null || !OMNIFACES_LIBRARY_NAME.equals(resource.getLibraryName())) {
-			return resource;
-		}
+    @Override
+    public Resource decorateResource(Resource resource) {
+        if (resource == null || !OMNIFACES_LIBRARY_NAME.equals(resource.getLibraryName())) {
+            return resource;
+        }
 
-		return new RemappedResource(resource, resource.getRequestPath() + version);
-	}
+        return new RemappedResource(resource, resource.getRequestPath() + version);
+    }
 
 }

@@ -26,95 +26,95 @@ import java.util.stream.IntStream;
  */
 public final class Arrays {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_ARRAY_SIZE = "The array size must be at least 0.";
+    private static final String ERROR_INVALID_ARRAY_SIZE = "The array size must be at least 0.";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Arrays() {
-		// Hide constructor.
-	}
+    private Arrays() {
+        // Hide constructor.
+    }
 
-	// Utility --------------------------------------------------------------------------------------------------------
+    // Utility --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates and returns a dummy object array of the given size. This is useful if you want to iterate <i>n</i> times
-	 * over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code> and <code>end</code>
-	 * attributes.
-	 * @param size The size of the dummy object array.
-	 * @return A dummy object array of the given size.
-	 * @throws IllegalArgumentException When the size is less than 0.
-	 */
-	public static Object[] createArray(int size) {
-		if (size < 0) {
-			throw new IllegalArgumentException(ERROR_INVALID_ARRAY_SIZE);
-		}
+    /**
+     * Creates and returns a dummy object array of the given size. This is useful if you want to iterate <i>n</i> times
+     * over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code> and <code>end</code>
+     * attributes.
+     * @param size The size of the dummy object array.
+     * @return A dummy object array of the given size.
+     * @throws IllegalArgumentException When the size is less than 0.
+     */
+    public static Object[] createArray(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException(ERROR_INVALID_ARRAY_SIZE);
+        }
 
-		return new Object[size];
-	}
+        return new Object[size];
+    }
 
-	/**
-	 * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive.
-	 * This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer
-	 * range to represent days and years. If the begin is greater than end, then the array will be decremental. If the
-	 * begin equals end, then the array will contain only one item.
-	 * @param begin The begin integer.
-	 * @param end The end integer.
-	 * @return An integer array which starts at the given integer and ends at the given integer, inclusive
-	 */
-	public static Integer[] createIntegerArray(int begin, int end) {
-		IntStream range = IntStream.rangeClosed(min(begin, end), max(begin, end));
+    /**
+     * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive.
+     * This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer
+     * range to represent days and years. If the begin is greater than end, then the array will be decremental. If the
+     * begin equals end, then the array will contain only one item.
+     * @param begin The begin integer.
+     * @param end The end integer.
+     * @return An integer array which starts at the given integer and ends at the given integer, inclusive
+     */
+    public static Integer[] createIntegerArray(int begin, int end) {
+        IntStream range = IntStream.rangeClosed(min(begin, end), max(begin, end));
 
-		if (begin > end) {
-			range = range.map(i -> begin + end - i);
-		}
+        if (begin > end) {
+            range = range.map(i -> begin + end - i);
+        }
 
-		return range.boxed().toArray(Integer[]::new);
-	}
+        return range.boxed().toArray(Integer[]::new);
+    }
 
-	/**
-	 * Returns <code>true</code> if the string representation of an item of the given array equals to the string
-	 * representation of the given item. This returns <code>false</code> if either the array or the item is null. This
-	 * is useful if you want to for example check if <code>#{paramValues.foo}</code> contains a certain value.
-	 * @param array The array whose items have to be compared.
-	 * @param item The item to be compared.
-	 * @return <code>true</code> if the string representation of an item of the given array equals to the string
-	 * representation of the given item.
-	 */
-	public static boolean contains(Object[] array, Object item) {
-		if (array == null || item == null) {
-			return false;
-		}
+    /**
+     * Returns <code>true</code> if the string representation of an item of the given array equals to the string
+     * representation of the given item. This returns <code>false</code> if either the array or the item is null. This
+     * is useful if you want to for example check if <code>#{paramValues.foo}</code> contains a certain value.
+     * @param array The array whose items have to be compared.
+     * @param item The item to be compared.
+     * @return <code>true</code> if the string representation of an item of the given array equals to the string
+     * representation of the given item.
+     */
+    public static boolean contains(Object[] array, Object item) {
+        if (array == null || item == null) {
+            return false;
+        }
 
-		for (Object object : array) {
-			if (object != null && object.toString().equals(item.toString())) {
-				return true;
-			}
-		}
+        for (Object object : array) {
+            if (object != null && object.toString().equals(item.toString())) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Returns a copy of the array with items in reversed order.
-	 * @param array The array to reverse.
-	 * @return A copy of the array with items in reversed order.
-	 * @since 2.4
-	 */
-	public static Object[] reverseArray(Object[] array) {
-		if (array == null) {
-			return null;
-		}
+    /**
+     * Returns a copy of the array with items in reversed order.
+     * @param array The array to reverse.
+     * @return A copy of the array with items in reversed order.
+     * @since 2.4
+     */
+    public static Object[] reverseArray(Object[] array) {
+        if (array == null) {
+            return null;
+        }
 
-		int length = array.length;
-		Object[] reversed = new Object[length];
+        int length = array.length;
+        Object[] reversed = new Object[length];
 
-		for (int i = 0; i < length; i++) {
-			reversed[i] = array[length - 1 - i];
-		}
+        for (int i = 0; i < length; i++) {
+            reversed[i] = array[length - 1 - i];
+        }
 
-		return reversed;
-	}
+        return reversed;
+    }
 
 }

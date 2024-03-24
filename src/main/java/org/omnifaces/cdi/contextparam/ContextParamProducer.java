@@ -32,24 +32,24 @@ import org.omnifaces.cdi.ContextParam;
 @Dependent
 public class ContextParamProducer {
 
-	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
-	@Inject
-	private InjectionPoint injectionPoint;
+    @SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
+    @Inject
+    private InjectionPoint injectionPoint;
 
-	@Inject
-	private ServletContext servletContext;
+    @Inject
+    private ServletContext servletContext;
 
-	/**
-	 * Returns context parameter value associated with context parameter name derived from given injection point.
-	 * @param injectionPoint Injection point to derive context parameter name from.
-	 * @return Context parameter value associated with context parameter name derived from given injection point.
-	 */
-	@Produces
-	@ContextParam
-	public String produce(InjectionPoint injectionPoint) {
-		ContextParam param = getQualifier(injectionPoint, ContextParam.class);
-		String name = param.name().isEmpty() ? injectionPoint.getMember().getName() : param.name();
-		return servletContext.getInitParameter(name);
-	}
+    /**
+     * Returns context parameter value associated with context parameter name derived from given injection point.
+     * @param injectionPoint Injection point to derive context parameter name from.
+     * @return Context parameter value associated with context parameter name derived from given injection point.
+     */
+    @Produces
+    @ContextParam
+    public String produce(InjectionPoint injectionPoint) {
+        ContextParam param = getQualifier(injectionPoint, ContextParam.class);
+        String name = param.name().isEmpty() ? injectionPoint.getMember().getName() : param.name();
+        return servletContext.getInitParameter(name);
+    }
 
 }

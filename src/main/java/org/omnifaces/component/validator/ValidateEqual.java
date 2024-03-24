@@ -39,19 +39,19 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateEqual.COMPONENT_TYPE)
 public class ValidateEqual extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateEqual#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateEqual";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateEqual#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateEqual";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if all values are equal.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		return (new HashSet<>(values).size() == 1);
-	}
+    /**
+     * Validate if all values are equal.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+        return (new HashSet<>(values).size() == 1);
+    }
 
 }

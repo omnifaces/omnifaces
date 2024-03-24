@@ -45,77 +45,77 @@ import jakarta.faces.event.PhaseListener;
  */
 public class CallbackPhaseListener implements PhaseListener {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public PhaseId getPhaseId() {
-		return ANY_PHASE;
-	}
+    @Override
+    public PhaseId getPhaseId() {
+        return ANY_PHASE;
+    }
 
-	@Override
-	public void beforePhase(PhaseEvent event) {
-		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
-			phaseListener.beforePhase(event);
-		}
-	}
+    @Override
+    public void beforePhase(PhaseEvent event) {
+        for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+            phaseListener.beforePhase(event);
+        }
+    }
 
-	@Override
-	public void afterPhase(PhaseEvent event) {
-		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
-			phaseListener.afterPhase(event);
-		}
-	}
+    @Override
+    public void afterPhase(PhaseEvent event) {
+        for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+            phaseListener.afterPhase(event);
+        }
+    }
 
-	// Utility --------------------------------------------------------------------------------------------------------
+    // Utility --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Adds the given phase listener to the current request scope.
-	 * @param phaseListener The phase listener to be added to the current request scope.
-	 */
-	public static void add(PhaseListener phaseListener) {
-		getCallbackPhaseListeners(getContext(), true).add(phaseListener);
-	}
+    /**
+     * Adds the given phase listener to the current request scope.
+     * @param phaseListener The phase listener to be added to the current request scope.
+     */
+    public static void add(PhaseListener phaseListener) {
+        getCallbackPhaseListeners(getContext(), true).add(phaseListener);
+    }
 
-	/**
-	 * Removes the given phase listener from the current request scope.
-	 * @param phaseListener The phase listener to be removed from the current request scope.
-	 * @return <code>true</code> if the current request scope indeed contained the given phase listener.
-	 */
-	public static boolean remove(PhaseListener phaseListener) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(getContext(), false);
-		return phaseListeners != null && phaseListeners.remove(phaseListener);
-	}
+    /**
+     * Removes the given phase listener from the current request scope.
+     * @param phaseListener The phase listener to be removed from the current request scope.
+     * @return <code>true</code> if the current request scope indeed contained the given phase listener.
+     */
+    public static boolean remove(PhaseListener phaseListener) {
+        Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(getContext(), false);
+        return phaseListeners != null && phaseListeners.remove(phaseListener);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
-		return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
-	}
+    private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
+        return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
+    }
 
-	private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
+    private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
+        Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
 
-		if (phaseListeners == null) {
-			return Collections.emptySet();
-		}
+        if (phaseListeners == null) {
+            return Collections.emptySet();
+        }
 
-		Set<PhaseListener> phaseListenersForEvent = new HashSet<>();
+        Set<PhaseListener> phaseListenersForEvent = new HashSet<>();
 
-		for (PhaseListener phaseListener : phaseListeners) {
-			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-				phaseListenersForEvent.add(phaseListener);
-			}
-		}
+        for (PhaseListener phaseListener : phaseListeners) {
+            if (isPhaseMatch(event, phaseListener.getPhaseId())) {
+                phaseListenersForEvent.add(phaseListener);
+            }
+        }
 
-		return Collections.unmodifiableSet(phaseListenersForEvent);
-	}
+        return Collections.unmodifiableSet(phaseListenersForEvent);
+    }
 
-	private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {
-		return ANY_PHASE.equals(phaseId) || event.getPhaseId().equals(phaseId);
-	}
+    private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {
+        return ANY_PHASE.equals(phaseId) || event.getPhaseId().equals(phaseId);
+    }
 
 }

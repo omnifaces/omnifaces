@@ -27,7 +27,7 @@ import jakarta.validation.Payload;
 @Target({ TYPE, METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface ValidateBeanITEntityConstraint {
-	String message() default "invalidEntity";
-	Class<?>[] groups() default {};
-	Class<? extends Payload>[] payload() default {};
+    String message() default "invalidEntity";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }

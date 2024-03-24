@@ -43,10 +43,10 @@ import jakarta.faces.convert.FacesConverter;
 @FacesConverter("omnifaces.ToUpperCaseConverter")
 public class ToUpperCaseConverter extends TrimConverter {
 
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		String trimmed = super.getAsObject(context, component, submittedValue);
-		return (trimmed == null) ? null : trimmed.toUpperCase(getLocale(context));
-	}
+    @Override
+    public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        String trimmed = super.getAsObject(context, component, submittedValue);
+        return (trimmed == null) ? null : trimmed.toUpperCase(getLocale(context));
+    }
 
 }

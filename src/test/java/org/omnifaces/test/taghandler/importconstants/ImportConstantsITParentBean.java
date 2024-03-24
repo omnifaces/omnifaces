@@ -14,6 +14,6 @@ package org.omnifaces.test.taghandler.importconstants;
 
 public class ImportConstantsITParentBean {
 
-	public static final String VALUE = "parent";
+    public static final String VALUE = "parent";
 
 }

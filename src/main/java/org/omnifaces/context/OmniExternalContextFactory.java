@@ -24,24 +24,24 @@ import jakarta.faces.context.ExternalContextFactory;
  */
 public class OmniExternalContextFactory extends ExternalContextFactory {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces external context factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public OmniExternalContextFactory(ExternalContextFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new OmniFaces external context factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public OmniExternalContextFactory(ExternalContextFactory wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new instance of {@link OmniExternalContext} which wraps the original external context.
-	 */
-	@Override
-	public ExternalContext getExternalContext(Object context, Object request, Object response) {
-		return new OmniExternalContext(getWrapped().getExternalContext(context, request, response));
-	}
+    /**
+     * Returns a new instance of {@link OmniExternalContext} which wraps the original external context.
+     */
+    @Override
+    public ExternalContext getExternalContext(Object context, Object request, Object response) {
+        return new OmniExternalContext(getWrapped().getExternalContext(context, request, response));
+    }
 
 }

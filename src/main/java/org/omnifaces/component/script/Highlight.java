@@ -82,125 +82,125 @@ import org.omnifaces.util.State;
 @FacesComponent(Highlight.COMPONENT_TYPE)
 public class Highlight extends OnloadScript {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.script.Highlight#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.Highlight";
+    /** The component type, which is {@value org.omnifaces.component.script.Highlight#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.script.Highlight";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
-	private static final String DEFAULT_STYLECLASS = "error";
-	private static final Boolean DEFAULT_FOCUS = TRUE;
-	private static final String SCRIPT = "OmniFaces.Highlight.apply([%s], '%s', %s);";
+    private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
+    private static final String DEFAULT_STYLECLASS = "error";
+    private static final Boolean DEFAULT_FOCUS = TRUE;
+    private static final String SCRIPT = "OmniFaces.Highlight.apply([%s], '%s', %s);";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		styleClass, focus
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        styleClass, focus
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	/**
-	 * The constructor instructs Faces to register all scripts during the render response phase if necessary.
-	 */
-	public Highlight() {
-		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
-	}
+    /**
+     * The constructor instructs Faces to register all scripts during the render response phase if necessary.
+     */
+    public Highlight() {
+        subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+    }
 
-	private void registerScriptsIfNecessary() {
-		// This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
-		// resource name which cannot be resolved statically.
-		addFacesScriptResource(); // Required for jsf.ajax.request.
-		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-	}
+    private void registerScriptsIfNecessary() {
+        // This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
+        // resource name which cannot be resolved statically.
+        addFacesScriptResource(); // Required for jsf.ajax.request.
+        addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not
-	 * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
-	 * <p>
-	 * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
-	 * whether the components associated with those client IDs are actually {@link UIInput} components which are not
-	 * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegating the job to JavaScript
-	 * instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we
-	 * don't want the changed style class to be saved in the server side view state as it may result in potential
-	 * inconsistencies because it's supposed to be an one-time change.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		UIForm form = getCurrentForm();
+    /**
+     * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not
+     * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
+     * <p>
+     * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
+     * whether the components associated with those client IDs are actually {@link UIInput} components which are not
+     * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegating the job to JavaScript
+     * instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we
+     * don't want the changed style class to be saved in the server side view state as it may result in potential
+     * inconsistencies because it's supposed to be an one-time change.
+     */
+    @Override
+    public void encodeChildren(FacesContext context) throws IOException {
+        UIForm form = getCurrentForm();
 
-		if (form == null) {
-			return;
-		}
+        if (form == null) {
+            return;
+        }
 
-		StringBuilder clientIds = new StringBuilder();
-		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
-			if (component instanceof UIInput && !((UIInput) component).isValid()) {
-				if (clientIds.length() > 0) {
-					clientIds.append(',');
-				}
+        StringBuilder clientIds = new StringBuilder();
+        form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
+            if (component instanceof UIInput && !((UIInput) component).isValid()) {
+                if (clientIds.length() > 0) {
+                    clientIds.append(',');
+                }
 
-				String clientId = component.getClientId(visitContext.getFacesContext());
-				clientIds.append('"').append(clientId).append('"');
-			}
+                String clientId = component.getClientId(visitContext.getFacesContext());
+                clientIds.append('"').append(clientId).append('"');
+            }
 
-			return VisitResult.ACCEPT;
-		});
+            return VisitResult.ACCEPT;
+        });
 
-		if (clientIds.length() > 0) {
-			context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
-		}
-	}
+        if (clientIds.length() > 0) {
+            context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
+        }
+    }
 
-	/**
-	 * This component is per definiton only rendered when the current request is a postback request and the
-	 * validation has failed.
-	 */
-	@Override
-	public boolean isRendered() {
-		FacesContext context = getFacesContext();
-		return context.isPostback() && context.isValidationFailed() && super.isRendered();
-	}
+    /**
+     * This component is per definiton only rendered when the current request is a postback request and the
+     * validation has failed.
+     */
+    @Override
+    public boolean isRendered() {
+        FacesContext context = getFacesContext();
+        return context.isPostback() && context.isValidationFailed() && super.isRendered();
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
-	 * @return The error style class which is to be applied on invalid inputs.
-	 */
-	public String getStyleClass() {
-		return state.get(PropertyKeys.styleClass, DEFAULT_STYLECLASS);
-	}
+    /**
+     * Returns the error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
+     * @return The error style class which is to be applied on invalid inputs.
+     */
+    public String getStyleClass() {
+        return state.get(PropertyKeys.styleClass, DEFAULT_STYLECLASS);
+    }
 
-	/**
-	 * Sets the error style class which is to be applied on invalid inputs.
-	 * @param styleClass The error style class which is to be applied on invalid inputs.
-	 */
-	public void setStyleClass(String styleClass) {
-		state.put(PropertyKeys.styleClass, styleClass);
-	}
+    /**
+     * Sets the error style class which is to be applied on invalid inputs.
+     * @param styleClass The error style class which is to be applied on invalid inputs.
+     */
+    public void setStyleClass(String styleClass) {
+        state.put(PropertyKeys.styleClass, styleClass);
+    }
 
-	/**
-	 * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
-	 * @return Whether the first error element should gain focus.
-	 */
-	public boolean isFocus() {
-		return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
-	}
+    /**
+     * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
+     * @return Whether the first error element should gain focus.
+     */
+    public boolean isFocus() {
+        return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
+    }
 
-	/**
-	 * Sets whether the first error element should gain focus.
-	 * @param focus Whether the first error element should gain focus.
-	 */
-	public void setFocus(boolean focus) {
-		state.put(PropertyKeys.focus, focus);
-	}
+    /**
+     * Sets whether the first error element should gain focus.
+     * @param focus Whether the first error element should gain focus.
+     */
+    public void setFocus(boolean focus) {
+        state.put(PropertyKeys.focus, focus);
+    }
 
 }

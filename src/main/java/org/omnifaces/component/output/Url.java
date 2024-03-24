@@ -118,198 +118,198 @@ import org.omnifaces.util.State;
 @FacesComponent(Url.COMPONENT_TYPE)
 public class Url extends OutputFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.Url#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Url";
+    /** The component type, which is {@value org.omnifaces.component.output.Url#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Url";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_EXPRESSION_DISALLOWED =
-		"A value expression is disallowed on 'var' attribute of Url.";
+    private static final String ERROR_EXPRESSION_DISALLOWED =
+        "A value expression is disallowed on 'var' attribute of Url.";
 
-	private static final String ERROR_INVALID_DOMAIN =
-		"o:url 'domain' attribute '%s' does not represent a valid domain.";
+    private static final String ERROR_INVALID_DOMAIN =
+        "o:url 'domain' attribute '%s' does not represent a valid domain.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		var,
-		value,
-		viewId,
-		domain,
-		includeViewParams,
-		includeRequestParams;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        var,
+        value,
+        viewId,
+        domain,
+        includeViewParams,
+        includeRequestParams;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
-	 * Finally it delegates to the super method.
-	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
-	 */
-	@Override
-	public void setValueExpression(String name, ValueExpression binding) {
-		if (PropertyKeys.var.toString().equals(name)) {
-			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
-		}
+    /**
+     * An override which checks if this isn't been invoked on <code>var</code> attribute.
+     * Finally it delegates to the super method.
+     * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
+     */
+    @Override
+    public void setValueExpression(String name, ValueExpression binding) {
+        if (PropertyKeys.var.toString().equals(name)) {
+            throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
+        }
 
-		super.setValueExpression(name, binding);
-	}
+        super.setValueExpression(name, binding);
+    }
 
-	/**
-	 * Returns <code>false</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return false;
-	}
+    /**
+     * Returns <code>false</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return false;
+    }
 
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		String value = getValue();
-		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-		String url = (value != null) ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        String value = getValue();
+        Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
+        String url = (value != null) ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
 
-		if (getVar() != null) {
-			setRequestAttribute(context, getVar(), url);
-		}
-		else {
-			context.getResponseWriter().writeText(url, null);
-		}
-	}
+        if (getVar() != null) {
+            setRequestAttribute(context, getVar(), url);
+        }
+        else {
+            context.getResponseWriter().writeText(url, null);
+        }
+    }
 
-	private String getBookmarkableURLWithDomain(FacesContext context, Map<String, List<String>> params) {
-		String uri = getBookmarkableURL(context, getViewId(), params, false);
-		String domain = getDomain();
-		return getBookmarkableURLWithDomain(context, uri, domain, ERROR_INVALID_DOMAIN);
-	}
+    private String getBookmarkableURLWithDomain(FacesContext context, Map<String, List<String>> params) {
+        String uri = getBookmarkableURL(context, getViewId(), params, false);
+        String domain = getDomain();
+        return getBookmarkableURLWithDomain(context, uri, domain, ERROR_INVALID_DOMAIN);
+    }
 
-	static String getBookmarkableURLWithDomain(FacesContext context, String uri, String domain, String errorMessage) {
-		if ("//".equals(domain)) {
-			return getRequestDomainURL(context).split(":", 2)[1] + uri;
-		}
-		else if (!"/".equals(domain)) {
-			String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
+    static String getBookmarkableURLWithDomain(FacesContext context, String uri, String domain, String errorMessage) {
+        if ("//".equals(domain)) {
+            return getRequestDomainURL(context).split(":", 2)[1] + uri;
+        }
+        else if (!"/".equals(domain)) {
+            String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
 
-			try {
-				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
-			}
-			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(format(errorMessage, domain), e);
-			}
+            try {
+                new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
+            }
+            catch (MalformedURLException e) {
+                throw new IllegalArgumentException(format(errorMessage, domain), e);
+            }
 
-			return stripTrailingSlash(normalizedDomain) + uri;
-		}
-		else {
-			return uri;
-		}
-	}
+            return stripTrailingSlash(normalizedDomain) + uri;
+        }
+        else {
+            return uri;
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the variable name which exposes the URL into the request scope.
-	 * @return The variable name which exposes the URL into the request scope.
-	 */
-	public String getVar() {
-		return state.get(PropertyKeys.var);
-	}
+    /**
+     * Returns the variable name which exposes the URL into the request scope.
+     * @return The variable name which exposes the URL into the request scope.
+     */
+    public String getVar() {
+        return state.get(PropertyKeys.var);
+    }
 
-	/**
-	 * Sets the variable name which exposes the URL into the request scope.
-	 * @param var The variable name which exposes the URL into the request scope.
-	 */
-	public void setVar(String var) {
-		state.put(PropertyKeys.var, var);
-	}
+    /**
+     * Sets the variable name which exposes the URL into the request scope.
+     * @param var The variable name which exposes the URL into the request scope.
+     */
+    public void setVar(String var) {
+        state.put(PropertyKeys.var, var);
+    }
 
-	/**
-	 * Returns the target URL.
-	 * @return The target URL.
-	 */
-	public String getValue() {
-		return state.get(PropertyKeys.value);
-	}
+    /**
+     * Returns the target URL.
+     * @return The target URL.
+     */
+    public String getValue() {
+        return state.get(PropertyKeys.value);
+    }
 
-	/**
-	 * Sets the target URL.
-	 * @param value The target URL.
-	 */
-	public void setValue(String value) {
-		state.put(PropertyKeys.value, value);
-	}
+    /**
+     * Sets the target URL.
+     * @param value The target URL.
+     */
+    public void setValue(String value) {
+        state.put(PropertyKeys.value, value);
+    }
 
-	/**
-	 * Returns the view ID to create URL for. Defaults to current view ID.
-	 * @return The view ID to create URL for.
-	 */
-	public String getViewId() {
-		return state.get(PropertyKeys.viewId, getFacesContext().getViewRoot().getViewId());
-	}
+    /**
+     * Returns the view ID to create URL for. Defaults to current view ID.
+     * @return The view ID to create URL for.
+     */
+    public String getViewId() {
+        return state.get(PropertyKeys.viewId, getFacesContext().getViewRoot().getViewId());
+    }
 
-	/**
-	 * Sets the view ID to create URL for.
-	 * @param viewId The view ID to create URL for.
-	 */
-	public void setViewId(String viewId) {
-		state.put(PropertyKeys.viewId, viewId);
-	}
+    /**
+     * Sets the view ID to create URL for.
+     * @param viewId The view ID to create URL for.
+     */
+    public void setViewId(String viewId) {
+        state.put(PropertyKeys.viewId, viewId);
+    }
 
-	/**
-	 * Returns the domain of the URL. Defaults to current domain.
-	 * @return The domain of the URL.
-	 */
-	public String getDomain() {
-		return state.get(PropertyKeys.domain, getRequestDomainURL());
-	}
+    /**
+     * Returns the domain of the URL. Defaults to current domain.
+     * @return The domain of the URL.
+     */
+    public String getDomain() {
+        return state.get(PropertyKeys.domain, getRequestDomainURL());
+    }
 
-	/**
-	 * Sets the domain of the URL.
-	 * @param domain The domain of the URL.
-	 */
-	public void setDomain(String domain) {
-		state.put(PropertyKeys.domain, domain);
-	}
+    /**
+     * Sets the domain of the URL.
+     * @param domain The domain of the URL.
+     */
+    public void setDomain(String domain) {
+        state.put(PropertyKeys.domain, domain);
+    }
 
-	/**
-	 * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @return Whether or not the view parameters should be encoded into the URL.
-	 */
-	public boolean isIncludeViewParams() {
-		return state.get(PropertyKeys.includeViewParams, FALSE);
-	}
+    /**
+     * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>.
+     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * @return Whether or not the view parameters should be encoded into the URL.
+     */
+    public boolean isIncludeViewParams() {
+        return state.get(PropertyKeys.includeViewParams, FALSE);
+    }
 
-	/**
-	 * Sets whether or not the view parameters should be encoded into the URL.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
-	 */
-	public void setIncludeViewParams(boolean includeViewParams) {
-		state.put(PropertyKeys.includeViewParams, includeViewParams);
-	}
+    /**
+     * Sets whether or not the view parameters should be encoded into the URL.
+     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
+     */
+    public void setIncludeViewParams(boolean includeViewParams) {
+        state.put(PropertyKeys.includeViewParams, includeViewParams);
+    }
 
-	/**
-	 * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>.
-	 * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
-	 * @return Whether or not the request query string parameters should be encoded into the URL.
-	 */
-	public boolean isIncludeRequestParams() {
-		return state.get(PropertyKeys.includeRequestParams, FALSE);
-	}
+    /**
+     * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>.
+     * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+     * @return Whether or not the request query string parameters should be encoded into the URL.
+     */
+    public boolean isIncludeRequestParams() {
+        return state.get(PropertyKeys.includeRequestParams, FALSE);
+    }
 
-	/**
-	 * Sets whether or not the request query string parameters should be encoded into the URL.
-	 * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
-	 * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
-	 */
-	public void setIncludeRequestParams(boolean includeRequestParams) {
-		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
-	}
+    /**
+     * Sets whether or not the request query string parameters should be encoded into the URL.
+     * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+     * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
+     */
+    public void setIncludeRequestParams(boolean includeRequestParams) {
+        state.put(PropertyKeys.includeRequestParams, includeRequestParams);
+    }
 
 }

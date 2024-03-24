@@ -62,38 +62,38 @@ import jakarta.faces.validator.ValidatorException;
 @FacesValidator("omnifaces.RequiredCheckboxValidator")
 public class RequiredCheckboxValidator implements Validator<Boolean> {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: a tick is required";
+    private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: a tick is required";
 
-	private static final String ERROR_WRONG_COMPONENT = "RequiredCheckboxValidator must be registered on a component"
-		+ " of type UISelectBoolean. Encountered component of type '%s'.";
+    private static final String ERROR_WRONG_COMPONENT = "RequiredCheckboxValidator must be registered on a component"
+        + " of type UISelectBoolean. Encountered component of type '%s'.";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void validate(FacesContext context, UIComponent component, Boolean value) {
-		if (!(component instanceof UISelectBoolean)) {
-			throw new IllegalArgumentException(format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
-		}
+    @Override
+    public void validate(FacesContext context, UIComponent component, Boolean value) {
+        if (!(component instanceof UISelectBoolean)) {
+            throw new IllegalArgumentException(format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
+        }
 
-		if (!Boolean.TRUE.equals(value)) {
-			String requiredMessage = ((UIInput) component).getRequiredMessage();
+        if (!Boolean.TRUE.equals(value)) {
+            String requiredMessage = ((UIInput) component).getRequiredMessage();
 
-			if (requiredMessage == null) {
-				ResourceBundle messageBundle = getMessageBundle(context);
+            if (requiredMessage == null) {
+                ResourceBundle messageBundle = getMessageBundle(context);
 
-				if (messageBundle != null) {
-					requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
-				}
-			}
+                if (messageBundle != null) {
+                    requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
+                }
+            }
 
-			if (requiredMessage == null) {
-				requiredMessage = DEFAULT_REQUIRED_MESSAGE;
-			}
+            if (requiredMessage == null) {
+                requiredMessage = DEFAULT_REQUIRED_MESSAGE;
+            }
 
-			throw new ValidatorException(createError(requiredMessage, getLabel(component)));
-		}
-	}
+            throw new ValidatorException(createError(requiredMessage, getLabel(component)));
+        }
+    }
 
 }

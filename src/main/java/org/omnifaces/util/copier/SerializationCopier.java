@@ -31,23 +31,23 @@ import java.io.Serializable;
  */
 public class SerializationCopier implements Copier {
 
-	@Override
-	public Object copy(Object object) {
+    @Override
+    public Object copy(Object object) {
 
-		if (!(object instanceof Serializable)) {
-			throw new IllegalStateException("Can't copy object of type " + object.getClass() + " since it doesn't implement Serializable");
-		}
+        if (!(object instanceof Serializable)) {
+            throw new IllegalStateException("Can't copy object of type " + object.getClass() + " since it doesn't implement Serializable");
+        }
 
-		try {
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			new ObjectOutputStream(outputStream).writeObject(object);
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            new ObjectOutputStream(outputStream).writeObject(object);
 
-			return new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+            return new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
 
-		} catch (IOException | ClassNotFoundException e) {
-			throw new IllegalStateException(e);
-		}
+        } catch (IOException | ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
 
-	}
+    }
 
 }

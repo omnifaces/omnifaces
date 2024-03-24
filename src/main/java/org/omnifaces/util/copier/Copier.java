@@ -26,12 +26,12 @@ package org.omnifaces.util.copier;
  */
 public interface Copier {
 
-	/**
-	 * Return an object that's logically a copy of the given object.
-	 *
-	 * @param object the object to be copied
-	 * @return a copy of the given object
-	 */
-	Object copy(Object object);
+    /**
+     * Return an object that's logically a copy of the given object.
+     *
+     * @param object the object to be copied
+     * @return a copy of the given object
+     */
+    Object copy(Object object);
 
 }

@@ -120,5 +120,5 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface GraphicImageBean {
-	//
+    //
 }

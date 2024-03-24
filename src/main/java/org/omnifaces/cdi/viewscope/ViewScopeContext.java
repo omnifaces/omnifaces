@@ -37,64 +37,64 @@ import org.omnifaces.cdi.ViewScoped;
  */
 public class ViewScopeContext implements Context {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private ViewScopeManager viewScopeManager;
+    private ViewScopeManager viewScopeManager;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link ViewScoped} class.
-	 */
-	@Override
-	public Class<? extends Annotation> getScope() {
-		return ViewScoped.class;
-	}
+    /**
+     * Returns {@link ViewScoped} class.
+     */
+    @Override
+    public Class<? extends Annotation> getScope() {
+        return ViewScoped.class;
+    }
 
-	/**
-	 * Returns <code>true</code> if there is a {@link FacesContext}, and it has a {@link UIViewRoot}, and
-	 * {@link #isInitialized()} has returned <code>true</code>.
-	 */
-	@Override
-	public boolean isActive() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		return context != null && context.getViewRoot() != null && isInitialized();
-	}
+    /**
+     * Returns <code>true</code> if there is a {@link FacesContext}, and it has a {@link UIViewRoot}, and
+     * {@link #isInitialized()} has returned <code>true</code>.
+     */
+    @Override
+    public boolean isActive() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        return context != null && context.getViewRoot() != null && isInitialized();
+    }
 
-	@Override
-	public <T> T get(Contextual<T> type) {
-		checkActive();
-		return viewScopeManager.getBean(type);
-	}
+    @Override
+    public <T> T get(Contextual<T> type) {
+        checkActive();
+        return viewScopeManager.getBean(type);
+    }
 
-	@Override
-	public <T> T get(Contextual<T> type, CreationalContext<T> context) {
-		T instance = get(type);
-		return (instance != null) ? instance : viewScopeManager.createBean(type, context);
-	}
+    @Override
+    public <T> T get(Contextual<T> type, CreationalContext<T> context) {
+        T instance = get(type);
+        return (instance != null) ? instance : viewScopeManager.createBean(type, context);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Check and initialize the view scope manager.
-	 * @return <code>true</code> if it has been initialized.
-	 */
-	private boolean isInitialized() {
-		if (viewScopeManager == null) {
-			viewScopeManager = getReference(ViewScopeManager.class);
-		}
+    /**
+     * Check and initialize the view scope manager.
+     * @return <code>true</code> if it has been initialized.
+     */
+    private boolean isInitialized() {
+        if (viewScopeManager == null) {
+            viewScopeManager = getReference(ViewScopeManager.class);
+        }
 
-		return viewScopeManager != null;
-	}
+        return viewScopeManager != null;
+    }
 
-	/**
-	 * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
-	 * @throws ContextNotActiveException When context is not active.
-	 */
-	private void checkActive() {
-		if (!isActive()) {
-			throw new ContextNotActiveException();
-		}
-	}
+    /**
+     * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
+     * @throws ContextNotActiveException When context is not active.
+     */
+    private void checkActive() {
+        if (!isActive()) {
+            throw new ContextNotActiveException();
+        }
+    }
 
 }

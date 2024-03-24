@@ -23,14 +23,14 @@ import jakarta.servlet.http.HttpSessionListener;
  */
 public abstract class DefaultHttpSessionListener implements HttpSessionListener {
 
-	@Override
-	public void sessionCreated(HttpSessionEvent se) {
-		// NOOP
-	}
+    @Override
+    public void sessionCreated(HttpSessionEvent se) {
+        // NOOP
+    }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent se) {
-		// NOOP
-	}
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+        // NOOP
+    }
 
 }

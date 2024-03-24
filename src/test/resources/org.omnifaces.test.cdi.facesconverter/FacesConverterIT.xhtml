@@ -14,31 +14,31 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<h:outputText id="facesConverterITConverter" value="test" converter="facesConverterITConverter" />
-		<h:outputText id="facesConverterITManagedConverter" value="test" converter="facesConverterITManagedConverter" />
-		<h:outputText id="facesConverterITExtendedConverter" value="test" converter="facesConverterITExtendedConverter" />
-		<h:outputText id="facesConverterITExtendedManagedConverter" value="test" converter="facesConverterITExtendedManagedConverter" />
+    <h:body>
+        <h:outputText id="facesConverterITConverter" value="test" converter="facesConverterITConverter" />
+        <h:outputText id="facesConverterITManagedConverter" value="test" converter="facesConverterITManagedConverter" />
+        <h:outputText id="facesConverterITExtendedConverter" value="test" converter="facesConverterITExtendedConverter" />
+        <h:outputText id="facesConverterITExtendedManagedConverter" value="test" converter="facesConverterITExtendedManagedConverter" />
 
-		<h:outputText id="facesConverterITConverterResourceDependency" />
-		<h:outputText id="facesConverterITManagedConverterResourceDependency" />
-		<h:outputText id="facesConverterITExtendedConverterResourceDependency" />
-		<h:outputText id="facesConverterITExtendedManagedConverterResourceDependency" />
+        <h:outputText id="facesConverterITConverterResourceDependency" />
+        <h:outputText id="facesConverterITManagedConverterResourceDependency" />
+        <h:outputText id="facesConverterITExtendedConverterResourceDependency" />
+        <h:outputText id="facesConverterITExtendedManagedConverterResourceDependency" />
 
-		<h:outputText id="loaded" />
+        <h:outputText id="loaded" />
 
-		<script>
-			// This ensures that any resource dependency scripts are finished because they're also only executed on "load" event.
-			window.addEventListener("load", function() { document.getElementById("loaded").innerHTML = "true" });
-		</script>
-	</h:body>
+        <script>
+            // This ensures that any resource dependency scripts are finished because they're also only executed on "load" event.
+            window.addEventListener("load", function() { document.getElementById("loaded").innerHTML = "true" });
+        </script>
+    </h:body>
 </html>

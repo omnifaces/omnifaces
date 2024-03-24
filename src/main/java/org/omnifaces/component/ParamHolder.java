@@ -30,35 +30,35 @@ import org.omnifaces.util.Faces;
  */
 public interface ParamHolder<T> extends ValueHolder {
 
-	/**
-	 * Returns the name of the parameter.
-	 * @return The name of the parameter.
-	 */
-	String getName();
+    /**
+     * Returns the name of the parameter.
+     * @return The name of the parameter.
+     */
+    String getName();
 
-	/**
-	 * Returns the original, unconverted value of the parameter.
-	 * @return The original, unconverted value of the parameter.
-	 */
-	@Override
-	T getLocalValue();
+    /**
+     * Returns the original, unconverted value of the parameter.
+     * @return The original, unconverted value of the parameter.
+     */
+    @Override
+    T getLocalValue();
 
-	/**
-	 * Returns the converter, if any.
-	 * @return The converter, if any.
-	 */
-	@Override
-	Converter<T> getConverter();
+    /**
+     * Returns the converter, if any.
+     * @return The converter, if any.
+     */
+    @Override
+    Converter<T> getConverter();
 
-	/**
-	 * Returns the value of the parameter as {@link String}. If the converter is set, or if any converter is available by
-	 * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
-	 * {@link Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)},
-	 * otherwise return the {@link Object#toString()} of the value.
-	 * @return The value of the parameter as {@link String}.
-	 * @see Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)
-	 */
-	@Override
-	String getValue();
+    /**
+     * Returns the value of the parameter as {@link String}. If the converter is set, or if any converter is available by
+     * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
+     * {@link Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)},
+     * otherwise return the {@link Object#toString()} of the value.
+     * @return The value of the parameter as {@link String}.
+     * @see Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)
+     */
+    @Override
+    String getValue();
 
 }

@@ -37,105 +37,105 @@ import jakarta.faces.model.ListDataModel;
  */
 public class IterableDataModel<E> extends DataModel<E> {
 
-	private int index = -1;
-	private Iterable<E> iterable;
-	private List<E> list;
+    private int index = -1;
+    private Iterable<E> iterable;
+    private List<E> list;
 
-	/**
-	 * Construct the iterable data model based on the given iterable instance.
-	 * @param iterable The iterable instance to construct the iterable data model for.
-	 */
-	public IterableDataModel(Iterable<E> iterable) {
-		setWrappedData(iterable);
-	}
+    /**
+     * Construct the iterable data model based on the given iterable instance.
+     * @param iterable The iterable instance to construct the iterable data model for.
+     */
+    public IterableDataModel(Iterable<E> iterable) {
+        setWrappedData(iterable);
+    }
 
-	@Override
-	public boolean isRowAvailable() {
-		return list != null && index >= 0 && index < list.size();
-	}
+    @Override
+    public boolean isRowAvailable() {
+        return list != null && index >= 0 && index < list.size();
+    }
 
-	@Override
-	public int getRowCount() {
-		if (list == null) {
-			return -1;
-		}
+    @Override
+    public int getRowCount() {
+        if (list == null) {
+            return -1;
+        }
 
-		return list.size();
-	}
+        return list.size();
+    }
 
-	@Override
-	public E getRowData() {
-		if (list == null) {
-			return null;
-		}
-		if (!isRowAvailable()) {
-			throw new IllegalStateException();
-		}
+    @Override
+    public E getRowData() {
+        if (list == null) {
+            return null;
+        }
+        if (!isRowAvailable()) {
+            throw new IllegalStateException();
+        }
 
-		return list.get(index);
-	}
+        return list.get(index);
+    }
 
-	@Override
-	public int getRowIndex() {
-		return index;
-	}
+    @Override
+    public int getRowIndex() {
+        return index;
+    }
 
-	@Override
-	public void setRowIndex(int rowIndex) {
+    @Override
+    public void setRowIndex(int rowIndex) {
 
-		if (rowIndex < -1) {
-			throw new IllegalArgumentException();
-		}
+        if (rowIndex < -1) {
+            throw new IllegalArgumentException();
+        }
 
-		int oldRowIndex = index;
-		index = rowIndex;
+        int oldRowIndex = index;
+        index = rowIndex;
 
-		if (list == null) {
-			return;
-		}
+        if (list == null) {
+            return;
+        }
 
-		notifyListeners(oldRowIndex, rowIndex);
-	}
+        notifyListeners(oldRowIndex, rowIndex);
+    }
 
-	@Override
-	public Object getWrappedData() {
-		return iterable;
-	}
+    @Override
+    public Object getWrappedData() {
+        return iterable;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void setWrappedData(Object data) {
-		if (data == null) {
-			iterable = null;
-			list = null;
-			setRowIndex(-1);
-		} else {
-			iterable = (Iterable<E>) data;
-			list = iterableToList(iterable);
-			setRowIndex(0);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setWrappedData(Object data) {
+        if (data == null) {
+            iterable = null;
+            list = null;
+            setRowIndex(-1);
+        } else {
+            iterable = (Iterable<E>) data;
+            list = iterableToList(iterable);
+            setRowIndex(0);
+        }
+    }
 
-	private E getRowDataOrNull() {
-		if (isRowAvailable()) {
-			return getRowData();
-		}
+    private E getRowDataOrNull() {
+        if (isRowAvailable()) {
+            return getRowData();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private void notifyListeners(int oldRowIndex, int rowIndex) {
-		DataModelListener[] dataModelListeners = getDataModelListeners();
-		if (oldRowIndex != rowIndex && dataModelListeners != null) {
+    private void notifyListeners(int oldRowIndex, int rowIndex) {
+        DataModelListener[] dataModelListeners = getDataModelListeners();
+        if (oldRowIndex != rowIndex && dataModelListeners != null) {
 
-			DataModelEvent dataModelEvent = new DataModelEvent(this, rowIndex, getRowDataOrNull());
+            DataModelEvent dataModelEvent = new DataModelEvent(this, rowIndex, getRowDataOrNull());
 
-			for (DataModelListener dataModelListener : dataModelListeners) {
-				if (dataModelListener != null) {
-					dataModelListener.rowSelected(dataModelEvent);
-				}
-			}
-		}
-	}
+            for (DataModelListener dataModelListener : dataModelListeners) {
+                if (dataModelListener != null) {
+                    dataModelListener.rowSelected(dataModelEvent);
+                }
+            }
+        }
+    }
 
 }

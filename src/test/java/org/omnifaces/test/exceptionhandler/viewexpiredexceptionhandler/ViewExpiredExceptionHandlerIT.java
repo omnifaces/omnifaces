@@ -27,40 +27,40 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly deal with flash cookies, they seem to hang around one request too long")
 public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 
-	@FindBy(id="form:wasViewExpired")
-	private WebElement wasViewExpired;
+    @FindBy(id="form:wasViewExpired")
+    private WebElement wasViewExpired;
 
-	@FindBy(id="form:submit")
-	private WebElement submit;
+    @FindBy(id="form:submit")
+    private WebElement submit;
 
-	@FindBy(id="expire")
-	private WebElement expire;
+    @FindBy(id="expire")
+    private WebElement expire;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(ViewExpiredExceptionHandlerIT.class)
-			.withWebXml(distributable) // Should trigger Mojarra issue 4431 (NPE while obtaining flash scope in new session).
-			.withFacesConfig(withViewExpiredExceptionHandler)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(ViewExpiredExceptionHandlerIT.class)
+            .withWebXml(distributable) // Should trigger Mojarra issue 4431 (NPE while obtaining flash scope in new session).
+            .withFacesConfig(withViewExpiredExceptionHandler)
+            .createDeployment();
+    }
 
-	@Test
-	void test() {
-		assertEquals("false", wasViewExpired.getText());
+    @Test
+    void test() {
+        assertEquals("false", wasViewExpired.getText());
 
-		guardAjax(submit::click);
-		assertEquals("false", wasViewExpired.getText());
+        guardAjax(submit::click);
+        assertEquals("false", wasViewExpired.getText());
 
-		clearTextContent(wasViewExpired);
-		expire.click();
-		waitUntilTextContent(wasViewExpired);
-		assertEquals("expired", wasViewExpired.getText());
+        clearTextContent(wasViewExpired);
+        expire.click();
+        waitUntilTextContent(wasViewExpired);
+        assertEquals("expired", wasViewExpired.getText());
 
-		guardAjax(submit::click);
-		assertEquals("true", wasViewExpired.getText());
+        guardAjax(submit::click);
+        assertEquals("true", wasViewExpired.getText());
 
-		guardAjax(submit::click);
-		assertEquals("false", wasViewExpired.getText());
+        guardAjax(submit::click);
+        assertEquals("false", wasViewExpired.getText());
 
-	}
+    }
 }

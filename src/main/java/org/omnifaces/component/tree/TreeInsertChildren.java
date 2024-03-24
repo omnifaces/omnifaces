@@ -37,44 +37,44 @@ import jakarta.faces.event.PhaseId;
 @FacesComponent(TreeInsertChildren.COMPONENT_TYPE)
 public class TreeInsertChildren extends TreeFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.tree.TreeInsertChildren#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
+    /** The component type, which is {@value org.omnifaces.component.tree.TreeInsertChildren#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate the component hierarchy.
-	 * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any
-	 * children.
-	 */
-	@Override
-	protected void validateHierarchy() {
-		validateHasParent(this, TreeNodeItem.class);
-		validateHasNoChildren(this);
-	}
+    /**
+     * Validate the component hierarchy.
+     * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any
+     * children.
+     */
+    @Override
+    protected void validateHierarchy() {
+        validateHasParent(this, TreeNodeItem.class);
+        validateHasNoChildren(this);
+    }
 
-	/**
-	 * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
-	 * @see Tree#processTreeNode(FacesContext, PhaseId)
-	 */
-	@Override
-	protected void process(FacesContext context, PhaseId phaseId) {
-		getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
-	}
+    /**
+     * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
+     * @see Tree#processTreeNode(FacesContext, PhaseId)
+     */
+    @Override
+    protected void process(FacesContext context, PhaseId phaseId) {
+        getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
+    }
 
-	/**
-	 * Delegate visiting of the tree node to {@link Tree#visitTreeNode(VisitContext, VisitCallback)}.
-	 * @see Tree#visitTreeNode(VisitContext, VisitCallback)
-	 */
-	@Override
-	public boolean visitTree(VisitContext context, VisitCallback callback) {
-		if (context.getHints().contains(SKIP_ITERATION)) {
-			return super.visitTree(context, callback);
-		}
+    /**
+     * Delegate visiting of the tree node to {@link Tree#visitTreeNode(VisitContext, VisitCallback)}.
+     * @see Tree#visitTreeNode(VisitContext, VisitCallback)
+     */
+    @Override
+    public boolean visitTree(VisitContext context, VisitCallback callback) {
+        if (context.getHints().contains(SKIP_ITERATION)) {
+            return super.visitTree(context, callback);
+        }
 
-		return getClosestParent(this, Tree.class).visitTreeNode(context, callback);
-	}
+        return getClosestParent(this, Tree.class).visitTreeNode(context, callback);
+    }
 
 }

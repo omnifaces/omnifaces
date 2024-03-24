@@ -33,34 +33,34 @@ import org.omnifaces.cdi.PushContext;
 @Dependent
 public class SocketPushContextProducer {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
-	@Inject
-	private InjectionPoint injectionPoint;
+    @SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
+    @Inject
+    private InjectionPoint injectionPoint;
 
-	@Inject
-	private SocketChannelManager socketChannels;
+    @Inject
+    private SocketChannelManager socketChannels;
 
-	@Inject
-	private SocketSessionManager socketSessions;
+    @Inject
+    private SocketSessionManager socketSessions;
 
-	@Inject
-	private SocketUserManager socketUsers;
+    @Inject
+    private SocketUserManager socketUsers;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link PushContext} associated with channel name derived from given injection point.
-	 * @param injectionPoint Injection point to derive channel name from.
-	 * @return {@link PushContext} associated with channel name derived from given injection point.
-	 */
-	@Produces
-	@Push
-	public PushContext produce(InjectionPoint injectionPoint) {
-		Push push = getQualifier(injectionPoint, Push.class);
-		String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
-		return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
-	}
+    /**
+     * Returns {@link PushContext} associated with channel name derived from given injection point.
+     * @param injectionPoint Injection point to derive channel name from.
+     * @return {@link PushContext} associated with channel name derived from given injection point.
+     */
+    @Produces
+    @Push
+    public PushContext produce(InjectionPoint injectionPoint) {
+        Push push = getQualifier(injectionPoint, Push.class);
+        String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
+        return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+    }
 
 }

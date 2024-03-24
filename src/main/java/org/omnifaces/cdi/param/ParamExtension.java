@@ -61,135 +61,135 @@ import org.omnifaces.util.Beans;
  */
 public class ParamExtension implements Extension {
 
-	private Set<Type> paramsWithInject = new HashSet<>();
+    private Set<Type> paramsWithInject = new HashSet<>();
 
-	/**
-	 * Collect fields annotated with {@link Param}.
-	 * @param <T> The generic injection target type.
-	 * @param event The process injection target event.
-	 */
-	public <T> void collectParams(@Observes ProcessInjectionTarget<T> event) {
-		Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
+    /**
+     * Collect fields annotated with {@link Param}.
+     * @param <T> The generic injection target type.
+     * @param event The process injection target event.
+     */
+    public <T> void collectParams(@Observes ProcessInjectionTarget<T> event) {
+        Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
 
-		for (AnnotatedField<?> field : event.getAnnotatedType().getFields()) {
-			collectParams(field, paramsWithInject, paramsWithoutInject);
-		}
+        for (AnnotatedField<?> field : event.getAnnotatedType().getFields()) {
+            collectParams(field, paramsWithInject, paramsWithoutInject);
+        }
 
-		for (AnnotatedConstructor<?> constructor : event.getAnnotatedType().getConstructors()) {
-			for (AnnotatedParameter<?> parameter : constructor.getParameters()) {
-				collectParams(parameter, paramsWithInject, null); // Without inject CDI won't invoke constructor in first place, so pass empty list.
-			}
-		}
+        for (AnnotatedConstructor<?> constructor : event.getAnnotatedType().getConstructors()) {
+            for (AnnotatedParameter<?> parameter : constructor.getParameters()) {
+                collectParams(parameter, paramsWithInject, null); // Without inject CDI won't invoke constructor in first place, so pass empty list.
+            }
+        }
 
-		processParamsWithoutInject(event, paramsWithoutInject);
-	}
+        processParamsWithoutInject(event, paramsWithoutInject);
+    }
 
-	private static void collectParams(Annotated annotated, Set<Type> paramsWithInject, Set<AnnotatedField<?>> paramsWithoutInject) {
-		if (annotated.isAnnotationPresent(Param.class)) {
-			Type type = annotated.getBaseType();
+    private static void collectParams(Annotated annotated, Set<Type> paramsWithInject, Set<AnnotatedField<?>> paramsWithoutInject) {
+        if (annotated.isAnnotationPresent(Param.class)) {
+            Type type = annotated.getBaseType();
 
-			if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
-				return; // Skip ParamValue as it is already handled by RequestParameterProducer.
-			}
+            if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+                return; // Skip ParamValue as it is already handled by RequestParameterProducer.
+            }
 
-			if (annotated.isAnnotationPresent(Inject.class) || (annotated instanceof AnnotatedParameter && ((AnnotatedParameter<?>) annotated).getDeclaringCallable().isAnnotationPresent(Inject.class))) {
-				paramsWithInject.add(type);
-			}
-			else if (annotated instanceof AnnotatedField) {
-				paramsWithoutInject.add((AnnotatedField<?>) annotated);
-			}
-		}
-	}
+            if (annotated.isAnnotationPresent(Inject.class) || (annotated instanceof AnnotatedParameter && ((AnnotatedParameter<?>) annotated).getDeclaringCallable().isAnnotationPresent(Inject.class))) {
+                paramsWithInject.add(type);
+            }
+            else if (annotated instanceof AnnotatedField) {
+                paramsWithoutInject.add((AnnotatedField<?>) annotated);
+            }
+        }
+    }
 
-	/**
-	 * Process {@link Param} fields annotated with {@link Inject}.
-	 * @param event The after bean discovery event.
-	 */
-	public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
-		for (Type paramWithInject : paramsWithInject) {
-			event.addBean(new DynamicParamValueProducer(paramWithInject));
-		}
-	}
+    /**
+     * Process {@link Param} fields annotated with {@link Inject}.
+     * @param event The after bean discovery event.
+     */
+    public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
+        for (Type paramWithInject : paramsWithInject) {
+            event.addBean(new DynamicParamValueProducer(paramWithInject));
+        }
+    }
 
-	/**
-	/**
-	 * Process {@link Param} fields without {@link Inject} annotation.
-	 * @param <T> The generic injection target type.
-	 * @param event The process injection target event.
-	 * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.
-	 */
-	public static <T> void processParamsWithoutInject(ProcessInjectionTarget<T> event, Set<AnnotatedField<?>> paramsWithoutInject) {
-		if (!paramsWithoutInject.isEmpty()) {
-			event.setInjectionTarget(new ParamInjectionTarget<>(event.getInjectionTarget(), paramsWithoutInject));
-		}
-	}
+    /**
+    /**
+     * Process {@link Param} fields without {@link Inject} annotation.
+     * @param <T> The generic injection target type.
+     * @param event The process injection target event.
+     * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.
+     */
+    public static <T> void processParamsWithoutInject(ProcessInjectionTarget<T> event, Set<AnnotatedField<?>> paramsWithoutInject) {
+        if (!paramsWithoutInject.isEmpty()) {
+            event.setInjectionTarget(new ParamInjectionTarget<>(event.getInjectionTarget(), paramsWithoutInject));
+        }
+    }
 
-	private static final class ParamInjectionTarget<T> extends InjectionTargetWrapper<T> {
+    private static final class ParamInjectionTarget<T> extends InjectionTargetWrapper<T> {
 
-		private Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
+        private Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
 
-		public ParamInjectionTarget(InjectionTarget<T> wrapped, Set<AnnotatedField<?>> paramsWithoutInject) {
-			super(wrapped);
-			this.paramsWithoutInject = paramsWithoutInject;
-		}
+        public ParamInjectionTarget(InjectionTarget<T> wrapped, Set<AnnotatedField<?>> paramsWithoutInject) {
+            super(wrapped);
+            this.paramsWithoutInject = paramsWithoutInject;
+        }
 
-		@Override
-		public void inject(T instance, CreationalContext<T> ctx) {
-			Class<?> beanClass = Beans.unwrapIfNecessary(instance.getClass());
+        @Override
+        public void inject(T instance, CreationalContext<T> ctx) {
+            Class<?> beanClass = Beans.unwrapIfNecessary(instance.getClass());
 
-			for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
-				ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(beanClass, paramWithoutInject));
-				Field field = paramWithoutInject.getJavaMember();
-				modifyField(instance, field, paramValue.getValue());
-			}
+            for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
+                ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(beanClass, paramWithoutInject));
+                Field field = paramWithoutInject.getJavaMember();
+                modifyField(instance, field, paramValue.getValue());
+            }
 
-			super.inject(instance, ctx);
-		}
+            super.inject(instance, ctx);
+        }
 
-		private static final class ParamInjectionPoint implements InjectionPoint {
+        private static final class ParamInjectionPoint implements InjectionPoint {
 
-			private Bean<?> bean;
-			private AnnotatedField<?> paramWithoutInject;
+            private Bean<?> bean;
+            private AnnotatedField<?> paramWithoutInject;
 
-			public ParamInjectionPoint(Class<?> beanClass, AnnotatedField<?> paramWithoutInject) {
-				this.bean = Beans.resolve(beanClass);
-				this.paramWithoutInject = paramWithoutInject;
-			}
+            public ParamInjectionPoint(Class<?> beanClass, AnnotatedField<?> paramWithoutInject) {
+                this.bean = Beans.resolve(beanClass);
+                this.paramWithoutInject = paramWithoutInject;
+            }
 
-			@Override
-			public Type getType() {
-				return paramWithoutInject.getBaseType();
-			}
+            @Override
+            public Type getType() {
+                return paramWithoutInject.getBaseType();
+            }
 
-			@Override
-			public Set<Annotation> getQualifiers() {
-				return stream(paramWithoutInject.getJavaMember().getAnnotations()).filter(annotation -> annotation.annotationType().isAnnotationPresent(Qualifier.class)).collect(toSet());
-			}
+            @Override
+            public Set<Annotation> getQualifiers() {
+                return stream(paramWithoutInject.getJavaMember().getAnnotations()).filter(annotation -> annotation.annotationType().isAnnotationPresent(Qualifier.class)).collect(toSet());
+            }
 
-			@Override
-			public Bean<?> getBean() {
-				return bean;
-			}
+            @Override
+            public Bean<?> getBean() {
+                return bean;
+            }
 
-			@Override
-			public Member getMember() {
-				return paramWithoutInject.getJavaMember();
-			}
+            @Override
+            public Member getMember() {
+                return paramWithoutInject.getJavaMember();
+            }
 
-			@Override
-			public Annotated getAnnotated() {
-				return paramWithoutInject;
-			}
+            @Override
+            public Annotated getAnnotated() {
+                return paramWithoutInject;
+            }
 
-			@Override
-			public boolean isDelegate() {
-				return true;
-			}
+            @Override
+            public boolean isDelegate() {
+                return true;
+            }
 
-			@Override
-			public boolean isTransient() {
-				return true;
-			}
-		}
-	}
+            @Override
+            public boolean isTransient() {
+                return true;
+            }
+        }
+    }
 }

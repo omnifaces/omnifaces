@@ -32,44 +32,44 @@ import org.omnifaces.component.input.HashParam;
  */
 public class HashChangeEvent extends ValueChangeEvent {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructs a new hash change event.
-	 * @param context The involved faces context.
-	 * @param oldHashQueryString The old hash query string.
-	 * @param newHashQueryString The new hash query string.
-	 */
-	public HashChangeEvent(FacesContext context, String oldHashQueryString, String newHashQueryString) {
-		super(context, context.getViewRoot(), oldHashQueryString, newHashQueryString);
-	}
+    /**
+     * Constructs a new hash change event.
+     * @param context The involved faces context.
+     * @param oldHashQueryString The old hash query string.
+     * @param newHashQueryString The new hash query string.
+     */
+    public HashChangeEvent(FacesContext context, String oldHashQueryString, String newHashQueryString) {
+        super(context, context.getViewRoot(), oldHashQueryString, newHashQueryString);
+    }
 
-	// Below overrides are purely to update the javadoc.
+    // Below overrides are purely to update the javadoc.
 
-	/**
-	 * Returns the current view root.
-	 * @return The current view root.
-	 */
-	@Override
-	public UIViewRoot getComponent() {
-		return (UIViewRoot) super.getComponent();
-	}
+    /**
+     * Returns the current view root.
+     * @return The current view root.
+     */
+    @Override
+    public UIViewRoot getComponent() {
+        return (UIViewRoot) super.getComponent();
+    }
 
-	/**
-	 * Returns the old hash query string value.
-	 * @return The old hash query string value.
-	 */
-	@Override
-	public String getOldValue() {
-		return (String) super.getOldValue();
-	}
+    /**
+     * Returns the old hash query string value.
+     * @return The old hash query string value.
+     */
+    @Override
+    public String getOldValue() {
+        return (String) super.getOldValue();
+    }
 
-	/**
-	 * Returns the new hash query string value.
-	 * @return The new hash query string value.
-	 */
-	@Override
-	public String getNewValue() {
-		return (String) super.getNewValue();
-	}
+    /**
+     * Returns the new hash query string value.
+     * @return The new hash query string value.
+     */
+    @Override
+    public String getNewValue() {
+        return (String) super.getNewValue();
+    }
 }

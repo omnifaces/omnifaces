@@ -36,12 +36,12 @@ public class PWAResourceHandlerITManifest extends WebAppManifest {
 
     @Override
     protected Collection<String> getCacheableViewIds() {
-    	return asList("/PWAResourceHandlerIT.xhtml");
+        return asList("/PWAResourceHandlerIT.xhtml");
     }
 
     @Override
     public String getLang() {
-    	return Locale.ENGLISH.getLanguage();
+        return Locale.ENGLISH.getLanguage();
     }
 
 }

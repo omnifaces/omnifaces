@@ -44,92 +44,92 @@ import org.omnifaces.util.Hacks;
  */
 public abstract class DynamicResource extends Resource {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final int RESPONSE_HEADERS_SIZE = 4;
+    private static final int RESPONSE_HEADERS_SIZE = 4;
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private long lastModified;
+    private long lastModified;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Constructs a new dynamic resource based on the given resource name, library name and content type.
-	 * @param resourceName The resource name.
-	 * @param libraryName The library name.
-	 * @param contentType The content type.
-	 */
-	protected DynamicResource(String resourceName, String libraryName, String contentType) {
-		setResourceName(resourceName);
-		setLibraryName(libraryName);
-		setContentType(contentType);
-	}
+    /**
+     * Constructs a new dynamic resource based on the given resource name, library name and content type.
+     * @param resourceName The resource name.
+     * @param libraryName The library name.
+     * @param contentType The content type.
+     */
+    protected DynamicResource(String resourceName, String libraryName, String contentType) {
+        setResourceName(resourceName);
+        setLibraryName(libraryName);
+        setContentType(contentType);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public String getRequestPath() {
-		String mapping = getMapping();
-		String path = concat(RESOURCE_IDENTIFIER, getResourceName());
-		return getRequestContextPath()
-			+ (isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
-			+ "?ln=" + getLibraryName()
-			+ "&v=" + getLastModified();
-	}
+    @Override
+    public String getRequestPath() {
+        String mapping = getMapping();
+        String path = concat(RESOURCE_IDENTIFIER, getResourceName());
+        return getRequestContextPath()
+            + (isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
+            + "?ln=" + getLibraryName()
+            + "&v=" + getLastModified();
+    }
 
-	@Override
-	public URL getURL() {
-		try {
-			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath.
-			return new URL(getRequestDomainURL() + getRequestPath());
-		}
-		catch (MalformedURLException e) {
-			// This exception should never occur.
-			throw new UnsupportedOperationException(e);
-		}
-	}
+    @Override
+    public URL getURL() {
+        try {
+            // Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath.
+            return new URL(getRequestDomainURL() + getRequestPath());
+        }
+        catch (MalformedURLException e) {
+            // This exception should never occur.
+            throw new UnsupportedOperationException(e);
+        }
+    }
 
-	@Override
-	public Map<String, String> getResponseHeaders() {
-		Map<String, String> responseHeaders = new HashMap<>(RESPONSE_HEADERS_SIZE);
-		responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
-		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
-		responseHeaders.put("Etag", format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
-		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
-		return responseHeaders;
-	}
+    @Override
+    public Map<String, String> getResponseHeaders() {
+        Map<String, String> responseHeaders = new HashMap<>(RESPONSE_HEADERS_SIZE);
+        responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
+        responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
+        responseHeaders.put("Etag", format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
+        responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
+        return responseHeaders;
+    }
 
-	/**
-	 * Returns the "last modified" timestamp of this resource.
-	 * @return The "last modified" timestamp of this resource.
-	 */
-	public long getLastModified() {
-		return lastModified;
-	}
+    /**
+     * Returns the "last modified" timestamp of this resource.
+     * @return The "last modified" timestamp of this resource.
+     */
+    public long getLastModified() {
+        return lastModified;
+    }
 
-	/**
-	 * Sets the "last modified" timestamp of this resource.
-	 * @param lastModified The "last modified" timestamp of this resource.
-	 */
-	public void setLastModified(long lastModified) {
-		this.lastModified = lastModified;
-	}
+    /**
+     * Sets the "last modified" timestamp of this resource.
+     * @param lastModified The "last modified" timestamp of this resource.
+     */
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
+    }
 
-	@Override
-	public boolean userAgentNeedsUpdate(FacesContext context) {
-		String ifModifiedSince = context.getExternalContext().getRequestHeaderMap().get("If-Modified-Since");
+    @Override
+    public boolean userAgentNeedsUpdate(FacesContext context) {
+        String ifModifiedSince = context.getExternalContext().getRequestHeaderMap().get("If-Modified-Since");
 
-		if (ifModifiedSince != null) {
-			try {
-				return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + SECONDS.toMillis(1); // RFC1123 doesn't store millis.
-			}
-			catch (ParseException ignore) {
-				return true;
-			}
-		}
+        if (ifModifiedSince != null) {
+            try {
+                return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + SECONDS.toMillis(1); // RFC1123 doesn't store millis.
+            }
+            catch (ParseException ignore) {
+                return true;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

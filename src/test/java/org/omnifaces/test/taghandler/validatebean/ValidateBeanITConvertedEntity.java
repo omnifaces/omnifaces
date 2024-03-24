@@ -16,15 +16,15 @@ import jakarta.validation.constraints.NotBlank;
 
 public class ValidateBeanITConvertedEntity {
 
-	@NotBlank(message = "please fill out")
-	private String value;
+    @NotBlank(message = "please fill out")
+    private String value;
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
 }

@@ -126,217 +126,217 @@ import org.omnifaces.util.State;
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
 public class Form extends HtmlForm {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.Form#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
+    /** The component type, which is {@value org.omnifaces.component.input.Form#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
-	enum PropertyKeys {
+    enum PropertyKeys {
 
-		useRequestURI,
-		includeRequestParams,
-		partialSubmit,
-	}
+        useRequestURI,
+        includeRequestParams,
+        partialSubmit,
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
-	private boolean ignoreValidationFailed;
+    private final State state = new State(getStateHelper());
+    private boolean ignoreValidationFailed;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void processValidators(FacesContext context) {
-		if (isIgnoreValidationFailed()) {
-			super.processValidators(new IgnoreValidationFailedFacesContext(context));
-		}
-		else {
-			super.processValidators(context);
-		}
-	}
+    @Override
+    public void processValidators(FacesContext context) {
+        if (isIgnoreValidationFailed()) {
+            super.processValidators(new IgnoreValidationFailedFacesContext(context));
+        }
+        else {
+            super.processValidators(context);
+        }
+    }
 
-	@Override
-	public void processUpdates(FacesContext context) {
-		if (isIgnoreValidationFailed()) {
-			super.processUpdates(new IgnoreValidationFailedFacesContext(context));
-		}
-		else {
-			super.processUpdates(context);
-		}
-	}
+    @Override
+    public void processUpdates(FacesContext context) {
+        if (isIgnoreValidationFailed()) {
+            super.processUpdates(new IgnoreValidationFailedFacesContext(context));
+        }
+        else {
+            super.processUpdates(context);
+        }
+    }
 
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		if (isPartialSubmit()) {
-			getPassThroughAttributes().put("data-partialsubmit", "true");
-		}
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        if (isPartialSubmit()) {
+            getPassThroughAttributes().put("data-partialsubmit", "true");
+        }
 
-		super.encodeBegin(new ActionURLDecorator(context, this));
-	}
+        super.encodeBegin(new ActionURLDecorator(context, this));
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns whether or not the request parameters should be encoded into the form's action URL.
-	 * @return Whether or not the request parameters should be encoded into the form's action URL.
-	 * @since 1.5
-	 */
-	public boolean isIncludeRequestParams() {
-		return state.get(includeRequestParams, FALSE);
-	}
+    /**
+     * Returns whether or not the request parameters should be encoded into the form's action URL.
+     * @return Whether or not the request parameters should be encoded into the form's action URL.
+     * @since 1.5
+     */
+    public boolean isIncludeRequestParams() {
+        return state.get(includeRequestParams, FALSE);
+    }
 
-	/**
-	 * Set whether or not the request parameters should be encoded into the form's action URL.
-	 * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
-	 * @since 1.5
-	 */
-	public void setIncludeRequestParams(boolean includeRequestParams) {
-		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
-	}
+    /**
+     * Set whether or not the request parameters should be encoded into the form's action URL.
+     * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
+     * @since 1.5
+     */
+    public void setIncludeRequestParams(boolean includeRequestParams) {
+        state.put(PropertyKeys.includeRequestParams, includeRequestParams);
+    }
 
-	/**
-	 * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @return Whether the request URI should be used as form's action URL.
-	 * @since 1.6
-	 */
-	public boolean isUseRequestURI() {
-		return state.get(useRequestURI, TRUE);
-	}
+    /**
+     * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
+     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * @return Whether the request URI should be used as form's action URL.
+     * @since 1.6
+     */
+    public boolean isUseRequestURI() {
+        return state.get(useRequestURI, TRUE);
+    }
 
-	/**
-	 * Set whether the request URI should be used as form's action URL.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @param useRequestURI Whether the request URI should be used as form's action URL.
-	 * @since 1.6
-	 */
-	public void setUseRequestURI(boolean useRequestURI) {
-		state.put(PropertyKeys.useRequestURI, useRequestURI);
-	}
+    /**
+     * Set whether the request URI should be used as form's action URL.
+     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * @param useRequestURI Whether the request URI should be used as form's action URL.
+     * @since 1.6
+     */
+    public void setUseRequestURI(boolean useRequestURI) {
+        state.put(PropertyKeys.useRequestURI, useRequestURI);
+    }
 
-	/**
-	 * Returns whether or not the form should ignore validation fail (and thus proceed to update model/invoke action).
-	 * @return Whether or not the form should ignore validation fail.
-	 * @since 2.1
-	 */
-	public boolean isIgnoreValidationFailed() {
-		return ignoreValidationFailed;
-	}
+    /**
+     * Returns whether or not the form should ignore validation fail (and thus proceed to update model/invoke action).
+     * @return Whether or not the form should ignore validation fail.
+     * @since 2.1
+     */
+    public boolean isIgnoreValidationFailed() {
+        return ignoreValidationFailed;
+    }
 
-	/**
-	 * Set whether the form should ignore validation fail.
-	 * @param ignoreValidationFailed Whether the form should ignore validation fail.
-	 * @since 2.1
-	 */
-	public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
-		this.ignoreValidationFailed = ignoreValidationFailed;
-	}
+    /**
+     * Set whether the form should ignore validation fail.
+     * @param ignoreValidationFailed Whether the form should ignore validation fail.
+     * @since 2.1
+     */
+    public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
+        this.ignoreValidationFailed = ignoreValidationFailed;
+    }
 
-	/**
-	 * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
-	 * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
-	 * @since 3.0
-	 */
-	public boolean isPartialSubmit() {
-		return state.get(partialSubmit, TRUE);
-	}
+    /**
+     * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
+     * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
+     * @since 3.0
+     */
+    public boolean isPartialSubmit() {
+        return state.get(partialSubmit, TRUE);
+    }
 
-	/**
-	 * Set whether to send only the form data which actually need to be processed as opposed to the entire form.
-	 * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
-	 * @since 3.0
-	 */
-	public void setPartialSubmit(boolean partialSubmit) {
-		state.put(PropertyKeys.partialSubmit, partialSubmit);
-	}
+    /**
+     * Set whether to send only the form data which actually need to be processed as opposed to the entire form.
+     * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
+     * @since 3.0
+     */
+    public void setPartialSubmit(boolean partialSubmit) {
+        state.put(PropertyKeys.partialSubmit, partialSubmit);
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * FacesContext wrapper which performs NOOP during {@link FacesContext#validationFailed()} and
-	 * {@link FacesContext#renderResponse()}.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	private static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
+    /**
+     * FacesContext wrapper which performs NOOP during {@link FacesContext#validationFailed()} and
+     * {@link FacesContext#renderResponse()}.
+     *
+     * @author Bauke Scholtz
+     */
+    private static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
 
-		public IgnoreValidationFailedFacesContext(FacesContext wrapped) {
-			super(wrapped);
-		}
+        public IgnoreValidationFailedFacesContext(FacesContext wrapped) {
+            super(wrapped);
+        }
 
-		@Override
-		public void validationFailed() {
-			// NOOP.
-		}
+        @Override
+        public void validationFailed() {
+            // NOOP.
+        }
 
-		@Override
-		public void renderResponse() {
-			// NOOP.
-		}
-	}
+        @Override
+        public void renderResponse() {
+            // NOOP.
+        }
+    }
 
-	/**
-	 * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler
-	 * -&gt; getActionURL.
-	 *
-	 * @author Arjan Tijms
-	 */
-	private static class ActionURLDecorator extends FacesContextWrapper {
+    /**
+     * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler
+     * -&gt; getActionURL.
+     *
+     * @author Arjan Tijms
+     */
+    private static class ActionURLDecorator extends FacesContextWrapper {
 
-		private Form form;
+        private Form form;
 
-		public ActionURLDecorator(FacesContext wrapped, Form form) {
-			super(wrapped);
-			this.form = form;
-		}
+        public ActionURLDecorator(FacesContext wrapped, Form form) {
+            super(wrapped);
+            this.form = form;
+        }
 
-		@Override
-		public Application getApplication() {
-			return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
-		}
-	}
+        @Override
+        public Application getApplication() {
+            return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
+        }
+    }
 
-	private static class ActionURLDecoratorApplication extends ApplicationWrapper {
+    private static class ActionURLDecoratorApplication extends ApplicationWrapper {
 
-		private Form form;
+        private Form form;
 
-		public ActionURLDecoratorApplication(Application wrapped, Form form) {
-			super(wrapped);
-			this.form = form;
-		}
+        public ActionURLDecoratorApplication(Application wrapped, Form form) {
+            super(wrapped);
+            this.form = form;
+        }
 
-		@Override
-		public ViewHandler getViewHandler() {
-			return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
-		}
-	}
+        @Override
+        public ViewHandler getViewHandler() {
+            return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
+        }
+    }
 
-	private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
+    private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
 
-		private Form form;
+        private Form form;
 
-		public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
-			super(wrapped);
-			this.form = form;
-		}
+        public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
+            super(wrapped);
+            this.form = form;
+        }
 
-		/**
-		 * The actual method we're decorating in order to either include the view parameters into the
-		 * action URL, or include the request parameters into the action URL, or use request URI as
-		 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
-		 * in the query string, overriding any existing view or request parameters on same name.
-		 */
-		@Override
-		public String getActionURL(FacesContext context, String viewId) {
-			String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
-			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), false));
-			return formatURLWithQueryString(actionURL, queryString);
-		}
+        /**
+         * The actual method we're decorating in order to either include the view parameters into the
+         * action URL, or include the request parameters into the action URL, or use request URI as
+         * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
+         * in the query string, overriding any existing view or request parameters on same name.
+         */
+        @Override
+        public String getActionURL(FacesContext context, String viewId) {
+            String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+            String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), false));
+            return formatURLWithQueryString(actionURL, queryString);
+        }
 
-		private String getActionURL(FacesContext context) {
-			String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
-			return actionURL.isEmpty() ? "/" : actionURL;
-		}
-	}
+        private String getActionURL(FacesContext context) {
+            String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
+            return actionURL.isEmpty() ? "/" : actionURL;
+        }
+    }
 
 }

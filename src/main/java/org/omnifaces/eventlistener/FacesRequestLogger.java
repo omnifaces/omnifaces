@@ -107,189 +107,189 @@ import org.omnifaces.util.Faces;
  */
 public class FacesRequestLogger extends DefaultPhaseListener {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(FacesRequestLogger.class.getName());
+    private static final Logger logger = Logger.getLogger(FacesRequestLogger.class.getName());
 
-	private static final Pattern PASSWORD_REQUEST_PARAMETER_PATTERN = Pattern.compile(".*(password|token)$", CASE_INSENSITIVE);
+    private static final Pattern PASSWORD_REQUEST_PARAMETER_PATTERN = Pattern.compile(".*(password|token)$", CASE_INSENSITIVE);
 
-	/**
-	 * Listen on any phase.
-	 */
-	public FacesRequestLogger() {
-		super(PhaseId.ANY_PHASE);
-	}
+    /**
+     * Listen on any phase.
+     */
+    public FacesRequestLogger() {
+        super(PhaseId.ANY_PHASE);
+    }
 
-	/**
-	 * Before any phase, start the timer.
-	 */
-	@Override
-	public void beforePhase(PhaseEvent event) {
-		FacesContext context = event.getFacesContext();
-		getPhaseTimer(context).start(event.getPhaseId());
-	}
+    /**
+     * Before any phase, start the timer.
+     */
+    @Override
+    public void beforePhase(PhaseEvent event) {
+        FacesContext context = event.getFacesContext();
+        getPhaseTimer(context).start(event.getPhaseId());
+    }
 
-	/**
-	 * After any phase, stop the timer, and if the current phase is RENDER_RESPONSE, or the response is complete, then log the Faces request
-	 * detail.
-	 */
-	@Override
-	public void afterPhase(PhaseEvent event) {
-		FacesContext context = event.getFacesContext();
-		getPhaseTimer(context).stop(event.getPhaseId());
+    /**
+     * After any phase, stop the timer, and if the current phase is RENDER_RESPONSE, or the response is complete, then log the Faces request
+     * detail.
+     */
+    @Override
+    public void afterPhase(PhaseEvent event) {
+        FacesContext context = event.getFacesContext();
+        getPhaseTimer(context).stop(event.getPhaseId());
 
-		if (!(event.getPhaseId() == RENDER_RESPONSE || context.getResponseComplete()) || !logger.isLoggable(INFO)) {
-			return;
-		}
+        if (!(event.getPhaseId() == RENDER_RESPONSE || context.getResponseComplete()) || !logger.isLoggable(INFO)) {
+            return;
+        }
 
-		try {
-			logger.log(INFO, () -> getRequest(context).getMethod() + "=" + getLogDetails(context));
-		}
-		catch (Exception e) {
-			logger.log(SEVERE, "Logging failed", e);
-		}
-	}
+        try {
+            logger.log(INFO, () -> getRequest(context).getMethod() + "=" + getLogDetails(context));
+        }
+        catch (Exception e) {
+            logger.log(SEVERE, "Logging failed", e);
+        }
+    }
 
-	/**
-	 * You can override this if you need more fine grained control over log details.
-	 * @param context The involved faces context.
-	 * @return Log details.
-	 */
-	protected Map<String, Object> getLogDetails(FacesContext context) {
-		Map<String, Object> logDetails = new LinkedHashMap<>();
-		logDetails.put("url", getRequestURIWithQueryString(context));
-		logDetails.put("user", getUserDetails(context));
-		logDetails.put("action", getActionDetails(context));
-		logDetails.put("params", getRequestParameters(context));
-		logDetails.put("messages", getFacesMessages(context));
-		logDetails.put("timer", getPhaseTimer(context));
-		return logDetails;
-	}
+    /**
+     * You can override this if you need more fine grained control over log details.
+     * @param context The involved faces context.
+     * @return Log details.
+     */
+    protected Map<String, Object> getLogDetails(FacesContext context) {
+        Map<String, Object> logDetails = new LinkedHashMap<>();
+        logDetails.put("url", getRequestURIWithQueryString(context));
+        logDetails.put("user", getUserDetails(context));
+        logDetails.put("action", getActionDetails(context));
+        logDetails.put("params", getRequestParameters(context));
+        logDetails.put("messages", getFacesMessages(context));
+        logDetails.put("timer", getPhaseTimer(context));
+        return logDetails;
+    }
 
-	/**
-	 * You can override this if you need more fine grained control over logging of user details.
-	 * @param context The involved faces context.
-	 * @return User details.
-	 */
-	protected Map<String, Object> getUserDetails(FacesContext context) {
-		Map<String, Object> userDetails = new LinkedHashMap<>();
-		userDetails.put("ip", getRemoteAddr(context));
-		userDetails.put("login", getRemoteUser(context));
-		userDetails.put("session", getSessionId(context));
-		if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
-			userDetails.put("viewState", getRequestParameter(context, VIEW_STATE_PARAM));
-		}
-		return userDetails;
-	}
+    /**
+     * You can override this if you need more fine grained control over logging of user details.
+     * @param context The involved faces context.
+     * @return User details.
+     */
+    protected Map<String, Object> getUserDetails(FacesContext context) {
+        Map<String, Object> userDetails = new LinkedHashMap<>();
+        userDetails.put("ip", getRemoteAddr(context));
+        userDetails.put("login", getRemoteUser(context));
+        userDetails.put("session", getSessionId(context));
+        if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
+            userDetails.put("viewState", getRequestParameter(context, VIEW_STATE_PARAM));
+        }
+        return userDetails;
+    }
 
-	/**
-	 * You can override this if you need more fine grained control over logging of action details.
-	 * @param context The involved faces context.
-	 * @return Action details.
-	 */
-	protected Map<String, Object> getActionDetails(FacesContext context) {
-		UIComponent actionSource = getCurrentActionSource();
-		Map<String, Object> actionDetails = new LinkedHashMap<>();
-		actionDetails.put("source", actionSource != null ? actionSource.getClientId(context) : null);
-		actionDetails.put("event", coalesce(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME), getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME)));
-		actionDetails.put("methods", getActionExpressionsAndListeners(actionSource));
-		actionDetails.put("validationFailed", context.isValidationFailed());
-		return actionDetails;
-	}
+    /**
+     * You can override this if you need more fine grained control over logging of action details.
+     * @param context The involved faces context.
+     * @return Action details.
+     */
+    protected Map<String, Object> getActionDetails(FacesContext context) {
+        UIComponent actionSource = getCurrentActionSource();
+        Map<String, Object> actionDetails = new LinkedHashMap<>();
+        actionDetails.put("source", actionSource != null ? actionSource.getClientId(context) : null);
+        actionDetails.put("event", coalesce(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME), getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME)));
+        actionDetails.put("methods", getActionExpressionsAndListeners(actionSource));
+        actionDetails.put("validationFailed", context.isValidationFailed());
+        return actionDetails;
+    }
 
-	/**
-	 * You can override this if you need more fine grained control over logging of request parameters.
-	 * @param context The involved faces context.
-	 * @return Request parameters.
-	 */
-	protected Map<String, String> getRequestParameters(FacesContext context) {
-		Set<Entry<String, String[]>> params = getRequestParameterValuesMap(context).entrySet();
-		Map<String, String> filteredParams = new TreeMap<>();
+    /**
+     * You can override this if you need more fine grained control over logging of request parameters.
+     * @param context The involved faces context.
+     * @return Request parameters.
+     */
+    protected Map<String, String> getRequestParameters(FacesContext context) {
+        Set<Entry<String, String[]>> params = getRequestParameterValuesMap(context).entrySet();
+        Map<String, String> filteredParams = new TreeMap<>();
 
-		for (Entry<String, String[]> entry : params) {
-			String name = entry.getKey();
+        for (Entry<String, String[]> entry : params) {
+            String name = entry.getKey();
 
-			if (name.startsWith("jakarta.faces.")) {
-				continue; // Faces internal stuff is not interesting.
-			}
+            if (name.startsWith("jakarta.faces.")) {
+                continue; // Faces internal stuff is not interesting.
+            }
 
-			String[] values = entry.getValue();
-			String value = (values != null && values.length == 1) ? values[0] : Arrays.toString(values);
+            String[] values = entry.getValue();
+            String value = (values != null && values.length == 1) ? values[0] : Arrays.toString(values);
 
-			if (value != null && getPasswordRequestParameterPattern(context).matcher(name).matches()) {
-				value = "********"; // Mask passwords and tokens.
-			}
+            if (value != null && getPasswordRequestParameterPattern(context).matcher(name).matches()) {
+                value = "********"; // Mask passwords and tokens.
+            }
 
-			filteredParams.put(name, value);
-		}
+            filteredParams.put(name, value);
+        }
 
-		return filteredParams;
-	}
+        return filteredParams;
+    }
 
-	/**
-	 * You can override this if you need to change the default pattern for password based request parameters which will be filtered in
-	 * {@link #getRequestParameters(FacesContext)}.
-	 * The default pattern matches every request parameter name ending with "password" or "token", case insensitive.
-	 * @param context The involved faces context.
-	 * @return Pattern for password request parameters.
-	 */
-	protected Pattern getPasswordRequestParameterPattern(FacesContext context) {
-		return PASSWORD_REQUEST_PARAMETER_PATTERN;
-	}
+    /**
+     * You can override this if you need to change the default pattern for password based request parameters which will be filtered in
+     * {@link #getRequestParameters(FacesContext)}.
+     * The default pattern matches every request parameter name ending with "password" or "token", case insensitive.
+     * @param context The involved faces context.
+     * @return Pattern for password request parameters.
+     */
+    protected Pattern getPasswordRequestParameterPattern(FacesContext context) {
+        return PASSWORD_REQUEST_PARAMETER_PATTERN;
+    }
 
-	/**
-	 * You can override this if you need more fine grained control over logging of faces messages.
-	 * @param context The involved faces context.
-	 * @return Faces messages.
-	 */
-	protected Map<String, List<String>> getFacesMessages(FacesContext context) {
-		Map<String, List<String>> facesMessages = new TreeMap<>();
-		context.getMessages(null).forEachRemaining(collectGlobalMessageSummaries(facesMessages));
-		context.getClientIdsWithMessages().forEachRemaining(collectMessageSummariesByClientId(context, facesMessages));
-		return facesMessages;
-	}
+    /**
+     * You can override this if you need more fine grained control over logging of faces messages.
+     * @param context The involved faces context.
+     * @return Faces messages.
+     */
+    protected Map<String, List<String>> getFacesMessages(FacesContext context) {
+        Map<String, List<String>> facesMessages = new TreeMap<>();
+        context.getMessages(null).forEachRemaining(collectGlobalMessageSummaries(facesMessages));
+        context.getClientIdsWithMessages().forEachRemaining(collectMessageSummariesByClientId(context, facesMessages));
+        return facesMessages;
+    }
 
-	private static Consumer<? super FacesMessage> collectGlobalMessageSummaries(Map<String, List<String>> facesMessages) {
-		return message -> facesMessages.computeIfAbsent("", v -> new ArrayList<>()).add(message.getSummary());
-	}
+    private static Consumer<? super FacesMessage> collectGlobalMessageSummaries(Map<String, List<String>> facesMessages) {
+        return message -> facesMessages.computeIfAbsent("", v -> new ArrayList<>()).add(message.getSummary());
+    }
 
-	private static Consumer<? super String> collectMessageSummariesByClientId(FacesContext context, Map<String, List<String>> facesMessages) {
-		return clientId -> facesMessages.put(coalesce(clientId, ""), context.getMessageList(clientId).stream().map(FacesMessage::getSummary).collect(toList()));
-	}
+    private static Consumer<? super String> collectMessageSummariesByClientId(FacesContext context, Map<String, List<String>> facesMessages) {
+        return clientId -> facesMessages.put(coalesce(clientId, ""), context.getMessageList(clientId).stream().map(FacesMessage::getSummary).collect(toList()));
+    }
 
-	private static PhaseTimer getPhaseTimer(FacesContext context) {
-		return getRequestAttribute(context, PhaseTimer.class.getName(), PhaseTimer::new);
-	}
+    private static PhaseTimer getPhaseTimer(FacesContext context) {
+        return getRequestAttribute(context, PhaseTimer.class.getName(), PhaseTimer::new);
+    }
 
-	private static class PhaseTimer {
+    private static class PhaseTimer {
 
-		private Map<Integer, Long> startTimes = new HashMap<>();
-		private Map<Integer, Long> endTimes = new HashMap<>();
+        private Map<Integer, Long> startTimes = new HashMap<>();
+        private Map<Integer, Long> endTimes = new HashMap<>();
 
-		public void start(PhaseId phaseId) {
-			startTimes.putIfAbsent(phaseId.getOrdinal(), nanoTime());
-		}
+        public void start(PhaseId phaseId) {
+            startTimes.putIfAbsent(phaseId.getOrdinal(), nanoTime());
+        }
 
-		public void stop(PhaseId phaseId) {
-			endTimes.put(phaseId.getOrdinal(), nanoTime());
-		}
+        public void stop(PhaseId phaseId) {
+            endTimes.put(phaseId.getOrdinal(), nanoTime());
+        }
 
-		public String getDuration(PhaseId phase) {
-			Long startTime = startTimes.get(phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal());
-			Long endTime = endTimes.get(phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal());
-			return (startTime != null && endTime != null ?  ((endTime - startTime) / 1_000_000) : -1) + "ms";
-		}
+        public String getDuration(PhaseId phase) {
+            Long startTime = startTimes.get(phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal());
+            Long endTime = endTimes.get(phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal());
+            return (startTime != null && endTime != null ?  ((endTime - startTime) / 1_000_000) : -1) + "ms";
+        }
 
-		@Override
-		public String toString() {
-			Map<Integer, String> duration = new TreeMap<>();
+        @Override
+        public String toString() {
+            Map<Integer, String> duration = new TreeMap<>();
 
-			for (PhaseId phase : PhaseId.VALUES) {
-				duration.put(phase.getOrdinal(), getDuration(phase));
-			}
+            for (PhaseId phase : PhaseId.VALUES) {
+                duration.put(phase.getOrdinal(), getDuration(phase));
+            }
 
-			return duration.toString();
-		}
-	}
+            return duration.toString();
+        }
+    }
 
 }

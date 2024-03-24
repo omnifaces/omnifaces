@@ -35,100 +35,100 @@ import org.omnifaces.ApplicationProcessor;
  */
 public final class OmniFaces {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** Returns the "omnifaces" resource library name. */
-	public static final String OMNIFACES_LIBRARY_NAME = "omnifaces";
+    /** Returns the "omnifaces" resource library name. */
+    public static final String OMNIFACES_LIBRARY_NAME = "omnifaces";
 
-	/** Returns the "omnifaces.js" main script name. */
-	public static final String OMNIFACES_SCRIPT_NAME = "omnifaces.js";
+    /** Returns the "omnifaces.js" main script name. */
+    public static final String OMNIFACES_SCRIPT_NAME = "omnifaces.js";
 
-	/** Returns the "omnifaces.event" request parameter name. */
-	public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
+    /** Returns the "omnifaces.event" request parameter name. */
+    public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
 
-	/** Returns the "omnifaces_form" ID of dynamic form. */
-	public static final String OMNIFACES_DYNAMIC_FORM_ID = "omnifaces_form";
+    /** Returns the "omnifaces_form" ID of dynamic form. */
+    public static final String OMNIFACES_DYNAMIC_FORM_ID = "omnifaces_form";
 
-	/**
-	 * The boolean context parameter name to skip any OmniFaces deployment exception.
-	 * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
-	 * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
-	 * deployment of the web application.
-	 * @since 3.14
-	 */
-	public static final String PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION = "org.omnifaces.SKIP_DEPLOYMENT_EXCEPTION";
+    /**
+     * The boolean context parameter name to skip any OmniFaces deployment exception.
+     * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
+     * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
+     * deployment of the web application.
+     * @since 3.14
+     */
+    public static final String PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION = "org.omnifaces.SKIP_DEPLOYMENT_EXCEPTION";
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
-	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
-	private static final Long STARTUP_TIME = System.currentTimeMillis();
-	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
+    private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
+    private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
+    private static final Long STARTUP_TIME = System.currentTimeMillis();
+    private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private OmniFaces() {
-		// Hide constructor.
-	}
+    private OmniFaces() {
+        // Hide constructor.
+    }
 
-	// Utility --------------------------------------------------------------------------------------------------------
+    // Utility --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns OmniFaces version.
-	 * This is extracted from Implementation-Version field of /META-INF/MANIFEST.MF file of omnifaces.jar file.
-	 * Release versions will return version in format <code>3.4.2</code>.
-	 * Snapshot versions will return version in format <code>3.4.2-SNAPSHOT</code>.
-	 * Local development versions (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
-	 * @return OmniFaces version.
-	 */
-	public static String getVersion() {
-		return VERSION;
-	}
+    /**
+     * Returns OmniFaces version.
+     * This is extracted from Implementation-Version field of /META-INF/MANIFEST.MF file of omnifaces.jar file.
+     * Release versions will return version in format <code>3.4.2</code>.
+     * Snapshot versions will return version in format <code>3.4.2-SNAPSHOT</code>.
+     * Local development versions (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
+     * @return OmniFaces version.
+     */
+    public static String getVersion() {
+        return VERSION;
+    }
 
-	/**
-	 * Returns whether current OmniFaces version is a SNAPSHOT or RC version.
-	 * @return Whether current OmniFaces version is a SNAPSHOT or RC version.
-	 */
-	public static boolean isSnapshot() {
-		return SNAPSHOT;
-	}
+    /**
+     * Returns whether current OmniFaces version is a SNAPSHOT or RC version.
+     * @return Whether current OmniFaces version is a SNAPSHOT or RC version.
+     */
+    public static boolean isSnapshot() {
+        return SNAPSHOT;
+    }
 
-	/**
-	 * Returns startup time in Epoch milli.
-	 * @return Startup time in Epoch milli.
-	 */
-	public static long getStartupTime() {
-		return STARTUP_TIME;
-	}
+    /**
+     * Returns startup time in Epoch milli.
+     * @return Startup time in Epoch milli.
+     */
+    public static long getStartupTime() {
+        return STARTUP_TIME;
+    }
 
-	/**
-	 * Returns resource bundle message associated with given key from application message bundle as identified by
-	 * <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>, or if it is absent, then return it from
-	 * OmniFaces internal <code>org.omnifaces.messages</code> bundle.
-	 * @param key The message bundle key.
-	 * @return Resource bundle message associated with given key.
-	 */
-	public static String getMessage(String key) {
-		ResourceBundle messageBundle = getMessageBundle();
+    /**
+     * Returns resource bundle message associated with given key from application message bundle as identified by
+     * <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>, or if it is absent, then return it from
+     * OmniFaces internal <code>org.omnifaces.messages</code> bundle.
+     * @param key The message bundle key.
+     * @return Resource bundle message associated with given key.
+     */
+    public static String getMessage(String key) {
+        ResourceBundle messageBundle = getMessageBundle();
 
-		if (messageBundle == null || !messageBundle.containsKey(key)) {
-			messageBundle = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale());
-		}
+        if (messageBundle == null || !messageBundle.containsKey(key)) {
+            messageBundle = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale());
+        }
 
-		return messageBundle.getString(key);
-	}
+        return messageBundle.getString(key);
+    }
 
-	/**
-	 * Returns whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
-	 * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
-	 * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
-	 * deployment of the web application.
-	 * @param servletContext The involved servlet context.
-	 * @return whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
-	 * @since 3.14
-	 */
-	public static boolean skipDeploymentException(ServletContext servletContext) {
-		return parseBoolean(servletContext.getInitParameter(PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION));
-	}
+    /**
+     * Returns whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
+     * If this is set to <code>true</code>, then any exception thrown by {@link ApplicationInitializer},
+     * {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the
+     * deployment of the web application.
+     * @param servletContext The involved servlet context.
+     * @return whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
+     * @since 3.14
+     */
+    public static boolean skipDeploymentException(ServletContext servletContext) {
+        return parseBoolean(servletContext.getInitParameter(PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION));
+    }
 
 }

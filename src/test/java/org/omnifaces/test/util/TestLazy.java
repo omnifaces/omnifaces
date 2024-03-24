@@ -27,27 +27,27 @@ import org.omnifaces.util.Lazy;
  */
 public class TestLazy {
 
-	private final AtomicInteger numCreations = new AtomicInteger();
+    private final AtomicInteger numCreations = new AtomicInteger();
 
-	@BeforeEach
-	public void before() {
-		numCreations.set(0);
-	}
+    @BeforeEach
+    public void before() {
+        numCreations.set(0);
+    }
 
-	class Expensive {
-		Expensive() {
-			numCreations.incrementAndGet();
-		}
-	}
+    class Expensive {
+        Expensive() {
+            numCreations.incrementAndGet();
+        }
+    }
 
-	@Test
-	void lazy() {
-		Expensive expensive = new Expensive();
-		Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
-		assertEquals(1, numCreations.get());
-		assertEquals(Expensive.class, cheap.get().getClass());
-		assertEquals(2, numCreations.get());
-		assertEquals(Expensive.class, cheap.get().getClass());
-		assertEquals(2, numCreations.get());
-	}
+    @Test
+    void lazy() {
+        Expensive expensive = new Expensive();
+        Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
+        assertEquals(1, numCreations.get());
+        assertEquals(Expensive.class, cheap.get().getClass());
+        assertEquals(2, numCreations.get());
+        assertEquals(Expensive.class, cheap.get().getClass());
+        assertEquals(2, numCreations.get());
+    }
 }

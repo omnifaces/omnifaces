@@ -30,19 +30,19 @@ import org.omnifaces.util.Beans;
 @Dependent
 public class InjectionPointGenerator {
 
-	// TODO: this is a workaround originally for older OWB versions, but while OWB is fixed, newer Weld versions
-	// are now broken. It seems this needs to be fixed in CDI 2.0.
-	// See https://issues.jboss.org/browse/CDI-610
+    // TODO: this is a workaround originally for older OWB versions, but while OWB is fixed, newer Weld versions
+    // are now broken. It seems this needs to be fixed in CDI 2.0.
+    // See https://issues.jboss.org/browse/CDI-610
 
-	@Inject
-	private InjectionPoint injectionPoint;
+    @Inject
+    private InjectionPoint injectionPoint;
 
-	/**
-	 * Returns injection point.
-	 * @return Injection point.
-	 */
-	public InjectionPoint getInjectionPoint() {
-		return injectionPoint;
-	}
+    /**
+     * Returns injection point.
+     * @return Injection point.
+     */
+    public InjectionPoint getInjectionPoint() {
+        return injectionPoint;
+    }
 
 }

@@ -14,6 +14,6 @@ package org.omnifaces.test.taghandler.importconstants;
 
 public interface ImportConstantsITInterface {
 
-	public static final String VALUE = "interface";
+    public static final String VALUE = "interface";
 
 }

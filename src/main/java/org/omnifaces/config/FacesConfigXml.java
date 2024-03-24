@@ -53,43 +53,43 @@ import org.omnifaces.cdi.config.FacesConfigXmlProducer;
  */
 public interface FacesConfigXml {
 
-	// Enum singleton -------------------------------------------------------------------------------------------------
+    // Enum singleton -------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the lazily loaded enum singleton instance.
-	 * @return The lazily loaded enum singleton instance.
-	 * @since 3.1
-	 */
-	static FacesConfigXml instance() {
-		return FacesConfigXmlSingleton.INSTANCE;
-	}
+    /**
+     * Returns the lazily loaded enum singleton instance.
+     * @return The lazily loaded enum singleton instance.
+     * @since 3.1
+     */
+    static FacesConfigXml instance() {
+        return FacesConfigXmlSingleton.INSTANCE;
+    }
 
-	// Getters --------------------------------------------------------------------------------------------------------
+    // Getters --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a mapping of all resource bundle base names by var.
-	 * @return A mapping of all resource bundle base names by var.
-	 */
-	Map<String, String> getResourceBundles();
+    /**
+     * Returns a mapping of all resource bundle base names by var.
+     * @return A mapping of all resource bundle base names by var.
+     */
+    Map<String, String> getResourceBundles();
 
-	/**
-	 * Returns an ordered list of all supported locales on this application, with the default locale as the first
-	 * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
-	 * @return An ordered list of all supported locales on this application, with the default locale as the first
-	 * item, if any.
-	 * @see Application#getDefaultLocale()
-	 * @see Application#getSupportedLocales()
-	 * @since 2.2
-	 */
-	List<Locale> getSupportedLocales();
+    /**
+     * Returns an ordered list of all supported locales on this application, with the default locale as the first
+     * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
+     * @return An ordered list of all supported locales on this application, with the default locale as the first
+     * item, if any.
+     * @see Application#getDefaultLocale()
+     * @see Application#getSupportedLocales()
+     * @since 2.2
+     */
+    List<Locale> getSupportedLocales();
 
-	/**
-	 * Returns an ordered list of all resource handlers registered on this application. This will return an empty list
-	 * if there are no resource handlers definied in <code>faces-config.xml</code>.
-	 * @return An ordered list of all resource handlers registered on this application.
-	 * @see Application#getResourceHandler()
-	 * @since 3.10
-	 */
-	public List<Class<? extends ResourceHandler>> getResourceHandlers();
+    /**
+     * Returns an ordered list of all resource handlers registered on this application. This will return an empty list
+     * if there are no resource handlers definied in <code>faces-config.xml</code>.
+     * @return An ordered list of all resource handlers registered on this application.
+     * @see Application#getResourceHandler()
+     * @since 3.10
+     */
+    public List<Class<? extends ResourceHandler>> getResourceHandlers();
 
 }

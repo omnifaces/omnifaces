@@ -80,242 +80,242 @@ import org.omnifaces.util.Hacks;
  */
 public class OmniViewHandler extends ViewHandlerWrapper {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String XML_CONTENT_TYPE = "text/xml";
+    private static final String XML_CONTENT_TYPE = "text/xml";
 
-	private static final String ERROR_NESTED_FORM_ENCOUNTERED =
-		"Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
+    private static final String ERROR_NESTED_FORM_ENCOUNTERED =
+        "Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces view handler around the given wrapped view handler.
-	 * @param wrapped The wrapped view handler.
-	 */
-	public OmniViewHandler(ViewHandler wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new OmniFaces view handler around the given wrapped view handler.
+     * @param wrapped The wrapped view handler.
+     */
+    public OmniViewHandler(ViewHandler wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the current request is a sw.js request from {@link PWAResourceHandler}, then create a dummy view and trigger
-	 * {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
-	 */
-	@Override
-	public UIViewRoot createView(FacesContext context, String viewId) {
-		if (isServiceWorkerRequest(context)) {
-			return createServiceWorkerView(context, viewId);
-		}
+    /**
+     * If the current request is a sw.js request from {@link PWAResourceHandler}, then create a dummy view and trigger
+     * {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
+     */
+    @Override
+    public UIViewRoot createView(FacesContext context, String viewId) {
+        if (isServiceWorkerRequest(context)) {
+            return createServiceWorkerView(context, viewId);
+        }
 
-		return super.createView(context, viewId);
-	}
+        return super.createView(context, viewId);
+    }
 
-	/**
-	 * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the
-	 * view root state and then immediately explicitly destroy the view, else restore the view as usual. If the
-	 * <code>&lt;o:enableRestoreView&gt;</code> is used once in the application, and the restored view is null and the
-	 * current request is a postback, then recreate and rebuild the view from scratch. If it indeed contains the
-	 * <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return <code>null</code>.
-	 */
-	@Override
-	public UIViewRoot restoreView(FacesContext context, String viewId) {
-		if (isUnloadRequest(context)) {
-			return unloadView(context, viewId);
-		}
+    /**
+     * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the
+     * view root state and then immediately explicitly destroy the view, else restore the view as usual. If the
+     * <code>&lt;o:enableRestoreView&gt;</code> is used once in the application, and the restored view is null and the
+     * current request is a postback, then recreate and rebuild the view from scratch. If it indeed contains the
+     * <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return <code>null</code>.
+     */
+    @Override
+    public UIViewRoot restoreView(FacesContext context, String viewId) {
+        if (isUnloadRequest(context)) {
+            return unloadView(context, viewId);
+        }
 
-		UIViewRoot restoredView = super.restoreView(context, viewId);
+        UIViewRoot restoredView = super.restoreView(context, viewId);
 
-		if (isRestorableViewRequest(context, restoredView)) {
-			return createRestorableViewIfNecessary(viewId);
-		}
+        if (isRestorableViewRequest(context, restoredView)) {
+            return createRestorableViewIfNecessary(viewId);
+        }
 
-		return restoredView;
-	}
+        return restoredView;
+    }
 
-	@Override
-	public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException {
-		if (isDevelopment(context)) {
-			validateComponentTreeStructure(context, viewToRender);
-		}
+    @Override
+    public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException {
+        if (isDevelopment(context)) {
+            validateComponentTreeStructure(context, viewToRender);
+        }
 
-		if (isAjaxRequest(context)) {
-			context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
-		}
+        if (isAjaxRequest(context)) {
+            context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
+        }
 
-		if (isViewResourceRequest(context)) {
-			String contentType = getMimeType(context, getRequestServletPath(context));
-			String characterEncoding = UTF_8.name();
+        if (isViewResourceRequest(context)) {
+            String contentType = getMimeType(context, getRequestServletPath(context));
+            String characterEncoding = UTF_8.name();
 
-			ExternalContext externalContext = context.getExternalContext();
-			externalContext.setResponseContentType(contentType);
-			externalContext.setResponseCharacterEncoding(characterEncoding);
-			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
-			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the setResponseContentType.
+            ExternalContext externalContext = context.getExternalContext();
+            externalContext.setResponseContentType(contentType);
+            externalContext.setResponseCharacterEncoding(characterEncoding);
+            context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
+            context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the setResponseContentType.
 
-			try {
-				Hacks.clearCachedFacesServletMapping(context);
-				super.renderView(new RenderViewResourceFacesContext(context), viewToRender);
-			}
-			finally {
-				Hacks.clearCachedFacesServletMapping(context);
-			}
-		}
-		else {
-			super.renderView(context, viewToRender);
-		}
-	}
+            try {
+                Hacks.clearCachedFacesServletMapping(context);
+                super.renderView(new RenderViewResourceFacesContext(context), viewToRender);
+            }
+            finally {
+                Hacks.clearCachedFacesServletMapping(context);
+            }
+        }
+        else {
+            super.renderView(context, viewToRender);
+        }
+    }
 
-	/**
-	 * Create a dummy view and trigger {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
-	 */
-	private UIViewRoot createServiceWorkerView(FacesContext context, String viewId) {
-		UIViewRoot createdView = super.createView(context, viewId);
-		context.responseComplete();
-		return createdView;
-	}
+    /**
+     * Create a dummy view and trigger {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
+     */
+    private UIViewRoot createServiceWorkerView(FacesContext context, String viewId) {
+        UIViewRoot createdView = super.createView(context, viewId);
+        context.responseComplete();
+        return createdView;
+    }
 
-	/**
-	 * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
-	 * view state. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send
-	 * a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
-	 * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
-	 */
-	private UIViewRoot unloadView(FacesContext context, String viewId) {
-		UIViewRoot createdView = super.createView(context, viewId);
-		ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
+    /**
+     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
+     * view state. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send
+     * a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
+     * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+     */
+    private UIViewRoot unloadView(FacesContext context, String viewId) {
+        UIViewRoot createdView = super.createView(context, viewId);
+        ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
 
-		if (restoreViewRootState(context, manager, createdView)) {
-			context.setProcessingEvents(true);
-			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
-			Hacks.removeViewState(context, manager, viewId);
-		}
-		else if (isSessionNew(context)) {
-			redirectPermanent(context, getRequestURIWithQueryString(context));
-		}
+        if (restoreViewRootState(context, manager, createdView)) {
+            context.setProcessingEvents(true);
+            context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
+            Hacks.removeViewState(context, manager, viewId);
+        }
+        else if (isSessionNew(context)) {
+            redirectPermanent(context, getRequestURIWithQueryString(context));
+        }
 
-		responseComplete();
-		return createdView;
-	}
+        responseComplete();
+        return createdView;
+    }
 
-	/**
-	 * Restore only the view root state. This ensures that the view scope map and all view root component system event
-	 * listeners are also restored (including those for {@link PreDestroyViewMapEvent}). This is done so because calling
-	 * <code>super.restoreView()</code> would implicitly also build the entire view and restore state of all other
-	 * components in the tree. This is unnecessary during an unload request.
-	 */
-	@SuppressWarnings("rawtypes")
-	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
-		Object state = manager.getState(context, view.getViewId());
+    /**
+     * Restore only the view root state. This ensures that the view scope map and all view root component system event
+     * listeners are also restored (including those for {@link PreDestroyViewMapEvent}). This is done so because calling
+     * <code>super.restoreView()</code> would implicitly also build the entire view and restore state of all other
+     * components in the tree. This is unnecessary during an unload request.
+     */
+    @SuppressWarnings("rawtypes")
+    private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
+        Object state = manager.getState(context, view.getViewId());
 
-		if (!(state instanceof Object[]) || ((Object[]) state).length < 2) {
-			return false;
-		}
+        if (!(state instanceof Object[]) || ((Object[]) state).length < 2) {
+            return false;
+        }
 
-		Object componentState = ((Object[]) state)[1];
-		Object viewRootState = null;
+        Object componentState = ((Object[]) state)[1];
+        Object viewRootState = null;
 
-		if (componentState instanceof Map) { // Partial state saving.
-			if (view.getId() == null) { // MyFaces.
-				view.setId(view.createUniqueId(context, null));
-				view.markInitialState();
-			}
+        if (componentState instanceof Map) { // Partial state saving.
+            if (view.getId() == null) { // MyFaces.
+                view.setId(view.createUniqueId(context, null));
+                view.markInitialState();
+            }
 
-			viewRootState = ((Map) componentState).get(view.getClientId(context));
-		}
-		else if (componentState instanceof Object[]) { // Full state saving.
-			viewRootState = ((Object[]) componentState)[0];
-		}
+            viewRootState = ((Map) componentState).get(view.getClientId(context));
+        }
+        else if (componentState instanceof Object[]) { // Full state saving.
+            viewRootState = ((Object[]) componentState)[0];
+        }
 
-		if (viewRootState != null) {
-			view.restoreState(context, viewRootState);
-			context.setViewRoot(view);
-			return true;
-		}
+        if (viewRootState != null) {
+            view.restoreState(context, viewRootState);
+            context.setViewRoot(view);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
-	 */
-	private UIViewRoot createRestorableViewIfNecessary(String viewId) {
-		try {
-			UIViewRoot createdView = buildView(viewId);
-			return isRestorableView(createdView) ? createdView : null;
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
-	}
+    /**
+     * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
+     */
+    private UIViewRoot createRestorableViewIfNecessary(String viewId) {
+        try {
+            UIViewRoot createdView = buildView(viewId);
+            return isRestorableView(createdView) ? createdView : null;
+        }
+        catch (IOException e) {
+            throw new FacesException(e);
+        }
+    }
 
-	private void validateComponentTreeStructure(FacesContext context, UIViewRoot view) {
-		checkNestedForms(context, view, null);
-	}
+    private void validateComponentTreeStructure(FacesContext context, UIViewRoot view) {
+        checkNestedForms(context, view, null);
+    }
 
-	private void checkNestedForms(FacesContext context, UIComponent parent, UIForm nestedParent) {
-		for (UIComponent child : parent.getChildren()) { // Historical note: UIViewRoot#visitTree() is inappropriate for this task: #653
-			UIForm form = null;
+    private void checkNestedForms(FacesContext context, UIComponent parent, UIForm nestedParent) {
+        for (UIComponent child : parent.getChildren()) { // Historical note: UIViewRoot#visitTree() is inappropriate for this task: #653
+            UIForm form = null;
 
-			if (child instanceof UIForm) {
-				form = (UIForm) child;
+            if (child instanceof UIForm) {
+                form = (UIForm) child;
 
-				if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
-					throw new IllegalStateException(
-						format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
-				}
-			}
+                if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
+                    throw new IllegalStateException(
+                        format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
+                }
+            }
 
-			checkNestedForms(context, child, form);
-		}
-	}
+            checkNestedForms(context, child, form);
+        }
+    }
 
-	// Inner classes -------------------------------------------------------------------------------------------------
+    // Inner classes -------------------------------------------------------------------------------------------------
 
-	private static class RenderViewResourceFacesContext extends FacesContextWrapper {
+    private static class RenderViewResourceFacesContext extends FacesContextWrapper {
 
-		private final ExternalContext externalContext;
+        private final ExternalContext externalContext;
 
-		private RenderViewResourceFacesContext(FacesContext wrapped) {
-			super(wrapped);
-			String defaultMapping = getDefaultFacesServletMapping(getServletContext(getWrapped()));
-			boolean prefixMapping = isPrefixMapping(defaultMapping);
-			String requestPathInfo = prefixMapping ? defaultMapping : null;
-			String requestServletPath = getRequestServletPath(getWrapped()) + (prefixMapping ? "" : defaultMapping);
-			this.externalContext = new RenderViewResourceExternalContext(getWrapped().getExternalContext(), requestPathInfo, requestServletPath);
-		}
+        private RenderViewResourceFacesContext(FacesContext wrapped) {
+            super(wrapped);
+            String defaultMapping = getDefaultFacesServletMapping(getServletContext(getWrapped()));
+            boolean prefixMapping = isPrefixMapping(defaultMapping);
+            String requestPathInfo = prefixMapping ? defaultMapping : null;
+            String requestServletPath = getRequestServletPath(getWrapped()) + (prefixMapping ? "" : defaultMapping);
+            this.externalContext = new RenderViewResourceExternalContext(getWrapped().getExternalContext(), requestPathInfo, requestServletPath);
+        }
 
-		@Override
-		public ExternalContext getExternalContext() {
-			return externalContext;
-		}
-	}
+        @Override
+        public ExternalContext getExternalContext() {
+            return externalContext;
+        }
+    }
 
-	private static class RenderViewResourceExternalContext extends ExternalContextWrapper {
+    private static class RenderViewResourceExternalContext extends ExternalContextWrapper {
 
-		private final String requestPathInfo;
-		private final String requestServletPath;
+        private final String requestPathInfo;
+        private final String requestServletPath;
 
-		private RenderViewResourceExternalContext(ExternalContext wrapped, String requestPathInfo, String requestServletPath) {
-			super(wrapped);
-			this.requestPathInfo = requestPathInfo;
-			this.requestServletPath = requestServletPath;
-		}
+        private RenderViewResourceExternalContext(ExternalContext wrapped, String requestPathInfo, String requestServletPath) {
+            super(wrapped);
+            this.requestPathInfo = requestPathInfo;
+            this.requestServletPath = requestServletPath;
+        }
 
-		@Override
-		public String getRequestPathInfo() {
-			return requestPathInfo;
-		}
+        @Override
+        public String getRequestPathInfo() {
+            return requestPathInfo;
+        }
 
-		@Override
-		public String getRequestServletPath() {
-			return requestServletPath;
-		}
+        @Override
+        public String getRequestServletPath() {
+            return requestServletPath;
+        }
 
-		@Override
-		public String encodeActionURL(String url) {
-			return super.encodeActionURL(url).replaceAll(";jsessionid=[^&?#]*", "");
-		}
-	}
+        @Override
+        public String encodeActionURL(String url) {
+            return super.encodeActionURL(url).replaceAll(";jsessionid=[^&?#]*", "");
+        }
+    }
 }

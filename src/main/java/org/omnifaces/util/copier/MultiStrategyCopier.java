@@ -36,27 +36,27 @@ import java.util.logging.Logger;
  */
 public class MultiStrategyCopier implements Copier {
 
-	private static final Logger logger = Logger.getLogger(MultiStrategyCopier.class.getName());
+    private static final Logger logger = Logger.getLogger(MultiStrategyCopier.class.getName());
 
-	private static final List<Copier> COPIERS = asList( // Note: copier instances used here must be thread-safe!
-		new CloneCopier(), new SerializationCopier(), new CopyCtorCopier(), new NewInstanceCopier()
-	);
+    private static final List<Copier> COPIERS = asList( // Note: copier instances used here must be thread-safe!
+        new CloneCopier(), new SerializationCopier(), new CopyCtorCopier(), new NewInstanceCopier()
+    );
 
-	@Override
-	public Object copy(Object object) {
+    @Override
+    public Object copy(Object object) {
 
-		for (Copier copier : COPIERS) {
+        for (Copier copier : COPIERS) {
 
-			try {
-				return copier.copy(object);
-			}
-			catch (Exception ignore) {
-				logger.log(FINEST, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
-			}
+            try {
+                return copier.copy(object);
+            }
+            catch (Exception ignore) {
+                logger.log(FINEST, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
+            }
 
-		}
+        }
 
-		throw new IllegalStateException("Can't copy object of type " + object.getClass() + ". No copier appeared to be capable of copying it.");
-	}
+        throw new IllegalStateException("Can't copy object of type " + object.getClass() + ". No copier appeared to be capable of copying it.");
+    }
 
 }

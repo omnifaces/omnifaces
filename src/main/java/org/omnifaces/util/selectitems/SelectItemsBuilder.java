@@ -25,34 +25,34 @@ import jakarta.faces.model.SelectItem;
  */
 public class SelectItemsBuilder {
 
-	private List<SelectItem> selectItems = new ArrayList<>();
+    private List<SelectItem> selectItems = new ArrayList<>();
 
-	public SelectItemsBuilder add(Object value, String label) {
-		selectItems.add(new SelectItem(value, label));
-		return this;
-	}
+    public SelectItemsBuilder add(Object value, String label) {
+        selectItems.add(new SelectItem(value, label));
+        return this;
+    }
 
-	public SelectItem[] build() {
-		return selectItems.toArray(new SelectItem[selectItems.size()]);
-	}
+    public SelectItem[] build() {
+        return selectItems.toArray(new SelectItem[selectItems.size()]);
+    }
 
-	public List<SelectItem> buildList() {
-		return selectItems;
-	}
+    public List<SelectItem> buildList() {
+        return selectItems;
+    }
 
-	/**
-	 * Builds a <code>List</code> of <code>SelectItem</code>s from the given <code>Map</code> argument.
-	 *
-	 * @param map the Map
-	 * @return <code>List</code> of <code>SelectItem</code>s having the map's value as value and the map's key as label.
-	 */
-	public static List<SelectItem> fromMap(Map<?, ?> map) {
-		List<SelectItem> items = new ArrayList<>(map.size());
-		for (Map.Entry<?, ?> entry : map.entrySet()) {
-			items.add(new SelectItem(entry.getValue(), entry.getKey().toString()));
-		}
+    /**
+     * Builds a <code>List</code> of <code>SelectItem</code>s from the given <code>Map</code> argument.
+     *
+     * @param map the Map
+     * @return <code>List</code> of <code>SelectItem</code>s having the map's value as value and the map's key as label.
+     */
+    public static List<SelectItem> fromMap(Map<?, ?> map) {
+        List<SelectItem> items = new ArrayList<>(map.size());
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            items.add(new SelectItem(entry.getValue(), entry.getKey().toString()));
+        }
 
-		return items;
-	}
+        return items;
+    }
 
 }

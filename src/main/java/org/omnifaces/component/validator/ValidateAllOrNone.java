@@ -40,36 +40,36 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateAllOrNone.COMPONENT_TYPE)
 public class ValidateAllOrNone extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateAllOrNone#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateAllOrNone";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateAllOrNone#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateAllOrNone";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if all or none is filled out.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		boolean hasValue = false;
-		boolean hasNoValue = false;
+    /**
+     * Validate if all or none is filled out.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+        boolean hasValue = false;
+        boolean hasNoValue = false;
 
-		for (Object value : values) {
-			boolean currentHasValue = !isEmpty(value);
-			hasValue |= currentHasValue;
-			hasNoValue |= !currentHasValue;
-		}
+        for (Object value : values) {
+            boolean currentHasValue = !isEmpty(value);
+            hasValue |= currentHasValue;
+            hasNoValue |= !currentHasValue;
+        }
 
-		return (hasValue != hasNoValue);
-	}
+        return (hasValue != hasNoValue);
+    }
 
-	/**
-	 * In an invalidating case, invalidate only those inputs which have an empty value.
-	 */
-	@Override
-	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
-		return isEmpty(value);
-	}
+    /**
+     * In an invalidating case, invalidate only those inputs which have an empty value.
+     */
+    @Override
+    protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
+        return isEmpty(value);
+    }
 
 }

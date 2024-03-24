@@ -78,92 +78,92 @@ import org.omnifaces.application.OmniApplicationFactory;
 @SuppressWarnings("rawtypes")
 public class ValidatorManager {
 
-	// Dependencies ---------------------------------------------------------------------------------------------------
+    // Dependencies ---------------------------------------------------------------------------------------------------
 
-	@Inject
-	private BeanManager manager;
-	private Map<String, Bean<Validator>> validatorsById = new HashMap<>();
+    @Inject
+    private BeanManager manager;
+    private Map<String, Bean<Validator>> validatorsById = new HashMap<>();
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the validator instance associated with the given validator ID,
-	 * or <code>null</code> if there is none.
-	 * @param application The involved Faces application.
-	 * @param validatorId The validator ID of the desired validator instance.
-	 * @return the validator instance associated with the given validator ID,
-	 * or <code>null</code> if there is none.
-	 */
-	public Validator createValidator(Application application, String validatorId) {
-		Validator validator = application.createValidator(validatorId);
-		Bean<Validator> bean = validatorsById.get(validatorId);
+    /**
+     * Returns the validator instance associated with the given validator ID,
+     * or <code>null</code> if there is none.
+     * @param application The involved Faces application.
+     * @param validatorId The validator ID of the desired validator instance.
+     * @return the validator instance associated with the given validator ID,
+     * or <code>null</code> if there is none.
+     */
+    public Validator createValidator(Application application, String validatorId) {
+        Validator validator = application.createValidator(validatorId);
+        Bean<Validator> bean = validatorsById.get(validatorId);
 
-		if (bean == null && !validatorsById.containsKey(validatorId)) {
+        if (bean == null && !validatorsById.containsKey(validatorId)) {
 
-			if (isUnmanaged(validator)) {
-				bean = resolve(validator.getClass(), validatorId);
-			}
+            if (isUnmanaged(validator)) {
+                bean = resolve(validator.getClass(), validatorId);
+            }
 
-			validatorsById.put(validatorId, bean);
-		}
+            validatorsById.put(validatorId, bean);
+        }
 
-		return (bean != null) ? getReference(manager, bean) : validator;
-	}
+        return (bean != null) ? getReference(manager, bean) : validator;
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private boolean isUnmanaged(Validator validator) {
-		if (validator == null) {
-			return false;
-		}
+    private boolean isUnmanaged(Validator validator) {
+        if (validator == null) {
+            return false;
+        }
 
-		FacesValidator annotation = validator.getClass().getAnnotation(FacesValidator.class);
+        FacesValidator annotation = validator.getClass().getAnnotation(FacesValidator.class);
 
-		if (annotation == null) {
-			return false;
-		}
+        if (annotation == null) {
+            return false;
+        }
 
-		return !annotation.managed();
-	}
+        return !annotation.managed();
+    }
 
-	@SuppressWarnings("unchecked")
-	private Bean<Validator> resolve(Class<? extends Validator> validatorClass, String validatorId) {
+    @SuppressWarnings("unchecked")
+    private Bean<Validator> resolve(Class<? extends Validator> validatorClass, String validatorId) {
 
-		// First try by class.
-		Bean<Validator> bean = (Bean<Validator>) resolveExact(manager, validatorClass);
+        // First try by class.
+        Bean<Validator> bean = (Bean<Validator>) resolveExact(manager, validatorClass);
 
-		if (bean == null) {
-			FacesValidator annotation = validatorClass.getAnnotation(FacesValidator.class);
+        if (bean == null) {
+            FacesValidator annotation = validatorClass.getAnnotation(FacesValidator.class);
 
-			if (annotation != null) {
-				// Then by own annotation, if any.
-				bean = (Bean<Validator>) resolveExact(manager, validatorClass, annotation);
-			}
+            if (annotation != null) {
+                // Then by own annotation, if any.
+                bean = (Bean<Validator>) resolveExact(manager, validatorClass, annotation);
+            }
 
-			if (bean == null) {
-				// Else by fabricated annotation literal.
-				bean = (Bean<Validator>) resolveExact(manager, validatorClass, new FacesValidator() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return FacesValidator.class;
-					}
-					@Override
-					public String value() {
-						return validatorId;
-					}
-					@Override
-					public boolean managed() {
-						return false;
-					}
-					@Override
-					public boolean isDefault() {
-						return false;
-					}
-				});
-			}
-		}
+            if (bean == null) {
+                // Else by fabricated annotation literal.
+                bean = (Bean<Validator>) resolveExact(manager, validatorClass, new FacesValidator() {
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return FacesValidator.class;
+                    }
+                    @Override
+                    public String value() {
+                        return validatorId;
+                    }
+                    @Override
+                    public boolean managed() {
+                        return false;
+                    }
+                    @Override
+                    public boolean isDefault() {
+                        return false;
+                    }
+                });
+            }
+        }
 
-		return bean;
-	}
+        return bean;
+    }
 
 }

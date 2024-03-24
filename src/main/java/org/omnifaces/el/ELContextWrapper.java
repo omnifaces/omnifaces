@@ -33,64 +33,64 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELContextWrapper extends ELContext implements FacesWrapper<ELContext> {
 
-	private ELContext wrapped;
+    private ELContext wrapped;
 
-	/**
-	 * Construct EL context wrapper.
-	 * @param wrapped The EL context to be wrapped.
-	 */
-	public ELContextWrapper(ELContext wrapped) {
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct EL context wrapper.
+     * @param wrapped The EL context to be wrapped.
+     */
+    public ELContextWrapper(ELContext wrapped) {
+        this.wrapped = wrapped;
+    }
 
-	@Override
-	public ELContext getWrapped() {
-		return wrapped;
-	}
+    @Override
+    public ELContext getWrapped() {
+        return wrapped;
+    }
 
-	@Override
-	public void setPropertyResolved(boolean resolved) {
-		getWrapped().setPropertyResolved(resolved);
-	}
+    @Override
+    public void setPropertyResolved(boolean resolved) {
+        getWrapped().setPropertyResolved(resolved);
+    }
 
-	@Override
-	public boolean isPropertyResolved() {
-		return getWrapped().isPropertyResolved();
-	}
+    @Override
+    public boolean isPropertyResolved() {
+        return getWrapped().isPropertyResolved();
+    }
 
-	@Override
-	public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
-		getWrapped().putContext(key, contextObject);
-	}
+    @Override
+    public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
+        getWrapped().putContext(key, contextObject);
+    }
 
-	@Override
-	public Object getContext(@SuppressWarnings("rawtypes") Class key) {
-		return getWrapped().getContext(key);
-	}
+    @Override
+    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+        return getWrapped().getContext(key);
+    }
 
-	@Override
-	public ELResolver getELResolver() {
-		return getWrapped().getELResolver();
-	}
+    @Override
+    public ELResolver getELResolver() {
+        return getWrapped().getELResolver();
+    }
 
-	@Override
-	public FunctionMapper getFunctionMapper() {
-		return getWrapped().getFunctionMapper();
-	}
+    @Override
+    public FunctionMapper getFunctionMapper() {
+        return getWrapped().getFunctionMapper();
+    }
 
-	@Override
-	public Locale getLocale() {
-		return getWrapped().getLocale();
-	}
+    @Override
+    public Locale getLocale() {
+        return getWrapped().getLocale();
+    }
 
-	@Override
-	public void setLocale(Locale locale) {
-		getWrapped().setLocale(locale);
-	}
+    @Override
+    public void setLocale(Locale locale) {
+        getWrapped().setLocale(locale);
+    }
 
-	@Override
-	public VariableMapper getVariableMapper() {
-		return getWrapped().getVariableMapper();
-	}
+    @Override
+    public VariableMapper getVariableMapper() {
+        return getWrapped().getVariableMapper();
+    }
 
 }

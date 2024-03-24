@@ -21,34 +21,34 @@ import static org.omnifaces.util.Reflection.toClass;
  */
 public final class Objects {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Objects() {
-		// Hide constructor.
-	}
+    private Objects() {
+        // Hide constructor.
+    }
 
-	// Utility --------------------------------------------------------------------------------------------------------
+    // Utility --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the first non-<code>null</code> object from the provided two objects. So, if the first object is not
-	 * <code>null</code>, then it will be returned, otherwise the second object will be returned.
-	 * @param first The first object.
-	 * @param second The second object.
-	 * @return The first non-<code>null</code> object from the provided two objects.
-	 */
-	public static Object coalesce(Object first, Object second) {
-		return first != null ? first : second;
-	}
+    /**
+     * Returns the first non-<code>null</code> object from the provided two objects. So, if the first object is not
+     * <code>null</code>, then it will be returned, otherwise the second object will be returned.
+     * @param first The first object.
+     * @param second The second object.
+     * @return The first non-<code>null</code> object from the provided two objects.
+     */
+    public static Object coalesce(Object first, Object second) {
+        return first != null ? first : second;
+    }
 
-	/**
-	 * Returns <code>true</code> if given object is an instance of the class as identified by given class name.
-	 * @param className Fully qualified class name of the class for which a class object needs to be created.
-	 * @param object The object to be checked if it is an instance of the created class object.
-	 * @return <code>true</code> if given object is an instance of the class as identified by given class name.
-	 * @since 3.0
-	 */
-	public static boolean isInstance(String className, Object object) {
-		return object != null && toClass(className).isInstance(object);
-	}
+    /**
+     * Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+     * @param className Fully qualified class name of the class for which a class object needs to be created.
+     * @param object The object to be checked if it is an instance of the created class object.
+     * @return <code>true</code> if given object is an instance of the class as identified by given class name.
+     * @since 3.0
+     */
+    public static boolean isInstance(String className, Object object) {
+        return object != null && toClass(className).isInstance(object);
+    }
 
 }

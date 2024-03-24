@@ -92,157 +92,157 @@ import org.omnifaces.application.OmniApplicationFactory;
 @SuppressWarnings("rawtypes")
 public class ConverterManager {
 
-	// Dependencies ---------------------------------------------------------------------------------------------------
+    // Dependencies ---------------------------------------------------------------------------------------------------
 
-	@Inject
-	private BeanManager manager;
-	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
-	private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
-	private TimeZone dateTimeConverterDefaultTimeZone;
+    @Inject
+    private BeanManager manager;
+    private Map<String, Bean<Converter>> convertersById = new HashMap<>();
+    private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
+    private TimeZone dateTimeConverterDefaultTimeZone;
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Initialize {@link Converter#DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME}.
-	 */
-	@PostConstruct
-	public void init() {
-		dateTimeConverterDefaultTimeZone =
-			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
-				? TimeZone.getDefault()
-				: null;
-	}
+    /**
+     * Initialize {@link Converter#DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME}.
+     */
+    @PostConstruct
+    public void init() {
+        dateTimeConverterDefaultTimeZone =
+            parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
+                ? TimeZone.getDefault()
+                : null;
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the converter instance associated with the given converter ID,
-	 * or <code>null</code> if there is none.
-	 * @param application The involved Faces application.
-	 * @param converterId The converter ID of the desired converter instance.
-	 * @return the converter instance associated with the given converter ID,
-	 * or <code>null</code> if there is none.
-	 */
-	public Converter createConverter(Application application, String converterId) {
-		Converter converter = application.createConverter(converterId);
-		Bean<Converter> bean = convertersById.get(converterId);
+    /**
+     * Returns the converter instance associated with the given converter ID,
+     * or <code>null</code> if there is none.
+     * @param application The involved Faces application.
+     * @param converterId The converter ID of the desired converter instance.
+     * @return the converter instance associated with the given converter ID,
+     * or <code>null</code> if there is none.
+     */
+    public Converter createConverter(Application application, String converterId) {
+        Converter converter = application.createConverter(converterId);
+        Bean<Converter> bean = convertersById.get(converterId);
 
-		if (bean == null && !convertersById.containsKey(converterId)) {
+        if (bean == null && !convertersById.containsKey(converterId)) {
 
-			if (isUnmanaged(converter)) {
-				bean = resolve(converter.getClass(), converterId, Object.class);
-			}
+            if (isUnmanaged(converter)) {
+                bean = resolve(converter.getClass(), converterId, Object.class);
+            }
 
-			convertersById.put(converterId, bean);
-		}
+            convertersById.put(converterId, bean);
+        }
 
-		if (bean != null) {
-			converter = getReference(manager, bean);
+        if (bean != null) {
+            converter = getReference(manager, bean);
 
-			if (converter != null) {
-				setDefaultPropertiesIfNecessary(converter);
-			}
-		}
+            if (converter != null) {
+                setDefaultPropertiesIfNecessary(converter);
+            }
+        }
 
-		return converter;
-	}
+        return converter;
+    }
 
-	/**
-	 * Returns the converter instance associated with the given converter for-class,
-	 * or <code>null</code> if there is none.
-	 * @param application The involved Faces application.
-	 * @param converterForClass The converter for-class of the desired converter instance.
-	 * @return the converter instance associated with the given converter for-class,
-	 * or <code>null</code> if there is none.
-	 */
-	public Converter createConverter(Application application, Class<?> converterForClass) {
-		Converter converter = application.createConverter(converterForClass);
-		Bean<Converter> bean = convertersByForClass.get(converterForClass);
+    /**
+     * Returns the converter instance associated with the given converter for-class,
+     * or <code>null</code> if there is none.
+     * @param application The involved Faces application.
+     * @param converterForClass The converter for-class of the desired converter instance.
+     * @return the converter instance associated with the given converter for-class,
+     * or <code>null</code> if there is none.
+     */
+    public Converter createConverter(Application application, Class<?> converterForClass) {
+        Converter converter = application.createConverter(converterForClass);
+        Bean<Converter> bean = convertersByForClass.get(converterForClass);
 
-		if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
+        if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
 
-			if (isUnmanaged(converter)) {
-				Class<? extends Converter> converterClass = converter.getClass();
+            if (isUnmanaged(converter)) {
+                Class<? extends Converter> converterClass = converter.getClass();
 
-				if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
-					bean = resolve(converterClass, "", converterForClass);
-				}
-			}
+                if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
+                    bean = resolve(converterClass, "", converterForClass);
+                }
+            }
 
-			convertersByForClass.put(converterForClass, bean);
-		}
+            convertersByForClass.put(converterForClass, bean);
+        }
 
-		if (bean != null) {
-			converter = getReference(manager, bean);
+        if (bean != null) {
+            converter = getReference(manager, bean);
 
-			if (converter != null) {
-				setDefaultPropertiesIfNecessary(converter);
-			}
-		}
+            if (converter != null) {
+                setDefaultPropertiesIfNecessary(converter);
+            }
+        }
 
-		return converter;
-	}
+        return converter;
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private boolean isUnmanaged(Converter converter) {
-		if (converter == null) {
-			return false;
-		}
+    private boolean isUnmanaged(Converter converter) {
+        if (converter == null) {
+            return false;
+        }
 
-		FacesConverter annotation = converter.getClass().getAnnotation(FacesConverter.class);
+        FacesConverter annotation = converter.getClass().getAnnotation(FacesConverter.class);
 
-		if (annotation == null) {
-			return false;
-		}
+        if (annotation == null) {
+            return false;
+        }
 
-		return !annotation.managed();
-	}
+        return !annotation.managed();
+    }
 
-	@SuppressWarnings("unchecked")
-	private Bean<Converter> resolve(Class<? extends Converter> converterClass, String converterId, Class<?> converterForClass) {
+    @SuppressWarnings("unchecked")
+    private Bean<Converter> resolve(Class<? extends Converter> converterClass, String converterId, Class<?> converterForClass) {
 
-		// First try by class.
-		Bean<Converter> bean = (Bean<Converter>) resolveExact(manager, converterClass);
+        // First try by class.
+        Bean<Converter> bean = (Bean<Converter>) resolveExact(manager, converterClass);
 
-		if (bean == null) {
-			FacesConverter annotation = converterClass.getAnnotation(FacesConverter.class);
+        if (bean == null) {
+            FacesConverter annotation = converterClass.getAnnotation(FacesConverter.class);
 
-			if (annotation != null) {
-				// Then by own annotation, if any.
-				bean = (Bean<Converter>) resolveExact(manager, converterClass, annotation);
-			}
+            if (annotation != null) {
+                // Then by own annotation, if any.
+                bean = (Bean<Converter>) resolveExact(manager, converterClass, annotation);
+            }
 
-			if (bean == null) {
-				// Else by fabricated annotation literal.
-				bean = (Bean<Converter>) resolveExact(manager, converterClass, new FacesConverter() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return FacesConverter.class;
-					}
-					@Override
-					public String value() {
-						return converterId;
-					}
-					@Override
-					public boolean managed() {
-						return false;
-					}
-					@Override
-					public Class forClass() {
-						return converterForClass;
-					}
-				});
-			}
-		}
+            if (bean == null) {
+                // Else by fabricated annotation literal.
+                bean = (Bean<Converter>) resolveExact(manager, converterClass, new FacesConverter() {
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return FacesConverter.class;
+                    }
+                    @Override
+                    public String value() {
+                        return converterId;
+                    }
+                    @Override
+                    public boolean managed() {
+                        return false;
+                    }
+                    @Override
+                    public Class forClass() {
+                        return converterForClass;
+                    }
+                });
+            }
+        }
 
-		return bean;
-	}
+        return bean;
+    }
 
-	private void setDefaultPropertiesIfNecessary(Converter converter) {
-		if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
-			((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
-		}
-	}
+    private void setDefaultPropertiesIfNecessary(Converter converter) {
+        if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
+            ((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
+        }
+    }
 
 }

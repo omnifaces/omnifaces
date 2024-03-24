@@ -46,37 +46,37 @@ import org.omnifaces.util.Platform;
  */
 public class ApplicationInitializer implements ServletContainerInitializer {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
+    private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
 
-	static final String WARNING_OMNIFACES_INITIALIZATION_FAIL =
-			"OmniFaces failed to initialize! %s";
-	static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
-			"OmniFaces failed to initialize! Report an issue to OmniFaces.";
+    static final String WARNING_OMNIFACES_INITIALIZATION_FAIL =
+            "OmniFaces failed to initialize! %s";
+    static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
+            "OmniFaces failed to initialize! Report an issue to OmniFaces.";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
-		logOmniFacesVersion();
+    @Override
+    public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
+        logOmniFacesVersion();
 
-		try {
-			Platform.getDefaultFacesServletMapping(servletContext);
-			FacesViews.registerForwardingFilter(servletContext);
-		}
-		catch (Exception | LinkageError e) {
-			if (OmniFaces.skipDeploymentException(servletContext)) {
-				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
-			}
-			else {
-				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
-			}
-		}
-	}
+        try {
+            Platform.getDefaultFacesServletMapping(servletContext);
+            FacesViews.registerForwardingFilter(servletContext);
+        }
+        catch (Exception | LinkageError e) {
+            if (OmniFaces.skipDeploymentException(servletContext)) {
+                logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
+            }
+            else {
+                throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+            }
+        }
+    }
 
-	private void logOmniFacesVersion() {
-		logger.info("Using OmniFaces version " + OmniFaces.getVersion());
-	}
+    private void logOmniFacesVersion() {
+        logger.info("Using OmniFaces version " + OmniFaces.getVersion());
+    }
 
 }

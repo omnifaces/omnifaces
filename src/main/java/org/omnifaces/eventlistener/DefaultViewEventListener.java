@@ -28,14 +28,14 @@ import jakarta.faces.event.SystemEventListener;
  */
 public abstract class DefaultViewEventListener implements SystemEventListener {
 
-	@Override
-	public void processEvent(SystemEvent event) {
-		// NOOP
-	}
+    @Override
+    public void processEvent(SystemEvent event) {
+        // NOOP
+    }
 
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return source instanceof UIViewRoot;
-	}
+    @Override
+    public boolean isListenerForSource(Object source) {
+        return source instanceof UIViewRoot;
+    }
 
 }

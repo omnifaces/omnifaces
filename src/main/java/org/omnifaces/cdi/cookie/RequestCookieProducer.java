@@ -33,24 +33,24 @@ import org.omnifaces.cdi.Cookie;
 @Dependent
 public class RequestCookieProducer {
 
-	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
-	@Inject
-	private InjectionPoint injectionPoint;
+    @SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
+    @Inject
+    private InjectionPoint injectionPoint;
 
-	@Inject
-	private HttpServletRequest request;
+    @Inject
+    private HttpServletRequest request;
 
-	/**
-	 * Returns cookie value associated with cookie name derived from given injection point.
-	 * @param injectionPoint Injection point to derive cookie name from.
-	 * @return Cookie value associated with cookie name derived from given injection point.
-	 */
-	@Produces
-	@Cookie
-	public String produce(InjectionPoint injectionPoint) {
-		Cookie cookie = getQualifier(injectionPoint, Cookie.class);
-		String name = cookie.name().isEmpty() ? injectionPoint.getMember().getName() : cookie.name();
-		return getRequestCookie(request, name);
-	}
+    /**
+     * Returns cookie value associated with cookie name derived from given injection point.
+     * @param injectionPoint Injection point to derive cookie name from.
+     * @return Cookie value associated with cookie name derived from given injection point.
+     */
+    @Produces
+    @Cookie
+    public String produce(InjectionPoint injectionPoint) {
+        Cookie cookie = getQualifier(injectionPoint, Cookie.class);
+        String name = cookie.name().isEmpty() ? injectionPoint.getMember().getName() : cookie.name();
+        return getRequestCookie(request, name);
+    }
 
 }

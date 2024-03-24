@@ -24,40 +24,40 @@ import org.omnifaces.cdi.ViewScoped;
 @ViewScoped
 public class ScriptParamITBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Integer clientTimeZoneOffset;
-	private JsonObject navigator;
-	private boolean postScriptParamInvoked;
+    private Integer clientTimeZoneOffset;
+    private JsonObject navigator;
+    private boolean postScriptParamInvoked;
 
-	public void onload() {
-		// Presence of f:viewAction along with o:scriptParam while using @ViewScoped should not
-		// throw "Component ID omnifaces_omnifaces_js has already been found in the view". #671
-	}
+    public void onload() {
+        // Presence of f:viewAction along with o:scriptParam while using @ViewScoped should not
+        // throw "Component ID omnifaces_omnifaces_js has already been found in the view". #671
+    }
 
-	@PostScriptParam
-	public void initScriptParams() {
-		postScriptParamInvoked = true;
-	}
+    @PostScriptParam
+    public void initScriptParams() {
+        postScriptParamInvoked = true;
+    }
 
-	public Integer getClientTimeZoneOffset() {
-		return clientTimeZoneOffset;
-	}
+    public Integer getClientTimeZoneOffset() {
+        return clientTimeZoneOffset;
+    }
 
-	public void setClientTimeZoneOffset(Integer clientTimeZoneOffset) {
-		this.clientTimeZoneOffset = clientTimeZoneOffset;
-	}
+    public void setClientTimeZoneOffset(Integer clientTimeZoneOffset) {
+        this.clientTimeZoneOffset = clientTimeZoneOffset;
+    }
 
-	public JsonObject getNavigator() {
-		return navigator;
-	}
+    public JsonObject getNavigator() {
+        return navigator;
+    }
 
-	public void setNavigator(JsonObject navigator) {
-		this.navigator = navigator;
-	}
+    public void setNavigator(JsonObject navigator) {
+        this.navigator = navigator;
+    }
 
-	public boolean isPostScriptParamInvoked() {
-		return postScriptParamInvoked;
-	}
+    public boolean isPostScriptParamInvoked() {
+        return postScriptParamInvoked;
+    }
 
 }

@@ -137,92 +137,92 @@ import org.omnifaces.util.Faces;
 @FacesComponent(ScriptParam.COMPONENT_TYPE)
 public class ScriptParam extends OnloadParam {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.ScriptParam#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ScriptParam";
+    /** The component type, which is {@value org.omnifaces.component.input.ScriptParam#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ScriptParam";
 
-	/** The omnifaces event value, which is {@value org.omnifaces.component.input.ScriptParam#EVENT_VALUE}. */
-	public static final String EVENT_VALUE = "setScriptParamValues";
+    /** The omnifaces event value, which is {@value org.omnifaces.component.input.ScriptParam#EVENT_VALUE}. */
+    public static final String EVENT_VALUE = "setScriptParamValues";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String SCRIPT_INIT = "OmniFaces.ScriptParam.run('%s', %s)";
+    private static final String SCRIPT_INIT = "OmniFaces.ScriptParam.run('%s', %s)";
 
-	private enum PropertyKeys {
-		SCRIPT;
-		@Override public String toString() { return name().toLowerCase(); }
-	}
+    private enum PropertyKeys {
+        SCRIPT;
+        @Override public String toString() { return name().toLowerCase(); }
+    }
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected String getInitScript(FacesContext context) {
-		StringBuilder scripts = new StringBuilder("{");
+    @Override
+    protected String getInitScript(FacesContext context) {
+        StringBuilder scripts = new StringBuilder("{");
 
-		for (ScriptParam scriptParam : getScriptParameters(context)) {
-			scripts.append("'").append(scriptParam.getClientId()).append("':").append(scriptParam.getScript()).append(',');
-		}
+        for (ScriptParam scriptParam : getScriptParameters(context)) {
+            scripts.append("'").append(scriptParam.getClientId()).append("':").append(scriptParam.getScript()).append(',');
+        }
 
-		scripts.append("}");
+        scripts.append("}");
 
-		return format(SCRIPT_INIT, getClientId(), scripts);
-	}
+        return format(SCRIPT_INIT, getClientId(), scripts);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected String getEventValue(FacesContext context) {
-		return EVENT_VALUE;
-	}
+    @Override
+    protected String getEventValue(FacesContext context) {
+        return EVENT_VALUE;
+    }
 
-	@Override
-	protected void decodeAll(FacesContext context) {
-		Set<Object> beans = new HashSet<>();
+    @Override
+    protected void decodeAll(FacesContext context) {
+        Set<Object> beans = new HashSet<>();
 
-		for (ScriptParam scriptParam : getScriptParameters(context)) {
-			String value = getRequestParameter(context, scriptParam.getClientId());
-			scriptParam.decodeImmediately(context, value);
-			ValueExpression valueExpression = scriptParam.getValueExpression(VALUE_ATTRIBUTE);
+        for (ScriptParam scriptParam : getScriptParameters(context)) {
+            String value = getRequestParameter(context, scriptParam.getClientId());
+            scriptParam.decodeImmediately(context, value);
+            ValueExpression valueExpression = scriptParam.getValueExpression(VALUE_ATTRIBUTE);
 
-			if (valueExpression != null) {
-				beans.add(getValueReference(context.getELContext(), valueExpression).getBase());
-			}
-		}
+            if (valueExpression != null) {
+                beans.add(getValueReference(context.getELContext(), valueExpression).getBase());
+            }
+        }
 
-		for (Object bean : beans) {
-			invokeMethods(bean, PostScriptParam.class);
-		}
-	}
+        for (Object bean : beans) {
+            invokeMethods(bean, PostScriptParam.class);
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the script to be evaluated.
-	 * @return The script to be evaluated.
-	 */
-	public String getScript() {
-		return state.get(PropertyKeys.SCRIPT);
-	}
+    /**
+     * Returns the script to be evaluated.
+     * @return The script to be evaluated.
+     */
+    public String getScript() {
+        return state.get(PropertyKeys.SCRIPT);
+    }
 
-	/**
-	 * Sets the script to be evaluated.
-	 * @param script The script to be evaluated.
-	 */
-	public void setScript(String script) {
-		state.put(PropertyKeys.SCRIPT, script);
-	}
+    /**
+     * Sets the script to be evaluated.
+     * @param script The script to be evaluated.
+     */
+    public void setScript(String script) {
+        state.put(PropertyKeys.SCRIPT, script);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> if the current request is triggered by a script param request.
-	 * I.e. if it is initiated by <code>OmniFaces.ScriptParam.setScriptParamValues()</code> script which runs on page load.
-	 * @param context The involved faces context.
-	 * @return <code>true</code> if the current request is triggered by a script param request.
-	 */
-	public static boolean isScriptParamRequest(FacesContext context) {
-		return isOnloadParamRequest(context, EVENT_VALUE);
-	}
+    /**
+     * Returns <code>true</code> if the current request is triggered by a script param request.
+     * I.e. if it is initiated by <code>OmniFaces.ScriptParam.setScriptParamValues()</code> script which runs on page load.
+     * @param context The involved faces context.
+     * @return <code>true</code> if the current request is triggered by a script param request.
+     */
+    public static boolean isScriptParamRequest(FacesContext context) {
+        return isOnloadParamRequest(context, EVENT_VALUE);
+    }
 
 }

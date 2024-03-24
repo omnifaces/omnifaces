@@ -14,24 +14,24 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
-	xmlns:p="http://primefaces.org/ui"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
+    xmlns:p="http://primefaces.org/ui"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<h:form id="form">
-			<h:commandButton id="commandButtonAction" value="commandButtonAction" action="#{componentsITBean.submit}"><f:ajax render=":expressions" /></h:commandButton>
-			<h:commandButton id="commandButtonActionListener" value="commandButtonActionListener" actionListener="#{componentsITBean.submit()}"><f:ajax render=":expressions" /></h:commandButton>
-			<h:commandButton id="commandButtonAjaxListener" value="commandButtonAjaxListener"><f:ajax listener="#{componentsITBean.submit()}" render=":expressions" /></h:commandButton>
-			<p:commandButton id="primeFacesCommandButtonAction" value="primeFacesCommandButtonAction" action="#{componentsITBean.submit}" update=":expressions" />
-			<p:commandButton id="primeFacesCommandButtonActionListener" value="primeFacesCommandButtonActionListener" actionListener="#{componentsITBean.submit()}" update=":expressions" />
-		</h:form>
-		<h:outputText id="expressions" value="#{componentsITBean.expressions}" />
-	</h:body>
+    <h:body>
+        <h:form id="form">
+            <h:commandButton id="commandButtonAction" value="commandButtonAction" action="#{componentsITBean.submit}"><f:ajax render=":expressions" /></h:commandButton>
+            <h:commandButton id="commandButtonActionListener" value="commandButtonActionListener" actionListener="#{componentsITBean.submit()}"><f:ajax render=":expressions" /></h:commandButton>
+            <h:commandButton id="commandButtonAjaxListener" value="commandButtonAjaxListener"><f:ajax listener="#{componentsITBean.submit()}" render=":expressions" /></h:commandButton>
+            <p:commandButton id="primeFacesCommandButtonAction" value="primeFacesCommandButtonAction" action="#{componentsITBean.submit}" update=":expressions" />
+            <p:commandButton id="primeFacesCommandButtonActionListener" value="primeFacesCommandButtonActionListener" actionListener="#{componentsITBean.submit()}" update=":expressions" />
+        </h:form>
+        <h:outputText id="expressions" value="#{componentsITBean.expressions}" />
+    </h:body>
 </html>

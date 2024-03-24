@@ -56,11 +56,11 @@ import org.omnifaces.cdi.contextparam.ContextParamProducer;
 @Target({ METHOD, FIELD, PARAMETER })
 public @interface ContextParam {
 
-	/**
-	 * (Optional) The name of the context parameter. If not specified the name of the injection target field will be used.
-	 *
-	 * @return The name of the context parameter.
-	 */
-	@Nonbinding	String name() default "";
+    /**
+     * (Optional) The name of the context parameter. If not specified the name of the injection target field will be used.
+     *
+     * @return The name of the context parameter.
+     */
+    @Nonbinding    String name() default "";
 
 }

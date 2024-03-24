@@ -146,165 +146,165 @@ import org.omnifaces.util.Faces;
  */
 public class ViewParamValidationFailed extends TagHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9][0-9][0-9]");
+    private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9][0-9][0-9]");
 
-	private static final String ERROR_INVALID_PARENT =
-		"%s This must be a child of UIViewRoot or UIViewParameter. Encountered parent of type '%s'."
-			+ " You need to enclose it in f:metadata or f|o:viewParam.";
-	private static final String ERROR_MISSING_ATTRIBUTE =
-		"%s You need to specify either 'sendRedirect' or 'sendError' attribute.";
-	private static final String ERROR_DOUBLE_ATTRIBUTE =
-		"%s You cannot specify both 'sendRedirect' and 'sendError' attributes. You can specify only one of them.";
-	private static final String ERROR_REQUIRED_ATTRIBUTE =
-		"%s This attribute is required, it cannot be set to null.";
-	private static final String ERROR_INVALID_SENDERROR =
-		"%s This attribute must represent a 3-digit HTTP status code. Encountered an invalid value '%s'.";
+    private static final String ERROR_INVALID_PARENT =
+        "%s This must be a child of UIViewRoot or UIViewParameter. Encountered parent of type '%s'."
+            + " You need to enclose it in f:metadata or f|o:viewParam.";
+    private static final String ERROR_MISSING_ATTRIBUTE =
+        "%s You need to specify either 'sendRedirect' or 'sendError' attribute.";
+    private static final String ERROR_DOUBLE_ATTRIBUTE =
+        "%s You cannot specify both 'sendRedirect' and 'sendError' attributes. You can specify only one of them.";
+    private static final String ERROR_REQUIRED_ATTRIBUTE =
+        "%s This attribute is required, it cannot be set to null.";
+    private static final String ERROR_INVALID_SENDERROR =
+        "%s This attribute must represent a 3-digit HTTP status code. Encountered an invalid value '%s'.";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private ValueExpression sendRedirect;
-	private ValueExpression sendError;
-	private ValueExpression message;
+    private ValueExpression sendRedirect;
+    private ValueExpression sendError;
+    private ValueExpression message;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public ViewParamValidationFailed(TagConfig config) {
-		super(config);
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public ViewParamValidationFailed(TagConfig config) {
+        super(config);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the
-	 * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
-	 * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
-	 * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
-	 * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or
-	 * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
-	 * registered on the same parent.
-	 * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are
-	 * missing or simultaneously specified.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
-			throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
-		}
+    /**
+     * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the
+     * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
+     * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
+     * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
+     * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or
+     * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
+     * registered on the same parent.
+     * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are
+     * missing or simultaneously specified.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
+            throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
+        }
 
-		FacesContext facesContext = context.getFacesContext();
+        FacesContext facesContext = context.getFacesContext();
 
-		if (!ComponentHandler.isNew(parent) || facesContext.isPostback() || facesContext.getRenderResponse()) {
-			return;
-		}
+        if (!ComponentHandler.isNew(parent) || facesContext.isPostback() || facesContext.getRenderResponse()) {
+            return;
+        }
 
-		sendRedirect = getValueExpression(context, getAttribute("sendRedirect"), String.class);
-		sendError = getValueExpression(context, getAttribute("sendError"), String.class);
-		message = getValueExpression(context, getAttribute("message"), String.class);
+        sendRedirect = getValueExpression(context, getAttribute("sendRedirect"), String.class);
+        sendError = getValueExpression(context, getAttribute("sendError"), String.class);
+        message = getValueExpression(context, getAttribute("message"), String.class);
 
-		if (sendRedirect == null && sendError == null) {
-			throw new IllegalArgumentException(format(ERROR_MISSING_ATTRIBUTE, this));
-		}
-		else if (sendRedirect != null && sendError != null) {
-			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
-		}
+        if (sendRedirect == null && sendError == null) {
+            throw new IllegalArgumentException(format(ERROR_MISSING_ATTRIBUTE, this));
+        }
+        else if (sendRedirect != null && sendError != null) {
+            throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
+        }
 
-		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, this::processViewParamValidationFailed);
-	}
+        subscribeToRequestComponentEvent(parent, PostValidateEvent.class, this::processViewParamValidationFailed);
+    }
 
-	/**
-	 * If the current request is <strong>not</strong> a postback and the current response is <strong>not</strong>
-	 * already completed, and validation on the parent component has failed (for {@link UIViewRoot} this is checked by
-	 * {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is checked by
-	 * {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
-	 * @param event The component system event.
-	 * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit
-	 * HTTP status code.
-	 */
-	protected void processViewParamValidationFailed(ComponentSystemEvent event) {
-		FacesContext context = getContext();
-		UIComponent component = event.getComponent();
+    /**
+     * If the current request is <strong>not</strong> a postback and the current response is <strong>not</strong>
+     * already completed, and validation on the parent component has failed (for {@link UIViewRoot} this is checked by
+     * {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is checked by
+     * {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
+     * @param event The component system event.
+     * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit
+     * HTTP status code.
+     */
+    protected void processViewParamValidationFailed(ComponentSystemEvent event) {
+        FacesContext context = getContext();
+        UIComponent component = event.getComponent();
 
-		if (component instanceof UIViewParameter ? ((UIViewParameter) component).isValid() : !context.isValidationFailed()) {
-			return; // Validation has not failed.
-		}
+        if (component instanceof UIViewParameter ? ((UIViewParameter) component).isValid() : !context.isValidationFailed()) {
+            return; // Validation has not failed.
+        }
 
-		if (TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
-			return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
-		}
+        if (TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
+            return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
+        }
 
-		String firstFacesMessage = coalesce(
-			cleanupFacesMessagesAndGetFirst(context.getMessages(component.getClientId(context))), // Prefer own message.
-			cleanupFacesMessagesAndGetFirst(context.getMessages(null)), // Then global messages.
-			cleanupFacesMessagesAndGetFirst(context.getMessages()) // Cleanup remainder.
-		);
+        String firstFacesMessage = coalesce(
+            cleanupFacesMessagesAndGetFirst(context.getMessages(component.getClientId(context))), // Prefer own message.
+            cleanupFacesMessagesAndGetFirst(context.getMessages(null)), // Then global messages.
+            cleanupFacesMessagesAndGetFirst(context.getMessages()) // Cleanup remainder.
+        );
 
-		evaluateAttributesAndHandleSendRedirectOrError(context, firstFacesMessage);
-	}
+        evaluateAttributesAndHandleSendRedirectOrError(context, firstFacesMessage);
+    }
 
-	private String cleanupFacesMessagesAndGetFirst(Iterator<FacesMessage> facesMessages) {
-		String firstFacesMessage = null;
+    private String cleanupFacesMessagesAndGetFirst(Iterator<FacesMessage> facesMessages) {
+        String firstFacesMessage = null;
 
-		while (facesMessages.hasNext()) {
-			FacesMessage facesMessage = facesMessages.next();
+        while (facesMessages.hasNext()) {
+            FacesMessage facesMessage = facesMessages.next();
 
-			if (firstFacesMessage == null) {
-				firstFacesMessage = facesMessage.getSummary();
-			}
+            if (firstFacesMessage == null) {
+                firstFacesMessage = facesMessage.getSummary();
+            }
 
-			facesMessages.remove(); // Avoid warning "Faces message has been enqueued but is not displayed".
-		}
+            facesMessages.remove(); // Avoid warning "Faces message has been enqueued but is not displayed".
+        }
 
-		return firstFacesMessage;
-	}
+        return firstFacesMessage;
+    }
 
-	private void evaluateAttributesAndHandleSendRedirectOrError(FacesContext context, String defaultMessage) {
-		ELContext elContext = context.getELContext();
-		String evaluatedMessage = evaluate(elContext, message, false);
+    private void evaluateAttributesAndHandleSendRedirectOrError(FacesContext context, String defaultMessage) {
+        ELContext elContext = context.getELContext();
+        String evaluatedMessage = evaluate(elContext, message, false);
 
-		if (evaluatedMessage == null) {
-			evaluatedMessage = defaultMessage;
-		}
+        if (evaluatedMessage == null) {
+            evaluatedMessage = defaultMessage;
+        }
 
-		if (sendRedirect != null) {
-			String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+        if (sendRedirect != null) {
+            String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
 
-			if (!isEmpty(evaluatedMessage)) {
-				addFlashGlobalError(evaluatedMessage);
-			}
+            if (!isEmpty(evaluatedMessage)) {
+                addFlashGlobalError(evaluatedMessage);
+            }
 
-			redirect(context, evaluatedSendRedirect);
-		}
-		else {
-			String evaluatedSendError = evaluate(elContext, sendError, true);
+            redirect(context, evaluatedSendRedirect);
+        }
+        else {
+            String evaluatedSendError = evaluate(elContext, sendError, true);
 
-			if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
-				throw new IllegalArgumentException(
-					format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
-			}
+            if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
+                throw new IllegalArgumentException(
+                    format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
+            }
 
-			responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
-		}
-	}
+            responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
+        }
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Evaluate the given value expression as string.
-	 */
-	private static String evaluate(ELContext context, ValueExpression expression, boolean required) {
-		Object value = (expression != null) ? expression.getValue(context) : null;
+    /**
+     * Evaluate the given value expression as string.
+     */
+    private static String evaluate(ELContext context, ValueExpression expression, boolean required) {
+        Object value = (expression != null) ? expression.getValue(context) : null;
 
-		if (required && isEmpty(value)) {
-			throw new IllegalArgumentException(format(ERROR_REQUIRED_ATTRIBUTE, expression));
-		}
+        if (required && isEmpty(value)) {
+            throw new IllegalArgumentException(format(ERROR_REQUIRED_ATTRIBUTE, expression));
+        }
 
-		return (value != null) ? value.toString() : null;
-	}
+        return (value != null) ? value.toString() : null;
+    }
 
 }

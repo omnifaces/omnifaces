@@ -88,139 +88,139 @@ import org.omnifaces.util.Utils;
 @FacesComponent(ViewParam.COMPONENT_TYPE)
 public class ViewParam extends UIViewParameter {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.ViewParam#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
+    /** The component type, which is {@value org.omnifaces.component.input.ViewParam#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private String submittedValue;
-	private boolean defaultValueSet;
-	private Map<String, Object> attributeInterceptMap;
+    private String submittedValue;
+    private boolean defaultValueSet;
+    private Map<String, Object> attributeInterceptMap;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void processDecodes(FacesContext context) {
-		// Ignore any request parameters that are present when the postback is done.
-		if (!context.isPostback()) {
-			super.processDecodes(context);
-		}
-	}
+    @Override
+    public void processDecodes(FacesContext context) {
+        // Ignore any request parameters that are present when the postback is done.
+        if (!context.isPostback()) {
+            super.processDecodes(context);
+        }
+    }
 
-	@Override
-	public void processValidators(FacesContext context) {
-		if (!context.isPostback()) {
-			defaultValueSet = false;
+    @Override
+    public void processValidators(FacesContext context) {
+        if (!context.isPostback()) {
+            defaultValueSet = false;
 
-			if (isEmpty(getSubmittedValue())) {
-				setSubmittedValue(getDefault());
-				defaultValueSet = true;
-			}
+            if (isEmpty(getSubmittedValue())) {
+                setSubmittedValue(getDefault());
+                defaultValueSet = true;
+            }
 
-			if (getSubmittedValue() == null) {
-				setSubmittedValue(""); // Workaround for it never triggering the (bean) validation when unspecified.
-			}
+            if (getSubmittedValue() == null) {
+                setSubmittedValue(""); // Workaround for it never triggering the (bean) validation when unspecified.
+            }
 
-			super.processValidators(context);
-		}
-	}
+            super.processValidators(context);
+        }
+    }
 
-	@Override
-	public Map<String, Object> getAttributes() {
-		if (attributeInterceptMap == null) {
-			attributeInterceptMap = new AttributeInterceptMap(super.getAttributes());
-		}
+    @Override
+    public Map<String, Object> getAttributes() {
+        if (attributeInterceptMap == null) {
+            attributeInterceptMap = new AttributeInterceptMap(super.getAttributes());
+        }
 
-		return attributeInterceptMap;
-	}
+        return attributeInterceptMap;
+    }
 
-	/**
-	 * When there's a value expression and the evaluated model value is <code>null</code>, then just return
-	 * <code>null</code> instead of delegating to default implementation which would return an empty string when a
-	 * converter is attached.
-	 * @since 1.8
-	 */
-	@Override
-	public String getStringValueFromModel(FacesContext context) {
-		if (defaultValueSet) {
-			return null;
-		}
+    /**
+     * When there's a value expression and the evaluated model value is <code>null</code>, then just return
+     * <code>null</code> instead of delegating to default implementation which would return an empty string when a
+     * converter is attached.
+     * @since 1.8
+     */
+    @Override
+    public String getStringValueFromModel(FacesContext context) {
+        if (defaultValueSet) {
+            return null;
+        }
 
-		ValueExpression ve = getValueExpression(VALUE_ATTRIBUTE);
-		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
-		return (value != null) ? super.getStringValueFromModel(context) : null;
-	}
+        ValueExpression ve = getValueExpression(VALUE_ATTRIBUTE);
+        Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
+        return (value != null) ? super.getStringValueFromModel(context) : null;
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	@Override
-	public String getSubmittedValue() {
-		return submittedValue;
-	}
+    @Override
+    public String getSubmittedValue() {
+        return submittedValue;
+    }
 
-	@Override
-	public void setSubmittedValue(Object submittedValue) {
-		this.submittedValue = (String) submittedValue; // Don't delegate to statehelper to keep it stateless.
-	}
+    @Override
+    public void setSubmittedValue(Object submittedValue) {
+        this.submittedValue = (String) submittedValue; // Don't delegate to statehelper to keep it stateless.
+    }
 
-	/**
-	 * Returns the default value in case the actual request parameter is <code>null</code> or empty.
-	 * @return The default value in case the actual request parameter is <code>null</code> or empty.
-	 * @since 2.2
-	 */
-	public String getDefault() {
-		return (String) getStateHelper().eval("default");
-	}
+    /**
+     * Returns the default value in case the actual request parameter is <code>null</code> or empty.
+     * @return The default value in case the actual request parameter is <code>null</code> or empty.
+     * @since 2.2
+     */
+    public String getDefault() {
+        return (String) getStateHelper().eval("default");
+    }
 
-	/**
-	 * Sets the default value in case the actual request parameter is <code>null</code> or empty.
-	 * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
-	 * @since 2.2
-	 */
-	public void setDefault(String defaultValue) {
-		getStateHelper().put("default", defaultValue);
-	}
+    /**
+     * Sets the default value in case the actual request parameter is <code>null</code> or empty.
+     * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
+     * @since 2.2
+     */
+    public void setDefault(String defaultValue) {
+        getStateHelper().put("default", defaultValue);
+    }
 
-	@Override
-	public boolean isRequired() {
-		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
-		// So we can safely skip the required validation on postbacks.
-		return !isPostback() && super.isRequired();
-	}
+    @Override
+    public boolean isRequired() {
+        // The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
+        // So we can safely skip the required validation on postbacks.
+        return !isPostback() && super.isRequired();
+    }
 
-	// Inner classes --------------------------------------------------------------------------------------------------
+    // Inner classes --------------------------------------------------------------------------------------------------
 
-	private class AttributeInterceptMap extends MapWrapper<String, Object> {
+    private class AttributeInterceptMap extends MapWrapper<String, Object> {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private AttributeInterceptMap(Map<String, Object> map) {
-			super(map);
-		}
+        private AttributeInterceptMap(Map<String, Object> map) {
+            super(map);
+        }
 
-		@Override
-		public Object get(Object key) {
-			Object value = super.get(key);
+        @Override
+        public Object get(Object key) {
+            Object value = super.get(key);
 
-			if (Utils.isEmpty(value) && "label".equals(key)) {
+            if (Utils.isEmpty(value) && "label".equals(key)) {
 
-				// Next check if our outer component has a value expression for the label
-				ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
-				if (labelExpression != null) {
-					value = labelExpression.getValue(getELContext());
-				}
+                // Next check if our outer component has a value expression for the label
+                ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
+                if (labelExpression != null) {
+                    value = labelExpression.getValue(getELContext());
+                }
 
-				// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
-				if (value == null) {
-					value = ViewParam.this.getName();
-				}
-			}
+                // No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
+                if (value == null) {
+                    value = ViewParam.this.getName();
+                }
+            }
 
-			return value;
-		}
+            return value;
+        }
 
-	}
+    }
 
 }

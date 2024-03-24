@@ -52,51 +52,51 @@ import org.omnifaces.facesviews.FacesViews;
  */
 public class ApplicationProcessor implements SystemEventListener {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
 
-	private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
-		"Resource handler %s is duplicated."
-			+ " This will result in erratic resource handling behavior."
-			+ " Please check if your build is clean and does not contain duplicate libraries having same resource handler."
-			+ " Also check if the same resource handler is not declared multiple times in all your faces-config.xml files combined.";
+    private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
+        "Resource handler %s is duplicated."
+            + " This will result in erratic resource handling behavior."
+            + " Please check if your build is clean and does not contain duplicate libraries having same resource handler."
+            + " Also check if the same resource handler is not declared multiple times in all your faces-config.xml files combined.";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return source instanceof Application;
-	}
+    @Override
+    public boolean isListenerForSource(Object source) {
+        return source instanceof Application;
+    }
 
-	@Override
-	public void processEvent(SystemEvent event) {
-		ServletContext servletContext = getServletContext();
+    @Override
+    public void processEvent(SystemEvent event) {
+        ServletContext servletContext = getServletContext();
 
-		try {
-			Application application = (Application) event.getSource();
-			checkDuplicateResourceHandler();
-			FacesViews.registerViewHandler(servletContext, application);
-			MessagesKeywordResolver.register(application);
-		}
-		catch (Exception | LinkageError e) {
-			if (OmniFaces.skipDeploymentException(servletContext)) {
-				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
-			}
-			else {
-				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
-			}
-		}
-	}
+        try {
+            Application application = (Application) event.getSource();
+            checkDuplicateResourceHandler();
+            FacesViews.registerViewHandler(servletContext, application);
+            MessagesKeywordResolver.register(application);
+        }
+        catch (Exception | LinkageError e) {
+            if (OmniFaces.skipDeploymentException(servletContext)) {
+                logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
+            }
+            else {
+                throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+            }
+        }
+    }
 
-	private void checkDuplicateResourceHandler() {
-		Set<Class<? extends ResourceHandler>> allResourceHandlers = new HashSet<>();
+    private void checkDuplicateResourceHandler() {
+        Set<Class<? extends ResourceHandler>> allResourceHandlers = new HashSet<>();
 
-		for (Class<? extends ResourceHandler> resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
-			if (!allResourceHandlers.add(resourceHandler)) {
-				throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler));
-			}
-		}
-	}
+        for (Class<? extends ResourceHandler> resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
+            if (!allResourceHandlers.add(resourceHandler)) {
+                throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler));
+            }
+        }
+    }
 
 }

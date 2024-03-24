@@ -62,143 +62,143 @@ import org.omnifaces.util.cache.CacheInitializer;
 @WebListener
 public class ApplicationListener extends DefaultServletContextListener {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
+    private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
 
-	private static final String ERROR_FACES_API_UNAVAILABLE =
-		"Faces API is not available in this environment.";
-	private static final String ERROR_CDI_API_UNAVAILABLE =
-		"CDI API is not available in this environment.";
-	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
-		"CDI BeanManager instance is not available in this environment.";
+    private static final String ERROR_FACES_API_UNAVAILABLE =
+        "Faces API is not available in this environment.";
+    private static final String ERROR_CDI_API_UNAVAILABLE =
+        "CDI API is not available in this environment.";
+    private static final String ERROR_CDI_IMPL_UNAVAILABLE =
+        "CDI BeanManager instance is not available in this environment.";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void contextInitialized(ServletContextEvent event) {
-		ServletContext servletContext = event.getServletContext();
-		boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        ServletContext servletContext = event.getServletContext();
+        boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
 
-		if (!skipDeploymentException) {
-			checkFacesAvailable();
-			checkCDIAvailable();
-		}
+        if (!skipDeploymentException) {
+            checkFacesAvailable();
+            checkCDIAvailable();
+        }
 
-		try {
-			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			FacesViews.addFacesServletMappings(servletContext);
-			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
+        try {
+            CacheInitializer.loadProviderAndRegisterFilter(servletContext);
+            FacesViews.addFacesServletMappings(servletContext);
+            ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 
-			if (skipDeploymentException) {
-				checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
-			}
+            if (skipDeploymentException) {
+                checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
+            }
 
-			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
-			GraphicResource.registerGraphicImageBeans();
-			Socket.registerEndpointIfNecessary(servletContext);
-		}
-		catch (Exception | LinkageError e) {
-			if (skipDeploymentException) {
-				logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
-			}
-			else {
-				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
-			}
-		}
-	}
+            EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
+            GraphicResource.registerGraphicImageBeans();
+            Socket.registerEndpointIfNecessary(servletContext);
+        }
+        catch (Exception | LinkageError e) {
+            if (skipDeploymentException) {
+                logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
+            }
+            else {
+                throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+            }
+        }
+    }
 
-	private void checkFacesAvailable() {
-		try {
-			checkFacesAPIAvailable();
-			// No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
-		}
-		catch (Exception | LinkageError e) {
-			logger.severe(""
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ OmniFaces failed to initialize!             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 4.x requires minimally Faces 3.0, ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ but none was found on this environment.     ▐"
-				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 3.x, 2.x or 1.x.     ▐"
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-			);
-			throw e;
-		}
- 	}
+    private void checkFacesAvailable() {
+        try {
+            checkFacesAPIAvailable();
+            // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
+        }
+        catch (Exception | LinkageError e) {
+            logger.severe(""
+                + "\n████████████████████████████████████████████████████████████████████████████████"
+                + "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ OmniFaces failed to initialize!             ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 4.x requires minimally Faces 3.0, ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ but none was found on this environment.     ▐"
+                + "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 3.x, 2.x or 1.x.     ▐"
+                + "\n████████████████████████████████████████████████████████████████████████████████"
+            );
+            throw e;
+        }
+     }
 
-	private void checkCDIAvailable() {
-		try {
-			checkCDIAPIAvailable();
-			// No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
-			checkCDIImplAvailable();
-		}
-		catch (Exception | LinkageError e) {
-			logger.severe(""
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-				+ "\n▌                         ▐█     ▐                                             ▐"
-				+ "\n▌    ▄                  ▄█▓█▌    ▐ OmniFaces failed to initialize!             ▐"
-				+ "\n▌   ▐██▄               ▄▓░░▓▓    ▐                                             ▐"
-				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI,        ▐"
-				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ but none was found on this environment.     ▐"
-				+ "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
-				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐                                             ▐"
-				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐                                             ▐"
-				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐                                             ▐"
-				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐                                             ▐"
-				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐                                             ▐"
-				+ "\n▌     ▓▓░▓██████▓░▓███▓▓▌░█▓     ▐                                             ▐"
-				+ "\n▌    ▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██     ▐                                             ▐"
-				+ "\n▌    ▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌    ▐                                             ▐"
-				+ "\n▌    ▓█▌░▓█████▓░░░▓███▓▀░▓█▓    ▐                                             ▐"
-				+ "\n▌   ▐▓█░░░▀▓██▀░░░░░ ▀▓▀░░▓█▓    ▐                                             ▐"
-				+ "\n▌   ▓██░░░░░░░░▀▄▄▄▄▀░░░░░░▓▓    ▐                                             ▐"
-				+ "\n▌   ▓█▌░░░░░░░░░░▐▌░░░░░░░░▓▓▌   ▐                                             ▐"
-				+ "\n▌   ▓█░░░░░░░░░▄▀▀▀▀▄░░░░░░░█▓   ▐                                             ▐"
-				+ "\n▌  ▐█▌░░░░░░░░▀░░░░░░▀░░░░░░█▓▌  ▐                                             ▐"
-				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░██▓  ▐                                             ▐"
-				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░▓█▓  ▐ You have 3 options:                         ▐"
-				+ "\n██████████████████████████████████ 1. Downgrade to CDI-less OmniFaces 1.x.     ▐"
-				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█ 2. Install CDI in this environment.         ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ 3. Switch to a CDI capable environment.     ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ For additional instructions, check          ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ https://omnifaces.org/cdi                   ▐"
-				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-			);
-			throw e;
-		}
-	}
+    private void checkCDIAvailable() {
+        try {
+            checkCDIAPIAvailable();
+            // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
+            checkCDIImplAvailable();
+        }
+        catch (Exception | LinkageError e) {
+            logger.severe(""
+                + "\n████████████████████████████████████████████████████████████████████████████████"
+                + "\n▌                         ▐█     ▐                                             ▐"
+                + "\n▌    ▄                  ▄█▓█▌    ▐ OmniFaces failed to initialize!             ▐"
+                + "\n▌   ▐██▄               ▄▓░░▓▓    ▐                                             ▐"
+                + "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI,        ▐"
+                + "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ but none was found on this environment.     ▐"
+                + "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
+                + "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐                                             ▐"
+                + "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐                                             ▐"
+                + "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐                                             ▐"
+                + "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐                                             ▐"
+                + "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐                                             ▐"
+                + "\n▌     ▓▓░▓██████▓░▓███▓▓▌░█▓     ▐                                             ▐"
+                + "\n▌    ▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██     ▐                                             ▐"
+                + "\n▌    ▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌    ▐                                             ▐"
+                + "\n▌    ▓█▌░▓█████▓░░░▓███▓▀░▓█▓    ▐                                             ▐"
+                + "\n▌   ▐▓█░░░▀▓██▀░░░░░ ▀▓▀░░▓█▓    ▐                                             ▐"
+                + "\n▌   ▓██░░░░░░░░▀▄▄▄▄▀░░░░░░▓▓    ▐                                             ▐"
+                + "\n▌   ▓█▌░░░░░░░░░░▐▌░░░░░░░░▓▓▌   ▐                                             ▐"
+                + "\n▌   ▓█░░░░░░░░░▄▀▀▀▀▄░░░░░░░█▓   ▐                                             ▐"
+                + "\n▌  ▐█▌░░░░░░░░▀░░░░░░▀░░░░░░█▓▌  ▐                                             ▐"
+                + "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░██▓  ▐                                             ▐"
+                + "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░▓█▓  ▐ You have 3 options:                         ▐"
+                + "\n██████████████████████████████████ 1. Downgrade to CDI-less OmniFaces 1.x.     ▐"
+                + "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█ 2. Install CDI in this environment.         ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ 3. Switch to a CDI capable environment.     ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ For additional instructions, check          ▐"
+                + "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ https://omnifaces.org/cdi                   ▐"
+                + "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
+                + "\n████████████████████████████████████████████████████████████████████████████████"
+            );
+            throw e;
+        }
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void checkFacesAPIAvailable() {
-		try {
-			toClass("jakarta.faces.webapp.FacesServlet");
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_FACES_API_UNAVAILABLE, e);
-		}
-	}
+    private static void checkFacesAPIAvailable() {
+        try {
+            toClass("jakarta.faces.webapp.FacesServlet");
+        }
+        catch (Exception | LinkageError e) {
+            throw new IllegalStateException(ERROR_FACES_API_UNAVAILABLE, e);
+        }
+    }
 
-	private static void checkCDIAPIAvailable() {
-		try {
-			toClass("jakarta.enterprise.inject.spi.BeanManager");
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
-		}
-	}
+    private static void checkCDIAPIAvailable() {
+        try {
+            toClass("jakarta.enterprise.inject.spi.BeanManager");
+        }
+        catch (Exception | LinkageError e) {
+            throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
+        }
+    }
 
-	private static void checkCDIImplAvailable() {
-		try {
-			toClass("org.omnifaces.util.Beans").getMethod("getManager").invoke(null).toString();
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
-		}
-	}
+    private static void checkCDIImplAvailable() {
+        try {
+            toClass("org.omnifaces.util.Beans").getMethod("getManager").invoke(null).toString();
+        }
+        catch (Exception | LinkageError e) {
+            throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
+        }
+    }
 
 }

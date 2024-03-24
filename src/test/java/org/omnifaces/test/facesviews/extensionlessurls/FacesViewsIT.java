@@ -26,131 +26,131 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file and error-page in web.xml")
 public class FacesViewsIT extends OmniFacesIT {
 
-	@FindBy(id="linkWithExtensionOutcome")
-	private WebElement linkWithExtensionOutcome;
+    @FindBy(id="linkWithExtensionOutcome")
+    private WebElement linkWithExtensionOutcome;
 
-	@FindBy(id="linkWithExtensionlessOutcome")
-	private WebElement linkWithExtensionlessOutcome;
+    @FindBy(id="linkWithExtensionlessOutcome")
+    private WebElement linkWithExtensionlessOutcome;
 
-	@FindBy(id="form")
-	private WebElement form;
+    @FindBy(id="form")
+    private WebElement form;
 
-	@FindBy(id="form:submit")
-	private WebElement formSubmit;
+    @FindBy(id="form:submit")
+    private WebElement formSubmit;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(FacesViewsIT.class)
-			.withWebXml(withFacesViews)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(FacesViewsIT.class)
+            .withWebXml(withFacesViews)
+            .createDeployment();
+    }
 
-	@Test
-	void testWelcomeFile() {
-		verify200("FacesViewsIT", "");
+    @Test
+    void testWelcomeFile() {
+        verify200("FacesViewsIT", "");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsIT", "");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsIT", "");
 
-		open("FacesViewsIT.xhtml");
-		verify200("FacesViewsIT", "");
+        open("FacesViewsIT.xhtml");
+        verify200("FacesViewsIT", "");
 
-		open("FacesViewsIT.jsf");
-		verify200("FacesViewsIT", "");
+        open("FacesViewsIT.jsf");
+        verify200("FacesViewsIT", "");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsIT", "");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsIT", "");
 
-		open("FacesViewsIT/");
-		verify404("FacesViewsIT/");
-	}
+        open("FacesViewsIT/");
+        verify404("FacesViewsIT/");
+    }
 
-	@Test
-	void testOtherPage() {
-		open("FacesViewsITOtherPage");
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+    @Test
+    void testOtherPage() {
+        open("FacesViewsITOtherPage");
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		open("FacesViewsITOtherPage.xhtml");
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+        open("FacesViewsITOtherPage.xhtml");
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		open("FacesViewsITOtherPage.jsf");
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+        open("FacesViewsITOtherPage.jsf");
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
-		open("FacesViewsITOtherPage/");
-		verify404("FacesViewsITOtherPage/");
-	}
+        open("FacesViewsITOtherPage/");
+        verify404("FacesViewsITOtherPage/");
+    }
 
-	@Test
-	void testFolderWithPeriod() {
-		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+    @Test
+    void testFolderWithPeriod() {
+        open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.xhtml");
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.xhtml");
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.jsf");
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.jsf");
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		guardHttp(formSubmit::click);
-		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+        guardHttp(formSubmit::click);
+        verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
 
-		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
-		verify404("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
-	}
+        open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
+        verify404("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
+    }
 
-	@Test
-	void testNonExistingPage() {
-		open("FacesViewsITNonExistingPage");
-		verify404("FacesViewsITNonExistingPage");
+    @Test
+    void testNonExistingPage() {
+        open("FacesViewsITNonExistingPage");
+        verify404("FacesViewsITNonExistingPage");
 
-		open("FacesViewsITNonExistingPage.xhtml");
-		verify404("FacesViewsITNonExistingPage.xhtml");
+        open("FacesViewsITNonExistingPage.xhtml");
+        verify404("FacesViewsITNonExistingPage.xhtml");
 
-		open("FacesViewsITNonExistingPage.jsf");
-		verify404("FacesViewsITNonExistingPage.jsf");
-	}
+        open("FacesViewsITNonExistingPage.jsf");
+        verify404("FacesViewsITNonExistingPage.jsf");
+    }
 
-	@Test
-	void testExcludedFolder() {
-		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
-		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+    @Test
+    void testExcludedFolder() {
+        open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+        verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
 
-		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
-		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
+        open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
+        verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.jsf");
 
-		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
-		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+        open("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+        verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
 
-		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
-		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
-	}
+        open("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
+        verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
+    }
 
-	private void verify200(String title, String path) {
-		assertEquals(title, browser.getTitle());
-		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionOutcome.getAttribute("href")));
-		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
-		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
-	}
+    private void verify200(String title, String path) {
+        assertEquals(title, browser.getTitle());
+        assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+        assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionOutcome.getAttribute("href")));
+        assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
+        assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
+    }
 
-	private void verify404(String path) {
-		assertEquals("404", browser.getTitle());
-		assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-	}
+    private void verify404(String path) {
+        assertEquals("404", browser.getTitle());
+        assertEquals("/FacesViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+    }
 
 }

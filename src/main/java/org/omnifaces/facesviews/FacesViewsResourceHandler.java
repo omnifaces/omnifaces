@@ -37,37 +37,37 @@ import org.omnifaces.util.Servlets;
  */
 public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 
-	private final boolean facesViewsEnabled;
+    private final boolean facesViewsEnabled;
 
-	/**
-	 * Construct faces views resource handler.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public FacesViewsResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-		facesViewsEnabled = isFacesViewsEnabled(Servlets.getContext());
-	}
+    /**
+     * Construct faces views resource handler.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public FacesViewsResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+        facesViewsEnabled = isFacesViewsEnabled(Servlets.getContext());
+    }
 
-	@Override
-	public ViewResource createViewResource(FacesContext context, String path) {
-		if (!facesViewsEnabled) {
-			return super.createViewResource(context, path);
-		}
+    @Override
+    public ViewResource createViewResource(FacesContext context, String path) {
+        if (!facesViewsEnabled) {
+            return super.createViewResource(context, path);
+        }
 
-		ViewResource resource = createMappedViewResource(context, path);
+        ViewResource resource = createMappedViewResource(context, path);
 
-		if (resource == null && isDevelopment()) {
-			// If resource is null it means it wasn't found.
-			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
-			scanAndStoreViews(getServletContext(context), false);
-			resource = createMappedViewResource(context, path);
-		}
+        if (resource == null && isDevelopment()) {
+            // If resource is null it means it wasn't found.
+            // Check if the resource was dynamically added by scanning the faces-views location(s) again.
+            scanAndStoreViews(getServletContext(context), false);
+            resource = createMappedViewResource(context, path);
+        }
 
-		return resource;
-	}
+        return resource;
+    }
 
-	private ViewResource createMappedViewResource(FacesContext context, String path) {
-		return super.createViewResource(context, coalesce(getMappedPath(path), path));
-	}
+    private ViewResource createMappedViewResource(FacesContext context, String path) {
+        return super.createViewResource(context, coalesce(getMappedPath(path), path));
+    }
 
 }

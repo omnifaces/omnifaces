@@ -33,63 +33,63 @@ import org.omnifaces.cdi.config.DateProducer.TemporalDate;
 
 public class TestDateProducer {
 
-	private static TimeZone originalTimeZone;
-	private static ZoneOffset testZoneOffset;
+    private static TimeZone originalTimeZone;
+    private static ZoneOffset testZoneOffset;
 
-	@BeforeAll
-	public static void setTestTimeZone() {
-		originalTimeZone = TimeZone.getDefault();
-		testZoneOffset = ZoneOffset.ofHours(-3);
-		TimeZone.setDefault(TimeZone.getTimeZone(testZoneOffset));
-	}
+    @BeforeAll
+    public static void setTestTimeZone() {
+        originalTimeZone = TimeZone.getDefault();
+        testZoneOffset = ZoneOffset.ofHours(-3);
+        TimeZone.setDefault(TimeZone.getTimeZone(testZoneOffset));
+    }
 
-	@AfterAll
-	public static void restoreTestTimeZone() {
-		TimeZone.setDefault(originalTimeZone);
-	}
+    @AfterAll
+    public static void restoreTestTimeZone() {
+        TimeZone.setDefault(originalTimeZone);
+    }
 
-	@Test
-	void testNow() {
-		Date oldNow = new Date();
-		TemporalDate newNow = new DateProducer.TemporalDate();
-		String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
-		String newNowAsString = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(newNow);
+    @Test
+    void testNow() {
+        Date oldNow = new Date();
+        TemporalDate newNow = new DateProducer.TemporalDate();
+        String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
+        String newNowAsString = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(newNow);
 
-		assertEquals(oldNowAsString, newNowAsString, "format");
-		assertEquals(testZoneOffset, ZoneOffset.ofTotalSeconds(newNow.get(ChronoField.OFFSET_SECONDS)), "offset");
-	}
+        assertEquals(oldNowAsString, newNowAsString, "format");
+        assertEquals(testZoneOffset, ZoneOffset.ofTotalSeconds(newNow.get(ChronoField.OFFSET_SECONDS)), "offset");
+    }
 
-	@Test
-	void testZonedDateTime() {
-		Date oldNow = new Date();
-		ZonedDateTime newNowAsZoned = new DateProducer.TemporalDate().getZonedDateTime();
-		String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
-		String newNowAsString = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(newNowAsZoned);
+    @Test
+    void testZonedDateTime() {
+        Date oldNow = new Date();
+        ZonedDateTime newNowAsZoned = new DateProducer.TemporalDate().getZonedDateTime();
+        String oldNowAsString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(oldNow);
+        String newNowAsString = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(newNowAsZoned);
 
-		assertEquals(oldNowAsString, newNowAsString, "format");
-		assertEquals(testZoneOffset, newNowAsZoned.getOffset(), "offset");
-	}
+        assertEquals(oldNowAsString, newNowAsString, "format");
+        assertEquals(testZoneOffset, newNowAsZoned.getOffset(), "offset");
+    }
 
-	@Test
-	void testInstant() {
-		Date oldNow = new Date();
-		Instant newNowAsInstant = new DateProducer.TemporalDate().getInstant();
-		long oldTime = oldNow.getTime();
-		long newTime = newNowAsInstant.toEpochMilli();
-		long timeDiff = Math.abs(oldTime - newTime);
+    @Test
+    void testInstant() {
+        Date oldNow = new Date();
+        Instant newNowAsInstant = new DateProducer.TemporalDate().getInstant();
+        long oldTime = oldNow.getTime();
+        long newTime = newNowAsInstant.toEpochMilli();
+        long timeDiff = Math.abs(oldTime - newTime);
 
-		assertTrue(timeDiff < TimeUnit.SECONDS.toMillis(1), timeDiff + " is less than 1s");
-	}
+        assertTrue(timeDiff < TimeUnit.SECONDS.toMillis(1), timeDiff + " is less than 1s");
+    }
 
-	@Test
-	void testTime() {
-		Date oldNow = new Date();
-		TemporalDate newNow = new DateProducer.TemporalDate();
-		long oldTime = oldNow.getTime();
-		long newTime = newNow.getTime();
-		long timeDiff = Math.abs(oldTime - newTime);
+    @Test
+    void testTime() {
+        Date oldNow = new Date();
+        TemporalDate newNow = new DateProducer.TemporalDate();
+        long oldTime = oldNow.getTime();
+        long newTime = newNow.getTime();
+        long timeDiff = Math.abs(oldTime - newTime);
 
-		assertTrue(timeDiff < TimeUnit.SECONDS.toMillis(1), timeDiff + " is less than 1s");
-	}
+        assertTrue(timeDiff < TimeUnit.SECONDS.toMillis(1), timeDiff + " is less than 1s");
+    }
 
 }

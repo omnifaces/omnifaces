@@ -48,82 +48,82 @@ import jakarta.servlet.ServletException;
  */
 public final class Exceptions {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	private Exceptions() {
-		// Hide constructor.
-	}
+    private Exceptions() {
+        // Hide constructor.
+    }
 
-	// Utility --------------------------------------------------------------------------------------------------------
+    // Utility --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Unwrap the nested causes of given exception as long as until it is not an instance of the given types and then
-	 * return it. If the given exception is already not an instance of the given types, then it will directly be
-	 * returned. Or if the exception, unwrapped or not, does not have a nested cause anymore, then it will be returned.
-	 * This is particularly useful if you want to unwrap the real root cause out of a nested hierarchy of
-	 * {@link ServletException} or {@link FacesException}.
-	 * @param exception The exception to be unwrapped.
-	 * @param types The types which need to be unwrapped.
-	 * @return The unwrapped root cause.
-	 */
-	@SafeVarargs
-	public static Throwable unwrap(Throwable exception, Class<? extends Throwable>... types) {
-		Throwable unwrappedException = exception;
+    /**
+     * Unwrap the nested causes of given exception as long as until it is not an instance of the given types and then
+     * return it. If the given exception is already not an instance of the given types, then it will directly be
+     * returned. Or if the exception, unwrapped or not, does not have a nested cause anymore, then it will be returned.
+     * This is particularly useful if you want to unwrap the real root cause out of a nested hierarchy of
+     * {@link ServletException} or {@link FacesException}.
+     * @param exception The exception to be unwrapped.
+     * @param types The types which need to be unwrapped.
+     * @return The unwrapped root cause.
+     */
+    @SafeVarargs
+    public static Throwable unwrap(Throwable exception, Class<? extends Throwable>... types) {
+        Throwable unwrappedException = exception;
 
-		while (isOneInstanceOf(unwrappedException.getClass(), types) && unwrappedException.getCause() != null) {
-			unwrappedException = unwrappedException.getCause();
-		}
+        while (isOneInstanceOf(unwrappedException.getClass(), types) && unwrappedException.getCause() != null) {
+            unwrappedException = unwrappedException.getCause();
+        }
 
-		return unwrappedException;
-	}
+        return unwrappedException;
+    }
 
-	/**
-	 * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException}
-	 * (Mojarra) or {@link ELException} (MyFaces) and then return it. If the given exception is already not an instance
-	 * of the mentioned types, then it will directly be returned. Or if the exception, unwrapped or not, does not have
-	 * a nested cause anymore, then it will be returned.
-	 * @param exception The exception to be unwrapped from {@link FacesException} and {@link ELException}.
-	 * @return The unwrapped root cause.
-	 * @since 1.4
-	 */
-	public static Throwable unwrap(Throwable exception) {
-		return unwrap(exception, FacesException.class, ELException.class);
-	}
+    /**
+     * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException}
+     * (Mojarra) or {@link ELException} (MyFaces) and then return it. If the given exception is already not an instance
+     * of the mentioned types, then it will directly be returned. Or if the exception, unwrapped or not, does not have
+     * a nested cause anymore, then it will be returned.
+     * @param exception The exception to be unwrapped from {@link FacesException} and {@link ELException}.
+     * @return The unwrapped root cause.
+     * @since 1.4
+     */
+    public static Throwable unwrap(Throwable exception) {
+        return unwrap(exception, FacesException.class, ELException.class);
+    }
 
-	/**
-	 * Returns <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
-	 * @param <T> The generic throwable type.
-	 * @param exception The exception to be checked.
-	 * @param type The type to be compared to.
-	 * @return <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
-	 */
-	public static <T extends Throwable> boolean is(Throwable exception, Class<T> type) {
-		return extract(exception, type) != null;
-	}
+    /**
+     * Returns <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
+     * @param <T> The generic throwable type.
+     * @param exception The exception to be checked.
+     * @param type The type to be compared to.
+     * @return <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
+     */
+    public static <T extends Throwable> boolean is(Throwable exception, Class<T> type) {
+        return extract(exception, type) != null;
+    }
 
-	/**
-	 * Returns the first encountered exception of the given type while cascading into the given exception,
-	 * or <code>null</code> if no such exception is found.
-	 * @param <T> The generic throwable type.
-	 * @param exception The exception to be checked.
-	 * @param type The type to be extracted.
-	 * @return The first encountered exception of the given type while cascading into the given exception,
-	 * or <code>null</code> if no such exception is found.
-	 * @since 3.10
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Throwable> T extract(Throwable exception, Class<T> type) {
-		Throwable unwrappedException = exception;
+    /**
+     * Returns the first encountered exception of the given type while cascading into the given exception,
+     * or <code>null</code> if no such exception is found.
+     * @param <T> The generic throwable type.
+     * @param exception The exception to be checked.
+     * @param type The type to be extracted.
+     * @return The first encountered exception of the given type while cascading into the given exception,
+     * or <code>null</code> if no such exception is found.
+     * @since 3.10
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Throwable> T extract(Throwable exception, Class<T> type) {
+        Throwable unwrappedException = exception;
 
-		while (unwrappedException != null) {
-			if (type.isInstance(unwrappedException)) {
-				return (T) unwrappedException;
-			}
+        while (unwrappedException != null) {
+            if (type.isInstance(unwrappedException)) {
+                return (T) unwrappedException;
+            }
 
-			unwrappedException = unwrappedException.getCause();
-		}
+            unwrappedException = unwrappedException.getCause();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 }

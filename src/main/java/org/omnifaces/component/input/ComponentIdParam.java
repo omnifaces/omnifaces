@@ -45,68 +45,68 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
 @FacesComponent(ComponentIdParam.COMPONENT_TYPE)
 public class ComponentIdParam extends ViewParam {
 
-	/** The component type, which is {@value org.omnifaces.component.input.ComponentIdParam#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ComponentIdParam";
+    /** The component type, which is {@value org.omnifaces.component.input.ComponentIdParam#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ComponentIdParam";
 
-	private enum PropertyKeys {
-		componentIdName, clientIdName, renderChildren
-	}
+    private enum PropertyKeys {
+        componentIdName, clientIdName, renderChildren
+    }
 
-	@Override
-	public void decode(FacesContext context) {
+    @Override
+    public void decode(FacesContext context) {
 
-		List<String> componentIds = getRequestValues(context, PropertyKeys.componentIdName);
-		List<String> clientIds = getRequestValues(context, PropertyKeys.clientIdName);
-		boolean renderChildren = getBooleanAttribute(PropertyKeys.renderChildren);
+        List<String> componentIds = getRequestValues(context, PropertyKeys.componentIdName);
+        List<String> clientIds = getRequestValues(context, PropertyKeys.clientIdName);
+        boolean renderChildren = getBooleanAttribute(PropertyKeys.renderChildren);
 
-		// Installs a PhaseListener on the view root that will replace the response writer before
-		// and after rendering with one that only renders when the current component has one of the Ids
-		// that we receive from the request here.
-		if (!componentIds.isEmpty() || !clientIds.isEmpty()) {
-			context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, renderChildren));
-		}
-	}
+        // Installs a PhaseListener on the view root that will replace the response writer before
+        // and after rendering with one that only renders when the current component has one of the Ids
+        // that we receive from the request here.
+        if (!componentIds.isEmpty() || !clientIds.isEmpty()) {
+            context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, renderChildren));
+        }
+    }
 
-	@Override
-	public void processValidators(FacesContext context) {
-		// NOOP. This component doesn't have a model value anyway.
-	}
+    @Override
+    public void processValidators(FacesContext context) {
+        // NOOP. This component doesn't have a model value anyway.
+    }
 
-	@Override
-	public void processUpdates(FacesContext context) {
-		// NOOP. This component doesn't have a model value anyway.
-	}
+    @Override
+    public void processUpdates(FacesContext context) {
+        // NOOP. This component doesn't have a model value anyway.
+    }
 
-	/**
-	 * Gets the list of request values for the request parameter names identified by the value of the given property key.
-	 *
-	 * @param context
-	 *            FacesContext for the request we are processing
-	 * @param propertyKey
-	 *            property that holds the request parameter name for which values are returned.
-	 * @return All values in the request corresponding to the given parameter name
-	 */
-	private List<String> getRequestValues(FacesContext context, PropertyKeys propertyKey) {
-		String componentIdName = (String) getAttributes().get(propertyKey.name());
-		if (componentIdName != null) {
-			String[] values = context.getExternalContext().getRequestParameterValuesMap().get(componentIdName);
-			if (values != null) {
-				return Arrays.asList(values);
-			}
-		}
+    /**
+     * Gets the list of request values for the request parameter names identified by the value of the given property key.
+     *
+     * @param context
+     *            FacesContext for the request we are processing
+     * @param propertyKey
+     *            property that holds the request parameter name for which values are returned.
+     * @return All values in the request corresponding to the given parameter name
+     */
+    private List<String> getRequestValues(FacesContext context, PropertyKeys propertyKey) {
+        String componentIdName = (String) getAttributes().get(propertyKey.name());
+        if (componentIdName != null) {
+            String[] values = context.getExternalContext().getRequestParameterValuesMap().get(componentIdName);
+            if (values != null) {
+                return Arrays.asList(values);
+            }
+        }
 
-		return Collections.emptyList();
-	}
+        return Collections.emptyList();
+    }
 
-	/**
-	 * Gets the boolean value for the given property key. Defaults to true if no value is defined.
-	 *
-	 * @param propertyKey
-	 * @return false if the boolean attribute is present and not equal to "true", true otherwise.
-	 */
-	private boolean getBooleanAttribute(PropertyKeys propertyKey) {
-		String attribute = (String) getAttributes().get(propertyKey.name());
-		return attribute == null || parseBoolean(attribute);
-	}
+    /**
+     * Gets the boolean value for the given property key. Defaults to true if no value is defined.
+     *
+     * @param propertyKey
+     * @return false if the boolean attribute is present and not equal to "true", true otherwise.
+     */
+    private boolean getBooleanAttribute(PropertyKeys propertyKey) {
+        String attribute = (String) getAttributes().get(propertyKey.name());
+        return attribute == null || parseBoolean(attribute);
+    }
 
 }

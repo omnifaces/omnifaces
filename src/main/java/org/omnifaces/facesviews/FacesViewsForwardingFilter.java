@@ -65,202 +65,202 @@ import org.omnifaces.filter.HttpFilter;
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
 
-	private ExtensionAction extensionAction;
-	private PathAction pathAction;
+    private ExtensionAction extensionAction;
+    private PathAction pathAction;
 
-	@Override
-	public void init() throws ServletException {
-		ServletContext servletContext = getServletContext();
+    @Override
+    public void init() throws ServletException {
+        ServletContext servletContext = getServletContext();
 
-		try {
-			extensionAction = getExtensionAction(servletContext);
-			pathAction = getPathAction(servletContext);
-		}
-		catch (IllegalStateException e) {
-			throw new ServletException(e);
-		}
-	}
+        try {
+            extensionAction = getExtensionAction(servletContext);
+            pathAction = getPathAction(servletContext);
+        }
+        catch (IllegalStateException e) {
+            throw new ServletException(e);
+        }
+    }
 
-	@Override
-	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-		if (!(filterExtensionLess(request, response, chain) || filterExtension(request, response) || filterPublicPath(request, response))) {
-			chain.doFilter(request, response);
-		}
-	}
+    @Override
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+        if (!(filterExtensionLess(request, response, chain) || filterExtension(request, response) || filterPublicPath(request, response))) {
+            chain.doFilter(request, response);
+        }
+    }
 
-	/**
-	 * A mapped resource request without extension is encountered.
-	 * The user setting "dispatchMethod" determines how we handle this.
-	 */
-	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException
-	{
-		String servletPath = request.getServletPath();
+    /**
+     * A mapped resource request without extension is encountered.
+     * The user setting "dispatchMethod" determines how we handle this.
+     */
+    private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException
+    {
+        String servletPath = request.getServletPath();
 
-		if (!isExtensionless(servletPath)) {
-			return false;
-		}
+        if (!isExtensionless(servletPath)) {
+            return false;
+        }
 
-		ServletContext servletContext = getServletContext();
-		boolean multiViews = isMultiViewsEnabled(request);
-		Map<String, String> resources = getMappedResources(servletContext);
-		String normalizedServletPath = stripTrailingSlash(servletPath);
-		String resource = normalizedServletPath + (multiViews ? "/*" : "");
+        ServletContext servletContext = getServletContext();
+        boolean multiViews = isMultiViewsEnabled(request);
+        Map<String, String> resources = getMappedResources(servletContext);
+        String normalizedServletPath = stripTrailingSlash(servletPath);
+        String resource = normalizedServletPath + (multiViews ? "/*" : "");
 
-		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
-			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
-			resources = scanAndStoreViews(servletContext, false);
-		}
+        if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
+            // Check if the resource was dynamically added by scanning the faces-views location(s) again.
+            resources = scanAndStoreViews(servletContext, false);
+        }
 
-		if (multiViews && !resources.containsKey(resource)) {
-			if (request.getPathInfo() != null) {
-				servletPath += request.getPathInfo();
-			}
+        if (multiViews && !resources.containsKey(resource)) {
+            if (request.getPathInfo() != null) {
+                servletPath += request.getPathInfo();
+            }
 
-			resource = getMultiViewsWelcomeFile(servletContext, resources, servletPath);
+            resource = getMultiViewsWelcomeFile(servletContext, resources, servletPath);
 
-			if (resource != null) {
-				String pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
-				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo.isEmpty() ? "/" : pathInfo);
-				request.getRequestDispatcher(resource).forward(request, response);
-				return true;
-			}
-		}
+            if (resource != null) {
+                String pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
+                request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo.isEmpty() ? "/" : pathInfo);
+                request.getRequestDispatcher(resource).forward(request, response);
+                return true;
+            }
+        }
 
-		return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
-	}
+        return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
+    }
 
-	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Map<String, String> resources, String resource, String path) throws IOException, ServletException
-	{
-		if (resources.containsKey(resource)) {
-			if (redirectExtensionLessWelcomeFileToFolderIfNecessary(request, response, path)) {
-				return true;
-			}
+    private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+            Map<String, String> resources, String resource, String path) throws IOException, ServletException
+    {
+        if (resources.containsKey(resource)) {
+            if (redirectExtensionLessWelcomeFileToFolderIfNecessary(request, response, path)) {
+                return true;
+            }
 
-			String servletPathWithExtension = path + getExtension(resources.get(resource));
+            String servletPathWithExtension = path + getExtension(resources.get(resource));
 
-			if (resources.containsKey(servletPathWithExtension)) {
-				filterExtensionLessToExtension(request, response, chain, servletPathWithExtension);
-				return true;
-			}
-			else if (forwardExtensionLessToExtensionIfNecessary(request, response, servletPathWithExtension)) {
-				return true;
-			}
-		}
+            if (resources.containsKey(servletPathWithExtension)) {
+                filterExtensionLessToExtension(request, response, chain, servletPathWithExtension);
+                return true;
+            }
+            else if (forwardExtensionLessToExtensionIfNecessary(request, response, servletPathWithExtension)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Check if a welcome file was explicitly requested and if so, redirect back to its parent folder.
-	 */
-	private boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(HttpServletRequest request, HttpServletResponse response, String normalizedServletPath) {
-		if ((getRequestRelativeURI(request) + "/").startsWith(normalizedServletPath + "/")) {
-			String servletPath = request.getServletPath();
-			String normalizedResource = stripWelcomeFilePrefix(request.getServletContext(), servletPath);
+    /**
+     * Check if a welcome file was explicitly requested and if so, redirect back to its parent folder.
+     */
+    private boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(HttpServletRequest request, HttpServletResponse response, String normalizedServletPath) {
+        if ((getRequestRelativeURI(request) + "/").startsWith(normalizedServletPath + "/")) {
+            String servletPath = request.getServletPath();
+            String normalizedResource = stripWelcomeFilePrefix(request.getServletContext(), servletPath);
 
-			if (!servletPath.equals(normalizedResource)) {
-				String uri = request.getContextPath() + normalizedResource;
-				String queryString = request.getQueryString();
-				redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
-				return true;
-			}
-		}
+            if (!servletPath.equals(normalizedResource)) {
+                String uri = request.getContextPath() + normalizedResource;
+                String queryString = request.getQueryString();
+                redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Continue the chain, but make the request appear to be to the resource with an extension.
-	 * This assumes that the FacesServlet has been mapped to something that includes the extensionless request.
-	 */
-	private void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath) throws IOException, ServletException {
-		try {
-			request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
-			String pathInfo = request.getPathInfo();
+    /**
+     * Continue the chain, but make the request appear to be to the resource with an extension.
+     * This assumes that the FacesServlet has been mapped to something that includes the extensionless request.
+     */
+    private void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath) throws IOException, ServletException {
+        try {
+            request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
+            String pathInfo = request.getPathInfo();
 
-			if (pathInfo != null) {
-				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
-			}
+            if (pathInfo != null) {
+                request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
+            }
 
-			chain.doFilter(new UriExtensionRequestWrapper(request, mappedServletPath), response);
-		}
-		finally {
-			request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
-			request.removeAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO);
-		}
-	}
+            chain.doFilter(new UriExtensionRequestWrapper(request, mappedServletPath), response);
+        }
+        finally {
+            request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+            request.removeAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO);
+        }
+    }
 
-	/**
-	 * Forward the resource (view) using its original extension, on which the Facelets Servlet is mapped.
-	 * Technically it matters most that the Facelets Servlet picks up the request,
-	 * and the exact extension or even prefix is perhaps less relevant.
-	 */
-	private boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension) throws ServletException, IOException {
-		RequestDispatcher requestDispatcher = request.getServletContext().getRequestDispatcher(servletPathWithExtension);
+    /**
+     * Forward the resource (view) using its original extension, on which the Facelets Servlet is mapped.
+     * Technically it matters most that the Facelets Servlet picks up the request,
+     * and the exact extension or even prefix is perhaps less relevant.
+     */
+    private boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension) throws ServletException, IOException {
+        RequestDispatcher requestDispatcher = request.getServletContext().getRequestDispatcher(servletPathWithExtension);
 
-		if (requestDispatcher != null) {
-			requestDispatcher.forward(request, response);
-			return true;
-		}
+        if (requestDispatcher != null) {
+            requestDispatcher.forward(request, response);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * A mapped resource request with extension is encountered.
-	 * The user setting "extensionAction" determines how we handle this.
-	 */
-	private boolean filterExtension(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String resource = request.getServletPath();
-		Map<String, String> resources = getMappedResources(getServletContext());
+    /**
+     * A mapped resource request with extension is encountered.
+     * The user setting "extensionAction" determines how we handle this.
+     */
+    private boolean filterExtension(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String resource = request.getServletPath();
+        Map<String, String> resources = getMappedResources(getServletContext());
 
-		if (resources.containsKey(resource)) {
-			if (resources.get(resource) != null) {
-				if (extensionAction == REDIRECT_TO_EXTENSIONLESS) {
-					redirectPermanent(response, getExtensionlessURLWithQuery(request, resource));
-					return true;
-				}
-				else if (extensionAction == PROCEED) {
-					return false;
-				}
-			}
+        if (resources.containsKey(resource)) {
+            if (resources.get(resource) != null) {
+                if (extensionAction == REDIRECT_TO_EXTENSIONLESS) {
+                    redirectPermanent(response, getExtensionlessURLWithQuery(request, resource));
+                    return true;
+                }
+                else if (extensionAction == PROCEED) {
+                    return false;
+                }
+            }
 
-			response.sendError(SC_NOT_FOUND);
-			return true;
-		}
+            response.sendError(SC_NOT_FOUND);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * A direct request to one of the public paths (excluding /) from where we scanned resources is encountered.
-	 * The user setting "pathAction" determines how we handle this.
-	 */
-	private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String resource = request.getServletPath();
+    /**
+     * A direct request to one of the public paths (excluding /) from where we scanned resources is encountered.
+     * The user setting "pathAction" determines how we handle this.
+     */
+    private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String resource = request.getServletPath();
 
-		if (!isResourceInPublicPath(getServletContext(), resource)) {
-			return false;
-		}
+        if (!isResourceInPublicPath(getServletContext(), resource)) {
+            return false;
+        }
 
-		Map<String, String> reverseResources = getReverseMappedResources(getServletContext());
+        Map<String, String> reverseResources = getReverseMappedResources(getServletContext());
 
-		if (reverseResources.containsKey(resource)) {
-			switch (pathAction) {
-				case REDIRECT_TO_SCANNED_EXTENSIONLESS:
-					redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));
-					return true;
-				case SEND_404:
-					response.sendError(SC_NOT_FOUND);
-					return true;
-				case PROCEED:
-					break;
-			}
-		}
+        if (reverseResources.containsKey(resource)) {
+            switch (pathAction) {
+                case REDIRECT_TO_SCANNED_EXTENSIONLESS:
+                    redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));
+                    return true;
+                case SEND_404:
+                    response.sendError(SC_NOT_FOUND);
+                    return true;
+                case PROCEED:
+                    break;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

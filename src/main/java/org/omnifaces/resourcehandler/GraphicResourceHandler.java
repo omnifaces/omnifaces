@@ -27,37 +27,37 @@ import jakarta.faces.application.ResourceHandler;
  */
 public class GraphicResourceHandler extends DefaultResourceHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The default library name of a graphic resource. Make sure that this is never used for other libraries. */
-	public static final String LIBRARY_NAME = "omnifaces.graphic";
+    /** The default library name of a graphic resource. Make sure that this is never used for other libraries. */
+    public static final String LIBRARY_NAME = "omnifaces.graphic";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates a new instance of this graphic resource handler which wraps the given resource handler.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public GraphicResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Creates a new instance of this graphic resource handler which wraps the given resource handler.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public GraphicResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link #LIBRARY_NAME}.
-	 */
-	@Override
-	public String getLibraryName() {
-		return LIBRARY_NAME;
-	}
+    /**
+     * Returns {@link #LIBRARY_NAME}.
+     */
+    @Override
+    public String getLibraryName() {
+        return LIBRARY_NAME;
+    }
 
-	/**
-	 * Returns a new {@link GraphicResource}.
-	 */
-	@Override
-	public Resource createResourceFromLibrary(String resourceName, String contentType) {
-		return new GraphicResource(resourceName, getRequestParameterValues("p"), getRequestParameter("v"));
-	}
+    /**
+     * Returns a new {@link GraphicResource}.
+     */
+    @Override
+    public Resource createResourceFromLibrary(String resourceName, String contentType) {
+        return new GraphicResource(resourceName, getRequestParameterValues("p"), getRequestParameter("v"));
+    }
 
 }

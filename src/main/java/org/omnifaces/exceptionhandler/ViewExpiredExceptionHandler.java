@@ -67,36 +67,36 @@ import org.omnifaces.util.Faces;
  */
 public class ViewExpiredExceptionHandler extends ExceptionSuppressor {
 
-	/**
-	 * The flash attribute name of a boolean value indicating that the previous request threw a
-	 * {@link ViewExpiredException} which was handled by this exception handler.
-	 */
-	public static final String FLASH_ATTRIBUTE_VIEW_EXPIRED = "org.omnifaces.view_expired";
+    /**
+     * The flash attribute name of a boolean value indicating that the previous request threw a
+     * {@link ViewExpiredException} which was handled by this exception handler.
+     */
+    public static final String FLASH_ATTRIBUTE_VIEW_EXPIRED = "org.omnifaces.view_expired";
 
-	/**
-	 * Construct a new view expired exception handler around the given wrapped exception handler.
-	 * @param wrapped The wrapped exception handler.
-	 */
-	public ViewExpiredExceptionHandler(ExceptionHandler wrapped) {
-		super(wrapped, ViewExpiredException.class);
-	}
+    /**
+     * Construct a new view expired exception handler around the given wrapped exception handler.
+     * @param wrapped The wrapped exception handler.
+     */
+    public ViewExpiredExceptionHandler(ExceptionHandler wrapped) {
+        super(wrapped, ViewExpiredException.class);
+    }
 
-	/**
-	 * Set the flash attribute {@value org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler#FLASH_ATTRIBUTE_VIEW_EXPIRED}.
-	 */
-	@Override
-	protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
-		setFlashAttribute(context, FLASH_ATTRIBUTE_VIEW_EXPIRED, TRUE);
-	}
+    /**
+     * Set the flash attribute {@value org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler#FLASH_ATTRIBUTE_VIEW_EXPIRED}.
+     */
+    @Override
+    protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
+        setFlashAttribute(context, FLASH_ATTRIBUTE_VIEW_EXPIRED, TRUE);
+    }
 
-	/**
-	 * Returns <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this
-	 * exception handler.
-	 * @return <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this
-	 * exception handler.
-	 */
-	public static boolean wasViewExpired() {
-		return getFlashAttribute(FLASH_ATTRIBUTE_VIEW_EXPIRED) == TRUE;
-	}
+    /**
+     * Returns <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this
+     * exception handler.
+     * @return <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this
+     * exception handler.
+     */
+    public static boolean wasViewExpired() {
+        return getFlashAttribute(FLASH_ATTRIBUTE_VIEW_EXPIRED) == TRUE;
+    }
 
 }

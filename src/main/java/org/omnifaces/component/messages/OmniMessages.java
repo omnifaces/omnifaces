@@ -117,101 +117,101 @@ import org.omnifaces.util.State;
 @FacesComponent(OmniMessages.COMPONENT_TYPE)
 public class OmniMessages extends HtmlMessages {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.messages.OmniMessages#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.messages.OmniMessages";
+    /** The component type, which is {@value org.omnifaces.component.messages.OmniMessages#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.messages.OmniMessages";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_EXPRESSION_DISALLOWED =
-		"A value expression is disallowed on 'var' attribute of OmniMessages.";
+    private static final String ERROR_EXPRESSION_DISALLOWED =
+        "A value expression is disallowed on 'var' attribute of OmniMessages.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		var, message, escape;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        var, message, escape;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new {@link OmniMessages} component whereby the renderer type is set to
-	 * {@link MessagesRenderer#RENDERER_TYPE}.
-	 */
-	public OmniMessages() {
-		setRendererType(MessagesRenderer.RENDERER_TYPE);
-	}
+    /**
+     * Construct a new {@link OmniMessages} component whereby the renderer type is set to
+     * {@link MessagesRenderer#RENDERER_TYPE}.
+     */
+    public OmniMessages() {
+        setRendererType(MessagesRenderer.RENDERER_TYPE);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
-	 * Finally it delegates to the super method.
-	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
-	 */
-	@Override
-	public void setValueExpression(String name, ValueExpression binding) {
-		if (PropertyKeys.var.toString().equals(name)) {
-			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
-		}
+    /**
+     * An override which checks if this isn't been invoked on <code>var</code> attribute.
+     * Finally it delegates to the super method.
+     * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
+     */
+    @Override
+    public void setValueExpression(String name, ValueExpression binding) {
+        if (PropertyKeys.var.toString().equals(name)) {
+            throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
+        }
 
-		super.setValueExpression(name, binding);
-	}
+        super.setValueExpression(name, binding);
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the name of the request attribute which exposes the current faces message.
-	 * @return The name of the request attribute which exposes the current faces message.
-	 */
-	public String getVar() {
-		return state.get(PropertyKeys.var);
-	}
+    /**
+     * Returns the name of the request attribute which exposes the current faces message.
+     * @return The name of the request attribute which exposes the current faces message.
+     */
+    public String getVar() {
+        return state.get(PropertyKeys.var);
+    }
 
-	/**
-	 * Sets the name of the request attribute which exposes the current faces message.
-	 * @param var The name of the request attribute which exposes the current faces message.
-	 */
-	public void setVar(String var) {
-		state.put(PropertyKeys.var, var);
-	}
+    /**
+     * Sets the name of the request attribute which exposes the current faces message.
+     * @param var The name of the request attribute which exposes the current faces message.
+     */
+    public void setVar(String var) {
+        state.put(PropertyKeys.var, var);
+    }
 
-	/**
-	 * Returns the single INFO message to be shown instead when this component has any faces message.
-	 * @return The single INFO message to be shown instead when this component has any faces message.
-	 * @since 1.6
-	 */
-	public String getMessage() {
-		return state.get(PropertyKeys.message);
-	}
+    /**
+     * Returns the single INFO message to be shown instead when this component has any faces message.
+     * @return The single INFO message to be shown instead when this component has any faces message.
+     * @since 1.6
+     */
+    public String getMessage() {
+        return state.get(PropertyKeys.message);
+    }
 
-	/**
-	 * Sets the single INFO message to be shown instead when this component has any faces message.
-	 * @param message The single INFO message to be shown instead when this component has any faces message.
-	 * @since 1.6
-	 */
-	public void setMessage(String message) {
-		state.put(PropertyKeys.message, message);
-	}
+    /**
+     * Sets the single INFO message to be shown instead when this component has any faces message.
+     * @param message The single INFO message to be shown instead when this component has any faces message.
+     * @since 1.6
+     */
+    public void setMessage(String message) {
+        state.put(PropertyKeys.message, message);
+    }
 
-	/**
-	 * Returns whether the message detail and summary should be HTML-escaped. Defaults to <code>true</code>.
-	 * @return Whether the message detail and summary should be HTML-escaped.
-	 */
-	public boolean isEscape() {
-		return state.get(PropertyKeys.escape, true);
-	}
+    /**
+     * Returns whether the message detail and summary should be HTML-escaped. Defaults to <code>true</code>.
+     * @return Whether the message detail and summary should be HTML-escaped.
+     */
+    public boolean isEscape() {
+        return state.get(PropertyKeys.escape, true);
+    }
 
-	/**
-	 * Sets whether the message detail and summary should be HTML-escaped.
-	 * @param escape Whether the message detail and summary should be HTML-escaped.
-	 */
-	public void setEscape(boolean escape) {
-		state.put(PropertyKeys.escape, escape);
-	}
+    /**
+     * Sets whether the message detail and summary should be HTML-escaped.
+     * @param escape Whether the message detail and summary should be HTML-escaped.
+     */
+    public void setEscape(boolean escape) {
+        state.put(PropertyKeys.escape, escape);
+    }
 
 }

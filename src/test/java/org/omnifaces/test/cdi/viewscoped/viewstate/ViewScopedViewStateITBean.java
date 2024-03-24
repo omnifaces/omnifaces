@@ -32,54 +32,54 @@ import org.omnifaces.cdi.ViewScoped;
 public class ViewScopedViewStateITBean implements Serializable {
 
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static boolean unloaded;
-	private static boolean destroyed;
+    private static boolean unloaded;
+    private static boolean destroyed;
 
-	private String uuid;
+    private String uuid;
 
-	@PostConstruct
-	public void init() {
-		uuid = UUID.randomUUID().toString();
-		checkUnloadedOrDestroyed();
-		addGlobalInfo("init ");
-	}
+    @PostConstruct
+    public void init() {
+        uuid = UUID.randomUUID().toString();
+        checkUnloadedOrDestroyed();
+        addGlobalInfo("init ");
+    }
 
-	public void checkUnloadedOrDestroyed() {
-		if (unloaded) {
-			addGlobalInfo("unload ");
-			unloaded = false;
-		}
-		else if (destroyed) {
-			addGlobalInfo("destroy ");
-			destroyed = false;
-		}
-	}
+    public void checkUnloadedOrDestroyed() {
+        if (unloaded) {
+            addGlobalInfo("unload ");
+            unloaded = false;
+        }
+        else if (destroyed) {
+            addGlobalInfo("destroy ");
+            destroyed = false;
+        }
+    }
 
-	public void submit() {
-		checkUnloadedOrDestroyed();
-		addGlobalInfo("submit ");
-	}
+    public void submit() {
+        checkUnloadedOrDestroyed();
+        addGlobalInfo("submit ");
+    }
 
-	public String navigate() {
-		addGlobalInfo("navigate ");
-		return getViewId();
-	}
+    public String navigate() {
+        addGlobalInfo("navigate ");
+        return getViewId();
+    }
 
-	@PreDestroy
-	public void destroy() {
-		if (hasContext() && isUnloadRequest(getContext())) {
-			unloaded = true;
-		}
-		else {
-			destroyed = true;
-		}
-	}
+    @PreDestroy
+    public void destroy() {
+        if (hasContext() && isUnloadRequest(getContext())) {
+            unloaded = true;
+        }
+        else {
+            destroyed = true;
+        }
+    }
 
-	@Override
-	public String toString() {
-		return getClass() + "@" + uuid;
-	}
+    @Override
+    public String toString() {
+        return getClass() + "@" + uuid;
+    }
 
 }

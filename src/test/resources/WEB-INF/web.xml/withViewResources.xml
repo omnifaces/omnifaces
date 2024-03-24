@@ -14,28 +14,28 @@
 
 -->
 <web-app
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-	version="5.0"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+    version="5.0"
 >
-	<context-param>
-		<param-name>org.omnifaces.VIEW_RESOURCE_HANDLER_URIS</param-name>
-		<param-value>/sitemap.xml</param-value>
-	</context-param>
+    <context-param>
+        <param-name>org.omnifaces.VIEW_RESOURCE_HANDLER_URIS</param-name>
+        <param-value>/sitemap.xml</param-value>
+    </context-param>
 
-	<servlet>
-		<servlet-name>facesServlet</servlet-name>
-		<servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>facesServlet</servlet-name>
-		<url-pattern>*.xhtml</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>facesServlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>facesServlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
 
-	<mime-mapping>
-		<extension>xml</extension>
-		<mime-type>text/xml</mime-type> <!-- WildFly uses application/xml instead. -->
-	</mime-mapping>
+    <mime-mapping>
+        <extension>xml</extension>
+        <mime-type>text/xml</mime-type> <!-- WildFly uses application/xml instead. -->
+    </mime-mapping>
 </web-app>

@@ -22,43 +22,43 @@ import org.omnifaces.test.OmniFacesIT;
 
 public class CheckNestedFormsIT extends OmniFacesIT {
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(CheckNestedFormsIT.class)
-			.withWebXml(WebXml.withDevelopmentStage)
-			.withPrimeFaces()
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(CheckNestedFormsIT.class)
+            .withWebXml(WebXml.withDevelopmentStage)
+            .withPrimeFaces()
+            .createDeployment();
+    }
 
-	@Test
-	void testProperMarkup() {
-		verify200("ProperMarkup.xhtml");
-	}
+    @Test
+    void testProperMarkup() {
+        verify200("ProperMarkup.xhtml");
+    }
 
-	@Test
-	void testCornercaseMarkup() {
-		verify200("CornercaseMarkup.xhtml");
-	}
+    @Test
+    void testCornercaseMarkup() {
+        verify200("CornercaseMarkup.xhtml");
+    }
 
-	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
-	void testNestedForm() {
-		verify500("NestedForm.xhtml");
-	}
+    @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    void testNestedForm() {
+        verify500("NestedForm.xhtml");
+    }
 
-	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
-	void testNestedDialogForm() {
-		verify500("NestedDialogForm.xhtml");
-	}
+    @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    void testNestedDialogForm() {
+        verify500("NestedDialogForm.xhtml");
+    }
 
-	private void verify200(String path) {
-		open(path);
-		assertEquals(path, browser.getTitle());
-	}
+    private void verify200(String path) {
+        open(path);
+        assertEquals(path, browser.getTitle());
+    }
 
-	private void verify500(String path) {
-		open(path);
-		assertEquals("500", browser.getTitle());
-	}
+    private void verify500(String path) {
+        open(path);
+        assertEquals("500", browser.getTitle());
+    }
 }

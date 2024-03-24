@@ -25,24 +25,24 @@ import org.openqa.selenium.support.FindBy;
 
 public class VersionedResourceHandlerIT extends OmniFacesIT {
 
-	@FindBy(css="link[rel=stylesheet]")
-	private WebElement someCss;
+    @FindBy(css="link[rel=stylesheet]")
+    private WebElement someCss;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(VersionedResourceHandlerIT.class)
-			.withWebXml(WebXml.withVersionedResourceHandler)
-			.withFacesConfig(FacesConfig.withVersionedResourceHandler)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(VersionedResourceHandlerIT.class)
+            .withWebXml(WebXml.withVersionedResourceHandler)
+            .withFacesConfig(FacesConfig.withVersionedResourceHandler)
+            .createDeployment();
+    }
 
-	@Test
-	void test() {
-		String[] parts = someCss.getAttribute("href").split("\\?", 2);
-		String resourceName = parts[0].split(quote(RESOURCE_IDENTIFIER + "/"), 2)[1].split("\\.xhtml", 2)[0];
-		String queryString = parts[1];
-		assertEquals("some.min.css", resourceName);
-		assertEquals("before=true&v=3.13.3", queryString);
-	}
+    @Test
+    void test() {
+        String[] parts = someCss.getAttribute("href").split("\\?", 2);
+        String resourceName = parts[0].split(quote(RESOURCE_IDENTIFIER + "/"), 2)[1].split("\\.xhtml", 2)[0];
+        String queryString = parts[1];
+        assertEquals("some.min.css", resourceName);
+        assertEquals("before=true&v=3.13.3", queryString);
+    }
 
 }

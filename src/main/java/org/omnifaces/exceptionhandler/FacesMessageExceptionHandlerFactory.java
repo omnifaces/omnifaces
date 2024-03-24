@@ -32,24 +32,24 @@ import jakarta.faces.context.ExceptionHandlerFactory;
  */
 public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new full ajax exception handler factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public FacesMessageExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new full ajax exception handler factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public FacesMessageExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new instance of {@link FacesMessageExceptionHandler} which wraps the original exception handler.
-	 */
-	@Override
-	public ExceptionHandler getExceptionHandler() {
-		return new FacesMessageExceptionHandler(getWrapped().getExceptionHandler());
-	}
+    /**
+     * Returns a new instance of {@link FacesMessageExceptionHandler} which wraps the original exception handler.
+     */
+    @Override
+    public ExceptionHandler getExceptionHandler() {
+        return new FacesMessageExceptionHandler(getWrapped().getExceptionHandler());
+    }
 
 }

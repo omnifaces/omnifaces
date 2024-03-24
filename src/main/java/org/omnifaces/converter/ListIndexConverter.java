@@ -52,57 +52,57 @@ import jakarta.faces.model.SelectItem;
 @FacesConverter("omnifaces.ListIndexConverter")
 public class ListIndexConverter implements Converter<Object> {
 
-	private static final String ERROR_LIST_INDEX =
-			"Could not determine index for value ''{0}'' in component {1}.";
+    private static final String ERROR_LIST_INDEX =
+            "Could not determine index for value ''{0}'' in component {1}.";
 
-	private static final String ERROR_LIST_INDEX_BOUNDS =
-			"Index {0} for value {1} in component {2} is out of bounds.";
+    private static final String ERROR_LIST_INDEX_BOUNDS =
+            "Index {0} for value {1} in component {2} is out of bounds.";
 
-	private static final String ERROR_VALUE_NOT_IN_LIST =
-			"Object {0} in component {1} does not appear to be present in the given list.";
+    private static final String ERROR_VALUE_NOT_IN_LIST =
+            "Object {0} in component {1} does not appear to be present in the given list.";
 
-	private List<?> list;
+    private List<?> list;
 
-	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String value) {
-		int index;
+    @Override
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+        int index;
 
-		try {
-			index = Integer.valueOf(value);
-		}
-		catch (NumberFormatException e) {
-			throw new ConverterException(
-				createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e);
-		}
+        try {
+            index = Integer.valueOf(value);
+        }
+        catch (NumberFormatException e) {
+            throw new ConverterException(
+                createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e);
+        }
 
-		if (index < 0 || index >= list.size()) {
-			throw new ConverterException(
-				createError(ERROR_LIST_INDEX_BOUNDS, index, value, component.getClientId(context))
-			);
-		}
+        if (index < 0 || index >= list.size()) {
+            throw new ConverterException(
+                createError(ERROR_LIST_INDEX_BOUNDS, index, value, component.getClientId(context))
+            );
+        }
 
-		return list.get(index);
-	}
+        return list.get(index);
+    }
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).equals(value)) {
-				return Integer.toString(i);
-			}
-		}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).equals(value)) {
+                return Integer.toString(i);
+            }
+        }
 
-		throw new ConverterException(
-			createError(ERROR_VALUE_NOT_IN_LIST, value == null ? "null" : value.toString(), component.getClientId(context))
-		);
-	}
+        throw new ConverterException(
+            createError(ERROR_VALUE_NOT_IN_LIST, value == null ? "null" : value.toString(), component.getClientId(context))
+        );
+    }
 
-	/**
-	 * Sets the list of available items.
-	 * @param list The list of available items.
-	 */
-	public void setList(List<?> list) {
-		this.list = list;
-	}
+    /**
+     * Sets the list of available items.
+     * @param list The list of available items.
+     */
+    public void setList(List<?> list) {
+        this.list = list;
+    }
 
 }

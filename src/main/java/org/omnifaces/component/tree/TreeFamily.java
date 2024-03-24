@@ -28,115 +28,115 @@ import jakarta.faces.event.PhaseId;
  */
 public abstract class TreeFamily extends UIComponentBase {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.tree";
+    /** The standard component family. */
+    public static final String COMPONENT_FAMILY = "org.omnifaces.component.tree";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The base constructor sets the renderer type to <code>null</code> as the components of the Tree family does not
-	 * render anything by themselves.
-	 */
-	protected TreeFamily() {
-		setRendererType(null);
-	}
+    /**
+     * The base constructor sets the renderer type to <code>null</code> as the components of the Tree family does not
+     * render anything by themselves.
+     */
+    protected TreeFamily() {
+        setRendererType(null);
+    }
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
+    /**
+     * Returns {@link #COMPONENT_FAMILY}.
+     */
+    @Override
+    public String getFamily() {
+        return COMPONENT_FAMILY;
+    }
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    /**
+     * Returns <code>true</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
-	/**
-	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#APPLY_REQUEST_VALUES}.
-	 */
-	@Override
-	public void processDecodes(FacesContext context) {
-		process(context, PhaseId.APPLY_REQUEST_VALUES);
-	}
+    /**
+     * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#APPLY_REQUEST_VALUES}.
+     */
+    @Override
+    public void processDecodes(FacesContext context) {
+        process(context, PhaseId.APPLY_REQUEST_VALUES);
+    }
 
-	/**
-	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#PROCESS_VALIDATIONS}.
-	 */
-	@Override
-	public void processValidators(FacesContext context) {
-		process(context, PhaseId.PROCESS_VALIDATIONS);
-	}
+    /**
+     * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#PROCESS_VALIDATIONS}.
+     */
+    @Override
+    public void processValidators(FacesContext context) {
+        process(context, PhaseId.PROCESS_VALIDATIONS);
+    }
 
-	/**
-	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#UPDATE_MODEL_VALUES}.
-	 */
-	@Override
-	public void processUpdates(FacesContext context) {
-		process(context, PhaseId.UPDATE_MODEL_VALUES);
-	}
+    /**
+     * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#UPDATE_MODEL_VALUES}.
+     */
+    @Override
+    public void processUpdates(FacesContext context) {
+        process(context, PhaseId.UPDATE_MODEL_VALUES);
+    }
 
-	/**
-	 * Calls {@link #validateHierarchy()} when project stage is <code>Development</code> and then
-	 * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		if (isDevelopment(context)) {
-			validateHierarchy();
-		}
+    /**
+     * Calls {@link #validateHierarchy()} when project stage is <code>Development</code> and then
+     * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
+     */
+    @Override
+    public void encodeChildren(FacesContext context) throws IOException {
+        if (isDevelopment(context)) {
+            validateHierarchy();
+        }
 
-		process(context, PhaseId.RENDER_RESPONSE);
-	}
+        process(context, PhaseId.RENDER_RESPONSE);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
-	 * @throws IllegalStateException When component hierarchy is wrong.
-	 */
-	protected abstract void validateHierarchy();
+    /**
+     * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
+     * @throws IllegalStateException When component hierarchy is wrong.
+     */
+    protected abstract void validateHierarchy();
 
-	/**
-	 * Process the component according to the rules of the given phase ID.
-	 * @param context The faces context to work with.
-	 * @param phaseId The current phase ID.
-	 */
-	protected abstract void process(FacesContext context, PhaseId phaseId);
+    /**
+     * Process the component according to the rules of the given phase ID.
+     * @param context The faces context to work with.
+     * @param phaseId The current phase ID.
+     */
+    protected abstract void process(FacesContext context, PhaseId phaseId);
 
-	/**
-	 * Helper method to delegate the processing further to the {@link UIComponentBase} superclass which will handle
-	 * all children.
-	 * @param context The faces context to work with.
-	 * @param phaseId The current phase ID.
-	 */
-	protected void processSuper(FacesContext context, PhaseId phaseId) {
-		if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
-			super.processDecodes(context);
-		}
-		else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
-			super.processValidators(context);
-		}
-		else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
-			super.processUpdates(context);
-		}
-		else if (phaseId == PhaseId.RENDER_RESPONSE) {
-			try {
-				super.encodeChildren(context);
-			}
-			catch (IOException e) {
-				throw new FacesException(e);
-			}
-		}
-	}
+    /**
+     * Helper method to delegate the processing further to the {@link UIComponentBase} superclass which will handle
+     * all children.
+     * @param context The faces context to work with.
+     * @param phaseId The current phase ID.
+     */
+    protected void processSuper(FacesContext context, PhaseId phaseId) {
+        if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
+            super.processDecodes(context);
+        }
+        else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
+            super.processValidators(context);
+        }
+        else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
+            super.processUpdates(context);
+        }
+        else if (phaseId == PhaseId.RENDER_RESPONSE) {
+            try {
+                super.encodeChildren(context);
+            }
+            catch (IOException e) {
+                throw new FacesException(e);
+            }
+        }
+    }
 
 }

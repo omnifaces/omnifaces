@@ -51,34 +51,34 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
 public class ResourceInclude extends OutputFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.ResourceInclude#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
+    /** The component type, which is {@value org.omnifaces.component.output.ResourceInclude#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to
-	 * the Faces response writer.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		validateHasNoChildren(this);
+    /**
+     * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to
+     * the Faces response writer.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        validateHasNoChildren(this);
 
-		ExternalContext externalContext = context.getExternalContext();
-		HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-		HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-		BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
+        ExternalContext externalContext = context.getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
+        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
+        BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
 
-		try {
-			request.getRequestDispatcher((String) getAttributes().get("path")).include(request, bufferedResponse);
-		}
-		catch (ServletException e) {
-			throw new FacesException(e);
-		}
+        try {
+            request.getRequestDispatcher((String) getAttributes().get("path")).include(request, bufferedResponse);
+        }
+        catch (ServletException e) {
+            throw new FacesException(e);
+        }
 
-		context.getResponseWriter().write(bufferedResponse.getBufferAsString());
-	}
+        context.getResponseWriter().write(bufferedResponse.getBufferAsString());
+    }
 
 }

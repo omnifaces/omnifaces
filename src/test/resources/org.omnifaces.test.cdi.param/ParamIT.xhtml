@@ -14,33 +14,33 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<f:metadata>
-		<f:viewParam name="entityViewParam" value="#{paramITBean.entityViewParam}">
-			<f:validator validatorId="paramITEntityValidator" />
-		</f:viewParam>
-	</f:metadata>
+    <f:metadata>
+        <f:viewParam name="entityViewParam" value="#{paramITBean.entityViewParam}">
+            <f:validator validatorId="paramITEntityValidator" />
+        </f:viewParam>
+    </f:metadata>
 
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<h:outputText id="stringParam" value="#{paramITBean.stringParam}" />
-		<h:outputText id="stringParamArray" value="#{paramITBean.stringParamArray}" />
-		<h:outputText id="stringParamList" value="#{paramITBean.stringParamList}" />
-		<h:outputText id="longParam" value="#{paramITBean.longParam}" />
-		<h:outputText id="longParamArray" value="#{paramITBean.longParamArray}" />
-		<h:outputText id="longParamList" value="#{paramITBean.longParamList}" />
-		<h:outputText id="longParamListTypes" value="#{paramITBean.longParamList.stream().map(item -> item['class'].name).toList()}" />
-		<h:outputText id="dateParam" value="#{paramITBean.dateParam}" />
-		<h:outputText id="entityParam" value="#{paramITBean.entityParam}" />
-		<h:outputText id="entityViewParam" value="#{paramITBean.entityViewParam}" />
-		<h:outputText id="initResult" value="#{paramITBean.initResult}" />
-		<h:messages id="messages" />
-	</h:body>
+    <h:body>
+        <h:outputText id="stringParam" value="#{paramITBean.stringParam}" />
+        <h:outputText id="stringParamArray" value="#{paramITBean.stringParamArray}" />
+        <h:outputText id="stringParamList" value="#{paramITBean.stringParamList}" />
+        <h:outputText id="longParam" value="#{paramITBean.longParam}" />
+        <h:outputText id="longParamArray" value="#{paramITBean.longParamArray}" />
+        <h:outputText id="longParamList" value="#{paramITBean.longParamList}" />
+        <h:outputText id="longParamListTypes" value="#{paramITBean.longParamList.stream().map(item -> item['class'].name).toList()}" />
+        <h:outputText id="dateParam" value="#{paramITBean.dateParam}" />
+        <h:outputText id="entityParam" value="#{paramITBean.entityParam}" />
+        <h:outputText id="entityViewParam" value="#{paramITBean.entityViewParam}" />
+        <h:outputText id="initResult" value="#{paramITBean.initResult}" />
+        <h:messages id="messages" />
+    </h:body>
 </html>

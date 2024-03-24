@@ -35,61 +35,61 @@ import jakarta.servlet.http.MappingMatch;
  */
 public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
-	private final String servletPath;
-	private final HttpServletMapping mapping;
+    private final String servletPath;
+    private final HttpServletMapping mapping;
 
-	/**
-	 * Construct the URI extension request wrapper.
-	 * @param request The request to be wrapped.
-	 * @param servletPath The involved servlet path.
-	 */
-	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
-		super(request);
-		this.servletPath = servletPath;
+    /**
+     * Construct the URI extension request wrapper.
+     * @param request The request to be wrapped.
+     * @param servletPath The involved servlet path.
+     */
+    public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
+        super(request);
+        this.servletPath = servletPath;
 
-		String[] parts = servletPath.split("\\.", 2);
-		final String pattern = "*." + parts[1];
-		final String matchValue = parts[0];
-		final String servletName = request.getHttpServletMapping().getServletName();
+        String[] parts = servletPath.split("\\.", 2);
+        final String pattern = "*." + parts[1];
+        final String matchValue = parts[0];
+        final String servletName = request.getHttpServletMapping().getServletName();
 
-		this.mapping = new HttpServletMapping() {
+        this.mapping = new HttpServletMapping() {
 
-			@Override
-			public String getServletName() {
-				return servletName;
-			}
+            @Override
+            public String getServletName() {
+                return servletName;
+            }
 
-			@Override
-			public String getPattern() {
-				return pattern;
-			}
+            @Override
+            public String getPattern() {
+                return pattern;
+            }
 
-			@Override
-			public String getMatchValue() {
-				return matchValue;
-			}
+            @Override
+            public String getMatchValue() {
+                return matchValue;
+            }
 
-			@Override
-			public MappingMatch getMappingMatch() {
-				return MappingMatch.EXTENSION;
-			}
-		};
-	}
+            @Override
+            public MappingMatch getMappingMatch() {
+                return MappingMatch.EXTENSION;
+            }
+        };
+    }
 
-	@Override
-	public String getServletPath() {
-		return servletPath;
-	}
+    @Override
+    public String getServletPath() {
+        return servletPath;
+    }
 
-	@Override
-	public String getPathInfo() {
-		// Since we simulate that the request is mapped to an extension and not to a prefix path, there can be no path info.
-		return null;
-	}
+    @Override
+    public String getPathInfo() {
+        // Since we simulate that the request is mapped to an extension and not to a prefix path, there can be no path info.
+        return null;
+    }
 
-	@Override
-	public HttpServletMapping getHttpServletMapping() {
-		return mapping;
-	}
+    @Override
+    public HttpServletMapping getHttpServletMapping() {
+        return mapping;
+    }
 
 }

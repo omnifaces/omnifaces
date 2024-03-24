@@ -75,103 +75,103 @@ import org.omnifaces.util.Exceptions;
  */
 public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 
-	/**
-	 * The context parameter name to specify exception types to suppress by {@link ExceptionSuppressor}. The context
-	 * parameter value must be a commaseparated string of fully qualified names of exception types. Note that this also
-	 * covers subclasses of specified exception types.
-	 */
-	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS =
-		"org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS";
+    /**
+     * The context parameter name to specify exception types to suppress by {@link ExceptionSuppressor}. The context
+     * parameter value must be a commaseparated string of fully qualified names of exception types. Note that this also
+     * covers subclasses of specified exception types.
+     */
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS =
+        "org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS";
 
-	private Class<? extends Throwable>[] exceptionTypesToSuppress;
+    private Class<? extends Throwable>[] exceptionTypesToSuppress;
 
-	/**
-	 * Construct a new exception suppressor around the given wrapped exception handler.
-	 * @param wrapped The wrapped exception handler.
-	 */
-	public ExceptionSuppressor(ExceptionHandler wrapped) {
-		this(wrapped, getExceptionTypesToSuppress(getServletContext()));
-	}
+    /**
+     * Construct a new exception suppressor around the given wrapped exception handler.
+     * @param wrapped The wrapped exception handler.
+     */
+    public ExceptionSuppressor(ExceptionHandler wrapped) {
+        this(wrapped, getExceptionTypesToSuppress(getServletContext()));
+    }
 
-	/**
-	 * Construct a new exception suppressor around the given wrapped exception handler and using the given array of
-	 * exception types to suppress.
-	 * @param wrapped The wrapped exception handler.
-	 * @param exceptionTypesToSuppress Array of exception types to suppress.
-	 */
-	@SafeVarargs
-	protected ExceptionSuppressor(ExceptionHandler wrapped, Class<? extends Throwable>... exceptionTypesToSuppress) {
-		super(wrapped);
-		this.exceptionTypesToSuppress = exceptionTypesToSuppress;
-	}
+    /**
+     * Construct a new exception suppressor around the given wrapped exception handler and using the given array of
+     * exception types to suppress.
+     * @param wrapped The wrapped exception handler.
+     * @param exceptionTypesToSuppress Array of exception types to suppress.
+     */
+    @SafeVarargs
+    protected ExceptionSuppressor(ExceptionHandler wrapped, Class<? extends Throwable>... exceptionTypesToSuppress) {
+        super(wrapped);
+        this.exceptionTypesToSuppress = exceptionTypesToSuppress;
+    }
 
-	/**
-	 * Get the exception types to suppress. This can be specified via context parameter
-	 * {@value org.omnifaces.exceptionhandler.ExceptionSuppressor#PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
-	 * @param context The involved servlet context.
-	 * @return Exception types to suppress.
-	 */
-	public static Class<? extends Throwable>[] getExceptionTypesToSuppress(ServletContext context) {
-		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS, null);
-	}
+    /**
+     * Get the exception types to suppress. This can be specified via context parameter
+     * {@value org.omnifaces.exceptionhandler.ExceptionSuppressor#PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
+     * @param context The involved servlet context.
+     * @return Exception types to suppress.
+     */
+    public static Class<? extends Throwable>[] getExceptionTypesToSuppress(ServletContext context) {
+        return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS, null);
+    }
 
-	/**
-	 * Inspect all {@link #getUnhandledExceptionQueuedEvents()} if any of them is caused by one of the exception types
-	 * listed in {@link #PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
-	 * If so, then drain the {@link #getUnhandledExceptionQueuedEvents()}, and refresh the current URL with query string.
-	 */
-	@Override
-	public void handle() {
-		handleSuppressedException(getContext());
-		getWrapped().handle();
-	}
+    /**
+     * Inspect all {@link #getUnhandledExceptionQueuedEvents()} if any of them is caused by one of the exception types
+     * listed in {@link #PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
+     * If so, then drain the {@link #getUnhandledExceptionQueuedEvents()}, and refresh the current URL with query string.
+     */
+    @Override
+    public void handle() {
+        handleSuppressedException(getContext());
+        getWrapped().handle();
+    }
 
-	private void handleSuppressedException(FacesContext context) {
-		if (context == null) {
-			return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
-		}
+    private void handleSuppressedException(FacesContext context) {
+        if (context == null) {
+            return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
+        }
 
-		Optional<Throwable> suppressedException = findSuppressedException();
+        Optional<Throwable> suppressedException = findSuppressedException();
 
-		if (!suppressedException.isPresent()) {
-			return;
-		}
+        if (!suppressedException.isPresent()) {
+            return;
+        }
 
-		handleSuppressedException(context, suppressedException.get());
+        handleSuppressedException(context, suppressedException.get());
 
-		if (!isResponseComplete() && !isResponseCommitted(context)) {
-			refreshWithQueryString();
-		}
+        if (!isResponseComplete() && !isResponseCommitted(context)) {
+            refreshWithQueryString();
+        }
 
-		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			// Drain out the exceptions.
-			iter.next();
-			iter.remove();
-		}
-	}
+        for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
+            // Drain out the exceptions.
+            iter.next();
+            iter.remove();
+        }
+    }
 
-	/**
-	 * Subclasses can override this method to have finer grained control over what must happen when the given exception
-	 * has been suppressed.
-	 * @param context The involved faces context.
-	 * @param suppressedException The suppressed exception.
-	 */
-	protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
-		// NOOP.
-	}
+    /**
+     * Subclasses can override this method to have finer grained control over what must happen when the given exception
+     * has been suppressed.
+     * @param context The involved faces context.
+     * @param suppressedException The suppressed exception.
+     */
+    protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
+        // NOOP.
+    }
 
-	private Optional<Throwable> findSuppressedException() {
-		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			Throwable unhandledException = iter.next().getContext().getException();
+    private Optional<Throwable> findSuppressedException() {
+        for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
+            Throwable unhandledException = iter.next().getContext().getException();
 
-			for (Class<? extends Throwable> exceptionTypeToSuppress : exceptionTypesToSuppress) {
-				if (Exceptions.is(unhandledException, exceptionTypeToSuppress)) {
-					return Optional.of(unhandledException);
-				}
-			}
-		}
+            for (Class<? extends Throwable> exceptionTypeToSuppress : exceptionTypesToSuppress) {
+                if (Exceptions.is(unhandledException, exceptionTypeToSuppress)) {
+                    return Optional.of(unhandledException);
+                }
+            }
+        }
 
-		return Optional.empty();
-	}
+        return Optional.empty();
+    }
 
 }

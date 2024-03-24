@@ -25,16 +25,16 @@ import org.omnifaces.cdi.push.SocketEvent.Opened;
 @ApplicationScoped
 public class SocketITObserver {
 
-	@Inject @Push
-	private PushContext applicationScopedServerEvent;
+    @Inject @Push
+    private PushContext applicationScopedServerEvent;
 
-	public void onopen(@Observes @Opened SocketEvent event) {
-		String channel = event.getChannel();
-		applicationScopedServerEvent.send("opened:" + channel);
-	}
+    public void onopen(@Observes @Opened SocketEvent event) {
+        String channel = event.getChannel();
+        applicationScopedServerEvent.send("opened:" + channel);
+    }
 
-	public void onclose(@Observes @Closed SocketEvent event) {
-		String channel = event.getChannel();
-		applicationScopedServerEvent.send("closed:" + channel);
-	}
+    public void onclose(@Observes @Closed SocketEvent event) {
+        String channel = event.getChannel();
+        applicationScopedServerEvent.send("closed:" + channel);
+    }
 }

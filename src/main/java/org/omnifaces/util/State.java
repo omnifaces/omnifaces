@@ -24,59 +24,59 @@ import jakarta.faces.component.StateHelper;
  */
 public class State {
 
-	private final StateHelper stateHelper;
+    private final StateHelper stateHelper;
 
-	public State(StateHelper stateHelper) {
-		this.stateHelper = stateHelper;
-	}
+    public State(StateHelper stateHelper) {
+        this.stateHelper = stateHelper;
+    }
 
-	/**
-	 * Attempts to find a value associated with the specified key in the component's state.
-	 * <p>
-	 * See {@link StateHelper#eval(Serializable)}
-	 *
-	 * @param <T> The expected return type.
-	 * @param key the name of the value in component's state
-	 * @return The value associated with the specified key.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T get(Serializable key) {
-		return (T) stateHelper.eval(key);
-	}
+    /**
+     * Attempts to find a value associated with the specified key in the component's state.
+     * <p>
+     * See {@link StateHelper#eval(Serializable)}
+     *
+     * @param <T> The expected return type.
+     * @param key the name of the value in component's state
+     * @return The value associated with the specified key.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(Serializable key) {
+        return (T) stateHelper.eval(key);
+    }
 
-	/**
-	 * Attempts to find a value associated with the specified key in the component's state.
-	 * <p>
-	 * See {@link StateHelper#eval(Serializable, Object)}
-	 *
-	 * @param <T> The expected return type.
-	 * @param key the name of the value in component's state
-	 * @param defaultValue the value to return if no value is found in the call to get()
-	 * @return The value associated with the specified key, or the given default value if no value is found.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T get(Serializable key, Object defaultValue) {
-		return (T) stateHelper.eval(key, defaultValue);
-	}
+    /**
+     * Attempts to find a value associated with the specified key in the component's state.
+     * <p>
+     * See {@link StateHelper#eval(Serializable, Object)}
+     *
+     * @param <T> The expected return type.
+     * @param key the name of the value in component's state
+     * @param defaultValue the value to return if no value is found in the call to get()
+     * @return The value associated with the specified key, or the given default value if no value is found.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(Serializable key, Object defaultValue) {
+        return (T) stateHelper.eval(key, defaultValue);
+    }
 
-	/**
-	 * Puts a value in the component's state and returns the previous value.
-	 * Note that the previous value has to be of the same type as the value
-	 * being set. If this is unwanted, use the original StateHelper.
-	 * <p>
-	 * See {@link StateHelper#put(Serializable, Object)}
-	 *
-	 * @param <T> The expected value and return type.
-	 * @param key The name of the value in component's state.
-	 * @param value The value to put in component's state.
-	 * @return The previous value, if any.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T put(Serializable key, T value) {
-		return (T) stateHelper.put(key, value);
-	}
+    /**
+     * Puts a value in the component's state and returns the previous value.
+     * Note that the previous value has to be of the same type as the value
+     * being set. If this is unwanted, use the original StateHelper.
+     * <p>
+     * See {@link StateHelper#put(Serializable, Object)}
+     *
+     * @param <T> The expected value and return type.
+     * @param key The name of the value in component's state.
+     * @param value The value to put in component's state.
+     * @return The previous value, if any.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T put(Serializable key, T value) {
+        return (T) stateHelper.put(key, value);
+    }
 
 }

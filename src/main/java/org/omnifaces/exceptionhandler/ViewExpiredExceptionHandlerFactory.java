@@ -32,20 +32,20 @@ import jakarta.faces.context.ExceptionHandlerFactory;
  */
 public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	/**
-	 * Construct a new view expired exception handler factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new view expired exception handler factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
+        super(wrapped);
+    }
 
-	/**
-	 * Returns a new instance of {@link ViewExpiredExceptionHandler} which wraps the original exception handler.
-	 */
-	@Override
-	public ExceptionHandler getExceptionHandler() {
-		return new ViewExpiredExceptionHandler(getWrapped().getExceptionHandler());
-	}
+    /**
+     * Returns a new instance of {@link ViewExpiredExceptionHandler} which wraps the original exception handler.
+     */
+    @Override
+    public ExceptionHandler getExceptionHandler() {
+        return new ViewExpiredExceptionHandler(getWrapped().getExceptionHandler());
+    }
 
 }

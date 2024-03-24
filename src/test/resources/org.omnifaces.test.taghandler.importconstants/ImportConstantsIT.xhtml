@@ -14,24 +14,24 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
 >
-	<h:head />
-	
-	<h:body>
-		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITParentBean" />
-		<h:outputText id="parent" value="#{ImportConstantsITParentBean.VALUE}" />
-		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITChildBean" />
-		<h:outputText id="child" value="#{ImportConstantsITChildBean.VALUE}" />
-		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITInterface" />
-		<h:outputText id="interface" value="#{ImportConstantsITInterface.VALUE}" />
-		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITEnum" />
-		<h:outputText id="enumValues" value="#{ImportConstantsITEnum.values()}" />
-		<o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITEnumImplementingInterface" />
-		<h:outputText id="enumInterfaceValues" value="#{ImportConstantsITEnumImplementingInterface.values()}" />
-	</h:body>
+    <h:head />
+    
+    <h:body>
+        <o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITParentBean" />
+        <h:outputText id="parent" value="#{ImportConstantsITParentBean.VALUE}" />
+        <o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITChildBean" />
+        <h:outputText id="child" value="#{ImportConstantsITChildBean.VALUE}" />
+        <o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITInterface" />
+        <h:outputText id="interface" value="#{ImportConstantsITInterface.VALUE}" />
+        <o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITEnum" />
+        <h:outputText id="enumValues" value="#{ImportConstantsITEnum.values()}" />
+        <o:importConstants type="org.omnifaces.test.taghandler.importconstants.ImportConstantsITEnumImplementingInterface" />
+        <h:outputText id="enumInterfaceValues" value="#{ImportConstantsITEnumImplementingInterface.values()}" />
+    </h:body>
 </html>

@@ -28,26 +28,26 @@ import jakarta.faces.event.ViewMapListener;
  */
 public class ViewScopeEventListener implements ViewMapListener {
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> if given source is an instance of {@link UIViewRoot}.
-	 */
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return (source instanceof UIViewRoot);
-	}
+    /**
+     * Returns <code>true</code> if given source is an instance of {@link UIViewRoot}.
+     */
+    @Override
+    public boolean isListenerForSource(Object source) {
+        return (source instanceof UIViewRoot);
+    }
 
-	/**
-	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the Faces view scope is about to
-	 * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
-	 * {@link ViewScopeManager#preDestroyView()} method.
-	 */
-	@Override
-	public void processEvent(SystemEvent event) {
-		if (event instanceof PreDestroyViewMapEvent) {
-			getReference(ViewScopeManager.class).preDestroyView();
-		}
-	}
+    /**
+     * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the Faces view scope is about to
+     * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
+     * {@link ViewScopeManager#preDestroyView()} method.
+     */
+    @Override
+    public void processEvent(SystemEvent event) {
+        if (event instanceof PreDestroyViewMapEvent) {
+            getReference(ViewScopeManager.class).preDestroyView();
+        }
+    }
 
 }

@@ -31,67 +31,67 @@ import jakarta.enterprise.inject.spi.PassivationCapable;
  */
 public class BeanStorage implements Serializable {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentHashMap<String, Serializable> beans;
+    private final ConcurrentHashMap<String, Serializable> beans;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new CDI bean storage with the given initial capacity of the map holding all beans.
-	 * @param initialCapacity The initial capacity of the map holding all beans.
-	 */
-	public BeanStorage(int initialCapacity) {
-		beans = new ConcurrentHashMap<>(initialCapacity);
-	}
+    /**
+     * Construct a new CDI bean storage with the given initial capacity of the map holding all beans.
+     * @param initialCapacity The initial capacity of the map holding all beans.
+     */
+    public BeanStorage(int initialCapacity) {
+        beans = new ConcurrentHashMap<>(initialCapacity);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Create and return the bean associated with given context and creational context.
-	 * @param <T> The generic bean type.
-	 * @param type The contextual type of the CDI managed bean.
-	 * @param context The context to create the bean in.
-	 * @return The bean associated with given context and creational context.
-	 * @throws ClassCastException When the bean doesn't implement serializable.
-	 */
-	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-		T bean = type.create(context);
-		beans.put(getBeanId(type), (Serializable) bean);
-		return bean;
-	}
+    /**
+     * Create and return the bean associated with given context and creational context.
+     * @param <T> The generic bean type.
+     * @param type The contextual type of the CDI managed bean.
+     * @param context The context to create the bean in.
+     * @return The bean associated with given context and creational context.
+     * @throws ClassCastException When the bean doesn't implement serializable.
+     */
+    public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
+        T bean = type.create(context);
+        beans.put(getBeanId(type), (Serializable) bean);
+        return bean;
+    }
 
-	/**
-	 * Returns the bean associated with the given context, or <code>null</code> if there is none.
-	 * @param <T> The generic bean type.
-	 * @param type The contextual type of the CDI managed bean.
-	 * @return The bean associated with the given context, or <code>null</code> if there is none.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T getBean(Contextual<T> type) {
-		return (T) beans.get(getBeanId(type));
-	}
+    /**
+     * Returns the bean associated with the given context, or <code>null</code> if there is none.
+     * @param <T> The generic bean type.
+     * @param type The contextual type of the CDI managed bean.
+     * @return The bean associated with the given context, or <code>null</code> if there is none.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getBean(Contextual<T> type) {
+        return (T) beans.get(getBeanId(type));
+    }
 
-	/**
-	 * Returns the bean identifier of the given type.
-	 */
-	private static String getBeanId(Contextual<?> type) {
-		return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
-	}
+    /**
+     * Returns the bean identifier of the given type.
+     */
+    private static String getBeanId(Contextual<?> type) {
+        return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
+    }
 
-	/**
-	 * Destroy all beans managed so far.
-	 */
-	public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
-		for (Object bean : beans.values()) {
-			destroy(bean);
-		}
+    /**
+     * Destroy all beans managed so far.
+     */
+    public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
+        for (Object bean : beans.values()) {
+            destroy(bean);
+        }
 
-		beans.clear();
-	}
+        beans.clear();
+    }
 
 }

@@ -44,29 +44,29 @@ import org.omnifaces.servlet.BufferedHttpServletResponse;
  */
 public class OnDemandResponseBufferFilter extends HttpFilter {
 
-	/** The request attribute name under which the buffered response is stored. */
-	public static final String BUFFERED_RESPONSE = "org.omnifaces.servlet.BUFFERED_RESPONSE";
+    /** The request attribute name under which the buffered response is stored. */
+    public static final String BUFFERED_RESPONSE = "org.omnifaces.servlet.BUFFERED_RESPONSE";
 
-	@Override
-	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
-			IOException {
+    @Override
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
+            IOException {
 
-		BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
+        BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
 
-		// By default don't buffer, code has to activate this explicitly.
-		bufferedResponse.setPassThrough(true);
+        // By default don't buffer, code has to activate this explicitly.
+        bufferedResponse.setPassThrough(true);
 
-		request.setAttribute(BUFFERED_RESPONSE, bufferedResponse);
+        request.setAttribute(BUFFERED_RESPONSE, bufferedResponse);
 
-		try {
-			chain.doFilter(request, bufferedResponse);
-		} finally {
-			if (!bufferedResponse.isPassThrough()) {
-				// TODO: output stream support
-				response.getWriter().write(bufferedResponse.getBufferAsString());
-			}
-		}
+        try {
+            chain.doFilter(request, bufferedResponse);
+        } finally {
+            if (!bufferedResponse.isPassThrough()) {
+                // TODO: output stream support
+                response.getWriter().write(bufferedResponse.getBufferAsString());
+            }
+        }
 
-	}
+    }
 
 }

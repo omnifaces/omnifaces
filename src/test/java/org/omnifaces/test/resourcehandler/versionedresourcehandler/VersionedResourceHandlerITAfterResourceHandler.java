@@ -19,13 +19,13 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 
 public class VersionedResourceHandlerITAfterResourceHandler extends DefaultResourceHandler {
 
-	public VersionedResourceHandlerITAfterResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-	}
+    public VersionedResourceHandlerITAfterResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource) {
-		resource.setResourceName(resource.getResourceName().replace(".", ".min."));
-		return resource;
-	}
+    @Override
+    public Resource decorateResource(Resource resource) {
+        resource.setResourceName(resource.getResourceName().replace(".", ".min."));
+        return resource;
+    }
 }

@@ -31,98 +31,98 @@ import jakarta.faces.event.PostRestoreStateEvent;
  */
 public abstract class ScriptFamily extends UIComponentBase {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.script";
+    /** The standard component family. */
+    public static final String COMPONENT_FAMILY = "org.omnifaces.component.script";
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
+    /**
+     * Returns {@link #COMPONENT_FAMILY}.
+     */
+    @Override
+    public String getFamily() {
+        return COMPONENT_FAMILY;
+    }
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    /**
+     * Returns <code>true</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
-	/**
-	 * If this component is rendered, then start the <code>&lt;script&gt;</code> element.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		if (getRendererType() != null) {
-			super.encodeBegin(context);
-			return;
-		}
+    /**
+     * If this component is rendered, then start the <code>&lt;script&gt;</code> element.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        if (getRendererType() != null) {
+            super.encodeBegin(context);
+            return;
+        }
 
-		pushComponentToEL(context, this);
+        pushComponentToEL(context, this);
 
-		if (isRendered()) {
-			ResponseWriter writer = context.getResponseWriter();
+        if (isRendered()) {
+            ResponseWriter writer = context.getResponseWriter();
 
-			if (getId() != null || !getClientBehaviors().isEmpty()) {
-				writer.startElement("input", this);
-				writeAttribute(writer, "type", "hidden");
-				writeAttribute(writer, "id", getClientId(context));
-				writer.endElement("input");
-			}
+            if (getId() != null || !getClientBehaviors().isEmpty()) {
+                writer.startElement("input", this);
+                writeAttribute(writer, "type", "hidden");
+                writeAttribute(writer, "id", getClientId(context));
+                writer.endElement("input");
+            }
 
-			writer.startElement("script", this);
-			writeAttribute(writer, "type", "text/javascript");
-		}
-	}
+            writer.startElement("script", this);
+            writeAttribute(writer, "type", "text/javascript");
+        }
+    }
 
-	/**
-	 * If this component is rendered, then end the <code>&lt;script&gt;</code> element.
-	 */
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		if (getRendererType() != null) {
-			super.encodeEnd(context);
-			return;
-		}
+    /**
+     * If this component is rendered, then end the <code>&lt;script&gt;</code> element.
+     */
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        if (getRendererType() != null) {
+            super.encodeEnd(context);
+            return;
+        }
 
-		if (isRendered()) {
-			context.getResponseWriter().endElement("script");
-		}
+        if (isRendered()) {
+            context.getResponseWriter().endElement("script");
+        }
 
-		popComponentFromEL(context);
-	}
+        popComponentFromEL(context);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Move this ScriptFamily component to end of body and returns <code>true</code> if done so. This method
-	 * needs to be called from {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or
-	 * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
-	 * component resource.
-	 * @param event The involved event, which can be either {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}.
-	 * @return <code>true</code> if the move has taken place.
-	 */
-	protected boolean moveToBody(ComponentSystemEvent event) {
-		if (!(event instanceof PostAddToViewEvent || event instanceof PostRestoreStateEvent)) {
-			return false;
-		}
+    /**
+     * Move this ScriptFamily component to end of body and returns <code>true</code> if done so. This method
+     * needs to be called from {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or
+     * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
+     * component resource.
+     * @param event The involved event, which can be either {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}.
+     * @return <code>true</code> if the move has taken place.
+     */
+    protected boolean moveToBody(ComponentSystemEvent event) {
+        if (!(event instanceof PostAddToViewEvent || event instanceof PostRestoreStateEvent)) {
+            return false;
+        }
 
-		FacesContext context = event.getFacesContext();
-		UIViewRoot view = context.getViewRoot();
+        FacesContext context = event.getFacesContext();
+        UIViewRoot view = context.getViewRoot();
 
-		if (context.isPostback() ? !view.getComponentResources(context, "body").contains(this) : event instanceof PostAddToViewEvent) {
-			view.addComponentResource(context, this, "body");
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+        if (context.isPostback() ? !view.getComponentResources(context, "body").contains(this) : event instanceof PostAddToViewEvent) {
+            view.addComponentResource(context, this, "body");
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
 }

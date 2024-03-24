@@ -22,9 +22,9 @@ import jakarta.interceptor.InvocationContext;
 @Priority(Interceptor.Priority.APPLICATION)
 public class ParamITCustomAnnotationInterceptor {
 
-	@PostConstruct
-	public Object initializeBeanWithCustomAnnotation(InvocationContext invocationContext) throws Exception {
-		return invocationContext.proceed();
-	}
+    @PostConstruct
+    public Object initializeBeanWithCustomAnnotation(InvocationContext invocationContext) throws Exception {
+        return invocationContext.proceed();
+    }
 
 }

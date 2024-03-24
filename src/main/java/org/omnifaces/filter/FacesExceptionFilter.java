@@ -94,75 +94,75 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  */
 public class FacesExceptionFilter extends HttpFilter {
 
-	private static final Logger logger = Logger.getLogger(FacesExceptionFilter.class.getName());
+    private static final Logger logger = Logger.getLogger(FacesExceptionFilter.class.getName());
 
-	private static final String LOG_EXCEPTION_HANDLED =
-		"FacesExceptionFilter: An exception occurred during processing servlet request."
-			+ " Error page '%s' will be shown.";
+    private static final String LOG_EXCEPTION_HANDLED =
+        "FacesExceptionFilter: An exception occurred during processing servlet request."
+            + " Error page '%s' will be shown.";
 
-	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
-	private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
+    private Class<? extends Throwable>[] exceptionTypesToUnwrap;
+    private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
 
-	@Override
-	public void init() throws ServletException {
-		exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
-		exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
-	}
+    @Override
+    public void init() throws ServletException {
+        exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
+        exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
+    }
 
-	@Override
-	public void doFilter
-		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-			throws ServletException, IOException
-	{
-		try {
-			chain.doFilter(request, response);
-		}
-		catch (FileNotFoundException ignore) {
-			logger.log(FINEST, "Ignoring thrown exception; this is a Faces quirk and it should be interpreted as 404.", ignore);
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-		}
-		catch (Throwable exception) {
-			request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
-			Throwable cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
-			String location = WebXml.instance().findErrorPageLocation(cause);
-			logException(request, cause, location, LOG_EXCEPTION_HANDLED, location);
+    @Override
+    public void doFilter
+        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+            throws ServletException, IOException
+    {
+        try {
+            chain.doFilter(request, response);
+        }
+        catch (FileNotFoundException ignore) {
+            logger.log(FINEST, "Ignoring thrown exception; this is a Faces quirk and it should be interpreted as 404.", ignore);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+        }
+        catch (Throwable exception) {
+            request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
+            Throwable cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
+            String location = WebXml.instance().findErrorPageLocation(cause);
+            logException(request, cause, location, LOG_EXCEPTION_HANDLED, location);
 
-			if (Objects.equals(exception, cause)) {
-				throw exception;
-			}
+            if (Objects.equals(exception, cause)) {
+                throw exception;
+            }
 
-			logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", exception);
+            logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", exception);
 
-			if (cause instanceof RuntimeException) {
-				throw (RuntimeException) cause;
-			}
-			else {
-				throw new ServletException(cause);
-			}
-		}
-	}
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw new ServletException(cause);
+            }
+        }
+    }
 
-	/**
-	 * Log the thrown exception and determined error page location with the given message, optionally parameterized
-	 * with the given parameters.
-	 * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
-	 * not an instance of any type specified in context parameter
-	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
-	 * The log message will be prepended with the UUID and IP address.
-	 * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
-	 * @param request The involved servlet request.
-	 * @param exception The exception to log.
-	 * @param location The error page location.
-	 * @param message The log message.
-	 * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
-	 * @since 3.2
-	 */
-	protected void logException
-		(HttpServletRequest request, Throwable exception, String location, String message, Object... parameters)
-	{
-		if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-			logger.log(SEVERE, format("[%s][%s] %s", request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), format(message, parameters)), exception);
-		}
-	}
+    /**
+     * Log the thrown exception and determined error page location with the given message, optionally parameterized
+     * with the given parameters.
+     * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
+     * not an instance of any type specified in context parameter
+     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+     * The log message will be prepended with the UUID and IP address.
+     * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * @param request The involved servlet request.
+     * @param exception The exception to log.
+     * @param location The error page location.
+     * @param message The log message.
+     * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
+     * @since 3.2
+     */
+    protected void logException
+        (HttpServletRequest request, Throwable exception, String location, String message, Object... parameters)
+    {
+        if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
+            logger.log(SEVERE, format("[%s][%s] %s", request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), format(message, parameters)), exception);
+        }
+    }
 
 }

@@ -41,66 +41,66 @@ import org.omnifaces.util.State;
 @FacesComponent(TreeNode.COMPONENT_TYPE)
 public class TreeNode extends TreeFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.tree.TreeNode#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNode";
+    /** The component type, which is {@value org.omnifaces.component.tree.TreeNode#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNode";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		level;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        level;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate the component hierarchy.
-	 * @throws IllegalStateException When the direct parent component isn't of type {@link Tree}, or when this
-	 * component is nested in another {@link TreeNode}, or when there aren't any children of type {@link TreeNodeItem}.
-	 */
-	@Override
-	protected void validateHierarchy() {
-		validateHasDirectParent(this, Tree.class);
-		validateHasNoParent(this, TreeNode.class);
-		validateHasChild(this, TreeNodeItem.class);
-	}
+    /**
+     * Validate the component hierarchy.
+     * @throws IllegalStateException When the direct parent component isn't of type {@link Tree}, or when this
+     * component is nested in another {@link TreeNode}, or when there aren't any children of type {@link TreeNodeItem}.
+     */
+    @Override
+    protected void validateHierarchy() {
+        validateHasDirectParent(this, Tree.class);
+        validateHasNoParent(this, TreeNode.class);
+        validateHasChild(this, TreeNodeItem.class);
+    }
 
-	/**
-	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)} as it maintains all
-	 * the nodes.
-	 * @see Tree#processTreeNode(FacesContext, PhaseId)
-	 */
-	@Override
-	protected void process(FacesContext context, PhaseId phaseId) {
-		if (!isRendered()) {
-			return;
-		}
+    /**
+     * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)} as it maintains all
+     * the nodes.
+     * @see Tree#processTreeNode(FacesContext, PhaseId)
+     */
+    @Override
+    protected void process(FacesContext context, PhaseId phaseId) {
+        if (!isRendered()) {
+            return;
+        }
 
-		processSuper(context, phaseId);
-	}
+        processSuper(context, phaseId);
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the level for which this node should render the items.
-	 * @return The level for which this node should render the items.
-	 */
-	public Integer getLevel() {
-		return state.get(PropertyKeys.level);
-	}
+    /**
+     * Returns the level for which this node should render the items.
+     * @return The level for which this node should render the items.
+     */
+    public Integer getLevel() {
+        return state.get(PropertyKeys.level);
+    }
 
-	/**
-	 * Sets the level for which this node should render the items.
-	 * @param level The level for which this node should render the items.
-	 */
-	public void setLevel(Integer level) {
-		state.put(PropertyKeys.level, level);
-	}
+    /**
+     * Sets the level for which this node should render the items.
+     * @param level The level for which this node should render the items.
+     */
+    public void setLevel(Integer level) {
+        state.put(PropertyKeys.level, level);
+    }
 
 }

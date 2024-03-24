@@ -29,7 +29,7 @@ import org.omnifaces.component.ParamHolder;
 
 /**
  * <p>
- * The	<code>&lt;o:param&gt;</code> is a component that extends the standard {@link UIParameter} to implement {@link ValueHolder}
+ * The    <code>&lt;o:param&gt;</code> is a component that extends the standard {@link UIParameter} to implement {@link ValueHolder}
  * and thus support a {@link Converter} to convert the supplied value to string, if necessary.
  * <p>
  * You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
@@ -60,76 +60,76 @@ import org.omnifaces.component.ParamHolder;
 @FacesComponent(Param.COMPONENT_TYPE)
 public class Param<T> extends UIParameter implements ParamHolder<T> {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.Param#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Param";
+    /** The component type, which is {@value org.omnifaces.component.output.Param#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Param";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		converter;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        converter;
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Converter<T> getConverter() {
-		return (Converter<T>) getStateHelper().eval(PropertyKeys.converter);
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public Converter<T> getConverter() {
+        return (Converter<T>) getStateHelper().eval(PropertyKeys.converter);
+    }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public void setConverter(Converter converter) {
-		getStateHelper().put(PropertyKeys.converter, converter);
-	}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void setConverter(Converter converter) {
+        getStateHelper().put(PropertyKeys.converter, converter);
+    }
 
-	/**
-	 * @throws ClassCastException When actual value is not <code>T</code>.
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T getLocalValue() {
-		return (T) super.getValue();
-	}
+    /**
+     * @throws ClassCastException When actual value is not <code>T</code>.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public T getLocalValue() {
+        return (T) super.getValue();
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public String getValue() {
-		FacesContext context = getFacesContext();
-		Object value = getLocalValue();
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getValue() {
+        FacesContext context = getFacesContext();
+        Object value = getLocalValue();
 
-		if (value == null && getChildCount() > 0) {
-			ResponseWriter originalResponseWriter = context.getResponseWriter();
-			StringWriter output = new StringWriter();
-			context.setResponseWriter(originalResponseWriter.cloneWithWriter(output));
+        if (value == null && getChildCount() > 0) {
+            ResponseWriter originalResponseWriter = context.getResponseWriter();
+            StringWriter output = new StringWriter();
+            context.setResponseWriter(originalResponseWriter.cloneWithWriter(output));
 
-			try {
-				super.encodeChildren(context);
-			}
-			catch (IOException e) {
-				throw new FacesException(e);
-			}
-			finally {
-				context.setResponseWriter(originalResponseWriter);
-			}
+            try {
+                super.encodeChildren(context);
+            }
+            catch (IOException e) {
+                throw new FacesException(e);
+            }
+            finally {
+                context.setResponseWriter(originalResponseWriter);
+            }
 
-			value = output.toString();
-		}
+            value = output.toString();
+        }
 
-		return convertToString(context, this, (T) value);
-	}
+        return convertToString(context, this, (T) value);
+    }
 
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		// This override which does nothing effectively blocks the children from being encoded during Faces render.
-	}
+    @Override
+    public void encodeChildren(FacesContext context) throws IOException {
+        // This override which does nothing effectively blocks the children from being encoded during Faces render.
+    }
 
 }

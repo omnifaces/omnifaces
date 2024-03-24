@@ -58,38 +58,38 @@ import jakarta.faces.convert.Converter;
  */
 public abstract class ValueChangeConverter<T> implements Converter<T> {
 
-	/**
-	 * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object
-	 * value is equal to the submitted value, then immediately return its old object value unchanged. Otherwise, invoke
-	 * {@link #getAsChangedObject(FacesContext, UIComponent, String)} which may in turn do the necessary possibly
-	 * expensive DAO operations.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (component instanceof EditableValueHolder) {
-			String newStringValue = submittedValue;
-			T oldObjectValue = (T) ((EditableValueHolder) component).getValue();
-			String oldStringValue = getAsString(context, component, oldObjectValue);
+    /**
+     * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object
+     * value is equal to the submitted value, then immediately return its old object value unchanged. Otherwise, invoke
+     * {@link #getAsChangedObject(FacesContext, UIComponent, String)} which may in turn do the necessary possibly
+     * expensive DAO operations.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public T getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (component instanceof EditableValueHolder) {
+            String newStringValue = submittedValue;
+            T oldObjectValue = (T) ((EditableValueHolder) component).getValue();
+            String oldStringValue = getAsString(context, component, oldObjectValue);
 
-			if (Objects.equals(newStringValue, oldStringValue)) {
-				return oldObjectValue;
-			}
-		}
+            if (Objects.equals(newStringValue, oldStringValue)) {
+                return oldObjectValue;
+            }
+        }
 
-		return getAsChangedObject(context, component, submittedValue);
-	}
+        return getAsChangedObject(context, component, submittedValue);
+    }
 
-	/**
-	 * Use this method instead of {@link #getAsObject(FacesContext, UIComponent, String)} if you intend to perform the
-	 * conversion only when the submitted value is really changed as compared to the model value.
-	 * @param context The involved faces context.
-	 * @param component The involved UI component.
-	 * @param submittedValue The submitted value.
-	 * @return The converted value, exactly like as when you use {@link #getAsObject(FacesContext, UIComponent, String)}
-	 * the usual way.
-	 */
-	public abstract T getAsChangedObject(FacesContext context, UIComponent component, String submittedValue);
+    /**
+     * Use this method instead of {@link #getAsObject(FacesContext, UIComponent, String)} if you intend to perform the
+     * conversion only when the submitted value is really changed as compared to the model value.
+     * @param context The involved faces context.
+     * @param component The involved UI component.
+     * @param submittedValue The submitted value.
+     * @return The converted value, exactly like as when you use {@link #getAsObject(FacesContext, UIComponent, String)}
+     * the usual way.
+     */
+    public abstract T getAsChangedObject(FacesContext context, UIComponent component, String submittedValue);
 
 }

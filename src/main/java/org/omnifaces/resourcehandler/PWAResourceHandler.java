@@ -263,254 +263,254 @@ import org.omnifaces.util.Json;
  */
 public class PWAResourceHandler extends DefaultResourceHandler {
 
-	private static final Logger logger = Logger.getLogger(PWAResourceHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(PWAResourceHandler.class.getName());
 
-	private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
-			"%s#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
-	private static final String WARNING_INVALID_CACHEABLE_VIEW_ID =
-			"Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getCacheableViewIds() returned a typo?";
-	private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
-			"Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getOfflineViewId() returned a typo?";
+    private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
+            "%s#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
+    private static final String WARNING_INVALID_CACHEABLE_VIEW_ID =
+            "Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getCacheableViewIds() returned a typo?";
+    private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
+            "Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getOfflineViewId() returned a typo?";
 
-	/** The resource name <code>manifest.webmanifest</code>. */
-	public static final String MANIFEST_RESOURCE_NAME = "manifest.webmanifest";
+    /** The resource name <code>manifest.webmanifest</code>. */
+    public static final String MANIFEST_RESOURCE_NAME = "manifest.webmanifest";
 
-	/** The alternative resource name <code>manifest.json</code>. */
-	private static final String ALTERNATIVE_MANIFEST_RESOURCE_NAME = "manifest.json";
+    /** The alternative resource name <code>manifest.json</code>. */
+    private static final String ALTERNATIVE_MANIFEST_RESOURCE_NAME = "manifest.json";
 
-	/** The content type <code>application/manifest+json</code>. */
-	private static final String MANIFEST_CONTENT_TYPE = "application/manifest+json";
+    /** The content type <code>application/manifest+json</code>. */
+    private static final String MANIFEST_CONTENT_TYPE = "application/manifest+json";
 
-	/** The resource name <code>sw.js</code>. */
-	public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
+    /** The resource name <code>sw.js</code>. */
+    public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
 
-	private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
+    private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
 
-	private final Bean<WebAppManifest> manifestBean;
+    private final Bean<WebAppManifest> manifestBean;
 
-	private byte[] manifestContents;
-	private byte[] serviceWorkerContents;
-	private long lastModified;
+    private byte[] manifestContents;
+    private byte[] serviceWorkerContents;
+    private long lastModified;
 
-	/**
-	 * Creates a new instance of this web app manifest resource handler which wraps the given resource handler.
-	 * This will also try to resolve the concrete implementation of {@link WebAppManifest}.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public PWAResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-		manifestBean = Beans.resolve(WebAppManifest.class); // Unfortunately, @Inject isn't yet supported in ResourceHandler.
-	}
+    /**
+     * Creates a new instance of this web app manifest resource handler which wraps the given resource handler.
+     * This will also try to resolve the concrete implementation of {@link WebAppManifest}.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public PWAResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+        manifestBean = Beans.resolve(WebAppManifest.class); // Unfortunately, @Inject isn't yet supported in ResourceHandler.
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
-		if (manifestBean == null || !OMNIFACES_LIBRARY_NAME.equals(libraryName)) {
-			return resource;
-		}
+    @Override
+    public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
+        if (manifestBean == null || !OMNIFACES_LIBRARY_NAME.equals(libraryName)) {
+            return resource;
+        }
 
-		boolean manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName) || ALTERNATIVE_MANIFEST_RESOURCE_NAME.equals(resourceName);
-		boolean serviceWorkerResourceRequest = SERVICEWORKER_RESOURCE_NAME.equals(resourceName);
+        boolean manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName) || ALTERNATIVE_MANIFEST_RESOURCE_NAME.equals(resourceName);
+        boolean serviceWorkerResourceRequest = SERVICEWORKER_RESOURCE_NAME.equals(resourceName);
 
-		if (!(manifestResourceRequest || serviceWorkerResourceRequest)) {
-			return resource;
-		}
+        if (!(manifestResourceRequest || serviceWorkerResourceRequest)) {
+            return resource;
+        }
 
-		WebAppManifest manifest = Beans.getInstance(manifestBean, false);
+        WebAppManifest manifest = Beans.getInstance(manifestBean, false);
 
-		if (manifest == null) {
-			manifest = Beans.getInstance(manifestBean, true);
-			lastModified = 0;
-		}
+        if (manifest == null) {
+            manifest = Beans.getInstance(manifestBean, true);
+            lastModified = 0;
+        }
 
-		FacesContext context = Faces.getContext();
-		boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
+        FacesContext context = Faces.getContext();
+        boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
 
-		if (resourceContentsRequest && lastModified == 0) {
-			manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
-			serviceWorkerContents = getServiceWorkerContents(manifest).getBytes(UTF_8);
-			lastModified = System.currentTimeMillis();
-		}
+        if (resourceContentsRequest && lastModified == 0) {
+            manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
+            serviceWorkerContents = getServiceWorkerContents(manifest).getBytes(UTF_8);
+            lastModified = System.currentTimeMillis();
+        }
 
-		if (manifestResourceRequest) {
-			if (!resourceContentsRequest) {
-				if (!manifest.getCacheableViewIds().isEmpty()) {
-					addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
-					addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-					addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
-				}
-				else {
-					logger.warning(format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
-				}
-			}
+        if (manifestResourceRequest) {
+            if (!resourceContentsRequest) {
+                if (!manifest.getCacheableViewIds().isEmpty()) {
+                    addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
+                    addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+                    addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+                }
+                else {
+                    logger.warning(format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
+                }
+            }
 
-			return createManifestResource(resourceName);
-		}
-		else {
-			return createServiceWorkerResource();
-		}
-	}
+            return createManifestResource(resourceName);
+        }
+        else {
+            return createServiceWorkerResource();
+        }
+    }
 
-	private DynamicResource createManifestResource(String resourceName) {
-		return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, "application/json") {
-			@Override
-			public InputStream getInputStream() throws IOException {
-				return new ByteArrayInputStream(manifestContents);
-			}
+    private DynamicResource createManifestResource(String resourceName) {
+        return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, "application/json") {
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return new ByteArrayInputStream(manifestContents);
+            }
 
-			@Override
-			public long getLastModified() {
-				return lastModified;
-			}
+            @Override
+            public long getLastModified() {
+                return lastModified;
+            }
 
-			@Override
-			public String getContentType() {
-				return MANIFEST_CONTENT_TYPE;
-			}
-		};
-	}
+            @Override
+            public String getContentType() {
+                return MANIFEST_CONTENT_TYPE;
+            }
+        };
+    }
 
-	private DynamicResource createServiceWorkerResource() {
-		return new DynamicResource(SERVICEWORKER_RESOURCE_NAME, OMNIFACES_LIBRARY_NAME, "application/javascript") {
-			@Override
-			public InputStream getInputStream() throws IOException {
-				return new ByteArrayInputStream(serviceWorkerContents);
-			}
+    private DynamicResource createServiceWorkerResource() {
+        return new DynamicResource(SERVICEWORKER_RESOURCE_NAME, OMNIFACES_LIBRARY_NAME, "application/javascript") {
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return new ByteArrayInputStream(serviceWorkerContents);
+            }
 
-			@Override
-			public long getLastModified() {
-				return lastModified;
-			}
+            @Override
+            public long getLastModified() {
+                return lastModified;
+            }
 
-			@Override
-			public Map<String, String> getResponseHeaders() {
-				Map<String, String> responseHeaders = super.getResponseHeaders();
-				responseHeaders.put("Service-Worker-Allowed", getServiceWorkerScope(getContext()));
-				return responseHeaders;
-			}
-		};
-	}
+            @Override
+            public Map<String, String> getResponseHeaders() {
+                Map<String, String> responseHeaders = super.getResponseHeaders();
+                responseHeaders.put("Service-Worker-Allowed", getServiceWorkerScope(getContext()));
+                return responseHeaders;
+            }
+        };
+    }
 
-	private static String camelCaseToSnakeCase(String string) {
-		return string.codePoints().collect(StringBuilder::new, (sb, cp) -> {
-			if (isUpperCase(cp)) {
-				sb.append('_').appendCodePoint(toLowerCase(cp));
-			}
-			else {
-				sb.appendCodePoint(cp);
-			}
-		}, (sb1, sb2) -> {}).toString();
-	}
+    private static String camelCaseToSnakeCase(String string) {
+        return string.codePoints().collect(StringBuilder::new, (sb, cp) -> {
+            if (isUpperCase(cp)) {
+                sb.append('_').appendCodePoint(toLowerCase(cp));
+            }
+            else {
+                sb.appendCodePoint(cp);
+            }
+        }, (sb1, sb2) -> {}).toString();
+    }
 
-	private static String getServiceWorkerContents(WebAppManifest manifest) {
-		if (manifest.getCacheableViewIds().isEmpty()) {
-			return "";
-		}
-		else {
-			try (Scanner scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8.name())) {
-				return scanner.useDelimiter("\\A").next()
-					.replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
-					.replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
-			}
-		}
-	}
+    private static String getServiceWorkerContents(WebAppManifest manifest) {
+        if (manifest.getCacheableViewIds().isEmpty()) {
+            return "";
+        }
+        else {
+            try (Scanner scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8.name())) {
+                return scanner.useDelimiter("\\A").next()
+                    .replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
+                    .replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
+            }
+        }
+    }
 
-	private static Collection<String> getCacheableResources(WebAppManifest manifest) {
-		FacesContext context = Faces.getContext();
-		ViewHandler viewHandler = context.getApplication().getViewHandler();
-		Collection<String> viewIds = new LinkedHashSet<>(manifest.getCacheableViewIds());
-		Collection<String> cacheableResources = new LinkedHashSet<>();
-		cacheableResources.add(manifest.getStartUrl().replaceFirst(Pattern.quote(getRequestDomainURL()), ""));
+    private static Collection<String> getCacheableResources(WebAppManifest manifest) {
+        FacesContext context = Faces.getContext();
+        ViewHandler viewHandler = context.getApplication().getViewHandler();
+        Collection<String> viewIds = new LinkedHashSet<>(manifest.getCacheableViewIds());
+        Collection<String> cacheableResources = new LinkedHashSet<>();
+        cacheableResources.add(manifest.getStartUrl().replaceFirst(Pattern.quote(getRequestDomainURL()), ""));
 
-		if (manifest.getOfflineViewId() != null) {
-			viewIds.add(manifest.getOfflineViewId());
-		}
+        if (manifest.getOfflineViewId() != null) {
+            viewIds.add(manifest.getOfflineViewId());
+        }
 
-		for (String viewId : viewIds) {
-			ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
+        for (String viewId : viewIds) {
+            ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
 
-			if (!viewDeclarationLanguage.viewExists(context, viewId)) {
-				logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
-				continue;
-			}
+            if (!viewDeclarationLanguage.viewExists(context, viewId)) {
+                logger.warning(format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
+                continue;
+            }
 
-			cacheableResources.add(viewHandler.getActionURL(context, viewId));
-			UIViewRoot view = viewHandler.createView(context, viewId);
+            cacheableResources.add(viewHandler.getActionURL(context, viewId));
+            UIViewRoot view = viewHandler.createView(context, viewId);
 
-			try {
-				context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
-				viewDeclarationLanguage.buildView(context, view);
-				context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
-			}
-			catch (Exception e) {
-				throw new FacesException("Cannot build the view " + viewId, e);
-			}
+            try {
+                context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
+                viewDeclarationLanguage.buildView(context, view);
+                context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
+            }
+            catch (Exception e) {
+                throw new FacesException("Cannot build the view " + viewId, e);
+            }
 
-			forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
-				if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
-					cacheableResources.add(((UIGraphic) component).getValue().toString());
-				}
-				else if (component.getAttributes().get("name") != null) {
-					String url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
+            forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
+                if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
+                    cacheableResources.add(((UIGraphic) component).getValue().toString());
+                }
+                else if (component.getAttributes().get("name") != null) {
+                    String url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
 
-					if (url != null) {
-						cacheableResources.add(url);
-					}
-				}
-			});
-		}
+                    if (url != null) {
+                        cacheableResources.add(url);
+                    }
+                }
+            });
+        }
 
-		cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
-		cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
-		return cacheableResources;
-	}
+        cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
+        cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
+        return cacheableResources;
+    }
 
-	private static String getOfflineResource(WebAppManifest manifest) {
-		if (manifest.getOfflineViewId() != null) {
-			FacesContext context = Faces.getContext();
-			ViewHandler viewHandler = context.getApplication().getViewHandler();
-			return viewHandler.getActionURL(context, manifest.getOfflineViewId());
-		}
-		else {
-			return null;
-		}
-	}
+    private static String getOfflineResource(WebAppManifest manifest) {
+        if (manifest.getOfflineViewId() != null) {
+            FacesContext context = Faces.getContext();
+            ViewHandler viewHandler = context.getApplication().getViewHandler();
+            return viewHandler.getActionURL(context, manifest.getOfflineViewId());
+        }
+        else {
+            return null;
+        }
+    }
 
-	private static String getServiceWorkerUrl(FacesContext context) {
-		return context.getExternalContext().encodeResourceURL(FacesLocal.createResource(context, OMNIFACES_LIBRARY_NAME, SERVICEWORKER_RESOURCE_NAME).getRequestPath());
-	}
+    private static String getServiceWorkerUrl(FacesContext context) {
+        return context.getExternalContext().encodeResourceURL(FacesLocal.createResource(context, OMNIFACES_LIBRARY_NAME, SERVICEWORKER_RESOURCE_NAME).getRequestPath());
+    }
 
-	private static String getServiceWorkerScope(FacesContext context) {
-		return getRequestContextPath(context) + "/";
-	}
+    private static String getServiceWorkerScope(FacesContext context) {
+        return getRequestContextPath(context) + "/";
+    }
 
-	private static String getResourceUrl(FacesContext context, String libraryName, String resourceName) {
-		Resource resource = FacesLocal.createResource(context, libraryName, resourceName);
+    private static String getResourceUrl(FacesContext context, String libraryName, String resourceName) {
+        Resource resource = FacesLocal.createResource(context, libraryName, resourceName);
 
-		if (resource == null) {
-			return null;
-		}
+        if (resource == null) {
+            return null;
+        }
 
-		return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
-	}
+        return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
+    }
 
-	/**
-	 * Returns <code>true</code> if the current request is triggered by a sw.js request.
-	 * @param context The involved faces context.
-	 * @return <code>true</code> if the current request is triggered by a sw.js request.
-	 * @since 4.1
-	 */
-	public static boolean isServiceWorkerRequest(FacesContext context) {
-		return isServiceWorkerRequest(getRequest(context));
-	}
+    /**
+     * Returns <code>true</code> if the current request is triggered by a sw.js request.
+     * @param context The involved faces context.
+     * @return <code>true</code> if the current request is triggered by a sw.js request.
+     * @since 4.1
+     */
+    public static boolean isServiceWorkerRequest(FacesContext context) {
+        return isServiceWorkerRequest(getRequest(context));
+    }
 
-	/**
-	 * Returns <code>true</code> if the given request is triggered by a sw.js request.
-	 * @param request The involved request.
-	 * @return <code>true</code> if the given request is triggered by a sw.js request.
-	 * @since 4.1
-	 */
-	public static boolean isServiceWorkerRequest(HttpServletRequest request) {
-		return SERVICEWORKER_RESOURCE_NAME.equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
-	}
+    /**
+     * Returns <code>true</code> if the given request is triggered by a sw.js request.
+     * @param request The involved request.
+     * @return <code>true</code> if the given request is triggered by a sw.js request.
+     * @since 4.1
+     */
+    public static boolean isServiceWorkerRequest(HttpServletRequest request) {
+        return SERVICEWORKER_RESOURCE_NAME.equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
+    }
 
 }

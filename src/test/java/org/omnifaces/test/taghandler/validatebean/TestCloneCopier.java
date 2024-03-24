@@ -19,68 +19,68 @@ import org.omnifaces.util.copier.CloneCopier;
 
 public class TestCloneCopier {
 
-	@Test
-	void testDoesNotImplementCloneable() {
-		try {
-			new CloneCopier().copy(new DoesNotImplementCloneable());
-			fail();
-		}
-		catch (IllegalStateException e) {
-		}
-	}
+    @Test
+    void testDoesNotImplementCloneable() {
+        try {
+            new CloneCopier().copy(new DoesNotImplementCloneable());
+            fail();
+        }
+        catch (IllegalStateException e) {
+        }
+    }
 
-	@Test
-	void testImplementsCloneableButDoesNotOverrideClone() {
-		try {
-			new CloneCopier().copy(new ImplementsCloneableButDoesNotOverrideClone());
-			fail();
-		}
-		catch (IllegalStateException e) {
-		}
-	}
+    @Test
+    void testImplementsCloneableButDoesNotOverrideClone() {
+        try {
+            new CloneCopier().copy(new ImplementsCloneableButDoesNotOverrideClone());
+            fail();
+        }
+        catch (IllegalStateException e) {
+        }
+    }
 
-	@Test
-	void testImplementsCloneableButHasProtectedClone() {
-		try {
-			new CloneCopier().copy(new ImplementsCloneableButHasProtectedClone());
-			fail();
-		}
-		catch (IllegalStateException e) {
-		}
-	}
+    @Test
+    void testImplementsCloneableButHasProtectedClone() {
+        try {
+            new CloneCopier().copy(new ImplementsCloneableButHasProtectedClone());
+            fail();
+        }
+        catch (IllegalStateException e) {
+        }
+    }
 
-	@Test
-	void testImplementsCloneable() {
-		try {
-			new CloneCopier().copy(new ImplementsCloneable());
-		}
-		catch (IllegalStateException e) {
-			fail(e);
-		}
-	}
+    @Test
+    void testImplementsCloneable() {
+        try {
+            new CloneCopier().copy(new ImplementsCloneable());
+        }
+        catch (IllegalStateException e) {
+            fail(e);
+        }
+    }
 
-	public static class DoesNotImplementCloneable {
+    public static class DoesNotImplementCloneable {
 
-	}
+    }
 
-	public static class ImplementsCloneableButDoesNotOverrideClone implements Cloneable {
+    public static class ImplementsCloneableButDoesNotOverrideClone implements Cloneable {
 
-	}
+    }
 
-	public static class ImplementsCloneableButHasProtectedClone implements Cloneable {
+    public static class ImplementsCloneableButHasProtectedClone implements Cloneable {
 
-		@Override
-		protected ImplementsCloneableButHasProtectedClone clone() {
-			return new ImplementsCloneableButHasProtectedClone();
-		}
-	}
+        @Override
+        protected ImplementsCloneableButHasProtectedClone clone() {
+            return new ImplementsCloneableButHasProtectedClone();
+        }
+    }
 
-	public static class ImplementsCloneable implements Cloneable {
+    public static class ImplementsCloneable implements Cloneable {
 
-		@Override
-		public ImplementsCloneable clone() {
-			return new ImplementsCloneable();
-		}
-	}
+        @Override
+        public ImplementsCloneable clone() {
+            return new ImplementsCloneable();
+        }
+    }
 
 }

@@ -109,92 +109,92 @@ import jakarta.faces.event.SystemEventListener;
  */
 public class ResetInputAjaxActionListener extends DefaultPhaseListener implements ActionListener {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(SKIP_TRANSIENT, SKIP_UNRENDERED);
-	private static final VisitCallback VISIT_CALLBACK = (context, target) -> {
-		FacesContext facesContext = context.getFacesContext();
+    private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(SKIP_TRANSIENT, SKIP_UNRENDERED);
+    private static final VisitCallback VISIT_CALLBACK = (context, target) -> {
+        FacesContext facesContext = context.getFacesContext();
 
-		if (facesContext.getPartialViewContext().getExecuteIds().contains(target.getClientId(facesContext))) {
-			return REJECT;
-		}
+        if (facesContext.getPartialViewContext().getExecuteIds().contains(target.getClientId(facesContext))) {
+            return REJECT;
+        }
 
-		if (target instanceof EditableValueHolder) {
-			((EditableValueHolder) target).resetValue();
-		}
-		else if (!ALL_IDS.equals(context.getIdsToVisit())) {
-			// Render ID didn't specifically point an EditableValueHolder. Visit all children as well.
-			target.visitTree(createVisitContext(facesContext, null, context.getHints()), ResetInputAjaxActionListener.VISIT_CALLBACK);
-		}
+        if (target instanceof EditableValueHolder) {
+            ((EditableValueHolder) target).resetValue();
+        }
+        else if (!ALL_IDS.equals(context.getIdsToVisit())) {
+            // Render ID didn't specifically point an EditableValueHolder. Visit all children as well.
+            target.visitTree(createVisitContext(facesContext, null, context.getHints()), ResetInputAjaxActionListener.VISIT_CALLBACK);
+        }
 
-		return ACCEPT;
-	};
+        return ACCEPT;
+    };
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private transient ActionListener wrapped;
+    private transient ActionListener wrapped;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new reset input ajax action listener. This constructor will be used when specifying the action
-	 * listener by <code>&lt;f:actionListener&gt;</code> or when registering as <code>&lt;phase-listener&gt;</code> in
-	 * <code>faces-config.xml</code>.
-	 */
-	public ResetInputAjaxActionListener() {
-		this(null);
-	}
+    /**
+     * Construct a new reset input ajax action listener. This constructor will be used when specifying the action
+     * listener by <code>&lt;f:actionListener&gt;</code> or when registering as <code>&lt;phase-listener&gt;</code> in
+     * <code>faces-config.xml</code>.
+     */
+    public ResetInputAjaxActionListener() {
+        this(null);
+    }
 
-	/**
-	 * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor
-	 * will be used when registering as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>.
-	 * @param wrapped The wrapped action listener.
-	 */
-	public ResetInputAjaxActionListener(ActionListener wrapped) {
-		super(INVOKE_APPLICATION);
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor
+     * will be used when registering as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>.
+     * @param wrapped The wrapped action listener.
+     */
+    public ResetInputAjaxActionListener(ActionListener wrapped) {
+        super(INVOKE_APPLICATION);
+        this.wrapped = wrapped;
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Delegate to the {@link #processAction(ActionEvent)} method when this action listener is been registered as a
-	 * phase listener so that it get applied on <strong>all</strong> ajax requests.
-	 * @see #processAction(ActionEvent)
-	 */
-	@Override
-	public void beforePhase(PhaseEvent event) {
-		processAction(null);
-	}
+    /**
+     * Delegate to the {@link #processAction(ActionEvent)} method when this action listener is been registered as a
+     * phase listener so that it get applied on <strong>all</strong> ajax requests.
+     * @see #processAction(ActionEvent)
+     */
+    @Override
+    public void beforePhase(PhaseEvent event) {
+        processAction(null);
+    }
 
-	/**
-	 * Handle the reset input action as follows, only and only if the current request is an ajax request and the
-	 * {@link PartialViewContext#getRenderIds()} does not return an empty collection nor is the same as
-	 * {@link PartialViewContext#getExecuteIds()}: find all {@link EditableValueHolder} components based on
-	 * {@link PartialViewContext#getRenderIds()} and if the component is not covered by
-	 * {@link PartialViewContext#getExecuteIds()}, then invoke {@link EditableValueHolder#resetValue()} on the
-	 * component.
-	 * @throws IllegalArgumentException When one of the client IDs resolved to a <code>null</code> component. This
-	 * would however indicate a bug in the concrete {@link PartialViewContext} implementation which is been used.
-	 */
-	@Override
-	public void processAction(ActionEvent event) {
-		FacesContext context = FacesContext.getCurrentInstance();
-		PartialViewContext partialViewContext = context.getPartialViewContext();
+    /**
+     * Handle the reset input action as follows, only and only if the current request is an ajax request and the
+     * {@link PartialViewContext#getRenderIds()} does not return an empty collection nor is the same as
+     * {@link PartialViewContext#getExecuteIds()}: find all {@link EditableValueHolder} components based on
+     * {@link PartialViewContext#getRenderIds()} and if the component is not covered by
+     * {@link PartialViewContext#getExecuteIds()}, then invoke {@link EditableValueHolder#resetValue()} on the
+     * component.
+     * @throws IllegalArgumentException When one of the client IDs resolved to a <code>null</code> component. This
+     * would however indicate a bug in the concrete {@link PartialViewContext} implementation which is been used.
+     */
+    @Override
+    public void processAction(ActionEvent event) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        PartialViewContext partialViewContext = context.getPartialViewContext();
 
-		if (partialViewContext.isAjaxRequest()) {
-			Collection<String> renderIds = partialViewContext.getRenderIds();
+        if (partialViewContext.isAjaxRequest()) {
+            Collection<String> renderIds = partialViewContext.getRenderIds();
 
-			if (!renderIds.isEmpty() && !partialViewContext.getExecuteIds().containsAll(renderIds)) {
-				context.getViewRoot().visitTree(createVisitContext(context, renderIds, VISIT_HINTS), VISIT_CALLBACK);
-			}
-		}
+            if (!renderIds.isEmpty() && !partialViewContext.getExecuteIds().containsAll(renderIds)) {
+                context.getViewRoot().visitTree(createVisitContext(context, renderIds, VISIT_HINTS), VISIT_CALLBACK);
+            }
+        }
 
-		if (wrapped != null && event != null) {
-			wrapped.processAction(event);
-		}
-	}
+        if (wrapped != null && event != null) {
+            wrapped.processAction(event);
+        }
+    }
 
 }

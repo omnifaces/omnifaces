@@ -22,13 +22,13 @@ import org.omnifaces.resourcehandler.RemappedResource;
 
 public class VersionedResourceHandlerITBeforeResourceHandler extends DefaultResourceHandler {
 
-	public VersionedResourceHandlerITBeforeResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-	}
+    public VersionedResourceHandlerITBeforeResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource) {
-		return new RemappedResource(resource, formatURLWithQueryString(resource.getRequestPath(), "before=true"));
-	}
+    @Override
+    public Resource decorateResource(Resource resource) {
+        return new RemappedResource(resource, formatURLWithQueryString(resource.getRequestPath(), "before=true"));
+    }
 
 }

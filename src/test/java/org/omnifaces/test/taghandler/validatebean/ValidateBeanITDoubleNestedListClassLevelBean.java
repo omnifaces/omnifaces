@@ -28,28 +28,28 @@ import jakarta.validation.Valid;
 @RequestScoped
 public class ValidateBeanITDoubleNestedListClassLevelBean {
 
-	@Valid
-	private List<ValidateBeanITNestedEntity> nestedEntities;
+    @Valid
+    private List<ValidateBeanITNestedEntity> nestedEntities;
 
-	@PostConstruct
-	public void init() {
-		nestedEntities = new ArrayList<>();
-		nestedEntities.add(new ValidateBeanITNestedEntity());
-		nestedEntities.get(0).getEntities().add(new ValidateBeanITEntity());
-		nestedEntities.get(0).getEntities().add(new ValidateBeanITEntity());
-	}
+    @PostConstruct
+    public void init() {
+        nestedEntities = new ArrayList<>();
+        nestedEntities.add(new ValidateBeanITNestedEntity());
+        nestedEntities.get(0).getEntities().add(new ValidateBeanITEntity());
+        nestedEntities.get(0).getEntities().add(new ValidateBeanITEntity());
+    }
 
-	public void action() {
-		if (isValidationFailed()) {
-			addGlobalWarn(" actionValidationFailed");
-		}
-		else {
-			addGlobalInfo("actionSuccess");
-		}
-	}
+    public void action() {
+        if (isValidationFailed()) {
+            addGlobalWarn(" actionValidationFailed");
+        }
+        else {
+            addGlobalInfo("actionSuccess");
+        }
+    }
 
-	public List<ValidateBeanITNestedEntity> getNestedEntities() {
-		return nestedEntities;
-	}
+    public List<ValidateBeanITNestedEntity> getNestedEntities() {
+        return nestedEntities;
+    }
 
 }

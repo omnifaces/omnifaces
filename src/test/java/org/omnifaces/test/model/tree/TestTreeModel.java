@@ -21,43 +21,43 @@ import org.omnifaces.model.tree.TreeModel;
 
 public class TestTreeModel {
 
-	@Test
-	void testTree() {
-		TreeModel<String> tree = new ListTreeModel<>();
-		TreeModel<String> one = tree.addChild("One");
-		TreeModel<String> two = one.addChild("Two");
-		TreeModel<String> three = two.getParent().addChild("Three");
-		TreeModel<String> four = three.getParent().getParent().addChild("Four");
-		TreeModel<String> five = four.addChild("Five");
-		assertEquals("[One[Two, Three], Four[Five]]", tree.toString());
-		assertEquals(null, one.getPreviousSibling());
-		assertEquals(four, one.getNextSibling());
-		assertEquals(three, five.getPreviousSibling());
-		assertEquals(null, five.getNextSibling());
+    @Test
+    void testTree() {
+        TreeModel<String> tree = new ListTreeModel<>();
+        TreeModel<String> one = tree.addChild("One");
+        TreeModel<String> two = one.addChild("Two");
+        TreeModel<String> three = two.getParent().addChild("Three");
+        TreeModel<String> four = three.getParent().getParent().addChild("Four");
+        TreeModel<String> five = four.addChild("Five");
+        assertEquals("[One[Two, Three], Four[Five]]", tree.toString());
+        assertEquals(null, one.getPreviousSibling());
+        assertEquals(four, one.getNextSibling());
+        assertEquals(three, five.getPreviousSibling());
+        assertEquals(null, five.getNextSibling());
 
-		three.remove();
-		assertEquals("[One[Two], Four[Five]]", tree.toString());
+        three.remove();
+        assertEquals("[One[Two], Four[Five]]", tree.toString());
 
-		four.remove();
-		assertEquals("[One[Two]]", tree.toString());
+        four.remove();
+        assertEquals("[One[Two]]", tree.toString());
 
-		one.addChildNode(three);
-		assertEquals("[One[Two, Three]]", tree.toString());
+        one.addChildNode(three);
+        assertEquals("[One[Two, Three]]", tree.toString());
 
-		TreeModel<String> copy = new ListTreeModel<>();
-		copy.addChild("One").addChild("Two").getParent().addChild("Three");
-		assertEquals("[One[Two, Three]]", copy.toString());
-		assertEquals(copy, tree, tree + " equals " + copy);
+        TreeModel<String> copy = new ListTreeModel<>();
+        copy.addChild("One").addChild("Two").getParent().addChild("Three");
+        assertEquals("[One[Two, Three]]", copy.toString());
+        assertEquals(copy, tree, tree + " equals " + copy);
 
-		TreeModel<String> copyOne = copy.getChildren().iterator().next();
-		assertEquals("One[Two, Three]", one.toString());
-		assertEquals("One[Two, Three]", copyOne.toString());
-		assertEquals(copyOne, one, one + " equals " + copyOne);
+        TreeModel<String> copyOne = copy.getChildren().iterator().next();
+        assertEquals("One[Two, Three]", one.toString());
+        assertEquals("One[Two, Three]", copyOne.toString());
+        assertEquals(copyOne, one, one + " equals " + copyOne);
 
-		copy.setData("Copy");
-		assertEquals("One[Two, Three]", one.toString());
-		assertEquals("One[Two, Three]", copyOne.toString());
-		assertNotEquals(copyOne, one, one + " equals not " + copyOne);
-	}
+        copy.setData("Copy");
+        assertEquals("One[Two, Three]", one.toString());
+        assertEquals("One[Two, Three]", copyOne.toString());
+        assertNotEquals(copyOne, one, one + " equals not " + copyOne);
+    }
 
 }

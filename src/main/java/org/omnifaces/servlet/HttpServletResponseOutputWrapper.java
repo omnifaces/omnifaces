@@ -42,141 +42,141 @@ import org.omnifaces.io.ResettableBufferedWriter;
  */
 public abstract class HttpServletResponseOutputWrapper extends HttpServletResponseWrapper {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_GETOUTPUT_ALREADY_CALLED =
-		"getOutputStream() has already been called on this response.";
-	private static final String ERROR_GETWRITER_ALREADY_CALLED =
-		"getWriter() has already been called on this response.";
+    private static final String ERROR_GETOUTPUT_ALREADY_CALLED =
+        "getOutputStream() has already been called on this response.";
+    private static final String ERROR_GETWRITER_ALREADY_CALLED =
+        "getWriter() has already been called on this response.";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private ServletOutputStream output;
-	private PrintWriter writer;
-	private ResettableBuffer buffer;
-	private boolean passThrough;
+    private ServletOutputStream output;
+    private PrintWriter writer;
+    private ResettableBuffer buffer;
+    private boolean passThrough;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new {@link HttpServletResponseOutputWrapper} which wraps the given response.
-	 * @param wrappedResponse The wrapped response.
-	 */
-	protected HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
-		super(wrappedResponse);
-	}
+    /**
+     * Construct a new {@link HttpServletResponseOutputWrapper} which wraps the given response.
+     * @param wrappedResponse The wrapped response.
+     */
+    protected HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
+        super(wrappedResponse);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the custom implementation of the servlet response {@link OutputStream}.
-	 * @return The custom implementation of the servlet response {@link OutputStream}.
-	 */
-	protected abstract OutputStream createOutputStream();
+    /**
+     * Returns the custom implementation of the servlet response {@link OutputStream}.
+     * @return The custom implementation of the servlet response {@link OutputStream}.
+     */
+    protected abstract OutputStream createOutputStream();
 
-	@Override
-	public ServletOutputStream getOutputStream() throws IOException {
-		if (passThrough) {
-			return super.getOutputStream();
-		}
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+        if (passThrough) {
+            return super.getOutputStream();
+        }
 
-		if (writer != null) {
-			throw new IllegalStateException(ERROR_GETWRITER_ALREADY_CALLED);
-		}
+        if (writer != null) {
+            throw new IllegalStateException(ERROR_GETWRITER_ALREADY_CALLED);
+        }
 
-		if (output == null) {
-			buffer = new ResettableBufferedOutputStream(createOutputStream(), getBufferSize());
-			output = new DefaultServletOutputStream((OutputStream) buffer);
-		}
+        if (output == null) {
+            buffer = new ResettableBufferedOutputStream(createOutputStream(), getBufferSize());
+            output = new DefaultServletOutputStream((OutputStream) buffer);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	@Override
-	public PrintWriter getWriter() throws IOException {
-		if (passThrough) {
-			return super.getWriter();
-		}
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        if (passThrough) {
+            return super.getWriter();
+        }
 
-		if (output != null) {
-			throw new IllegalStateException(ERROR_GETOUTPUT_ALREADY_CALLED);
-		}
+        if (output != null) {
+            throw new IllegalStateException(ERROR_GETOUTPUT_ALREADY_CALLED);
+        }
 
-		if (writer == null) {
-			buffer = new ResettableBufferedWriter(new OutputStreamWriter(createOutputStream(),
-				getCharacterEncoding()), getBufferSize(), getCharacterEncoding());
-			writer = new PrintWriter((Writer) buffer);
-		}
+        if (writer == null) {
+            buffer = new ResettableBufferedWriter(new OutputStreamWriter(createOutputStream(),
+                getCharacterEncoding()), getBufferSize(), getCharacterEncoding());
+            writer = new PrintWriter((Writer) buffer);
+        }
 
-		return writer;
-	}
+        return writer;
+    }
 
-	@Override
-	public void flushBuffer() throws IOException {
-		super.flushBuffer();
+    @Override
+    public void flushBuffer() throws IOException {
+        super.flushBuffer();
 
-		if (passThrough) {
-			return;
-		}
+        if (passThrough) {
+            return;
+        }
 
-		if (writer != null) {
-			writer.flush();
-		}
-		else if (output != null) {
-			output.flush();
-		}
-	}
+        if (writer != null) {
+            writer.flush();
+        }
+        else if (output != null) {
+            output.flush();
+        }
+    }
 
-	/**
-	 * Close the response body. This closes any created writer or output stream.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public void close() throws IOException {
-		if (writer != null) {
-			writer.close();
-		}
-		else if (output != null) {
-			output.close();
-		}
-	}
+    /**
+     * Close the response body. This closes any created writer or output stream.
+     * @throws IOException When an I/O error occurs.
+     */
+    public void close() throws IOException {
+        if (writer != null) {
+            writer.close();
+        }
+        else if (output != null) {
+            output.close();
+        }
+    }
 
-	@Override
-	public void reset() {
-		super.reset();
+    @Override
+    public void reset() {
+        super.reset();
 
-		if (buffer != null) {
-			buffer.reset();
-		}
-	}
+        if (buffer != null) {
+            buffer.reset();
+        }
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns whether the response is committed or not. The response is also considered committed when the resettable
-	 * buffer has been flushed.
-	 * @return <code>true</code> if the response is committed, otherwise <code>false</code>.
-	 */
-	@Override
-	public boolean isCommitted() {
-		return super.isCommitted() || (buffer != null && !buffer.isResettable());
-	}
+    /**
+     * Returns whether the response is committed or not. The response is also considered committed when the resettable
+     * buffer has been flushed.
+     * @return <code>true</code> if the response is committed, otherwise <code>false</code>.
+     */
+    @Override
+    public boolean isCommitted() {
+        return super.isCommitted() || (buffer != null && !buffer.isResettable());
+    }
 
-	/**
-	 * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-	 * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream},
-	 * otherwise <code>false</code>.
-	 */
-	public boolean isPassThrough() {
-		return passThrough;
-	}
+    /**
+     * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
+     * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream},
+     * otherwise <code>false</code>.
+     */
+    public boolean isPassThrough() {
+        return passThrough;
+    }
 
-	/**
-	 * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-	 * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped
-	 * {@link ServletOutputStream}.
-	 */
-	public void setPassThrough(boolean passThrough) {
-		this.passThrough = passThrough;
-	}
+    /**
+     * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
+     * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped
+     * {@link ServletOutputStream}.
+     */
+    public void setPassThrough(boolean passThrough) {
+        this.passThrough = passThrough;
+    }
 
 }

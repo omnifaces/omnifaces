@@ -16,19 +16,19 @@ import java.time.temporal.Temporal;
 
 public class ViewResourceHandlerITEntity {
 
-	private Long id;
-	private Temporal lastModified;
+    private Long id;
+    private Temporal lastModified;
 
-	public ViewResourceHandlerITEntity(Long id, Temporal lastModified) {
-		this.id = id;
-		this.lastModified = lastModified;
-	}
+    public ViewResourceHandlerITEntity(Long id, Temporal lastModified) {
+        this.id = id;
+        this.lastModified = lastModified;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Temporal getLastModified() {
-		return lastModified;
-	}
+    public Temporal getLastModified() {
+        return lastModified;
+    }
 }

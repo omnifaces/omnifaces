@@ -66,32 +66,32 @@ import jakarta.validation.MessageInterpolator;
  */
 public class JsfLabelMessageInterpolator implements MessageInterpolator {
 
-	private final MessageInterpolator wrapped;
+    private final MessageInterpolator wrapped;
 
-	public JsfLabelMessageInterpolator() {
-		wrapped = byDefaultProvider().configure().getDefaultMessageInterpolator();
-	}
+    public JsfLabelMessageInterpolator() {
+        wrapped = byDefaultProvider().configure().getDefaultMessageInterpolator();
+    }
 
-	@Override
-	public String interpolate(String messageTemplate, Context context) {
-		return interpolate(messageTemplate, context, hasContext() ? getLocale() : Locale.getDefault());
-	}
+    @Override
+    public String interpolate(String messageTemplate, Context context) {
+        return interpolate(messageTemplate, context, hasContext() ? getLocale() : Locale.getDefault());
+    }
 
-	@Override
-	public String interpolate(String messageTemplate, Context context, Locale locale) {
-		String message = wrapped.interpolate(messageTemplate, context, locale);
+    @Override
+    public String interpolate(String messageTemplate, Context context, Locale locale) {
+        String message = wrapped.interpolate(messageTemplate, context, locale);
 
-		if (message.contains("{jsf.label}")) {
+        if (message.contains("{jsf.label}")) {
 
-			String label = "";
-			if (hasContext()) {
-				label = getLabel(getCurrentComponent());
-			}
+            String label = "";
+            if (hasContext()) {
+                label = getLabel(getCurrentComponent());
+            }
 
-			message = message.replace("{jsf.label}", label);
-		}
+            message = message.replace("{jsf.label}", label);
+        }
 
-		return message;
-	}
+        return message;
+    }
 
 }

@@ -107,308 +107,308 @@ import org.omnifaces.util.State;
 @FacesComponent(SitemapUrl.COMPONENT_TYPE)
 public class SitemapUrl extends OutputFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.SitemapUrl#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.SitemapUrl";
+    /** The component type, which is {@value org.omnifaces.component.output.SitemapUrl#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.SitemapUrl";
 
-	/** The available values of the "changefreq" element of the sitemap URL. */
-	public enum ChangeFrequency {
-		// Cannot be uppercased. They have to exactly match the sitemap spec.
+    /** The available values of the "changefreq" element of the sitemap URL. */
+    public enum ChangeFrequency {
+        // Cannot be uppercased. They have to exactly match the sitemap spec.
 
-		/** Always changed. */
-		always,
+        /** Always changed. */
+        always,
 
-		/** Hourly changed. */
-		hourly,
+        /** Hourly changed. */
+        hourly,
 
-		/** Daily changed. */
-		daily,
+        /** Daily changed. */
+        daily,
 
-		/** Weekly changed. */
-		weekly,
+        /** Weekly changed. */
+        weekly,
 
-		/** Monthly changed. */
-		monthly,
+        /** Monthly changed. */
+        monthly,
 
-		/** Yearly changed. */
-		yearly,
+        /** Yearly changed. */
+        yearly,
 
-		/** Never changed. */
-		never
-	}
+        /** Never changed. */
+        never
+    }
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_REQUEST =
-		"o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
+    private static final String ERROR_INVALID_REQUEST =
+        "o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
 
-	private static final String ERROR_MISSING_VALUE_OR_VIEWID =
-		"o:sitemapUrl 'value' or 'viewId' attribute must be set.";
+    private static final String ERROR_MISSING_VALUE_OR_VIEWID =
+        "o:sitemapUrl 'value' or 'viewId' attribute must be set.";
 
-	private static final String ERROR_INVALID_DOMAIN =
-		"o:sitemapUrl 'domain' attribute '%s' does not represent a valid domain.";
+    private static final String ERROR_INVALID_DOMAIN =
+        "o:sitemapUrl 'domain' attribute '%s' does not represent a valid domain.";
 
-	private static final String ERROR_INVALID_PRIORITY =
-		"o:sitemapUrl 'priority' attribute '%s' must be between 0.0 and 1.0.";
+    private static final String ERROR_INVALID_PRIORITY =
+        "o:sitemapUrl 'priority' attribute '%s' must be between 0.0 and 1.0.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		value,
-		viewId,
-		domain,
-		lastModified,
-		changeFrequency,
-		priority
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        value,
+        viewId,
+        domain,
+        lastModified,
+        changeFrequency,
+        priority
+    }
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Constructs the {@link SitemapUrl} component.
-	 * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and
-	 * the current request is not for the {@link ViewResourceHandler} at all.
-	 */
-	public SitemapUrl() {
-		if (isDevelopment() && !isViewResourceRequest(getFacesContext())) {
-			throw new IllegalStateException(ERROR_INVALID_REQUEST);
-		}
+    /**
+     * Constructs the {@link SitemapUrl} component.
+     * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and
+     * the current request is not for the {@link ViewResourceHandler} at all.
+     */
+    public SitemapUrl() {
+        if (isDevelopment() && !isViewResourceRequest(getFacesContext())) {
+            throw new IllegalStateException(ERROR_INVALID_REQUEST);
+        }
 
-		setRendererType(null);
-	}
+        setRendererType(null);
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Renders the start of the <code>&lt;url&gt;</code> parent element.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		context.getResponseWriter().startElement("url", this);
-	}
+    /**
+     * Renders the start of the <code>&lt;url&gt;</code> parent element.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        context.getResponseWriter().startElement("url", this);
+    }
 
-	/**
-	 * Delegates to {@link #encodeLocation(FacesContext)}, {@link #encodeLastModified(FacesContext)}, {@link #encodeChangeFrequency(FacesContext)} and
-	 * {@link #encodePriority(FacesContext)} in this order.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		encodeLocation(context);
-		encodeLastModified(context);
-		encodeChangeFrequency(context);
-		encodePriority(context);
-	}
+    /**
+     * Delegates to {@link #encodeLocation(FacesContext)}, {@link #encodeLastModified(FacesContext)}, {@link #encodeChangeFrequency(FacesContext)} and
+     * {@link #encodePriority(FacesContext)} in this order.
+     */
+    @Override
+    public void encodeChildren(FacesContext context) throws IOException {
+        encodeLocation(context);
+        encodeLastModified(context);
+        encodeChangeFrequency(context);
+        encodePriority(context);
+    }
 
-	/**
-	 * Renders the end of the <code>&lt;url&gt;</code> parent element.
-	 */
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		context.getResponseWriter().endElement("url");
-	}
+    /**
+     * Renders the end of the <code>&lt;url&gt;</code> parent element.
+     */
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        context.getResponseWriter().endElement("url");
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Renders the <code>&lt;loc&gt;</code> child element with either the value of {@link #getValue()},
-	 * or the value of {@link #getViewId()} and {@link #getDomain()} combined.
-	 * @param context The involved faces context.
-	 * @throws IOException When an I/O error occurs.
-	 * @throws IllegalArgumentException When the {@link #getDomain()} does not represent a valid domain.
-	 */
-	protected void encodeLocation(FacesContext context) throws IOException {
-		String value = getValue();
-		List<ParamHolder<Object>> params = getParams(this);
-		String loc;
+    /**
+     * Renders the <code>&lt;loc&gt;</code> child element with either the value of {@link #getValue()},
+     * or the value of {@link #getViewId()} and {@link #getDomain()} combined.
+     * @param context The involved faces context.
+     * @throws IOException When an I/O error occurs.
+     * @throws IllegalArgumentException When the {@link #getDomain()} does not represent a valid domain.
+     */
+    protected void encodeLocation(FacesContext context) throws IOException {
+        String value = getValue();
+        List<ParamHolder<Object>> params = getParams(this);
+        String loc;
 
-		if (value != null) {
-			loc = context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params)));
-		}
-		else {
-			String viewId = getViewId();
+        if (value != null) {
+            loc = context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params)));
+        }
+        else {
+            String viewId = getViewId();
 
-			if (viewId == null) {
-				throw new IllegalArgumentException(ERROR_MISSING_VALUE_OR_VIEWID);
-			}
+            if (viewId == null) {
+                throw new IllegalArgumentException(ERROR_MISSING_VALUE_OR_VIEWID);
+            }
 
-			String uri = getBookmarkableURL(context, viewId, params, false);
-			loc = Url.getBookmarkableURLWithDomain(context, uri, getDomain(), ERROR_INVALID_DOMAIN);
-		}
+            String uri = getBookmarkableURL(context, viewId, params, false);
+            loc = Url.getBookmarkableURLWithDomain(context, uri, getDomain(), ERROR_INVALID_DOMAIN);
+        }
 
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("loc", this);
-		writer.writeText(loc, (value != null) ? "value" : "viewId");
-		writer.endElement("loc");
-	}
+        ResponseWriter writer = context.getResponseWriter();
+        writer.startElement("loc", this);
+        writer.writeText(loc, (value != null) ? "value" : "viewId");
+        writer.endElement("loc");
+    }
 
-	/**
-	 * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any.
-	 * It may only encode formats specified in https://www.w3.org/TR/NOTE-datetime
-	 * @param context The involved faces context.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	protected void encodeLastModified(FacesContext context) throws IOException {
-		Temporal lastModified = getLastModified();
+    /**
+     * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any.
+     * It may only encode formats specified in https://www.w3.org/TR/NOTE-datetime
+     * @param context The involved faces context.
+     * @throws IOException When an I/O error occurs.
+     */
+    protected void encodeLastModified(FacesContext context) throws IOException {
+        Temporal lastModified = getLastModified();
 
-		if (lastModified != null) {
-			if (lastModified instanceof LocalDateTime) {
-				lastModified = ((LocalDateTime) lastModified).atZone(ZoneId.systemDefault()); // Time zone is required by spec.
-			}
+        if (lastModified != null) {
+            if (lastModified instanceof LocalDateTime) {
+                lastModified = ((LocalDateTime) lastModified).atZone(ZoneId.systemDefault()); // Time zone is required by spec.
+            }
 
-			if (lastModified instanceof ZonedDateTime) {
-				lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Time zone names are not supported by spec.
-			}
+            if (lastModified instanceof ZonedDateTime) {
+                lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Time zone names are not supported by spec.
+            }
 
-			ResponseWriter writer = context.getResponseWriter();
-			writer.startElement("lastmod", this);
-			writer.writeText(lastModified.toString(), PropertyKeys.lastModified.name());
-			writer.endElement("lastmod");
-		}
-	}
+            ResponseWriter writer = context.getResponseWriter();
+            writer.startElement("lastmod", this);
+            writer.writeText(lastModified.toString(), PropertyKeys.lastModified.name());
+            writer.endElement("lastmod");
+        }
+    }
 
-	/**
-	 * Renders the <code>&lt;changefreq&gt;</code> child element with the value of {@link #getChangeFrequency()}, if any.
-	 * @param context The involved faces context.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	protected void encodeChangeFrequency(FacesContext context) throws IOException {
-		ChangeFrequency changeFrequency = getChangeFrequency();
+    /**
+     * Renders the <code>&lt;changefreq&gt;</code> child element with the value of {@link #getChangeFrequency()}, if any.
+     * @param context The involved faces context.
+     * @throws IOException When an I/O error occurs.
+     */
+    protected void encodeChangeFrequency(FacesContext context) throws IOException {
+        ChangeFrequency changeFrequency = getChangeFrequency();
 
-		if (changeFrequency != null) {
-			ResponseWriter writer = context.getResponseWriter();
-			writer.startElement("changefreq", this);
-			writer.writeText(changeFrequency, PropertyKeys.changeFrequency.name());
-			writer.endElement("changefreq");
-		}
-	}
+        if (changeFrequency != null) {
+            ResponseWriter writer = context.getResponseWriter();
+            writer.startElement("changefreq", this);
+            writer.writeText(changeFrequency, PropertyKeys.changeFrequency.name());
+            writer.endElement("changefreq");
+        }
+    }
 
-	/**
-	 * Renders the <code>&lt;priority&gt;</code> child element with the value of {@link #getPriority()}, if any.
-	 * @param context The involved faces context.
-	 * @throws IOException When an I/O error occurs.
-	 * @throws IllegalArgumentException When the {@link #getPriority()} is not between 0.0 and 1.0 (inclusive).
-	 */
-	protected void encodePriority(FacesContext context) throws IOException {
-		BigDecimal priority = getPriority();
+    /**
+     * Renders the <code>&lt;priority&gt;</code> child element with the value of {@link #getPriority()}, if any.
+     * @param context The involved faces context.
+     * @throws IOException When an I/O error occurs.
+     * @throws IllegalArgumentException When the {@link #getPriority()} is not between 0.0 and 1.0 (inclusive).
+     */
+    protected void encodePriority(FacesContext context) throws IOException {
+        BigDecimal priority = getPriority();
 
-		if (priority != null) {
-			if (priority.compareTo(BigDecimal.ZERO) < 0 || priority.compareTo(BigDecimal.ONE) > 0) {
-				throw new IllegalArgumentException(format(ERROR_INVALID_PRIORITY, priority));
-			}
+        if (priority != null) {
+            if (priority.compareTo(BigDecimal.ZERO) < 0 || priority.compareTo(BigDecimal.ONE) > 0) {
+                throw new IllegalArgumentException(format(ERROR_INVALID_PRIORITY, priority));
+            }
 
-			ResponseWriter writer = context.getResponseWriter();
-			writer.startElement("priority", this);
-			writer.writeText(priority, PropertyKeys.priority.name());
-			writer.endElement("priority");
-		}
-	}
+            ResponseWriter writer = context.getResponseWriter();
+            writer.startElement("priority", this);
+            writer.writeText(priority, PropertyKeys.priority.name());
+            writer.endElement("priority");
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the value of the "loc" element of the sitemap URL.
-	 * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
-	 * @return The value of the "loc" element of the sitemap URL.
-	 */
-	public String getValue() {
-		return state.get(PropertyKeys.value);
-	}
+    /**
+     * Returns the value of the "loc" element of the sitemap URL.
+     * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * @return The value of the "loc" element of the sitemap URL.
+     */
+    public String getValue() {
+        return state.get(PropertyKeys.value);
+    }
 
-	/**
-	 * Sets the value of the "loc" element of the sitemap URL.
-	 * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
-	 * @param value The value of the "loc" element of the sitemap URL.
-	 */
-	public void setValue(String value) {
-		state.put(PropertyKeys.value, value);
-	}
+    /**
+     * Sets the value of the "loc" element of the sitemap URL.
+     * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * @param value The value of the "loc" element of the sitemap URL.
+     */
+    public void setValue(String value) {
+        state.put(PropertyKeys.value, value);
+    }
 
-	/**
-	 * Returns the view ID to create the URI part of the "loc" element of the sitemap URL for.
-	 * Note: this is ignored when {@link #getValue()} is specified.
-	 * @return The view ID to create the URI part of the "loc" element of the sitemap URL for.
-	 */
-	public String getViewId() {
-		return state.get(PropertyKeys.viewId);
-	}
+    /**
+     * Returns the view ID to create the URI part of the "loc" element of the sitemap URL for.
+     * Note: this is ignored when {@link #getValue()} is specified.
+     * @return The view ID to create the URI part of the "loc" element of the sitemap URL for.
+     */
+    public String getViewId() {
+        return state.get(PropertyKeys.viewId);
+    }
 
-	/**
-	 * Sets the view ID to create the URI part of the "loc" element of the sitemap URL for.
-	 * Note: this is ignored when {@link #getValue()} is specified.
-	 * @param viewId The view ID to create the URI part of the "loc" element of the sitemap URL for.
-	 */
-	public void setViewId(String viewId) {
-		state.put(PropertyKeys.viewId, viewId);
-	}
+    /**
+     * Sets the view ID to create the URI part of the "loc" element of the sitemap URL for.
+     * Note: this is ignored when {@link #getValue()} is specified.
+     * @param viewId The view ID to create the URI part of the "loc" element of the sitemap URL for.
+     */
+    public void setViewId(String viewId) {
+        state.put(PropertyKeys.viewId, viewId);
+    }
 
-	/**
-	 * Returns the domain of the "loc" element of the sitemap URL.
-	 * Note: this is ignored when {@link #getValue()} is specified.
-	 * @return The domain of the "loc" element of the sitemap URL for.
-	 */
-	public String getDomain() {
-		return state.get(PropertyKeys.domain, getRequestDomainURL());
-	}
+    /**
+     * Returns the domain of the "loc" element of the sitemap URL.
+     * Note: this is ignored when {@link #getValue()} is specified.
+     * @return The domain of the "loc" element of the sitemap URL for.
+     */
+    public String getDomain() {
+        return state.get(PropertyKeys.domain, getRequestDomainURL());
+    }
 
-	/**
-	 * Sets the domain of the "loc" element of the sitemap URL.
-	 * Note: this is ignored when {@link #getValue()} is specified.
-	 * @param domain The domain of the "loc" element of the sitemap URL for.
-	 */
-	public void setDomain(String domain) {
-		state.put(PropertyKeys.domain, domain);
-	}
+    /**
+     * Sets the domain of the "loc" element of the sitemap URL.
+     * Note: this is ignored when {@link #getValue()} is specified.
+     * @param domain The domain of the "loc" element of the sitemap URL for.
+     */
+    public void setDomain(String domain) {
+        state.put(PropertyKeys.domain, domain);
+    }
 
-	/**
-	 * Returns the value of the "lastmod" element of the sitemap URL.
-	 * @return The value of the "lastmod" element of the sitemap URL.
-	 */
-	public Temporal getLastModified() {
-		return state.get(PropertyKeys.lastModified);
-	}
+    /**
+     * Returns the value of the "lastmod" element of the sitemap URL.
+     * @return The value of the "lastmod" element of the sitemap URL.
+     */
+    public Temporal getLastModified() {
+        return state.get(PropertyKeys.lastModified);
+    }
 
-	/**
-	 * Sets the value of the "lastmod" element of the sitemap URL.
-	 * @param lastModified The value of the "lastmod" element of the sitemap URL.
-	 */
-	public void setLastModified(Temporal lastModified) {
-		state.put(PropertyKeys.lastModified, lastModified);
-	}
+    /**
+     * Sets the value of the "lastmod" element of the sitemap URL.
+     * @param lastModified The value of the "lastmod" element of the sitemap URL.
+     */
+    public void setLastModified(Temporal lastModified) {
+        state.put(PropertyKeys.lastModified, lastModified);
+    }
 
-	/**
-	 * Returns the value of the "changefreq" element of the sitemap URL.
-	 * @return The value of the "changefreq" element of the sitemap URL.
-	 */
-	public ChangeFrequency getChangeFrequency() {
-		return state.get(PropertyKeys.changeFrequency);
-	}
+    /**
+     * Returns the value of the "changefreq" element of the sitemap URL.
+     * @return The value of the "changefreq" element of the sitemap URL.
+     */
+    public ChangeFrequency getChangeFrequency() {
+        return state.get(PropertyKeys.changeFrequency);
+    }
 
-	/**
-	 * Sets the value of the "changefreq" element of the sitemap URL.
-	 * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
-	 */
-	public void setChangeFrequency(ChangeFrequency changeFrequency) {
-		state.put(PropertyKeys.changeFrequency, changeFrequency);
-	}
+    /**
+     * Sets the value of the "changefreq" element of the sitemap URL.
+     * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
+     */
+    public void setChangeFrequency(ChangeFrequency changeFrequency) {
+        state.put(PropertyKeys.changeFrequency, changeFrequency);
+    }
 
-	/**
-	 * Returns the value of the "priority" element of the sitemap URL.
-	 * @return The value of the "priority" element of the sitemap URL.
-	 */
-	public BigDecimal getPriority() {
-		return state.get(PropertyKeys.priority);
-	}
+    /**
+     * Returns the value of the "priority" element of the sitemap URL.
+     * @return The value of the "priority" element of the sitemap URL.
+     */
+    public BigDecimal getPriority() {
+        return state.get(PropertyKeys.priority);
+    }
 
-	/**
-	 * Sets the value of the "priority" element of the sitemap URL.
-	 * @param priority The value of the "priority" element of the sitemap URL.
-	 */
-	public void setPriority(BigDecimal priority) {
-		state.put(PropertyKeys.priority, priority);
-	}
+    /**
+     * Sets the value of the "priority" element of the sitemap URL.
+     * @param priority The value of the "priority" element of the sitemap URL.
+     */
+    public void setPriority(BigDecimal priority) {
+        state.put(PropertyKeys.priority, priority);
+    }
 
 }

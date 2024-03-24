@@ -238,18 +238,18 @@ import org.omnifaces.viewhandler.OmniViewHandler;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 public @interface ViewScoped {
 
-	/**
-	 * <p>
-	 * Sets whether to save the view scoped bean instance in Faces view state instead of in HTTP session. By default,
-	 * concrete view scoped bean instances are saved in HTTP session, also when client side state saving is enabled.
-	 * This means, when the HTTP session expires, then the view scoped bean instances will also implicitly expire and
-	 * be newly recreated upon a request in a new session. This may be undesirable when using client side state saving
-	 * as it's intuitively expected that concrete view scoped beans are also saved in Faces view state.
-	 *
-	 * @return Whether to save the view scoped bean instance in Faces view state instead of in HTTP session.
-	 * @throws IllegalStateException When enabled while not using client side state saving.
-	 * @since 2.6
-	 */
-	@Nonbinding	boolean saveInViewState() default false;
+    /**
+     * <p>
+     * Sets whether to save the view scoped bean instance in Faces view state instead of in HTTP session. By default,
+     * concrete view scoped bean instances are saved in HTTP session, also when client side state saving is enabled.
+     * This means, when the HTTP session expires, then the view scoped bean instances will also implicitly expire and
+     * be newly recreated upon a request in a new session. This may be undesirable when using client side state saving
+     * as it's intuitively expected that concrete view scoped beans are also saved in Faces view state.
+     *
+     * @return Whether to save the view scoped bean instance in Faces view state instead of in HTTP session.
+     * @throws IllegalStateException When enabled while not using client side state saving.
+     * @since 2.6
+     */
+    @Nonbinding    boolean saveInViewState() default false;
 
 }

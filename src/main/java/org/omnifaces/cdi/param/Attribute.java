@@ -32,15 +32,15 @@ import jakarta.faces.validator.Validator;
 @Retention(RUNTIME)
 public @interface Attribute {
 
-	/**
-	 * Name of the attribute.
-	 * @return Name of the attribute.
-	 */
-	String name();
+    /**
+     * Name of the attribute.
+     * @return Name of the attribute.
+     */
+    String name();
 
-	/**
-	 * Value of the attribute.
-	 * @return Value of the attribute.
-	 */
-	String value();
+    /**
+     * Value of the attribute.
+     * @return Value of the attribute.
+     */
+    String value();
 }

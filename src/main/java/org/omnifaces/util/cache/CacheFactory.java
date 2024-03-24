@@ -24,64 +24,64 @@ import jakarta.servlet.ServletContext;
  */
 public final class CacheFactory {
 
-	public static final String CACHE_PROVIDER_PARAM_NAME = "org.omnifaces.cacheprovider";
-	private static final CacheProvider DEFAULT_PROVIDER = new DefaultCacheProvider();
+    public static final String CACHE_PROVIDER_PARAM_NAME = "org.omnifaces.cacheprovider";
+    private static final CacheProvider DEFAULT_PROVIDER = new DefaultCacheProvider();
 
-	private CacheFactory() {
-	}
+    private CacheFactory() {
+    }
 
-	/**
-	 * Gets an instance of a Cache using the configured cache provider.
-	 *
-	 * @param context
-	 *            faces context used for retrieving the cache provider and for resolving the given scope.
-	 * @param scope
-	 *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
-	 *            provider, but generally at least "session" and "application" should be supported.
-	 *
-	 * @return a cache provider specific Cache instance
-	 */
-	public static Cache getCache(FacesContext context, String scope) {
-		return getCacheProvider(context).getCache(context, scope);
-	}
+    /**
+     * Gets an instance of a Cache using the configured cache provider.
+     *
+     * @param context
+     *            faces context used for retrieving the cache provider and for resolving the given scope.
+     * @param scope
+     *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
+     *            provider, but generally at least "session" and "application" should be supported.
+     *
+     * @return a cache provider specific Cache instance
+     */
+    public static Cache getCache(FacesContext context, String scope) {
+        return getCacheProvider(context).getCache(context, scope);
+    }
 
-	/**
-	 * Gets the cache provider as it has been set in the ServletContext. Does NOT return the default cache provider if
-	 * none is present.
-	 *
-	 * @param servletContext
-	 *            the servlet context where the cache provider is retrieved from
-	 * @return the previously set provider if one is set, null otherwise
-	 */
-	public static CacheProvider getCacheProvider(ServletContext servletContext) {
-		return (CacheProvider) servletContext.getAttribute(CACHE_PROVIDER_PARAM_NAME);
-	}
+    /**
+     * Gets the cache provider as it has been set in the ServletContext. Does NOT return the default cache provider if
+     * none is present.
+     *
+     * @param servletContext
+     *            the servlet context where the cache provider is retrieved from
+     * @return the previously set provider if one is set, null otherwise
+     */
+    public static CacheProvider getCacheProvider(ServletContext servletContext) {
+        return (CacheProvider) servletContext.getAttribute(CACHE_PROVIDER_PARAM_NAME);
+    }
 
-	public static void setCacheProvider(CacheProvider cacheProvider, ServletContext servletContext) {
-		servletContext.setAttribute(CACHE_PROVIDER_PARAM_NAME, cacheProvider);
-	}
+    public static void setCacheProvider(CacheProvider cacheProvider, ServletContext servletContext) {
+        servletContext.setAttribute(CACHE_PROVIDER_PARAM_NAME, cacheProvider);
+    }
 
-	/**
-	 * Gets the cache provider that has been set, or the default provider if none is present.
-	 *
-	 * @param context
-	 *            the faces context where the cache provider is retrieved from
-	 * @return the previously set provider if one is set, otherwise the default provider
-	 */
-	public static CacheProvider getCacheProvider(FacesContext context) {
-		CacheProvider provider = (CacheProvider) context.getExternalContext().getApplicationMap().get(CACHE_PROVIDER_PARAM_NAME);
-		return provider != null ? provider : DEFAULT_PROVIDER;
-	}
+    /**
+     * Gets the cache provider that has been set, or the default provider if none is present.
+     *
+     * @param context
+     *            the faces context where the cache provider is retrieved from
+     * @return the previously set provider if one is set, otherwise the default provider
+     */
+    public static CacheProvider getCacheProvider(FacesContext context) {
+        CacheProvider provider = (CacheProvider) context.getExternalContext().getApplicationMap().get(CACHE_PROVIDER_PARAM_NAME);
+        return provider != null ? provider : DEFAULT_PROVIDER;
+    }
 
-	/**
-	 * Returns an instance of the default cache provider. This is the provider that is used in
-	 * {@link CacheFactory#getCache(FacesContext, String)} and {@link CacheFactory#getCacheProvider(FacesContext)} if no
-	 * explicit provider has been set.
-	 *
-	 * @return the default cache provider
-	 */
-	public static CacheProvider getDefaultCacheProvider() {
-		return DEFAULT_PROVIDER;
-	}
+    /**
+     * Returns an instance of the default cache provider. This is the provider that is used in
+     * {@link CacheFactory#getCache(FacesContext, String)} and {@link CacheFactory#getCacheProvider(FacesContext)} if no
+     * explicit provider has been set.
+     *
+     * @return the default cache provider
+     */
+    public static CacheProvider getDefaultCacheProvider() {
+        return DEFAULT_PROVIDER;
+    }
 
 }

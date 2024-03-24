@@ -31,87 +31,87 @@ import jakarta.faces.view.facelets.TagAttribute;
 @Typed
 public final class Facelets {
 
-	private static final String ERROR_EL_DISALLOWED = "The '%s' attribute may not be an EL expression.";
+    private static final String ERROR_EL_DISALLOWED = "The '%s' attribute may not be an EL expression.";
 
-	private Facelets() {
-		// Hide constructor.
-	}
+    private Facelets() {
+        // Hide constructor.
+    }
 
-	/**
-	 * Returns the String value of the given tag attribute.
-	 * @param context The involved Facelet context.
-	 * @param tagAttribute The tag attribute to retrieve the value from.
-	 * @return The String value of the given tag attribute, or null if the tag attribute is null.
-	 */
-	public static String getString(FaceletContext context, TagAttribute tagAttribute) {
-		return tagAttribute != null ? tagAttribute.getValue(context) : null;
-	}
+    /**
+     * Returns the String value of the given tag attribute.
+     * @param context The involved Facelet context.
+     * @param tagAttribute The tag attribute to retrieve the value from.
+     * @return The String value of the given tag attribute, or null if the tag attribute is null.
+     */
+    public static String getString(FaceletContext context, TagAttribute tagAttribute) {
+        return tagAttribute != null ? tagAttribute.getValue(context) : null;
+    }
 
-	/**
-	 * Returns the String literal of the given tag attribute.
-	 * @param tagAttribute The tag attribute to retrieve the value from.
-	 * @param name The tag attribute name; this is only used in exception message.
-	 * @return The String literal of the given tag attribute, or null if the tag attribute is null.
-	 * @throws IllegalArgumentException When the attribute is not a literal.
-	 * @since 2.6
-	 */
-	public static String getStringLiteral(TagAttribute tagAttribute, String name) {
-		if (tagAttribute != null) {
-			if (tagAttribute.isLiteral()) {
-				return tagAttribute.getValue();
-			}
-			else {
-				throw new IllegalArgumentException(format(ERROR_EL_DISALLOWED,  name));
-			}
-		}
+    /**
+     * Returns the String literal of the given tag attribute.
+     * @param tagAttribute The tag attribute to retrieve the value from.
+     * @param name The tag attribute name; this is only used in exception message.
+     * @return The String literal of the given tag attribute, or null if the tag attribute is null.
+     * @throws IllegalArgumentException When the attribute is not a literal.
+     * @since 2.6
+     */
+    public static String getStringLiteral(TagAttribute tagAttribute, String name) {
+        if (tagAttribute != null) {
+            if (tagAttribute.isLiteral()) {
+                return tagAttribute.getValue();
+            }
+            else {
+                throw new IllegalArgumentException(format(ERROR_EL_DISALLOWED,  name));
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Returns the boolean value of the given tag attribute.
-	 * @param context The involved Facelet context.
-	 * @param tagAttribute The tag attribute to retrieve the value from.
-	 * @return The boolean value of the given tag attribute, or false if the tag attribute is null.
-	 */
-	public static boolean getBoolean(FaceletContext context, TagAttribute tagAttribute) {
-		return tagAttribute != null && tagAttribute.getBoolean(context);
-	}
+    /**
+     * Returns the boolean value of the given tag attribute.
+     * @param context The involved Facelet context.
+     * @param tagAttribute The tag attribute to retrieve the value from.
+     * @return The boolean value of the given tag attribute, or false if the tag attribute is null.
+     */
+    public static boolean getBoolean(FaceletContext context, TagAttribute tagAttribute) {
+        return tagAttribute != null && tagAttribute.getBoolean(context);
+    }
 
-	/**
-	 * Returns the Object value of the given tag attribute
-	 * @param context The involved Facelet context.
-	 * @param tagAttribute The tag attribute to retrieve the value from.
-	 * @return The Object value of the given tag attribute, or null if the tag attribute is null.
-	 */
-	public static Object getObject(FaceletContext context, TagAttribute tagAttribute) {
-		return tagAttribute != null ? tagAttribute.getObject(context) : null;
-	}
+    /**
+     * Returns the Object value of the given tag attribute
+     * @param context The involved Facelet context.
+     * @param tagAttribute The tag attribute to retrieve the value from.
+     * @return The Object value of the given tag attribute, or null if the tag attribute is null.
+     */
+    public static Object getObject(FaceletContext context, TagAttribute tagAttribute) {
+        return tagAttribute != null ? tagAttribute.getObject(context) : null;
+    }
 
-	/**
-	 * Returns the typed Object value of the given tag attribute
-	 * @param <T> The expected return type.
-	 * @param context The involved Facelet context.
-	 * @param tagAttribute The tag attribute to retrieve the value from.
-	 * @param type The expected type of the Object value.
-	 * @return The typed Object value of the given tag attribute, or null if the tag attribute is null.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getObject(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
-		return tagAttribute != null ? (T) tagAttribute.getValueExpression(context, type).getValue(context) : null;
-	}
+    /**
+     * Returns the typed Object value of the given tag attribute
+     * @param <T> The expected return type.
+     * @param context The involved Facelet context.
+     * @param tagAttribute The tag attribute to retrieve the value from.
+     * @param type The expected type of the Object value.
+     * @return The typed Object value of the given tag attribute, or null if the tag attribute is null.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getObject(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
+        return tagAttribute != null ? (T) tagAttribute.getValueExpression(context, type).getValue(context) : null;
+    }
 
-	/**
-	 * Returns the value of the given tag attribute as a value expression, so it can be carried around and evaluated at
-	 * a later moment in the lifecycle without needing the Facelet context.
-	 * @param context The involved Facelet context.
-	 * @param tagAttribute The tag attribute to extract the value expression from.
-	 * @param type The expected type of the value behind the value expression.
-	 * @return The value of the given tag attribute as a value expression, or null if the tag attribute is null.
-	 */
-	public static ValueExpression getValueExpression(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
-		return tagAttribute != null ? tagAttribute.getValueExpression(context, type) : null;
-	}
+    /**
+     * Returns the value of the given tag attribute as a value expression, so it can be carried around and evaluated at
+     * a later moment in the lifecycle without needing the Facelet context.
+     * @param context The involved Facelet context.
+     * @param tagAttribute The tag attribute to extract the value expression from.
+     * @param type The expected type of the value behind the value expression.
+     * @return The value of the given tag attribute as a value expression, or null if the tag attribute is null.
+     */
+    public static ValueExpression getValueExpression(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
+        return tagAttribute != null ? tagAttribute.getValueExpression(context, type) : null;
+    }
 
 }

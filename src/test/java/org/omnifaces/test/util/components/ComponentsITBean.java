@@ -23,13 +23,13 @@ import org.omnifaces.util.Components;
 @RequestScoped
 public class ComponentsITBean {
 
-	private List<String> expressions;
+    private List<String> expressions;
 
-	public void submit() {
-		expressions = Components.getActionExpressionsAndListeners(Components.getCurrentActionSource());
-	}
+    public void submit() {
+        expressions = Components.getActionExpressionsAndListeners(Components.getCurrentActionSource());
+    }
 
-	public List<String> getExpressions() {
-		return expressions;
-	}
+    public List<String> getExpressions() {
+        return expressions;
+    }
 }

@@ -39,59 +39,59 @@ import org.omnifaces.filter.OnDemandResponseBufferFilter;
  */
 public final class CacheInitializer {
 
-	// Web context parameter to set the cache provider implementation
-	public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";
-	public static final String CACHE_INSTALL_BUFFER_FILTER = "org.omnifaces.CACHE_INSTALL_BUFFER_FILTER";
-	public static final String CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX = "org.omnifaces.CACHE_SETTING_";
+    // Web context parameter to set the cache provider implementation
+    public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";
+    public static final String CACHE_INSTALL_BUFFER_FILTER = "org.omnifaces.CACHE_INSTALL_BUFFER_FILTER";
+    public static final String CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX = "org.omnifaces.CACHE_SETTING_";
 
-	private CacheInitializer() {
-		// Hide constructor.
-	}
+    private CacheInitializer() {
+        // Hide constructor.
+    }
 
-	public static void loadProviderAndRegisterFilter(ServletContext context) {
+    public static void loadProviderAndRegisterFilter(ServletContext context) {
 
-		// Check for a user configured custom cache provider, or get default one
-		CacheProvider cacheProvider = getCacheProvider(context);
+        // Check for a user configured custom cache provider, or get default one
+        CacheProvider cacheProvider = getCacheProvider(context);
 
-		// Build a map of settings for either the custom- or the default cache provider and set them.
-		cacheProvider.setParameters(getCacheSetting(context));
+        // Build a map of settings for either the custom- or the default cache provider and set them.
+        cacheProvider.setParameters(getCacheSetting(context));
 
-		// Installs a filter that on demands buffers the response from the Faces Servlet, in order to grab child content
-		// from the buffer.
-		if (parseBoolean(context.getInitParameter(CACHE_INSTALL_BUFFER_FILTER))) {
-			ServletRegistration facesServletRegistration = getFacesServletRegistration(context);
-			FilterRegistration bufferFilterRegistration = context.addFilter(OnDemandResponseBufferFilter.class.getName(), OnDemandResponseBufferFilter.class);
-			bufferFilterRegistration.addMappingForServletNames(null, true, facesServletRegistration.getName());
-		}
-	}
+        // Installs a filter that on demands buffers the response from the Faces Servlet, in order to grab child content
+        // from the buffer.
+        if (parseBoolean(context.getInitParameter(CACHE_INSTALL_BUFFER_FILTER))) {
+            ServletRegistration facesServletRegistration = getFacesServletRegistration(context);
+            FilterRegistration bufferFilterRegistration = context.addFilter(OnDemandResponseBufferFilter.class.getName(), OnDemandResponseBufferFilter.class);
+            bufferFilterRegistration.addMappingForServletNames(null, true, facesServletRegistration.getName());
+        }
+    }
 
-	private static CacheProvider getCacheProvider(ServletContext context) {
-		CacheProvider cacheProvider;
+    private static CacheProvider getCacheProvider(ServletContext context) {
+        CacheProvider cacheProvider;
 
-		String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
-		if (cacheProviderName != null) {
-			cacheProvider = instance(cacheProviderName);
-			CacheFactory.setCacheProvider(cacheProvider, context);
-		} else {
-			cacheProvider = CacheFactory.getDefaultCacheProvider();
-		}
+        String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
+        if (cacheProviderName != null) {
+            cacheProvider = instance(cacheProviderName);
+            CacheFactory.setCacheProvider(cacheProvider, context);
+        } else {
+            cacheProvider = CacheFactory.getDefaultCacheProvider();
+        }
 
-		return cacheProvider;
-	}
+        return cacheProvider;
+    }
 
-	private static Map<String, String> getCacheSetting(ServletContext context) {
-		Map<String, String> settings = new HashMap<>();
+    private static Map<String, String> getCacheSetting(ServletContext context) {
+        Map<String, String> settings = new HashMap<>();
 
-		for (String initParameterName : list(context.getInitParameterNames())) {
-			if (initParameterName.startsWith(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX)) {
-				settings.put(
-					initParameterName.substring(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX.length()),
-					context.getInitParameter(initParameterName)
-				);
-			}
-		}
+        for (String initParameterName : list(context.getInitParameterNames())) {
+            if (initParameterName.startsWith(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX)) {
+                settings.put(
+                    initParameterName.substring(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX.length()),
+                    context.getInitParameter(initParameterName)
+                );
+            }
+        }
 
-		return settings;
-	}
+        return settings;
+    }
 
 }

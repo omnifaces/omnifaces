@@ -22,18 +22,18 @@ import org.omnifaces.cdi.Startup;
 @Startup
 public class EagerITStartupBean {
 
-	@Inject
-	private EagerITLazyApplicationScopedBean bean;
+    @Inject
+    private EagerITLazyApplicationScopedBean bean;
 
-	private boolean beanInjectedInStartupBean;
+    private boolean beanInjectedInStartupBean;
 
-	@PostConstruct
-	public void init() {
-		beanInjectedInStartupBean = (bean != null);
-	}
+    @PostConstruct
+    public void init() {
+        beanInjectedInStartupBean = (bean != null);
+    }
 
-	public boolean isBeanInjectedInStartupBean() {
-		return beanInjectedInStartupBean;
-	}
+    public boolean isBeanInjectedInStartupBean() {
+        return beanInjectedInStartupBean;
+    }
 
 }

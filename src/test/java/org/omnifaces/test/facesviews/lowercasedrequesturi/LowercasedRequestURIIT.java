@@ -26,134 +26,134 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
 public class LowercasedRequestURIIT extends OmniFacesIT {
 
-	@FindBy(id="linkWithExtensionOutcome")
-	private WebElement linkWithExtensionOutcome;
+    @FindBy(id="linkWithExtensionOutcome")
+    private WebElement linkWithExtensionOutcome;
 
-	@FindBy(id="linkWithExtensionlessOutcome")
-	private WebElement linkWithExtensionlessOutcome;
+    @FindBy(id="linkWithExtensionlessOutcome")
+    private WebElement linkWithExtensionlessOutcome;
 
-	@FindBy(id="lowercasedLinkWithExtensionOutcome")
-	private WebElement lowercasedLinkWithExtensionOutcome;
+    @FindBy(id="lowercasedLinkWithExtensionOutcome")
+    private WebElement lowercasedLinkWithExtensionOutcome;
 
-	@FindBy(id="lowercasedLinkWithExtensionlessOutcome")
-	private WebElement lowercasedLinkWithExtensionlessOutcome;
+    @FindBy(id="lowercasedLinkWithExtensionlessOutcome")
+    private WebElement lowercasedLinkWithExtensionlessOutcome;
 
-	@FindBy(id="form")
-	private WebElement form;
+    @FindBy(id="form")
+    private WebElement form;
 
-	@FindBy(id="form:submit")
-	private WebElement formSubmit;
+    @FindBy(id="form:submit")
+    private WebElement formSubmit;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(LowercasedRequestURIIT.class)
-			.withWebXml(withFacesViewsLowercasedRequestURI)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(LowercasedRequestURIIT.class)
+            .withWebXml(withFacesViewsLowercasedRequestURI)
+            .createDeployment();
+    }
 
-	@Test
-	void test() {
-		open("lowercasedrequesturiit");
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+    @Test
+    void test() {
+        open("lowercasedrequesturiit");
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		open("lowercasedrequesturiit.xhtml");
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+        open("lowercasedrequesturiit.xhtml");
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIIT", "lowercasedrequesturiit");
 
-		open("lowercasedrequesturiit/");
-		verify404("lowercasedrequesturiit/");
+        open("lowercasedrequesturiit/");
+        verify404("lowercasedrequesturiit/");
 
-		open("LowercasedRequestURIIT");
-		verify404("LowercasedRequestURIIT");
+        open("LowercasedRequestURIIT");
+        verify404("LowercasedRequestURIIT");
 
-		open("LowercasedRequestURIIT/");
-		verify404("LowercasedRequestURIIT/");
+        open("LowercasedRequestURIIT/");
+        verify404("LowercasedRequestURIIT/");
 
-		open("LowercasedRequestURIIT.xhtml");
-		verify404("LowercasedRequestURIIT.xhtml");
-	}
+        open("LowercasedRequestURIIT.xhtml");
+        verify404("LowercasedRequestURIIT.xhtml");
+    }
 
-	@Test
-	void testSubFolder() {
-		open("subfolder/lowercasedrequesturiit");
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+    @Test
+    void testSubFolder() {
+        open("subfolder/lowercasedrequesturiit");
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		open("subfolder/lowercasedrequesturiit.xhtml");
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+        open("subfolder/lowercasedrequesturiit.xhtml");
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		guardHttp(formSubmit::click);
-		verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
+        guardHttp(formSubmit::click);
+        verify200("LowercasedRequestURIITInSubFolder", "subfolder/lowercasedrequesturiit");
 
-		open("subfolder/lowercasedrequesturiit/");
-		verify404("subfolder/lowercasedrequesturiit/");
+        open("subfolder/lowercasedrequesturiit/");
+        verify404("subfolder/lowercasedrequesturiit/");
 
-		open("subfolder/LowercasedRequestURIIT");
-		verify404("subfolder/LowercasedRequestURIIT");
+        open("subfolder/LowercasedRequestURIIT");
+        verify404("subfolder/LowercasedRequestURIIT");
 
-		open("subfolder/LowercasedRequestURIIT/");
-		verify404("subfolder/LowercasedRequestURIIT/");
+        open("subfolder/LowercasedRequestURIIT/");
+        verify404("subfolder/LowercasedRequestURIIT/");
 
-		open("subfolder/LowercasedRequestURIIT.xhtml");
-		verify404("subfolder/LowercasedRequestURIIT.xhtml");
-	}
+        open("subfolder/LowercasedRequestURIIT.xhtml");
+        verify404("subfolder/LowercasedRequestURIIT.xhtml");
+    }
 
-	@Test
-	void testAlreadyLowercasedViewId() {
-		open("alreadylowercasedviewid");
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+    @Test
+    void testAlreadyLowercasedViewId() {
+        open("alreadylowercasedviewid");
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit::click);
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+        guardHttp(formSubmit::click);
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit::click);
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+        guardHttp(formSubmit::click);
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		open("alreadylowercasedviewid.xhtml");
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+        open("alreadylowercasedviewid.xhtml");
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit::click);
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+        guardHttp(formSubmit::click);
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		guardHttp(formSubmit::click);
-		verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
+        guardHttp(formSubmit::click);
+        verify200("AlreadyLowercasedViewId", "alreadylowercasedviewid");
 
-		open("alreadylowercasedviewid/");
-		verify404("alreadylowercasedviewid/");
-	}
+        open("alreadylowercasedviewid/");
+        verify404("alreadylowercasedviewid/");
+    }
 
-	private void verify200(String title, String path) {
-		assertEquals(title, browser.getTitle());
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(linkWithExtensionOutcome.getAttribute("href")));
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(lowercasedLinkWithExtensionOutcome.getAttribute("href")));
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(lowercasedLinkWithExtensionlessOutcome.getAttribute("href")));
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
-	}
+    private void verify200(String title, String path) {
+        assertEquals(title, browser.getTitle());
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(linkWithExtensionOutcome.getAttribute("href")));
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(linkWithExtensionlessOutcome.getAttribute("href")));
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(lowercasedLinkWithExtensionOutcome.getAttribute("href")));
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(lowercasedLinkWithExtensionlessOutcome.getAttribute("href")));
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
+    }
 
-	private void verify404(String path) {
-		assertEquals("404", browser.getTitle());
-		assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-	}
+    private void verify404(String path) {
+        assertEquals("404", browser.getTitle());
+        assertEquals("/LowercasedRequestURIIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+    }
 
 }

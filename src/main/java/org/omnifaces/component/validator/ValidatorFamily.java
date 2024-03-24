@@ -27,76 +27,76 @@ import jakarta.faces.event.PreValidateEvent;
  */
 public abstract class ValidatorFamily extends UIComponentBase {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.validator";
+    /** The standard component family. */
+    public static final String COMPONENT_FAMILY = "org.omnifaces.component.validator";
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
+    /**
+     * Returns {@link #COMPONENT_FAMILY}.
+     */
+    @Override
+    public String getFamily() {
+        return COMPONENT_FAMILY;
+    }
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    /**
+     * Returns <code>true</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
-	/**
-	 * Calls {@link #validateHierarchy()}.
-	 */
-	@Override
-	public void processDecodes(FacesContext context) {
-		validateHierarchy();
-	}
+    /**
+     * Calls {@link #validateHierarchy()}.
+     */
+    @Override
+    public void processDecodes(FacesContext context) {
+        validateHierarchy();
+    }
 
-	/**
-	 * Calls {@link #validateComponents(FacesContext)}.
-	 */
-	@Override
-	public void processValidators(FacesContext context) {
-		Application application = context.getApplication();
-		application.publishEvent(context, PreValidateEvent.class, this);
-		validateComponents(context);
-		application.publishEvent(context, PostValidateEvent.class, this);
-	}
+    /**
+     * Calls {@link #validateComponents(FacesContext)}.
+     */
+    @Override
+    public void processValidators(FacesContext context) {
+        Application application = context.getApplication();
+        application.publishEvent(context, PreValidateEvent.class, this);
+        validateComponents(context);
+        application.publishEvent(context, PostValidateEvent.class, this);
+    }
 
-	/**
-	 * Does nothing.
-	 */
-	@Override
-	public void processUpdates(FacesContext context) {
-		// NOOP.
-	}
+    /**
+     * Does nothing.
+     */
+    @Override
+    public void processUpdates(FacesContext context) {
+        // NOOP.
+    }
 
-	/**
-	 * Calls {@link #validateHierarchy()}.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		validateHierarchy();
-	}
+    /**
+     * Calls {@link #validateHierarchy()}.
+     */
+    @Override
+    public void encodeChildren(FacesContext context) throws IOException {
+        validateHierarchy();
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate our own component hierarchy.
-	 * @throws IllegalStateException When component hierarchy is wrong.
-	 */
-	protected abstract void validateHierarchy();
+    /**
+     * Validate our own component hierarchy.
+     * @throws IllegalStateException When component hierarchy is wrong.
+     */
+    protected abstract void validateHierarchy();
 
-	/**
-	 * Perform the actual validation.
-	 * @param context The faces context to work with.
-	 */
-	protected abstract void validateComponents(FacesContext context);
+    /**
+     * Perform the actual validation.
+     * @param context The faces context to work with.
+     */
+    protected abstract void validateComponents(FacesContext context);
 
 }

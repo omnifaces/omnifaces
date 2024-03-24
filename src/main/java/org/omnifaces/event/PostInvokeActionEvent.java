@@ -42,18 +42,18 @@ import org.omnifaces.eventlistener.InvokeActionEventListener;
 @NamedEvent(shortName = "postInvokeAction")
 public class PostInvokeActionEvent extends ComponentSystemEvent {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new post invoke action event on the given component.
-	 * @param component The component to invoke the event on.
-	 */
-	public PostInvokeActionEvent(UIComponent component) {
-		super(component);
-	}
+    /**
+     * Construct a new post invoke action event on the given component.
+     * @param component The component to invoke the event on.
+     */
+    public PostInvokeActionEvent(UIComponent component) {
+        super(component);
+    }
 
 }

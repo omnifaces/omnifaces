@@ -87,156 +87,156 @@ import org.omnifaces.util.Utils;
  */
 public class ImportFunctions extends TagHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ImportFunctions.class.getName());
+    private static final Logger logger = Logger.getLogger(ImportFunctions.class.getName());
 
-	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
-	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
-	private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
+    private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
+    private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
+    private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private String varValue;
-	private TagAttribute typeAttribute;
-	private TagAttribute loaderAttribute;
+    private String varValue;
+    private TagAttribute typeAttribute;
+    private TagAttribute loaderAttribute;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public ImportFunctions(TagConfig config) {
-		super(config);
-		varValue = getStringLiteral(getAttribute("var"), "var");
-		typeAttribute = getRequiredAttribute("type");
-		loaderAttribute = getAttribute("loader");
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public ImportFunctions(TagConfig config) {
+        super(config);
+        varValue = getStringLiteral(getAttribute("var"), "var");
+        typeAttribute = getRequiredAttribute("type");
+        loaderAttribute = getAttribute("loader");
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Register a new {@link FunctionMapper} which checks if the given prefix matches our own <code>var</code> and then
-	 * find the associated method based on the given method name.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		String type = typeAttribute.getValue(context);
-		String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
-		ClassLoader loader = getClassLoader(context, loaderAttribute);
-		FunctionMapper originalFunctionMapper = context.getFunctionMapper();
-		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type, loader)));
-	}
+    /**
+     * Register a new {@link FunctionMapper} which checks if the given prefix matches our own <code>var</code> and then
+     * find the associated method based on the given method name.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        String type = typeAttribute.getValue(context);
+        String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
+        ClassLoader loader = getClassLoader(context, loaderAttribute);
+        FunctionMapper originalFunctionMapper = context.getFunctionMapper();
+        context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type, loader)));
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the class loader associated with the object specified in given tag attribute, if any.
-	 * @param context The involved facelet context.
-	 * @param attribute The optional tag attribute to obtain the class loader from.
-	 * @return The class loader associated with the object specified in given tag attribute, if any.
-	 */
-	static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants and LoadBundle can also use it.
-		return Utils.getClassLoader(attribute == null ? null : attribute.getObject(context));
-	}
+    /**
+     * Returns the class loader associated with the object specified in given tag attribute, if any.
+     * @param context The involved facelet context.
+     * @param attribute The optional tag attribute to obtain the class loader from.
+     * @return The class loader associated with the object specified in given tag attribute, if any.
+     */
+    static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants and LoadBundle can also use it.
+        return Utils.getClassLoader(attribute == null ? null : attribute.getObject(context));
+    }
 
-	/**
-	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
-	 * @param type The fully qualified name of the class.
-	 * @return The concrete {@link Class} instance.
-	 * @throws IllegalArgumentException When it is missing in the classpath.
-	 */
-	static Class<?> toClass(String type, ClassLoader loader) { // Package-private so that ImportConstants can also use it.
-		try {
-			return Class.forName(type, true, loader);
-		}
-		catch (ClassNotFoundException e) {
-			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
-			// Let's be lenient on that although the proper type notation should be com.example.SomeClass$SomeEnum.
-			int i = type.lastIndexOf('.');
+    /**
+     * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
+     * @param type The fully qualified name of the class.
+     * @return The concrete {@link Class} instance.
+     * @throws IllegalArgumentException When it is missing in the classpath.
+     */
+    static Class<?> toClass(String type, ClassLoader loader) { // Package-private so that ImportConstants can also use it.
+        try {
+            return Class.forName(type, true, loader);
+        }
+        catch (ClassNotFoundException e) {
+            // Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
+            // Let's be lenient on that although the proper type notation should be com.example.SomeClass$SomeEnum.
+            int i = type.lastIndexOf('.');
 
-			if (i > 0) {
-				try {
-					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString(), loader);
-				}
-				catch (Exception ignore) {
-					logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
-					// Just continue to IllegalArgumentException on original ClassNotFoundException.
-				}
-			}
+            if (i > 0) {
+                try {
+                    return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString(), loader);
+                }
+                catch (Exception ignore) {
+                    logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
+                    // Just continue to IllegalArgumentException on original ClassNotFoundException.
+                }
+            }
 
-			throw new IllegalArgumentException(format(ERROR_MISSING_CLASS, type), e);
-		}
-	}
+            throw new IllegalArgumentException(format(ERROR_MISSING_CLASS, type), e);
+        }
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	private static class ImportFunctionsMapper extends FunctionMapper {
+    private static class ImportFunctionsMapper extends FunctionMapper {
 
-		private FunctionMapper originalFunctionMapper;
-		private String var;
-		private Class<?> type;
+        private FunctionMapper originalFunctionMapper;
+        private String var;
+        private Class<?> type;
 
-		public ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
-			this.originalFunctionMapper = originalFunctionMapper;
-			this.var = var;
-			this.type = type;
-		}
+        public ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
+            this.originalFunctionMapper = originalFunctionMapper;
+            this.var = var;
+            this.type = type;
+        }
 
-		@Override
-		public Method resolveFunction(String prefix, String name) {
-			if (var.equals(prefix)) {
-				String key = type + "." + name;
-				Method function = FUNCTIONS_CACHE.get(key);
+        @Override
+        public Method resolveFunction(String prefix, String name) {
+            if (var.equals(prefix)) {
+                String key = type + "." + name;
+                Method function = FUNCTIONS_CACHE.get(key);
 
-				if (function == null) {
-					function = findMethod(type, name);
+                if (function == null) {
+                    function = findMethod(type, name);
 
-					if (function == null) {
-						throw new IllegalArgumentException(format(ERROR_INVALID_FUNCTION, type.getName(), name));
-					}
+                    if (function == null) {
+                        throw new IllegalArgumentException(format(ERROR_INVALID_FUNCTION, type.getName(), name));
+                    }
 
-					FUNCTIONS_CACHE.put(key, function);
-				}
+                    FUNCTIONS_CACHE.put(key, function);
+                }
 
-				return function;
-			}
-			else {
-				return originalFunctionMapper.resolveFunction(prefix, name);
-			}
-		}
+                return function;
+            }
+            else {
+                return originalFunctionMapper.resolveFunction(prefix, name);
+            }
+        }
 
-		/**
-		 * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
-		 * and return the first one.
-		 * @param cls The class to find the method in.
-		 * @param name The method name.
-		 * @return The found method, or <code>null</code> if none is found.
-		 */
-		private static Method findMethod(Class<?> cls, String name) {
-			Set<Method> methods = new TreeSet<>((Method m1, Method m2) -> Integer.valueOf(m1.getParameterCount()).compareTo(m2.getParameterCount()));
+        /**
+         * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
+         * and return the first one.
+         * @param cls The class to find the method in.
+         * @param name The method name.
+         * @return The found method, or <code>null</code> if none is found.
+         */
+        private static Method findMethod(Class<?> cls, String name) {
+            Set<Method> methods = new TreeSet<>((Method m1, Method m2) -> Integer.valueOf(m1.getParameterCount()).compareTo(m2.getParameterCount()));
 
-			for (Method method : cls.getDeclaredMethods()) {
-				if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {
-					methods.add(method);
-				}
-			}
+            for (Method method : cls.getDeclaredMethods()) {
+                if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {
+                    methods.add(method);
+                }
+            }
 
-			return methods.isEmpty() ? null : methods.iterator().next();
-		}
+            return methods.isEmpty() ? null : methods.iterator().next();
+        }
 
-		/**
-		 * Returns whether the given method is an utility method, that is when it is public and static and returns a
-		 * non-void type.
-		 * @param method The method to be checked.
-		 * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
-		 */
-		private static boolean isPublicStaticNonVoid(Method method) {
-			int modifiers = method.getModifiers();
-			return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && method.getReturnType() != void.class;
-		}
+        /**
+         * Returns whether the given method is an utility method, that is when it is public and static and returns a
+         * non-void type.
+         * @param method The method to be checked.
+         * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
+         */
+        private static boolean isPublicStaticNonVoid(Method method) {
+            int modifiers = method.getModifiers();
+            return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && method.getReturnType() != void.class;
+        }
 
-	}
+    }
 
 }

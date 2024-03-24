@@ -26,19 +26,19 @@ import java.lang.reflect.InvocationTargetException;
  *
  */
 public class CopyCtorCopier implements Copier {
-	
-	@Override
-	public Object copy(Object object) {
-		
-		try {
-			Constructor<? extends Object> copyConstructor = object.getClass().getConstructor(object.getClass());
-			
-			return copyConstructor.newInstance(object);
-			
-		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalStateException(e);
-		}
-		
-	}
+    
+    @Override
+    public Object copy(Object object) {
+        
+        try {
+            Constructor<? extends Object> copyConstructor = object.getClass().getConstructor(object.getClass());
+            
+            return copyConstructor.newInstance(object);
+            
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new IllegalStateException(e);
+        }
+        
+    }
 
 }

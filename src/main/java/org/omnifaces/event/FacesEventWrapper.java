@@ -30,58 +30,58 @@ import jakarta.faces.event.PhaseId;
  */
 public abstract class FacesEventWrapper extends FacesEvent implements FacesWrapper<FacesEvent> {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private FacesEvent wrapped;
+    private FacesEvent wrapped;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new faces event wrapper which wraps the given faces event for the given component.
-	 * @param wrapped The faces event to be wrapped.
-	 * @param component The component to broadcast this event for.
-	 */
-	protected FacesEventWrapper(FacesEvent wrapped, UIComponent component) {
-		super(component);
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct a new faces event wrapper which wraps the given faces event for the given component.
+     * @param wrapped The faces event to be wrapped.
+     * @param component The component to broadcast this event for.
+     */
+    protected FacesEventWrapper(FacesEvent wrapped, UIComponent component) {
+        super(component);
+        this.wrapped = wrapped;
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void queue() {
-		wrapped.queue();
-	}
+    @Override
+    public void queue() {
+        wrapped.queue();
+    }
 
-	@Override
-	public boolean isAppropriateListener(FacesListener listener) {
-		return wrapped.isAppropriateListener(listener);
-	}
+    @Override
+    public boolean isAppropriateListener(FacesListener listener) {
+        return wrapped.isAppropriateListener(listener);
+    }
 
-	@Override
-	public void processListener(FacesListener listener) {
-		wrapped.processListener(listener);
-	}
+    @Override
+    public void processListener(FacesListener listener) {
+        wrapped.processListener(listener);
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	@Override
-	public PhaseId getPhaseId() {
-		return wrapped.getPhaseId();
-	}
+    @Override
+    public PhaseId getPhaseId() {
+        return wrapped.getPhaseId();
+    }
 
-	@Override
-	public void setPhaseId(PhaseId phaseId) {
-		wrapped.setPhaseId(phaseId);
-	}
+    @Override
+    public void setPhaseId(PhaseId phaseId) {
+        wrapped.setPhaseId(phaseId);
+    }
 
-	@Override
-	public FacesEvent getWrapped() {
-		return wrapped;
-	}
+    @Override
+    public FacesEvent getWrapped() {
+        return wrapped;
+    }
 
 }

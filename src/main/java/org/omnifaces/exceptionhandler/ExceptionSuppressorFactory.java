@@ -32,20 +32,20 @@ import jakarta.faces.context.ExceptionHandlerFactory;
  */
 public class ExceptionSuppressorFactory extends ExceptionHandlerFactory {
 
-	/**
-	 * Construct a new view expired exception handler factory around the given wrapped factory.
-	 * @param wrapped The wrapped factory.
-	 */
-	public ExceptionSuppressorFactory(ExceptionHandlerFactory wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Construct a new view expired exception handler factory around the given wrapped factory.
+     * @param wrapped The wrapped factory.
+     */
+    public ExceptionSuppressorFactory(ExceptionHandlerFactory wrapped) {
+        super(wrapped);
+    }
 
-	/**
-	 * Returns a new instance of {@link ExceptionSuppressor} which wraps the original exception handler.
-	 */
-	@Override
-	public ExceptionHandler getExceptionHandler() {
-		return new ExceptionSuppressor(getWrapped().getExceptionHandler());
-	}
+    /**
+     * Returns a new instance of {@link ExceptionSuppressor} which wraps the original exception handler.
+     */
+    @Override
+    public ExceptionHandler getExceptionHandler() {
+        return new ExceptionSuppressor(getWrapped().getExceptionHandler());
+    }
 
 }

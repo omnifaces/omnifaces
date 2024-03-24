@@ -23,14 +23,14 @@ import jakarta.faces.event.SystemEventListener;
  */
 public abstract class DefaultSystemEventListener implements SystemEventListener {
 
-	@Override
-	public void processEvent(SystemEvent event) {
-		// NOOP
-	}
+    @Override
+    public void processEvent(SystemEvent event) {
+        // NOOP
+    }
 
-	@Override
-	public boolean isListenerForSource(Object source) {
-		return true;
-	}
+    @Override
+    public boolean isListenerForSource(Object source) {
+        return true;
+    }
 
 }

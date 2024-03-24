@@ -14,31 +14,31 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<f:metadata>
-		<o:hashParam name="foo" value="#{hashParamITBean.foo}" render="hashLoadTimestamp" />
-		<o:hashParam name="bar" value="#{hashParamITBean.bar}" default="def" />
-	</f:metadata>
+    <f:metadata>
+        <o:hashParam name="foo" value="#{hashParamITBean.foo}" render="hashLoadTimestamp" />
+        <o:hashParam name="bar" value="#{hashParamITBean.bar}" default="def" />
+    </f:metadata>
 
-	<h:head />
+    <h:head />
 
-	<h:body>
-    	<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
-		<h:panelGroup id="hashLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
+    <h:body>
+        <h:outputText id="pageLoadTimestamp" value="#{now.time}" />
+        <h:panelGroup id="hashLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
 
-    	<o:form id="form">
-    		<h:inputText id="foo" value="#{hashParamITBean.foo}" />
-    		<h:inputText id="bar" value="#{hashParamITBean.bar}" />
-    		<h:commandButton id="submit" value="submit">
-    			<f:ajax execute="@form" />
-    		</h:commandButton>
-    	</o:form>
-	</h:body>
+        <o:form id="form">
+            <h:inputText id="foo" value="#{hashParamITBean.foo}" />
+            <h:inputText id="bar" value="#{hashParamITBean.bar}" />
+            <h:commandButton id="submit" value="submit">
+                <f:ajax execute="@form" />
+            </h:commandButton>
+        </o:form>
+    </h:body>
 </html>

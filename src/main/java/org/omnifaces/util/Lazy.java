@@ -37,40 +37,40 @@ import java.util.function.Supplier;
  */
 public final class Lazy<T> implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	private transient T delegate;
-	private transient volatile boolean initialized;
-	private final Supplier<T> initFunction;
-	private final Lock lock = new ReentrantLock();
+    private static final long serialVersionUID = 1L;
+    private transient T delegate;
+    private transient volatile boolean initialized;
+    private final Supplier<T> initFunction;
+    private final Lock lock = new ReentrantLock();
 
-	public interface SerializableSupplier<T> extends Supplier<T>, Serializable { }
+    public interface SerializableSupplier<T> extends Supplier<T>, Serializable { }
 
-	public Lazy(SerializableSupplier<T> initFunction) {
-		this.initFunction = initFunction;
-	}
+    public Lazy(SerializableSupplier<T> initFunction) {
+        this.initFunction = initFunction;
+    }
 
-	/**
-	 * @return Underlying object, initialize when necessary.
-	 */
-	public T get() {
-		boolean localInitialized = this.initialized;
+    /**
+     * @return Underlying object, initialize when necessary.
+     */
+    public T get() {
+        boolean localInitialized = this.initialized;
 
-		if (!localInitialized) {
-			lock.lock();
+        if (!localInitialized) {
+            lock.lock();
 
-			try {
-				if (!initialized) {
-					delegate = initFunction.get();
-				}
+            try {
+                if (!initialized) {
+                    delegate = initFunction.get();
+                }
 
-				initialized = true;
+                initialized = true;
 
-			}
-			finally {
-				lock.unlock();
-			}
-		}
+            }
+            finally {
+                lock.unlock();
+            }
+        }
 
-		return delegate;
-	}
+        return delegate;
+    }
 }

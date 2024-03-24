@@ -207,182 +207,182 @@ import org.omnifaces.util.State;
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically graphicimage.js.
 public class GraphicImage extends HtmlGraphicImage {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.GraphicImage#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
+    /** The component type, which is {@value org.omnifaces.component.output.GraphicImage#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
 
-	/** Attribute names inherited from superclass. */
-	protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
+    /** Attribute names inherited from superclass. */
+    protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
 
-	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
+    private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		dataURI,
-		lazy;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        dataURI,
+        lazy;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Constructs the GraphicImage component.
-	 */
-	public GraphicImage() {
-		setRendererType(null);
-	}
+    /**
+     * Constructs the GraphicImage component.
+     */
+    public GraphicImage() {
+        setRendererType(null);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("img", this);
-		writeIdAttributeIfNecessary(writer, this);
-		String src = getSrc(context);
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        ResponseWriter writer = context.getResponseWriter();
+        writer.startElement("img", this);
+        writeIdAttributeIfNecessary(writer, this);
+        String src = getSrc(context);
 
-		if (isLazy() && !isDataURI()) {
-			writer.writeAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", null);
-			writer.writeAttribute("data-src", src, "value");
-			writer.writeAttribute("data-lazy", "true", "lazy");
-		}
-		else {
-			writer.writeAttribute("src", src, "value"); // h:graphicImage uses writeURIAttribute(), but it kills URL fragment identifiers, so we use writeAttribute() instead.
-		}
+        if (isLazy() && !isDataURI()) {
+            writer.writeAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", null);
+            writer.writeAttribute("data-src", src, "value");
+            writer.writeAttribute("data-lazy", "true", "lazy");
+        }
+        else {
+            writer.writeAttribute("src", src, "value"); // h:graphicImage uses writeURIAttribute(), but it kills URL fragment identifiers, so we use writeAttribute() instead.
+        }
 
-		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
-	}
+        writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
+    }
 
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		ResponseWriter writer = context.getResponseWriter();
-		writer.endElement("img");
-	}
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        ResponseWriter writer = context.getResponseWriter();
+        writer.endElement("img");
+    }
 
-	/**
-	 * Returns the URL needed for the 'src' attribute.
-	 * @param context The involved faces context.
-	 * @return The URL needed for the 'src' attribute.
-	 * @throws IOException When something fails at I/O level.
-	 */
-	protected String getSrc(FacesContext context) throws IOException {
-		String name = (String) getAttributes().get("name");
-		boolean dataURI = isDataURI();
+    /**
+     * Returns the URL needed for the 'src' attribute.
+     * @param context The involved faces context.
+     * @return The URL needed for the 'src' attribute.
+     * @throws IOException When something fails at I/O level.
+     */
+    protected String getSrc(FacesContext context) throws IOException {
+        String name = (String) getAttributes().get("name");
+        boolean dataURI = isDataURI();
 
-		Resource resource;
+        Resource resource;
 
-		if (name != null) {
-			resource = createGraphicResourceByName(context, name, dataURI);
+        if (name != null) {
+            resource = createGraphicResourceByName(context, name, dataURI);
 
-			if (resource == null) {
-				return RES_NOT_FOUND;
-			}
-		}
-		else {
-			ValueExpression value = getValueExpression(VALUE_ATTRIBUTE);
+            if (resource == null) {
+                return RES_NOT_FOUND;
+            }
+        }
+        else {
+            ValueExpression value = getValueExpression(VALUE_ATTRIBUTE);
 
-			if (value != null) {
-				resource = createGraphicResourceByValue(context, value, dataURI);
-			}
-			else {
-				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
-			}
-		}
+            if (value != null) {
+                resource = createGraphicResourceByValue(context, value, dataURI);
+            }
+            else {
+                throw new IllegalArgumentException(ERROR_MISSING_VALUE);
+            }
+        }
 
-		String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
-		String fragment = (String) getAttributes().get("fragment");
+        String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
+        String fragment = (String) getAttributes().get("fragment");
 
-		if (dataURI || isEmpty(fragment)) {
-			return url;
-		}
+        if (dataURI || isEmpty(fragment)) {
+            return url;
+        }
 
-		return url + (fragment.charAt(0) == '#' ? "" : "#") + fragment;
-	}
+        return url + (fragment.charAt(0) == '#' ? "" : "#") + fragment;
+    }
 
-	private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
-		String library = (String) getAttributes().get("library");
-		Resource resource = createResource(context, library, name);
+    private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
+        String library = (String) getAttributes().get("library");
+        Resource resource = createResource(context, library, name);
 
-		if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
-			resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
-		}
+        if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
+            resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
+        }
 
-		return resource;
-	}
+        return resource;
+    }
 
-	private Resource createGraphicResourceByValue(FacesContext context, ValueExpression value, boolean dataURI) {
-		String type = (String) getAttributes().get("type");
+    private Resource createGraphicResourceByValue(FacesContext context, ValueExpression value, boolean dataURI) {
+        String type = (String) getAttributes().get("type");
 
-		if (dataURI) {
-			return new GraphicResource(value.getValue(context.getELContext()), type);
-		}
-		else {
-			return GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
-		}
-	}
+        if (dataURI) {
+            return new GraphicResource(value.getValue(context.getELContext()), type);
+        }
+        else {
+            return GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns an empty string as default value instead of <code>null</code>, so that the attribute is always rendered,
-	 * as mandated by HTML5.
-	 */
-	@Override
-	public String getAlt() {
-		return coalesce(super.getAlt(), "");
-	}
+    /**
+     * Returns an empty string as default value instead of <code>null</code>, so that the attribute is always rendered,
+     * as mandated by HTML5.
+     */
+    @Override
+    public String getAlt() {
+        return coalesce(super.getAlt(), "");
+    }
 
-	/**
-	 * Returns whether or not to render image in data URI format.
-	 * @return Whether or not to render image in data URI format.
-	 * @since 3.10
-	 */
-	public boolean isDataURI() {
-		return state.get(PropertyKeys.dataURI, false);
-	}
+    /**
+     * Returns whether or not to render image in data URI format.
+     * @return Whether or not to render image in data URI format.
+     * @since 3.10
+     */
+    public boolean isDataURI() {
+        return state.get(PropertyKeys.dataURI, false);
+    }
 
-	/**
-	 * Sets whether or not to render image in data URI format.
-	 * @param dataURI Whether or not to render image in data URI format.
-	 * @since 3.10.1
-	 */
-	public void setDataURI(boolean dataURI) {
-		state.put(PropertyKeys.dataURI, dataURI);
-	}
+    /**
+     * Sets whether or not to render image in data URI format.
+     * @param dataURI Whether or not to render image in data URI format.
+     * @since 3.10.1
+     */
+    public void setDataURI(boolean dataURI) {
+        state.put(PropertyKeys.dataURI, dataURI);
+    }
 
-	/**
-	 * Returns whether or not to lazily load image.
-	 * @return Whether or not to lazily load image.
-	 * @since 3.10
-	 */
-	public boolean isLazy() {
-		return state.get(PropertyKeys.lazy, false);
-	}
+    /**
+     * Returns whether or not to lazily load image.
+     * @return Whether or not to lazily load image.
+     * @since 3.10
+     */
+    public boolean isLazy() {
+        return state.get(PropertyKeys.lazy, false);
+    }
 
-	/**
-	 * Sets whether or not to lazily load image.
-	 * @param lazy Whether or not to lazily load image.
-	 * @since 3.10
-	 */
-	public void setLazy(boolean lazy) {
-		state.put(PropertyKeys.lazy, lazy);
-	}
+    /**
+     * Sets whether or not to lazily load image.
+     * @param lazy Whether or not to lazily load image.
+     * @since 3.10
+     */
+    public void setLazy(boolean lazy) {
+        state.put(PropertyKeys.lazy, lazy);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private static Map<String, String> collectAttributeNames() {
-		Map<String, String> attributeNames = new HashMap<>();
+    private static Map<String, String> collectAttributeNames() {
+        Map<String, String> attributeNames = new HashMap<>();
 
-		for (HtmlGraphicImage.PropertyKeys propertyKey : HtmlGraphicImage.PropertyKeys.values()) {
-			String name = propertyKey.name();
-			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
-		}
+        for (HtmlGraphicImage.PropertyKeys propertyKey : HtmlGraphicImage.PropertyKeys.values()) {
+            String name = propertyKey.name();
+            attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
+        }
 
-		return Collections.unmodifiableMap(attributeNames);
-	}
+        return Collections.unmodifiableMap(attributeNames);
+    }
 
 }

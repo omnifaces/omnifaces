@@ -26,185 +26,185 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file in web.xml, the servlet path returns wrong value")
 public class MultiViewsIT extends OmniFacesIT {
 
-	@FindBy(id="firstPathParamAsString")
-	private WebElement firstPathParamAsString;
+    @FindBy(id="firstPathParamAsString")
+    private WebElement firstPathParamAsString;
 
-	@FindBy(id="secondPathParamAsInteger")
-	private WebElement secondPathParamAsInteger;
+    @FindBy(id="secondPathParamAsInteger")
+    private WebElement secondPathParamAsInteger;
 
-	@FindBy(id="form")
-	private WebElement form;
+    @FindBy(id="form")
+    private WebElement form;
 
-	@FindBy(id="form:submit")
-	private WebElement formSubmit;
+    @FindBy(id="form:submit")
+    private WebElement formSubmit;
 
-	@FindBy(id="link")
-	private WebElement link;
+    @FindBy(id="link")
+    private WebElement link;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(MultiViewsIT.class)
-			.withWebXml(withMultiViews)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(MultiViewsIT.class)
+            .withWebXml(withMultiViews)
+            .createDeployment();
+    }
 
-	@Test
-	void testWelcomeFileOnEmptyPath() {
-		open("");
-		verify200("MultiViewsITWelcomeFile", "", "", "");
+    @Test
+    void testWelcomeFileOnEmptyPath() {
+        open("");
+        verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITWelcomeFile", "", "", "");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(link::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
-	}
+        guardHttp(link::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+    }
 
-	@Test
-	void testWelcomeFileOnNamedPath() {
-		open("MultiViewsITWelcomeFile");
-		verify200("MultiViewsITWelcomeFile", "", "", ""); // So it should have autoredirected back to empty path.
+    @Test
+    void testWelcomeFileOnNamedPath() {
+        open("MultiViewsITWelcomeFile");
+        verify200("MultiViewsITWelcomeFile", "", "", ""); // So it should have autoredirected back to empty path.
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITWelcomeFile", "", "", "");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITWelcomeFile", "", "", "");
 
-		guardHttp(link::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
-	}
+        guardHttp(link::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+    }
 
-	@Test
-	void testWelcomeFileWithPathParameters() {
-		open("foo/42");
-		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
+    @Test
+    void testWelcomeFileWithPathParameters() {
+        open("foo/42");
+        verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITWelcomeFile", "foo/42", "foo", "42");
 
-		open("foo/42/bar/");
-		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
+        open("foo/42/bar/");
+        verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
-	}
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITWelcomeFile", "foo/42/bar/", "foo", "42");
+    }
 
-	@Test
-	void testSubfolderWelcomeFileOnEmptyPath() {
-		open("subfolder/");
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
+    @Test
+    void testSubfolderWelcomeFileOnEmptyPath() {
+        open("subfolder/");
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(formSubmit::click);
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
+        guardHttp(formSubmit::click);
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(link::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
-	}
+        guardHttp(link::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+    }
 
-	@Test
-	void testSubfolderWelcomeFileOnNamedPath() {
-		open("subfolder/MultiViewsITWelcomeFile");
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to subfolder.
+    @Test
+    void testSubfolderWelcomeFileOnNamedPath() {
+        open("subfolder/MultiViewsITWelcomeFile");
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", ""); // So it should have autoredirected back to subfolder.
 
-		guardHttp(formSubmit::click);
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
+        guardHttp(formSubmit::click);
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/", "", "");
 
-		guardHttp(link::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
-	}
+        guardHttp(link::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+    }
 
-	@Test
-	void testSubfolderWelcomeFileWithPathParameters() {
-		open("subfolder/foo/42");
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
+    @Test
+    void testSubfolderWelcomeFileWithPathParameters() {
+        open("subfolder/foo/42");
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
+        guardHttp(formSubmit::click);
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42", "foo", "42");
 
-		open("subfolder/foo/42/bar/");
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
+        open("subfolder/foo/42/bar/");
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
-	}
+        guardHttp(formSubmit::click);
+        verify200("subfolder/MultiViewsITWelcomeFile", "subfolder/foo/42/bar/", "foo", "42");
+    }
 
-	@Test
-	void testOtherPage() {
-		open("MultiViewsITOtherPage");
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
+    @Test
+    void testOtherPage() {
+        open("MultiViewsITOtherPage");
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		open("MultiViewsITOtherPage.xhtml");
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
+        open("MultiViewsITOtherPage.xhtml");
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
-		open("MultiViewsITOtherPage/foo/42");
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
+        open("MultiViewsITOtherPage/foo/42");
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42", "foo", "42");
 
-		open("MultiViewsITOtherPage/foo/42/bar/");
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
+        open("MultiViewsITOtherPage/foo/42/bar/");
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
-		guardHttp(formSubmit::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
+        guardHttp(formSubmit::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
-		guardHttp(link::click);
-		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
-	}
+        guardHttp(link::click);
+        verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+    }
 
-	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
-	void testNonExistingPage() {
-		open("MultiViewsITNonExistingPage");
-		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
+    @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    void testNonExistingPage() {
+        open("MultiViewsITNonExistingPage");
+        verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
 
-		open("MultiViewsITNonExistingPage/");
-		verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
+        open("MultiViewsITNonExistingPage/");
+        verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
-		open("MultiViewsITNonExistingPage.xhtml");
-		verify404("MultiViewsITNonExistingPage.xhtml");
-	}
+        open("MultiViewsITNonExistingPage.xhtml");
+        verify404("MultiViewsITNonExistingPage.xhtml");
+    }
 
-	@Test
-	@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
-	void testExcludedFolder() {
-		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
-		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
+    @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    void testExcludedFolder() {
+        open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
+        verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
 
-		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
-		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+        open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+        verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
 
-		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
-		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+        open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+        verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
 
-		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
-		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+        open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+        verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
 
-		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
-		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+        open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+        verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
 
-		open("excludedfolder/foo/42");
-		verify404("excludedfolder/foo/42");
+        open("excludedfolder/foo/42");
+        verify404("excludedfolder/foo/42");
 
-		open("excludedfolder/");
-		verify404("excludedfolder/");
-	}
+        open("excludedfolder/");
+        verify404("excludedfolder/");
+    }
 
-	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {
-		assertEquals(title, browser.getTitle());
-		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-		assertEquals(firstPathParam, firstPathParamAsString.getText());
-		assertEquals(secondPathParam, secondPathParamAsInteger.getText());
-		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
-		assertEquals("/MultiViewsIT/MultiViewsITOtherPage/pathParam/471", stripHostAndJsessionid(link.getAttribute("href")));
-	}
+    private void verify200(String title, String path, String firstPathParam, String secondPathParam) {
+        assertEquals(title, browser.getTitle());
+        assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+        assertEquals(firstPathParam, firstPathParamAsString.getText());
+        assertEquals(secondPathParam, secondPathParamAsInteger.getText());
+        assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(form.getAttribute("action")));
+        assertEquals("/MultiViewsIT/MultiViewsITOtherPage/pathParam/471", stripHostAndJsessionid(link.getAttribute("href")));
+    }
 
-	private void verify404(String path) {
-		assertEquals("404", browser.getTitle());
-		assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
-	}
+    private void verify404(String path) {
+        assertEquals("404", browser.getTitle());
+        assertEquals("/MultiViewsIT/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
+    }
 }

@@ -21,111 +21,111 @@ import { Util } from "./Util";
  */
 export module Highlight {
 
-	// "Constant" fields ----------------------------------------------------------------------------------------------
+    // "Constant" fields ----------------------------------------------------------------------------------------------
 
-	export const DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
-	export const DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
+    export const DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
+    export const DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
 
-	// Private static fields ------------------------------------------------------------------------------------------
+    // Private static fields ------------------------------------------------------------------------------------------
 
-	let labelsByFor: Record<string, HTMLLabelElement>;
+    let labelsByFor: Record<string, HTMLLabelElement>;
 
-	// Public static functions ----------------------------------------------------------------------------------------
+    // Public static functions ----------------------------------------------------------------------------------------
 
-	/**
-	 * Apply the highlight. Add the given error style class to all input elements of the given client IDs and their
-	 * associated labels. If doFocus is <code>true</code>, then also set the focus on the first input element. All
-	 * non-existing input elements are ignored.
-	 * @param clientIds Array of client IDs of elements to highlight.
-	 * @param styleClass CSS style class to be set on the elements and the associated label elements.
-	 * @param doFocus Whether or not to put focus on the first highlighted element.
-	 */
-	export function apply(clientIds: string[], styleClass: string, doFocus: boolean) {
-		labelsByFor = getLabelsByFor();
+    /**
+     * Apply the highlight. Add the given error style class to all input elements of the given client IDs and their
+     * associated labels. If doFocus is <code>true</code>, then also set the focus on the first input element. All
+     * non-existing input elements are ignored.
+     * @param clientIds Array of client IDs of elements to highlight.
+     * @param styleClass CSS style class to be set on the elements and the associated label elements.
+     * @param doFocus Whether or not to put focus on the first highlighted element.
+     */
+    export function apply(clientIds: string[], styleClass: string, doFocus: boolean) {
+        labelsByFor = getLabelsByFor();
 
-		for (let clientId of clientIds) {
-			const input = getElementByIdOrName(clientId);
+        for (let clientId of clientIds) {
+            const input = getElementByIdOrName(clientId);
 
-			if (input) {
-				input.className += " " + styleClass;
-				input.setAttribute(DATA_HIGHLIGHT_CLASS, styleClass);
-				const label = labelsByFor[input.id];
+            if (input) {
+                input.className += " " + styleClass;
+                input.setAttribute(DATA_HIGHLIGHT_CLASS, styleClass);
+                const label = labelsByFor[input.id];
 
-				if (label) {
-					label.className += " " + styleClass;
-					input.setAttribute(DATA_HIGHLIGHT_LABEL, "true");
-				}
+                if (label) {
+                    label.className += " " + styleClass;
+                    input.setAttribute(DATA_HIGHLIGHT_LABEL, "true");
+                }
 
-				if (doFocus) {
-					input.focus();
-					doFocus = false;
-				}
+                if (doFocus) {
+                    input.focus();
+                    doFocus = false;
+                }
 
-				Util.addEventListener(input, "click input", removeHighlight);
-			}
-		}
-	}
+                Util.addEventListener(input, "click input", removeHighlight);
+            }
+        }
+    }
 
-	// Private static functions ---------------------------------------------------------------------------------------
+    // Private static functions ---------------------------------------------------------------------------------------
 
-	/**
-	 * Return a mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
-	 * @return A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
-	 */
-	function getLabelsByFor(): Record<string, HTMLLabelElement> {
-		const labels = document.getElementsByTagName("LABEL") as HTMLCollectionOf<HTMLLabelElement>;
-		const labelsByFor: Record<string, HTMLLabelElement> = {};
+    /**
+     * Return a mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+     * @return A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+     */
+    function getLabelsByFor(): Record<string, HTMLLabelElement> {
+        const labels = document.getElementsByTagName("LABEL") as HTMLCollectionOf<HTMLLabelElement>;
+        const labelsByFor: Record<string, HTMLLabelElement> = {};
 
-		for (var i = 0; i < labels.length; i++) {
-			const label = labels[i];
-			const htmlFor = label.htmlFor;
+        for (var i = 0; i < labels.length; i++) {
+            const label = labels[i];
+            const htmlFor = label.htmlFor;
 
-			if (htmlFor) {
-				labelsByFor[htmlFor] = label;
-			}
-		}
+            if (htmlFor) {
+                labelsByFor[htmlFor] = label;
+            }
+        }
 
-		return labelsByFor;
-	}
+        return labelsByFor;
+    }
 
-	/**
-	 * Returns an element by ID or name.
-	 * @param Client ID.
-	 * @return HTML element identified by given client ID. 
-	 */
-	function getElementByIdOrName(clientId: string): HTMLElement {
-		let element = document.getElementById(clientId);
+    /**
+     * Returns an element by ID or name.
+     * @param Client ID.
+     * @return HTML element identified by given client ID. 
+     */
+    function getElementByIdOrName(clientId: string): HTMLElement {
+        let element = document.getElementById(clientId);
 
-		if (!element) {
-			const elements = document.getElementsByName(clientId); // #21
+        if (!element) {
+            const elements = document.getElementsByName(clientId); // #21
 
-			if (elements && elements.length) {
-				element = elements[0];
-			}
-		}
+            if (elements && elements.length) {
+                element = elements[0];
+            }
+        }
 
-		return element;
-	}
+        return element;
+    }
 
-	/**
-	 * Remove the highlight. Remove the error style class from involved input element and its associated label.
-	 */
-	function removeHighlight() {
-		const input = this;
-		Util.removeEventListener(input, "click input", removeHighlight);
-		const styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
+    /**
+     * Remove the highlight. Remove the error style class from involved input element and its associated label.
+     */
+    function removeHighlight() {
+        const input = this;
+        Util.removeEventListener(input, "click input", removeHighlight);
+        const styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
 
-		if (styleClass) {
-			input.removeAttribute(DATA_HIGHLIGHT_CLASS);
-			const regex = new RegExp(" " + styleClass, "g");
-			input.className = input.className.replace(regex, "");
-			let label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
+        if (styleClass) {
+            input.removeAttribute(DATA_HIGHLIGHT_CLASS);
+            const regex = new RegExp(" " + styleClass, "g");
+            input.className = input.className.replace(regex, "");
+            let label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
 
-			if (label) {
-				input.removeAttribute(DATA_HIGHLIGHT_LABEL);
-				label = labelsByFor[input.id];
-				label.className = label.className.replace(regex, "");
-			}
-		}
-	}
+            if (label) {
+                input.removeAttribute(DATA_HIGHLIGHT_LABEL);
+                label = labelsByFor[input.id];
+                label.className = label.className.replace(regex, "");
+            }
+        }
+    }
 }

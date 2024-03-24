@@ -11,5 +11,5 @@
  * specific language governing permissions and limitations under the License.
  */
 OmniFaces.Util.addOnloadListener(function() {
-	document.getElementById("headWithTarget").innerHTML += (++i + ",headWithTarget");
+    document.getElementById("headWithTarget").innerHTML += (++i + ",headWithTarget");
 });

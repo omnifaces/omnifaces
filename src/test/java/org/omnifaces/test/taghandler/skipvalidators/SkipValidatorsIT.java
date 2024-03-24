@@ -23,60 +23,60 @@ import org.openqa.selenium.support.FindBy;
 
 public class SkipValidatorsIT extends OmniFacesIT {
 
-	@FindBy(id="form:toggleRequired")
-	private WebElement toggleRequired;
+    @FindBy(id="form:toggleRequired")
+    private WebElement toggleRequired;
 
-	@FindBy(id="form:input")
-	private WebElement input;
+    @FindBy(id="form:input")
+    private WebElement input;
 
-	@FindBy(id="form:message")
-	private WebElement message;
+    @FindBy(id="form:message")
+    private WebElement message;
 
-	@FindBy(id="form:submit")
-	private WebElement submit;
+    @FindBy(id="form:submit")
+    private WebElement submit;
 
-	@FindBy(id="form:validationFailed")
-	private WebElement validationFailed;
+    @FindBy(id="form:validationFailed")
+    private WebElement validationFailed;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(SkipValidatorsIT.class)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(SkipValidatorsIT.class)
+            .createDeployment();
+    }
 
-	@Test
-	void test() {
-		guardAjax(submit::click);
-		assertEquals("required!", message.getText());
-		assertEquals("true", validationFailed.getText());
+    @Test
+    void test() {
+        guardAjax(submit::click);
+        assertEquals("required!", message.getText());
+        assertEquals("true", validationFailed.getText());
 
-		guardAjax(toggleRequired::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
-		guardAjax(submit::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
+        guardAjax(toggleRequired::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
+        guardAjax(submit::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
 
-		guardAjax(toggleRequired::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
-		guardAjax(submit::click);
-		assertEquals("required!", message.getText());
-		assertEquals("true", validationFailed.getText());
+        guardAjax(toggleRequired::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
+        guardAjax(submit::click);
+        assertEquals("required!", message.getText());
+        assertEquals("true", validationFailed.getText());
 
-		guardAjax(toggleRequired::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
-		guardAjax(submit::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
+        guardAjax(toggleRequired::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
+        guardAjax(submit::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
 
-		guardAjax(toggleRequired::click);
-		assertEquals("", message.getText());
-		assertEquals("false", validationFailed.getText());
-		guardAjax(submit::click);
-		assertEquals("required!", message.getText());
-		assertEquals("true", validationFailed.getText());
-	}
+        guardAjax(toggleRequired::click);
+        assertEquals("", message.getText());
+        assertEquals("false", validationFailed.getText());
+        guardAjax(submit::click);
+        assertEquals("required!", message.getText());
+        assertEquals("true", validationFailed.getText());
+    }
 
 }

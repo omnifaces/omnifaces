@@ -14,44 +14,44 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<h:outputText id="valueReferenceBase" value="#{expressionInspectorITBean.valueReference.base['class'].simpleName}" />
-		<h:outputText id="valueReferenceProperty" value="#{expressionInspectorITBean.valueReference.property}" />
+    <h:body>
+        <h:outputText id="valueReferenceBase" value="#{expressionInspectorITBean.valueReference.base['class'].simpleName}" />
+        <h:outputText id="valueReferenceProperty" value="#{expressionInspectorITBean.valueReference.property}" />
 
-		<h:outputText id="getterReferenceBase" value="#{expressionInspectorITBean.getterReference.base['class'].simpleName}" />
-		<h:outputText id="getterReferenceMethodName" value="#{expressionInspectorITBean.getterReference.method.name}" />
-		<h:outputText id="getterReferenceReturnType" value="#{expressionInspectorITBean.getterReference.returnType.simpleName}" />
-		<h:outputText id="getterReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.getterReference.paramTypes, ', ')}" />
-		<h:outputText id="getterReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.getterReference.actualParameters, ', ')}" />
+        <h:outputText id="getterReferenceBase" value="#{expressionInspectorITBean.getterReference.base['class'].simpleName}" />
+        <h:outputText id="getterReferenceMethodName" value="#{expressionInspectorITBean.getterReference.method.name}" />
+        <h:outputText id="getterReferenceReturnType" value="#{expressionInspectorITBean.getterReference.returnType.simpleName}" />
+        <h:outputText id="getterReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.getterReference.paramTypes, ', ')}" />
+        <h:outputText id="getterReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.getterReference.actualParameters, ', ')}" />
 
-		<h:outputText id="methodReferenceBase" value="#{expressionInspectorITBean.methodReference.base['class'].simpleName}" />
-		<h:outputText id="methodReferenceMethodName" value="#{expressionInspectorITBean.methodReference.method.name}" />
-		<h:outputText id="methodReferenceReturnType" value="#{expressionInspectorITBean.methodReference.returnType.simpleName}" />
-		<h:outputText id="methodReferenceFirstParamType" value="#{empty expressionInspectorITBean.methodReference.paramTypes ? '' : expressionInspectorITBean.methodReference.paramTypes[0].simpleName}" />
-		<h:outputText id="methodReferenceFirstActualParameter" value="#{empty expressionInspectorITBean.methodReference.actualParameters ? '' : expressionInspectorITBean.methodReference.actualParameters[0]['class'].simpleName}" />
+        <h:outputText id="methodReferenceBase" value="#{expressionInspectorITBean.methodReference.base['class'].simpleName}" />
+        <h:outputText id="methodReferenceMethodName" value="#{expressionInspectorITBean.methodReference.method.name}" />
+        <h:outputText id="methodReferenceReturnType" value="#{expressionInspectorITBean.methodReference.returnType.simpleName}" />
+        <h:outputText id="methodReferenceFirstParamType" value="#{empty expressionInspectorITBean.methodReference.paramTypes ? '' : expressionInspectorITBean.methodReference.paramTypes[0].simpleName}" />
+        <h:outputText id="methodReferenceFirstActualParameter" value="#{empty expressionInspectorITBean.methodReference.actualParameters ? '' : expressionInspectorITBean.methodReference.actualParameters[0]['class'].simpleName}" />
 
-		<h:outputText id="valueMethodReferenceBase" value="#{expressionInspectorITBean.valueMethodReference.base['class'].simpleName}" />
-		<h:outputText id="valueMethodReferenceMethodName" value="#{expressionInspectorITBean.valueMethodReference.method.name}" />
-		<h:outputText id="valueMethodReferenceReturnType" value="#{expressionInspectorITBean.valueMethodReference.returnType.simpleName}" />
-		<h:outputText id="valueMethodReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.paramTypes, ', ')}" />
-		<h:outputText id="valueMethodReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.actualParameters, ', ')}" />
+        <h:outputText id="valueMethodReferenceBase" value="#{expressionInspectorITBean.valueMethodReference.base['class'].simpleName}" />
+        <h:outputText id="valueMethodReferenceMethodName" value="#{expressionInspectorITBean.valueMethodReference.method.name}" />
+        <h:outputText id="valueMethodReferenceReturnType" value="#{expressionInspectorITBean.valueMethodReference.returnType.simpleName}" />
+        <h:outputText id="valueMethodReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.paramTypes, ', ')}" />
+        <h:outputText id="valueMethodReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.valueMethodReference.actualParameters, ', ')}" />
 
-		<h:outputText id="methodValueReferenceBase" value="#{expressionInspectorITBean.methodValueReference.base['class'].simpleName}" />
-		<h:outputText id="methodValueReferenceProperty" value="#{expressionInspectorITBean.methodValueReference.property}" />
+        <h:outputText id="methodValueReferenceBase" value="#{expressionInspectorITBean.methodValueReference.base['class'].simpleName}" />
+        <h:outputText id="methodValueReferenceProperty" value="#{expressionInspectorITBean.methodValueReference.property}" />
 
-		<h:outputText id="methodMethodReferenceBase" value="#{expressionInspectorITBean.methodMethodReference.base['class'].simpleName}" />
-		<h:outputText id="methodMethodReferenceMethodName" value="#{expressionInspectorITBean.methodMethodReference.method.name}" />
-		<h:outputText id="methodMethodReferenceReturnType" value="#{expressionInspectorITBean.methodMethodReference.returnType.simpleName}" />
-		<h:outputText id="methodMethodReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.methodMethodReference.paramTypes, ', ')}" />
-		<h:outputText id="methodMethodReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.methodMethodReference.actualParameters, ', ')}" />
-	</h:body>
+        <h:outputText id="methodMethodReferenceBase" value="#{expressionInspectorITBean.methodMethodReference.base['class'].simpleName}" />
+        <h:outputText id="methodMethodReferenceMethodName" value="#{expressionInspectorITBean.methodMethodReference.method.name}" />
+        <h:outputText id="methodMethodReferenceReturnType" value="#{expressionInspectorITBean.methodMethodReference.returnType.simpleName}" />
+        <h:outputText id="methodMethodReferenceParamTypes" value="#{of:joinArray(expressionInspectorITBean.methodMethodReference.paramTypes, ', ')}" />
+        <h:outputText id="methodMethodReferenceActualParameters" value="#{of:joinArray(expressionInspectorITBean.methodMethodReference.actualParameters, ', ')}" />
+    </h:body>
 </html>

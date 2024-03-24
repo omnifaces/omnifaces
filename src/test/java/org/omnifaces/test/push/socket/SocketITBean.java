@@ -30,39 +30,39 @@ import org.omnifaces.cdi.ViewScoped;
 @ViewScoped
 public class SocketITBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Inject @Push
-	private PushContext applicationScopedServerEvent;
+    @Inject @Push
+    private PushContext applicationScopedServerEvent;
 
-	@Inject @Push
-	private PushContext sessionScopedUserTargeted;
+    @Inject @Push
+    private PushContext sessionScopedUserTargeted;
 
-	@Inject @Push
-	private PushContext viewScopedAjaxAware;
+    @Inject @Push
+    private PushContext viewScopedAjaxAware;
 
-	private String ajaxAwareMessage;
+    private String ajaxAwareMessage;
 
-	public void pushApplicationScopedServerEvent() {
-		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = applicationScopedServerEvent.send(timestamp);
-		addGlobalInfo("{0},{1}", sent.size(), timestamp);
-	}
+    public void pushApplicationScopedServerEvent() {
+        String timestamp = String.valueOf(nanoTime());
+        Set<Future<Void>> sent = applicationScopedServerEvent.send(timestamp);
+        addGlobalInfo("{0},{1}", sent.size(), timestamp);
+    }
 
-	public void pushSessionScopedUserTargeted(String recipientUser) {
-		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = sessionScopedUserTargeted.send(timestamp, recipientUser);
-		addGlobalInfo("{0},{1}", sent.size(), timestamp);
-	}
+    public void pushSessionScopedUserTargeted(String recipientUser) {
+        String timestamp = String.valueOf(nanoTime());
+        Set<Future<Void>> sent = sessionScopedUserTargeted.send(timestamp, recipientUser);
+        addGlobalInfo("{0},{1}", sent.size(), timestamp);
+    }
 
-	public void pushViewScopedAjaxAware() {
-		ajaxAwareMessage = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = viewScopedAjaxAware.send("someAjaxEventName");
-		addGlobalInfo("{0},{1}", sent.size(), ajaxAwareMessage);
-	}
+    public void pushViewScopedAjaxAware() {
+        ajaxAwareMessage = String.valueOf(nanoTime());
+        Set<Future<Void>> sent = viewScopedAjaxAware.send("someAjaxEventName");
+        addGlobalInfo("{0},{1}", sent.size(), ajaxAwareMessage);
+    }
 
-	public String getAjaxAwareMessage() {
-		return ajaxAwareMessage;
-	}
+    public String getAjaxAwareMessage() {
+        return ajaxAwareMessage;
+    }
 
 }

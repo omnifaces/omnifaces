@@ -60,151 +60,151 @@ import org.omnifaces.cdi.Eager;
 @Dependent
 public class DateProducer {
 
-	/**
-	 * This makes an instance of {@link Temporal} as startup datetime available by <code>#{startup}</code>.
-	 * @return Startup datetime.
-	 */
-	@Produces @Named @ApplicationScoped @Eager
-	public TemporalDate getStartup() {
-		return new TemporalDate();
-	}
+    /**
+     * This makes an instance of {@link Temporal} as startup datetime available by <code>#{startup}</code>.
+     * @return Startup datetime.
+     */
+    @Produces @Named @ApplicationScoped @Eager
+    public TemporalDate getStartup() {
+        return new TemporalDate();
+    }
 
-	/**
-	 * This makes an instance of {@link Temporal} as current datetime available by <code>#{now}</code>.
-	 * @return Current datetime.
-	 */
-	@Produces @Named @RequestScoped
-	public TemporalDate getNow() {
-		return new TemporalDate();
-	}
+    /**
+     * This makes an instance of {@link Temporal} as current datetime available by <code>#{now}</code>.
+     * @return Current datetime.
+     */
+    @Produces @Named @RequestScoped
+    public TemporalDate getNow() {
+        return new TemporalDate();
+    }
 
-	/**
-	 * {@link ZonedDateTime} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL
-	 * expressions relying on {@link Date#getTime()} such as <code>#{now.time}</code> so that they continue working
-	 * after migration from {@link Date} to {@link Temporal} in OmniFaces 4.0.
-	 *
-	 * @author Bauke Scholtz
-	 * @since 4.0
-	 */
-	public static class TemporalDate implements Temporal, Comparable<TemporalDate>, Serializable {
+    /**
+     * {@link ZonedDateTime} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL
+     * expressions relying on {@link Date#getTime()} such as <code>#{now.time}</code> so that they continue working
+     * after migration from {@link Date} to {@link Temporal} in OmniFaces 4.0.
+     *
+     * @author Bauke Scholtz
+     * @since 4.0
+     */
+    public static class TemporalDate implements Temporal, Comparable<TemporalDate>, Serializable {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private ZonedDateTime zonedDateTime;
-		private Instant instant;
-		private long time;
-		private String string;
+        private ZonedDateTime zonedDateTime;
+        private Instant instant;
+        private long time;
+        private String string;
 
-		/**
-		 * Constructs a new proxyable temporal date which is initialized with {@link ZonedDateTime#now()}.
-		 */
-		public TemporalDate() {
-			this(ZonedDateTime.now());
-		}
+        /**
+         * Constructs a new proxyable temporal date which is initialized with {@link ZonedDateTime#now()}.
+         */
+        public TemporalDate() {
+            this(ZonedDateTime.now());
+        }
 
-		/**
-		 * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
-		 * @param zonedDateTime ZonedDateTime to initialize with.
-		 * @throws NullPointerException when given ZonedDateTime is {@code null}.
-		 */
-		public TemporalDate(ZonedDateTime zonedDateTime) {
-			this.zonedDateTime = zonedDateTime;
-			this.instant = zonedDateTime.toInstant();
-			this.time = instant.toEpochMilli();
-			this.string = zonedDateTime.toString();
-		}
+        /**
+         * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
+         * @param zonedDateTime ZonedDateTime to initialize with.
+         * @throws NullPointerException when given ZonedDateTime is {@code null}.
+         */
+        public TemporalDate(ZonedDateTime zonedDateTime) {
+            this.zonedDateTime = zonedDateTime;
+            this.instant = zonedDateTime.toInstant();
+            this.time = instant.toEpochMilli();
+            this.string = zonedDateTime.toString();
+        }
 
-		/**
-		 * Convenience method to return this temporal date as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
-		 * @return This as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
-		 */
-		public ZonedDateTime getZonedDateTime() {
-			return zonedDateTime;
-		}
+        /**
+         * Convenience method to return this temporal date as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
+         * @return This as {@link ZonedDateTime} at {@link ZoneId#systemDefault()}.
+         */
+        public ZonedDateTime getZonedDateTime() {
+            return zonedDateTime;
+        }
 
-		/**
-		 * Convenience method to return this temporal date as {@link Instant} at {@link ZoneOffset#UTC}.
-		 * @return This as {@link Instant} at {@link ZoneOffset#UTC}.
-		 */
-		public Instant getInstant() {
-			return instant;
-		}
+        /**
+         * Convenience method to return this temporal date as {@link Instant} at {@link ZoneOffset#UTC}.
+         * @return This as {@link Instant} at {@link ZoneOffset#UTC}.
+         */
+        public Instant getInstant() {
+            return instant;
+        }
 
-		/**
-		 * Has the same signature as {@link Date#getTime()}.
-		 * This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
-		 * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this temporal date.
-		 */
-		public long getTime() {
-			return time;
-		}
+        /**
+         * Has the same signature as {@link Date#getTime()}.
+         * This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
+         * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this temporal date.
+         */
+        public long getTime() {
+            return time;
+        }
 
-		// Required overrides -----------------------------------------------------------------------------------------
+        // Required overrides -----------------------------------------------------------------------------------------
 
-		/**
-		 * Returns {@link ZonedDateTime#compareTo(java.time.chrono.ChronoZonedDateTime)}
-		 */
-		@Override
-		public int compareTo(TemporalDate other) {
-			return zonedDateTime.compareTo(other.getZonedDateTime());
-		}
+        /**
+         * Returns {@link ZonedDateTime#compareTo(java.time.chrono.ChronoZonedDateTime)}
+         */
+        @Override
+        public int compareTo(TemporalDate other) {
+            return zonedDateTime.compareTo(other.getZonedDateTime());
+        }
 
-		/**
-		 * Returns {@link ZonedDateTime#equals(Object)}
-		 */
-		@Override
-		public boolean equals(Object other) {
-			return other == this
-				|| (other instanceof TemporalDate && zonedDateTime.equals(((TemporalDate) other).getZonedDateTime()));
-		}
+        /**
+         * Returns {@link ZonedDateTime#equals(Object)}
+         */
+        @Override
+        public boolean equals(Object other) {
+            return other == this
+                || (other instanceof TemporalDate && zonedDateTime.equals(((TemporalDate) other).getZonedDateTime()));
+        }
 
-		/**
-		 * Returns {@link ZonedDateTime#hashCode()}
-		 */
-		@Override
-		public int hashCode() {
-			return zonedDateTime.hashCode();
-		}
+        /**
+         * Returns {@link ZonedDateTime#hashCode()}
+         */
+        @Override
+        public int hashCode() {
+            return zonedDateTime.hashCode();
+        }
 
-		/**
-		 * Returns {@link ZonedDateTime#toString()}.
-		 */
-		@Override
-		public String toString() {
-			return string;
-		}
+        /**
+         * Returns {@link ZonedDateTime#toString()}.
+         */
+        @Override
+        public String toString() {
+            return string;
+        }
 
-		// Temporal delegates -----------------------------------------------------------------------------------------
+        // Temporal delegates -----------------------------------------------------------------------------------------
 
-		@Override
-		public boolean isSupported(TemporalField field) {
-			return zonedDateTime.isSupported(field);
-		}
+        @Override
+        public boolean isSupported(TemporalField field) {
+            return zonedDateTime.isSupported(field);
+        }
 
-		@Override
-		public long getLong(TemporalField field) {
-			return zonedDateTime.getLong(field);
-		}
+        @Override
+        public long getLong(TemporalField field) {
+            return zonedDateTime.getLong(field);
+        }
 
-		@Override
-		public boolean isSupported(TemporalUnit unit) {
-			return zonedDateTime.isSupported(unit);
-		}
+        @Override
+        public boolean isSupported(TemporalUnit unit) {
+            return zonedDateTime.isSupported(unit);
+        }
 
-		@Override
-		public Temporal with(TemporalField field, long newValue) {
-			return zonedDateTime.with(field, newValue);
-		}
+        @Override
+        public Temporal with(TemporalField field, long newValue) {
+            return zonedDateTime.with(field, newValue);
+        }
 
-		@Override
-		public Temporal plus(long amountToAdd, TemporalUnit unit) {
-			return zonedDateTime.plus(amountToAdd, unit);
-		}
+        @Override
+        public Temporal plus(long amountToAdd, TemporalUnit unit) {
+            return zonedDateTime.plus(amountToAdd, unit);
+        }
 
-		@Override
-		public long until(Temporal endExclusive, TemporalUnit unit) {
-			return zonedDateTime.until(endExclusive, unit);
-		}
+        @Override
+        public long until(Temporal endExclusive, TemporalUnit unit) {
+            return zonedDateTime.until(endExclusive, unit);
+        }
 
-	}
+    }
 }

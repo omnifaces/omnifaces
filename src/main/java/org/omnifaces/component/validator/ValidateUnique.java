@@ -39,19 +39,19 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateUnique.COMPONENT_TYPE)
 public class ValidateUnique extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateUnique#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateUnique";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateUnique#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateUnique";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if all values are unique.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		return (new HashSet<>(values).size() == inputs.size());
-	}
+    /**
+     * Validate if all values are unique.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+        return (new HashSet<>(values).size() == inputs.size());
+    }
 
 }

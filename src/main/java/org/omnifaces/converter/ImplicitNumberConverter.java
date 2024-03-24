@@ -49,89 +49,89 @@ import jakarta.faces.convert.NumberConverter;
 @FacesConverter("omnifaces.ImplicitNumberConverter")
 public class ImplicitNumberConverter extends NumberConverter {
 
-	private static final Pattern PATTERN_NUMBER = Pattern.compile("[\\d,.]+");
+    private static final Pattern PATTERN_NUMBER = Pattern.compile("[\\d,.]+");
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		String string = super.getAsString(context, component, modelValue);
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+        String string = super.getAsString(context, component, modelValue);
 
-		if (string != null) {
-			DecimalFormat formatter = getFormatter();
+        if (string != null) {
+            DecimalFormat formatter = getFormatter();
 
-			if (formatter != null) {
-				String symbol = getSymbol(formatter);
+            if (formatter != null) {
+                String symbol = getSymbol(formatter);
 
-				if (symbol != null) {
-					string = string.replace(symbol, "").trim();
-				}
-			}
-		}
+                if (symbol != null) {
+                    string = string.replace(symbol, "").trim();
+                }
+            }
+        }
 
-		return string;
-	}
+        return string;
+    }
 
-	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		String string = submittedValue;
+    @Override
+    public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        String string = submittedValue;
 
-		if (!isEmpty(string)) {
-			DecimalFormat formatter = getFormatter();
+        if (!isEmpty(string)) {
+            DecimalFormat formatter = getFormatter();
 
-			if (formatter != null) {
-				String symbol = getSymbol(formatter);
+            if (formatter != null) {
+                String symbol = getSymbol(formatter);
 
-				if (!string.contains(symbol)) {
-					string = PATTERN_NUMBER.matcher(formatter.format(0)).replaceAll(submittedValue);
-				}
-			}
-		}
+                if (!string.contains(symbol)) {
+                    string = PATTERN_NUMBER.matcher(formatter.format(0)).replaceAll(submittedValue);
+                }
+            }
+        }
 
-		return super.getAsObject(context, component, string);
-	}
+        return super.getAsObject(context, component, string);
+    }
 
-	private boolean isPercent() {
-		return "percent".equals(getType());
-	}
+    private boolean isPercent() {
+        return "percent".equals(getType());
+    }
 
-	private boolean isCurrency() {
-		return "currency".equals(getType());
-	}
+    private boolean isCurrency() {
+        return "currency".equals(getType());
+    }
 
-	private DecimalFormat getFormatter() {
-		if (isPercent()) {
-			return (DecimalFormat) NumberFormat.getPercentInstance(getLocale());
-		}
-		else if (isCurrency()) {
-			DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
-			String currencyCode = getCurrencyCode();
-			String currencySymbol = getCurrencySymbol();
+    private DecimalFormat getFormatter() {
+        if (isPercent()) {
+            return (DecimalFormat) NumberFormat.getPercentInstance(getLocale());
+        }
+        else if (isCurrency()) {
+            DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
+            String currencyCode = getCurrencyCode();
+            String currencySymbol = getCurrencySymbol();
 
-			if (currencyCode != null) {
-				formatter.setCurrency(Currency.getInstance(currencyCode));
-			}
-			else if (currencySymbol != null) {
-				DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
-				symbols.setCurrencySymbol(currencySymbol);
-				formatter.setDecimalFormatSymbols(symbols);
-			}
+            if (currencyCode != null) {
+                formatter.setCurrency(Currency.getInstance(currencyCode));
+            }
+            else if (currencySymbol != null) {
+                DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
+                symbols.setCurrencySymbol(currencySymbol);
+                formatter.setDecimalFormatSymbols(symbols);
+            }
 
-			return formatter;
-		}
-		else {
-			return null;
-		}
-	}
+            return formatter;
+        }
+        else {
+            return null;
+        }
+    }
 
-	private String getSymbol(DecimalFormat formatter) {
-		if (isPercent()) {
-			return String.valueOf(formatter.getDecimalFormatSymbols().getPercent());
-		}
-		else if (isCurrency()) {
-			return formatter.getDecimalFormatSymbols().getCurrencySymbol();
-		}
-		else {
-			return null;
-		}
-	}
+    private String getSymbol(DecimalFormat formatter) {
+        if (isPercent()) {
+            return String.valueOf(formatter.getDecimalFormatSymbols().getPercent());
+        }
+        else if (isCurrency()) {
+            return formatter.getDecimalFormatSymbols().getCurrencySymbol();
+        }
+        else {
+            return null;
+        }
+    }
 
 }

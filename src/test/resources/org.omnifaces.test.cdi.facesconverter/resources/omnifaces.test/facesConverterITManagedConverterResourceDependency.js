@@ -11,5 +11,5 @@
  * specific language governing permissions and limitations under the License.
  */
 window.addEventListener("load", function() {
-	document.getElementById("facesConverterITManagedConverterResourceDependency").innerHTML = "facesConverterITManagedConverterResourceDependency";
+    document.getElementById("facesConverterITManagedConverterResourceDependency").innerHTML = "facesConverterITManagedConverterResourceDependency";
 });

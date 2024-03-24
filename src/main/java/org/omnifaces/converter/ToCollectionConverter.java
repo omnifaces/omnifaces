@@ -74,108 +74,108 @@ import org.omnifaces.util.Faces;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ToCollectionConverter implements Converter<Collection> {
 
-	private static final String DEFAULT_DELIMITER = ",";
-	private static final String DEFAULT_SET_TYPE = "java.util.LinkedHashSet";
-	private static final String DEFAULT_COLLECTION_TYPE = "java.util.ArrayList";
+    private static final String DEFAULT_DELIMITER = ",";
+    private static final String DEFAULT_SET_TYPE = "java.util.LinkedHashSet";
+    private static final String DEFAULT_COLLECTION_TYPE = "java.util.ArrayList";
 
-	private String delimiter;
-	private String collectionType;
-	private Object itemConverter;
+    private String delimiter;
+    private String collectionType;
+    private Object itemConverter;
 
-	@Override
-	public Collection getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (isEmpty(submittedValue)) {
-			return null;
-		}
+    @Override
+    public Collection getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (isEmpty(submittedValue)) {
+            return null;
+        }
 
-		String type = collectionType;
-		Converter converter = createConverter(itemConverter);
-		ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
+        String type = collectionType;
+        Converter converter = createConverter(itemConverter);
+        ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
-		if (valueExpression != null) {
-			Method getter = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression).getMethod();
-			Class<?> returnType = getter.getReturnType();
+        if (valueExpression != null) {
+            Method getter = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression).getMethod();
+            Class<?> returnType = getter.getReturnType();
 
-			if (!Collection.class.isAssignableFrom(returnType)) {
-				throw new IllegalArgumentException(valueExpression.getExpressionString() + " does not resolve to Collection.");
-			}
+            if (!Collection.class.isAssignableFrom(returnType)) {
+                throw new IllegalArgumentException(valueExpression.getExpressionString() + " does not resolve to Collection.");
+            }
 
-			if (collectionType == null && Set.class.isAssignableFrom(returnType)) {
-				type = DEFAULT_SET_TYPE;
-			}
+            if (collectionType == null && Set.class.isAssignableFrom(returnType)) {
+                type = DEFAULT_SET_TYPE;
+            }
 
-			if (converter == null) {
-				Type[] actualTypeArguments = ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments();
+            if (converter == null) {
+                Type[] actualTypeArguments = ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments();
 
-				if (actualTypeArguments.length > 0) {
-					Class<?> forClass = (Class<?>) actualTypeArguments[0];
-					converter = context.getApplication().createConverter(forClass);
-				}
-			}
-		}
+                if (actualTypeArguments.length > 0) {
+                    Class<?> forClass = (Class<?>) actualTypeArguments[0];
+                    converter = context.getApplication().createConverter(forClass);
+                }
+            }
+        }
 
-		Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
+        Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
-		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER)))) {
-			String trimmed = item.trim();
-			collection.add(converter == null ? trimmed : converter.getAsObject(context, component, trimmed));
-		}
+        for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER)))) {
+            String trimmed = item.trim();
+            collection.add(converter == null ? trimmed : converter.getAsObject(context, component, trimmed));
+        }
 
-		return collection;
-	}
+        return collection;
+    }
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Collection modelValue) {
-		if (isEmpty(modelValue)) {
-			return "";
-		}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Collection modelValue) {
+        if (isEmpty(modelValue)) {
+            return "";
+        }
 
-		Application application = context.getApplication();
-		StringBuilder builder = new StringBuilder();
-		String specifiedDelimiter = coalesce(delimiter, DEFAULT_DELIMITER);
-		Converter specifiedConverter = createConverter(itemConverter);
-		Class<?> forClass = null;
-		Converter converter = specifiedConverter;
-		int i = 0;
+        Application application = context.getApplication();
+        StringBuilder builder = new StringBuilder();
+        String specifiedDelimiter = coalesce(delimiter, DEFAULT_DELIMITER);
+        Converter specifiedConverter = createConverter(itemConverter);
+        Class<?> forClass = null;
+        Converter converter = specifiedConverter;
+        int i = 0;
 
-		for (Object item : (Collection<?>) modelValue) {
-			if (i++ > 0) {
-				builder.append(specifiedDelimiter);
-			}
+        for (Object item : (Collection<?>) modelValue) {
+            if (i++ > 0) {
+                builder.append(specifiedDelimiter);
+            }
 
-			if (specifiedConverter == null && item != null && forClass != item.getClass()) {
-				forClass = item.getClass();
-				converter = application.createConverter(forClass);
-			}
+            if (specifiedConverter == null && item != null && forClass != item.getClass()) {
+                forClass = item.getClass();
+                converter = application.createConverter(forClass);
+            }
 
-			builder.append(converter == null ? coalesce(item, "") : converter.getAsString(context, component, item));
-		}
+            builder.append(converter == null ? coalesce(item, "") : converter.getAsString(context, component, item));
+        }
 
-		return builder.toString();
-	}
+        return builder.toString();
+    }
 
-	/**
-	 * Sets the delimiter to split on.
-	 * @param delimiter The delimiter to split on.
-	 */
-	public void setDelimiter(String delimiter) {
-		this.delimiter = delimiter;
-	}
+    /**
+     * Sets the delimiter to split on.
+     * @param delimiter The delimiter to split on.
+     */
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
 
-	/**
-	 * Sets the FQN of the collection to create.
-	 * @param collectionType The FQN of the collection to create.
-	 */
-	public void setCollectionType(String collectionType) {
-		this.collectionType = collectionType;
-	}
+    /**
+     * Sets the FQN of the collection to create.
+     * @param collectionType The FQN of the collection to create.
+     */
+    public void setCollectionType(String collectionType) {
+        this.collectionType = collectionType;
+    }
 
-	/**
-	 * Sets the converter for the item.
-	 * @param itemConverter The converter for the item.
-	 */
-	public void setItemConverter(Object itemConverter) {
-		this.itemConverter = itemConverter;
-	}
+    /**
+     * Sets the converter for the item.
+     * @param itemConverter The converter for the item.
+     */
+    public void setItemConverter(Object itemConverter) {
+        this.itemConverter = itemConverter;
+    }
 
 }

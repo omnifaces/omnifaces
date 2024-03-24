@@ -63,66 +63,66 @@ import org.omnifaces.util.State;
 @FacesComponent(ConditionalComment.COMPONENT_TYPE)
 public class ConditionalComment extends OutputFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.ConditionalComment#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ConditionalComment";
+    /** The component type, which is {@value org.omnifaces.component.output.ConditionalComment#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ConditionalComment";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_MISSING_IF =
-		"ConditionalComment attribute 'if' must be specified.";
+    private static final String ERROR_MISSING_IF =
+        "ConditionalComment attribute 'if' must be specified.";
 
-	private enum PropertyKeys {
-		IF;
-		@Override public String toString() { return name().toLowerCase(); }
-	}
+    private enum PropertyKeys {
+        IF;
+        @Override public String toString() { return name().toLowerCase(); }
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * @throws IllegalArgumentException When <code>if</code> attribute is not specified.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		String condition = getIf();
+    /**
+     * @throws IllegalArgumentException When <code>if</code> attribute is not specified.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        String condition = getIf();
 
-		if (isEmpty(condition)) {
-			throw new IllegalArgumentException(ERROR_MISSING_IF);
-		}
+        if (isEmpty(condition)) {
+            throw new IllegalArgumentException(ERROR_MISSING_IF);
+        }
 
-		ResponseWriter writer = context.getResponseWriter();
-		writer.write("<!--[if ");
-		writer.write(condition);
-		writer.write("]>");
-	}
+        ResponseWriter writer = context.getResponseWriter();
+        writer.write("<!--[if ");
+        writer.write(condition);
+        writer.write("]>");
+    }
 
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		ResponseWriter writer = context.getResponseWriter();
-		writer.write("<![endif]-->");
-	}
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        ResponseWriter writer = context.getResponseWriter();
+        writer.write("<![endif]-->");
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the if condition.
-	 * @return The if condition.
-	 */
-	public String getIf() {
-		return state.get(PropertyKeys.IF);
-	}
+    /**
+     * Returns the if condition.
+     * @return The if condition.
+     */
+    public String getIf() {
+        return state.get(PropertyKeys.IF);
+    }
 
-	/**
-	 * Sets the if condition.
-	 * @param condition The if condition.
-	 */
-	public void setIf(String condition) {
-		state.put(PropertyKeys.IF, condition);
-	}
+    /**
+     * Sets the if condition.
+     * @param condition The if condition.
+     */
+    public void setIf(String condition) {
+        state.put(PropertyKeys.IF, condition);
+    }
 
 }

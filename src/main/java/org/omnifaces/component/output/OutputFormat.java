@@ -55,89 +55,89 @@ import org.omnifaces.util.State;
 @FacesComponent(OutputFormat.COMPONENT_TYPE)
 public class OutputFormat extends HtmlOutputFormat {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.output.OutputFormat#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputFormat";
+    /** The component type, which is {@value org.omnifaces.component.output.OutputFormat#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputFormat";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_EXPRESSION_DISALLOWED =
-		"A value expression is disallowed on 'var' attribute of OutputFormat.";
+    private static final String ERROR_EXPRESSION_DISALLOWED =
+        "A value expression is disallowed on 'var' attribute of OutputFormat.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		var;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        var;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
-	 * Finally it delegates to the super method.
-	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
-	 */
-	@Override
-	public void setValueExpression(String name, ValueExpression binding) {
-		if (PropertyKeys.var.toString().equals(name)) {
-			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
-		}
+    /**
+     * An override which checks if this isn't been invoked on <code>var</code> attribute.
+     * Finally it delegates to the super method.
+     * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
+     */
+    @Override
+    public void setValueExpression(String name, ValueExpression binding) {
+        if (PropertyKeys.var.toString().equals(name)) {
+            throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
+        }
 
-		super.setValueExpression(name, binding);
-	}
+        super.setValueExpression(name, binding);
+    }
 
-	/**
-	 * If the <code>var</code> attribute is set, start capturing the output.
-	 */
-	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		if (getVar() != null) {
-			ResponseWriter originalResponseWriter = context.getResponseWriter();
-			StringWriter buffer = new StringWriter();
-			context.setResponseWriter(originalResponseWriter.cloneWithWriter(buffer));
-			context.getAttributes().put(this + "_writer", originalResponseWriter);
-			context.getAttributes().put(this + "_buffer", buffer);
-		}
+    /**
+     * If the <code>var</code> attribute is set, start capturing the output.
+     */
+    @Override
+    public void encodeBegin(FacesContext context) throws IOException {
+        if (getVar() != null) {
+            ResponseWriter originalResponseWriter = context.getResponseWriter();
+            StringWriter buffer = new StringWriter();
+            context.setResponseWriter(originalResponseWriter.cloneWithWriter(buffer));
+            context.getAttributes().put(this + "_writer", originalResponseWriter);
+            context.getAttributes().put(this + "_buffer", buffer);
+        }
 
-		super.encodeBegin(context);
-	}
+        super.encodeBegin(context);
+    }
 
-	/**
-	 * If the <code>var</code> attribute is set, stop capturing the output and expose it in request scope by the
-	 * <code>var</code> attribute value as variable name.
-	 */
-	@Override
-	public void encodeEnd(FacesContext context) throws IOException {
-		super.encodeEnd(context);
+    /**
+     * If the <code>var</code> attribute is set, stop capturing the output and expose it in request scope by the
+     * <code>var</code> attribute value as variable name.
+     */
+    @Override
+    public void encodeEnd(FacesContext context) throws IOException {
+        super.encodeEnd(context);
 
-		if (getVar() != null) {
-			ResponseWriter originalResponseWriter = (ResponseWriter) context.getAttributes().remove(this + "_writer");
-			StringWriter buffer = (StringWriter) context.getAttributes().remove(this + "_buffer");
-			context.setResponseWriter(originalResponseWriter);
-			context.getExternalContext().getRequestMap().put(getVar(), buffer.toString());
-		}
-	}
+        if (getVar() != null) {
+            ResponseWriter originalResponseWriter = (ResponseWriter) context.getAttributes().remove(this + "_writer");
+            StringWriter buffer = (StringWriter) context.getAttributes().remove(this + "_buffer");
+            context.setResponseWriter(originalResponseWriter);
+            context.getExternalContext().getRequestMap().put(getVar(), buffer.toString());
+        }
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the variable name which exposes the captured output into the request scope.
-	 * @return The variable name which exposes the captured output into the request scope.
-	 */
-	public String getVar() {
-		return state.get(PropertyKeys.var);
-	}
+    /**
+     * Returns the variable name which exposes the captured output into the request scope.
+     * @return The variable name which exposes the captured output into the request scope.
+     */
+    public String getVar() {
+        return state.get(PropertyKeys.var);
+    }
 
-	/**
-	 * Sets the variable name which exposes the captured output into the request scope.
-	 * @param var The variable name which exposes the captured output into the request scope.
-	 */
-	public void setVar(String var) {
-		state.put(PropertyKeys.var, var);
-	}
+    /**
+     * Sets the variable name which exposes the captured output into the request scope.
+     * @param var The variable name which exposes the captured output into the request scope.
+     */
+    public void setVar(String var) {
+        state.put(PropertyKeys.var, var);
+    }
 
 }

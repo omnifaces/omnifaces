@@ -15,33 +15,33 @@ package org.omnifaces.test.taghandler.validatebean;
 @ValidateBeanITEntityConstraint
 public class ValidateBeanITEntity {
 
-	private Integer number1;
-	private Integer number2;
+    private Integer number1;
+    private Integer number2;
 
-	public ValidateBeanITEntity() {
-		// Default c'tor.
-	}
+    public ValidateBeanITEntity() {
+        // Default c'tor.
+    }
 
-	public ValidateBeanITEntity(ValidateBeanITEntity other) {
-		// Copy c'tor.
-		number1 = other.number1;
-		number2 = other.number2;
-	}
+    public ValidateBeanITEntity(ValidateBeanITEntity other) {
+        // Copy c'tor.
+        number1 = other.number1;
+        number2 = other.number2;
+    }
 
-	public Integer getNumber1() {
-		return number1;
-	}
+    public Integer getNumber1() {
+        return number1;
+    }
 
-	public void setNumber1(Integer number1) {
-		this.number1 = number1;
-	}
+    public void setNumber1(Integer number1) {
+        this.number1 = number1;
+    }
 
-	public Integer getNumber2() {
-		return number2;
-	}
+    public Integer getNumber2() {
+        return number2;
+    }
 
-	public void setNumber2(Integer number2) {
-		this.number2 = number2;
-	}
+    public void setNumber2(Integer number2) {
+        this.number2 = number2;
+    }
 
 }

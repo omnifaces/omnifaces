@@ -17,24 +17,24 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidateBeanITEntityValidator implements ConstraintValidator<ValidateBeanITEntityConstraint, ValidateBeanITEntity> {
 
-	@Override
-	public void initialize(ValidateBeanITEntityConstraint constraint) {
-		//
-	}
+    @Override
+    public void initialize(ValidateBeanITEntityConstraint constraint) {
+        //
+    }
 
-	@Override
-	public boolean isValid(ValidateBeanITEntity entity, ConstraintValidatorContext context) {
-		if (entity.getNumber1() < entity.getNumber2()) {
-			return true;
-		}
+    @Override
+    public boolean isValid(ValidateBeanITEntity entity, ConstraintValidatorContext context) {
+        if (entity.getNumber1() < entity.getNumber2()) {
+            return true;
+        }
 
-		if (entity.getNumber1() == 2) {
-			// Specific case to test targeting a specific property node when using showMessageFor="@violating" so that the message is only shown for number1 and not for both number1 and number2.
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
-		}
+        if (entity.getNumber1() == 2) {
+            // Specific case to test targeting a specific property node when using showMessageFor="@violating" so that the message is only shown for number1 and not for both number1 and number2.
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

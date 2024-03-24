@@ -18,14 +18,14 @@ import jakarta.faces.convert.Converter;
 
 public abstract class FacesConverterITBaseConverter implements Converter<Object> {
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return "";
-	}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        return "";
+    }
 
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
-	}
+    @Override
+    public String getAsObject(FacesContext context, UIComponent component, String value) {
+        return null;
+    }
 
 }

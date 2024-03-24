@@ -19,10 +19,10 @@ import org.omnifaces.util.Reflection;
 @ApplicationScoped
 public class ParamITBaseEntityService {
 
-	public ParamITBaseEntity find(Class<? extends ParamITBaseEntity> type, Long id) {
-		ParamITBaseEntity instance = Reflection.instance(type);
-		instance.setId(id);
-		return instance;
-	}
+    public ParamITBaseEntity find(Class<? extends ParamITBaseEntity> type, Long id) {
+        ParamITBaseEntity instance = Reflection.instance(type);
+        instance.setId(id);
+        return instance;
+    }
 
 }

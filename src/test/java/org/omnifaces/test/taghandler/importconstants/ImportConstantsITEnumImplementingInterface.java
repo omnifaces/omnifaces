@@ -14,6 +14,6 @@ package org.omnifaces.test.taghandler.importconstants;
 
 public enum ImportConstantsITEnumImplementingInterface implements ImportConstantsITInterface {
 
-	ONE, TWO, THREE;
+    ONE, TWO, THREE;
 
 }

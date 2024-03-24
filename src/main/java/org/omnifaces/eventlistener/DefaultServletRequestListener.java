@@ -23,15 +23,15 @@ import jakarta.servlet.ServletRequestListener;
  * @since 1.8
  */
 public abstract class DefaultServletRequestListener implements ServletRequestListener {
-	
-	@Override
-	public void requestInitialized(ServletRequestEvent sre) {
-		// NOOP
-	}
-	
-	@Override
-	public void requestDestroyed(ServletRequestEvent sre) {
-		// NOOP
-	}
+    
+    @Override
+    public void requestInitialized(ServletRequestEvent sre) {
+        // NOOP
+    }
+    
+    @Override
+    public void requestDestroyed(ServletRequestEvent sre) {
+        // NOOP
+    }
 
 }

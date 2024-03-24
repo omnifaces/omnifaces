@@ -62,41 +62,41 @@ import org.omnifaces.util.Utils;
  */
 public class LoadBundle extends TagHandler {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private String varValue;
-	private TagAttribute basenameAttribute;
-	private TagAttribute loaderAttribute;
+    private String varValue;
+    private TagAttribute basenameAttribute;
+    private TagAttribute loaderAttribute;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public LoadBundle(TagConfig config) {
-		super(config);
-		varValue = getStringLiteral(getRequiredAttribute("var"), "var");
-		basenameAttribute = getRequiredAttribute("basename");
-		loaderAttribute = getAttribute("loader");
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public LoadBundle(TagConfig config) {
+        super(config);
+        varValue = getStringLiteral(getRequiredAttribute("var"), "var");
+        basenameAttribute = getRequiredAttribute("basename");
+        loaderAttribute = getAttribute("loader");
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * First obtain the resource bundle by its name as specified in the <code>basename</code> attribute with the locale
-	 * which is obtained as specified in {@link Faces#getLocale()} and the class loader which is obtained as specified
-	 * in {@link Utils#getClassLoader(Object)} with the <code>loader</code> attribute as argument. Finally set the
-	 * resource bundle in the request scope by the name as specified in the <code>var</code> attribute.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
+    /**
+     * First obtain the resource bundle by its name as specified in the <code>basename</code> attribute with the locale
+     * which is obtained as specified in {@link Faces#getLocale()} and the class loader which is obtained as specified
+     * in {@link Utils#getClassLoader(Object)} with the <code>loader</code> attribute as argument. Finally set the
+     * resource bundle in the request scope by the name as specified in the <code>var</code> attribute.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
         ResourceBundle bundle;
 
         try {
-        	String basename = basenameAttribute.getValue(context);
-        	Locale locale = getLocale(context, parent);
-        	ClassLoader classLoader = getClassLoader(context, loaderAttribute);
+            String basename = basenameAttribute.getValue(context);
+            Locale locale = getLocale(context, parent);
+            ClassLoader classLoader = getClassLoader(context, loaderAttribute);
             bundle = ResourceBundle.getBundle(basename, locale, classLoader);
         }
         catch (Exception e) {
@@ -104,68 +104,68 @@ public class LoadBundle extends TagHandler {
         }
 
         context.getFacesContext().getExternalContext().getRequestMap().put(varValue, new BundleMap(bundle));
-	}
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the locale associated with the given component conform {@link Faces#getLocale()}.
-	 * @param context The involved facelet context.
-	 * @param component The component to find the locale in.
-	 * @return The locale associated with the given component.
-	 */
-	private static Locale getLocale(FaceletContext context, UIComponent component) {
-		UIViewRoot view = (component instanceof UIViewRoot) ? (UIViewRoot) component : getClosestParent(component, UIViewRoot.class);
+    /**
+     * Returns the locale associated with the given component conform {@link Faces#getLocale()}.
+     * @param context The involved facelet context.
+     * @param component The component to find the locale in.
+     * @return The locale associated with the given component.
+     */
+    private static Locale getLocale(FaceletContext context, UIComponent component) {
+        UIViewRoot view = (component instanceof UIViewRoot) ? (UIViewRoot) component : getClosestParent(component, UIViewRoot.class);
 
-		if (view != null) {
-			Locale locale = view.getLocale();
+        if (view != null) {
+            Locale locale = view.getLocale();
 
-			if (locale != null) {
-				return locale;
-			}
-		}
+            if (locale != null) {
+                return locale;
+            }
+        }
 
-		return FacesLocal.getLocale(context.getFacesContext());
-	}
+        return FacesLocal.getLocale(context.getFacesContext());
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * Specific map implementation which wraps the given resource bundle in {@link Collections#unmodifiableMap(Map)} and
-	 * returns {@code ???key???} in {@link BundleMap#get(Object)} method when the key doesn't exist at all.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	private static class BundleMap extends MapWrapper<String, String> {
+    /**
+     * Specific map implementation which wraps the given resource bundle in {@link Collections#unmodifiableMap(Map)} and
+     * returns {@code ???key???} in {@link BundleMap#get(Object)} method when the key doesn't exist at all.
+     *
+     * @author Bauke Scholtz
+     */
+    private static class BundleMap extends MapWrapper<String, String> {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private transient ResourceBundle bundle;
+        private transient ResourceBundle bundle;
 
-		public BundleMap(ResourceBundle bundle) {
-			super(list(bundle.getKeys()).stream().collect(toUnmodifiableMap(identity(), bundle::getString)));
-			this.bundle = bundle;
-		}
+        public BundleMap(ResourceBundle bundle) {
+            super(list(bundle.getKeys()).stream().collect(toUnmodifiableMap(identity(), bundle::getString)));
+            this.bundle = bundle;
+        }
 
-		@Override
-		public String get(Object key) {
-			if (!containsKey(key)) {
-				return "???" + key + "???";
-			}
+        @Override
+        public String get(Object key) {
+            if (!containsKey(key)) {
+                return "???" + key + "???";
+            }
 
-			return super.get(key);
-		}
+            return super.get(key);
+        }
 
-		@Override
-		public boolean equals(Object object) {
-			return super.equals(object) && bundle.equals(((BundleMap) object).bundle);
-		}
+        @Override
+        public boolean equals(Object object) {
+            return super.equals(object) && bundle.equals(((BundleMap) object).bundle);
+        }
 
-		@Override
-		public int hashCode() {
-			return super.hashCode() + bundle.hashCode();
-		}
+        @Override
+        public int hashCode() {
+            return super.hashCode() + bundle.hashCode();
+        }
 
-	}
+    }
 
 }

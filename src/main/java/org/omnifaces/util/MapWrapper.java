@@ -36,95 +36,95 @@ import java.util.Set;
  */
 public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Map<K, V> map;
+    private Map<K, V> map;
 
-	/**
-	 * Initializes the wrapper with its wrapped map.
-	 * @param map the map to wrap.
-	 */
-	public MapWrapper(Map<K, V> map) {
-		this.map = map;
-	}
+    /**
+     * Initializes the wrapper with its wrapped map.
+     * @param map the map to wrap.
+     */
+    public MapWrapper(Map<K, V> map) {
+        this.map = map;
+    }
 
-	@Override
-	public void clear() {
-		getWrapped().clear();
-	}
+    @Override
+    public void clear() {
+        getWrapped().clear();
+    }
 
-	@Override
-	public boolean containsKey(Object key) {
-		return getWrapped().containsKey(key);
-	}
+    @Override
+    public boolean containsKey(Object key) {
+        return getWrapped().containsKey(key);
+    }
 
-	@Override
-	public boolean containsValue(Object value) {
-		return getWrapped().containsValue(value);
-	}
+    @Override
+    public boolean containsValue(Object value) {
+        return getWrapped().containsValue(value);
+    }
 
-	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return getWrapped().entrySet();
-	}
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        return getWrapped().entrySet();
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		return getWrapped().equals(object);
-	}
+    @Override
+    public boolean equals(Object object) {
+        return getWrapped().equals(object);
+    }
 
-	@Override
-	public V get(Object key) {
-		return getWrapped().get(key);
-	}
+    @Override
+    public V get(Object key) {
+        return getWrapped().get(key);
+    }
 
-	@Override
-	public int hashCode() {
-		return getWrapped().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return getWrapped().hashCode();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return getWrapped().isEmpty();
-	}
+    @Override
+    public boolean isEmpty() {
+        return getWrapped().isEmpty();
+    }
 
-	@Override
-	public Set<K> keySet() {
-		return getWrapped().keySet();
-	}
+    @Override
+    public Set<K> keySet() {
+        return getWrapped().keySet();
+    }
 
-	@Override
-	public V put(K key, V value) {
-		return getWrapped().put(key, value);
-	}
+    @Override
+    public V put(K key, V value) {
+        return getWrapped().put(key, value);
+    }
 
-	@Override
-	public void putAll(Map< ? extends K, ? extends V> m) {
-		getWrapped().putAll(m);
-	}
+    @Override
+    public void putAll(Map< ? extends K, ? extends V> m) {
+        getWrapped().putAll(m);
+    }
 
-	@Override
-	public V remove(Object key) {
-		return getWrapped().remove(key);
-	}
+    @Override
+    public V remove(Object key) {
+        return getWrapped().remove(key);
+    }
 
-	@Override
-	public int size() {
-		return getWrapped().size();
-	}
+    @Override
+    public int size() {
+        return getWrapped().size();
+    }
 
-	@Override
-	public Collection<V> values() {
-		return getWrapped().values();
-	}
+    @Override
+    public Collection<V> values() {
+        return getWrapped().values();
+    }
 
-	@Override
-	public String toString() {
-		return getWrapped().toString();
-	}
+    @Override
+    public String toString() {
+        return getWrapped().toString();
+    }
 
-	public Map<K, V> getWrapped() {
-		return map;
-	}
+    public Map<K, V> getWrapped() {
+        return map;
+    }
 
 }

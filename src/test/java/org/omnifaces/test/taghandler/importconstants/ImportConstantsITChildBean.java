@@ -14,6 +14,6 @@ package org.omnifaces.test.taghandler.importconstants;
 
 public class ImportConstantsITChildBean extends ImportConstantsITParentBean {
 
-	public static final String VALUE = "child";
+    public static final String VALUE = "child";
 
 }

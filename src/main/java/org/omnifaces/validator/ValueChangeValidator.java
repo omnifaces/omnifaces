@@ -55,34 +55,34 @@ import jakarta.faces.validator.Validator;
  */
 public abstract class ValueChangeValidator<T> implements Validator<T> {
 
-	/**
-	 * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
-	 * submitted value, then return immediately from the method and don't perform any validation. Otherwise, invoke
-	 * {@link #validateChangedObject(FacesContext, UIComponent, Object)} which may in turn do the necessary possibly
-	 * expensive DAO operations.
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void validate(FacesContext context, UIComponent component, T submittedValue) {
-		if (component instanceof EditableValueHolder) {
-			T newValue = submittedValue;
-			T oldValue = (T) ((EditableValueHolder) component).getValue();
+    /**
+     * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
+     * submitted value, then return immediately from the method and don't perform any validation. Otherwise, invoke
+     * {@link #validateChangedObject(FacesContext, UIComponent, Object)} which may in turn do the necessary possibly
+     * expensive DAO operations.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void validate(FacesContext context, UIComponent component, T submittedValue) {
+        if (component instanceof EditableValueHolder) {
+            T newValue = submittedValue;
+            T oldValue = (T) ((EditableValueHolder) component).getValue();
 
-			if (Objects.equals(newValue, oldValue)) {
-				return;
-			}
-		}
+            if (Objects.equals(newValue, oldValue)) {
+                return;
+            }
+        }
 
-		validateChangedObject(context, component, submittedValue);
-	}
+        validateChangedObject(context, component, submittedValue);
+    }
 
-	/**
-	 * Use this method instead of {@link #validate(FacesContext, UIComponent, Object)} if you intend to perform the
-	 * validation only when the submitted value is really changed as compared to the model value.
-	 * @param context The involved faces context.
-	 * @param component The involved UI component.
-	 * @param submittedValue The submitted value.
-	 */
-	public abstract void validateChangedObject(FacesContext context, UIComponent component, T submittedValue);
+    /**
+     * Use this method instead of {@link #validate(FacesContext, UIComponent, Object)} if you intend to perform the
+     * validation only when the submitted value is really changed as compared to the model value.
+     * @param context The involved faces context.
+     * @param component The involved UI component.
+     * @param submittedValue The submitted value.
+     */
+    public abstract void validateChangedObject(FacesContext context, UIComponent component, T submittedValue);
 
 }

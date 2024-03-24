@@ -14,15 +14,15 @@
 
 -->
 <faces-config
-	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
-	version="2.3"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
+    version="2.3"
 >
-	<application>
-		<resource-handler>org.omnifaces.test.resourcehandler.versionedresourcehandler.VersionedResourceHandlerITBeforeResourceHandler</resource-handler>
-		<resource-handler>org.omnifaces.resourcehandler.VersionedResourceHandler</resource-handler>
-		<resource-handler>org.omnifaces.test.resourcehandler.versionedresourcehandler.VersionedResourceHandlerITAfterResourceHandler</resource-handler>
-	</application>
+    <application>
+        <resource-handler>org.omnifaces.test.resourcehandler.versionedresourcehandler.VersionedResourceHandlerITBeforeResourceHandler</resource-handler>
+        <resource-handler>org.omnifaces.resourcehandler.VersionedResourceHandler</resource-handler>
+        <resource-handler>org.omnifaces.test.resourcehandler.versionedresourcehandler.VersionedResourceHandlerITAfterResourceHandler</resource-handler>
+    </application>
 
 </faces-config>

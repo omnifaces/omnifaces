@@ -14,34 +14,34 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<h:panelGroup layout="block" id="results">
-			<div id="bean">#{viewScopedITBean}</div>
-			<h:messages id="messages" globalOnly="true" />
-		</h:panelGroup>
+    <h:body>
+        <h:panelGroup layout="block" id="results">
+            <div id="bean">#{viewScopedITBean}</div>
+            <h:messages id="messages" globalOnly="true" />
+        </h:panelGroup>
 
-		<h:button id="unload" value="unload" />
-		<h:link id="newtab" value="newtab" target="_blank" />
+        <h:button id="unload" value="unload" />
+        <h:link id="newtab" value="newtab" target="_blank" />
 
-		<o:form id="non-ajax">
-			<h:commandButton id="submit" value="submit" action="#{viewScopedITBean.submit}" />
-			<h:commandLink id="navigate" value="navigate" action="#{viewScopedITBean.navigate}" />
-		</o:form>
+        <o:form id="non-ajax">
+            <h:commandButton id="submit" value="submit" action="#{viewScopedITBean.submit}" />
+            <h:commandLink id="navigate" value="navigate" action="#{viewScopedITBean.navigate}" />
+        </o:form>
 
-		<o:form id="ajax">
-			<f:ajax render=":results">
-				<h:commandButton id="submit" value="submit" action="#{viewScopedITBean.submit}" />
-				<h:commandLink id="navigate" value="navigate" action="#{viewScopedITBean.navigate}" />
-			</f:ajax>
-		</o:form>
-	</h:body>
+        <o:form id="ajax">
+            <f:ajax render=":results">
+                <h:commandButton id="submit" value="submit" action="#{viewScopedITBean.submit}" />
+                <h:commandLink id="navigate" value="navigate" action="#{viewScopedITBean.navigate}" />
+            </f:ajax>
+        </o:form>
+    </h:body>
 </html>

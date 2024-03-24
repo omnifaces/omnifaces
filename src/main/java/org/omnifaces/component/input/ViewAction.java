@@ -78,113 +78,113 @@ import org.omnifaces.util.State;
 @FacesComponent(ViewAction.COMPONENT_TYPE)
 public class ViewAction extends UIViewAction {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.ViewAction#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewAction";
+    /** The component type, which is {@value org.omnifaces.component.input.ViewAction#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewAction";
 
-	enum PropertyKeys {
-		message
-	}
+    enum PropertyKeys {
+        message
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Only broadcast the action event when {@link UIViewAction#isRendered()} returns <code>true</code>. The default
-	 * implementation will always broadcast. The {@link UIViewAction#isRendered()} is by default only considered during
-	 * {@link #decode(jakarta.faces.context.FacesContext)}.
-	 * <p>
-	 * If the action event performs any redirect, then add any {@link #getMessage()} as a global flash warning message.
-	 */
-	@Override
-	public void broadcast(FacesEvent event) {
-		if (super.isRendered()) {
-			String message = getMessage();
-			super.broadcast(isEmpty(message) ? event : new RedirectMessageEvent(event, message));
-		}
-	}
+    /**
+     * Only broadcast the action event when {@link UIViewAction#isRendered()} returns <code>true</code>. The default
+     * implementation will always broadcast. The {@link UIViewAction#isRendered()} is by default only considered during
+     * {@link #decode(jakarta.faces.context.FacesContext)}.
+     * <p>
+     * If the action event performs any redirect, then add any {@link #getMessage()} as a global flash warning message.
+     */
+    @Override
+    public void broadcast(FacesEvent event) {
+        if (super.isRendered()) {
+            String message = getMessage();
+            super.broadcast(isEmpty(message) ? event : new RedirectMessageEvent(event, message));
+        }
+    }
 
-	private static class RedirectMessageEvent extends ActionEvent {
+    private static class RedirectMessageEvent extends ActionEvent {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private FacesEvent wrapped;
-		private String message;
+        private FacesEvent wrapped;
+        private String message;
 
-		public RedirectMessageEvent(FacesEvent wrapped, String message) {
-			super(wrapped.getComponent());
-			this.wrapped = wrapped;
-			this.message = message;
-		}
+        public RedirectMessageEvent(FacesEvent wrapped, String message) {
+            super(wrapped.getComponent());
+            this.wrapped = wrapped;
+            this.message = message;
+        }
 
-		@Override
-		public FacesContext getFacesContext() {
-			return new RedirectMessageFacesContext(wrapped.getFacesContext(), message);
-		}
-	}
+        @Override
+        public FacesContext getFacesContext() {
+            return new RedirectMessageFacesContext(wrapped.getFacesContext(), message);
+        }
+    }
 
-	private static class RedirectMessageFacesContext extends FacesContextWrapper {
+    private static class RedirectMessageFacesContext extends FacesContextWrapper {
 
-		private String message;
+        private String message;
 
-		public RedirectMessageFacesContext(FacesContext wrapped, String message) {
-			super(wrapped);
-			this.message = message;
-		}
+        public RedirectMessageFacesContext(FacesContext wrapped, String message) {
+            super(wrapped);
+            this.message = message;
+        }
 
-		@Override
-		public ExternalContext getExternalContext() {
-			return new RedirectMessageExternalContext(getWrapped().getExternalContext(), message);
-		}
-	}
+        @Override
+        public ExternalContext getExternalContext() {
+            return new RedirectMessageExternalContext(getWrapped().getExternalContext(), message);
+        }
+    }
 
-	private static class RedirectMessageExternalContext extends ExternalContextWrapper {
+    private static class RedirectMessageExternalContext extends ExternalContextWrapper {
 
-		private String message;
+        private String message;
 
-		public RedirectMessageExternalContext(ExternalContext wrapped, String message) {
-			super(wrapped);
-			this.message = message;
-		}
+        public RedirectMessageExternalContext(ExternalContext wrapped, String message) {
+            super(wrapped);
+            this.message = message;
+        }
 
-		@Override
-		public void redirect(String url) throws IOException {
-			addFlashGlobalWarn(message);
-			super.redirect(url);
-		}
-	}
+        @Override
+        public void redirect(String url) throws IOException {
+            addFlashGlobalWarn(message);
+            super.redirect(url);
+        }
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> if the <code>immediate="true"</code> attribute is <strong>not</strong> set, otherwise
-	 * delegate to super, hereby maintaining the original behavior of <code>immediate="true"</code>.
-	 */
-	@Override
-	public boolean isRendered() {
-		return !isImmediate() || super.isRendered();
-	}
+    /**
+     * Returns <code>true</code> if the <code>immediate="true"</code> attribute is <strong>not</strong> set, otherwise
+     * delegate to super, hereby maintaining the original behavior of <code>immediate="true"</code>.
+     */
+    @Override
+    public boolean isRendered() {
+        return !isImmediate() || super.isRendered();
+    }
 
-	/**
-	 * Returns the global flash warning message to be shown in the redirected page.
-	 * @return The global flash warning message to be shown in the redirected page.
-	 * @since 3.2
-	 */
-	public String getMessage() {
-		return state.get(PropertyKeys.message);
-	}
+    /**
+     * Returns the global flash warning message to be shown in the redirected page.
+     * @return The global flash warning message to be shown in the redirected page.
+     * @since 3.2
+     */
+    public String getMessage() {
+        return state.get(PropertyKeys.message);
+    }
 
-	/**
-	 * Sets the global flash warning message to be shown in the redirected page.
-	 * @param message The global flash warning message to be shown in the redirected page.
-	 * @since 3.2
-	 */
-	public void setMessage(String message) {
-		state.put(PropertyKeys.message, message);
-	}
+    /**
+     * Sets the global flash warning message to be shown in the redirected page.
+     * @param message The global flash warning message to be shown in the redirected page.
+     * @since 3.2
+     */
+    public void setMessage(String message) {
+        state.put(PropertyKeys.message, message);
+    }
 
 }

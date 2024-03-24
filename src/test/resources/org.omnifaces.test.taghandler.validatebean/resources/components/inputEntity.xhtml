@@ -13,23 +13,23 @@
 
 -->
 <ui:component
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<cc:interface>
-		<cc:attribute name="value" type="org.omnifaces.test.taghandler.validatebean.ValidateBeanITEntity" />
-	</cc:interface>
-	<cc:implementation>
-		<h:inputText id="number1" label="number1Label" value="#{cc.attrs.value.number1}" />
-		<h:message id="number1Message" for="number1" />
-		<h:inputText id="number2" label="number2Label" value="#{cc.attrs.value.number2}" />
-		<h:message id="number2Message" for="number2" />
-	</cc:implementation>
+    <cc:interface>
+        <cc:attribute name="value" type="org.omnifaces.test.taghandler.validatebean.ValidateBeanITEntity" />
+    </cc:interface>
+    <cc:implementation>
+        <h:inputText id="number1" label="number1Label" value="#{cc.attrs.value.number1}" />
+        <h:message id="number1Message" for="number1" />
+        <h:inputText id="number2" label="number2Label" value="#{cc.attrs.value.number2}" />
+        <h:message id="number2Message" for="number2" />
+    </cc:implementation>
 </ui:component>
 
 

@@ -33,61 +33,61 @@ import org.omnifaces.util.Hacks;
 @ViewScoped
 public class ViewScopedITBean implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static boolean unloaded;
-	private static boolean destroyed;
+    private static boolean unloaded;
+    private static boolean destroyed;
 
-	@PostConstruct
-	public void init() {
-		try {
-			Thread.sleep(500);  // Give unload opportunity to hit server.
-		}catch (InterruptedException e) {
-			throw new FacesException(e);
-		}
+    @PostConstruct
+    public void init() {
+        try {
+            Thread.sleep(500);  // Give unload opportunity to hit server.
+        }catch (InterruptedException e) {
+            throw new FacesException(e);
+        }
 
-		checkUnloadedOrDestroyed();
-		addGlobalInfo("init ");
-	}
+        checkUnloadedOrDestroyed();
+        addGlobalInfo("init ");
+    }
 
-	public void checkUnloadedOrDestroyed() {
-		if (unloaded) {
-			addGlobalInfo("unload ");
-			unloaded = false;
-		}
-		else if (destroyed) {
-			addGlobalInfo("destroy ");
-			destroyed = false;
-		}
-	}
+    public void checkUnloadedOrDestroyed() {
+        if (unloaded) {
+            addGlobalInfo("unload ");
+            unloaded = false;
+        }
+        else if (destroyed) {
+            addGlobalInfo("destroy ");
+            destroyed = false;
+        }
+    }
 
-	public void submit() {
-		checkUnloadedOrDestroyed();
-		addGlobalInfo("submit ");
-	}
+    public void submit() {
+        checkUnloadedOrDestroyed();
+        addGlobalInfo("submit ");
+    }
 
-	public String navigate() {
-		addGlobalInfo("navigate ");
+    public String navigate() {
+        addGlobalInfo("navigate ");
 
-		if (Hacks.isMyFacesUsed()) { // MyFaces refused to fix this. See #4120
-			Object renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
-			Faces.setViewRoot(Faces.getViewId());
-			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources);
-			return null;
-		}
-		else {
-			return getViewId();
-		}
-	}
+        if (Hacks.isMyFacesUsed()) { // MyFaces refused to fix this. See #4120
+            Object renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
+            Faces.setViewRoot(Faces.getViewId());
+            Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources);
+            return null;
+        }
+        else {
+            return getViewId();
+        }
+    }
 
-	@PreDestroy
-	public void destroy() {
-		if (hasContext() && isUnloadRequest(getContext())) {
-			unloaded = true;
-		}
-		else {
-			destroyed = true;
-		}
-	}
+    @PreDestroy
+    public void destroy() {
+        if (hasContext() && isUnloadRequest(getContext())) {
+            unloaded = true;
+        }
+        else {
+            destroyed = true;
+        }
+    }
 
 }

@@ -34,37 +34,37 @@ import org.omnifaces.resourcehandler.CombinedResourceHandler;
 @FacesRenderer(componentFamily=UIOutput.COMPONENT_FAMILY, rendererType=InlineStylesheetRenderer.RENDERER_TYPE)
 public class InlineStylesheetRenderer extends InlineResourceRenderer {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	/** The standard renderer type. */
-	public static final String RENDERER_TYPE = "org.omnifaces.InlineStylesheet";
+    /** The standard renderer type. */
+    public static final String RENDERER_TYPE = "org.omnifaces.InlineStylesheet";
 
-	private static final int BUFFER_SIZE = 10240;
+    private static final int BUFFER_SIZE = 10240;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
-		writer.startElement("style", component);
-		writer.writeAttribute("type", "text/css", "type");
-		writer.write("/*<![CDATA[*/\n");
-	}
+    @Override
+    public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
+        writer.startElement("style", component);
+        writer.writeAttribute("type", "text/css", "type");
+        writer.write("/*<![CDATA[*/\n");
+    }
 
-	@Override
-	public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-		CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
+    @Override
+    public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
+        CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
 
-		while (reader.read(buffer) != -1) {
-			buffer.flip();
-			writer.append(buffer);
-			buffer.clear();
-		}
-	}
+        while (reader.read(buffer) != -1) {
+            buffer.flip();
+            writer.append(buffer);
+            buffer.clear();
+        }
+    }
 
-	@Override
-	public void endElement(ResponseWriter writer) throws IOException {
-		writer.write("\n/*]]>*/");
-		writer.endElement("style");
-	}
+    @Override
+    public void endElement(ResponseWriter writer) throws IOException {
+        writer.write("\n/*]]>*/");
+        writer.endElement("style");
+    }
 
 }

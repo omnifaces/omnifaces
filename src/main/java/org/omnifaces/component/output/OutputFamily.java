@@ -22,27 +22,27 @@ import jakarta.faces.component.UIComponentBase;
  */
 public abstract class OutputFamily extends UIComponentBase {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
+    /** The standard component family. */
+    public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // UIComponent overrides ------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
+    /**
+     * Returns {@link #COMPONENT_FAMILY}.
+     */
+    @Override
+    public String getFamily() {
+        return COMPONENT_FAMILY;
+    }
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    /**
+     * Returns <code>true</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
 }

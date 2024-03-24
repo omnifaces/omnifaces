@@ -28,80 +28,80 @@ import org.omnifaces.util.Hacks;
  */
 public class DelegatingVariableMapper extends VariableMapper {
 
-	private final VariableMapper wrapped;
-	private final Map<String, ValueExpression> variables = new HashMap<>();
+    private final VariableMapper wrapped;
+    private final Map<String, ValueExpression> variables = new HashMap<>();
 
-	/**
-	 * Construct delegating variable mapper.
-	 * @param wrapped The variable mapper to be wrapped.
-	 */
-	public DelegatingVariableMapper(VariableMapper wrapped) {
-		this.wrapped = wrapped;
-	}
+    /**
+     * Construct delegating variable mapper.
+     * @param wrapped The variable mapper to be wrapped.
+     */
+    public DelegatingVariableMapper(VariableMapper wrapped) {
+        this.wrapped = wrapped;
+    }
 
-	@Override
-	public ValueExpression resolveVariable(String name) {
-		if (name.charAt(0) == '@') {
-			return wrapped.resolveVariable(name.substring(1)); // So we can detect a nested DelegatingVariableMapper in resolveWrappedVariable().
-		}
-		else if (!variables.containsKey(name)) {
-			return wrapped.resolveVariable(name);
-		}
-		else {
-			return variables.get(name);
-		}
-	}
+    @Override
+    public ValueExpression resolveVariable(String name) {
+        if (name.charAt(0) == '@') {
+            return wrapped.resolveVariable(name.substring(1)); // So we can detect a nested DelegatingVariableMapper in resolveWrappedVariable().
+        }
+        else if (!variables.containsKey(name)) {
+            return wrapped.resolveVariable(name);
+        }
+        else {
+            return variables.get(name);
+        }
+    }
 
-	/**
-	 * Resolve wrapped variable of given name.
-	 * @param name Name of wrapped variable.
-	 * @return Resolved wrapped variable.
-	 */
-	public ValueExpression resolveWrappedVariable(String name) {
-		ValueExpression wrappedVariable = wrapped.resolveVariable(name);
-		ValueExpression globalVariable = variables.get(name);
+    /**
+     * Resolve wrapped variable of given name.
+     * @param name Name of wrapped variable.
+     * @return Resolved wrapped variable.
+     */
+    public ValueExpression resolveWrappedVariable(String name) {
+        ValueExpression wrappedVariable = wrapped.resolveVariable(name);
+        ValueExpression globalVariable = variables.get(name);
 
-		if (Objects.equals(wrappedVariable, globalVariable)) {
-			return null; // Will happen when variable isn't defined, so any global variable needs to be cleared out.
-		}
+        if (Objects.equals(wrappedVariable, globalVariable)) {
+            return null; // Will happen when variable isn't defined, so any global variable needs to be cleared out.
+        }
 
-		ValueExpression parentVariable = wrapped.resolveVariable("@" + name);
+        ValueExpression parentVariable = wrapped.resolveVariable("@" + name);
 
-		if (Objects.equals(wrappedVariable, parentVariable)) {
-			return null; // Will happen when DelegatingVariableMapper is nested but variable isn't redefined, so it needs to be cleared out.
-		}
+        if (Objects.equals(wrappedVariable, parentVariable)) {
+            return null; // Will happen when DelegatingVariableMapper is nested but variable isn't redefined, so it needs to be cleared out.
+        }
 
-		return wrappedVariable;
-	}
+        return wrappedVariable;
+    }
 
-	@Override
-	public ValueExpression setVariable(String name, ValueExpression expression) {
-		return variables.put(name, expression);
-	}
+    @Override
+    public ValueExpression setVariable(String name, ValueExpression expression) {
+        return variables.put(name, expression);
+    }
 
-	/**
-	 * Sets wrapped variable of given name with given value expression.
-	 * @param name Name of wrapped variable.
-	 * @param expression Value expression of wrapped variable.
-	 * @return The wrapped variable.
-	 */
-	public ValueExpression setWrappedVariable(String name, ValueExpression expression) {
-		ValueExpression previous = wrapped.setVariable(name, expression);
+    /**
+     * Sets wrapped variable of given name with given value expression.
+     * @param name Name of wrapped variable.
+     * @param expression Value expression of wrapped variable.
+     * @return The wrapped variable.
+     */
+    public ValueExpression setWrappedVariable(String name, ValueExpression expression) {
+        ValueExpression previous = wrapped.setVariable(name, expression);
 
-		if (expression == null) {
-			clearWrappedVariableMapperIfNecessary(wrapped, name);
-		}
+        if (expression == null) {
+            clearWrappedVariableMapperIfNecessary(wrapped, name);
+        }
 
-		return previous;
-	}
+        return previous;
+    }
 
-	private static void clearWrappedVariableMapperIfNecessary(VariableMapper mapper, String name) {
-		VariableMapper wrapped = Hacks.findWrappedVariableMapper(mapper);
+    private static void clearWrappedVariableMapperIfNecessary(VariableMapper mapper, String name) {
+        VariableMapper wrapped = Hacks.findWrappedVariableMapper(mapper);
 
-		if (wrapped != null) {
-			wrapped.setVariable(name, null);
-			clearWrappedVariableMapperIfNecessary(wrapped, name);
-		}
-	}
+        if (wrapped != null) {
+            wrapped.setVariable(name, null);
+            clearWrappedVariableMapperIfNecessary(wrapped, name);
+        }
+    }
 
 }

@@ -37,5 +37,5 @@ import org.omnifaces.component.input.ScriptParam;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface PostScriptParam {
-	//
+    //
 }

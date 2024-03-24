@@ -119,138 +119,138 @@ import org.omnifaces.util.Hacks;
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(UnmappedResourceHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(UnmappedResourceHandler.class.getName());
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Creates a new instance of this unmapped resource handler which wraps the given resource handler.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public UnmappedResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-	}
+    /**
+     * Creates a new instance of this unmapped resource handler which wraps the given resource handler.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public UnmappedResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
-	 */
-	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null) {
-			return resource;
-		}
+    /**
+     * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
+     */
+    @Override
+    public Resource decorateResource(Resource resource) {
+        if (resource == null) {
+            return resource;
+        }
 
-		String path = fixMyFacesMultiViewsPrefixMappingIfNecessary(resource.getRequestPath());
-		return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
-	}
+        String path = fixMyFacesMultiViewsPrefixMappingIfNecessary(resource.getRequestPath());
+        return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
+    }
 
-	@Override
-	public boolean isResourceRequest(FacesContext context) {
-		return isResourceRequest(getRequestURI(context)) || super.isResourceRequest(context);
-	}
+    @Override
+    public boolean isResourceRequest(FacesContext context) {
+        return isResourceRequest(getRequestURI(context)) || super.isResourceRequest(context);
+    }
 
-	@Override
-	public void handleResourceRequest(FacesContext context) throws IOException {
-		Resource resource = createResource(context);
+    @Override
+    public void handleResourceRequest(FacesContext context) throws IOException {
+        Resource resource = createResource(context);
 
-		if (resource == null) {
-			super.handleResourceRequest(context);
-			return;
-		}
+        if (resource == null) {
+            super.handleResourceRequest(context);
+            return;
+        }
 
-		ExternalContext externalContext = context.getExternalContext();
+        ExternalContext externalContext = context.getExternalContext();
 
-		if (!resource.userAgentNeedsUpdate(context)) {
-			externalContext.setResponseStatus(SC_NOT_MODIFIED);
-			return;
-		}
+        if (!resource.userAgentNeedsUpdate(context)) {
+            externalContext.setResponseStatus(SC_NOT_MODIFIED);
+            return;
+        }
 
-		InputStream inputStream = null;
+        InputStream inputStream = null;
 
-		try {
-			inputStream = resource.getInputStream();
-		}
-		catch (Exception resourceNameIsProbablyInvalid) {
-			logger.log(FINE, "Ignoring thrown exception; this can only be caused by a spoofed request.", resourceNameIsProbablyInvalid);
-		}
+        try {
+            inputStream = resource.getInputStream();
+        }
+        catch (Exception resourceNameIsProbablyInvalid) {
+            logger.log(FINE, "Ignoring thrown exception; this can only be caused by a spoofed request.", resourceNameIsProbablyInvalid);
+        }
 
-		if (inputStream == null) {
-			externalContext.setResponseStatus(SC_NOT_FOUND);
-			return;
-		}
+        if (inputStream == null) {
+            externalContext.setResponseStatus(SC_NOT_FOUND);
+            return;
+        }
 
-		externalContext.setResponseContentType(resource.getContentType());
+        externalContext.setResponseContentType(resource.getContentType());
 
-		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
-			externalContext.setResponseHeader(header.getKey(), header.getValue());
-		}
+        for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
+            externalContext.setResponseHeader(header.getKey(), header.getValue());
+        }
 
-		stream(inputStream, externalContext.getResponseOutputStream());
-	}
+        stream(inputStream, externalContext.getResponseOutputStream());
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private static boolean isResourceRequest(String path) {
-		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
-	}
+    private static boolean isResourceRequest(String path) {
+        return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
+    }
 
-	private static String fixMyFacesMultiViewsPrefixMappingIfNecessary(String path) {
-		if (!(Hacks.isMyFacesUsed() && isMultiViewsEnabled(getServletContext()) && isPrefixMapping())) {
-			return path;
-		}
+    private static String fixMyFacesMultiViewsPrefixMappingIfNecessary(String path) {
+        if (!(Hacks.isMyFacesUsed() && isMultiViewsEnabled(getServletContext()) && isPrefixMapping())) {
+            return path;
+        }
 
-		int resourceIdentifierIndex = path.indexOf(RESOURCE_IDENTIFIER);
+        int resourceIdentifierIndex = path.indexOf(RESOURCE_IDENTIFIER);
 
-		if (resourceIdentifierIndex > -1) {
-			String contextPath = getRequestContextPath();
+        if (resourceIdentifierIndex > -1) {
+            String contextPath = getRequestContextPath();
 
-			if (path.startsWith(contextPath)) {
-				String resourcePath = contextPath + RESOURCE_IDENTIFIER;
+            if (path.startsWith(contextPath)) {
+                String resourcePath = contextPath + RESOURCE_IDENTIFIER;
 
-				if (!path.startsWith(resourcePath)) {
-					return resourcePath + path.substring(resourceIdentifierIndex);
-				}
-			}
-		}
+                if (!path.startsWith(resourcePath)) {
+                    return resourcePath + path.substring(resourceIdentifierIndex);
+                }
+            }
+        }
 
-		return path;
-	}
+        return path;
+    }
 
-	private static String unmapRequestPath(String path) {
-		String mapping = getMapping();
+    private static String unmapRequestPath(String path) {
+        String mapping = getMapping();
 
-		if (isPrefixMapping(mapping)) {
-			return path.replaceFirst(mapping, "");
-		}
-		else if (path.contains("?")) {
-			return path.replace(mapping + "?", "?");
-		}
-		else if (path.endsWith(mapping)) {
-			return path.substring(0, path.length() - mapping.length());
-		}
-		else {
-			return path;
-		}
-	}
+        if (isPrefixMapping(mapping)) {
+            return path.replaceFirst(mapping, "");
+        }
+        else if (path.contains("?")) {
+            return path.replace(mapping + "?", "?");
+        }
+        else if (path.endsWith(mapping)) {
+            return path.substring(0, path.length() - mapping.length());
+        }
+        else {
+            return path;
+        }
+    }
 
-	private static Resource createResource(FacesContext context) {
-		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
-			return null;
-		}
+    private static Resource createResource(FacesContext context) {
+        if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
+            return null;
+        }
 
-		String pathInfo = context.getExternalContext().getRequestPathInfo();
-		String resourceName = (pathInfo != null) ? pathInfo.substring(1) : "";
+        String pathInfo = context.getExternalContext().getRequestPathInfo();
+        String resourceName = (pathInfo != null) ? pathInfo.substring(1) : "";
 
-		if (resourceName.isEmpty()) {
-			return null;
-		}
+        if (resourceName.isEmpty()) {
+            return null;
+        }
 
-		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
-		return FacesLocal.createResource(context, libraryName, resourceName);
-	}
+        String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
+        return FacesLocal.createResource(context, libraryName, resourceName);
+    }
 
 }

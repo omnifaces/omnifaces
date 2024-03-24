@@ -25,27 +25,27 @@ import jakarta.json.JsonObject;
 @FacesConverter(forClass = JsonObject.class)
 public class ScriptParamITJsobObjectConverter implements Converter<JsonObject> {
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, JsonObject modelValue) {
-		if (modelValue == null) {
-			return "";
-		}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, JsonObject modelValue) {
+        if (modelValue == null) {
+            return "";
+        }
 
-		return modelValue.toString();
-	}
+        return modelValue.toString();
+    }
 
-	@Override
-	public JsonObject getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (submittedValue == null || submittedValue.isEmpty()) {
-			return null;
-		}
+    @Override
+    public JsonObject getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (submittedValue == null || submittedValue.isEmpty()) {
+            return null;
+        }
 
-		try {
-			return Json.createReader(new StringReader(submittedValue)).readObject();
-		}
-		catch (Exception e) {
-			throw new ConverterException("Not a valid JSON object", e);
-		}
-	}
+        try {
+            return Json.createReader(new StringReader(submittedValue)).readObject();
+        }
+        catch (Exception e) {
+            throw new ConverterException("Not a valid JSON object", e);
+        }
+    }
 
 }

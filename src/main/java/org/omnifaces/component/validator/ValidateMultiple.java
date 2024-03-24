@@ -77,69 +77,69 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateMultiple.COMPONENT_TYPE)
 public class ValidateMultiple extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateMultiple#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateMultiple";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateMultiple#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateMultiple";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private enum PropertyKeys {
-		validateMethod
-	}
+    private enum PropertyKeys {
+        validateMethod
+    }
 
-	// Vars -----------------------------------------------------------------------------------------------------------
+    // Vars -----------------------------------------------------------------------------------------------------------
 
-	private MultiFieldValidator validator;
+    private MultiFieldValidator validator;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Invoke the validator and return its outcome.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
-		if (validator != null) {
-			return validator.validateValues(context, components, values);
-		}
-		else {
-			ELContext elContext = context.getELContext();
-			return (Boolean) getValidateMethod().invoke(elContext, new Object[] { context, components, values });
-		}
-	}
+    /**
+     * Invoke the validator and return its outcome.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
+        if (validator != null) {
+            return validator.validateValues(context, components, values);
+        }
+        else {
+            ELContext elContext = context.getELContext();
+            return (Boolean) getValidateMethod().invoke(elContext, new Object[] { context, components, values });
+        }
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the validator instance.
-	 * @return The validator instance.
-	 */
-	public MultiFieldValidator getValidator() {
-		return validator;
-	}
+    /**
+     * Returns the validator instance.
+     * @return The validator instance.
+     */
+    public MultiFieldValidator getValidator() {
+        return validator;
+    }
 
-	/**
-	 * Sets the validator instance.
-	 * @param validator The validator instance.
-	 */
-	public void setValidator(MultiFieldValidator validator) {
-		this.validator = validator;
-	}
+    /**
+     * Sets the validator instance.
+     * @param validator The validator instance.
+     */
+    public void setValidator(MultiFieldValidator validator) {
+        this.validator = validator;
+    }
 
-	/**
-	 * Returns the validator method expression.
-	 * @return The validator method expression.
-	 */
-	public MethodExpression getValidateMethod() {
-		return (MethodExpression) getStateHelper().eval(PropertyKeys.validateMethod);
-	}
+    /**
+     * Returns the validator method expression.
+     * @return The validator method expression.
+     */
+    public MethodExpression getValidateMethod() {
+        return (MethodExpression) getStateHelper().eval(PropertyKeys.validateMethod);
+    }
 
-	/**
-	 * Sets the validator method expression.
-	 * @param validateMethod The validator method expression.
-	 */
-	public void setValidateMethod(MethodExpression validateMethod) {
-		getStateHelper().put(PropertyKeys.validateMethod, validateMethod);
-	}
+    /**
+     * Sets the validator method expression.
+     * @param validateMethod The validator method expression.
+     */
+    public void setValidateMethod(MethodExpression validateMethod) {
+        getStateHelper().put(PropertyKeys.validateMethod, validateMethod);
+    }
 
 }

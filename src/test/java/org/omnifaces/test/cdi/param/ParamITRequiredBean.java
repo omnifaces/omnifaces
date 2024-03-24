@@ -24,26 +24,26 @@ import org.omnifaces.cdi.Param;
 @RequestScoped
 public class ParamITRequiredBean {
 
-	@Param(required = true)
-	private String requiredStringParam;
+    @Param(required = true)
+    private String requiredStringParam;
 
-	private String initResult;
+    private String initResult;
 
-	@PostConstruct
-	public void init() {
-		if (isValidationFailed()) {
-			initResult = "initValidationFailed";
-		}
-		else {
-			initResult = "initSuccess";
-		}
-	}
+    @PostConstruct
+    public void init() {
+        if (isValidationFailed()) {
+            initResult = "initValidationFailed";
+        }
+        else {
+            initResult = "initSuccess";
+        }
+    }
 
-	public String getRequiredStringParam() {
-		return requiredStringParam;
-	}
+    public String getRequiredStringParam() {
+        return requiredStringParam;
+    }
 
-	public String getInitResult() {
-		return initResult;
-	}
+    public String getInitResult() {
+        return initResult;
+    }
 }

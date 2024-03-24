@@ -35,34 +35,34 @@ import org.omnifaces.component.output.Cache;
  */
 public class CacheValue extends TagHandler {
 
-	private final TagAttribute name;
-	private final TagAttribute value;
+    private final TagAttribute name;
+    private final TagAttribute value;
 
-	/**
-	 * Construct the tag.
-	 * @param config The tag config.
-	 */
-	public CacheValue(TagConfig config) {
-		super(config);
-		this.name = this.getRequiredAttribute("name");
-		this.value = this.getRequiredAttribute("value");
-	}
+    /**
+     * Construct the tag.
+     * @param config The tag config.
+     */
+    public CacheValue(TagConfig config) {
+        super(config);
+        this.name = this.getRequiredAttribute("name");
+        this.value = this.getRequiredAttribute("value");
+    }
 
-	@Override
-	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
+    @Override
+    public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
 
-		Cache cacheComponent;
-		if (parent instanceof Cache) {
-			cacheComponent = (Cache) parent;
-		} else {
-			throw new IllegalStateException("CacheValue components needs to have a Cache component as direct parent.");
-		}
+        Cache cacheComponent;
+        if (parent instanceof Cache) {
+            cacheComponent = (Cache) parent;
+        } else {
+            throw new IllegalStateException("CacheValue components needs to have a Cache component as direct parent.");
+        }
 
-		String nameStr = name.getValue(ctx);
+        String nameStr = name.getValue(ctx);
 
-		// The original value expression we get inside the Facelets tag
-		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
+        // The original value expression we get inside the Facelets tag
+        ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
 
-		ctx.getVariableMapper().setVariable(nameStr, new CachingValueExpression(nameStr, valueExpression, cacheComponent));
-	}
+        ctx.getVariableMapper().setVariable(nameStr, new CachingValueExpression(nameStr, valueExpression, cacheComponent));
+    }
 }

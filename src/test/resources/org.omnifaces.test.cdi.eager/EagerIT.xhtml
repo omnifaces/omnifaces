@@ -14,28 +14,28 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<div id="lazyApplicationScopedBean">#{eagerITLazyApplicationScopedBean.initTime}</div>
-		<div id="eagerApplicationScopedBean">#{eagerITEagerApplicationScopedBean.initTime}</div>
+    <h:body>
+        <div id="lazyApplicationScopedBean">#{eagerITLazyApplicationScopedBean.initTime}</div>
+        <div id="eagerApplicationScopedBean">#{eagerITEagerApplicationScopedBean.initTime}</div>
 
-		<div id="lazySessionScopedBean">#{eagerITLazySessionScopedBean.initTime}</div>
-		<div id="eagerSessionScopedBean">#{eagerITEagerSessionScopedBean.initTime}</div>
+        <div id="lazySessionScopedBean">#{eagerITLazySessionScopedBean.initTime}</div>
+        <div id="eagerSessionScopedBean">#{eagerITEagerSessionScopedBean.initTime}</div>
 
-		<div id="lazyViewScopedBean">#{eagerITLazyViewScopedBean.initTime}</div>
-		<div id="eagerViewScopedBean">#{eagerITEagerViewScopedBean.initTime}</div>
+        <div id="lazyViewScopedBean">#{eagerITLazyViewScopedBean.initTime}</div>
+        <div id="eagerViewScopedBean">#{eagerITEagerViewScopedBean.initTime}</div>
 
-		<div id="lazyRequestScopedBean">#{eagerITLazyRequestScopedBean.initTime}</div>
-		<div id="eagerRequestScopedBean">#{eagerITEagerRequestScopedBean.initTime}</div>
-		
-		<div id="beanInjectedInStartupBean">#{eagerITStartupBean.beanInjectedInStartupBean}</div>
-	</h:body>
+        <div id="lazyRequestScopedBean">#{eagerITLazyRequestScopedBean.initTime}</div>
+        <div id="eagerRequestScopedBean">#{eagerITEagerRequestScopedBean.initTime}</div>
+        
+        <div id="beanInjectedInStartupBean">#{eagerITStartupBean.beanInjectedInStartupBean}</div>
+    </h:body>
 </html>

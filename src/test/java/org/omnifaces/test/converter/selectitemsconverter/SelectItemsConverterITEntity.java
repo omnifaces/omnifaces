@@ -14,24 +14,24 @@ package org.omnifaces.test.converter.selectitemsconverter;
 
 public class SelectItemsConverterITEntity {
 
-	private Long id;
-	private String name;
+    private Long id;
+    private String name;
 
-	public SelectItemsConverterITEntity(Long id) {
-		this.id = id;
-		this.name = "name" + id;
-	}
+    public SelectItemsConverterITEntity(Long id) {
+        this.id = id;
+        this.name = "name" + id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		return "Entity[" + id + "]";
-	}
+    @Override
+    public String toString() {
+        return "Entity[" + id + "]";
+    }
 }

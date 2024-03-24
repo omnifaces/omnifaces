@@ -23,18 +23,18 @@ import java.util.Collection;
  */
 public class ListTreeModel<T> extends AbstractTreeModel<T> {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a new {@link ArrayList}.
-	 */
-	@Override
-	protected Collection<TreeModel<T>> createChildren() {
-		return new ArrayList<>();
-	}
+    /**
+     * Returns a new {@link ArrayList}.
+     */
+    @Override
+    protected Collection<TreeModel<T>> createChildren() {
+        return new ArrayList<>();
+    }
 
 }

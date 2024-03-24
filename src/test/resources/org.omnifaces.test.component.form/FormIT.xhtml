@@ -14,36 +14,36 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:o="http://omnifaces.org/ui"
-	xmlns:of="http://omnifaces.org/functions"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
+    <h:head />
 
-	<h:body>
-		<o:form id="formDefault">
-			<h:inputText id="input1" />
-			<h:inputText id="input2" />
-			<h:inputText id="input3" />
-			<h:inputText id="input4" />
-			<h:commandButton id="submit" value="submit">
-				<f:ajax execute="input2 input3" render="@form" />
-			</h:commandButton>
-			<h:outputText id="params" value="#{request.parameterMap.keySet()}" />
-		</o:form>
-		<o:form id="formDisabled" partialSubmit="false">
-			<h:inputText id="input1" />
-			<h:inputText id="input2" />
-			<h:inputText id="input3" />
-			<h:inputText id="input4" />
-			<h:commandButton id="submit" value="submit">
-				<f:ajax execute="input2 input3" render="@form" />
-			</h:commandButton>
-			<h:outputText id="params" value="#{request.parameterMap.keySet()}" />
-		</o:form>
-	</h:body>
+    <h:body>
+        <o:form id="formDefault">
+            <h:inputText id="input1" />
+            <h:inputText id="input2" />
+            <h:inputText id="input3" />
+            <h:inputText id="input4" />
+            <h:commandButton id="submit" value="submit">
+                <f:ajax execute="input2 input3" render="@form" />
+            </h:commandButton>
+            <h:outputText id="params" value="#{request.parameterMap.keySet()}" />
+        </o:form>
+        <o:form id="formDisabled" partialSubmit="false">
+            <h:inputText id="input1" />
+            <h:inputText id="input2" />
+            <h:inputText id="input3" />
+            <h:inputText id="input4" />
+            <h:commandButton id="submit" value="submit">
+                <f:ajax execute="input2 input3" render="@form" />
+            </h:commandButton>
+            <h:outputText id="params" value="#{request.parameterMap.keySet()}" />
+        </o:form>
+    </h:body>
 </html>

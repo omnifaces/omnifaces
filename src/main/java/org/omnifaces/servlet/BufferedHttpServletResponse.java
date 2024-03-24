@@ -30,46 +30,46 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class BufferedHttpServletResponse extends HttpServletResponseOutputWrapper {
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private final ByteArrayOutputStream buffer;
+    private final ByteArrayOutputStream buffer;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a buffered HTTP servlet response which wraps the given response.
-	 * @param response The response to be wrapped.
-	 */
-	public BufferedHttpServletResponse(HttpServletResponse response) {
-		super(response);
-		buffer = new ByteArrayOutputStream(response.getBufferSize());
-	}
+    /**
+     * Construct a buffered HTTP servlet response which wraps the given response.
+     * @param response The response to be wrapped.
+     */
+    public BufferedHttpServletResponse(HttpServletResponse response) {
+        super(response);
+        buffer = new ByteArrayOutputStream(response.getBufferSize());
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected OutputStream createOutputStream() {
-		return buffer;
-	}
+    @Override
+    protected OutputStream createOutputStream() {
+        return buffer;
+    }
 
-	/**
-	 * Flushes and returns the buffered response.
-	 * @return The buffered response.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public byte[] getBuffer() throws IOException {
-		close();
-		return buffer.toByteArray();
-	}
+    /**
+     * Flushes and returns the buffered response.
+     * @return The buffered response.
+     * @throws IOException When an I/O error occurs.
+     */
+    public byte[] getBuffer() throws IOException {
+        close();
+        return buffer.toByteArray();
+    }
 
-	/**
-	 * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by
-	 * {@link #getCharacterEncoding()}.
-	 * @return The buffered response as string.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public String getBufferAsString() throws IOException {
-		return new String(getBuffer(), getCharacterEncoding());
-	}
+    /**
+     * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by
+     * {@link #getCharacterEncoding()}.
+     * @return The buffered response as string.
+     * @throws IOException When an I/O error occurs.
+     */
+    public String getBufferAsString() throws IOException {
+        return new String(getBuffer(), getCharacterEncoding());
+    }
 
 }

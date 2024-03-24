@@ -34,114 +34,114 @@ import jakarta.faces.model.SelectItemGroup;
  */
 public final class SelectItemsUtils {
 
-	private SelectItemsUtils() {}
+    private SelectItemsUtils() {}
 
-	/**
-	 * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with
-	 * the given string value.
-	 *
-	 * @param context The involved faces context.
-	 * @param component the component with which {@link SelectItem}s should be associated that are used to search in.
-	 * @param value a string that should match the string representation of one of the values held by the {@link SelectItem}s.
-	 * @param converter the faces {@link Converter} used to generate String representations for the values held by the {@link SelectItem}s.
-	 *
-	 * @return the Object representation of the value where its string representation matches the input value.
-	 */
-	public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter<Object> converter) {
-		return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
-	}
+    /**
+     * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with
+     * the given string value.
+     *
+     * @param context The involved faces context.
+     * @param component the component with which {@link SelectItem}s should be associated that are used to search in.
+     * @param value a string that should match the string representation of one of the values held by the {@link SelectItem}s.
+     * @param converter the faces {@link Converter} used to generate String representations for the values held by the {@link SelectItem}s.
+     *
+     * @return the Object representation of the value where its string representation matches the input value.
+     */
+    public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter<Object> converter) {
+        return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
+    }
 
-	private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter<Object> converter) {
-		while (items.hasNext()) {
-			SelectItem item = items.next();
+    private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter<Object> converter) {
+        while (items.hasNext()) {
+            SelectItem item = items.next();
 
-			if (item instanceof SelectItemGroup) {
-				SelectItem[] groupItems = ((SelectItemGroup) item).getSelectItems();
-				Object object = findValueByStringConversion(context, component, groupItems, value, converter);
+            if (item instanceof SelectItemGroup) {
+                SelectItem[] groupItems = ((SelectItemGroup) item).getSelectItems();
+                Object object = findValueByStringConversion(context, component, groupItems, value, converter);
 
-				if (object != null) {
-					return object;
-				}
-			}
-			else if (!item.isNoSelectionOption()) {
-				Object itemValue = item.getValue();
-				String convertedItemValue = converter.getAsString(context, component, itemValue);
+                if (object != null) {
+                    return object;
+                }
+            }
+            else if (!item.isNoSelectionOption()) {
+                Object itemValue = item.getValue();
+                String convertedItemValue = converter.getAsString(context, component, itemValue);
 
-				if (Objects.equals(value, convertedItemValue)) {
-					return itemValue;
-				}
-			}
-		}
+                if (Objects.equals(value, convertedItemValue)) {
+                    return itemValue;
+                }
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter<Object> converter) {
-		return isEmpty(items) ? null : findValueByStringConversion(context, component, new ArrayIterator(items), value, converter);
-	}
+    private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter<Object> converter) {
+        return isEmpty(items) ? null : findValueByStringConversion(context, component, new ArrayIterator(items), value, converter);
+    }
 
-	/**
-	 * Collects all values associated with all {@link SelectItem} instances associated with the given component.
-	 * <p>
-	 * Note that values from recursively scanned {@link SelectItemGroup} instances are included.
-	 *
-	 * @param context The involved faces context.
-	 * @param component the component with which {@link SelectItem} instances should be associated
-	 * @return List of all values hold by {@link SelectItem} instances
-	 */
-	public static List<Object> collectAllValuesFromSelectItems(FacesContext context, UIComponent component) {
-		List<Object> values = new ArrayList<>();
-		collect(SelectItemsCollector.collectFromParent(context, component).iterator(), values);
+    /**
+     * Collects all values associated with all {@link SelectItem} instances associated with the given component.
+     * <p>
+     * Note that values from recursively scanned {@link SelectItemGroup} instances are included.
+     *
+     * @param context The involved faces context.
+     * @param component the component with which {@link SelectItem} instances should be associated
+     * @return List of all values hold by {@link SelectItem} instances
+     */
+    public static List<Object> collectAllValuesFromSelectItems(FacesContext context, UIComponent component) {
+        List<Object> values = new ArrayList<>();
+        collect(SelectItemsCollector.collectFromParent(context, component).iterator(), values);
 
-		return values;
-	}
+        return values;
+    }
 
-	private static void collect(Iterator<SelectItem> items, List<Object> values) {
-		while (items.hasNext()) {
-			SelectItem item = items.next();
-			if (item instanceof SelectItemGroup) {
-				SelectItem[] subitems = ((SelectItemGroup) item).getSelectItems();
-				if (!isEmpty(subitems)) {
-					collect(new ArrayIterator(subitems), values);
-				}
-			} else if (!item.isNoSelectionOption()) {
-				values.add(item.getValue());
-			}
-		}
-	}
+    private static void collect(Iterator<SelectItem> items, List<Object> values) {
+        while (items.hasNext()) {
+            SelectItem item = items.next();
+            if (item instanceof SelectItemGroup) {
+                SelectItem[] subitems = ((SelectItemGroup) item).getSelectItems();
+                if (!isEmpty(subitems)) {
+                    collect(new ArrayIterator(subitems), values);
+                }
+            } else if (!item.isNoSelectionOption()) {
+                values.add(item.getValue());
+            }
+        }
+    }
 
-	/**
-	 * Exposes an Array via an <code>Iterator</code>
-	 */
-	static class ArrayIterator implements Iterator<SelectItem> {
+    /**
+     * Exposes an Array via an <code>Iterator</code>
+     */
+    static class ArrayIterator implements Iterator<SelectItem> {
 
-		private SelectItem[] items;
-		private int index = 0;
+        private SelectItem[] items;
+        private int index = 0;
 
-		public ArrayIterator(SelectItem[] items) {
-			this.items = items;
-		}
+        public ArrayIterator(SelectItem[] items) {
+            this.items = items;
+        }
 
-		@Override
-		public boolean hasNext() {
-			return (index < items.length);
-		}
+        @Override
+        public boolean hasNext() {
+            return (index < items.length);
+        }
 
-		@Override
-		public SelectItem next() {
-			if (hasNext()) {
-				return items[index++];
-			}
-			else {
-				throw new NoSuchElementException();
-			}
-		}
+        @Override
+        public SelectItem next() {
+            if (hasNext()) {
+                return items[index++];
+            }
+            else {
+                throw new NoSuchElementException();
+            }
+        }
 
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
 
-	}
+    }
 
 }

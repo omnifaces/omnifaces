@@ -14,1026 +14,1026 @@
 
 -->
 <facelet-taglib
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_3_0.xsd"
-	version="3.0"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_3_0.xsd"
+    version="3.0"
 >
-	<description>OmniFaces EL functions.</description>
-	<namespace>http://omnifaces.org/functions</namespace>
-	<short-name>of</short-name>
-
-	<!-- Strings ================================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Abbreviate the given text on the given size limit with ellipsis.
-			]]>
-		</description>
-		<function-name>abbreviate</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String abbreviate(java.lang.String, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Concatenate the string representation of the given objects. This is useful when you don't know
-				beforehand if one of the both hands is a string or is <code>null</code>, otherwise the new EL 2.2
-				<code>#{bean.string1.concat(bean.string2)}</code> can just be used.
-			]]>
-		</description>
-		<function-name>concat</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String concat(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Capitalize the given string, i.e. uppercase the first character.
-			]]>
-		</description>
-		<function-name>capitalize</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String capitalize(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
-			]]>
-		</description>
-		<function-name>parenthesize</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String parenthesize(java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Replace all matches of the given pattern on the given string with the given replacement.
-			]]>
-		</description>
-		<function-name>replaceAll</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String replaceAll(java.lang.String, java.lang.String, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns true if the given string matches the given pattern.
-			]]>
-		</description>
-		<function-name>matches</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String matches(java.lang.String, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				URL-prettify the given string. It performs the following tasks:
-				<ul>
-				<li>Lowercase the string.
-				<li>Remove combining diacritical marks.
-				<li>Replace non-alphanumeric characters by hyphens.
-				</ul>
-				This is useful when populating links with dynamic paths obtained from user controlled variables, such
-				as blog titles.
-			]]>
-		</description>
-		<function-name>prettyURL</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String prettyURL(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				URL-encode the given string using UTF-8. This is useful for cases where you can't use
-				<code>&lt;f:param&gt;</code>.
-			]]>
-		</description>
-		<function-name>encodeURL</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String encodeURL(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				URI-encode the given string using UTF-8. This is useful for cases where you need to embed path parameters in URLs.
-			]]>
-		</description>
-		<function-name>encodeURI</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String encodeURI(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Base64-encode the given string using UTF-8. This is useful for cases where you need to create data URLs.
-			]]>
-		</description>
-		<function-name>encodeBase64</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String encodeBase64(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Escapes the given string according the JavaScript code rules. This escapes among others the special
-				characters, the whitespace, the quotes and the unicode characters. Useful whenever you want to use a
-				Java string variable as a JavaScript string variable.
-			]]>
-		</description>
-		<function-name>escapeJS</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given string with 1 parameter using <code>java.text.MessageFormat</code> API.
-				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
-				functions does not support varargs methods nor overloaded function names.
-			]]>
-		</description>
-		<function-name>format1</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format1(java.lang.String, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given string with 2 parameters using <code>java.text.MessageFormat</code> API.
-				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
-				functions does not support varargs methods nor overloaded function names.
-			]]>
-		</description>
-		<function-name>format2</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format2(java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given string with 3 parameters using <code>java.text.MessageFormat</code> API.
-				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
-				functions does not support varargs methods nor overloaded function names.
-			]]>
-		</description>
-		<function-name>format3</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format3(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given string with 4 parameters using <code>java.text.MessageFormat</code> API.
-				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
-				functions does not support varargs methods nor overloaded function names.
-			]]>
-		</description>
-		<function-name>format4</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format4(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given string with 5 parameters using <code>java.text.MessageFormat</code> API.
-				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
-				functions does not support varargs methods nor overloaded function names.
-			]]>
-		</description>
-		<function-name>format5</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format5(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Remove XML tags from a given text and return plain text.
-			]]>
-		</description>
-		<function-name>stripTags</function-name>
-		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String stripTags(java.lang.String)</function-signature>
-	</function>
-
-	<!-- Arrays =================================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Creates and returns a dummy object array of the given size. This is useful if you want to iterate
-				<i>n</i> times over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code>
-				and <code>end</code> attributes.
-			]]>
-		</description>
-		<function-name>createArray</function-name>
-		<function-class>org.omnifaces.el.functions.Arrays</function-class>
-		<function-signature>java.lang.Object[] createArray(int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is
-				useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
-				represent days and years.
-			]]>
-		</description>
-		<function-name>createIntegerArray</function-name>
-		<function-class>org.omnifaces.el.functions.Arrays</function-class>
-		<function-signature>java.lang.int[] createIntegerArray(int, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>true</code> if the string representation of an item of the given array equals to the
-				string representation of the given item. This returns <code>false</code> if either the array or the
-				item is null. This is useful if you want to for example check if <code>#{paramValues.foo}</code>
-				contains a certain value.
-			]]>
-		</description>
-		<function-name>contains</function-name>
-		<function-class>org.omnifaces.el.functions.Arrays</function-class>
-		<function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a copy of the array with items in reversed order.
-			]]>
-		</description>
-		<function-name>reverseArray</function-name>
-		<function-class>org.omnifaces.el.functions.Arrays</function-class>
-		<function-signature>java.lang.Object[] reverseArray(java.lang.Object[])</function-signature>
-	</function>
-
-	<!-- Converters =============================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate
-				over a <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
-			]]>
-		</description>
-		<function-name>setToList</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.util.List setToList(java.util.Set)</function-signature>
-	</function>
-	
-	<function>
-		<description>
-			<![CDATA[
-				Converts any iterable, like a Collection or more specifically a Set into a List so it can 
-				be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
-			]]>
-		</description>
-		<function-name>iterableToList</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.util.List iterableToList(java.lang.Iterable)</function-signature>
-	</function>
-	
-	<function>
-		<description>
-			<![CDATA[
-				Wraps any iterable, like a Collection or more specifically a Set into a DataModel so it can 
-				be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
-			]]>
-		</description>
-		<function-name>iterableToModel</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>jakarta.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&ltK, V&gt;&gt;</code>. Useful when
-				you want to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the
-				entries has the usual <code>getKey()</code> and <code>getValue()</code> methods.
-			]]>
-		</description>
-		<function-name>mapToList</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.util.List mapToList(java.util.Map)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Joins all elements of the given array to a single string, separated by the given separator.
-			]]>
-		</description>
-		<function-name>joinArray</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String joinArray(java.lang.Object, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Joins all elements of the given collection to a single string, separated by the given separator.
-			]]>
-		</description>
-		<function-name>joinCollection</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String joinCollection(java.util.Collection, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Joins all elements of the given map to a single string, separated by the given key-value pair separator and
-				entry separator.
-			]]>
-		</description>
-		<function-name>joinMap</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String joinMap(java.util.Map, java.lang.String, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Splits the given array into an array of subarrays of the given fragment size.
-			]]>
-		</description>
-		<function-name>splitArray</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.Object[] splitArray(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Splits the given list into a list of sublists of the given fragment size. 
-			]]>
-		</description>
-		<function-name>splitList</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.util.List splitList(java.util.List, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Encode given object as JSON.
-			]]>
-		</description>
-		<function-name>toJson</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String toJson(java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Print the stack trace of the given exception.
-			]]>
-		</description>
-		<function-name>printStackTrace</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Convert given object to string using <code>Converter#getAsString(FacesContext, UIComponent, Object)</code> of the
-				converter identified by the given converter ID, invoked with <code>FacesContext#getCurrentInstance()</code>,
-				<code>UIComponent#getCurrentComponent(FacesContext)</code> and given object as arguments.
-			]]>
-		</description>
-		<function-name>convert</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String convert(java.lang.String, java.lang.Object)</function-signature>
-	</function>
-
-	<!-- Dates ==================================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given date in the given pattern and system default timezone. This is useful when you want to
-				format dates in for example the <code>title</code> attribute of an UI component, or the
-				<code>itemLabel</code> attribute of select item, or wherever you can't use the
-				<code>&lt;f:convertDateTime&gt;</code> tag.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>formatDate</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String formatDate(java.lang.Object, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given date in the given pattern with given timezone. This is useful when you want to format
-				dates in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
-				attribute of select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>formatDateWithTimezone</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String formatDateWithTimezone(java.lang.Object, java.lang.String, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of years. The years can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addYears</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addYears(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of months. The months can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addMonths</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addMonths(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of weeks. The weeks can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addWeeks</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addWeeks(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of days. The days can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addDays</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addDays(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of hours. The hours can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addHours</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addHours(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of minutes. The minutes can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addMinutes</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addMinutes(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a new date instance which is a sum of the given date and the given amount of seconds. The seconds can be negative.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>addSeconds</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.Object addSeconds(java.lang.Object, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of years between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>yearsBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int yearsBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of months between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>monthsBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int monthsBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of weeks between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>weeksBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int weeksBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of days between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>daysBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int daysBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of hours between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>hoursBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int hoursBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of minutes between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>minutesBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int minutesBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the amount of seconds between two given dates. This will be negative when the end date is before the start date.
-				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
-			]]>
-		</description>
-		<function-name>secondsBetween</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int secondsBetween(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
-				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-				months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
-				to improve retrieving performance.
-			]]>
-		</description>
-		<function-name>getMonths</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Map getMonths()</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2",
-				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-				short months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
-				cache to improve retrieving performance.
-			]]>
-		</description>
-		<function-name>getShortMonths</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Map getShortMonths()</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a mapping of day of week names in ISO 8601 order for the current locale. For example: "Monday=1", "Tuesday=2",
-				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-				days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
-				to improve retrieving performance.
-			]]>
-		</description>
-		<function-name>getDaysOfWeek</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Map getDaysOfWeek()</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns a mapping of short day of week names in ISO 8601 order for the current locale. For example: "Mon=1", "Tue=2",
-				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-				short days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
-				cache to improve retrieving performance.
-			]]>
-		</description>
-		<function-name>getShortDaysOfWeek</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Map getShortDaysOfWeek()</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the month name from the mapping associated with the given month number for the current locale. For
-				example: "1=January", "2=February", etc. The locale is obtained by Faces#getLocale().
-			]]>
-		</description>
-		<function-name>getMonth</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String getMonth(java.lang.Integer)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the short month name from the mapping associated with the given month number for the current locale. For
-				example: "1=Jan", "2=Feb", etc. The locale is obtained by Faces#getLocale().
-			]]>
-		</description>
-		<function-name>getShortMonth</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String getShortMonth(java.lang.Integer)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order
-				(Monday first) for the current locale. For example: "1=Monday", "2=Tuesday", etc. The locale is obtained by
-				Faces#getLocale().
-			]]>
-		</description>
-		<function-name>getDayOfWeek</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String getDayOfWeek(java.lang.Integer)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601
-				order (Monday first) for the current locale. For example: "1=Mon", "2=Tue", etc. The locale is obtained by
-				Faces#getLocale().
-			]]>
-		</description>
-		<function-name>getShortDayOfWeek</function-name>
-		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String getShortDayOfWeek(java.lang.Integer)</function-signature>
-	</function>
-
-	<!-- Numbers ================================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
-				precision of 1 fraction. For example:
-				<ul>
-					<li>1023 bytes will appear as 1023 B
-					<li>1024 bytes will appear as 1.0 KiB
-					<li>500000 bytes will appear as 488.3 KiB
-					<li>1048576 bytes will appear as 1.0 GiB
-				</ul>
-			]]>
-		</description>
-		<function-name>formatBytes</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number as currency with the given symbol. This is useful when you want to format numbers as
-				currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
-				attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
-				locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
-			]]>
-		</description>
-		<function-name>formatCurrency</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatCurrency(java.lang.Number, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number in the given pattern. This is useful when you want to format numbers in for example the
-				<code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or
-				wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as
-				obtained by <code>Faces#getLocale()</code>.
-			]]>
-		</description>
-		<function-name>formatNumber</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatNumber(java.lang.Number, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number in the default pattern of the default locale. This is useful when you want to format numbers in for 
-				example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default locale is
-				the one as obtained by <code>Faces#getLocale()</code>.
-			]]>
-		</description>
-		<function-name>formatNumberDefault</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number in the default pattern of the given locale. This is useful when you want to format numbers in for 
-				example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
-				locale can be a {@link Locale} object or a string representation.
-			]]>
-		</description>
-		<function-name>formatNumberDefaultForLocale</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatNumberDefaultForLocale(java.lang.Number, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number as percentage. This is useful when you want to format numbers as
-				percentage in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
-				attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
-				locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
-			]]>
-		</description>
-		<function-name>formatPercent</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatPercent(java.lang.Number)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
-				with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter
-				trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
-				For example (with English locale):
-				<ul>
-					<li>999.999 will appear as 999.999
-					<li>1000 will appear as 1k
-					<li>1004 will appear as 1k
-					<li>1005 will appear as 1.01k
-					<li>1594 will appear as 1.59k
-					<li>1595 will appear as 1.6k
-					<li>9000 will appear as 9k
-					<li>9900 will appear as 9.9k
-					<li>9994 will appear as 9.99k
-					<li>9995 will appear as 10k
-					<li>99990 will appear as 100k
-					<li>9994999 will appear as 9.99M
-					<li>9995000 will appear as 10M
-				</ul>
-				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
-				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
-			]]>
-		</description>
-		<function-name>formatThousands</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatThousands(java.lang.Number)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
-				prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
-				trailing zeroes in fraction part are stripped.
-				For example (with English locale and unit <code>B</code>):
-				<ul>
-				<li>999 will appear as 999 B
-				<li>1000 will appear as 1 kB
-				<li>1004 will appear as 1 kB
-				<li>1005 will appear as 1.01 kB
-				<li>1594 will appear as 1.59 kB
-				<li>1595 will appear as 1.6 kB
-				<li>9000 will appear as 9 kB
-				<li>9900 will appear as 9.9 kB
-				<li>9994 will appear as 9.99 kB
-				<li>9995 will appear as 10 kB
-				<li>99990 will appear as 100 kB
-				<li>9994999 will appear as 9.99 MB
-				<li>9995000 will appear as 10 MB
-				</ul>
-				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
-				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
-			]]>
-		</description>
-		<function-name>formatThousandsUnit</function-name>
-		<function-class>org.omnifaces.el.functions.Numbers</function-class>
-		<function-signature>java.lang.String formatThousandsUnit(java.lang.Number, java.lang.String)</function-signature>
-	</function>
-
-	<!-- Objects ================================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Return the first non-<code>null</code> object from the two objects.
-			]]>
-		</description>
-		<function-name>coalesce</function-name>
-		<function-class>org.omnifaces.el.functions.Objects</function-class>
-		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>true</code> if given object is an instance of the class as identified by given class name.
-			]]>
-		</description>
-		<function-name>isInstance</function-name>
-		<function-class>org.omnifaces.el.functions.Objects</function-class>
-		<function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
-	</function>
-
-	<!-- Components =============================================================================================== -->
-
-	<function>
-		<description>
-			<![CDATA[
-				Gets the value of a component's attribute by trying to evaluate a value expression associated with the
-				attribute first, and if none exists goes via the regular attribute mechanism (which will likely call
-				a getter on the component if indeed no value expression is associated).
-			]]>
-		</description>
-		<function-name>evalAttribute</function-name>
-		<function-class>org.omnifaces.el.functions.Components</function-class>
-		<function-signature>java.lang.Object evalAttribute(jakarta.faces.component.UIComponent, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>@GraphicImageBean</code> URL based on given expression string.
-				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
-				<p>
-				Usage example:
-				<pre>
+    <description>OmniFaces EL functions.</description>
+    <namespace>http://omnifaces.org/functions</namespace>
+    <short-name>of</short-name>
+
+    <!-- Strings ================================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Abbreviate the given text on the given size limit with ellipsis.
+            ]]>
+        </description>
+        <function-name>abbreviate</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String abbreviate(java.lang.String, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Concatenate the string representation of the given objects. This is useful when you don't know
+                beforehand if one of the both hands is a string or is <code>null</code>, otherwise the new EL 2.2
+                <code>#{bean.string1.concat(bean.string2)}</code> can just be used.
+            ]]>
+        </description>
+        <function-name>concat</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String concat(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Capitalize the given string, i.e. uppercase the first character.
+            ]]>
+        </description>
+        <function-name>capitalize</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String capitalize(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+            ]]>
+        </description>
+        <function-name>parenthesize</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String parenthesize(java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Replace all matches of the given pattern on the given string with the given replacement.
+            ]]>
+        </description>
+        <function-name>replaceAll</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String replaceAll(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns true if the given string matches the given pattern.
+            ]]>
+        </description>
+        <function-name>matches</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String matches(java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                URL-prettify the given string. It performs the following tasks:
+                <ul>
+                <li>Lowercase the string.
+                <li>Remove combining diacritical marks.
+                <li>Replace non-alphanumeric characters by hyphens.
+                </ul>
+                This is useful when populating links with dynamic paths obtained from user controlled variables, such
+                as blog titles.
+            ]]>
+        </description>
+        <function-name>prettyURL</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String prettyURL(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                URL-encode the given string using UTF-8. This is useful for cases where you can't use
+                <code>&lt;f:param&gt;</code>.
+            ]]>
+        </description>
+        <function-name>encodeURL</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeURL(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                URI-encode the given string using UTF-8. This is useful for cases where you need to embed path parameters in URLs.
+            ]]>
+        </description>
+        <function-name>encodeURI</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeURI(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Base64-encode the given string using UTF-8. This is useful for cases where you need to create data URLs.
+            ]]>
+        </description>
+        <function-name>encodeBase64</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeBase64(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Escapes the given string according the JavaScript code rules. This escapes among others the special
+                characters, the whitespace, the quotes and the unicode characters. Useful whenever you want to use a
+                Java string variable as a JavaScript string variable.
+            ]]>
+        </description>
+        <function-name>escapeJS</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given string with 1 parameter using <code>java.text.MessageFormat</code> API.
+                Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+                functions does not support varargs methods nor overloaded function names.
+            ]]>
+        </description>
+        <function-name>format1</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format1(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given string with 2 parameters using <code>java.text.MessageFormat</code> API.
+                Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+                functions does not support varargs methods nor overloaded function names.
+            ]]>
+        </description>
+        <function-name>format2</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format2(java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given string with 3 parameters using <code>java.text.MessageFormat</code> API.
+                Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+                functions does not support varargs methods nor overloaded function names.
+            ]]>
+        </description>
+        <function-name>format3</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format3(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given string with 4 parameters using <code>java.text.MessageFormat</code> API.
+                Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+                functions does not support varargs methods nor overloaded function names.
+            ]]>
+        </description>
+        <function-name>format4</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format4(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given string with 5 parameters using <code>java.text.MessageFormat</code> API.
+                Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+                functions does not support varargs methods nor overloaded function names.
+            ]]>
+        </description>
+        <function-name>format5</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format5(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Remove XML tags from a given text and return plain text.
+            ]]>
+        </description>
+        <function-name>stripTags</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String stripTags(java.lang.String)</function-signature>
+    </function>
+
+    <!-- Arrays =================================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Creates and returns a dummy object array of the given size. This is useful if you want to iterate
+                <i>n</i> times over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code>
+                and <code>end</code> attributes.
+            ]]>
+        </description>
+        <function-name>createArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.Object[] createArray(int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is
+                useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
+                represent days and years.
+            ]]>
+        </description>
+        <function-name>createIntegerArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.int[] createIntegerArray(int, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns <code>true</code> if the string representation of an item of the given array equals to the
+                string representation of the given item. This returns <code>false</code> if either the array or the
+                item is null. This is useful if you want to for example check if <code>#{paramValues.foo}</code>
+                contains a certain value.
+            ]]>
+        </description>
+        <function-name>contains</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a copy of the array with items in reversed order.
+            ]]>
+        </description>
+        <function-name>reverseArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.Object[] reverseArray(java.lang.Object[])</function-signature>
+    </function>
+
+    <!-- Converters =============================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate
+                over a <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
+            ]]>
+        </description>
+        <function-name>setToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List setToList(java.util.Set)</function-signature>
+    </function>
+    
+    <function>
+        <description>
+            <![CDATA[
+                Converts any iterable, like a Collection or more specifically a Set into a List so it can 
+                be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
+            ]]>
+        </description>
+        <function-name>iterableToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List iterableToList(java.lang.Iterable)</function-signature>
+    </function>
+    
+    <function>
+        <description>
+            <![CDATA[
+                Wraps any iterable, like a Collection or more specifically a Set into a DataModel so it can 
+                be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
+            ]]>
+        </description>
+        <function-name>iterableToModel</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>jakarta.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&ltK, V&gt;&gt;</code>. Useful when
+                you want to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the
+                entries has the usual <code>getKey()</code> and <code>getValue()</code> methods.
+            ]]>
+        </description>
+        <function-name>mapToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List mapToList(java.util.Map)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Joins all elements of the given array to a single string, separated by the given separator.
+            ]]>
+        </description>
+        <function-name>joinArray</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinArray(java.lang.Object, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Joins all elements of the given collection to a single string, separated by the given separator.
+            ]]>
+        </description>
+        <function-name>joinCollection</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinCollection(java.util.Collection, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Joins all elements of the given map to a single string, separated by the given key-value pair separator and
+                entry separator.
+            ]]>
+        </description>
+        <function-name>joinMap</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinMap(java.util.Map, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Splits the given array into an array of subarrays of the given fragment size.
+            ]]>
+        </description>
+        <function-name>splitArray</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.Object[] splitArray(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Splits the given list into a list of sublists of the given fragment size. 
+            ]]>
+        </description>
+        <function-name>splitList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List splitList(java.util.List, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Encode given object as JSON.
+            ]]>
+        </description>
+        <function-name>toJson</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String toJson(java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Print the stack trace of the given exception.
+            ]]>
+        </description>
+        <function-name>printStackTrace</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Convert given object to string using <code>Converter#getAsString(FacesContext, UIComponent, Object)</code> of the
+                converter identified by the given converter ID, invoked with <code>FacesContext#getCurrentInstance()</code>,
+                <code>UIComponent#getCurrentComponent(FacesContext)</code> and given object as arguments.
+            ]]>
+        </description>
+        <function-name>convert</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String convert(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <!-- Dates ==================================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given date in the given pattern and system default timezone. This is useful when you want to
+                format dates in for example the <code>title</code> attribute of an UI component, or the
+                <code>itemLabel</code> attribute of select item, or wherever you can't use the
+                <code>&lt;f:convertDateTime&gt;</code> tag.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>formatDate</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String formatDate(java.lang.Object, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given date in the given pattern with given timezone. This is useful when you want to format
+                dates in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+                attribute of select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>formatDateWithTimezone</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String formatDateWithTimezone(java.lang.Object, java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of years. The years can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addYears</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addYears(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of months. The months can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addMonths(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of weeks. The weeks can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addWeeks</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addWeeks(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of days. The days can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addDays</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addDays(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of hours. The hours can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addHours</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addHours(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of minutes. The minutes can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addMinutes</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addMinutes(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a new date instance which is a sum of the given date and the given amount of seconds. The seconds can be negative.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>addSeconds</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addSeconds(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of years between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>yearsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int yearsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of months between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>monthsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int monthsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of weeks between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>weeksBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int weeksBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of days between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>daysBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int daysBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of hours between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>hoursBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int hoursBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of minutes between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>minutesBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int minutesBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the amount of seconds between two given dates. This will be negative when the end date is before the start date.
+                <code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
+            ]]>
+        </description>
+        <function-name>secondsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int secondsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
+                etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+                months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
+                to improve retrieving performance.
+            ]]>
+        </description>
+        <function-name>getMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getMonths()</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2",
+                etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+                short months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
+                cache to improve retrieving performance.
+            ]]>
+        </description>
+        <function-name>getShortMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getShortMonths()</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a mapping of day of week names in ISO 8601 order for the current locale. For example: "Monday=1", "Tuesday=2",
+                etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+                days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
+                to improve retrieving performance.
+            ]]>
+        </description>
+        <function-name>getDaysOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getDaysOfWeek()</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns a mapping of short day of week names in ISO 8601 order for the current locale. For example: "Mon=1", "Tue=2",
+                etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+                short days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
+                cache to improve retrieving performance.
+            ]]>
+        </description>
+        <function-name>getShortDaysOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getShortDaysOfWeek()</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the month name from the mapping associated with the given month number for the current locale. For
+                example: "1=January", "2=February", etc. The locale is obtained by Faces#getLocale().
+            ]]>
+        </description>
+        <function-name>getMonth</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getMonth(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the short month name from the mapping associated with the given month number for the current locale. For
+                example: "1=Jan", "2=Feb", etc. The locale is obtained by Faces#getLocale().
+            ]]>
+        </description>
+        <function-name>getShortMonth</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getShortMonth(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order
+                (Monday first) for the current locale. For example: "1=Monday", "2=Tuesday", etc. The locale is obtained by
+                Faces#getLocale().
+            ]]>
+        </description>
+        <function-name>getDayOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getDayOfWeek(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601
+                order (Monday first) for the current locale. For example: "1=Mon", "2=Tue", etc. The locale is obtained by
+                Faces#getLocale().
+            ]]>
+        </description>
+        <function-name>getShortDayOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getShortDayOfWeek(java.lang.Integer)</function-signature>
+    </function>
+
+    <!-- Numbers ================================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
+                precision of 1 fraction. For example:
+                <ul>
+                    <li>1023 bytes will appear as 1023 B
+                    <li>1024 bytes will appear as 1.0 KiB
+                    <li>500000 bytes will appear as 488.3 KiB
+                    <li>1048576 bytes will appear as 1.0 GiB
+                </ul>
+            ]]>
+        </description>
+        <function-name>formatBytes</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number as currency with the given symbol. This is useful when you want to format numbers as
+                currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+                attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
+                locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+            ]]>
+        </description>
+        <function-name>formatCurrency</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatCurrency(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number in the given pattern. This is useful when you want to format numbers in for example the
+                <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or
+                wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as
+                obtained by <code>Faces#getLocale()</code>.
+            ]]>
+        </description>
+        <function-name>formatNumber</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumber(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number in the default pattern of the default locale. This is useful when you want to format numbers in for 
+                example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
+                item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default locale is
+                the one as obtained by <code>Faces#getLocale()</code>.
+            ]]>
+        </description>
+        <function-name>formatNumberDefault</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number in the default pattern of the given locale. This is useful when you want to format numbers in for 
+                example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
+                item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
+                locale can be a {@link Locale} object or a string representation.
+            ]]>
+        </description>
+        <function-name>formatNumberDefaultForLocale</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumberDefaultForLocale(java.lang.Number, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number as percentage. This is useful when you want to format numbers as
+                percentage in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+                attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
+                locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+            ]]>
+        </description>
+        <function-name>formatPercent</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatPercent(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
+                with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter
+                trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
+                For example (with English locale):
+                <ul>
+                    <li>999.999 will appear as 999.999
+                    <li>1000 will appear as 1k
+                    <li>1004 will appear as 1k
+                    <li>1005 will appear as 1.01k
+                    <li>1594 will appear as 1.59k
+                    <li>1595 will appear as 1.6k
+                    <li>9000 will appear as 9k
+                    <li>9900 will appear as 9.9k
+                    <li>9994 will appear as 9.99k
+                    <li>9995 will appear as 10k
+                    <li>99990 will appear as 100k
+                    <li>9994999 will appear as 9.99M
+                    <li>9995000 will appear as 10M
+                </ul>
+                The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+                If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+            ]]>
+        </description>
+        <function-name>formatThousands</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatThousands(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
+                prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
+                trailing zeroes in fraction part are stripped.
+                For example (with English locale and unit <code>B</code>):
+                <ul>
+                <li>999 will appear as 999 B
+                <li>1000 will appear as 1 kB
+                <li>1004 will appear as 1 kB
+                <li>1005 will appear as 1.01 kB
+                <li>1594 will appear as 1.59 kB
+                <li>1595 will appear as 1.6 kB
+                <li>9000 will appear as 9 kB
+                <li>9900 will appear as 9.9 kB
+                <li>9994 will appear as 9.99 kB
+                <li>9995 will appear as 10 kB
+                <li>99990 will appear as 100 kB
+                <li>9994999 will appear as 9.99 MB
+                <li>9995000 will appear as 10 MB
+                </ul>
+                The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+                If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+            ]]>
+        </description>
+        <function-name>formatThousandsUnit</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatThousandsUnit(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <!-- Objects ================================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Return the first non-<code>null</code> object from the two objects.
+            ]]>
+        </description>
+        <function-name>coalesce</function-name>
+        <function-class>org.omnifaces.el.functions.Objects</function-class>
+        <function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+            ]]>
+        </description>
+        <function-name>isInstance</function-name>
+        <function-class>org.omnifaces.el.functions.Objects</function-class>
+        <function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <!-- Components =============================================================================================== -->
+
+    <function>
+        <description>
+            <![CDATA[
+                Gets the value of a component's attribute by trying to evaluate a value expression associated with the
+                attribute first, and if none exists goes via the regular attribute mechanism (which will likely call
+                a getter on the component if indeed no value expression is associated).
+            ]]>
+        </description>
+        <function-name>evalAttribute</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.Object evalAttribute(jakarta.faces.component.UIComponent, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>
+            <![CDATA[
+                Returns <code>@GraphicImageBean</code> URL based on given expression string.
+                The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+                <p>
+                Usage example:
+                <pre>
 &lt;a href="#{of:graphicImageURL('images.full(product.imageId)')}"&gt;
     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" /&gt;
 &lt;/a&gt;
-				</pre>
-			]]>
-		</description>
-		<function-name>graphicImageURL</function-name>
-		<function-class>org.omnifaces.el.functions.Components</function-class>
-		<function-signature>java.lang.String graphicImageURL(java.lang.String)</function-signature>
-	</function>
+                </pre>
+            ]]>
+        </description>
+        <function-name>graphicImageURL</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURL(java.lang.String)</function-signature>
+    </function>
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>@GraphicImageBean</code> URL based on given expression string and image type.
-				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
-				The image type is represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
-				<p>
-				Usage example:
-				<pre>
+    <function>
+        <description>
+            <![CDATA[
+                Returns <code>@GraphicImageBean</code> URL based on given expression string and image type.
+                The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+                The image type is represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+                <p>
+                Usage example:
+                <pre>
 &lt;a href="#{of:graphicImageURLWithType('images.full(product.imageId)', 'png')}"&gt;
     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" /&gt;
 &lt;/a&gt;
-				</pre>
-			]]>
-		</description>
-		<function-name>graphicImageURLWithType</function-name>
-		<function-class>org.omnifaces.el.functions.Components</function-class>
-		<function-signature>java.lang.String graphicImageURLWithType(java.lang.String, java.lang.String)</function-signature>
-	</function>
+                </pre>
+            ]]>
+        </description>
+        <function-name>graphicImageURLWithType</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURLWithType(java.lang.String, java.lang.String)</function-signature>
+    </function>
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>@GraphicImageBean</code> URL based on given expression string, image type and last modified.
-				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
-				The image type is represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
-				The "last modified" timestamp can be either a <code>java.lang.Long</code>, <code>java.util.Date</code>, 
-				or <code>java.lang.String</code> which is parseable as <code>java.lang.Long</code>.
-				<p>
-				Usage example:
-				<pre>
+    <function>
+        <description>
+            <![CDATA[
+                Returns <code>@GraphicImageBean</code> URL based on given expression string, image type and last modified.
+                The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+                The image type is represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+                The "last modified" timestamp can be either a <code>java.lang.Long</code>, <code>java.util.Date</code>, 
+                or <code>java.lang.String</code> which is parseable as <code>java.lang.Long</code>.
+                <p>
+                Usage example:
+                <pre>
 &lt;a href="#{of:graphicImageURLWithTypeAndLastModified('images.full(product.imageId)', 'png', product.lastModified)}"&gt;
     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" lastModified="#{product.lastModified}" /&gt;
 &lt;/a&gt;
-				</pre>
-			]]>
-		</description>
-		<function-name>graphicImageURLWithTypeAndLastModified</function-name>
-		<function-class>org.omnifaces.el.functions.Components</function-class>
-		<function-signature>java.lang.String graphicImageURLWithTypeAndLastModified(java.lang.String, java.lang.String, java.lang.Object)</function-signature>
-	</function>
+                </pre>
+            ]]>
+        </description>
+        <function-name>graphicImageURLWithTypeAndLastModified</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURLWithTypeAndLastModified(java.lang.String, java.lang.String, java.lang.Object)</function-signature>
+    </function>
 
-	<!-- Faces (request URL/header shortcuts) ===================================================================== -->
+    <!-- Faces (request URL/header shortcuts) ===================================================================== -->
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
-				the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
-			]]>
-		</description>
-		<function-name>getRequestBaseURL</function-name>
-		<function-class>org.omnifaces.util.Faces</function-class>
-		<function-signature>java.lang.String getRequestBaseURL()</function-signature>
-	</function>
+    <function>
+        <description>
+            <![CDATA[
+                Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
+                the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+            ]]>
+        </description>
+        <function-name>getRequestBaseURL</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestBaseURL()</function-signature>
+    </function>
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
-			]]>
-		</description>
-		<function-name>getRequestDomainURL</function-name>
-		<function-class>org.omnifaces.util.Faces</function-class>
-		<function-signature>java.lang.String getRequestDomainURL()</function-signature>
-	</function>
+    <function>
+        <description>
+            <![CDATA[
+                Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+            ]]>
+        </description>
+        <function-name>getRequestDomainURL</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestDomainURL()</function-signature>
+    </function>
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
-				sees in browser address bar.
-			]]>
-		</description>
-		<function-name>getRequestURLWithQueryString</function-name>
-		<function-class>org.omnifaces.util.Faces</function-class>
-		<function-signature>java.lang.String getRequestURLWithQueryString()</function-signature>
-	</function>
+    <function>
+        <description>
+            <![CDATA[
+                Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
+                sees in browser address bar.
+            ]]>
+        </description>
+        <function-name>getRequestURLWithQueryString</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestURLWithQueryString()</function-signature>
+    </function>
 
-	<function>
-		<description>
-			<![CDATA[
-				Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
-				<code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
-				return <code>HttpServletRequest#getRemoteAddr()</code> unmodified.
-			]]>
-		</description>
-		<function-name>getRemoteAddr</function-name>
-		<function-class>org.omnifaces.util.Faces</function-class>
-		<function-signature>java.lang.String getRemoteAddr()</function-signature>
-	</function>
+    <function>
+        <description>
+            <![CDATA[
+                Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
+                <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
+                return <code>HttpServletRequest#getRemoteAddr()</code> unmodified.
+            ]]>
+        </description>
+        <function-name>getRemoteAddr</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRemoteAddr()</function-signature>
+    </function>
 
 </facelet-taglib>

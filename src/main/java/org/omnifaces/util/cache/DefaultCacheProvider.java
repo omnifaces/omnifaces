@@ -24,9 +24,9 @@ package org.omnifaces.util.cache;
  */
 public class DefaultCacheProvider extends CacheInstancePerScopeProvider {
 
-	@Override
-	protected Cache createCache(Integer timeToLive, Integer maxCapacity) {
-		return new DefaultCache(timeToLive, maxCapacity);
-	}
+    @Override
+    protected Cache createCache(Integer timeToLive, Integer maxCapacity) {
+        return new DefaultCache(timeToLive, maxCapacity);
+    }
 
 }

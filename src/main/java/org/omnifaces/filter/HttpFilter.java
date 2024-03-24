@@ -66,108 +66,108 @@ import jakarta.servlet.http.HttpSession;
  */
 public abstract class HttpFilter implements Filter {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NO_FILTERCONFIG = "FilterConfig is not available."
-		+ " It seems that you've overriden HttpFilter#init(FilterConfig)."
-		+ " You should be overriding HttpFilter#init() instead, otherwise you have to call super.init(config).";
+    private static final String ERROR_NO_FILTERCONFIG = "FilterConfig is not available."
+        + " It seems that you've overriden HttpFilter#init(FilterConfig)."
+        + " You should be overriding HttpFilter#init() instead, otherwise you have to call super.init(config).";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	private FilterConfig filterConfig;
+    private FilterConfig filterConfig;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Called by the servlet container when the filter is about to be placed into service. This implementation stores
-	 * the {@link FilterConfig} object for later use by the getter methods. It's recommended to <strong>not</strong>
-	 * override this method. Instead, just use {@link #init()} method. When overriding this method anyway, don't forget
-	 * to call <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
-	 */
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		this.filterConfig = filterConfig;
-		init();
-	}
+    /**
+     * Called by the servlet container when the filter is about to be placed into service. This implementation stores
+     * the {@link FilterConfig} object for later use by the getter methods. It's recommended to <strong>not</strong>
+     * override this method. Instead, just use {@link #init()} method. When overriding this method anyway, don't forget
+     * to call <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
+     */
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        this.filterConfig = filterConfig;
+        init();
+    }
 
-	/**
-	 * Convenience init() method without FilterConfig parameter which will be called by init(FilterConfig).
-	 * @throws ServletException When filter's initialization failed.
-	 */
-	public void init() throws ServletException {
-		//
-	}
+    /**
+     * Convenience init() method without FilterConfig parameter which will be called by init(FilterConfig).
+     * @throws ServletException When filter's initialization failed.
+     */
+    public void init() throws ServletException {
+        //
+    }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-		throws ServletException, IOException
-	{
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		HttpSession session = httpRequest.getSession(false);
-		doFilter(httpRequest, httpResponse, session, chain);
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws ServletException, IOException
+    {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpSession session = httpRequest.getSession(false);
+        doFilter(httpRequest, httpResponse, session, chain);
+    }
 
-	/**
-	 * Filter the HTTP request. The session argument is <code>null</code> if there is no session.
-	 * @param request The HTTP request.
-	 * @param response The HTTP response.
-	 * @param session The HTTP session, if any, else <code>null</code>.
-	 * @param chain The filter chain to continue.
-	 * @throws ServletException As wrapper exception when something fails in the request processing.
-	 * @throws IOException Whenever something fails at I/O level.
-	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-	 */
-	public abstract void doFilter
-		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-			throws ServletException, IOException;
+    /**
+     * Filter the HTTP request. The session argument is <code>null</code> if there is no session.
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param session The HTTP session, if any, else <code>null</code>.
+     * @param chain The filter chain to continue.
+     * @throws ServletException As wrapper exception when something fails in the request processing.
+     * @throws IOException Whenever something fails at I/O level.
+     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+     */
+    public abstract void doFilter
+        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+            throws ServletException, IOException;
 
-	@Override
-	public void destroy() {
-		filterConfig = null;
-	}
+    @Override
+    public void destroy() {
+        filterConfig = null;
+    }
 
-	// Getters --------------------------------------------------------------------------------------------------------
+    // Getters --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the filter config.
-	 * @return The filter config.
-	 */
-	protected FilterConfig getFilterConfig() {
-		checkFilterConfig();
-		return filterConfig;
-	}
+    /**
+     * Returns the filter config.
+     * @return The filter config.
+     */
+    protected FilterConfig getFilterConfig() {
+        checkFilterConfig();
+        return filterConfig;
+    }
 
-	/**
-	 * Returns the value of the filter init parameter associated with the given name.
-	 * @param name The filter init parameter name to return the associated value for.
-	 * @return The value of the filter init parameter associated with the given name.
-	 */
-	protected String getInitParameter(String name) {
-		checkFilterConfig();
-		return filterConfig.getInitParameter(name);
-	}
+    /**
+     * Returns the value of the filter init parameter associated with the given name.
+     * @param name The filter init parameter name to return the associated value for.
+     * @return The value of the filter init parameter associated with the given name.
+     */
+    protected String getInitParameter(String name) {
+        checkFilterConfig();
+        return filterConfig.getInitParameter(name);
+    }
 
-	/**
-	 * Returns the servlet context.
-	 * @return The servlet context.
-	 */
-	protected ServletContext getServletContext() {
-		checkFilterConfig();
-		return filterConfig.getServletContext();
-	}
+    /**
+     * Returns the servlet context.
+     * @return The servlet context.
+     */
+    protected ServletContext getServletContext() {
+        checkFilterConfig();
+        return filterConfig.getServletContext();
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Check if the filter config is been set and thus the enduser has properly called super.init(config) when
-	 * overriding the init(config).
-	 * @throws IllegalStateException When this is not the case.
-	 */
-	private void checkFilterConfig() {
-		if (filterConfig == null) {
-			throw new IllegalStateException(ERROR_NO_FILTERCONFIG);
-		}
-	}
+    /**
+     * Check if the filter config is been set and thus the enduser has properly called super.init(config) when
+     * overriding the init(config).
+     * @throws IllegalStateException When this is not the case.
+     */
+    private void checkFilterConfig() {
+        if (filterConfig == null) {
+            throw new IllegalStateException(ERROR_NO_FILTERCONFIG);
+        }
+    }
 
 }

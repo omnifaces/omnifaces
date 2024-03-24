@@ -40,211 +40,211 @@ import org.omnifaces.model.ExtendedSelectItem;
  */
 public final class SelectItemsCollector {
 
-	private static final String ERROR_UNKNOWN_SELECT_TYPE =
-		"A value expression of type '%s' is disallowed for a select item";
+    private static final String ERROR_UNKNOWN_SELECT_TYPE =
+        "A value expression of type '%s' is disallowed for a select item";
 
-	private SelectItemsCollector() {
-		//
-	}
+    private SelectItemsCollector() {
+        //
+    }
 
-	/**
-	 * This method gets all select items that are expressed via {@link UISelectItem} or {@link UISelectItems}
-	 * children of the given parent component.
-	 * <p>
-	 * Note that if {@link SelectItemGroup} instances are present then those will be inserted directly in the returned list
-	 * and the using code still has to iterate over its children recursively to obtain all separate {@link SelectItem} instances.
-	 *
-	 * @param parent the parent whose children are scanned
-	 * @param context The involved faces context.
-	 * @return list of select items obtained from parent's children.
-	 */
-	public static List<SelectItem> collectFromParent(FacesContext context, UIComponent parent) {
-		List<SelectItem> selectItems = new ArrayList<>();
+    /**
+     * This method gets all select items that are expressed via {@link UISelectItem} or {@link UISelectItems}
+     * children of the given parent component.
+     * <p>
+     * Note that if {@link SelectItemGroup} instances are present then those will be inserted directly in the returned list
+     * and the using code still has to iterate over its children recursively to obtain all separate {@link SelectItem} instances.
+     *
+     * @param parent the parent whose children are scanned
+     * @param context The involved faces context.
+     * @return list of select items obtained from parent's children.
+     */
+    public static List<SelectItem> collectFromParent(FacesContext context, UIComponent parent) {
+        List<SelectItem> selectItems = new ArrayList<>();
 
-		// Iterate over all children of the parent component. Non-UISelectItem/s children are automatically skipped.
-		for (UIComponent child : parent.getChildren()) {
-			if (child instanceof UISelectItem) {
-				UISelectItem uiSelectItem = (UISelectItem) child;
-				selectItems.add(getFromUISelectItem(uiSelectItem));
-			}
-			else if (child instanceof UISelectItems) {
-				UISelectItems uiSelectItems = (UISelectItems) child;
+        // Iterate over all children of the parent component. Non-UISelectItem/s children are automatically skipped.
+        for (UIComponent child : parent.getChildren()) {
+            if (child instanceof UISelectItem) {
+                UISelectItem uiSelectItem = (UISelectItem) child;
+                selectItems.add(getFromUISelectItem(uiSelectItem));
+            }
+            else if (child instanceof UISelectItems) {
+                UISelectItems uiSelectItems = (UISelectItems) child;
 
-				if (uiSelectItems.getValue() != null) {
-					selectItems.addAll(collectFromUISelectItems(context, uiSelectItems));
-				}
-			}
-		}
+                if (uiSelectItems.getValue() != null) {
+                    selectItems.addAll(collectFromUISelectItems(context, uiSelectItems));
+                }
+            }
+        }
 
-		return selectItems;
-	}
+        return selectItems;
+    }
 
-	private static SelectItem getFromUISelectItem(UISelectItem uiSelectItem) {
-		Object value = uiSelectItem.getValue();
+    private static SelectItem getFromUISelectItem(UISelectItem uiSelectItem) {
+        Object value = uiSelectItem.getValue();
 
-		if (value instanceof SelectItem) {
-			// A single SelectItem can be added directly without any further processing.
-			return (SelectItem)value;
-		}
-		else if (value == null) {
-			// No value binding specified, create a select item out of the properties of the UI component.
-			return new ExtendedSelectItem(uiSelectItem);
-		}
-		else {
-			// A value binding was specified, but of a type we don't support.
-			throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
-		}
-	}
+        if (value instanceof SelectItem) {
+            // A single SelectItem can be added directly without any further processing.
+            return (SelectItem)value;
+        }
+        else if (value == null) {
+            // No value binding specified, create a select item out of the properties of the UI component.
+            return new ExtendedSelectItem(uiSelectItem);
+        }
+        else {
+            // A value binding was specified, but of a type we don't support.
+            throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
+        }
+    }
 
-	private static Collection<SelectItem> collectFromUISelectItems(FacesContext context, UISelectItems uiSelectItems) {
-		Object value = uiSelectItems.getValue();
+    private static Collection<SelectItem> collectFromUISelectItems(FacesContext context, UISelectItems uiSelectItems) {
+        Object value = uiSelectItems.getValue();
 
-		if (value instanceof SelectItem) {
-			// A single SelectItem can be added directly without any further processing.
-			return Collections.singleton((SelectItem) value);
-		}
-		else if (value instanceof Object[]) {
-			// An array of objects is supposed to be transformed by the SelectItems iteration construct.
-			return collectFromUISelectItemsIterator(context, uiSelectItems, Arrays.asList((Object[]) value));
-		}
-		else if (value instanceof Iterable) {
-			// An iterable (Collection, List, etc) is also supposed to be transformed by the SelectItems iteration construct.
-			return collectFromUISelectItemsIterator(context, uiSelectItems, (Iterable<?>) value);
-		}
-		else if (value instanceof Map) {
-			// A map has its own algorithm for how it should be turned into a list of SelectItems.
-			return SelectItemsBuilder.fromMap((Map<?, ?>)value);
-		}
-		else {
-			// A value binding was specified, but of a type we don't support.
-			throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
-		}
-	}
+        if (value instanceof SelectItem) {
+            // A single SelectItem can be added directly without any further processing.
+            return Collections.singleton((SelectItem) value);
+        }
+        else if (value instanceof Object[]) {
+            // An array of objects is supposed to be transformed by the SelectItems iteration construct.
+            return collectFromUISelectItemsIterator(context, uiSelectItems, Arrays.asList((Object[]) value));
+        }
+        else if (value instanceof Iterable) {
+            // An iterable (Collection, List, etc) is also supposed to be transformed by the SelectItems iteration construct.
+            return collectFromUISelectItemsIterator(context, uiSelectItems, (Iterable<?>) value);
+        }
+        else if (value instanceof Map) {
+            // A map has its own algorithm for how it should be turned into a list of SelectItems.
+            return SelectItemsBuilder.fromMap((Map<?, ?>)value);
+        }
+        else {
+            // A value binding was specified, but of a type we don't support.
+            throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
+        }
+    }
 
-	/**
-	 * This method runs the algorithm expressed by a <code>UISelectItems</code> component that uses the <code>var</code> iterator construct to generate
-	 * a list of <code>SelectItem</code>s.
-	 *
-	 * @param uiSelectItems The involved select items component.
-	 * @param items The available select items.
-	 * @param facesContext The involved faces context.
-	 * @return list of <code>SelectItem</code> obtained from the given parameters
-	 */
-	public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {
+    /**
+     * This method runs the algorithm expressed by a <code>UISelectItems</code> component that uses the <code>var</code> iterator construct to generate
+     * a list of <code>SelectItem</code>s.
+     *
+     * @param uiSelectItems The involved select items component.
+     * @param items The available select items.
+     * @param facesContext The involved faces context.
+     * @return list of <code>SelectItem</code> obtained from the given parameters
+     */
+    public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {
 
-		List<SelectItem> selectItems = new ArrayList<>();
-		Map<String, Object> attributes = uiSelectItems.getAttributes();
-		String var = (String) attributes.get("var");
+        List<SelectItem> selectItems = new ArrayList<>();
+        Map<String, Object> attributes = uiSelectItems.getAttributes();
+        String var = (String) attributes.get("var");
 
-		// Helper class that's used to set the item value in (EL) scope using the name set by "var" during the iteration.
-		// If during each iteration the value of this is changed, any value expressions in the attribute
-		// map referring it will resolve to that particular instance.
-		ScopedRunner scopedRunner = new ScopedRunner(facesContext);
+        // Helper class that's used to set the item value in (EL) scope using the name set by "var" during the iteration.
+        // If during each iteration the value of this is changed, any value expressions in the attribute
+        // map referring it will resolve to that particular instance.
+        ScopedRunner scopedRunner = new ScopedRunner(facesContext);
 
-		for (Object item : items) {
+        for (Object item : items) {
 
-			// If the item is already a SelectItem, take it directly.
-			// NOTE: I'm not 100% sure if this is right, since it now allows a collection to consist
-			// out of a mix of SelectItems and non-SelectItems. Should we maybe always process the iterator
-			// if there's a "var", "itemLabel" or "itemValue" present, or should we process the entire collection
-			// as SelectItems if the first element is a SelectItem and throw an exception as soon as we encounter
-			// a non-SelectItem?
-			if (item instanceof SelectItem) {
-				selectItems.add((SelectItem)item);
-				continue;
-			}
+            // If the item is already a SelectItem, take it directly.
+            // NOTE: I'm not 100% sure if this is right, since it now allows a collection to consist
+            // out of a mix of SelectItems and non-SelectItems. Should we maybe always process the iterator
+            // if there's a "var", "itemLabel" or "itemValue" present, or should we process the entire collection
+            // as SelectItems if the first element is a SelectItem and throw an exception as soon as we encounter
+            // a non-SelectItem?
+            if (item instanceof SelectItem) {
+                selectItems.add((SelectItem)item);
+                continue;
+            }
 
-			if (!isEmpty(var)) {
-				scopedRunner.with(var, item);
-			}
+            if (!isEmpty(var)) {
+                scopedRunner.with(var, item);
+            }
 
-			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(() -> {
-				Object itemValue = getItemValue(attributes, item);
-				Object noSelectionValue = attributes.get("noSelectionValue");
-				boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
+            // During each iteration, just resolve all attributes again.
+            scopedRunner.invoke(() -> {
+                Object itemValue = getItemValue(attributes, item);
+                Object noSelectionValue = attributes.get("noSelectionValue");
+                boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
-				selectItems.add(new SelectItem(
-					itemValue,
-					getItemLabel(attributes, itemValue),
-					getItemDescription(attributes),
-					getBooleanAttribute(attributes, "itemDisabled", false),
-					getBooleanAttribute(attributes, "itemLabelEscaped", true),
-					getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
-				));
-			});
-		}
+                selectItems.add(new SelectItem(
+                    itemValue,
+                    getItemLabel(attributes, itemValue),
+                    getItemDescription(attributes),
+                    getBooleanAttribute(attributes, "itemDisabled", false),
+                    getBooleanAttribute(attributes, "itemLabelEscaped", true),
+                    getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
+                ));
+            });
+        }
 
-		return selectItems;
-	}
+        return selectItems;
+    }
 
-	/**
-	 * Gets the optional value. It defaults to the item itself if not specified.
-	 *
-	 * @param attributes the attributes from which the label is fetched.
-	 * @param item default value if no item value present
-	 * @return the value, or the item if none is present
-	 */
-	private static Object getItemValue(Map<String, Object> attributes, Object item) {
-		Object itemValue = attributes.get("itemValue");
-		if (itemValue == null) {
-			itemValue = item;
-		}
+    /**
+     * Gets the optional value. It defaults to the item itself if not specified.
+     *
+     * @param attributes the attributes from which the label is fetched.
+     * @param item default value if no item value present
+     * @return the value, or the item if none is present
+     */
+    private static Object getItemValue(Map<String, Object> attributes, Object item) {
+        Object itemValue = attributes.get("itemValue");
+        if (itemValue == null) {
+            itemValue = item;
+        }
 
-		return itemValue;
-	}
+        return itemValue;
+    }
 
-	/**
-	 * Gets the optional label. It defaults to the item value if not specified.
-	 *
-	 * @param attributes the attributes from which the label is fetched.
-	 * @param itemValue default value if no item value present
-	 * @return the label, or the item value if none present
-	 */
-	private static String getItemLabel(Map<String, Object> attributes, Object itemValue) {
-		Object itemLabelObj = attributes.get("itemLabel");
-		String itemLabel;
+    /**
+     * Gets the optional label. It defaults to the item value if not specified.
+     *
+     * @param attributes the attributes from which the label is fetched.
+     * @param itemValue default value if no item value present
+     * @return the label, or the item value if none present
+     */
+    private static String getItemLabel(Map<String, Object> attributes, Object itemValue) {
+        Object itemLabelObj = attributes.get("itemLabel");
+        String itemLabel;
 
-		if (itemLabelObj != null) {
-			itemLabel = itemLabelObj.toString();
-		}
-		else {
-			itemLabel = itemValue.toString();
-		}
+        if (itemLabelObj != null) {
+            itemLabel = itemLabelObj.toString();
+        }
+        else {
+            itemLabel = itemValue.toString();
+        }
 
-		return itemLabel;
-	}
+        return itemLabel;
+    }
 
-	/**
-	 * Gets the optional description.
-	 *
-	 * @param attributes the attributes from which the description is fetched.
-	 * @return the description, or null if none present.
-	 */
-	private static String getItemDescription(Map<String, Object> attributes) {
-		Object itemDescriptionObj = attributes.get("itemDescription");
-		String itemDescription = null;
-		if (itemDescriptionObj != null) {
-			itemDescription = itemDescriptionObj.toString();
-		}
+    /**
+     * Gets the optional description.
+     *
+     * @param attributes the attributes from which the description is fetched.
+     * @return the description, or null if none present.
+     */
+    private static String getItemDescription(Map<String, Object> attributes) {
+        Object itemDescriptionObj = attributes.get("itemDescription");
+        String itemDescription = null;
+        if (itemDescriptionObj != null) {
+            itemDescription = itemDescriptionObj.toString();
+        }
 
-		return itemDescription;
-	}
+        return itemDescription;
+    }
 
-	/**
-	 * Gets the name boolean attribute. It defaults to <code>false</code> if not specified.
-	 * @param attributes the attributes from which the attribute is fetched.
-	 * @param key name of the attribute
-	 * @return the boolean represented by the attribute or false if there's no such attribute
-	 */
-	private static boolean getBooleanAttribute(Map<String, Object> attributes, String key, boolean defaultValue) {
-		Object valueObj = attributes.get(key);
-		boolean value = defaultValue;
-		if (valueObj != null) {
-			value = Boolean.parseBoolean(valueObj.toString());
-		}
+    /**
+     * Gets the name boolean attribute. It defaults to <code>false</code> if not specified.
+     * @param attributes the attributes from which the attribute is fetched.
+     * @param key name of the attribute
+     * @return the boolean represented by the attribute or false if there's no such attribute
+     */
+    private static boolean getBooleanAttribute(Map<String, Object> attributes, String key, boolean defaultValue) {
+        Object valueObj = attributes.get(key);
+        boolean value = defaultValue;
+        if (valueObj != null) {
+            value = Boolean.parseBoolean(valueObj.toString());
+        }
 
-		return value;
-	}
+        return value;
+    }
 
 }

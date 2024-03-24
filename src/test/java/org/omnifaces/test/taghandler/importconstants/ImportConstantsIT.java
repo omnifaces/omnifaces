@@ -23,50 +23,50 @@ import org.openqa.selenium.support.FindBy;
 
 public class ImportConstantsIT extends OmniFacesIT {
 
-	@FindBy(id="parent")
-	private WebElement parent;
+    @FindBy(id="parent")
+    private WebElement parent;
 
-	@FindBy(id="child")
-	private WebElement child;
+    @FindBy(id="child")
+    private WebElement child;
 
-	@FindBy(id="interface")
-	private WebElement iface;
+    @FindBy(id="interface")
+    private WebElement iface;
 
-	@FindBy(id="enumValues")
-	private WebElement enumValues;
+    @FindBy(id="enumValues")
+    private WebElement enumValues;
 
-	@FindBy(id="enumInterfaceValues")
-	private WebElement enumInterfaceValues;
+    @FindBy(id="enumInterfaceValues")
+    private WebElement enumInterfaceValues;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(ImportConstantsIT.class)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(ImportConstantsIT.class)
+            .createDeployment();
+    }
 
-	@Test
-	void testParent() {
-		assertEquals("parent", parent.getText());
-	}
+    @Test
+    void testParent() {
+        assertEquals("parent", parent.getText());
+    }
 
-	@Test
-	void testChild() {
-		assertEquals("child", child.getText());
-	}
+    @Test
+    void testChild() {
+        assertEquals("child", child.getText());
+    }
 
-	@Test
-	void testInterface() {
-		assertEquals("interface", iface.getText());
-	}
+    @Test
+    void testInterface() {
+        assertEquals("interface", iface.getText());
+    }
 
-	@Test
-	void testEnum() {
-		assertEquals("[ONE, TWO, THREE]", enumValues.getText());
-	}
+    @Test
+    void testEnum() {
+        assertEquals("[ONE, TWO, THREE]", enumValues.getText());
+    }
 
-	@Test
-	void testEnumImplementingInterface() {
-		assertEquals("[ONE, TWO, THREE, interface]", enumInterfaceValues.getText());
-	}
+    @Test
+    void testEnumImplementingInterface() {
+        assertEquals("[ONE, TWO, THREE, interface]", enumInterfaceValues.getText());
+    }
 
 }

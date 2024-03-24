@@ -19,15 +19,15 @@ package org.omnifaces.io;
  */
 public interface ResettableBuffer {
 
-	/**
-	 * Perform a buffer reset.
-	 */
-	void reset();
+    /**
+     * Perform a buffer reset.
+     */
+    void reset();
 
-	/**
-	 * Returns true if buffer can be reset.
-	 * @return <code>true</code> if buffer can be reset, otherwise <code>false</code>.
-	 */
-	boolean isResettable();
+    /**
+     * Returns true if buffer can be reset.
+     * @return <code>true</code> if buffer can be reset, otherwise <code>false</code>.
+     */
+    boolean isResettable();
 
 }

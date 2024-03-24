@@ -35,58 +35,58 @@ import org.omnifaces.resourcehandler.CombinedResourceHandler;
  */
 public abstract class InlineResourceRenderer extends Renderer {
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+    /**
+     * Returns <code>true</code>.
+     */
+    @Override
+    public boolean getRendersChildren() {
+        return true;
+    }
 
-	/**
-	 * Obtain the resource, construct a {@link Reader} around it using the character encoding as obtained from the
-	 * response writer and then invoke {@link #startElement(ResponseWriter, UIComponent)},
-	 * {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in sequence.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
-		ResponseWriter writer = context.getResponseWriter();
-		String name = (String) component.getAttributes().get("name");
-		String library = (String) component.getAttributes().get("library");
-		Resource resource = createResource(context, library, name);
+    /**
+     * Obtain the resource, construct a {@link Reader} around it using the character encoding as obtained from the
+     * response writer and then invoke {@link #startElement(ResponseWriter, UIComponent)},
+     * {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in sequence.
+     */
+    @Override
+    public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
+        ResponseWriter writer = context.getResponseWriter();
+        String name = (String) component.getAttributes().get("name");
+        String library = (String) component.getAttributes().get("library");
+        Resource resource = createResource(context, library, name);
 
-		startElement(writer, component);
+        startElement(writer, component);
 
-		try (Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding())) {
-			writeResource(reader, writer);
-		}
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding())) {
+            writeResource(reader, writer);
+        }
 
-		endElement(writer);
-	}
+        endElement(writer);
+    }
 
-	/**
-	 * Start the element.
-	 * @param writer The response writer.
-	 * @param component The {@link UIComponent} to which this element corresponds.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public abstract void startElement(ResponseWriter writer, UIComponent component) throws IOException;
+    /**
+     * Start the element.
+     * @param writer The response writer.
+     * @param component The {@link UIComponent} to which this element corresponds.
+     * @throws IOException When an I/O error occurs.
+     */
+    public abstract void startElement(ResponseWriter writer, UIComponent component) throws IOException;
 
-	/**
-	 * Write the resource inline.
-	 * @param reader The reader providing the resource content.
-	 * @param writer The response writer where the resource content has to be written to.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public abstract void writeResource(Reader reader, ResponseWriter writer) throws IOException;
+    /**
+     * Write the resource inline.
+     * @param reader The reader providing the resource content.
+     * @param writer The response writer where the resource content has to be written to.
+     * @throws IOException When an I/O error occurs.
+     */
+    public abstract void writeResource(Reader reader, ResponseWriter writer) throws IOException;
 
-	/**
-	 * End the element.
-	 * @param writer The response writer.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	public abstract void endElement(ResponseWriter writer) throws IOException;
+    /**
+     * End the element.
+     * @param writer The response writer.
+     * @throws IOException When an I/O error occurs.
+     */
+    public abstract void endElement(ResponseWriter writer) throws IOException;
 
 }

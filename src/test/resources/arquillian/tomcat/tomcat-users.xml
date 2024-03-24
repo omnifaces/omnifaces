@@ -14,5 +14,5 @@
 
 -->
 <tomcat-users>
-	<user username="arquillian" password="arquillian" roles="manager-script"/>
+    <user username="arquillian" password="arquillian" roles="manager-script"/>
 </tomcat-users>

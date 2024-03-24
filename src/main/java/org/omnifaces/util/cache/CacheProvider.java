@@ -26,25 +26,25 @@ import jakarta.faces.context.FacesContext;
  */
 public interface CacheProvider {
 
-	/**
-	 * Gets an instance of a Cache using the configured cache provider.
-	 *
-	 * @param context
-	 *            faces context used for resolving the given scope.
-	 * @param scope
-	 *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
-	 *            provider, but generally at least "session" and "application" should be supported.
-	 *
-	 * @return Cache instance encapsulating the cache represented by this CacheProvider
-	 */
-	Cache getCache(FacesContext context, String scope);
+    /**
+     * Gets an instance of a Cache using the configured cache provider.
+     *
+     * @param context
+     *            faces context used for resolving the given scope.
+     * @param scope
+     *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
+     *            provider, but generally at least "session" and "application" should be supported.
+     *
+     * @return Cache instance encapsulating the cache represented by this CacheProvider
+     */
+    Cache getCache(FacesContext context, String scope);
 
-	/**
-	 * Passes parameters to the cache provider implementation. This is mainly intended for configuration of things
-	 * like LRU and global TTL. Settings are mainly implementation specific.
-	 *
-	 * @param parameters map of parameters used to configure the cache.
-	 */
-	void setParameters(Map<String, String> parameters);
+    /**
+     * Passes parameters to the cache provider implementation. This is mainly intended for configuration of things
+     * like LRU and global TTL. Settings are mainly implementation specific.
+     *
+     * @param parameters map of parameters used to configure the cache.
+     */
+    void setParameters(Map<String, String> parameters);
 
 }

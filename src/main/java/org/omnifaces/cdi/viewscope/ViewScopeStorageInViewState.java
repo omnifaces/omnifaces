@@ -34,29 +34,29 @@ import org.omnifaces.cdi.ViewScoped;
 @Dependent // This class is supposed to be entirely stateless.
 public class ViewScopeStorageInViewState implements ViewScopeStorage {
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public UUID getBeanStorageId() {
-		return (UUID) getViewRoot().getAttributes().get(getClass().getName());
-	}
+    @Override
+    public UUID getBeanStorageId() {
+        return (UUID) getViewRoot().getAttributes().get(getClass().getName());
+    }
 
-	@Override
-	public BeanStorage getBeanStorage(UUID id) {
-		return (BeanStorage) getViewRoot().getAttributes().get(id.toString());
-	}
+    @Override
+    public BeanStorage getBeanStorage(UUID id) {
+        return (BeanStorage) getViewRoot().getAttributes().get(id.toString());
+    }
 
-	@Override
-	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-		UIViewRoot viewRoot = getViewRoot();
+    @Override
+    public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
+        UIViewRoot viewRoot = getViewRoot();
 
-		if (!viewRoot.initialStateMarked()) {
-			viewRoot.markInitialState(); // Forces Faces to start recording changes in view state.
-		}
+        if (!viewRoot.initialStateMarked()) {
+            viewRoot.markInitialState(); // Forces Faces to start recording changes in view state.
+        }
 
-		Map<String, Object> viewState = viewRoot.getAttributes();
-		viewState.put(getClass().getName(), beanStorageId);
-		viewState.put(beanStorageId.toString(), beanStorage);
-	}
+        Map<String, Object> viewState = viewRoot.getAttributes();
+        viewState.put(getClass().getName(), beanStorageId);
+        viewState.put(beanStorageId.toString(), beanStorage);
+    }
 
 }

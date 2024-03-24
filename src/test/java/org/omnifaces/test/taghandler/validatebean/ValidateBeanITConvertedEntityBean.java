@@ -24,24 +24,24 @@ import jakarta.validation.Valid;
 @RequestScoped
 public class ValidateBeanITConvertedEntityBean {
 
-	@Valid
-	private ValidateBeanITConvertedEntity entity;
+    @Valid
+    private ValidateBeanITConvertedEntity entity;
 
-	public void action() {
-		if (isValidationFailed()) {
-			addGlobalWarn(" actionValidationFailed");
-		}
-		else {
-			addGlobalInfo("actionSuccess");
-		}
-	}
+    public void action() {
+        if (isValidationFailed()) {
+            addGlobalWarn(" actionValidationFailed");
+        }
+        else {
+            addGlobalInfo("actionSuccess");
+        }
+    }
 
-	public ValidateBeanITConvertedEntity getEntity() {
-		return entity;
-	}
+    public ValidateBeanITConvertedEntity getEntity() {
+        return entity;
+    }
 
-	public void setEntity(ValidateBeanITConvertedEntity entity) {
-		this.entity = entity;
-	}
+    public void setEntity(ValidateBeanITConvertedEntity entity) {
+        this.entity = entity;
+    }
 
 }

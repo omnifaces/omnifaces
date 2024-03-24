@@ -93,161 +93,161 @@ import org.omnifaces.util.Utils;
  */
 public class ImportConstants extends TagHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
 
-	private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
-	private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
+    private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
+    private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private String varValue;
-	private TagAttribute typeAttribute;
-	private TagAttribute loaderAttribute;
+    private String varValue;
+    private TagAttribute typeAttribute;
+    private TagAttribute loaderAttribute;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public ImportConstants(TagConfig config) {
-		super(config);
-		varValue = getStringLiteral(getAttribute("var"), "var");
-		typeAttribute = getRequiredAttribute("type");
-		loaderAttribute = getAttribute("loader");
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public ImportConstants(TagConfig config) {
+        super(config);
+        varValue = getStringLiteral(getAttribute("var"), "var");
+        typeAttribute = getRequiredAttribute("type");
+        loaderAttribute = getAttribute("loader");
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code>
-	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
-	 * them and store in cache. Finally set the constants in the request scope by the simple name of the type, or by the
-	 * name as specified in the <code>var</code> attribute, if any.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		String type = typeAttribute.getValue(context);
-		Map<String, Object> constants = CONSTANTS_CACHE.get(type);
+    /**
+     * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code>
+     * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
+     * them and store in cache. Finally set the constants in the request scope by the simple name of the type, or by the
+     * name as specified in the <code>var</code> attribute, if any.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        String type = typeAttribute.getValue(context);
+        Map<String, Object> constants = CONSTANTS_CACHE.get(type);
 
-		if (constants == null) {
-			ClassLoader loader = getClassLoader(context, loaderAttribute);
-			constants = collectConstants(type, loader);
-			CONSTANTS_CACHE.put(type, constants);
-		}
+        if (constants == null) {
+            ClassLoader loader = getClassLoader(context, loaderAttribute);
+            constants = collectConstants(type, loader);
+            CONSTANTS_CACHE.put(type, constants);
+        }
 
-		String var = varValue;
+        String var = varValue;
 
-		if (var == null) {
-			int innerClass = type.lastIndexOf('$');
-			int outerClass = type.lastIndexOf('.');
-			var = type.substring(max(innerClass, outerClass) + 1);
-		}
+        if (var == null) {
+            int innerClass = type.lastIndexOf('$');
+            int outerClass = type.lastIndexOf('.');
+            var = type.substring(max(innerClass, outerClass) + 1);
+        }
 
-		context.setAttribute(var, constants);
-	}
+        context.setAttribute(var, constants);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Collect constants of the given type. That are, all public static final fields of the given type.
-	 * @param type The fully qualified name of the type to collect constants for.
-	 * @return Constants of the given type.
-	 */
-	private static Map<String, Object> collectConstants(String type, ClassLoader loader) {
-		Map<String, Object> constants = new LinkedHashMap<>();
+    /**
+     * Collect constants of the given type. That are, all public static final fields of the given type.
+     * @param type The fully qualified name of the type to collect constants for.
+     * @return Constants of the given type.
+     */
+    private static Map<String, Object> collectConstants(String type, ClassLoader loader) {
+        Map<String, Object> constants = new LinkedHashMap<>();
 
-		for (Class<?> declaredType : getDeclaredTypes(toClass(type, loader))) {
-			for (Field field : declaredType.getDeclaredFields()) {
-				if (isPublicStaticFinal(field)) {
-					try {
-						constants.putIfAbsent(field.getName(), field.get(null));
-					}
-					catch (Exception e) {
-						throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
-					}
-				}
-			}
-		}
+        for (Class<?> declaredType : getDeclaredTypes(toClass(type, loader))) {
+            for (Field field : declaredType.getDeclaredFields()) {
+                if (isPublicStaticFinal(field)) {
+                    try {
+                        constants.putIfAbsent(field.getName(), field.get(null));
+                    }
+                    catch (Exception e) {
+                        throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
+                    }
+                }
+            }
+        }
 
-		return new ConstantsMap(constants, type);
-	}
+        return new ConstantsMap(constants, type);
+    }
 
-	/**
-	 * Returns an ordered set of all declared types of given type except for Object.class.
-	 */
-	private static Set<Class<?>> getDeclaredTypes(Class<?> type) {
-		Set<Class<?>> declaredTypes = new LinkedHashSet<>();
-		declaredTypes.add(type);
-		fillAllSuperClasses(type, declaredTypes);
-		new LinkedHashSet<>(declaredTypes).stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
-		return Collections.unmodifiableSet(declaredTypes);
-	}
+    /**
+     * Returns an ordered set of all declared types of given type except for Object.class.
+     */
+    private static Set<Class<?>> getDeclaredTypes(Class<?> type) {
+        Set<Class<?>> declaredTypes = new LinkedHashSet<>();
+        declaredTypes.add(type);
+        fillAllSuperClasses(type, declaredTypes);
+        new LinkedHashSet<>(declaredTypes).stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
+        return Collections.unmodifiableSet(declaredTypes);
+    }
 
-	private static void fillAllSuperClasses(Class<?> type, Set<Class<?>> set) {
-		for (Class<?> sc = type.getSuperclass(); !isOneOf(sc, null, Object.class); sc = sc.getSuperclass()) {
-			set.add(sc);
-		}
-	}
+    private static void fillAllSuperClasses(Class<?> type, Set<Class<?>> set) {
+        for (Class<?> sc = type.getSuperclass(); !isOneOf(sc, null, Object.class); sc = sc.getSuperclass()) {
+            set.add(sc);
+        }
+    }
 
-	private static void fillAllInterfaces(Class<?> type, Set<Class<?>> set) {
-		for (Class<?> i : type.getInterfaces()) {
-			if (set.add(i)) {
-				fillAllInterfaces(i, set);
-			}
-		}
-	}
+    private static void fillAllInterfaces(Class<?> type, Set<Class<?>> set) {
+        for (Class<?> i : type.getInterfaces()) {
+            if (set.add(i)) {
+                fillAllInterfaces(i, set);
+            }
+        }
+    }
 
-	/**
-	 * Returns whether the given field is a constant field, that is when it is public, static and final.
-	 * @param field The field to be checked.
-	 * @return <code>true</code> if the given field is a constant field, otherwise <code>false</code>.
-	 */
-	private static boolean isPublicStaticFinal(Field field) {
-		int modifiers = field.getModifiers();
-		return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
-	}
+    /**
+     * Returns whether the given field is a constant field, that is when it is public, static and final.
+     * @param field The field to be checked.
+     * @return <code>true</code> if the given field is a constant field, otherwise <code>false</code>.
+     */
+    private static boolean isPublicStaticFinal(Field field) {
+        int modifiers = field.getModifiers();
+        return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an
-	 * {@link IllegalArgumentException} in {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	private static class ConstantsMap extends MapWrapper<String, Object> {
+    /**
+     * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an
+     * {@link IllegalArgumentException} in {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
+     *
+     * @author Bauke Scholtz
+     */
+    private static class ConstantsMap extends MapWrapper<String, Object> {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private String type;
+        private String type;
 
-		public ConstantsMap(Map<String, Object> map, String type) {
-			super(Collections.unmodifiableMap(map));
-			this.type = type;
-		}
+        public ConstantsMap(Map<String, Object> map, String type) {
+            super(Collections.unmodifiableMap(map));
+            this.type = type;
+        }
 
-		@Override
-		public Object get(Object key) {
-			if (!containsKey(key)) {
-				throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type, key));
-			}
+        @Override
+        public Object get(Object key) {
+            if (!containsKey(key)) {
+                throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type, key));
+            }
 
-			return super.get(key);
-		}
+            return super.get(key);
+        }
 
-		@Override
-		public boolean equals(Object object) {
-			return super.equals(object) && type.equals(((ConstantsMap) object).type);
-		}
+        @Override
+        public boolean equals(Object object) {
+            return super.equals(object) && type.equals(((ConstantsMap) object).type);
+        }
 
-		@Override
-		public int hashCode() {
-			return super.hashCode() + type.hashCode();
-		}
+        @Override
+        public int hashCode() {
+            return super.hashCode() + type.hashCode();
+        }
 
-	}
+    }
 
 }

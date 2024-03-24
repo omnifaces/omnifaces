@@ -124,85 +124,85 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  */
 public class GzipResponseFilter extends HttpFilter {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String INIT_PARAM_THRESHOLD = "threshold";
-	private static final String INIT_PARAM_MIMETYPES = "mimetypes";
+    private static final String INIT_PARAM_THRESHOLD = "threshold";
+    private static final String INIT_PARAM_MIMETYPES = "mimetypes";
 
-	private static final int DEFAULT_THRESHOLD = 150;
-	private static final Set<String> DEFAULT_MIMETYPES = unmodifiableSet(
-		"text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
-		"application/xml", "application/xhtml+xml", "application/javascript", "application/x-javascript", "application/json",
-		"image/svg+xml"
-	);
+    private static final int DEFAULT_THRESHOLD = 150;
+    private static final Set<String> DEFAULT_MIMETYPES = unmodifiableSet(
+        "text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
+        "application/xml", "application/xhtml+xml", "application/javascript", "application/x-javascript", "application/json",
+        "image/svg+xml"
+    );
 
-	private static final String ERROR_THRESHOLD = "The 'threshold' init param must be a number between 0 and 9999."
-		+ " Encountered an invalid value of '%s'.";
+    private static final String ERROR_THRESHOLD = "The 'threshold' init param must be a number between 0 and 9999."
+        + " Encountered an invalid value of '%s'.";
 
-	// Vars -----------------------------------------------------------------------------------------------------------
+    // Vars -----------------------------------------------------------------------------------------------------------
 
-	private Set<String> mimetypes = DEFAULT_MIMETYPES;
-	private int threshold = DEFAULT_THRESHOLD;
+    private Set<String> mimetypes = DEFAULT_MIMETYPES;
+    private int threshold = DEFAULT_THRESHOLD;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Initializes the filter parameters.
-	 */
-	@Override
-	public void init() throws ServletException {
-		String thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
+    /**
+     * Initializes the filter parameters.
+     */
+    @Override
+    public void init() throws ServletException {
+        String thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
 
-		if (thresholdParam != null) {
-			if (!thresholdParam.matches("[0-9]{1,4}")) {
-				throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
-			}
-			else {
-				threshold = Integer.valueOf(thresholdParam);
-			}
-		}
+        if (thresholdParam != null) {
+            if (!thresholdParam.matches("[0-9]{1,4}")) {
+                throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
+            }
+            else {
+                threshold = Integer.valueOf(thresholdParam);
+            }
+        }
 
-		String mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
+        String mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
 
-		if (mimetypesParam != null) {
-			mimetypes = new HashSet<>(Arrays.asList(mimetypesParam.split("\\s*,\\s*")));
-		}
-	}
+        if (mimetypesParam != null) {
+            mimetypes = new HashSet<>(Arrays.asList(mimetypesParam.split("\\s*,\\s*")));
+        }
+    }
 
-	/**
-	 * Perform the filtering job. Only if the client accepts GZIP based on the request headers, then wrap the response
-	 * in a {@link GzipHttpServletResponse} and pass it through the filter chain.
-	 */
-	@Override
-	public void doFilter
-		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-			throws ServletException, IOException
-	{
-		if (acceptsGzip(request)) {
-			GzipHttpServletResponse gzipResponse = new GzipHttpServletResponse(response, threshold, mimetypes);
-			chain.doFilter(request, gzipResponse);
-			gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
-		}
-		else {
-			chain.doFilter(request, response);
-		}
-	}
+    /**
+     * Perform the filtering job. Only if the client accepts GZIP based on the request headers, then wrap the response
+     * in a {@link GzipHttpServletResponse} and pass it through the filter chain.
+     */
+    @Override
+    public void doFilter
+        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+            throws ServletException, IOException
+    {
+        if (acceptsGzip(request)) {
+            GzipHttpServletResponse gzipResponse = new GzipHttpServletResponse(response, threshold, mimetypes);
+            chain.doFilter(request, gzipResponse);
+            gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
+        }
+        else {
+            chain.doFilter(request, response);
+        }
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns whether the given request indicates that the client accepts GZIP encoding.
-	 * @param request The request to be checked.
-	 * @return <code>true</code> if the client accepts GZIP encoding, otherwise <code>false</code>.
-	 */
-	private static boolean acceptsGzip(HttpServletRequest request) {
-		for (Enumeration<String> e = request.getHeaders("Accept-Encoding"); e.hasMoreElements();) {
-			if (e.nextElement().contains("gzip")) {
-				return true;
-			}
-		}
+    /**
+     * Returns whether the given request indicates that the client accepts GZIP encoding.
+     * @param request The request to be checked.
+     * @return <code>true</code> if the client accepts GZIP encoding, otherwise <code>false</code>.
+     */
+    private static boolean acceptsGzip(HttpServletRequest request) {
+        for (Enumeration<String> e = request.getHeaders("Accept-Encoding"); e.hasMoreElements();) {
+            if (e.nextElement().contains("gzip")) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

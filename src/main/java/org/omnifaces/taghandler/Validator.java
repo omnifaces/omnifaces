@@ -84,144 +84,144 @@ import org.omnifaces.util.Messages;
  */
 public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The constructor.
-	 * @param config The validator config.
-	 */
-	public Validator(ValidatorConfig config) {
-		super(config);
-	}
+    /**
+     * The constructor.
+     * @param config The validator config.
+     */
+    public Validator(ValidatorConfig config) {
+        super(config);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Create a {@link jakarta.faces.validator.Validator} based on the <code>binding</code> and/or
-	 * <code>validatorId</code> attributes as per the standard Faces <code>&lt;f:validator&gt;</code> implementation and
-	 * collect the render time attributes. Then create an anonymous <code>Validator</code> implementation which wraps
-	 * the created <code>Validator</code> and delegates the methods to it after setting the render time attributes only
-	 * and only if the <code>disabled</code> attribute evaluates <code>true</code> for the current request. Finally set
-	 * the anonymous implementation on the parent component.
-	 * @param context The involved facelet context.
-	 * @param parent The parent component to add the <code>Validator</code> to.
-	 * @throws IOException If something fails at I/O level.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+    /**
+     * Create a {@link jakarta.faces.validator.Validator} based on the <code>binding</code> and/or
+     * <code>validatorId</code> attributes as per the standard Faces <code>&lt;f:validator&gt;</code> implementation and
+     * collect the render time attributes. Then create an anonymous <code>Validator</code> implementation which wraps
+     * the created <code>Validator</code> and delegates the methods to it after setting the render time attributes only
+     * and only if the <code>disabled</code> attribute evaluates <code>true</code> for the current request. Finally set
+     * the anonymous implementation on the parent component.
+     * @param context The involved facelet context.
+     * @param parent The parent component to add the <code>Validator</code> to.
+     * @throws IOException If something fails at I/O level.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
 
-		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
-			// If it's not new nor inside a composite component, we're finished.
-			return;
-		}
+        if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
+            // If it's not new nor inside a composite component, we're finished.
+            return;
+        }
 
-		if (!(parent instanceof EditableValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
-			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
-			super.apply(context, parent);
-			return;
-		}
+        if (!(parent instanceof EditableValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+            // It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
+            super.apply(context, parent);
+            return;
+        }
 
-		ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
-		ValueExpression id = getValueExpression(context, this, "validatorId", String.class);
-		ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
-		ValueExpression message = getValueExpression(context, this, "message", String.class);
-		jakarta.faces.validator.Validator<Object> validator = createInstance(context.getFacesContext(), context, binding, id);
-		DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
-		((EditableValueHolder) parent).addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
-	}
+        ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
+        ValueExpression id = getValueExpression(context, this, "validatorId", String.class);
+        ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
+        ValueExpression message = getValueExpression(context, this, "message", String.class);
+        jakarta.faces.validator.Validator<Object> validator = createInstance(context.getFacesContext(), context, binding, id);
+        DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
+        ((EditableValueHolder) parent).addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
+    }
 
-	@Override
-	public TagAttribute getTagAttribute(String name) {
-		return getAttribute(name);
-	}
+    @Override
+    public TagAttribute getTagAttribute(String name) {
+        return getAttribute(name);
+    }
 
-	@Override
-	protected TagHandlerDelegate getTagHandlerDelegate() {
-		return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
-	}
+    @Override
+    protected TagHandlerDelegate getTagHandlerDelegate() {
+        return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
+    }
 
-	@Override
-	public boolean isDisabled(FaceletContext context) {
-		return false; // Let the deferred validator handle it.
-	}
+    @Override
+    public boolean isDisabled(FaceletContext context) {
+        return false; // Let the deferred validator handle it.
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	@SuppressWarnings("unchecked")
-	private static jakarta.faces.validator.Validator<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
-		return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createValidator, "validator");
-	}
+    @SuppressWarnings("unchecked")
+    private static jakarta.faces.validator.Validator<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
+        return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createValidator, "validator");
+    }
 
-	// Nested classes -------------------------------------------------------------------------------------------------
+    // Nested classes -------------------------------------------------------------------------------------------------
 
-	/**
-	 * So that we can have a serializable validator.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	protected static class DeferredValidator implements jakarta.faces.validator.Validator<Object>, Serializable {
-		private static final long serialVersionUID = 1L;
+    /**
+     * So that we can have a serializable validator.
+     *
+     * @author Bauke Scholtz
+     */
+    protected static class DeferredValidator implements jakarta.faces.validator.Validator<Object>, Serializable {
+        private static final long serialVersionUID = 1L;
 
-		private transient jakarta.faces.validator.Validator<Object> validator;
-		private final ValueExpression binding;
-		private final ValueExpression id;
-		private final ValueExpression disabled;
-		private final ValueExpression message;
-		private final DeferredAttributes attributes;
+        private transient jakarta.faces.validator.Validator<Object> validator;
+        private final ValueExpression binding;
+        private final ValueExpression id;
+        private final ValueExpression disabled;
+        private final ValueExpression message;
+        private final DeferredAttributes attributes;
 
-		/**
-		 * Construct the deferred validator.
-		 * @param validator The wrapped validator.
-		 * @param binding The binding expression.
-		 * @param id The ID expression.
-		 * @param disabled The disabled expression.
-		 * @param message The message expression.
-		 * @param attributes The deferred attributes.
-		 */
-		public DeferredValidator(jakarta.faces.validator.Validator<Object> validator, ValueExpression binding, ValueExpression id, ValueExpression disabled, ValueExpression message, DeferredAttributes attributes) {
-			this.validator = validator;
-			this.binding = binding;
-			this.id = id;
-			this.disabled = disabled;
-			this.message = message;
-			this.attributes = attributes;
-		}
+        /**
+         * Construct the deferred validator.
+         * @param validator The wrapped validator.
+         * @param binding The binding expression.
+         * @param id The ID expression.
+         * @param disabled The disabled expression.
+         * @param message The message expression.
+         * @param attributes The deferred attributes.
+         */
+        public DeferredValidator(jakarta.faces.validator.Validator<Object> validator, ValueExpression binding, ValueExpression id, ValueExpression disabled, ValueExpression message, DeferredAttributes attributes) {
+            this.validator = validator;
+            this.binding = binding;
+            this.id = id;
+            this.disabled = disabled;
+            this.message = message;
+            this.attributes = attributes;
+        }
 
-		@Override
-		public void validate(FacesContext context, UIComponent component, Object value) {
-			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
-				try {
-					getValidator(context).validate(context, component, value);
-				}
-				catch (ValidatorException e) {
-					rethrowValidatorException(context, component, message, e);
-				}
-			}
-		}
+        @Override
+        public void validate(FacesContext context, UIComponent component, Object value) {
+            if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
+                try {
+                    getValidator(context).validate(context, component, value);
+                }
+                catch (ValidatorException e) {
+                    rethrowValidatorException(context, component, message, e);
+                }
+            }
+        }
 
-		private jakarta.faces.validator.Validator<Object> getValidator(FacesContext context) {
-			if (validator == null) {
-				validator = Validator.createInstance(context, context.getELContext(), binding, id);
-			}
+        private jakarta.faces.validator.Validator<Object> getValidator(FacesContext context) {
+            if (validator == null) {
+                validator = Validator.createInstance(context, context.getELContext(), binding, id);
+            }
 
-			attributes.invokeSetters(context.getELContext(), validator);
-			return validator;
-		}
+            attributes.invokeSetters(context.getELContext(), validator);
+            return validator;
+        }
 
-		private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
-			if (message != null) {
-				String validatorMessage = (String) message.getValue(context.getELContext());
+        private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
+            if (message != null) {
+                String validatorMessage = (String) message.getValue(context.getELContext());
 
-				if (validatorMessage != null) {
-					String label = getLabel(component);
-					throw new ValidatorException(Messages.create(validatorMessage, label)
-						.detail(validatorMessage, label).error().get(), e.getCause());
-				}
-			}
+                if (validatorMessage != null) {
+                    String label = getLabel(component);
+                    throw new ValidatorException(Messages.create(validatorMessage, label)
+                        .detail(validatorMessage, label).error().get(), e.getCause());
+                }
+            }
 
-			throw e;
-		}
-	}
+            throw e;
+        }
+    }
 
 }

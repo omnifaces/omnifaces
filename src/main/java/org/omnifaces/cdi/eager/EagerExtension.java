@@ -43,73 +43,73 @@ import org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans;
  */
 public class EagerExtension implements Extension {
 
-	private static final Logger logger = Logger.getLogger(EagerExtension.class.getName());
+    private static final Logger logger = Logger.getLogger(EagerExtension.class.getName());
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_EAGER_UNAVAILABLE =
-		"@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
+    private static final String ERROR_EAGER_UNAVAILABLE =
+        "@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private EagerBeansRepository.EagerBeans eagerBeans = new EagerBeansRepository.EagerBeans();
+    private EagerBeansRepository.EagerBeans eagerBeans = new EagerBeansRepository.EagerBeans();
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Collect beans annotated with {@link Eager} into {@link EagerBeans}.
-	 * @param <T> The generic bean type.
-	 * @param event The process bean event.
-	 * @param beanManager The involved bean manager.
-	 */
-	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
+    /**
+     * Collect beans annotated with {@link Eager} into {@link EagerBeans}.
+     * @param <T> The generic bean type.
+     * @param event The process bean event.
+     * @param beanManager The involved bean manager.
+     */
+    public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
 
-		Annotated annotated = event.getAnnotated();
-		Eager eager = getAnnotation(beanManager, annotated, Eager.class);
+        Annotated annotated = event.getAnnotated();
+        Eager eager = getAnnotation(beanManager, annotated, Eager.class);
 
-		if (eager != null) {
+        if (eager != null) {
 
-			Bean<?> bean = event.getBean();
+            Bean<?> bean = event.getBean();
 
-			if (getAnnotation(beanManager, annotated, ApplicationScoped.class) != null) {
-				eagerBeans.addApplicationScoped(bean);
-			}
-			else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
-				eagerBeans.addSessionScoped(bean);
-			}
-			else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null || getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
-				eagerBeans.addByViewId(bean, eager.viewId());
-			}
-			else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
-				eagerBeans.addByRequestURIOrViewId(bean, eager.requestURI(), eager.viewId());
-			}
-		}
-	}
+            if (getAnnotation(beanManager, annotated, ApplicationScoped.class) != null) {
+                eagerBeans.addApplicationScoped(bean);
+            }
+            else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
+                eagerBeans.addSessionScoped(bean);
+            }
+            else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null || getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
+                eagerBeans.addByViewId(bean, eager.viewId());
+            }
+            else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
+                eagerBeans.addByRequestURIOrViewId(bean, eager.requestURI(), eager.viewId());
+            }
+        }
+    }
 
-	/**
-	 * Load collected beans annotated with {@link Eager} into {@link EagerBeansRepository} via
-	 * {@link EagerBeansRepository#setEagerBeans(org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans)}.
-	 * @param event The after deployment validation event.
-	 * @param beanManager The involved bean manager.
-	 */
-	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+    /**
+     * Load collected beans annotated with {@link Eager} into {@link EagerBeansRepository} via
+     * {@link EagerBeansRepository#setEagerBeans(org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans)}.
+     * @param event The after deployment validation event.
+     * @param beanManager The involved bean manager.
+     */
+    public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
-		if (eagerBeans.isEmpty()) {
-			return;
-		}
+        if (eagerBeans.isEmpty()) {
+            return;
+        }
 
-		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
+        EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
 
-		if (eagerBeansRepository == null) {
-			eagerBeansRepository = getReference(EagerBeansRepository.class); // #744: Work around for Payara. Apparently its beanManager instance has become "stale" somehow?
+        if (eagerBeansRepository == null) {
+            eagerBeansRepository = getReference(EagerBeansRepository.class); // #744: Work around for Payara. Apparently its beanManager instance has become "stale" somehow?
 
-			if (eagerBeansRepository == null) {
-				logger.warning(ERROR_EAGER_UNAVAILABLE);
-				return;
-			}
-		}
+            if (eagerBeansRepository == null) {
+                logger.warning(ERROR_EAGER_UNAVAILABLE);
+                return;
+            }
+        }
 
-		eagerBeansRepository.setEagerBeans(eagerBeans);
-	}
+        eagerBeansRepository.setEagerBeans(eagerBeans);
+    }
 
 }

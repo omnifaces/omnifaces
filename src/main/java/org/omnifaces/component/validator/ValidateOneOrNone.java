@@ -41,31 +41,31 @@ import org.omnifaces.validator.MultiFieldValidator;
 @FacesComponent(ValidateOneOrNone.COMPONENT_TYPE)
 public class ValidateOneOrNone extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateOneOrNone#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrNone";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateOneOrNone#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrNone";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if only one or none is filled out.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		boolean hasValue = false;
+    /**
+     * Validate if only one or none is filled out.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+        boolean hasValue = false;
 
-		for (Object value : values) {
-			if (!isEmpty(value)) {
-				if (hasValue) {
-					return false;
-				}
+        for (Object value : values) {
+            if (!isEmpty(value)) {
+                if (hasValue) {
+                    return false;
+                }
 
-				hasValue = true;
-			}
-		}
+                hasValue = true;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

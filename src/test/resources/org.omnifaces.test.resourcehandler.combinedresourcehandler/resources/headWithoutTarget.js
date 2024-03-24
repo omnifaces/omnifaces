@@ -11,5 +11,5 @@
  * specific language governing permissions and limitations under the License.
  */
 window.onload = function() {
-	document.getElementById("headWithoutTarget").innerHTML += (++i + ",headWithoutTarget");
+    document.getElementById("headWithoutTarget").innerHTML += (++i + ",headWithoutTarget");
 };

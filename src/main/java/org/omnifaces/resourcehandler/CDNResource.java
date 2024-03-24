@@ -27,40 +27,40 @@ import jakarta.faces.application.ResourceHandler;
  */
 public class CDNResource extends RemappedResource {
 
-	/**
-	 * Do not use this constructor. It's merely there for {@link Externalizable}.
-	 */
-	public CDNResource() {
-		// Keep default c'tor alive for Externalizable.
-	}
+    /**
+     * Do not use this constructor. It's merely there for {@link Externalizable}.
+     */
+    public CDNResource() {
+        // Keep default c'tor alive for Externalizable.
+    }
 
-	/**
-	 * Constructs a new CDN resource which remaps the given wrapped resource to the given CDN URL.
-	 * The CDN URL is available by {@link #getRequestPath()}.
-	 * The local URL is available by {@link #getLocalRequestPath()}.
-	 * @param resource The resource to be remapped.
-	 * @param cdnURL The CDN URL of the resource.
-	 */
-	public CDNResource(Resource resource, String cdnURL) {
-		super(resource, cdnURL);
-	}
+    /**
+     * Constructs a new CDN resource which remaps the given wrapped resource to the given CDN URL.
+     * The CDN URL is available by {@link #getRequestPath()}.
+     * The local URL is available by {@link #getLocalRequestPath()}.
+     * @param resource The resource to be remapped.
+     * @param cdnURL The CDN URL of the resource.
+     */
+    public CDNResource(Resource resource, String cdnURL) {
+        super(resource, cdnURL);
+    }
 
-	/**
-	 * Returns the CDN URL. I.e. the remapped request path pointing a CDN host.
-	 * @return The CDN URL.
-	 */
-	@Override
-	public String getRequestPath() {
-		return super.getRequestPath();
-	}
+    /**
+     * Returns the CDN URL. I.e. the remapped request path pointing a CDN host.
+     * @return The CDN URL.
+     */
+    @Override
+    public String getRequestPath() {
+        return super.getRequestPath();
+    }
 
-	/**
-	 * Returns the local URL. I.e. the original request path pointing the local host.
-	 * @return The local URL.
-	 */
-	public String getLocalRequestPath() {
-		Resource wrapped = getWrapped();
-		return wrapped != null ? wrapped.getRequestPath() : null;
-	}
+    /**
+     * Returns the local URL. I.e. the original request path pointing the local host.
+     * @return The local URL.
+     */
+    public String getLocalRequestPath() {
+        Resource wrapped = getWrapped();
+        return wrapped != null ? wrapped.getRequestPath() : null;
+    }
 
 }

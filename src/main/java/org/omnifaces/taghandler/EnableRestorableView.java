@@ -76,65 +76,65 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  */
 public class EnableRestorableView extends TagHandler {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_PARENT =
-		"EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
-			+ " It is recommended to enclose o:enableRestorableView in f:metadata.";
+    private static final String ERROR_INVALID_PARENT =
+        "EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
+            + " It is recommended to enclose o:enableRestorableView in f:metadata.";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * The tag constructor.
-	 * @param config The tag config.
-	 */
-	public EnableRestorableView(TagConfig config) {
-		super(config);
-		setApplicationAttribute(EnableRestorableView.class.getName(), TRUE);
-	}
+    /**
+     * The tag constructor.
+     * @param config The tag config.
+     */
+    public EnableRestorableView(TagConfig config) {
+        super(config);
+        setApplicationAttribute(EnableRestorableView.class.getName(), TRUE);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Enable the current view to be restorable. This basically sets a specific view attribute which the
-	 * {@link OmniViewHandler} could intercept on.
-	 * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
-	 */
-	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!(parent instanceof UIViewRoot)) {
-			throw new IllegalStateException(
-				format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
-		}
+    /**
+     * Enable the current view to be restorable. This basically sets a specific view attribute which the
+     * {@link OmniViewHandler} could intercept on.
+     * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
+     */
+    @Override
+    public void apply(FaceletContext context, UIComponent parent) throws IOException {
+        if (!(parent instanceof UIViewRoot)) {
+            throw new IllegalStateException(
+                format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
+        }
 
-		if (!ComponentHandler.isNew(parent)) {
-			return;
-		}
+        if (!ComponentHandler.isNew(parent)) {
+            return;
+        }
 
-		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
-	}
+        parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
-	 * @param context The involved faces context.
-	 * @param view The involved view.
-	 * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
-	 */
-	public static boolean isRestorableViewRequest(FacesContext context, UIViewRoot view) {
-		return view == null
-			&& context.isPostback()
-			&& TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
-	}
+    /**
+     * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+     * @param context The involved faces context.
+     * @param view The involved view.
+     * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+     */
+    public static boolean isRestorableViewRequest(FacesContext context, UIViewRoot view) {
+        return view == null
+            && context.isPostback()
+            && TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
+    }
 
-	/**
-	 * Returns true if given view indeed contains {@link EnableRestorableView}.
-	 * @param view The involved view.
-	 * @return true if given view indeed contains {@link EnableRestorableView}.
-	 */
-	public static boolean isRestorableView(UIViewRoot view) {
-		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
-	}
+    /**
+     * Returns true if given view indeed contains {@link EnableRestorableView}.
+     * @param view The involved view.
+     * @return true if given view indeed contains {@link EnableRestorableView}.
+     */
+    public static boolean isRestorableView(UIViewRoot view) {
+        return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
+    }
 
 }

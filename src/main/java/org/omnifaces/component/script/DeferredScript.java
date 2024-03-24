@@ -63,33 +63,33 @@ import org.omnifaces.renderer.DeferredScriptRenderer;
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class DeferredScript extends ScriptFamily {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.script.DeferredScript#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.DeferredScript";
+    /** The component type, which is {@value org.omnifaces.component.script.DeferredScript#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.script.DeferredScript";
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new {@link DeferredScript} component whereby the renderer type is set to
-	 * {@link DeferredScriptRenderer#RENDERER_TYPE}.
-	 */
-	public DeferredScript() {
-		setRendererType(DeferredScriptRenderer.RENDERER_TYPE);
-	}
+    /**
+     * Construct a new {@link DeferredScript} component whereby the renderer type is set to
+     * {@link DeferredScriptRenderer#RENDERER_TYPE}.
+     */
+    public DeferredScript() {
+        setRendererType(DeferredScriptRenderer.RENDERER_TYPE);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}. If successfully moved,
-	 * then set the script resource as rendered, so that Faces won't auto-include it.
-	 */
-	@Override
-	public void processEvent(ComponentSystemEvent event) {
-		if (moveToBody(event)) {
-			FacesContext context = event.getFacesContext();
-			context.getApplication().getResourceHandler().markResourceRendered(context, getAttribute(this, "name"), getAttribute(this, "library"));
-		}
-	}
+    /**
+     * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}. If successfully moved,
+     * then set the script resource as rendered, so that Faces won't auto-include it.
+     */
+    @Override
+    public void processEvent(ComponentSystemEvent event) {
+        if (moveToBody(event)) {
+            FacesContext context = event.getFacesContext();
+            context.getApplication().getResourceHandler().markResourceRendered(context, getAttribute(this, "name"), getAttribute(this, "library"));
+        }
+    }
 
 }

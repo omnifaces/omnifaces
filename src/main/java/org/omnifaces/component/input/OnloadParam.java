@@ -40,180 +40,180 @@ import org.omnifaces.util.State;
  */
 public abstract class OnloadParam extends UIViewParameter {
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private enum PropertyKeys {
-		RENDER;
-		@Override public String toString() { return name().toLowerCase(); }
-	}
+    private enum PropertyKeys {
+        RENDER;
+        @Override public String toString() { return name().toLowerCase(); }
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	/** The component state. */
-	protected final State state = new State(getStateHelper());
+    /** The component state. */
+    protected final State state = new State(getStateHelper());
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	/**
-	 * The constructor instructs Faces to register all scripts during the render response phase if necessary.
-	 */
-	protected OnloadParam() {
-		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
-	}
+    /**
+     * The constructor instructs Faces to register all scripts during the render response phase if necessary.
+     */
+    protected OnloadParam() {
+        subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+    }
 
-	private void registerScriptsIfNecessary() {
-		FacesContext context = getFacesContext();
+    private void registerScriptsIfNecessary() {
+        FacesContext context = getFacesContext();
 
-		if (!isOnloadParamRequest(context)) {
-			addFormIfNecessary(); // Required by jsf.ajax.request.
+        if (!isOnloadParamRequest(context)) {
+            addFormIfNecessary(); // Required by jsf.ajax.request.
 
-			// This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
-			// ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
-			// Also, JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
-			addFacesScriptResource(); // Required for faces.ajax.request.
-			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+            // This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
+            // ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
+            // Also, JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
+            addFacesScriptResource(); // Required for faces.ajax.request.
+            addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 
-			if (!isAjaxRequestWithPartialRendering(context)) {
-				if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered OnloadParam.
-					String initScript = getInitScript(context);
+            if (!isAjaxRequestWithPartialRendering(context)) {
+                if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered OnloadParam.
+                    String initScript = getInitScript(context);
 
-					if (initScript != null) {
-						addScript(initScript);
-					}
-				}
-			}
-			else {
-				String updateScript = getUpdateScript(context);
+                    if (initScript != null) {
+                        addScript(initScript);
+                    }
+                }
+            }
+            else {
+                String updateScript = getUpdateScript(context);
 
-				if (updateScript != null) {
-					addScript(updateScript);
-				}
-			}
-		}
-	}
+                if (updateScript != null) {
+                    addScript(updateScript);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Returns script which should be executed upon initialization of a new view.
-	 * @param context The involved faces context.
-	 * @return Script which should be executed upon initialization of a new view.
-	 */
-	protected String getInitScript(FacesContext context) {
-		return null;
-	}
+    /**
+     * Returns script which should be executed upon initialization of a new view.
+     * @param context The involved faces context.
+     * @return Script which should be executed upon initialization of a new view.
+     */
+    protected String getInitScript(FacesContext context) {
+        return null;
+    }
 
-	/**
-	 * Returns script which should be exeucted upon ajax update of the current view.
-	 * @param context The involved faces context.
-	 * @return Script which should be exeucted upon ajax update of the current view.
-	 */
-	protected String getUpdateScript(FacesContext context) {
-		return null;
-	}
+    /**
+     * Returns script which should be exeucted upon ajax update of the current view.
+     * @param context The involved faces context.
+     * @return Script which should be exeucted upon ajax update of the current view.
+     */
+    protected String getUpdateScript(FacesContext context) {
+        return null;
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
-	 * @param context The involved faces context.
-	 * @return The value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
-	 */
-	protected abstract String getEventValue(FacesContext context);
+    /**
+     * Returns the value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
+     * @param context The involved faces context.
+     * @return The value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
+     */
+    protected abstract String getEventValue(FacesContext context);
 
-	/**
-	 * Returns <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
-	 * @param context The involved faces context.
-	 * @return <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
-	 */
-	protected boolean isOnloadParamRequest(FacesContext context)
-	{
-		return isOnloadParamRequest(context, getEventValue(context));
-	}
+    /**
+     * Returns <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
+     * @param context The involved faces context.
+     * @return <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
+     */
+    protected boolean isOnloadParamRequest(FacesContext context)
+    {
+        return isOnloadParamRequest(context, getEventValue(context));
+    }
 
-	/**
-	 * If this is invoked during an OnloadParam postback, then decode as if immediate=true to save lifecycle overhead.
-	 */
-	@Override
-	public void processDecodes(FacesContext context) {
-		if (isOnloadParamRequest(context) && isExecuted(getClientId(context))) {
-			decodeAll(context);
-			context.renderResponse();
-		}
-	}
+    /**
+     * If this is invoked during an OnloadParam postback, then decode as if immediate=true to save lifecycle overhead.
+     */
+    @Override
+    public void processDecodes(FacesContext context) {
+        if (isOnloadParamRequest(context) && isExecuted(getClientId(context))) {
+            decodeAll(context);
+            context.renderResponse();
+        }
+    }
 
-	/**
-	 * Decode all relevant {@link OnloadParam} components at once.
-	 * @param context The involved faces context.
-	 */
-	protected abstract void decodeAll(FacesContext context);
+    /**
+     * Decode all relevant {@link OnloadParam} components at once.
+     * @param context The involved faces context.
+     */
+    protected abstract void decodeAll(FacesContext context);
 
-	/**
-	 * This basically acts as if immediate=true is set to save lifecycle overhead.
-	 * @param context The involved faces context.
-	 * @param submittedValue The submitted value.
-	 */
-	protected void decodeImmediately(FacesContext context, String submittedValue) {
-		setSubmittedValue(submittedValue);
-		validate(context);
+    /**
+     * This basically acts as if immediate=true is set to save lifecycle overhead.
+     * @param context The involved faces context.
+     * @param submittedValue The submitted value.
+     */
+    protected void decodeImmediately(FacesContext context, String submittedValue) {
+        setSubmittedValue(submittedValue);
+        validate(context);
 
-		if (isValid()) {
-			updateModel(context);
-		}
-		else {
-			setValid(true); // Don't leave OnloadParam in an invalid state for next postback as it would block processing of regular forms.
-		}
+        if (isValid()) {
+            updateModel(context);
+        }
+        else {
+            setValid(true); // Don't leave OnloadParam in an invalid state for next postback as it would block processing of regular forms.
+        }
 
-		String render = getRender();
+        String render = getRender();
 
-		if (render != null) {
-			update(render.split("\\s+"));
-		}
-	}
+        if (render != null) {
+            update(render.split("\\s+"));
+        }
+    }
 
-	/**
-	 * This override which does effectively nothing prevents Faces from performing validation during non-onloadparam postbacks.
-	 */
-	@Override
-	public void processValidators(FacesContext context) {
-		// NOOP.
-	}
+    /**
+     * This override which does effectively nothing prevents Faces from performing validation during non-onloadparam postbacks.
+     */
+    @Override
+    public void processValidators(FacesContext context) {
+        // NOOP.
+    }
 
-	/**
-	 * This override which does effectively nothing prevents Faces from performing update during non-onloadparam postbacks.
-	 */
-	@Override
-	public void processUpdates(FacesContext context) {
-		// NOOP.
-	}
+    /**
+     * This override which does effectively nothing prevents Faces from performing update during non-onloadparam postbacks.
+     */
+    @Override
+    public void processUpdates(FacesContext context) {
+        // NOOP.
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns a space separated string of client IDs to update on ajax response.
-	 * @return A space separated string of client IDs to update on ajax response.
-	 */
-	public String getRender() {
-		return state.get(PropertyKeys.RENDER, "@none");
-	}
+    /**
+     * Returns a space separated string of client IDs to update on ajax response.
+     * @return A space separated string of client IDs to update on ajax response.
+     */
+    public String getRender() {
+        return state.get(PropertyKeys.RENDER, "@none");
+    }
 
-	/**
-	 * Sets a space separated string of client IDs to update on ajax response.
-	 * @param render A space separated string of client IDs to update on ajax response.
-	 */
-	public void setRender(String render) {
-		state.put(PropertyKeys.RENDER, render);
-	}
+    /**
+     * Sets a space separated string of client IDs to update on ajax response.
+     * @param render A space separated string of client IDs to update on ajax response.
+     */
+    public void setRender(String render) {
+        state.put(PropertyKeys.RENDER, render);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
-	 * @param context The involved faces context.
-	 * @param onloadEvent The onload param event.
-	 * @return <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
-	 */
-	protected static boolean isOnloadParamRequest(FacesContext context, String onloadEvent)
-	{
-		return context.isPostback() && onloadEvent.equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
-	}
+    /**
+     * Returns <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
+     * @param context The involved faces context.
+     * @param onloadEvent The onload param event.
+     * @return <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
+     */
+    protected static boolean isOnloadParamRequest(FacesContext context, String onloadEvent)
+    {
+        return context.isPostback() && onloadEvent.equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
+    }
 
 }

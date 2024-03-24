@@ -27,127 +27,127 @@ import org.openqa.selenium.support.FindBy;
 
 public class CombinedResourceHandlerIT extends OmniFacesIT {
 
-	private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|jakarta.faces:" + (isFaces4Used() ? "faces.js" : "jsf.js") + "|headWithTarget.js|bodyWithTargetHead.js");
-	private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
-	private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
-	private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-O+BEiFMIrNp5+3EV1U/ZpJg3T+qlYYvqTsF0UIsd5swios9XPYrMkDuxHxvtkBlx";
-	private static final String HEAD_COMBINED_STYLESHEET_INTEGRITY = "sha384-hK8kfbP+Ilff/XDJqs5ZaQnx8kmWBoGYRkf3kcvQzdDSHLbfIe8QAkpIkR4uh4UX";
-	private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
+    private static final String HEAD_COMBINED_SCRIPT_NAME = serializeURLSafe("omnifaces:omnifaces.js|jakarta.faces:" + (isFaces4Used() ? "faces.js" : "jsf.js") + "|headWithTarget.js|bodyWithTargetHead.js");
+    private static final String DEFERRED_COMBINED_SCRIPT_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
+    private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
+    private static final String DEFERRED_COMBINED_SCRIPT_INTEGRITY = "sha384-O+BEiFMIrNp5+3EV1U/ZpJg3T+qlYYvqTsF0UIsd5swios9XPYrMkDuxHxvtkBlx";
+    private static final String HEAD_COMBINED_STYLESHEET_INTEGRITY = "sha384-hK8kfbP+Ilff/XDJqs5ZaQnx8kmWBoGYRkf3kcvQzdDSHLbfIe8QAkpIkR4uh4UX";
+    private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
 
-	@FindBy(css="script[src*='ln=omnifaces.combined']")
-	private List<WebElement> combinedScripts;
+    @FindBy(css="script[src*='ln=omnifaces.combined']")
+    private List<WebElement> combinedScripts;
 
-	@FindBy(css="link[rel=stylesheet][href*='ln=omnifaces.combined']")
-	private List<WebElement> combinedStylesheets;
+    @FindBy(css="link[rel=stylesheet][href*='ln=omnifaces.combined']")
+    private List<WebElement> combinedStylesheets;
 
-	@FindBy(css="link[rel=stylesheet][href*='print.css']")
-	private List<WebElement> printStylesheets;
+    @FindBy(css="link[rel=stylesheet][href*='print.css']")
+    private List<WebElement> printStylesheets;
 
-	@FindBy(id="bodyWithTargetBody")
-	private WebElement bodyWithTargetBody;
+    @FindBy(id="bodyWithTargetBody")
+    private WebElement bodyWithTargetBody;
 
-	@FindBy(id="headWithoutTarget")
-	private WebElement headWithoutTarget;
+    @FindBy(id="headWithoutTarget")
+    private WebElement headWithoutTarget;
 
-	@FindBy(id="headWithTarget")
-	private WebElement headWithTarget;
+    @FindBy(id="headWithTarget")
+    private WebElement headWithTarget;
 
-	@FindBy(id="bodyWithTargetHead")
-	private WebElement bodyWithTargetHead;
+    @FindBy(id="bodyWithTargetHead")
+    private WebElement bodyWithTargetHead;
 
-	@FindBy(id="bodyWithoutTarget")
-	private WebElement bodyWithoutTarget;
+    @FindBy(id="bodyWithoutTarget")
+    private WebElement bodyWithoutTarget;
 
-	@FindBy(id="deferredInHead")
-	private WebElement deferredInHead;
+    @FindBy(id="deferredInHead")
+    private WebElement deferredInHead;
 
-	@FindBy(id="deferredInBody")
-	private WebElement deferredInBody;
+    @FindBy(id="deferredInBody")
+    private WebElement deferredInBody;
 
-	@FindBy(id="nonAjax:submit")
-	private WebElement nonAjaxSubmit;
+    @FindBy(id="nonAjax:submit")
+    private WebElement nonAjaxSubmit;
 
-	@FindBy(id="nonAjax:rebuild")
-	private WebElement nonAjaxRebuild;
+    @FindBy(id="nonAjax:rebuild")
+    private WebElement nonAjaxRebuild;
 
-	@FindBy(id="ajax:submit")
-	private WebElement ajaxSubmit;
+    @FindBy(id="ajax:submit")
+    private WebElement ajaxSubmit;
 
-	@FindBy(id="ajax:rebuild")
-	private WebElement ajaxRebuild;
+    @FindBy(id="ajax:rebuild")
+    private WebElement ajaxRebuild;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(CombinedResourceHandlerIT.class)
-			.withFacesConfig(withCombinedResourceHandler)
-			.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(CombinedResourceHandlerIT.class)
+            .withFacesConfig(withCombinedResourceHandler)
+            .createDeployment();
+    }
 
-	@Test
-	void nonAjax() {
-		verifyElements();
-		guardHttp(nonAjaxSubmit::click);
-		verifyElements();
-		guardHttp(nonAjaxRebuild::click);
-		verifyElements();
-	}
+    @Test
+    void nonAjax() {
+        verifyElements();
+        guardHttp(nonAjaxSubmit::click);
+        verifyElements();
+        guardHttp(nonAjaxRebuild::click);
+        verifyElements();
+    }
 
-	@Test
-	void ajax() {
-		verifyElements();
-		guardAjax(ajaxSubmit::click);
-		verifyElements();
-		guardAjax(ajaxRebuild::click);
-		verifyElements();
-	}
+    @Test
+    void ajax() {
+        verifyElements();
+        guardAjax(ajaxSubmit::click);
+        verifyElements();
+        guardAjax(ajaxRebuild::click);
+        verifyElements();
+    }
 
-	@Test
-	void mixed() {
-		verifyElements();
-		guardHttp(nonAjaxSubmit::click);
-		verifyElements();
-		guardAjax(ajaxSubmit::click);
-		verifyElements();
-		guardHttp(nonAjaxRebuild::click);
-		verifyElements();
-		guardAjax(ajaxSubmit::click);
-		verifyElements();
-		guardHttp(nonAjaxSubmit::click);
-		verifyElements();
-		guardAjax(ajaxRebuild::click);
-		verifyElements();
-		guardHttp(nonAjaxSubmit::click);
-		verifyElements();
-		guardAjax(ajaxSubmit::click);
-		verifyElements();
-	}
+    @Test
+    void mixed() {
+        verifyElements();
+        guardHttp(nonAjaxSubmit::click);
+        verifyElements();
+        guardAjax(ajaxSubmit::click);
+        verifyElements();
+        guardHttp(nonAjaxRebuild::click);
+        verifyElements();
+        guardAjax(ajaxSubmit::click);
+        verifyElements();
+        guardHttp(nonAjaxSubmit::click);
+        verifyElements();
+        guardAjax(ajaxRebuild::click);
+        verifyElements();
+        guardHttp(nonAjaxSubmit::click);
+        verifyElements();
+        guardAjax(ajaxSubmit::click);
+        verifyElements();
+    }
 
-	private void verifyElements() {
-		waitUntilTextContent(deferredInBody); // Wait until last o:deferredScript is finished.
+    private void verifyElements() {
+        waitUntilTextContent(deferredInBody); // Wait until last o:deferredScript is finished.
 
-		assertEquals(2, combinedScripts.size());
-		assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-		assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, combinedScripts.get(1).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-		assertEquals(1, combinedStylesheets.size());
-		assertEquals(HEAD_COMBINED_STYLESHEET_NAME, combinedStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
-		assertEquals(1, printStylesheets.size());
-		assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+        assertEquals(2, combinedScripts.size());
+        assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+        assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, combinedScripts.get(1).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+        assertEquals(1, combinedStylesheets.size());
+        assertEquals(HEAD_COMBINED_STYLESHEET_NAME, combinedStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+        assertEquals(1, printStylesheets.size());
+        assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
 
-		assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
-		assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
-		assertEquals("3,headWithTarget", headWithTarget.getText());
-		assertEquals("4,bodyWithTargetHead", bodyWithTargetHead.getText());
-		assertEquals("5,bodyWithoutTarget", bodyWithoutTarget.getText());
-		assertEquals("6,deferredInHead", deferredInHead.getText());
-		assertEquals("7,deferredInBody", deferredInBody.getText());
+        assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
+        assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
+        assertEquals("3,headWithTarget", headWithTarget.getText());
+        assertEquals("4,bodyWithTargetHead", bodyWithTargetHead.getText());
+        assertEquals("5,bodyWithoutTarget", bodyWithoutTarget.getText());
+        assertEquals("6,deferredInHead", deferredInHead.getText());
+        assertEquals("7,deferredInBody", deferredInBody.getText());
 
-		verifyIntegrity(combinedScripts.get(1), DEFERRED_COMBINED_SCRIPT_INTEGRITY);
-		verifyIntegrity(combinedStylesheets.get(0), HEAD_COMBINED_STYLESHEET_INTEGRITY);
-	}
+        verifyIntegrity(combinedScripts.get(1), DEFERRED_COMBINED_SCRIPT_INTEGRITY);
+        verifyIntegrity(combinedStylesheets.get(0), HEAD_COMBINED_STYLESHEET_INTEGRITY);
+    }
 
-	private void verifyIntegrity(WebElement element, String integrity) {
-		assertEquals("anonymous", element.getAttribute("crossorigin"));
-		assertEquals(integrity, element.getAttribute("integrity"));
-	}
+    private void verifyIntegrity(WebElement element, String integrity) {
+        assertEquals("anonymous", element.getAttribute("crossorigin"));
+        assertEquals(integrity, element.getAttribute("integrity"));
+    }
 
 }

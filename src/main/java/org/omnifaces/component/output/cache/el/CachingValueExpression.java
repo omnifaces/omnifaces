@@ -33,44 +33,44 @@ import org.omnifaces.el.ValueExpressionWrapper;
  */
 public class CachingValueExpression extends ValueExpressionWrapper {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final String name;
-	private final transient Cache cache;
+    private final String name;
+    private final transient Cache cache;
 
-	/**
-	 * Construct the caching value expression.
-	 * @param name The cache name.
-	 * @param valueExpression The value expression to be wrapped.
-	 * @param cache The cache itself.
-	 */
-	public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
-		super(valueExpression);
-		this.name = name;
-		this.cache = cache;
-	}
+    /**
+     * Construct the caching value expression.
+     * @param name The cache name.
+     * @param valueExpression The value expression to be wrapped.
+     * @param cache The cache itself.
+     */
+    public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
+        super(valueExpression);
+        this.name = name;
+        this.cache = cache;
+    }
 
-	@Override
-	public Object getValue(ELContext elContext) {
-		FacesContext facesContext = getContext(elContext);
+    @Override
+    public Object getValue(ELContext elContext) {
+        FacesContext facesContext = getContext(elContext);
 
-		Serializable value = cache.getCacheAttribute(facesContext, name);
-		if (value == null) {
-			value = (Serializable) super.getValue(elContext);
-			cache.setCacheAttribute(facesContext, name, value);
-		}
+        Serializable value = cache.getCacheAttribute(facesContext, name);
+        if (value == null) {
+            value = (Serializable) super.getValue(elContext);
+            cache.setCacheAttribute(facesContext, name, value);
+        }
 
-		return value;
-	}
+        return value;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		return super.equals(object) && Objects.equals(name, ((CachingValueExpression) object).name);
-	}
+    @Override
+    public boolean equals(Object object) {
+        return super.equals(object) && Objects.equals(name, ((CachingValueExpression) object).name);
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode() + Objects.hashCode(name);
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Objects.hashCode(name);
+    }
 
 }

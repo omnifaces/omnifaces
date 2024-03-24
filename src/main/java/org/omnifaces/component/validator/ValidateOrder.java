@@ -60,99 +60,99 @@ import org.omnifaces.validator.MultiFieldValidator;
 @SuppressWarnings({ "unchecked", "rawtypes" }) // We don't care about the actual Comparable type.
 public class ValidateOrder extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.validator.ValidateOrder#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOrder";
+    /** The component type, which is {@value org.omnifaces.component.validator.ValidateOrder#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOrder";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private enum Type {
-		LT(values -> new ArrayList<>(new TreeSet<>(values)).equals(values)),
+    private enum Type {
+        LT(values -> new ArrayList<>(new TreeSet<>(values)).equals(values)),
 
-		LTE(values -> {
-			List<Comparable> sortedValues = new ArrayList<>(values);
-			Collections.sort(sortedValues);
-			return sortedValues.equals(values);
-		}),
+        LTE(values -> {
+            List<Comparable> sortedValues = new ArrayList<>(values);
+            Collections.sort(sortedValues);
+            return sortedValues.equals(values);
+        }),
 
-		GT(values -> {
-			List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
-			Collections.reverse(sortedValues);
-			return sortedValues.equals(values);
-		}),
+        GT(values -> {
+            List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
+            Collections.reverse(sortedValues);
+            return sortedValues.equals(values);
+        }),
 
-		GTE(values -> {
-			List<Comparable> sortedValues = new ArrayList<>(values);
-			Collections.sort(sortedValues, Collections.reverseOrder());
-			return sortedValues.equals(values);
-		});
+        GTE(values -> {
+            List<Comparable> sortedValues = new ArrayList<>(values);
+            Collections.sort(sortedValues, Collections.reverseOrder());
+            return sortedValues.equals(values);
+        });
 
-		private Function<List<Comparable>, Boolean> callback;
+        private Function<List<Comparable>, Boolean> callback;
 
-		private Type(Function<List<Comparable>, Boolean> callback) {
-			this.callback = callback;
-		}
+        private Type(Function<List<Comparable>, Boolean> callback) {
+            this.callback = callback;
+        }
 
-		public boolean validateOrder(List<Comparable> values) {
-			return callback.apply(values);
-		}
-	}
+        public boolean validateOrder(List<Comparable> values) {
+            return callback.apply(values);
+        }
+    }
 
-	private static final String DEFAULT_TYPE = Type.LT.name();
-	private static final String ERROR_INVALID_TYPE = "Invalid type '%s'. Only 'lt', 'lte', 'gt' and 'gte' are allowed.";
-	private static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
+    private static final String DEFAULT_TYPE = Type.LT.name();
+    private static final String ERROR_INVALID_TYPE = "Invalid type '%s'. Only 'lt', 'lte', 'gt' and 'gte' are allowed.";
+    private static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
 
-	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
-		type;
-	}
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        type;
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Validate if all values are in specified order.
-	 */
-	@Override
-	public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
-		try {
-			Object tmp = values; // https://bugs.eclipse.org/bugs/show_bug.cgi?id=158870
-			List<Comparable> comparableValues = new ArrayList<>((List<Comparable>) tmp);
-			comparableValues.removeAll(asList(null, "")); // Empty checking job is up to required="true".
-			return Type.valueOf(getType().toUpperCase()).validateOrder(comparableValues);
-		}
-		catch (ClassCastException e) {
-			throw new IllegalArgumentException(ERROR_VALUES_NOT_COMPARABLE, e);
-		}
-	}
+    /**
+     * Validate if all values are in specified order.
+     */
+    @Override
+    public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
+        try {
+            Object tmp = values; // https://bugs.eclipse.org/bugs/show_bug.cgi?id=158870
+            List<Comparable> comparableValues = new ArrayList<>((List<Comparable>) tmp);
+            comparableValues.removeAll(asList(null, "")); // Empty checking job is up to required="true".
+            return Type.valueOf(getType().toUpperCase()).validateOrder(comparableValues);
+        }
+        catch (ClassCastException e) {
+            throw new IllegalArgumentException(ERROR_VALUES_NOT_COMPARABLE, e);
+        }
+    }
 
-	// Getters/setters ------------------------------------------------------------------------------------------------
+    // Getters/setters ------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the ordering type to be used.
-	 * @return The ordering type to be used.
-	 */
-	public String getType() {
-		return state.get(PropertyKeys.type, DEFAULT_TYPE);
-	}
+    /**
+     * Returns the ordering type to be used.
+     * @return The ordering type to be used.
+     */
+    public String getType() {
+        return state.get(PropertyKeys.type, DEFAULT_TYPE);
+    }
 
-	/**
-	 * Sets the ordering type to be used.
-	 * @param type The ordering type to be used.
-	 */
-	public void setType(String type) {
-		try {
-			Type.valueOf(type.toUpperCase());
-		}
-		catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, type), e);
-		}
+    /**
+     * Sets the ordering type to be used.
+     * @param type The ordering type to be used.
+     */
+    public void setType(String type) {
+        try {
+            Type.valueOf(type.toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, type), e);
+        }
 
-		state.put(PropertyKeys.type, type);
-	}
+        state.put(PropertyKeys.type, type);
+    }
 
 }

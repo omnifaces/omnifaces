@@ -33,73 +33,73 @@ import org.omnifaces.util.Components;
 @RequestScoped
 public class ExpressionInspectorITBean {
 
-	private ValueReference valueReference;
-	private MethodReference getterReference;
-	private MethodReference methodReference;
-	private MethodReference valueMethodReference;
-	private ValueReference methodValueReference;
-	private MethodReference methodMethodReference;
+    private ValueReference valueReference;
+    private MethodReference getterReference;
+    private MethodReference methodReference;
+    private MethodReference valueMethodReference;
+    private ValueReference methodValueReference;
+    private MethodReference methodMethodReference;
 
-	@PostConstruct
-	public void init() {
-		ELContext elContext = getELContext();
+    @PostConstruct
+    public void init() {
+        ELContext elContext = getELContext();
 
-		ValueExpression valueExpression = createValueExpression("#{bar.selected}", Baz.class);
-		valueReference = ExpressionInspector.getValueReference(elContext, valueExpression);
-		getterReference = ExpressionInspector.getMethodReference(elContext, valueExpression);
+        ValueExpression valueExpression = createValueExpression("#{bar.selected}", Baz.class);
+        valueReference = ExpressionInspector.getValueReference(elContext, valueExpression);
+        getterReference = ExpressionInspector.getMethodReference(elContext, valueExpression);
 
-		MethodExpression methodExpression = Components.createMethodExpression("#{foo.create(bar.selected)}", Void.class, Baz.class);
-		methodReference = ExpressionInspector.getMethodReference(elContext, methodExpression);
+        MethodExpression methodExpression = Components.createMethodExpression("#{foo.create(bar.selected)}", Void.class, Baz.class);
+        methodReference = ExpressionInspector.getMethodReference(elContext, methodExpression);
 
-		MethodExpressionValueExpressionAdapter methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
-		valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
+        MethodExpressionValueExpressionAdapter methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
+        valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
 
-		ValueExpression valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
-		methodValueReference = ExpressionInspector.getValueReference(elContext, valueExpressionMethodExpression);
-		methodMethodReference = ExpressionInspector.getMethodReference(elContext, valueExpressionMethodExpression);
-	}
+        ValueExpression valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
+        methodValueReference = ExpressionInspector.getValueReference(elContext, valueExpressionMethodExpression);
+        methodMethodReference = ExpressionInspector.getMethodReference(elContext, valueExpressionMethodExpression);
+    }
 
-	public ValueReference getValueReference() {
-		return valueReference;
-	}
+    public ValueReference getValueReference() {
+        return valueReference;
+    }
 
-	public MethodReference getGetterReference() {
-		return getterReference;
-	}
+    public MethodReference getGetterReference() {
+        return getterReference;
+    }
 
-	public MethodReference getMethodReference() {
-		return methodReference;
-	}
+    public MethodReference getMethodReference() {
+        return methodReference;
+    }
 
-	public MethodReference getValueMethodReference() {
-		return valueMethodReference;
-	}
+    public MethodReference getValueMethodReference() {
+        return valueMethodReference;
+    }
 
-	public ValueReference getMethodValueReference() {
-		return methodValueReference;
-	}
+    public ValueReference getMethodValueReference() {
+        return methodValueReference;
+    }
 
-	public MethodReference getMethodMethodReference() {
-		return methodMethodReference;
-	}
+    public MethodReference getMethodMethodReference() {
+        return methodMethodReference;
+    }
 
-	@Named
-	@RequestScoped
-	public static class Foo {
-		public void create(Baz baz) {
-			//
-		}
-	}
+    @Named
+    @RequestScoped
+    public static class Foo {
+        public void create(Baz baz) {
+            //
+        }
+    }
 
-	@Named
-	@RequestScoped
-	public static class Bar {
-		public Baz getSelected() {
-			return new Baz();
-		}
-	}
+    @Named
+    @RequestScoped
+    public static class Bar {
+        public Baz getSelected() {
+            return new Baz();
+        }
+    }
 
-	public static class Baz {
-		//
-	}
+    public static class Baz {
+        //
+    }
 }

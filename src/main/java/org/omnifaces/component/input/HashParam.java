@@ -122,110 +122,110 @@ import org.omnifaces.util.Faces;
 @FacesComponent(HashParam.COMPONENT_TYPE)
 public class HashParam extends OnloadParam {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.HashParam#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.HashParam";
+    /** The component type, which is {@value org.omnifaces.component.input.HashParam#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.HashParam";
 
-	/** The omnifaces event value, which is {@value org.omnifaces.component.input.HashParam#EVENT_VALUE}. */
-	public static final String EVENT_VALUE = "setHashParamValues";
+    /** The omnifaces event value, which is {@value org.omnifaces.component.input.HashParam#EVENT_VALUE}. */
+    public static final String EVENT_VALUE = "setHashParamValues";
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String SCRIPT_INIT = "OmniFaces.HashParam.init('%s')";
-	private static final String SCRIPT_UPDATE = "OmniFaces.HashParam.update('%s', '%s')";
+    private static final String SCRIPT_INIT = "OmniFaces.HashParam.init('%s')";
+    private static final String SCRIPT_UPDATE = "OmniFaces.HashParam.update('%s', '%s')";
 
-	private enum PropertyKeys {
-		DEFAULT;
-		@Override public String toString() { return name().toLowerCase(); }
-	}
+    private enum PropertyKeys {
+        DEFAULT;
+        @Override public String toString() { return name().toLowerCase(); }
+    }
 
-	// Init -----------------------------------------------------------------------------------------------------------
+    // Init -----------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected String getInitScript(FacesContext context) {
-		return format(SCRIPT_INIT, getClientId(context));
-	}
+    @Override
+    protected String getInitScript(FacesContext context) {
+        return format(SCRIPT_INIT, getClientId(context));
+    }
 
 
-	@Override
-	protected String getUpdateScript(FacesContext context) {
-		return format(SCRIPT_UPDATE, getName(), getRenderedValue(context));
-	}
+    @Override
+    protected String getUpdateScript(FacesContext context) {
+        return format(SCRIPT_UPDATE, getName(), getRenderedValue(context));
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected String getEventValue(FacesContext context) {
-		return EVENT_VALUE;
-	}
+    @Override
+    protected String getEventValue(FacesContext context) {
+        return EVENT_VALUE;
+    }
 
-	@Override
-	protected void decodeAll(FacesContext context) {
-		String oldHashQueryString = getHashQueryString(context);
-		Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
+    @Override
+    protected void decodeAll(FacesContext context) {
+        String oldHashQueryString = getHashQueryString(context);
+        Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
 
-		for (HashParam hashParam : getHashParameters(context)) {
-			List<String> values = hashParams.get(hashParam.getName());
-			hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
-		}
+        for (HashParam hashParam : getHashParameters(context)) {
+            List<String> values = hashParams.get(hashParam.getName());
+            hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
+        }
 
-		String newHashQueryString = getHashQueryString(context);
+        String newHashQueryString = getHashQueryString(context);
 
-		if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
-			fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
-		}
-	}
+        if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
+            fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
+        }
+    }
 
-	/**
-	 * Convert the value to string using any converter and ensure that an empty string is returned when the component
-	 * is invalid or the resulting string is null or represents the default value.
-	 * @param context The involved faces context.
-	 * @return The rendered value.
-	 */
-	public String getRenderedValue(FacesContext context) {
-		if (!isValid()) {
-			return "";
-		}
+    /**
+     * Convert the value to string using any converter and ensure that an empty string is returned when the component
+     * is invalid or the resulting string is null or represents the default value.
+     * @param context The involved faces context.
+     * @return The rendered value.
+     */
+    public String getRenderedValue(FacesContext context) {
+        if (!isValid()) {
+            return "";
+        }
 
-		Object value = getValue();
+        Object value = getValue();
 
-		if (Objects.equals(value, getDefault())) {
-			value = null;
-		}
+        if (Objects.equals(value, getDefault())) {
+            value = null;
+        }
 
-		return coalesce(convertToString(context, this, value), "");
-	}
+        return coalesce(convertToString(context, this, value), "");
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the default value in case the actual hash parameter is <code>null</code> or empty.
-	 * @return The default value in case the actual hash parameter is <code>null</code> or empty.
-	 */
-	public String getDefault() {
-		return state.get(PropertyKeys.DEFAULT);
-	}
+    /**
+     * Returns the default value in case the actual hash parameter is <code>null</code> or empty.
+     * @return The default value in case the actual hash parameter is <code>null</code> or empty.
+     */
+    public String getDefault() {
+        return state.get(PropertyKeys.DEFAULT);
+    }
 
-	/**
-	 * Sets the default value in case the actual hash parameter is <code>null</code> or empty.
-	 * @param defaultValue The default value in case the actual hash parameter is <code>null</code> or empty.
-	 */
-	public void setDefault(String defaultValue) {
-		state.put(PropertyKeys.DEFAULT, defaultValue);
-	}
+    /**
+     * Sets the default value in case the actual hash parameter is <code>null</code> or empty.
+     * @param defaultValue The default value in case the actual hash parameter is <code>null</code> or empty.
+     */
+    public void setDefault(String defaultValue) {
+        state.put(PropertyKeys.DEFAULT, defaultValue);
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code> if the current request is triggered by a hash param request.
-	 * I.e. if it is initiated by <code>OmniFaces.HashParam.setHashParamValues()</code> script which runs on page load
-	 * when the <code>window.location.hash</code> is present, and on every <code>window.onhashchange</code> event.
-	 * @param context The involved faces context.
-	 * @return <code>true</code> if the current request is triggered by a hash param request.
-	 */
-	public static boolean isHashParamRequest(FacesContext context) {
-		return isOnloadParamRequest(context, EVENT_VALUE);
-	}
+    /**
+     * Returns <code>true</code> if the current request is triggered by a hash param request.
+     * I.e. if it is initiated by <code>OmniFaces.HashParam.setHashParamValues()</code> script which runs on page load
+     * when the <code>window.location.hash</code> is present, and on every <code>window.onhashchange</code> event.
+     * @param context The involved faces context.
+     * @return <code>true</code> if the current request is triggered by a hash param request.
+     */
+    public static boolean isHashParamRequest(FacesContext context) {
+        return isOnloadParamRequest(context, EVENT_VALUE);
+    }
 
 }

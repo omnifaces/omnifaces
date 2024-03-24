@@ -62,47 +62,47 @@ import org.omnifaces.util.Lazy;
  */
 public class VersionedResourceHandler extends DefaultResourceHandler {
 
-	/** The context parameter name to specify value of the version to be appended to the resource URL. */
-	public static final String PARAM_NAME_VERSION = "org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION";
+    /** The context parameter name to specify value of the version to be appended to the resource URL. */
+    public static final String PARAM_NAME_VERSION = "org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION";
 
-	private static final String XHTML_EXTENSION = ".xhtml";
-	private static final String VERSION_SUFFIX = "v=";
-	private final Lazy<String> versionString;
+    private static final String XHTML_EXTENSION = ".xhtml";
+    private static final String VERSION_SUFFIX = "v=";
+    private final Lazy<String> versionString;
 
-	/**
-	 * Creates a new instance of this versioned resource handler which wraps the given resource handler.
-	 * This will also initialize the version based on the context parameter.
-	 * @param wrapped The resource handler to be wrapped.
-	 */
-	public VersionedResourceHandler(ResourceHandler wrapped) {
-		super(wrapped);
-		versionString = new Lazy<>(() -> encodeURL(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))));
-	}
+    /**
+     * Creates a new instance of this versioned resource handler which wraps the given resource handler.
+     * This will also initialize the version based on the context parameter.
+     * @param wrapped The resource handler to be wrapped.
+     */
+    public VersionedResourceHandler(ResourceHandler wrapped) {
+        super(wrapped);
+        versionString = new Lazy<>(() -> encodeURL(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))));
+    }
 
-	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null || isBlank(versionString.get())) {
-			return resource;
-		}
+    @Override
+    public Resource decorateResource(Resource resource) {
+        if (resource == null || isBlank(versionString.get())) {
+            return resource;
+        }
 
-		String requestPath = resource.getRequestPath();
+        String requestPath = resource.getRequestPath();
 
-		if (requestPath.contains('&' + VERSION_SUFFIX) || requestPath.contains('?' + VERSION_SUFFIX)) {
-			// ignore already-versioned resources
-			return resource;
-		}
-		else if (!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
-			// do not touch CDN resources
-			return resource;
-		}
-		else if (resource.getResourceName().endsWith(XHTML_EXTENSION)) {
-			// do not touch XHTML resources
-			return resource;
-		}
-		else {
-			requestPath += (requestPath.contains("?") ? '&' : '?') + VERSION_SUFFIX + versionString.get();
-			return new RemappedResource(resource, requestPath);
-		}
-	}
+        if (requestPath.contains('&' + VERSION_SUFFIX) || requestPath.contains('?' + VERSION_SUFFIX)) {
+            // ignore already-versioned resources
+            return resource;
+        }
+        else if (!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
+            // do not touch CDN resources
+            return resource;
+        }
+        else if (resource.getResourceName().endsWith(XHTML_EXTENSION)) {
+            // do not touch XHTML resources
+            return resource;
+        }
+        else {
+            requestPath += (requestPath.contains("?") ? '&' : '?') + VERSION_SUFFIX + versionString.get();
+            return new RemappedResource(resource, requestPath);
+        }
+    }
 
 }

@@ -36,55 +36,55 @@ import jakarta.servlet.http.HttpSessionListener;
  */
 public class EagerBeansWebListener implements HttpSessionListener, ServletRequestListener {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(EagerBeansWebListener.class.getName());
+    private static final Logger logger = Logger.getLogger(EagerBeansWebListener.class.getName());
 
-	private static final String POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE =
-		"Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
-			+ " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
+    private static final String POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE =
+        "Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
+            + " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
 
-	private static boolean sessionListenerDisabled;
-	private static boolean requestListenerDisabled;
+    private static boolean sessionListenerDisabled;
+    private static boolean requestListenerDisabled;
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	static void disable() {
-		sessionListenerDisabled = true;
-		requestListenerDisabled = true;
-	}
+    static void disable() {
+        sessionListenerDisabled = true;
+        requestListenerDisabled = true;
+    }
 
-	@Override
-	public void sessionCreated(HttpSessionEvent event) {
-		if (!sessionListenerDisabled && !EagerBeansRepository.getInstance().instantiateSessionScoped()) {
-			sessionListenerDisabled = true;
-		}
-	}
+    @Override
+    public void sessionCreated(HttpSessionEvent event) {
+        if (!sessionListenerDisabled && !EagerBeansRepository.getInstance().instantiateSessionScoped()) {
+            sessionListenerDisabled = true;
+        }
+    }
 
-	@Override
-	public void requestInitialized(ServletRequestEvent event) {
-		if (!requestListenerDisabled) {
-			String uri = getRequestRelativeURIWithoutPathParameters((HttpServletRequest) event.getServletRequest());
+    @Override
+    public void requestInitialized(ServletRequestEvent event) {
+        if (!requestListenerDisabled) {
+            String uri = getRequestRelativeURIWithoutPathParameters((HttpServletRequest) event.getServletRequest());
 
-			try {
-				if (!EagerBeansRepository.getInstance().instantiateByRequestURI(uri)) {
-					requestListenerDisabled = true;
-				}
-			}
-			catch (Exception e) {
-				logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
-			}
-		}
-	}
+            try {
+                if (!EagerBeansRepository.getInstance().instantiateByRequestURI(uri)) {
+                    requestListenerDisabled = true;
+                }
+            }
+            catch (Exception e) {
+                logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
+            }
+        }
+    }
 
-	@Override
-	public void requestDestroyed(ServletRequestEvent event) {
-		// NOOP.
-	}
+    @Override
+    public void requestDestroyed(ServletRequestEvent event) {
+        // NOOP.
+    }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent event) {
-		// NOOP.
-	}
+    @Override
+    public void sessionDestroyed(HttpSessionEvent event) {
+        // NOOP.
+    }
 
 }

@@ -45,11 +45,11 @@ import org.omnifaces.cdi.push.Socket;
 @Target({ METHOD, FIELD, PARAMETER })
 public @interface Push {
 
-	/**
-	 * (Optional) The name of the push channel. If not specified the name of the injection target field will be used.
-	 *
-	 * @return The name of the push channel.
-	 */
-	@Nonbinding	String channel() default "";
+    /**
+     * (Optional) The name of the push channel. If not specified the name of the injection target field will be used.
+     *
+     * @return The name of the push channel.
+     */
+    @Nonbinding    String channel() default "";
 
 }

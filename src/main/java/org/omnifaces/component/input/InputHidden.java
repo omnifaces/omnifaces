@@ -71,76 +71,76 @@ import org.omnifaces.util.State;
 @FacesComponent(InputHidden.COMPONENT_TYPE)
 public class InputHidden extends HtmlInputHidden {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/** The component type, which is {@value org.omnifaces.component.input.InputHidden#COMPONENT_TYPE}. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputHidden";
+    /** The component type, which is {@value org.omnifaces.component.input.InputHidden#COMPONENT_TYPE}. */
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputHidden";
 
-	enum PropertyKeys {
-		readonly
-	}
+    enum PropertyKeys {
+        readonly
+    }
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final State state = new State(getStateHelper());
+    private final State state = new State(getStateHelper());
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * This override performs decode, validate and update at once.
-	 */
-	@Override
-	public void decode(FacesContext context) {
-		if (isRendered() && isReadonly()) {
-			setSubmittedValue(convertToString(context, this, getValue()));
-		}
-		else {
-			super.decode(context);
-		}
+    /**
+     * This override performs decode, validate and update at once.
+     */
+    @Override
+    public void decode(FacesContext context) {
+        if (isRendered() && isReadonly()) {
+            setSubmittedValue(convertToString(context, this, getValue()));
+        }
+        else {
+            super.decode(context);
+        }
 
-		validate(context);
+        validate(context);
 
-		if (!isReadonly() && isValid()) {
-			updateModel(context);
-		}
-	}
+        if (!isReadonly() && isValid()) {
+            updateModel(context);
+        }
+    }
 
-	/**
-	 * This override which does effectively nothing prevents Faces from performing validation for second time.
-	 */
-	@Override
-	public void processValidators(FacesContext context) {
-		// NOOP.
-	}
+    /**
+     * This override which does effectively nothing prevents Faces from performing validation for second time.
+     */
+    @Override
+    public void processValidators(FacesContext context) {
+        // NOOP.
+    }
 
-	/**
-	 * This override which does effectively nothing prevents Faces from performing update for second time.
-	 */
-	@Override
-	public void processUpdates(FacesContext context) {
-		// NOOP.
-	}
+    /**
+     * This override which does effectively nothing prevents Faces from performing update for second time.
+     */
+    @Override
+    public void processUpdates(FacesContext context) {
+        // NOOP.
+    }
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
-	/**
-	 * Returns whether this component is readonly. Defaults to <code>false</code>. Note that even when this component is
-	 * readonly, all associated validators will be invoked based on the model value, not on the submitted value. Also
-	 * the setter won't be invoked.
-	 * @return Whether this component is readonly.
-	 * @since 4.1
-	 */
-	public boolean isReadonly() {
-		return state.get(PropertyKeys.readonly, FALSE);
-	}
+    /**
+     * Returns whether this component is readonly. Defaults to <code>false</code>. Note that even when this component is
+     * readonly, all associated validators will be invoked based on the model value, not on the submitted value. Also
+     * the setter won't be invoked.
+     * @return Whether this component is readonly.
+     * @since 4.1
+     */
+    public boolean isReadonly() {
+        return state.get(PropertyKeys.readonly, FALSE);
+    }
 
-	/**
-	 * Set whether this component is readonly.
-	 * @param readonly Whether this component is readonly.
-	 * @since 4.1
-	 */
-	public void setReadonly(boolean readonly) {
-		state.put(PropertyKeys.readonly, readonly);
-	}
+    /**
+     * Set whether this component is readonly.
+     * @param readonly Whether this component is readonly.
+     * @since 4.1
+     */
+    public void setReadonly(boolean readonly) {
+        state.put(PropertyKeys.readonly, readonly);
+    }
 
 }

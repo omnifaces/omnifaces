@@ -24,28 +24,28 @@ import jakarta.inject.Inject;
 @FacesConverter(forClass = ParamITBaseEntity.class)
 public class ParamITBaseEntityConverter implements Converter<ParamITBaseEntity> {
 
-	@Inject
-	private ParamITBaseEntityService service;
+    @Inject
+    private ParamITBaseEntityService service;
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, ParamITBaseEntity value) {
-		return value == null ? "" : value.toString();
-	}
+    @Override
+    public String getAsString(FacesContext context, UIComponent component, ParamITBaseEntity value) {
+        return value == null ? "" : value.toString();
+    }
 
-	@Override
-	public ParamITBaseEntity getAsObject(FacesContext context, UIComponent component, String value) {
-		if (value == null) {
-			return null;
-		}
+    @Override
+    public ParamITBaseEntity getAsObject(FacesContext context, UIComponent component, String value) {
+        if (value == null) {
+            return null;
+        }
 
-		try {
-			Class<? extends ParamITBaseEntity> type = getExpectedValueType(component);
-			Long id = Long.valueOf(value);
-			return service.find(type, id);
-		}
-		catch (Exception e) {
-			throw asConverterException("Cannot convert because it threw " + e);
-		}
-	}
+        try {
+            Class<? extends ParamITBaseEntity> type = getExpectedValueType(component);
+            Long id = Long.valueOf(value);
+            return service.find(type, id);
+        }
+        catch (Exception e) {
+            throw asConverterException("Cannot convert because it threw " + e);
+        }
+    }
 
 }

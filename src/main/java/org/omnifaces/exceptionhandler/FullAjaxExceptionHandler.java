@@ -206,396 +206,396 @@ import org.omnifaces.util.Hacks;
  */
 public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
-	// Public constants -----------------------------------------------------------------------------------------------
+    // Public constants -----------------------------------------------------------------------------------------------
 
-	/**
-	 * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
-	 * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
-	 * @since 2.3
-	 */
-	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP =
-		"org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+    /**
+     * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
+     * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
+     * @since 2.3
+     */
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP =
+        "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
 
-	/**
-	 * The context parameter name to specify exception types to ignore in logging by both {@link FullAjaxExceptionHandler}
-	 * and {@link FacesExceptionFilter}.
-	 * @since 2.5
-	 */
-	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING =
-		"org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
+    /**
+     * The context parameter name to specify exception types to ignore in logging by both {@link FullAjaxExceptionHandler}
+     * and {@link FacesExceptionFilter}.
+     * @since 2.5
+     */
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING =
+        "org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
 
-	/**
-	 * The request attribute name of the UUID of the thrown exception which is logged by both {@link FullAjaxExceptionHandler}
-	 * and {@link FacesExceptionFilter}.
-	 * @since 3.2
-	 */
-	public static final String EXCEPTION_UUID =
-		"org.omnifaces.exception_uuid";
+    /**
+     * The request attribute name of the UUID of the thrown exception which is logged by both {@link FullAjaxExceptionHandler}
+     * and {@link FacesExceptionFilter}.
+     * @since 3.2
+     */
+    public static final String EXCEPTION_UUID =
+        "org.omnifaces.exception_uuid";
 
-	/**
-	 * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
-	 *
-	 * @author Bauke Scholtz
-	 * @since 2.4
-	 */
-	protected enum LogReason {
-		/** An exception occurred during processing Faces ajax request. Error page will be shown. */
-		EXCEPTION_HANDLED(LOG_EXCEPTION_HANDLED),
+    /**
+     * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
+     *
+     * @author Bauke Scholtz
+     * @since 2.4
+     */
+    protected enum LogReason {
+        /** An exception occurred during processing Faces ajax request. Error page will be shown. */
+        EXCEPTION_HANDLED(LOG_EXCEPTION_HANDLED),
 
-		/** An exception occurred during rendering Faces ajax request. Error page will be shown. */
-		RENDER_EXCEPTION_HANDLED(LOG_RENDER_EXCEPTION_HANDLED),
+        /** An exception occurred during rendering Faces ajax request. Error page will be shown. */
+        RENDER_EXCEPTION_HANDLED(LOG_RENDER_EXCEPTION_HANDLED),
 
-		/** An exception occurred during rendering Faces ajax request. Error page CANNOT be shown as response is already committed. */
-		RENDER_EXCEPTION_UNHANDLED(LOG_RENDER_EXCEPTION_UNHANDLED),
+        /** An exception occurred during rendering Faces ajax request. Error page CANNOT be shown as response is already committed. */
+        RENDER_EXCEPTION_UNHANDLED(LOG_RENDER_EXCEPTION_UNHANDLED),
 
-		/** Another exception occurred during rendering error page. A hardcoded error page will be shown. */
-		ERROR_PAGE_ERROR(LOG_ERROR_PAGE_ERROR);
+        /** Another exception occurred during rendering error page. A hardcoded error page will be shown. */
+        ERROR_PAGE_ERROR(LOG_ERROR_PAGE_ERROR);
 
-		private final String message;
+        private final String message;
 
-		private LogReason(String message) {
-			this.message = message;
-		}
+        private LogReason(String message) {
+            this.message = message;
+        }
 
-		/**
-		 * Returns the default message associated with the log reason.
-		 * @return The default message associated with the log reason.
-		 */
-		public String getMessage() {
-			return message;
-		}
-	}
+        /**
+         * Returns the default message associated with the log reason.
+         * @return The default message associated with the log reason.
+         */
+        public String getMessage() {
+            return message;
+        }
+    }
 
-	// Private constants ----------------------------------------------------------------------------------------------
+    // Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
 
-	private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
-		unmodifiableSet(FacesException.class, ELException.class);
+    private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
+        unmodifiableSet(FacesException.class, ELException.class);
 
-	private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS =
-		"Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
-	private static final String ERROR_DEFAULT_LOCATION_MISSING =
-		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
-			+ " Neither was found.";
-	private static final String LOG_EXCEPTION_HANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during processing Faces ajax request."
-			+ " Error page '%s' will be shown.";
-	private static final String LOG_RENDER_EXCEPTION_HANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
-			+ " Error page '%s' will be shown.";
-	private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
-		"FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
-			+ " Error page '%s' CANNOT be shown as response is already committed."
-			+ " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
-	private static final String LOG_ERROR_PAGE_ERROR =
-		"FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
-			+ " Trying to render a hardcoded error page now.";
-	private static final String ERROR_PAGE_ERROR =
-		"<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
-			+ "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
-			+ "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
-			+ " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
-			+ " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
-			+ "</body></html>]]></update></changes></partial-response>";
+    private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS =
+        "Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
+    private static final String ERROR_DEFAULT_LOCATION_MISSING =
+        "Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
+            + " Neither was found.";
+    private static final String LOG_EXCEPTION_HANDLED =
+        "FullAjaxExceptionHandler: An exception occurred during processing Faces ajax request."
+            + " Error page '%s' will be shown.";
+    private static final String LOG_RENDER_EXCEPTION_HANDLED =
+        "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
+            + " Error page '%s' will be shown.";
+    private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
+        "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
+            + " Error page '%s' CANNOT be shown as response is already committed."
+            + " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
+    private static final String LOG_ERROR_PAGE_ERROR =
+        "FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
+            + " Trying to render a hardcoded error page now.";
+    private static final String ERROR_PAGE_ERROR =
+        "<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
+            + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
+            + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
+            + " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
+            + " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
+            + "</body></html>]]></update></changes></partial-response>";
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
-	private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
+    private Class<? extends Throwable>[] exceptionTypesToUnwrap;
+    private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new ajax exception handler around the given wrapped exception handler.
-	 * @param wrapped The wrapped exception handler.
-	 */
-	public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
-		super(wrapped);
-		exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
-		exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
-	}
+    /**
+     * Construct a new ajax exception handler around the given wrapped exception handler.
+     * @param wrapped The wrapped exception handler.
+     */
+    public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
+        super(wrapped);
+        exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
+        exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
+    }
 
-	/**
-	 * Get the exception types to unwrap. This contains at least the standard types to unwrap {@link FacesException} and
-	 * {@link ELException}. Additional types can be specified via context parameter
-	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
-	 * @param context The involved servlet context.
-	 * @return Exception types to unwrap.
-	 * @since 2.3
-	 */
-	public static Class<? extends Throwable>[] getExceptionTypesToUnwrap(ServletContext context) {
-		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP, STANDARD_TYPES_TO_UNWRAP);
-	}
+    /**
+     * Get the exception types to unwrap. This contains at least the standard types to unwrap {@link FacesException} and
+     * {@link ELException}. Additional types can be specified via context parameter
+     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+     * @param context The involved servlet context.
+     * @return Exception types to unwrap.
+     * @since 2.3
+     */
+    public static Class<? extends Throwable>[] getExceptionTypesToUnwrap(ServletContext context) {
+        return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP, STANDARD_TYPES_TO_UNWRAP);
+    }
 
-	/**
-	 * Get the exception types to ignore in logging. This can be specified via context parameter
-	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
-	 * @param context The involved servlet context.
-	 * @return Exception types to ignore in logging.
-	 * @since 2.5
-	 */
-	public static Class<? extends Throwable>[] getExceptionTypesToIgnoreInLogging(ServletContext context) {
-		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING, null);
-	}
+    /**
+     * Get the exception types to ignore in logging. This can be specified via context parameter
+     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+     * @param context The involved servlet context.
+     * @return Exception types to ignore in logging.
+     * @since 2.5
+     */
+    public static Class<? extends Throwable>[] getExceptionTypesToIgnoreInLogging(ServletContext context) {
+        return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING, null);
+    }
 
-	@SuppressWarnings("unchecked")
-	static Class<? extends Throwable>[] parseExceptionTypesParam(ServletContext context, String paramName, Set<Class<? extends Throwable>> defaults) {
-		Set<Class<? extends Throwable>> types = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    static Class<? extends Throwable>[] parseExceptionTypesParam(ServletContext context, String paramName, Set<Class<? extends Throwable>> defaults) {
+        Set<Class<? extends Throwable>> types = new HashSet<>();
 
-		if (defaults != null) {
-			types.addAll(defaults);
-		}
+        if (defaults != null) {
+            types.addAll(defaults);
+        }
 
-		String typesParam = context.getInitParameter(paramName);
+        String typesParam = context.getInitParameter(paramName);
 
-		if (!isEmpty(typesParam)) {
-			for (String typeParam : typesParam.split("\\s*,\\s*")) {
-				try {
-					types.add((Class<? extends Throwable>) Class.forName(typeParam));
-				}
-				catch (ClassNotFoundException e) {
-					throw new IllegalArgumentException(
-						format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
-				}
-			}
-		}
+        if (!isEmpty(typesParam)) {
+            for (String typeParam : typesParam.split("\\s*,\\s*")) {
+                try {
+                    types.add((Class<? extends Throwable>) Class.forName(typeParam));
+                }
+                catch (ClassNotFoundException e) {
+                    throw new IllegalArgumentException(
+                        format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
+                }
+            }
+        }
 
-		return types.toArray(new Class[types.size()]);
-	}
+        return types.toArray(new Class[types.size()]);
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted
-	 * response and there is at least one unhandled exception:
-	 * <ul>
-	 *   <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
-	 *   <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
-	 *   <li>Set the standard servlet error request attributes.
-	 *   <li>Force Faces to render the full error page in its entirety.
-	 * </ul>
-	 * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
-	 */
-	@Override
-	public void handle() {
-		handleAjaxException(getContext());
-		getWrapped().handle();
-	}
+    /**
+     * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted
+     * response and there is at least one unhandled exception:
+     * <ul>
+     *   <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
+     *   <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
+     *   <li>Set the standard servlet error request attributes.
+     *   <li>Force Faces to render the full error page in its entirety.
+     * </ul>
+     * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
+     */
+    @Override
+    public void handle() {
+        handleAjaxException(getContext());
+        getWrapped().handle();
+    }
 
-	private void handleAjaxException(FacesContext context) {
-		if (context == null) {
-			return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
-		}
+    private void handleAjaxException(FacesContext context) {
+        if (context == null) {
+            return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
+        }
 
-		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
+        Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
-		if (!unhandledExceptionQueuedEvents.hasNext()) {
-			return; // There's no unhandled exception.
-		}
+        if (!unhandledExceptionQueuedEvents.hasNext()) {
+            return; // There's no unhandled exception.
+        }
 
-		Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+        Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
 
-		if (exception instanceof AbortProcessingException) {
-			return; // Let Faces handle it itself.
-		}
+        if (exception instanceof AbortProcessingException) {
+            return; // Let Faces handle it itself.
+        }
 
-		exception = findExceptionRootCause(context, exception);
-		unhandledExceptionQueuedEvents.remove();
+        exception = findExceptionRootCause(context, exception);
+        unhandledExceptionQueuedEvents.remove();
 
-		if (!shouldHandleExceptionRootCause(context, exception)) {
-			return; // A subclass apparently want to do it differently.
-		}
+        if (!shouldHandleExceptionRootCause(context, exception)) {
+            return; // A subclass apparently want to do it differently.
+        }
 
-		String errorPageLocation = findErrorPageLocation(context, exception);
+        String errorPageLocation = findErrorPageLocation(context, exception);
 
-		if (errorPageLocation == null) {
-			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
-		}
+        if (errorPageLocation == null) {
+            throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
+        }
 
-		if (!context.getPartialViewContext().isAjaxRequest()) {
-			throw new FacesException(exception); // Not an ajax request, let default web.xml error page mechanism or FacesExceptionFilter do its job.
-		}
+        if (!context.getPartialViewContext().isAjaxRequest()) {
+            throw new FacesException(exception); // Not an ajax request, let default web.xml error page mechanism or FacesExceptionFilter do its job.
+        }
 
-		if (!canRenderErrorPageView(context, exception, errorPageLocation)) {
-			return; // If error page cannot be rendered, then it's end of story.
-		}
+        if (!canRenderErrorPageView(context, exception, errorPageLocation)) {
+            return; // If error page cannot be rendered, then it's end of story.
+        }
 
-		// Set the necessary servlet request attributes which a bit decent error page may expect.
-		HttpServletRequest request = getRequest(context);
-		request.setAttribute(ERROR_EXCEPTION, exception);
-		request.setAttribute(ERROR_EXCEPTION_TYPE, exception.getClass());
-		request.setAttribute(ERROR_MESSAGE, exception.getMessage());
-		request.setAttribute(ERROR_REQUEST_URI, request.getRequestURI());
-		request.setAttribute(ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        // Set the necessary servlet request attributes which a bit decent error page may expect.
+        HttpServletRequest request = getRequest(context);
+        request.setAttribute(ERROR_EXCEPTION, exception);
+        request.setAttribute(ERROR_EXCEPTION_TYPE, exception.getClass());
+        request.setAttribute(ERROR_MESSAGE, exception.getMessage());
+        request.setAttribute(ERROR_REQUEST_URI, request.getRequestURI());
+        request.setAttribute(ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-		try {
-			renderErrorPageView(context, request, errorPageLocation);
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
+        try {
+            renderErrorPageView(context, request, errorPageLocation);
+        }
+        catch (IOException e) {
+            throw new FacesException(e);
+        }
 
-		while (unhandledExceptionQueuedEvents.hasNext()) {
-			// Any remaining unhandled exceptions are not interesting. First fix the first.
-			unhandledExceptionQueuedEvents.next();
-			unhandledExceptionQueuedEvents.remove();
-		}
-	}
+        while (unhandledExceptionQueuedEvents.hasNext()) {
+            // Any remaining unhandled exceptions are not interesting. First fix the first.
+            unhandledExceptionQueuedEvents.next();
+            unhandledExceptionQueuedEvents.remove();
+        }
+    }
 
-	/**
-	 * Determine the root cause based on the caught exception, which will then be used to find the error page location.
-	 * The default implementation delegates to {@link Exceptions#unwrap(Throwable, Class...)} with {@link FacesException},
-	 * {@link ELException} and the types specified in context parameter
-	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
-	 * @param context The involved faces context.
-	 * @param exception The caught exception to determine the root cause for.
-	 * @return The root cause of the caught exception.
-	 * @since 1.5
-	 */
-	protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
-		return unwrap(exception, exceptionTypesToUnwrap);
-	}
+    /**
+     * Determine the root cause based on the caught exception, which will then be used to find the error page location.
+     * The default implementation delegates to {@link Exceptions#unwrap(Throwable, Class...)} with {@link FacesException},
+     * {@link ELException} and the types specified in context parameter
+     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+     * @param context The involved faces context.
+     * @param exception The caught exception to determine the root cause for.
+     * @return The root cause of the caught exception.
+     * @since 1.5
+     */
+    protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
+        return unwrap(exception, exceptionTypesToUnwrap);
+    }
 
-	/**
-	 * Returns <code>true</code> if the {@link FullAjaxExceptionHandler} should handle this exception root cause. If
-	 * this returns <code>false</code>, then the {@link FullAjaxExceptionHandler} will skip handling this exception and
-	 * delegate it further to the wrapped exception handler. The default implementation just returns <code>true</code>.
-	 * @param context The involved faces context.
-	 * @param exception The caught exception to determine the root cause for.
-	 * @return <code>true</code> if the given exception should be handled by the {@link FullAjaxExceptionHandler}.
-	 * @since 1.8
-	 */
-	protected boolean shouldHandleExceptionRootCause(FacesContext context, Throwable exception) {
-		return true;
-	}
+    /**
+     * Returns <code>true</code> if the {@link FullAjaxExceptionHandler} should handle this exception root cause. If
+     * this returns <code>false</code>, then the {@link FullAjaxExceptionHandler} will skip handling this exception and
+     * delegate it further to the wrapped exception handler. The default implementation just returns <code>true</code>.
+     * @param context The involved faces context.
+     * @param exception The caught exception to determine the root cause for.
+     * @return <code>true</code> if the given exception should be handled by the {@link FullAjaxExceptionHandler}.
+     * @since 1.8
+     */
+    protected boolean shouldHandleExceptionRootCause(FacesContext context, Throwable exception) {
+        return true;
+    }
 
-	/**
-	 * Determine the error page location based on the given exception.
-	 * The default implementation delegates to {@link WebXml#findErrorPageLocation(Throwable)}.
-	 * @param context The involved faces context.
-	 * @param exception The exception to determine the error page for.
-	 * @return The location of the error page. It must start with <code>/</code> and be relative to the context path.
-	 * @since 1.5
-	 */
-	protected String findErrorPageLocation(FacesContext context, Throwable exception) {
-		return WebXml.instance().findErrorPageLocation(exception);
-	}
+    /**
+     * Determine the error page location based on the given exception.
+     * The default implementation delegates to {@link WebXml#findErrorPageLocation(Throwable)}.
+     * @param context The involved faces context.
+     * @param exception The exception to determine the error page for.
+     * @return The location of the error page. It must start with <code>/</code> and be relative to the context path.
+     * @since 1.5
+     */
+    protected String findErrorPageLocation(FacesContext context, Throwable exception) {
+        return WebXml.instance().findErrorPageLocation(exception);
+    }
 
-	/**
-	 * Log the thrown exception and determined error page location for the given log reason.
-	 * The default implementation delegates to {@link #logException(FacesContext, Throwable, String, String, Object...)}
-	 * with the default message associated with the log reason.
-	 * @param context The involved faces context.
-	 * @param exception The exception to log.
-	 * @param location The error page location.
-	 * @param reason The log reason.
-	 * @since 2.4
-	 */
-	protected void logException(FacesContext context, Throwable exception, String location, LogReason reason) {
-		logException(context, exception, location, reason.getMessage(), location);
-	}
+    /**
+     * Log the thrown exception and determined error page location for the given log reason.
+     * The default implementation delegates to {@link #logException(FacesContext, Throwable, String, String, Object...)}
+     * with the default message associated with the log reason.
+     * @param context The involved faces context.
+     * @param exception The exception to log.
+     * @param location The error page location.
+     * @param reason The log reason.
+     * @since 2.4
+     */
+    protected void logException(FacesContext context, Throwable exception, String location, LogReason reason) {
+        logException(context, exception, location, reason.getMessage(), location);
+    }
 
-	/**
-	 * Log the thrown exception and determined error page location with the given message, optionally parameterized
-	 * with the given parameters.
-	 * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
-	 * not an instance of any type specified in context parameter
-	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
-	 * Since version 3.2, the log message will be prepended with the UUID and IP address.
-	 * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
-	 * @param context The involved faces context.
-	 * @param exception The exception to log.
-	 * @param location The error page location.
-	 * @param message The log message.
-	 * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
-	 * @since 1.6
-	 */
-	protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
-		if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-			logger.log(SEVERE, format("[%s][%s] %s", getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), format(message, parameters)), exception);
-		}
-	}
+    /**
+     * Log the thrown exception and determined error page location with the given message, optionally parameterized
+     * with the given parameters.
+     * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
+     * not an instance of any type specified in context parameter
+     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+     * Since version 3.2, the log message will be prepended with the UUID and IP address.
+     * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * @param context The involved faces context.
+     * @param exception The exception to log.
+     * @param location The error page location.
+     * @param message The log message.
+     * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
+     * @since 1.6
+     */
+    protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
+        if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
+            logger.log(SEVERE, format("[%s][%s] %s", getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), format(message, parameters)), exception);
+        }
+    }
 
-	private boolean canRenderErrorPageView(FacesContext context, Throwable exception, String errorPageLocation) {
-		setRequestAttribute(context, EXCEPTION_UUID, UUID.randomUUID().toString());
+    private boolean canRenderErrorPageView(FacesContext context, Throwable exception, String errorPageLocation) {
+        setRequestAttribute(context, EXCEPTION_UUID, UUID.randomUUID().toString());
 
-		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-			logException(context, exception, errorPageLocation, LogReason.EXCEPTION_HANDLED);
-			return true;
-		}
-		else if (!context.getExternalContext().isResponseCommitted()) {
-			logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_HANDLED);
-			resetResponse(context); // If the exception was thrown in midst of rendering the Faces response, then reset (partial) response.
-			return true;
-		}
-		else {
-			logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_UNHANDLED);
+        if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+            logException(context, exception, errorPageLocation, LogReason.EXCEPTION_HANDLED);
+            return true;
+        }
+        else if (!context.getExternalContext().isResponseCommitted()) {
+            logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_HANDLED);
+            resetResponse(context); // If the exception was thrown in midst of rendering the Faces response, then reset (partial) response.
+            return true;
+        }
+        else {
+            logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_UNHANDLED);
 
-			// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
-			OmniPartialViewContext.getCurrentInstance(context).closePartialResponse();
-			return false;
-		}
-	}
+            // Mojarra doesn't close the partial response during render exception. Let do it ourselves.
+            OmniPartialViewContext.getCurrentInstance(context).closePartialResponse();
+            return false;
+        }
+    }
 
-	private void resetResponse(FacesContext context) {
-		ExternalContext externalContext = context.getExternalContext();
-		String contentType = externalContext.getResponseContentType(); // Remember content type.
-		String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
-		externalContext.responseReset();
-		OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
-		externalContext.setResponseContentType(contentType);
-		externalContext.setResponseCharacterEncoding(characterEncoding);
-	}
+    private void resetResponse(FacesContext context) {
+        ExternalContext externalContext = context.getExternalContext();
+        String contentType = externalContext.getResponseContentType(); // Remember content type.
+        String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
+        externalContext.responseReset();
+        OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
+        externalContext.setResponseContentType(contentType);
+        externalContext.setResponseCharacterEncoding(characterEncoding);
+    }
 
-	private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)
-		throws IOException
-	{
-		String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
-		ViewHandler viewHandler = context.getApplication().getViewHandler();
-		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
-		Hacks.removeResourceDependencyState(context);
-		context.setViewRoot(viewRoot);
-		context.getPartialViewContext().setRenderAll(true);
+    private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)
+        throws IOException
+    {
+        String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
+        ViewHandler viewHandler = context.getApplication().getViewHandler();
+        UIViewRoot viewRoot = viewHandler.createView(context, viewId);
+        Hacks.removeResourceDependencyState(context);
+        context.setViewRoot(viewRoot);
+        context.getPartialViewContext().setRenderAll(true);
 
-		try {
-			ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-			vdl.buildView(context, viewRoot);
-			context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
-			vdl.renderView(context, viewRoot);
-			context.responseComplete();
-		}
-		catch (Exception e) {
-			// Apparently, the error page itself contained an error.
-			logException(context, e, errorPageLocation, LogReason.ERROR_PAGE_ERROR);
-			ExternalContext externalContext = context.getExternalContext();
+        try {
+            ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+            vdl.buildView(context, viewRoot);
+            context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+            vdl.renderView(context, viewRoot);
+            context.responseComplete();
+        }
+        catch (Exception e) {
+            // Apparently, the error page itself contained an error.
+            logException(context, e, errorPageLocation, LogReason.ERROR_PAGE_ERROR);
+            ExternalContext externalContext = context.getExternalContext();
 
-			if (!externalContext.isResponseCommitted()) {
-				// Okay, reset the response and tell that the error page itself contained an error.
-				resetResponse(context);
-				externalContext.setResponseContentType("text/xml");
-				externalContext.getResponseOutputWriter().write(ERROR_PAGE_ERROR);
-				context.responseComplete();
-			}
-			else {
-				// Well, it's too late to handle. Just let it go.
-				throw new FacesException(e);
-			}
-		}
-		finally {
-			// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
-			// are known to do that. It would only result in IllegalStateException "response already committed"
-			// or "getOutputStream() has already been called for this response".
-			request.removeAttribute(ERROR_EXCEPTION);
-		}
-	}
+            if (!externalContext.isResponseCommitted()) {
+                // Okay, reset the response and tell that the error page itself contained an error.
+                resetResponse(context);
+                externalContext.setResponseContentType("text/xml");
+                externalContext.getResponseOutputWriter().write(ERROR_PAGE_ERROR);
+                context.responseComplete();
+            }
+            else {
+                // Well, it's too late to handle. Just let it go.
+                throw new FacesException(e);
+            }
+        }
+        finally {
+            // Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
+            // are known to do that. It would only result in IllegalStateException "response already committed"
+            // or "getOutputStream() has already been called for this response".
+            request.removeAttribute(ERROR_EXCEPTION);
+        }
+    }
 
-	private String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
-		String[] parts = errorPageLocation.split("\\?", 2);
+    private String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
+        String[] parts = errorPageLocation.split("\\?", 2);
 
-		// TODO: #287: make params available via #{param(Values)}. Request wrapper needed :|
+        // TODO: #287: make params available via #{param(Values)}. Request wrapper needed :|
 
-		return normalizeViewId(context, parts[0]);
-	}
+        return normalizeViewId(context, parts[0]);
+    }
 
 }

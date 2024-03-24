@@ -23,59 +23,59 @@ import org.openqa.selenium.support.FindBy;
 
 public class ComponentsIT extends OmniFacesIT {
 
-	@FindBy(id="form:commandButtonAction")
-	private WebElement commandButtonAction;
+    @FindBy(id="form:commandButtonAction")
+    private WebElement commandButtonAction;
 
-	@FindBy(id="form:commandButtonActionListener")
-	private WebElement commandButtonActionListener;
+    @FindBy(id="form:commandButtonActionListener")
+    private WebElement commandButtonActionListener;
 
-	@FindBy(id="form:commandButtonAjaxListener")
-	private WebElement commandButtonAjaxListener;
+    @FindBy(id="form:commandButtonAjaxListener")
+    private WebElement commandButtonAjaxListener;
 
-	@FindBy(id="form:primeFacesCommandButtonAction")
-	private WebElement primeFacesCommandButtonAction;
+    @FindBy(id="form:primeFacesCommandButtonAction")
+    private WebElement primeFacesCommandButtonAction;
 
-	@FindBy(id="form:primeFacesCommandButtonActionListener")
-	private WebElement primeFacesCommandButtonActionListener;
+    @FindBy(id="form:primeFacesCommandButtonActionListener")
+    private WebElement primeFacesCommandButtonActionListener;
 
-	@FindBy(id="expressions")
-	private WebElement expressions;
+    @FindBy(id="expressions")
+    private WebElement expressions;
 
-	@Deployment(testable=false)
-	public static WebArchive createDeployment() {
-		return buildWebArchive(ComponentsIT.class)
-				.withPrimeFaces()
-				.createDeployment();
-	}
+    @Deployment(testable=false)
+    public static WebArchive createDeployment() {
+        return buildWebArchive(ComponentsIT.class)
+                .withPrimeFaces()
+                .createDeployment();
+    }
 
-	@Test
-	void testCommandButtonAction() {
-		guardAjax(commandButtonAction::click);
-		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
-	}
+    @Test
+    void testCommandButtonAction() {
+        guardAjax(commandButtonAction::click);
+        assertEquals("[#{componentsITBean.submit}]", expressions.getText());
+    }
 
-	@Test
-	void testCommandButtonActionListener() {
-		guardAjax(commandButtonActionListener::click);
-		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
-	}
+    @Test
+    void testCommandButtonActionListener() {
+        guardAjax(commandButtonActionListener::click);
+        assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
+    }
 
-	@Test
-	void testCommandButtonAjaxListener() {
-		guardAjax(commandButtonAjaxListener::click);
-		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
-	}
+    @Test
+    void testCommandButtonAjaxListener() {
+        guardAjax(commandButtonAjaxListener::click);
+        assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
+    }
 
-	@Test
-	void testPrimeFacesCommandButtonAction() {
-		guardPrimeFacesAjax(primeFacesCommandButtonAction::click);
-		assertEquals("[#{componentsITBean.submit}]", expressions.getText());
-	}
+    @Test
+    void testPrimeFacesCommandButtonAction() {
+        guardPrimeFacesAjax(primeFacesCommandButtonAction::click);
+        assertEquals("[#{componentsITBean.submit}]", expressions.getText());
+    }
 
-	@Test
-	void testPrimeFacesCommandButtonActionListener() {
-		guardPrimeFacesAjax(primeFacesCommandButtonActionListener::click);
-		assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
-	}
+    @Test
+    void testPrimeFacesCommandButtonActionListener() {
+        guardPrimeFacesAjax(primeFacesCommandButtonActionListener::click);
+        assertEquals("[#{componentsITBean.submit()}]", expressions.getText());
+    }
 
 }

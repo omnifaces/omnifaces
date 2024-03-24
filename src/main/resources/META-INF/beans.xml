@@ -14,27 +14,27 @@
 
 -->
 <beans
-	xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd"
-	version="3.0" bean-discovery-mode="annotated"
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd"
+    version="3.0" bean-discovery-mode="annotated"
 >
-	<scan>
-		<exclude name="org.omnifaces.application.**" />
-		<exclude name="org.omnifaces.config.**" />
-		<exclude name="org.omnifaces.context.**" />
-		<exclude name="org.omnifaces.el.**" />
-		<exclude name="org.omnifaces.eventlistener.**" />
-		<exclude name="org.omnifaces.exceptionhandler.**" />
-		<exclude name="org.omnifaces.facesviews.**" />
-		<exclude name="org.omnifaces.filter.**" />
-		<exclude name="org.omnifaces.io.**" />
-		<exclude name="org.omnifaces.model.**" />
-		<exclude name="org.omnifaces.renderkit.**" />
-		<exclude name="org.omnifaces.resourcehandler.**" />
-		<exclude name="org.omnifaces.servlet.**" />
-		<exclude name="org.omnifaces.taghandler.**" />
-		<exclude name="org.omnifaces.util.**" />
-		<exclude name="org.omnifaces.viewhandler.**" />
-	</scan>
+    <scan>
+        <exclude name="org.omnifaces.application.**" />
+        <exclude name="org.omnifaces.config.**" />
+        <exclude name="org.omnifaces.context.**" />
+        <exclude name="org.omnifaces.el.**" />
+        <exclude name="org.omnifaces.eventlistener.**" />
+        <exclude name="org.omnifaces.exceptionhandler.**" />
+        <exclude name="org.omnifaces.facesviews.**" />
+        <exclude name="org.omnifaces.filter.**" />
+        <exclude name="org.omnifaces.io.**" />
+        <exclude name="org.omnifaces.model.**" />
+        <exclude name="org.omnifaces.renderkit.**" />
+        <exclude name="org.omnifaces.resourcehandler.**" />
+        <exclude name="org.omnifaces.servlet.**" />
+        <exclude name="org.omnifaces.taghandler.**" />
+        <exclude name="org.omnifaces.util.**" />
+        <exclude name="org.omnifaces.viewhandler.**" />
+    </scan>
 </beans>
