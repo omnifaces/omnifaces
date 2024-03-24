@@ -39,7 +39,7 @@ import org.omnifaces.util.Callback.SerializableBiConsumer;
  * @param <V> The generic map value type.
  * @since 4.4
  */
-public class LruCache<K, V> implements ConcurrentMap<K, V>, Serializable {
+public class LruCache<K extends Serializable, V extends Serializable> implements ConcurrentMap<K, V>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
