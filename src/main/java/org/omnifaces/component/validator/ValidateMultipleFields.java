@@ -22,6 +22,7 @@ import static org.omnifaces.util.Components.getValue;
 import static org.omnifaces.util.Components.isEditable;
 import static org.omnifaces.util.Components.validateHasNoChildren;
 import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
 
@@ -225,6 +226,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			for (UIInput input : inputs) {
 				if (Components.isRendered(input)) {
 					input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+
+					if (!input.isValid() && input.isLocalValueSet()) {
+						input.setSubmittedValue(getRequestParameter(input.getClientId(context)));
+					}
 				}
 				i++;
 			}
