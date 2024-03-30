@@ -1,0 +1,48 @@
+<!--
+
+    Copyright OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+    xmlns:o="http://omnifaces.org/ui"
+>
+    <h:head />
+    
+    <h:body>
+        <o:form id="form1">
+            <o:validateUnique components="input1 input2" showMessageFor="input2" />
+            <h:inputText id="input1" value="#{validateUniqueITBean.input1}" required="true" />
+            <h:message id="input1_m" for="input1" />
+            <h:inputText id="input2" value="#{validateUniqueITBean.input2}" />
+            <h:message id="input2_m" for="input2" />
+            <h:commandButton id="submit"><f:ajax execute="@form" render="@form" /></h:commandButton>
+            <h:panelGroup id="ok"><h:outputText value="OK!" rendered="#{facesContext.postback and not facesContext.validationFailed}" /></h:panelGroup>
+        </o:form>
+
+        <o:form id="form2">
+            <h:inputText id="input1" value="#{validateUniqueITBean.input1}" required="true" />
+            <h:message id="input1_m" for="input1" />
+            <h:inputText id="input2" value="#{validateUniqueITBean.input2}" />
+            <h:message id="input2_m" for="input2" />
+            <o:validateUnique components="input1 input2" showMessageFor="input2" />
+            <h:commandButton id="submit"><f:ajax execute="@form" render="@form" /></h:commandButton>
+            <h:panelGroup id="ok"><h:outputText value="OK!" rendered="#{facesContext.postback and not facesContext.validationFailed}" /></h:panelGroup>
+        </o:form>
+
+    </h:body>
+</html>
