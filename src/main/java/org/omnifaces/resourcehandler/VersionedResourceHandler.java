@@ -12,45 +12,42 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.Optional.ofNullable;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isBlank;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 
 import org.omnifaces.util.Lazy;
+import org.omnifaces.util.Utils;
 
 /**
- * Automatically adds version parameter with query string name <code>v</code> to all resource URLs so, in production mode
- * they will be cached forever (or as configured in web.xml),
- * but will not be stale when a new version of the app is deployed.
+ * Automatically adds version parameter with query string name <code>v</code> to all resource URLs so that the browser
+ * cache will be busted whenever the version parameter changes.
  * <p>
  * NOTE: if resource URL already has <code>v</code> query string parameter, or when it is URL-rewritten to not include
  * <code>{@value javax.faces.application.ResourceHandler#RESOURCE_IDENTIFIER}</code> path anymore, then these will be ignored.
+ * <h3>Installation</h3>
  * <p>
- * Example:
+ * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
- * faces-config.xml:
  * {@code
- *   <application>
- *       <resource-handler>org.omnifaces.resourcehandler.VersionedResourceHandler</resource-handler>
- *   </application>
+ * <application>
+ *     <resource-handler>org.omnifaces.resourcehandler.VersionedResourceHandler</resource-handler>
+ * </application>
  * }
- *
- * web.xml:
+ * </pre>
+ * <p>
+ * And the version parameter needs to be configured as follows in <code>web.xml</code>:
+ * <pre>
  * {@code
- *   <context-param>
- *       <!-- Mojarra: 1 year cache, effects production mode only -->
- *       <param-name>com.sun.faces.defaultResourceMaxAge</param-name>
- *       <param-value>31536000000</param-value>
- *   </context-param>
- *   <context-param>
- *       <param-name>org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION</param-name>
- *       <!-- Version string could be any string here, or taken from @Named bean -->
- *       <param-value>#{environmentInfo.version}</param-value>
- *   </context-param>
+ * <context-param>
+ *     <param-name>org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION</param-name>
+ *     <!-- Version parameter value could be any hardcoded string here, or any object property from managed bean -->
+ *     <param-value>#{environmentInfo.version}</param-value>
+ * </context-param>
  * }
  * </pre>
  * <p>
@@ -71,7 +68,7 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
 
 	public VersionedResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
-		versionString = new Lazy<>(() -> encodeURL(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))));
+		versionString = new Lazy<>(() -> ofNullable(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))).map(String::valueOf).map(Utils::encodeURL).orElse(null));
 	}
 
 	@Override
