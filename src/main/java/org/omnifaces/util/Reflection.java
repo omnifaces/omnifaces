@@ -579,10 +579,10 @@ public final class Reflection {
 		List<Method> methods = new ArrayList<>();
 
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
-			for (Method method : cls.getDeclaredMethods()) {
-				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length && isNotOverridden(methods, method)) {
-					methods.add(method);
-				}
+			collectMethods(methods, cls, false, methodName, params);
+
+			for (Class<?> iface : cls.getInterfaces()) {
+				collectInterfaceMethods(methods, iface, methodName, params);
 			}
 		}
 
@@ -591,6 +591,22 @@ public final class Reflection {
 		}
 		else {
 			return closestMatchingMethod(methods, params);  // Overloaded methods were found. Try to find closest match.
+		}
+	}
+
+	private static void collectInterfaceMethods(List<Method> methods, Class<?> iface, String methodName, Object... params) {
+		collectMethods(methods, iface, true, methodName, params);
+
+		for (Class<?> superiface : iface.getInterfaces()) {
+			collectInterfaceMethods(methods, superiface, methodName, params);
+		}
+	}
+
+	private static void collectMethods(List<Method> methods, Class<?> type, boolean iface, String methodName, Object... params) {
+		for (Method method : type.getDeclaredMethods()) {
+			if ((!iface || method.isDefault()) && method.getName().equals(methodName) && method.getParameterTypes().length == params.length && isNotOverridden(methods, method)) {
+				methods.add(method);
+			}
 		}
 	}
 
@@ -660,7 +676,7 @@ public final class Reflection {
 	 * @since 2.7.2
 	 */
 	public static boolean isAssignable(Object source, Class<?> targetType) {
-		Class<?> sourceType = source != null ? source.getClass() : null;
+		Class<?> sourceType = source instanceof Class ? (Class<?>) source : source != null ? source.getClass() : null;
 
 		if (sourceType != null && targetType.isPrimitive()) {
 			sourceType = getPrimitiveType(sourceType);
