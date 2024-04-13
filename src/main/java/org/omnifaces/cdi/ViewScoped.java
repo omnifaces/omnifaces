@@ -36,6 +36,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeStorageInSession;
 import org.omnifaces.cdi.viewscope.ViewScopeStorageInViewState;
 import org.omnifaces.context.OmniExternalContext;
 import org.omnifaces.context.OmniExternalContextFactory;
+import org.omnifaces.util.cache.LruCache;
 import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
@@ -226,6 +227,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * @see ViewScopeStorageInViewState
  * @see ViewScopeEventListener
  * @see BeanStorage
+ * @see LruCache
  * @see OmniViewHandler
  * @see OmniExternalContext
  * @see OmniExternalContextFactory

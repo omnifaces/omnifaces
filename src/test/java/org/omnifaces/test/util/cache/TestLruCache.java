@@ -1,6 +1,7 @@
 package org.omnifaces.test.util.cache;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -18,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +28,11 @@ import org.omnifaces.util.cache.LruCache;
 
 class TestLruCache {
 
+    private static final Logger logger = Logger.getLogger(TestLruCache.class.getName());
+
     private static final int SIZE = 1000;
     private static final int ITERATIONS = (SIZE * SIZE) + 1;
+    private static final int LAST_EXISTING_KEY = SIZE * SIZE - SIZE;
 
     private Map<String, String> lruCache;
     private Set<String> evicted;
@@ -41,6 +47,18 @@ class TestLruCache {
     @Test
     void testPutThreadSafety() {
         testThreadSafety(i -> lruCache.put("k" + i, "v" + i));
+
+        if (evicted.size() == ITERATIONS - SIZE + 1) {
+            // Very sometimes the last existing key is evicted while put by another thread, just inevitable nature of the test using overlapping keys, we'll want to remove the known key from the eviction set.
+            String keyOfLastIteration = "k" + LAST_EXISTING_KEY;
+            List<String> leftIntersecting = evicted.stream().filter(lruCache::containsKey).collect(toList());
+            List<String> rightIntersecting = lruCache.keySet().stream().filter(evicted::contains).collect(toList());
+
+            if (leftIntersecting.size() == 1 && leftIntersecting.contains(keyOfLastIteration) && leftIntersecting.equals(rightIntersecting)) { // Just to ensure it's indeed that one.
+                logger.warning("Last existing key evicted while put by another thread: " + keyOfLastIteration);
+                evicted.remove(keyOfLastIteration);
+            }
+        }
 
         assertAll(
             () -> assertEquals(SIZE, lruCache.size(), "size must be still " + SIZE),

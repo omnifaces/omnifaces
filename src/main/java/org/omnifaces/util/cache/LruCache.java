@@ -46,9 +46,9 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     private static final String ERROR_NULL_KEY_DISALLOWED = "key may not be null";
     private static final String ERROR_NULL_VALUE_DISALLOWED = "value may not be null";
 
-    private int maximumCapacity;
-    private SerializableBiConsumer<K, V> evictionListener;
-    private LinkedHashMap<K, V> entries;
+    private final int maximumCapacity;
+    private final SerializableBiConsumer<K, V> evictionListener;
+    private final LinkedHashMap<K, V> entries;
 
     private final transient Lock lock = new ReentrantLock();
 

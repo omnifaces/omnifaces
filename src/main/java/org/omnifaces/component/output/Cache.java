@@ -148,6 +148,7 @@ import org.omnifaces.util.cache.TimeToLiveCache;
  * @see CacheProvider
  * @see DefaultCache
  * @see DefaultCacheProvider
+ * @see LruCache
  * @see TimeToLiveCache
  * @see CacheValue
  * @see CachingValueExpression
