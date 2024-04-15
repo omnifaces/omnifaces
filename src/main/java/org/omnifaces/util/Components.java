@@ -249,6 +249,18 @@ public final class Components {
     }
 
     /**
+     * Set the attribute value on the specified component for the specified name.
+     * @param <T> The expected value type.
+     * @param component The component on which to set the attribute.
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * @since 4.5
+     */
+    public static <T> void setAttribute( UIComponent component , String name , T value ) {
+        component.getAttributes().put(name,value);
+    }
+
+    /**
      * Returns whether the given UI component and all of its parents is rendered. This thus not only checks the
      * component's own <code>rendered</code> attribute, but also of all of its parents.
      * @param component The component to be checked.
@@ -263,6 +275,24 @@ public final class Components {
         }
 
         return true;
+    }
+
+    /**
+     * Disable the passed UI component.
+     * @param component The component to disable.
+     * @since 4.5
+     */
+    public static void disableInputComponent( UIComponent component ) {
+        setAttribute(component,"disabled",true);
+    }
+
+    /**
+     * Disable the UI component matching the given client ID search expression.
+     * @param clientId The client ID search expression.
+     * @since 4.5
+     */
+    public static void disableInputComponent( String clientId ) {
+        disableInputComponent(findComponent(clientId));
     }
 
     // Traversal ------------------------------------------------------------------------------------------------------
