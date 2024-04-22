@@ -12,14 +12,14 @@
  */
 package org.omnifaces.util.cache;
 
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     private final SerializableBiConsumer<K, V> evictionListener;
     private final LinkedHashMap<K, V> entries;
 
-    private final transient Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
      * @throws IllegalArgumentException when maximum capacity is less than 2.
      */
     public LruCache(int maximumCapacity) {
-        this(maximumCapacity, (key, value) -> {});
+        this(maximumCapacity, null); // emptySerializableBiConsumer()
     }
 
     /**
@@ -81,26 +81,13 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         this.entries = new LinkedHashMap<>(maximumCapacity);
     }
 
-    // Internal -------------------------------------------------------------------------------------------------------
-
-    private <R> R withLock(Supplier<R> task) {
-        lock.lock();
-
-        try {
-            return task.get();
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
     // Mutation methods -----------------------------------------------------------------------------------------------
 
     @Override
     @SuppressWarnings("unchecked")
     public V get(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> {
+        return execAtomic(lock, () -> {
             V value = entries.remove(key);
             if (value != null) {
                 entries.put((K) key, value);
@@ -123,20 +110,23 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     private V put(K key, V value, boolean onlyIfAbsent) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-        V previousValue = withLock(() -> {
-            V existingValue = entries.remove(key);
 
+        // put the new value and remove all the elements (usually 1) exceeding the maximum capacity
+        Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
+        V previousValue = execAtomic(lock, () -> {
+            V existingValue = entries.remove(key);
             while (entries.size() >= maximumCapacity) {
                 K leastRecentlyUsedKey = entries.keySet().iterator().next();
                 evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
             }
-
             entries.put(key, (onlyIfAbsent && existingValue != null) ? existingValue : value);
             return existingValue;
         });
 
-        evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
+        // if we have a registered eviction listener -> invoke on each removed value (usually 1)
+        if (evictionListener != null) evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
+
+        // return the previous value
         return previousValue;
     }
 
@@ -148,21 +138,21 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     @Override
     public V remove(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> entries.remove(key));
+        return execAtomic(lock, () -> entries.remove(key));
     }
 
     @Override
     public boolean remove(Object key, Object value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> value.equals(entries.get(key)) && entries.remove(key) != null);
+        return execAtomic(lock, () -> value.equals(entries.get(key)) && entries.remove(key) != null);
     }
 
     @Override
     public V replace(K key, V value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> entries.containsKey(key) ? put(key, value, false) : null);
+        return execAtomic(lock, () -> entries.containsKey(key) ? put(key, value, false) : null);
     }
 
     @Override
@@ -170,12 +160,12 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(oldValue, ERROR_NULL_VALUE_DISALLOWED);
         requireNonNull(newValue, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
+        return execAtomic(lock, () -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
     }
 
     @Override
     public void clear() {
-        withLock(() -> { entries.clear(); return null; });
+        execAtomic(lock, () -> { entries.clear(); return null; });
     }
 
     // Readonly methods -----------------------------------------------------------------------------------------------
@@ -204,56 +194,43 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     @Override
     public Set<K> keySet() {
-        return new ReadOnlyCollection<>(entries::keySet);
+        return unmodifiableSet(entries.keySet());
     }
 
     @Override
     public Collection<V> values() {
-        return new ReadOnlyCollection<>(entries::values);
+        return unmodifiableCollection(entries.values());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Set<Entry<K, V>> entrySet() {
-        return new ReadOnlyCollection<>(entries::entrySet);
+        return unmodifiableSet((Set<? extends Entry<K, V>>) entries.keySet());
     }
 
-    // Inner classes --------------------------------------------------------------------------------------------------
+    // Utils -------------------------------------------------------------------------------------------------------
 
-    private final class ReadOnlyCollection<E> extends AbstractSet<E> {
+//    private static final SerializableBiConsumer<?,?> BI_CONSUMER_NO_OP = ((k, v) -> {});
+//
+//    @SuppressWarnings("unchecked")
+//    private static <K,V> SerializableBiConsumer<K,V> emptySerializableBiConsumer() {
+//        return (SerializableBiConsumer<K,V>) BI_CONSUMER_NO_OP;
+//    }
 
-        private final Supplier<Collection<E>> collectionSupplier;
+    /**
+     * Execute the passed task and return the computed result atomically using the passed lock.
+     * @param lock The {@link Lock} to be used for atomic execution
+     * @param task The {@link Supplier} to be executed atomically
+     * @return The result of the passed task.
+     */
+    public static <R> R execAtomic(Lock lock, Supplier<R> task) {
+        lock.lock();
 
-        public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
-            this.collectionSupplier = collectionSupplier;
+        try {
+            return task.get();
         }
-
-        @Override
-        public int size() {
-            return entries.size();
-        }
-
-        @Override
-        public Iterator<E> iterator() {
-            return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
-        }
-    }
-
-    private final class ReadOnlyIterator<E> implements Iterator<E> {
-
-        private final Iterator<E> iterator;
-
-        private ReadOnlyIterator(Iterator<E> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public E next() {
-            return iterator.next();
+        finally {
+            lock.unlock();
         }
     }
 
