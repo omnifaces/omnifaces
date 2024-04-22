@@ -18,8 +18,8 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MAX_ACTIVE
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NUMBER_OF_VIEWS;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.getViewAttribute;
-import static org.omnifaces.util.Faces.setViewAttribute;
+import static org.omnifaces.util.FacesLocal.getViewAttribute;
+import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -73,20 +74,27 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     }
 
     @Override
-    public UUID getBeanStorageId() {
-        UUID beanStorageId = getViewAttribute(getClass().getName());
-        return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+    public UUID getBeanStorageId(FacesContext context) {
+        try {
+            UUID beanStorageId = getViewAttribute(context, getClass().getName());
+            return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+        }
+        // Weld race condition on session get/create
+        // LINE 127 of https://github.com/weld/core/blob/master/modules/web/src/main/java/org/jboss/weld/module/web/context/beanstore/http/AbstractSessionBeanStore.java
+        catch (Throwable e) {
+            return null;
+        }
     }
 
     @Override
-    public BeanStorage getBeanStorage(UUID beanStorageId) {
+    public BeanStorage getBeanStorage(FacesContext context, UUID beanStorageId) {
         return activeViewScopes.get(beanStorageId);
     }
 
     @Override
-    public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
+    public void setBeanStorage(FacesContext context, UUID beanStorageId, BeanStorage beanStorage) {
         activeViewScopes.put(beanStorageId, beanStorage);
-        setViewAttribute(getClass().getName(), beanStorageId);
+        setViewAttribute(context, getClass().getName(), beanStorageId);
     }
 
     /**

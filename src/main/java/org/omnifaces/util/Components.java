@@ -495,14 +495,14 @@ public final class Components {
      */
     public static class ForEach {
 
-        private FacesContext facesContext;
+        private final FacesContext facesContext;
         private UIComponent root;
         private Collection<String> ids;
         private Set<VisitHint> hints;
         private Class<?>[] types;
 
         public ForEach() {
-            facesContext = Faces.getContext();
+            facesContext = getContext();
         }
 
         public ForEach(FacesContext facesContext) {
@@ -632,8 +632,8 @@ public final class Components {
 
         private static class TypesVisitCallback implements VisitCallback {
 
-            private Class<?>[] types;
-            private VisitCallback next;
+            private final Class<?>[] types;
+            private final VisitCallback next;
 
             public TypesVisitCallback(Class<?>[] types, VisitCallback next) {
                 this.types = types;
@@ -758,16 +758,27 @@ public final class Components {
      * @since 3.6
      */
     public static void addScript(String script) {
-        FacesContext context = FacesContext.getCurrentInstance();
+        addScript(getContext(), script);
+    }
+
+    /**
+     * Add given JavaScript code to the current view which is to be executed as an inline script when the rendering is
+     * completed. When the current request is {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate
+     * to {@link Ajax#oncomplete(String...)}, else it will add given JavaScript code as inline script to end of body.
+     * @param context The current {@link FacesContext}
+     * @param script JavaScript code which is to be executed as an inline script.
+     * @since 4.5
+     */
+    public static void addScript(FacesContext context, String script) {
 
         if (isAjaxRequestWithPartialRendering(context)) {
-            oncomplete(script);
+            oncomplete(context,script);
         }
         else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(script)); // Just to avoid it misses when view rebuilds in the meanwhile.
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(context, script)); // Just to avoid it misses when view rebuilds in the meanwhile.
         }
         else {
-            addScriptToBody(script);
+            addScriptToBody(context, script);
         }
     }
 
@@ -786,21 +797,39 @@ public final class Components {
      * @since 3.6
      */
     public static void addScriptResource(String libraryName, String resourceName) {
-        FacesContext context = FacesContext.getCurrentInstance();
+        addScriptResource(getContext(), libraryName, resourceName);
+    }
+
+    /**
+     * Add given JavaScript resource to the current view. This will first check if the resource isn't already rendered
+     * as per {@link ResourceHandler#isResourceRendered(FacesContext, String, String)}. If not, then continue as below:
+     * <ul>
+     * <li>When the current request is a {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate to
+     * {@link Ajax#load(String, String)}.</li>
+     * <li>Else when the <code>&lt;h:head&gt;</code> has not yet been rendered, then add given JavaScript resource to
+     * head.</li>
+     * <li>Else add given JavaScript resource to end of the <code>&lt;h:body&gt;</code>.</li>
+     * </ul>
+     * @param context the current {@link FacesContext}
+     * @param libraryName Library name of the JavaScript resource.
+     * @param resourceName Resource name of the JavaScript resource.
+     * @since 4.5
+     */
+    public static void addScriptResource(FacesContext context, String libraryName, String resourceName) {
 
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
                 load(libraryName, resourceName);
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-                addScriptResourceToHead(libraryName, resourceName);
+                addScriptResourceToHead(context,libraryName, resourceName);
                 subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
             }
             else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
-                addScriptResourceToHead(libraryName, resourceName);
+                addScriptResourceToHead(context,libraryName, resourceName);
             }
             else {
-                addScriptResourceToBody(libraryName, resourceName);
+                addScriptResourceToBody(context,libraryName, resourceName);
             }
         }
     }
@@ -811,7 +840,16 @@ public final class Components {
      * @since 4.0
      */
     public static void addFacesScriptResource() {
-        addScriptResource(JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME);
+        addFacesScriptResource(getContext());
+    }
+
+    /**
+     * Add the Faces JavaScript resource to current view. If Faces 4.0+ is present, then it will add the
+     * <code>jakarta.faces:faces.js</code> resource, else it will add the <code>jakarta.faces:jsf.js</code> resource.
+     * @since 4.5
+     */
+    public static void addFacesScriptResource(FacesContext context) {
+        addScriptResource(context,JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable(context) ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME);
     }
 
     private static UIOutput createScriptResource() {
@@ -821,7 +859,10 @@ public final class Components {
     }
 
     private static UIComponent addScriptResourceToTarget(String libraryName, String resourceName, String target) {
-        FacesContext context = FacesContext.getCurrentInstance();
+        return addScriptResourceToTarget(getContext(), libraryName, resourceName, target);
+    }
+
+    private static UIComponent addScriptResourceToTarget(FacesContext context,String libraryName, String resourceName, String target) {
         String id = (libraryName != null ? (libraryName.replaceAll("\\W+", "_") + "_") : "") + resourceName.replaceAll("\\W+", "_");
 
         for (UIComponent existingResource : context.getViewRoot().getComponentResources(context)) {
@@ -838,19 +879,30 @@ public final class Components {
         }
 
         outputScript.getAttributes().put("name", resourceName);
-        return addComponentResource(outputScript, target);
+        return addComponentResource(context,outputScript, target);
     }
 
     private static void addScriptResourceToHead(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "head");
+        addScriptResourceToHead(getContext(), libraryName, resourceName);
+    }
+
+    private static void addScriptResourceToHead(FacesContext context, String libraryName, String resourceName) {
+        addScriptResourceToTarget(context, libraryName, resourceName, "head");
     }
 
     private static void addScriptResourceToBody(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "body");
+        addScriptResourceToBody(getContext(), libraryName, resourceName);
+    }
+
+    private static void addScriptResourceToBody(FacesContext context,String libraryName, String resourceName) {
+        addScriptResourceToTarget(context,libraryName, resourceName, "body");
     }
 
     private static UIComponent addComponentResource(UIComponent resource, String target) {
-        FacesContext context = FacesContext.getCurrentInstance();
+        return addComponentResource(getContext(), resource, target);
+    }
+
+    private static UIComponent addComponentResource(FacesContext context, UIComponent resource, String target) {
 
         if (resource.getId() == null) {
             Hacks.setComponentResourceUniqueId(context, resource);
@@ -861,11 +913,15 @@ public final class Components {
     }
 
     private static void addScriptToBody(String script) {
+        addScriptToBody(getContext(), script);
+    }
+
+    private static void addScriptToBody(FacesContext context, String script) {
         UIOutput outputScript = createScriptResource();
         UIOutput content = new UIOutput();
         content.setValue(script);
         outputScript.getChildren().add(content);
-        addComponentResource(outputScript, "body");
+        addComponentResource(context,outputScript, "body");
     }
 
     // Building / rendering -------------------------------------------------------------------------------------------
@@ -1290,7 +1346,7 @@ public final class Components {
                 continue;
             }
 
-            params.put(param.getName(), asList(value));
+            params.put(param.getName(), List.of(value));
         }
 
         return Collections.unmodifiableMap(params);
@@ -1379,7 +1435,15 @@ public final class Components {
      * @since 3.6
      */
     public static void addFormIfNecessary() {
-        FacesContext context = FacesContext.getCurrentInstance();
+        addFormIfNecessary(getContext());
+    }
+
+    /**
+     * Add an {@link UIForm} to the current view if absent.
+     * This might be needed for scripts which rely on Faces view state identifier and/or on functioning of jsf.ajax.request().
+     * @since 4.5
+     */
+    public static void addFormIfNecessary(FacesContext context) {
 
         if (isAjaxRequestWithPartialRendering(context)) {
             return; // It's impossible to have this condition without an UIForm in first place.
@@ -1400,7 +1464,7 @@ public final class Components {
 
         Optional<UIComponent> body = viewRoot.getChildren().stream().filter(HtmlBody.class::isInstance).findFirst();
 
-        if (!body.isPresent()) {
+        if (body.isEmpty()) {
             return; // No <h:body> present. Not possible to add a new UIForm then.
         }
 
@@ -1429,7 +1493,7 @@ public final class Components {
         }
 
         if (converter != null) {
-            UIComponent component = null;
+            final UIComponent component;
 
             if (holder instanceof UIComponent) {
                 component = (UIComponent) holder;
@@ -1917,7 +1981,7 @@ public final class Components {
      */
     private static class TemporaryViewFacesContext extends FacesContextWrapper {
 
-        private UIViewRoot temporaryView;
+        private final UIViewRoot temporaryView;
 
         public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
             super(wrapped);

@@ -20,6 +20,7 @@ import static java.lang.String.format;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getPackage;
@@ -60,7 +61,7 @@ import jakarta.websocket.Session;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
  * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
  * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
@@ -173,7 +174,7 @@ public final class Hacks {
      */
     public static long getDefaultResourceMaxAge() {
         if (defaultResourceMaxAge == null) {
-            Long resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+            long resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
             FacesContext context = FacesContext.getCurrentInstance();
 
             if (context == null) {
@@ -186,7 +187,7 @@ public final class Hacks {
 
                 if (value != null) {
                     try {
-                        resourceMaxAge = Long.valueOf(value);
+                        resourceMaxAge = Long.parseLong(value);
                         break;
                     }
                     catch (NumberFormatException e) {
@@ -260,8 +261,16 @@ public final class Hacks {
      * @since 4.0
      */
     public static boolean isFacesScriptResourceAvailable() {
+       return isFacesScriptResourceAvailable(getContext());
+    }
+
+    /**
+     * Returns {@code true} if <code>jakarta.faces:faces.js</code> script resource is available.
+     * @return {@code true} if <code>jakarta.faces:faces.js</code> script resource is available.
+     * @since 4.5
+     */
+    public static boolean isFacesScriptResourceAvailable(FacesContext context) {
         if (facesScriptResourceAvailable == null) {
-            FacesContext context = FacesContext.getCurrentInstance();
 
             if (context == null) {
                 return false;

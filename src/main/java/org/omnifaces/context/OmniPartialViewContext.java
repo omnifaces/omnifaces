@@ -16,7 +16,6 @@ import static jakarta.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
-import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
@@ -24,6 +23,7 @@ import static org.omnifaces.util.FacesLocal.getResponse;
 import static org.omnifaces.util.FacesLocal.getViewId;
 import static org.omnifaces.util.FacesLocal.invalidateSession;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Servlets.facesRedirect;
 
 import java.io.IOException;
@@ -238,7 +238,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
         instance = unwrap(context.getPartialViewContext());
 
         if (instance != null) {
-            setCurrentInstance(instance);
+            setCurrentInstance(context, instance);
             return instance;
         }
 
@@ -247,7 +247,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     }
 
     private static void setCurrentInstance(OmniPartialViewContext instance) {
-        setContextAttribute(OmniPartialViewContext.class.getName(), instance);
+        setCurrentInstance(getContext(), instance);
+    }
+
+    private static void setCurrentInstance(FacesContext facesContext,OmniPartialViewContext instance) {
+        setContextAttribute(facesContext,OmniPartialViewContext.class.getName(), instance);
     }
 
     private static OmniPartialViewContext unwrap(PartialViewContext context) {
@@ -270,15 +274,15 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     /**
      * This OmniFaces partial response writer adds support for passing arguments to JavaScript context, executing
      * oncomplete callback scripts, resetting the ajax response (specifically for {@link FullAjaxExceptionHandler}) and
-     * fixing incomlete XML response in case of exceptions.
+     * fixing incomplete XML response in case of exceptions.
      * @author Bauke Scholtz
      */
     private static class OmniPartialResponseWriter extends PartialResponseWriter {
 
         // Variables --------------------------------------------------------------------------------------------------
 
-        private OmniPartialViewContext context;
-        private PartialResponseWriter wrapped;
+        private final OmniPartialViewContext context;
+        private final PartialResponseWriter wrapped;
         private boolean updating;
         private boolean updated;
 
