@@ -775,8 +775,15 @@ public final class Components {
             oncomplete(context,script);
         }
         else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            // Note: we can't use the current FacesContext for an Event listener callback
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(script)); // Just to avoid it misses when view rebuilds in the meanwhile.
+            // Just to avoid it misses when view rebuilds in the meanwhile.
+            // Note: We need to retrieve the current FacesContext in the callback
+            // Note2: we have to check if the FacesContext is not released otherwise if there is an error in the view,
+            //        we got a java.lang.IllegalStateException
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> {
+                FacesContext facesContext = getContext();
+                if (!facesContext.isReleased())
+                    addScriptToBody(facesContext, script);
+            });
         }
         else {
             addScriptToBody(context, script);
