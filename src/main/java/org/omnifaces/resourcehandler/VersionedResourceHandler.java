@@ -29,7 +29,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * NOTE: if resource URL already has <code>v</code> query string parameter, or when it is URL-rewritten to not include
  * <code>{@value jakarta.faces.application.ResourceHandler#RESOURCE_IDENTIFIER}</code> path anymore, then these will be ignored.
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
