@@ -75,7 +75,7 @@ OmniFaces.Form = (function(Util, window) {
 	}
 
 	function containsNamedChild(executeIds, key) {
-		var name = key.replace("%3A", "\\:");
+		var name = key.replace(/%3A/g, "\\:");
 
 		try {
 			for (var i = 0; i < executeIds.length; i++) {
