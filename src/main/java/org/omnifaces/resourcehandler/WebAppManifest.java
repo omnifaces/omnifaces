@@ -198,12 +198,15 @@ public abstract class WebAppManifest {
     }
 
     /**
-     * Returns the default orientation mode of your web application. The default implementation returns {@link Orientation#ANY}.
+     * Returns the default orientation mode of your web application. The default implementation returns {@code null} to let the device handle the orientation
+     * based on the combination of device orientation and user auto-orientation setting.
      * @return The default orientation mode of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation</a>
+     * @since 4.5 The default implementation returns {@code null}. The previous default value was {@link Orientation#ANY}
+     *
      */
     public Orientation getOrientation() {
-        return Orientation.ANY;
+        return null;
     }
 
     /**
