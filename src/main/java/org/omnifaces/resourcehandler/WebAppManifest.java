@@ -657,21 +657,48 @@ public abstract class WebAppManifest {
     /**
      * A {@link Screenshot} form factor
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor">https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor</a>
+     * @version 4.5
      */
-    protected enum ScreenshotFormFactor { narrow,wide; }
+    protected enum ScreenshotFormFactor {
+        NARROW, WIDE;
+
+        private final String value;
+
+        private ScreenshotFormFactor() {
+            value = name().toLowerCase();
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+
+    }
 
     /**
      * To be used in {@link WebAppManifest#getScreenshots()}
+     * @version 4.5
      */
     protected static final class Screenshot {
 
         private final ImageResource image;
         private final ScreenshotFormFactor formFactor;
 
-        public String getSrc() { return image.getSrc(); }
-        public String getSizes() { return image.getSizes(); }
-        public String getType() { return image.getType(); }
-        public ScreenshotFormFactor getFormFactor() {return formFactor;}
+        public String getSrc() {
+            return image.getSrc();
+        }
+
+        public String getSizes() {
+            return image.getSizes();
+        }
+
+        public String getType() {
+            return image.getType();
+        }
+
+        public ScreenshotFormFactor getFormFactor() {
+            return formFactor;
+        }
 
         private Screenshot(String resourceIdentifier, ScreenshotFormFactor formFactor, Size... sizes) {
             this.image = ImageResource.of(resourceIdentifier,sizes);
@@ -691,21 +718,30 @@ public abstract class WebAppManifest {
         }
 
         @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (!(object instanceof Screenshot)) {
+                return false;
+            }
+
+            Screenshot screenshot = (Screenshot) object;
+            return Objects.equals(image, screenshot.image)
+                    && Objects.equals(formFactor, screenshot.formFactor);
+        }
+
+        @Override
         public int hashCode() {
             return Objects.hash(image, formFactor);
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Screenshot)) return false;
-            Screenshot screenshot = (Screenshot) o;
-            return Objects.equals(image, screenshot.image) && Objects.equals(formFactor, screenshot.formFactor);
-        }
     }
 
     /**
      * to be used {@link WebAppManifest#getShortcuts()}
+     * @version 4.5
      */
     protected static final class Shortcut {
 
@@ -735,23 +771,43 @@ public abstract class WebAppManifest {
             return new Shortcut(name, shortName, description, url, icons);
         }
 
-        public String getName() {return name;}
-        public String getShortName() {return shortName;}
-        public String getDescription() {return description;}
-        public String getUrl() {return url;}
-        public Collection<ImageResource> getIcons() {return icons;}
+        public String getName() {
+            return name;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public Collection<ImageResource> getIcons() {
+            return icons;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (!(object instanceof Shortcut)) {
+                return false;
+            }
+
+            Shortcut shortcut = (Shortcut) object;
+            return Objects.equals(url, shortcut.url);
+        }
 
         @Override
         public int hashCode() {
             return Objects.hash(url);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Shortcut)) return false;
-            Shortcut shortcut = (Shortcut) o;
-            return Objects.equals(url, shortcut.url);
         }
 
     }
