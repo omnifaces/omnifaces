@@ -14,7 +14,6 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
@@ -125,7 +124,6 @@ public final class Utils {
     private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
     private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = collectPrimitiveDefaults();
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = collectPrimitiveTypes();
-    private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
     private static final String ERROR_UNSUPPORTED_DATE = "Only java.util.Date, java.util.Calendar and java.time.Temporal are supported.";
     private static final String ERROR_UNSUPPORTED_TIMEZONE = "Only java.lang.String, java.util.TimeZone and java.time.ZoneId are supported.";
 
@@ -274,7 +272,7 @@ public final class Utils {
             Long.parseLong(string);
             return true;
         }
-        catch (NumberFormatException ignore) {
+        catch (Exception ignore) {
             logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
             return false;
         }
@@ -293,7 +291,7 @@ public final class Utils {
             Double.parseDouble(string);
             return true;
         }
-        catch (NumberFormatException ignore) {
+        catch (Exception ignore) {
             logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
             return false;
         }
@@ -633,8 +631,8 @@ public final class Utils {
         }
         else {
             List<E> list = new ArrayList<>();
-            for (E e : iterable) {
-                list.add(e);
+            for (E element : iterable) {
+                list.add(element);
             }
 
             return list;
@@ -764,7 +762,7 @@ public final class Utils {
             return Stream.empty();
         }
         if (object instanceof Collection) {
-            return ((Collection<T>)object).stream();
+            return ((Collection<T>) object).stream();
         }
         if (object instanceof Iterable) {
             return StreamSupport.stream(((Iterable<T>) object).spliterator(), false);
