@@ -276,24 +276,6 @@ public final class Components {
         return true;
     }
 
-    /**
-     * Disable the passed UI component.
-     * @param component The component to disable.
-     * @since 4.5
-     */
-    public static void disableInputComponent(UIComponent component) {
-        setAttribute(component, "disabled", true);
-    }
-
-    /**
-     * Disable the UI component matching the given client ID search expression.
-     * @param clientId The client ID search expression.
-     * @since 4.5
-     */
-    public static void disableInputComponent(String clientId) {
-        disableInputComponent(findComponent(clientId));
-    }
-
     // Traversal ------------------------------------------------------------------------------------------------------
 
     /**
@@ -1400,6 +1382,24 @@ public final class Components {
      */
     public static void resetInputs(UIComponent component) {
         forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
+    }
+
+    /**
+     * Disable the passed {@link UIInput} component.
+     * @param input The {@link UIInput} component to disable.
+     * @since 4.5
+     */
+    public static void disableInput(UIInput input) {
+        setAttribute(input, "disabled", true);
+    }
+
+    /**
+     * Disable the {@link UIInput} component matching the given client ID search expression.
+     * @param clientId The client ID search expression.
+     * @since 4.5
+     */
+    public static void disableInput(String clientId) {
+        disableInput(findComponent(clientId));
     }
 
     /**
