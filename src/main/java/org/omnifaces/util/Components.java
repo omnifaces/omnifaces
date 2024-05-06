@@ -250,14 +250,13 @@ public final class Components {
 
     /**
      * Set the attribute value on the specified component for the specified name.
-     * @param <T> The expected value type.
      * @param component The component on which to set the attribute.
      * @param name The name of the attribute.
      * @param value The value of the attribute.
      * @since 4.5
      */
-    public static <T> void setAttribute( UIComponent component , String name , T value ) {
-        component.getAttributes().put(name,value);
+    public static void setAttribute(UIComponent component, String name, Object value) {
+        component.getAttributes().put(name, value);
     }
 
     /**
@@ -282,8 +281,8 @@ public final class Components {
      * @param component The component to disable.
      * @since 4.5
      */
-    public static void disableInputComponent( UIComponent component ) {
-        setAttribute(component,"disabled",true);
+    public static void disableInputComponent(UIComponent component) {
+        setAttribute(component, "disabled", true);
     }
 
     /**
@@ -291,7 +290,7 @@ public final class Components {
      * @param clientId The client ID search expression.
      * @since 4.5
      */
-    public static void disableInputComponent( String clientId ) {
+    public static void disableInputComponent(String clientId) {
         disableInputComponent(findComponent(clientId));
     }
 
