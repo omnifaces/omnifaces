@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -49,8 +48,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     private final int maximumCapacity;
     private final SerializableBiConsumer<K, V> evictionListener;
     private final LinkedHashMap<K, V> entries;
-
-    private final transient Lock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
