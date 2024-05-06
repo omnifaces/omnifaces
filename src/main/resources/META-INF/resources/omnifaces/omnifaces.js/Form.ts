@@ -76,11 +76,11 @@ export module Form {
     }
 
     function containsNamedChild(executeIds: string[], key: string) {
-        var name = key.replace(/%3A/g, "\\:");
+        const name = key.replace(/%3A/g, "\\:");
 
         try {
-            for (let executeId of executeIds) {
-                var parent = document.getElementById(executeId);
+            for (const executeId of executeIds) {
+                const parent = document.getElementById(executeId);
 
                 if (parent && parent.querySelector("[name='" + name + "']")) {
                     return true;
