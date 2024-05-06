@@ -154,10 +154,8 @@ public final class Utils {
                 Byte.class, byte.class,
                 Short.class, short.class,
                 Character.class, char.class,
-                Integer.class,
-                int.class,
-                Long.class,
-                long.class,
+                Integer.class, int.class,
+                Long.class, long.class,
                 Float.class, float.class,
                 Double.class, double.class
         );
