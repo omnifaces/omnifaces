@@ -18,6 +18,8 @@ import java.util.Map;
 
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.context.ExceptionHandlerFactory;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.config.FacesConfigXmlProducer;
 
@@ -91,5 +93,14 @@ public interface FacesConfigXml {
      * @since 3.10
      */
     public List<Class<? extends ResourceHandler>> getResourceHandlers();
+
+    /**
+     * Returns an ordered list of all exception handler factories registered on this application. This will return an
+     * empty list if there are no exception handler factories definied in <code>faces-config.xml</code>.
+     * @return An ordered list of all exception handler factories registered on this application.
+     * @see FacesContext#getExceptionHandler()
+     * @since 4.5
+     */
+    public List<Class<? extends ExceptionHandlerFactory>> getExceptionHandlerFactories();
 
 }

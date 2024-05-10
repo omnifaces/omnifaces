@@ -33,6 +33,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.context.ExceptionHandlerFactory;
 import jakarta.servlet.ServletContext;
 
 import org.omnifaces.util.Servlets;
@@ -72,6 +73,8 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
         "application/locale-config/supported-locale";
     private static final String XPATH_RESOURCE_HANDLER =
         "application/resource-handler";
+    private static final String XPATH_EXCEPTION_HANDLER_FACTORY =
+        "factory/exception-handler-factory";
     private static final String XPATH_VAR =
         "var";
     private static final String XPATH_BASE_NAME =
@@ -84,6 +87,7 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
     private Map<String, String> resourceBundles;
     private List<Locale> supportedLocales;
     private List<Class<? extends ResourceHandler>> resourceHandlers;
+    private List<Class<? extends ExceptionHandlerFactory>> exceptionHandlerFactories;
 
     // Init -----------------------------------------------------------------------------------------------------------
 
@@ -98,6 +102,7 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
             resourceBundles = parseResourceBundles(facesConfigXml, xpath);
             supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
             resourceHandlers = parseResourceHandlers(facesConfigXml, xpath);
+            exceptionHandlerFactories = parseExceptionHandlerFactories(facesConfigXml, xpath);
         }
         catch (Exception e) {
             throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
@@ -119,6 +124,11 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
     @Override
     public List<Class<? extends ResourceHandler>> getResourceHandlers() {
         return resourceHandlers;
+    }
+
+    @Override
+    public List<Class<? extends ExceptionHandlerFactory>> getExceptionHandlerFactories() {
+        return exceptionHandlerFactories;
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
@@ -192,6 +202,22 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
         }
 
         return Collections.unmodifiableList(resourceHandlers);
+    }
+
+    /**
+     * Create and return a list of all exception handler factories in same order as in the given document.
+     * @throws XPathExpressionException
+     */
+    private static List<Class<? extends ExceptionHandlerFactory>> parseExceptionHandlerFactories(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+        List<Class<? extends ExceptionHandlerFactory>> exceptionHandlerFactories = new ArrayList<>();
+        NodeList exceptionHandlerFactoryNodes = getNodeList(facesConfigXml, xpath, XPATH_EXCEPTION_HANDLER_FACTORY);
+
+        for (int i = 0; i < exceptionHandlerFactoryNodes.getLength(); i++) {
+            Class<? extends ExceptionHandlerFactory> exceptionHandlerFactory = toClass(getTextContent(exceptionHandlerFactoryNodes.item(i)));
+            exceptionHandlerFactories.add(exceptionHandlerFactory);
+        }
+
+        return Collections.unmodifiableList(exceptionHandlerFactories);
     }
 
 }
