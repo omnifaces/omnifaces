@@ -46,9 +46,7 @@ export module Unload {
         }
 
         if (id == null) {
-            const form = Util.getFacesForm();
-
-            if (!form) {
+            if (!Util.getFacesForm()) {
                 return;
             }
 
@@ -60,6 +58,7 @@ export module Unload {
                 }
 
                 try {
+                    const form = Util.getFacesForm();
                     const url = form.action;
                     const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
                     const contentType = "application/x-www-form-urlencoded";
