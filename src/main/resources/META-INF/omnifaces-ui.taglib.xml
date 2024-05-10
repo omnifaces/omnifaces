@@ -6651,4 +6651,12 @@ String name2 = Faces.getRequestParameter("name2"); // value2
         </converter>
     </tag>
 
+    <tag>
+        <description><![CDATA[Validates whether checkbox is checked. See <a href="https://showcase.omnifaces.org/validators/RequiredCheckboxValidator">RequiredCheckboxValidator</a> showcase.]]></description>
+        <tag-name>requiredCheckboxValidator</tag-name>
+        <validator>
+            <validator-id>omnifaces.RequiredCheckboxValidator</validator-id>
+        </validator>
+    </tag>
+
 </facelet-taglib>
