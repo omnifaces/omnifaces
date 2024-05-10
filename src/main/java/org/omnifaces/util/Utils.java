@@ -14,7 +14,6 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
@@ -69,7 +68,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -99,7 +97,7 @@ import org.omnifaces.cdi.config.DateProducer.TemporalDate;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
  * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
  * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
@@ -126,7 +124,6 @@ public final class Utils {
     private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
     private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = collectPrimitiveDefaults();
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = collectPrimitiveTypes();
-    private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
     private static final String ERROR_UNSUPPORTED_DATE = "Only java.util.Date, java.util.Calendar and java.time.Temporal are supported.";
     private static final String ERROR_UNSUPPORTED_TIMEZONE = "Only java.lang.String, java.util.TimeZone and java.time.ZoneId are supported.";
 
@@ -139,29 +136,29 @@ public final class Utils {
     // Initialization -------------------------------------------------------------------------------------------------
 
     private static Map<Class<?>, Object> collectPrimitiveDefaults() {
-        Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
-        primitiveDefaults.put(boolean.class, false);
-        primitiveDefaults.put(byte.class, (byte) 0);
-        primitiveDefaults.put(short.class, (short) 0);
-        primitiveDefaults.put(char.class, (char) 0);
-        primitiveDefaults.put(int.class, 0);
-        primitiveDefaults.put(long.class, (long) 0);
-        primitiveDefaults.put(float.class, (float) 0);
-        primitiveDefaults.put(double.class, (double) 0);
-        return unmodifiableMap(primitiveDefaults);
+        return Map.of(
+                boolean.class, false,
+                byte.class, (byte) 0,
+                short.class, (short) 0,
+                char.class, (char) 0,
+                int.class, 0,
+                long.class, (long) 0,
+                float.class, (float) 0,
+                double.class, (double) 0
+        );
     }
 
     private static Map<Class<?>, Class<?>> collectPrimitiveTypes() {
-        Map<Class<?>, Class<?>> primitiveTypes = new HashMap<>();
-        primitiveTypes.put(Boolean.class, boolean.class);
-        primitiveTypes.put(Byte.class, byte.class);
-        primitiveTypes.put(Short.class, short.class);
-        primitiveTypes.put(Character.class, char.class);
-        primitiveTypes.put(Integer.class, int.class);
-        primitiveTypes.put(Long.class, long.class);
-        primitiveTypes.put(Float.class, float.class);
-        primitiveTypes.put(Double.class, double.class);
-        return unmodifiableMap(primitiveTypes);
+        return Map.of(
+                Boolean.class, boolean.class,
+                Byte.class, byte.class,
+                Short.class, short.class,
+                Character.class, char.class,
+                Integer.class, int.class,
+                Long.class, long.class,
+                Float.class, float.class,
+                Double.class, double.class
+        );
     }
 
     // Lang -----------------------------------------------------------------------------------------------------------
@@ -213,13 +210,13 @@ public final class Utils {
             return true;
         }
         else if (value instanceof String) {
-            return isEmpty((String) value);
+            return ((String) value).isEmpty();
         }
         else if (value instanceof Collection) {
-            return isEmpty((Collection<?>) value);
+            return ((Collection<?>) value).isEmpty();
         }
         else if (value instanceof Map) {
-            return isEmpty((Map<?, ?>) value);
+            return ((Map<?, ?>) value).isEmpty();
         }
         else if (value instanceof Part) {
             return isEmpty((Part) value);
@@ -257,7 +254,7 @@ public final class Utils {
      * @since 1.5
      */
     public static boolean isBlank(String string) {
-        return isEmpty(string) || string.trim().isEmpty();
+        return isEmpty(string) || string.isBlank();
     }
 
     /**
@@ -270,7 +267,8 @@ public final class Utils {
     public static boolean isNumber(String string) {
         try {
             // Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-            return Long.valueOf(string) != null;
+            Long.parseLong(string);
+            return true;
         }
         catch (Exception ignore) {
             logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
@@ -288,7 +286,8 @@ public final class Utils {
     public static boolean isDecimal(String string) {
         try {
             // Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-            return Double.valueOf(string) != null;
+            Double.parseDouble(string);
+            return true;
         }
         catch (Exception ignore) {
             logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
@@ -564,28 +563,13 @@ public final class Utils {
      * @since 2.4
      */
     public static boolean isSerializable(Object object) {
-        try (ObjectOutputStream output = new ObjectOutputStream(new NullOutputStream())) {
+        try (ObjectOutputStream output = new ObjectOutputStream(OutputStream.nullOutputStream())) {
             output.writeObject(object);
             return true;
         }
         catch (IOException ignore) {
             logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
             return false;
-        }
-    }
-
-    private static final class NullOutputStream extends OutputStream {
-        @Override
-        public void write(int b) throws IOException {
-            // NOOP.
-        }
-        @Override
-        public void write(byte[] b) throws IOException {
-            // NOOP.
-        }
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            // NOOP.
         }
     }
 
@@ -645,9 +629,8 @@ public final class Utils {
         }
         else {
             List<E> list = new ArrayList<>();
-            Iterator<E> iterator = iterable.iterator();
-            while (iterator.hasNext()) {
-                list.add(iterator.next());
+            for (E element : iterable) {
+                list.add(element);
             }
 
             return list;
@@ -776,8 +759,11 @@ public final class Utils {
         if (object == null) {
             return Stream.empty();
         }
+        if (object instanceof Collection) {
+            return ((Collection<T>) object).stream();
+        }
         if (object instanceof Iterable) {
-            return (Stream<T>) StreamSupport.stream(((Iterable<?>) object).spliterator(), false);
+            return StreamSupport.stream(((Iterable<T>) object).spliterator(), false);
         }
         else if (object instanceof Map) {
             return (Stream<T>) ((Map<?, ?>) object).entrySet().stream();
@@ -1219,12 +1205,7 @@ public final class Utils {
             return null;
         }
 
-        try {
-            return URLEncoder.encode(string, UTF_8.name());
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-        }
+        return URLEncoder.encode(string, UTF_8);
     }
 
     /**
@@ -1239,12 +1220,7 @@ public final class Utils {
             return null;
         }
 
-        try {
-            return URLDecoder.decode(string, UTF_8.name());
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-        }
+        return URLDecoder.decode(string, UTF_8);
     }
 
     /**

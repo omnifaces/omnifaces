@@ -198,12 +198,15 @@ public abstract class WebAppManifest {
     }
 
     /**
-     * Returns the default orientation mode of your web application. The default implementaiton returns {@link Orientation#ANY}.
+     * Returns the default orientation mode of your web application. The default implementation returns {@code null} to let the device handle the orientation
+     * based on the combination of device orientation and user auto-orientation setting.
      * @return The default orientation mode of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation</a>
+     * @since 4.5 The default implementation returns {@code null}. The previous default value was {@link Orientation#ANY}
+     *
      */
     public Orientation getOrientation() {
-        return Orientation.ANY;
+        return null;
     }
 
     /**
@@ -250,6 +253,16 @@ public abstract class WebAppManifest {
         return null;
     }
 
+    /**
+     * A collection of screenshots of your application with different sizes and formats that the browser will show in the installation wizard popup.
+     * These images are intended to be also used by progressive web app stores.
+     * @return A collection of screenshots of your application with different sizes and formats.
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots">https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots</a>
+     * @since 4.5
+     */
+    public Collection<Screenshot> getScreenshots() {
+        return emptySet();
+    }
 
     // Optional -------------------------------------------------------------------------------------------------------
 
@@ -334,6 +347,15 @@ public abstract class WebAppManifest {
         return false;
     }
 
+    /**
+     * A collection of shortcut action link that the mobile operating system will render as a context action menu for the application.
+     * @return A collection of shortcut action link that the mobile operating system will render as a context action menu for the application.
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts">https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts</a>
+     * @since 4.5
+     */
+    public Collection<Shortcut> getShortcuts() {
+        return emptySet();
+    }
 
     // Nested classes -------------------------------------------------------------------------------------------------
 
@@ -342,9 +364,9 @@ public abstract class WebAppManifest {
      */
     protected static final class ImageResource {
 
-        private String src;
-        private String sizes;
-        private String type;
+        private final String src;
+        private final String sizes;
+        private final String type;
 
         private ImageResource(String resourceIdentifier, Size... sizes) {
             requireNonNull(resourceIdentifier, "resourceIdentifier");
@@ -419,8 +441,8 @@ public abstract class WebAppManifest {
             // Property checks.
             ImageResource other = (ImageResource) object;
             return Objects.equals(src, other.src)
-                && Objects.equals(sizes, other.sizes)
-                && Objects.equals(type, other.type);
+                    && Objects.equals(sizes, other.sizes)
+                    && Objects.equals(type, other.type);
         }
 
         @Override
@@ -482,7 +504,7 @@ public abstract class WebAppManifest {
         /** 512x512 */
         public static final Size SIZE_512 = Size.of(512);
 
-        private String value;
+        private final String value;
 
         private Size(int width, int height) {
             value = width + "x" + height;
@@ -552,9 +574,9 @@ public abstract class WebAppManifest {
      */
     protected static final class RelatedApplication {
 
-        private Platform platform;
-        private String url;
-        private String id;
+        private final Platform platform;
+        private final String url;
+        private final String id;
 
         private RelatedApplication(Platform platform, String url, String id) {
             requireNonNull(platform, "platform");
@@ -625,14 +647,172 @@ public abstract class WebAppManifest {
             // Property checks.
             RelatedApplication other = (RelatedApplication) object;
             return Objects.equals(platform, other.platform)
-                && Objects.equals(url, other.url)
-                && Objects.equals(id, other.id);
+                    && Objects.equals(url, other.url)
+                    && Objects.equals(id, other.id);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(platform, url, id);
         }
+    }
+
+    /**
+     * A {@link Screenshot} form factor
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor">https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor</a>
+     * @version 4.5
+     */
+    protected enum ScreenshotFormFactor {
+        NARROW, WIDE;
+
+        private final String value;
+
+        private ScreenshotFormFactor() {
+            value = name().toLowerCase();
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+
+    }
+
+    /**
+     * To be used in {@link WebAppManifest#getScreenshots()}
+     * @version 4.5
+     */
+    protected static final class Screenshot {
+
+        private final ImageResource image;
+        private final ScreenshotFormFactor formFactor;
+
+        public String getSrc() {
+            return image.getSrc();
+        }
+
+        public String getSizes() {
+            return image.getSizes();
+        }
+
+        public String getType() {
+            return image.getType();
+        }
+
+        public ScreenshotFormFactor getFormFactor() {
+            return formFactor;
+        }
+
+        private Screenshot(String resourceIdentifier, ScreenshotFormFactor formFactor, Size... sizes) {
+            this.image = ImageResource.of(resourceIdentifier,sizes);
+            this.formFactor = formFactor;
+        }
+
+        /**
+         * Creates a screenshot image resource of given resource identifier and sizes.
+         * @param resourceIdentifier The Faces resource identifier. E.g. <code>library:path/name.png</code>
+         * @param formFactor The supported {@link ScreenshotFormFactor} (wide or narrow).
+         * @return Screenshot resource of given resource identifier and sizes.
+         * @throws NullPointerException     When resource identifier is null.
+         * @throws IllegalArgumentException When resource cannot be found.
+         */
+        public static Screenshot of(String resourceIdentifier, ScreenshotFormFactor formFactor, Size... sizes) {
+            return new Screenshot(resourceIdentifier, formFactor, sizes);
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (!(object instanceof Screenshot)) {
+                return false;
+            }
+
+            Screenshot screenshot = (Screenshot) object;
+            return Objects.equals(image, screenshot.image)
+                    && Objects.equals(formFactor, screenshot.formFactor);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(image, formFactor);
+        }
+
+    }
+
+    /**
+     * to be used {@link WebAppManifest#getShortcuts()}
+     * @version 4.5
+     */
+    protected static final class Shortcut {
+
+        private final String name;
+        private final String shortName;
+        private final String description;
+        private final String url;
+        private final Collection<ImageResource> icons;
+
+        private Shortcut(String name, String shortName, String description, String url, Collection<ImageResource> icons) {
+            this.name = name;
+            this.shortName = shortName;
+            this.description = description;
+            this.url = url;
+            this.icons = icons;
+        }
+
+        /**
+         * Creates a Shortcut action link with the given attributes.
+         * @param name the name of the shortcut action
+         * @param shortName a short name for the shortcut action
+         * @param description a description of the shortcut action
+         * @param icons a {@link Collection} of {@link ImageResource} to be used as icon for the context menu
+         * @return Shortcut image icon to be used in the context action menu.
+         */
+        public static Shortcut of( String name, String shortName, String description, String url, Collection<ImageResource> icons) {
+            return new Shortcut(name, shortName, description, url, icons);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public Collection<ImageResource> getIcons() {
+            return icons;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+
+            if (!(object instanceof Shortcut)) {
+                return false;
+            }
+
+            Shortcut shortcut = (Shortcut) object;
+            return Objects.equals(url, shortcut.url);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(url);
+        }
+
     }
 
 }

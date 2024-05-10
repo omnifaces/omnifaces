@@ -249,6 +249,17 @@ public final class Components {
     }
 
     /**
+     * Set the attribute value on the specified component for the specified name.
+     * @param component The component on which to set the attribute.
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * @since 4.5
+     */
+    public static void setAttribute(UIComponent component, String name, Object value) {
+        component.getAttributes().put(name, value);
+    }
+
+    /**
      * Returns whether the given UI component and all of its parents is rendered. This thus not only checks the
      * component's own <code>rendered</code> attribute, but also of all of its parents.
      * @param component The component to be checked.
@@ -1371,6 +1382,24 @@ public final class Components {
      */
     public static void resetInputs(UIComponent component) {
         forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
+    }
+
+    /**
+     * Disable the passed {@link UIInput} component.
+     * @param input The {@link UIInput} component to disable.
+     * @since 4.5
+     */
+    public static void disableInput(UIInput input) {
+        setAttribute(input, "disabled", true);
+    }
+
+    /**
+     * Disable the {@link UIInput} component matching the given client ID search expression.
+     * @param clientId The client ID search expression.
+     * @since 4.5
+     */
+    public static void disableInput(String clientId) {
+        disableInput(findComponent(clientId));
     }
 
     /**
