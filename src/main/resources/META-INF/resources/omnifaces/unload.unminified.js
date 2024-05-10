@@ -42,9 +42,7 @@ OmniFaces.Unload = (function(Util, navigator, window) {
 		}
 
 		if (id == null) {
-			var form = Util.getFacesForm();
-
-			if (!form) {
+			if (!Util.getFacesForm()) {
 				return;
 			}
 
@@ -56,6 +54,7 @@ OmniFaces.Unload = (function(Util, navigator, window) {
 				}
 
 				try {
+					var form = Util.getFacesForm();
 					var url = form.action;
 					var query = OmniFaces.EVENT + "=unload&id=" + id + "&" + OmniFaces.VIEW_STATE_PARAM + "=" + encodeURIComponent(form[OmniFaces.VIEW_STATE_PARAM].value);
 					var contentType = "application/x-www-form-urlencoded";
