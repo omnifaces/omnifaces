@@ -12,12 +12,14 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static jakarta.servlet.DispatcherType.REQUEST;
 import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
 import static jakarta.servlet.RequestDispatcher.ERROR_MESSAGE;
 import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static java.lang.String.format;
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
@@ -32,9 +34,11 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -54,17 +58,21 @@ import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.omnifaces.ApplicationListener;
+import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.context.OmniPartialViewContextFactory;
 import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Hacks;
+import org.omnifaces.util.Reflection;
 
 /**
  * <p>
@@ -147,6 +155,11 @@ import org.omnifaces.util.Hacks;
  * will extract the root cause from a wrapped {@link FacesException} and {@link ELException} before delegating the
  * {@link ServletException} further to the container (the container will namely use the first root cause of
  * {@link ServletException} to match an error page by exception in web.xml).
+ * <p>
+ * Before OmniFaces 4.5, you needed to explicitly register the {@link FacesExceptionFilter} in {@code web.xml}. Since
+ * OmniFaces 4.5, the {@link FullAjaxExceptionHandler} will automatically register the {@link FacesExceptionFilter} on
+ * its default URL pattern of {@code /*} when it is absent in {@code web.xml}. In case you wish to map it on a different
+ * URL pattern for some reason, then you'll still need to explicitly register it in {@code web.xml}.
  *
  * <h2>Configuration</h2>
  * <p>
@@ -273,6 +286,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
         unmodifiableSet(FacesException.class, ELException.class);
 
+    private static final String FACES_EXCEPTION_FILTER_AUTO_INSTALLED =
+        "FullAjaxExceptionHandler: the FacesExceptionFilter has been automatically installed at URL pattern of /*";
     private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS =
         "Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
     private static final String ERROR_DEFAULT_LOCATION_MISSING =
@@ -303,6 +318,35 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
     private Class<? extends Throwable>[] exceptionTypesToUnwrap;
     private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
+
+    // Initialization -------------------------------------------------------------------------------------------------
+
+    /**
+     * This will register the {@link FacesExceptionFilter} when {@link FullAjaxExceptionHandler} is explicitly registered.
+     * This is invoked by {@link ApplicationListener}.
+     * @param servletContext The involved servlet context.
+     * @since 4.5
+     */
+    public static void registerFacesExceptionFilterIfNecessary(ServletContext servletContext) {
+        if (FacesConfigXml.instance().getExceptionHandlerFactories().stream()
+                .noneMatch(FullAjaxExceptionHandlerFactory.class::equals))
+        {
+            return; // FullAjaxExceptionHandler is not registered.
+        }
+
+        if (servletContext.getFilterRegistrations().values().stream()
+                .map(FilterRegistration::getClassName)
+                .map(Reflection::toClassOrNull).filter(Objects::nonNull)
+                .anyMatch(FacesExceptionFilter.class::equals))
+        {
+            return; // FacesExceptionFilter is already explicitly registered.
+        }
+
+        servletContext
+            .addFilter(FacesExceptionFilter.class.getName(), FacesExceptionFilter.class)
+            .addMappingForUrlPatterns(EnumSet.of(REQUEST), false, "/*");
+        logger.log(INFO, FACES_EXCEPTION_FILTER_AUTO_INSTALLED);
+    }
 
     // Constructors ---------------------------------------------------------------------------------------------------
 

@@ -32,7 +32,9 @@ import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
+import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.cache.CacheInitializer;
@@ -47,6 +49,7 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Load {@link Cache} provider and register its filter if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Add {@link ViewResourceHandler} mapping to FacesServlet if necessary.
+ * <li>Register {@link FacesExceptionFilter} via {@link FullAjaxExceptionHandler} if necessary.
  * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
@@ -89,6 +92,7 @@ public class ApplicationListener extends DefaultServletContextListener {
             CacheInitializer.loadProviderAndRegisterFilter(servletContext);
             FacesViews.addFacesServletMappings(servletContext);
             ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
+            FullAjaxExceptionHandler.registerFacesExceptionFilterIfNecessary(servletContext);
 
             if (skipDeploymentException) {
                 checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
