@@ -66,6 +66,14 @@ import jakarta.faces.convert.FacesConverter;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:genericEnumConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ *     &lt;o:genericEnumConverter /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
  *
  * <p><strong>See also</strong>:
  * <br><a href="https://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>

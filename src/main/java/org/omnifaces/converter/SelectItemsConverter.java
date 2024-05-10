@@ -37,6 +37,14 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:selectItemsConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:selectOneMenu value="#{bean.selectedItem}"&gt;
+ *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
+ *     &lt;o:selectItemsConverter /&gt;
+ * &lt;/h:selectOneMenu&gt;
+ * </pre>
  *
  * <h2>Make sure that your entity has a good <code>toString()</code> implementation</h2>
  * <p>

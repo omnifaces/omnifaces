@@ -43,6 +43,13 @@ import jakarta.faces.model.SelectItem;
  *     &lt;o:converter converterId="omnifaces.ListConverter" list="#{bean.dualListModel.source}" /&gt;
  * &lt;/p:pickList&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:listConverter&gt;</code> tag.
+ * <pre>
+ * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
+ *     &lt;o:listConverter" list="#{bean.dualListModel.source}" /&gt;
+ * &lt;/p:pickList&gt;
+ * </pre>
  *
  * <h2>Make sure that your entity has a good <code>toString()</code> implementation</h2>
  * <p>

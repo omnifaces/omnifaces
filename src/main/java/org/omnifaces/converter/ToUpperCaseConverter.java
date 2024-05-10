@@ -35,6 +35,13 @@ import jakarta.faces.convert.FacesConverter;
  * <pre>
  * &lt;h:inputText value="#{bean.zipCode}" converter="omnifaces.ToUpperCaseConverter" /&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:toUpperCaseConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:inputText value="#{bean.zipCode}"&gt;
+ *     &lt;o:toUpperCaseConverter /&gt;
+ * &lt;/h:inputText&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @see TrimConverter

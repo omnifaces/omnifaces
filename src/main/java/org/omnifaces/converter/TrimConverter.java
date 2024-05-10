@@ -35,6 +35,13 @@ import jakarta.faces.convert.FacesConverter;
  * &lt;h:inputText value="#{bean.username}" converter="omnifaces.TrimConverter" /&gt;
  * </pre>
  * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:trimConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:inputText value="#{bean.username}"&gt;
+ *     &lt;o:trimConverter /&gt;
+ * &lt;/h:inputText&gt;
+ * </pre>
+ * <p>
  * You can also configure it application wide via below entry in <code>faces-config.xml</code> without the need to
  * specify it in every single input component:
  * <pre>

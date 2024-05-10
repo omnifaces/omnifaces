@@ -47,6 +47,14 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:selectItemsIndexConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:selectOneMenu value="#{bean.selectedItem}"&gt;
+ *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
+ *     &lt;o:selectItemsIndexConverter /&gt;
+ * &lt;/h:selectOneMenu&gt;
+ * </pre>
  *
  * <h2>Pros and cons as compared to {@link SelectItemsConverter}</h2>
  * <p>

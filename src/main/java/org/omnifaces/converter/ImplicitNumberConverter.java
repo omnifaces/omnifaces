@@ -42,6 +42,16 @@ import jakarta.faces.convert.NumberConverter;
  *     &lt;/h:inputText&gt;
  * &lt;/span&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:implicitNumberConverter&gt;</code> tag.
+ * <pre>
+ * &lt;span class="currency"&gt;
+ *     &lt;span class="symbol"&gt;$&lt;/span&gt;
+ *     &lt;h:inputText value="#{bean.price}"&gt;
+ *         &lt;o:implicitNumberConverter type="currency" currencySymbol="$" /&gt;
+ *     &lt;/h:inputText&gt;
+ * &lt;/span&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 3.0

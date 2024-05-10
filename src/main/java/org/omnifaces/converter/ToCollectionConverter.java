@@ -49,20 +49,26 @@ import org.omnifaces.util.Faces;
  * &lt;h:inputText value="#{bean.commaSeparatedValues}" converter="omnifaces.ToCollectionConverter" /&gt;
  * </pre>
  * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:toCollectionConverter&gt;</code> tag.
+ * <pre>
+ * &lt;h:inputText value="#{bean.commaSeparatedValues}"&gt;
+ *     &lt;o:toCollectionConverter /&gt;
+ * &lt;/h:inputText&gt;
+ * </pre>
+ *
+ * <p>
  * The default delimiter is comma followed by space <code>, </code> and the default collection type is
  * <code>java.util.LinkedHashSet</code> for a <code>Set</code> property and <code>java.util.ArrayList</code> for anything
  * else, and the default converter for each item will in <code>getAsString()</code> be determined based on item type and
  * in <code>getAsObject()</code> be determined based on generic return type of the getter method.
  * <p>
- * You can use <code>&lt;o:converter&gt;</code> to specify those attributes. The <code>delimiter</code> must be a
- * <code>String</code>, the <code>collectionType</code> must be a FQN and the <code>itemConverter</code> can be
- * anything which is acceptable by {@link Faces#createConverter(Object)}.
+ * The <code>delimiter</code> must be a <code>String</code>, the <code>collectionType</code> must be a FQN and the
+ * <code>itemConverter</code> can be anything which is acceptable by {@link Faces#createConverter(Object)}.
  * <pre>
  * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedNumbers}"&gt;
- *     &lt;o:converter converterId="omnifaces.ToCollectionConverter"
- *                  delimiter=";"
- *                  collectionType="java.util.TreeSet"
- *                  itemConverter="jakarta.faces.Integer" &gt;
+ *     &lt;o:toCollectionConverter delimiter=";"
+ *                                 collectionType="java.util.TreeSet"
+ *                                 itemConverter="jakarta.faces.Integer" /&gt;
  * &lt;/h:inputText&gt;
  * </pre>
  *

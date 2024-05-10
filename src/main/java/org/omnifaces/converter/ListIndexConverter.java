@@ -40,6 +40,13 @@ import jakarta.faces.model.SelectItem;
  *     &lt;o:converter converterId="omnifaces.ListIndexConverter" list="#{bean.dualListModel.source}" /&gt;
  * &lt;/p:pickList&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:listIndexConverter&gt;</code> tag.
+ * <pre>
+ * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
+ *     &lt;o:listIndexConverter" list="#{bean.dualListModel.source}" /&gt;
+ * &lt;/p:pickList&gt;
+ * </pre>
  *
  * <h2>Pros and cons as compared to {@link ListConverter}</h2>
  * <p>

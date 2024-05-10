@@ -6516,4 +6516,139 @@ String name2 = Faces.getRequestParameter("name2"); // value2
             <type>java.lang.Object</type>
         </attribute>
     </tag>
+
+    <tag>
+        <description><![CDATA[Automatically detects enum type in generic collections. See <a href="https://showcase.omnifaces.org/converters/GenericEnumConverter">GenericEnumConverter</a> showcase.]]></description>
+        <tag-name>genericEnumConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.GenericEnumConverter</converter-id>
+        </converter>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Extends <code>NumberConverter</code> to automatically drop/imply currency and percent symbol. See <a href="https://showcase.omnifaces.org/converters/ImplicitNumberConverter">ImplicitNumberConverter</a> showcase.]]></description>
+        <tag-name>implicitNumberConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ImplicitNumberConverter</converter-id>
+        </converter>
+        <attribute>
+            <description>Sets the number type to be used. Valid values are "currency" and "percent".</description>
+            <name>type</name>
+            <required>true</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Sets the ISO 4217 currency code when type="currency" is used. For example "USD".</description>
+            <name>currencyCode</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Sets the currency symbol when type="currency" is used without any currencyCode. For example "$".</description>
+            <name>currencySymbol</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Sets the locale to be used. When unspecified this defaults to view root locale.</description>
+            <name>locale</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically converts based on <code>toString()</code> of given list items. See <a href="https://showcase.omnifaces.org/converters/ListConverter">ListConverter</a> showcase.]]></description>
+        <tag-name>listConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ListConverter</converter-id>
+        </converter>
+        <attribute>
+            <description>Sets the list of available items.</description>
+            <name>list</name>
+            <required>true</required>
+            <type>java.util.List</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically converts based on index of given list items. See <a href="https://showcase.omnifaces.org/converters/ListIndexConverter">ListIndexConverter</a> showcase.]]></description>
+        <tag-name>listIndexConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ListIndexConverter</converter-id>
+        </converter>
+        <attribute>
+            <description>Sets the list of available items.</description>
+            <name>list</name>
+            <required>true</required>
+            <type>java.util.List</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically converts based on <code>toString()</code> of <code>UISelectItem(s)</code> entries. See <a href="https://showcase.omnifaces.org/converters/SelectItemsConverter">SelectItemsConverter</a> showcase.]]></description>
+        <tag-name>selectItemsConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.SelectItemsConverter</converter-id>
+        </converter>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically converts based on index of <code>UISelectItem(s)</code> entries.See <a href="https://showcase.omnifaces.org/converters/SelectItemsIndexConverter">SelectItemsIndexConverter</a> showcase.]]></description>
+        <tag-name>selectItemsIndexConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.SelectItemsIndexConverter</converter-id>
+        </converter>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically converts between <code>String</code> and <code>Collection</code> based on delimiter. See <a href="https://showcase.omnifaces.org/converters/ToCollectionConverter">ToCollectionConverter</a> showcase.]]></description>
+        <tag-name>toCollectionConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ToCollectionConverter</converter-id>
+        </converter>
+        <attribute>
+            <description>Sets the delimiter to split on.</description>
+            <name>delimiter</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Sets the FQN of the collection to create.</description>
+            <name>collectionType</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Sets the converter for the item.</description>
+            <name>itemConverter</name>
+            <required>false</required>
+            <type>java.lang.Object</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically lower cases entire <code>String</code>. See <a href="https://showcase.omnifaces.org/converters/ToLowerCaseConverter">ToLowerCaseConverter</a> showcase.]]></description>
+        <tag-name>toLowerCaseConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ToLowerCaseConverter</converter-id>
+        </converter>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically upper cases entire <code>String</code>. See <a href="https://showcase.omnifaces.org/converters/ToUpperCaseConverter">ToUpperCaseConverter</a> showcase.]]></description>
+        <tag-name>toUpperCaseConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.ToUpperCaseConverter</converter-id>
+        </converter>
+    </tag>
+
+    <tag>
+        <description><![CDATA[Automatically trims entire <code>String</code>. See <a href="https://showcase.omnifaces.org/converters/TrimConverter">TrimConverter</a> showcase.]]></description>
+        <tag-name>trimConverter</tag-name>
+        <converter>
+            <converter-id>omnifaces.TrimConverter</converter-id>
+        </converter>
+    </tag>
+
 </facelet-taglib>
