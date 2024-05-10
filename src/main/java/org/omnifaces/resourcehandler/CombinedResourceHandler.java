@@ -14,6 +14,7 @@ package org.omnifaces.resourcehandler;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static org.omnifaces.util.Components.isRendered;
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
@@ -581,7 +582,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			if ((componentResource != null && !componentResource.isRendered()) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
+			if ((componentResource != null && !isRendered(componentResource)) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
