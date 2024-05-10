@@ -52,6 +52,13 @@ import jakarta.faces.validator.ValidatorException;
  * &lt;/h:selectBooleanCheckbox&gt;
  * </pre>
  * <p>
+ * Since OmniFaces 4.5 it's also available by <code>&lt;o:requiredCheckboxValidator&gt;</code> tag.
+ * <pre>
+ * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
+ *     &lt;o:requiredCheckboxValidator" /&gt;
+ * &lt;/h:selectBooleanCheckbox&gt;
+ * </pre>
+ * <p>
  * The validator will use the message as specified in <code>requiredMessage</code>. If it's absent, then it will use
  * the default required message as specified in custom <code>&lt;message-bundle&gt;</code> in
  * <code>faces-config.xml</code>. If it's absent, then it will default to
