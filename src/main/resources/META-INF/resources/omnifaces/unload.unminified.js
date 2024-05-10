@@ -48,9 +48,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 		}
 
 		if (id == null) {
-			var form = getFacesForm();
-
-			if (!form) {
+			if (!getFacesForm()) {
 				if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
 					console.error(ERROR_MISSING_FORM);
 				}
@@ -66,6 +64,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 				}
 
 				try {
+					var form = getFacesForm();
 					var url = form.action;
 					var query = "omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
 					var contentType = "application/x-www-form-urlencoded";
