@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *	 https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -13,11 +13,19 @@
 package org.omnifaces.converter;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static org.omnifaces.el.ExpressionInspector.getMethodReference;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
+import static org.omnifaces.util.Components.getAttribute;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Utils.isOneOf;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
 import javax.faces.context.FacesContext;
@@ -25,6 +33,8 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
+
+import org.omnifaces.util.Utils;
 
 /**
  * <p>
@@ -41,14 +51,14 @@ import javax.faces.convert.FacesConverter;
  * <pre>
  * &#64;FacesConverter("roleConverter")
  * public class RoleConverter extends EnumConverter {
- *     public RoleConverter() {
- *         super(Role.class);
- *     }
+ *	 public RoleConverter() {
+ *		 super(Role.class);
+ *	 }
  * }
  * </pre>
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedRoles}" converter="roleConverter"&gt;
- *     &lt;f:selectItems value="#{bean.availableRoles}" /&gt;
+ *	 &lt;f:selectItems value="#{bean.availableRoles}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  * <p>
@@ -63,7 +73,7 @@ import javax.faces.convert.FacesConverter;
  * example:
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}" converter="omnifaces.GenericEnumConverter"&gt;
- *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ *	 &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  *
@@ -76,7 +86,7 @@ import javax.faces.convert.FacesConverter;
  * <a href="https://github.com/javaee/javaserverfaces-spec/issues/1422">issue 1422</a>.
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
- *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ *	 &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  * <p>
@@ -85,7 +95,7 @@ import javax.faces.convert.FacesConverter;
  * may be still useful.
  * <pre>
  * &lt;h:selectManyCheckbox converter="omnifaces.GenericEnumConverter"&gt;
- *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ *	 &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  *
@@ -101,6 +111,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 
 	private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
 	private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
+	private static final String ERROR_NO_ENUM_TYPE = "Cannot determine enum type, use standard EnumConverter instead.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -111,6 +122,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 		}
 
 		Class<Enum> enumType = modelValue.getDeclaringClass();
+		component.getAttributes().put(ATTRIBUTE_ENUM_TYPE, enumType);
 		setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
 		return modelValue.name();
 	}
@@ -121,7 +133,22 @@ public class GenericEnumConverter implements Converter<Enum> {
 			return null;
 		}
 
-		Class<Enum> enumType = getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+		Class<Enum> enumType = Utils.coalesce(
+		    getAttribute(component, ATTRIBUTE_ENUM_TYPE),
+		    getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)))
+		);
+
+		if (enumType == null) {
+			try {
+				ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
+				Method getter = getMethodReference(context.getELContext(), valueExpression).getMethod();
+				enumType = (Class<Enum>) ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments()[0];
+				component.getAttributes().put(ATTRIBUTE_ENUM_TYPE, requireNonNull(enumType));
+			}
+			catch (Exception e) {
+				throw new ConverterException(createError(ERROR_NO_ENUM_TYPE), e);
+			}
+		}
 
 		try {
 			return Enum.valueOf(enumType, submittedValue);
