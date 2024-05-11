@@ -19,7 +19,6 @@ import static org.omnifaces.util.Components.getAttribute;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isOneOf;
 
 import java.lang.reflect.Method;
@@ -87,8 +86,9 @@ public class GenericEnumConverter implements Converter {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
-	private static final String ERROR_NO_ENUM_TYPE = "Given type ''{0}'' is not an enum.";
+	private static final String ERROR_NO_ENUM_INSTANCE = "Given type ''{0}'' is not an enum.";
 	private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
+    private static final String ERROR_NO_ENUM_TYPE = "Cannot determine enum type, use standard EnumConverter instead.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ public class GenericEnumConverter implements Converter {
 			return ((Enum) modelValue).name();
 		}
 		else {
-			throw new ConverterException(createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
+			throw new ConverterException(createError(ERROR_NO_ENUM_INSTANCE, modelValue.getClass()));
 		}
 	}
 
@@ -117,10 +117,11 @@ public class GenericEnumConverter implements Converter {
 			return null;
 		}
 
-		Class<Enum> enumType = coalesce(
-			getAttribute(component, ATTRIBUTE_ENUM_TYPE),
-			getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)))
-		);
+		Class<Enum> enumType = getAttribute(component, ATTRIBUTE_ENUM_TYPE);
+
+		if (enumType == null) {
+			getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+		}
 
 		if (enumType == null) {
 			try {
