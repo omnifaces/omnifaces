@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
 
@@ -39,23 +36,6 @@ public final class Callback {
     // Interfaces -----------------------------------------------------------------------------------------------------
 
     /**
-     * Use this if you need a void callback.
-     *
-     * @author Bauke Scholtz
-     * @deprecated Since 4.0. Use {@link Runnable} instead.
-     */
-    @Deprecated(since = "4.0", forRemoval = true)
-    @FunctionalInterface
-    public interface Void {
-
-        /**
-         * This method should be invoked by the method where you're passing this callback instance to.
-         */
-        void invoke();
-
-    }
-
-    /**
      * Use this if you need a serializable void callback.
      *
      * @author Bauke Scholtz
@@ -68,25 +48,6 @@ public final class Callback {
          * This method should be invoked by the method where you're passing this callback instance to.
          */
         void invoke();
-
-    }
-
-    /**
-     * Use this if you need a callback which returns a value.
-     *
-     * @author Bauke Scholtz
-     * @param <R> The return type.
-     * @deprecated Since 4.0. Use {@link Supplier} instead.
-     */
-    @Deprecated(since = "4.0", forRemoval = true)
-    @FunctionalInterface
-    public interface Returning<R> {
-
-        /**
-         * This method should be invoked by the method where you're passing this callback instance to.
-         * @return The callback result.
-         */
-        R invoke();
 
     }
 
@@ -109,25 +70,6 @@ public final class Callback {
     }
 
     /**
-     * Use this if you need a callback which takes an argument.
-     *
-     * @author Bauke Scholtz
-     * @param <A> The argument type.
-     * @deprecated Since 4.0. Use {@link Consumer} instead.
-     */
-    @Deprecated(since = "4.0", forRemoval = true)
-    @FunctionalInterface
-    public interface WithArgument<A> {
-
-        /**
-         * This method should be invoked by the method where you're passing this callback instance to.
-         * @param a The callback argument to work with.
-         */
-        void invoke(A a);
-
-    }
-
-    /**
      * Use this if you need a serializable callback which takes an argument.
      *
      * @author Bauke Scholtz
@@ -142,27 +84,6 @@ public final class Callback {
          * @param a The callback argument to work with.
          */
         void invoke(A a);
-
-    }
-
-    /**
-     * Use this if you need a callback which takes an argument and returns a value.
-     *
-     * @author Bauke Scholtz
-     * @param <R> The return type.
-     * @param <A> The argument type.
-     * @deprecated Since 4.0. Use {@link Function} instead.
-     */
-    @Deprecated(since = "4.0", forRemoval = true)
-    @FunctionalInterface
-    public interface ReturningWithArgument<R, A> {
-
-        /**
-         * This method should be invoked by the method where you're passing this callback instance to.
-         * @param a The callback argument to work with.
-         * @return The callback result.
-         */
-        R invoke(A a);
 
     }
 

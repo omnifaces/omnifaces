@@ -12,12 +12,10 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -114,7 +112,6 @@ public final class Hacks {
 
     private static Boolean mojarraUsed;
     private static Boolean myFacesUsed;
-    private static Boolean facesScriptResourceAvailable;
     private static Long defaultResourceMaxAge;
 
     // Constructors/init ----------------------------------------------------------------------------------------------
@@ -252,25 +249,6 @@ public final class Hacks {
      */
     public static void clearCachedFacesServletMapping(FacesContext context) {
         context.getAttributes().remove(isMyFacesUsed() ? MYFACES_CACHED_SERVLET_MAPPING_KEY : MOJARRA_CACHED_SERVLET_MAPPING_KEY);
-    }
-
-    /**
-     * Returns {@code true} if <code>jakarta.faces:faces.js</code> script resource is available.
-     * @return {@code true} if <code>jakarta.faces:faces.js</code> script resource is available.
-     * @since 4.0
-     */
-    public static boolean isFacesScriptResourceAvailable() {
-        if (facesScriptResourceAvailable == null) {
-            FacesContext context = FacesContext.getCurrentInstance();
-
-            if (context == null) {
-                return false;
-            }
-
-            facesScriptResourceAvailable = context.getApplication().getResourceHandler().createResource(FACES_SCRIPT_RESOURCE_NAME, JSF_SCRIPT_LIBRARY_NAME) != null;
-        }
-
-        return facesScriptResourceAvailable;
     }
 
     //  Faces state saving related ------------------------------------------------------------------------------------

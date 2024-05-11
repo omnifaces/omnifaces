@@ -34,6 +34,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.omnifaces.cdi.Push;
+import org.omnifaces.cdi.PushContext;
+import org.omnifaces.cdi.push.SocketEvent.Closed;
+import org.omnifaces.cdi.push.SocketEvent.Opened;
+import org.omnifaces.cdi.push.SocketEvent.Switched;
+import org.omnifaces.component.script.ScriptFamily;
+import org.omnifaces.util.Beans;
+import org.omnifaces.util.Callback;
+import org.omnifaces.util.Json;
+import org.omnifaces.util.State;
+
 import jakarta.el.ValueExpression;
 import jakarta.enterprise.event.Observes;
 import jakarta.faces.FacesException;
@@ -50,17 +61,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.server.ServerContainer;
 import jakarta.websocket.server.ServerEndpointConfig;
-
-import org.omnifaces.cdi.Push;
-import org.omnifaces.cdi.PushContext;
-import org.omnifaces.cdi.push.SocketEvent.Closed;
-import org.omnifaces.cdi.push.SocketEvent.Opened;
-import org.omnifaces.cdi.push.SocketEvent.Switched;
-import org.omnifaces.component.script.ScriptFamily;
-import org.omnifaces.util.Beans;
-import org.omnifaces.util.Callback;
-import org.omnifaces.util.Json;
-import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -529,14 +529,13 @@ import org.omnifaces.util.State;
  * }
  * </pre>
  * <p>
- * Then use {@link jakarta.enterprise.inject.spi.BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to
- * fire the CDI event.
+ * Then use {@link jakarta.enterprise.inject.spi.BeanManager#getEvent()} to fire the CDI event.
  * <pre>
  * &#64;Inject
  * private BeanManager beanManager;
  *
  * public void onSomeEntityChange(Entity entity) {
- *     beanManager.fireEvent(new PushEvent(entity.getSomeProperty()));
+ *     beanManager.getEvent().select().fire(new PushEvent(entity.getSomeProperty()));
  * }
  * </pre>
  * <p>

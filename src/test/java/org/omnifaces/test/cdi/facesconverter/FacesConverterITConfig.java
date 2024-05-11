@@ -13,8 +13,7 @@
 package org.omnifaces.test.cdi.facesconverter;
 
 import jakarta.faces.annotation.FacesConfig;
-import jakarta.faces.annotation.FacesConfig.Version;
 
-@FacesConfig(version = Version.JSF_2_3) // Else JSF 2.3-native @FacesConverter(managed=true) won't work in Mojarra.
+@FacesConfig // Else @FacesConverter(managed=true) won't work in Mojarra.
 public class FacesConverterITConfig {
 }

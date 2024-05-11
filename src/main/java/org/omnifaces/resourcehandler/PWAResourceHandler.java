@@ -28,7 +28,6 @@ import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,6 +38,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.omnifaces.util.Beans;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.FacesLocal;
+import org.omnifaces.util.Json;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
@@ -56,11 +60,6 @@ import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.ViewScoped;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.omnifaces.util.Beans;
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.FacesLocal;
-import org.omnifaces.util.Json;
 
 /**
  * <p>
@@ -442,7 +441,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     		}
         }
 
-        cacheableResources.add(getResourceUrl(context, JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME));
+        cacheableResources.add(getResourceUrl(context, FACES_SCRIPT_LIBRARY_NAME, FACES_SCRIPT_RESOURCE_NAME));
         cacheableResources.add(getResourceUrl(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME));
         return cacheableResources;
     }

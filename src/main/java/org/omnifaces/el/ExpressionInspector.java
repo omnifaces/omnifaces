@@ -245,9 +245,10 @@ public final class ExpressionInspector {
             return inspectorElResolver;
         }
 
-        @Override
-        public Object convertToType(Object value, Class<?> type) {
-            return value;
+		@Override
+		@SuppressWarnings("unchecked")
+        public <T> T convertToType(Object value, Class<T> targetType) {
+        	return (T) value;
         }
 
         public InspectorPass getPass() {

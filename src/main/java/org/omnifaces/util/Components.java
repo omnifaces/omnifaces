@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_LIBRARY_NAME;
+import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static jakarta.faces.component.UIComponent.getCompositeComponentParent;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
@@ -33,7 +33,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
-import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
@@ -52,7 +51,6 @@ import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
-import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
@@ -79,12 +77,18 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.SimpleParam;
+import org.omnifaces.component.input.Form;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.el.ScopedRunner;
+
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ViewHandler;
-import jakarta.faces.component.ActionSource2;
+import jakarta.faces.component.ActionSource;
 import jakarta.faces.component.EditableValueHolder;
 import jakarta.faces.component.NamingContainer;
 import jakarta.faces.component.UICommand;
@@ -122,12 +126,6 @@ import jakarta.faces.event.MethodExpressionActionListener;
 import jakarta.faces.render.RenderKit;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.facelets.FaceletContext;
-
-import org.omnifaces.component.ParamHolder;
-import org.omnifaces.component.SimpleParam;
-import org.omnifaces.component.input.Form;
-import org.omnifaces.config.OmniFaces;
-import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>
@@ -822,7 +820,7 @@ public final class Components {
      * @since 4.0
      */
     public static void addFacesScriptResource() {
-        addScriptResource(JSF_SCRIPT_LIBRARY_NAME, isFacesScriptResourceAvailable() ? FACES_SCRIPT_RESOURCE_NAME : JSF_SCRIPT_RESOURCE_NAME);
+        addScriptResource(FACES_SCRIPT_LIBRARY_NAME, FACES_SCRIPT_RESOURCE_NAME);
     }
 
     private static UIOutput createScriptResource() {
@@ -1708,8 +1706,8 @@ public final class Components {
     public static List<String> getActionExpressionsAndListeners(UIComponent component) {
         List<String> actions = new ArrayList<>();
 
-        if (component instanceof ActionSource2) {
-            ActionSource2 source = (ActionSource2) component;
+        if (component instanceof ActionSource) {
+            ActionSource source = (ActionSource) component;
             addExpressionStringIfNotNull(source.getActionExpression(), actions);
 
             for (ActionListener listener : source.getActionListeners()) {

@@ -8,11 +8,11 @@
 
     <groupId>org.omnifaces</groupId>
     <artifactId>omnifaces</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OmniFaces</name>
-    <description>Jakarta Faces 3.0+ utility library</description>
+    <description>Jakarta Faces 4.0+ utility library</description>
     <url>https://omnifaces.org</url>
     <organization>
         <name>OmniFaces</name>
@@ -57,8 +57,8 @@
     <properties>
 
         <!-- Java versions. -->
-        <javase.version>11</javase.version>
-        <jakartaee.version>9</jakartaee.version>
+        <javase.version>17</javase.version>
+        <jakartaee.version>11</jakartaee.version>
 
         <!-- Essential Maven defaults. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -68,26 +68,19 @@
         <maven.source.excludeResources>true</maven.source.excludeResources>
 
         <!-- Test server versions. -->
-        <test.wildfly-mojarra4.version>30.0.0.Final</test.wildfly-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
-        <test.liberty-myfaces3.version>23.0.0.11</test.liberty-myfaces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
-        <test.glassfish-mojarra4.version>7.0.10</test.glassfish-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>10.1.16</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
-        <test.piranha.version>23.11.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server -->
-        <test.tomee-myfaces3.version>9.1.1</test.tomee-myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+        <test.wildfly-mojarra.version>32.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+        <test.glassfish-mojarra.version>8.0.0-JDK17-M5</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.tomcat.version>11.0.0-M20</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
 
-        <!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-        <test.mojarra4.version>4.0.5</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
-        <test.mojarra3.version>3.0.5</test.mojarra3.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
-        <test.myfaces4.version>4.0.1</test.myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
-        <test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
-        <test.weld5.version>5.1.2.Final</test.weld5.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-        <test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-        <test.hibernateValidator8.version>8.0.1.Final</test.hibernateValidator8.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
-        <test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <!-- Test impl versions for servletcontainers (Tomcat). -->
+        <test.mojarra.version>4.1.0-M1</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.myfaces.version>4.1.0-RC2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
+        <test.weld.version>6.0.0.Beta1</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+        <test.hibernateValidator.version>8.0.1.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
-        <test.jstl.version>2.0.0</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl NOTE: JSTL 3.x cannot be used because we also want to test Tomcat + Faces 3.0 -->
-        <test.tyrus.version>2.1.4</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>13.0.3</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+        <test.tyrus.version>2.2.0-M1</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+        <test.primefaces.version>14.0.0</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -97,53 +90,51 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jakarta-staging</id>
-            <snapshots />
-            <url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for tyrus-bom:pom:2.1.0-M3 which is required by GlassFish 7.0.0-M4 -->
-        </repository>
-    </repositories>
-
     <dependencies>
 
-        <!-- Required Jakarta EE 9 dependencies. -->
+        <!-- Required Jakarta EE 11 dependencies. -->
         <dependency>
             <groupId>jakarta.faces</groupId>
             <artifactId>jakarta.faces-api</artifactId>
-            <version>3.0.0</version>
+            <version>4.1.0-M1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.el</groupId>
             <artifactId>jakarta.el-api</artifactId>
-            <version>4.0.0</version>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <version>6.1.0-M2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>3.0.0</version>
+            <version>4.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.websocket</groupId>
             <artifactId>jakarta.websocket-api</artifactId>
-            <version>2.0.0</version>
+            <version>2.2.0-M1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-client-api</artifactId>
+            <version>2.2.0-M1</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Optional Jakarta EE 9 dependencies. -->
+        <!-- Optional Jakarta EE 11 dependencies. -->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0-M2</version>
             <scope>provided</scope>
         </dependency>
 
@@ -151,13 +142,13 @@
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
-            <version>9.0.0</version>
+            <version>11.0.0-M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.2</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -169,19 +160,19 @@
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-            <version>3.2.1</version>
+            <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.15.0</version>
+            <version>4.20.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.6.2</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -216,7 +207,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[11,)</version>
+                                    <version>[17,)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -228,7 +219,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.3</version>
+                <version>4.4</version>
                 <configuration>
                     <licenseSets>
                         <licenseSet>
@@ -245,7 +236,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.14.2</version>
+                <version>1.15.0</version>
                 <configuration>
                     <nodeVersion>v18.15.0</nodeVersion>
                     <installDirectory>target</installDirectory>
@@ -292,7 +283,7 @@
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
                         <artifactId>plexus-utils</artifactId>
-                        <version>3.5.0</version>
+                        <version>4.0.1</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -333,7 +324,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -368,7 +359,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.2</version>
+                <version>3.6.3</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <javadocVersion>${javase.version}</javadocVersion>
@@ -419,7 +410,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>com.mycila</groupId>
                                         <artifactId>license-maven-plugin</artifactId>
-                                        <versionRange>[4.3,)</versionRange>
+                                        <versionRange>[4.4,)</versionRange>
                                         <goals>
                                             <goal>format</goal>
                                         </goals>
@@ -470,12 +461,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.2</version> <!-- 2.22.2 is the minimum version having native JUnit 5 support. -->
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.5</version>
                     <executions>
                         <execution>
                             <goals>
@@ -502,9 +493,9 @@
         <!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
         <!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
 
-        <!-- WildFly - Mojarra 4.x integration test profile: mvn verify -P wildfly-mojarra4 -->
+        <!-- WildFly - Mojarra integration test profile: mvn verify -P wildfly-mojarra -->
         <profile>
-            <id>wildfly-mojarra4</id>
+            <id>wildfly-mojarra</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -512,7 +503,7 @@
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>5.0.1.Final</version>
+                    <version>5.1.0.Beta2</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -528,7 +519,7 @@
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-preview-dist</artifactId>
-                                            <version>${test.wildfly-mojarra4.version}</version>
+                                            <version>${test.wildfly-mojarra.version}</version>
                                             <type>zip</type>
                                         </artifactItem>
                                     </artifactItems>
@@ -541,7 +532,7 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly-mojarra4.version}</jboss.home>
+                                <jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly-mojarra.version}</jboss.home>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
@@ -549,87 +540,9 @@
             </build>
         </profile>
 
-        <!-- OpenLiberty - MyFaces 3.x integration test profile: mvn verify -P liberty-myfaces3 -->
+        <!-- GlassFish - Mojarra integration test profile: mvn verify -P glassfish-mojarra -->
         <profile>
-            <id>liberty-myfaces3</id>
-            <dependencies>
-                <dependency>
-                    <groupId>io.openliberty.arquillian</groupId>
-                    <artifactId>arquillian-liberty-managed-jakarta</artifactId>
-                    <version>2.1.3</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>io.openliberty</groupId>
-                                            <artifactId>openliberty-runtime</artifactId>
-                                            <version>${test.liberty-myfaces3.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>io.openliberty.arquillian</groupId>
-                                            <artifactId>arquillian-liberty-support-jakarta</artifactId>
-                                            <version>2.1.3</version>
-                                            <type>zip</type>
-                                            <classifier>feature</classifier>
-                                            <outputDirectory>${project.build.directory}/wlp/usr</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>update-liberty-server</id> <!-- Liberty apparently requires a bit more specific server.xml in order for its own Arquillian plugin to be able to manage it. -->
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/wlp/usr/servers/defaultServer</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.basedir}/src/test/resources/arquillian/liberty</directory>
-                                            <includes>
-                                                <include>server.xml</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                    <overwrite>true</overwrite>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <arquillian.launch>liberty</arquillian.launch>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- GlassFish - Mojarra 4.x integration test profile: mvn verify -P glassfish-mojarra4 -->
-        <profile>
-            <id>glassfish-mojarra4</id>
+            <id>glassfish-mojarra</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
@@ -650,7 +563,7 @@
                                         <artifactItem>
                                             <groupId>org.glassfish.main.distributions</groupId>
                                             <artifactId>glassfish</artifactId>
-                                            <version>${test.glassfish-mojarra4.version}</version>
+                                            <version>${test.glassfish-mojarra.version}</version>
                                             <type>zip</type>
                                         </artifactItem>
                                     </artifactItems>
@@ -663,7 +576,7 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <environmentVariables>
-                                <GLASSFISH_HOME>${project.build.directory}/glassfish7</GLASSFISH_HOME>
+                                <GLASSFISH_HOME>${project.build.directory}/glassfish8</GLASSFISH_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
@@ -671,9 +584,9 @@
             </build>
         </profile>
 
-        <!-- Tomcat - Mojarra 4.x integration test profile: mvn verify -P tomcat-mojarra4 -->
+        <!-- Tomcat - Mojarra integration test profile: mvn verify -P tomcat-mojarra -->
         <profile>
-            <id>tomcat-mojarra4</id>
+            <id>tomcat-mojarra</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
@@ -735,9 +648,9 @@
                             <systemPropertyVariables>
                                 <arquillian.launch>tomcat</arquillian.launch>
                                 <war.libraries>
-                                    org.glassfish:jakarta.faces:${test.mojarra4.version},
-                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
-                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
+                                    org.glassfish:jakarta.faces:${test.mojarra.version},
+                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
                                     org.glassfish:jakarta.json:${test.jsonp.version},
                                     org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
                                 </war.libraries>
@@ -751,9 +664,9 @@
             </build>
         </profile>
 
-        <!-- Tomcat - Mojarra 3.x integration test profile: mvn verify -P tomcat-mojarra3 -->
+        <!-- Tomcat - MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
         <profile>
-            <id>tomcat-mojarra3</id>
+            <id>tomcat-myfaces</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
@@ -815,9 +728,9 @@
                             <systemPropertyVariables>
                                 <arquillian.launch>tomcat</arquillian.launch>
                                 <war.libraries>
-                                    org.glassfish:jakarta.faces:${test.mojarra3.version},
-                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
-                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
+                                    org.apache.myfaces.core:myfaces-impl:${test.myfaces.version},
+                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
                                     org.glassfish:jakarta.json:${test.jsonp.version},
                                     org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
                                 </war.libraries>
@@ -825,259 +738,6 @@
                             <environmentVariables>
                                 <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
                             </environmentVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Tomcat - MyFaces 4.x integration test profile: mvn verify -P tomcat-myfaces4 -->
-        <profile>
-            <id>tomcat-myfaces4</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.tomcat</groupId>
-                                            <artifactId>tomcat</artifactId>
-                                            <version>${test.tomcat.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
-                                            <includes>
-                                                <include>tomcat-users.xml</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                    <overwrite>true</overwrite>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <arquillian.launch>tomcat</arquillian.launch>
-                                <war.libraries>
-                                    org.apache.myfaces.core:myfaces-impl:${test.myfaces4.version},
-                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld5.version},
-                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
-                                    org.glassfish:jakarta.json:${test.jsonp.version},
-                                    org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
-                                </war.libraries>
-                            </systemPropertyVariables>
-                            <environmentVariables>
-                                <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
-                            </environmentVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Tomcat - MyFaces 3.x integration test profile: mvn verify -P tomcat-myfaces3 -->
-        <profile>
-            <id>tomcat-myfaces3</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.tomcat</groupId>
-                                            <artifactId>tomcat</artifactId>
-                                            <version>${test.tomcat.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
-                                            <includes>
-                                                <include>tomcat-users.xml</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                    <overwrite>true</overwrite>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <arquillian.launch>tomcat</arquillian.launch>
-                                <war.libraries>
-                                    org.apache.myfaces.core:myfaces-impl:${test.myfaces3.version},
-                                    org.jboss.weld.servlet:weld-servlet-shaded:${test.weld4.version},
-                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator7.version},
-                                    org.glassfish:jakarta.json:${test.jsonp.version},
-                                    org.glassfish.web:jakarta.servlet.jsp.jstl:${test.jstl.version}
-                                </war.libraries>
-                            </systemPropertyVariables>
-                            <environmentVariables>
-                                <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
-                            </environmentVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Piranha - Mojarra 4.x integration test profile: mvn verify -P piranha-mojarra4 -->
-        <!-- 
-                Note1: Piranha must be run using JDK 21, so the entire test suite should be run with JDK 16.
-                There's no need to compile OmniFaces with JDK 21. JDK 11 is fine for that.
-            
-                Note2: Piranha is still in development, and at the moment not everything is implemented.
-                The following is the current status as-of Piranha 23.11.0:
-
-                [WARNING] Tests run: 141, Failures: 0, Errors: 0, Skipped: 40
-                The skipped ones can be found via @DisabledIfSystemProperty and they all boil down to following 4 pending issues:
-                - welcome-file not correctly interpreted (servlet path returns wrong value)
-                - error-page not correctly interpreted (probably because of being in /WEB-INF or using FacesServlet mapping)
-                - request.getRequestURL returns different domain (e.g. 'view-localhost' or 'ip6-localhost' instead of 'localhost')
-                - flash cookie hangs one request too long
-         -->
-        <profile>
-            <id>piranha-mojarra4</id>
-            <dependencies>
-                <dependency>
-                    <groupId>cloud.piranha.arquillian</groupId>
-                    <artifactId>piranha-arquillian-server</artifactId>
-                    <version>${test.piranha.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
-                            <systemPropertyVariables>
-                                <javaEEServer>piranha-embedded</javaEEServer>
-                                <piranha.rootIsWarName>true</piranha.rootIsWarName>
-                                <war.libraries>
-                                    org.glassfish:jakarta.faces:${test.mojarra4.version},
-                                    org.hibernate.validator:hibernate-validator:${test.hibernateValidator8.version},
-                                    org.glassfish:jakarta.json:${test.jsonp.version},
-                                    org.glassfish.tyrus:tyrus-container-servlet:${test.tyrus.version}
-                                </war.libraries>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- TomEE - MyFaces 3.x integration test profile: mvn verify -P tomee-myfaces3 -->
-        <profile>
-            <id>tomee-myfaces3</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.tomee</groupId>
-                    <artifactId>arquillian-tomee-remote</artifactId>
-                    <version>${test.tomee-myfaces3.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.tomee</groupId>
-                                            <artifactId>apache-tomee</artifactId>
-                                            <version>${test.tomee-myfaces3.version}</version>
-                                            <type>zip</type>
-                                            <classifier>webprofile</classifier>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces3.version}</tomee.dir>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>

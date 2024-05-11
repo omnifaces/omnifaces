@@ -12,9 +12,6 @@
  */
 package org.omnifaces.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.faces.FacesWrapper;
@@ -70,11 +67,6 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return getWrapped().isReadOnly(context, base, property);
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return getWrapped().getFeatureDescriptors(context, base);
     }
 
     @Override

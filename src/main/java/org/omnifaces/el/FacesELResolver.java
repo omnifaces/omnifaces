@@ -16,18 +16,16 @@ import static java.beans.Introspector.decapitalize;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.omnifaces.util.Faces;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
-
-import org.omnifaces.util.Faces;
 
 /**
  * This EL resolver basically creates an implicit object <code>#{faces}</code> in EL scope.
@@ -123,11 +121,6 @@ public class FacesELResolver extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
 }

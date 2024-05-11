@@ -14,46 +14,46 @@
 # NOTE: this workflow file cannot have the same file name across all branches, otherwise each branch will pick the 
 # latest modified one. Hence the workflow files have each a different file name with the branch name as prefix. 
 
-name: 4.x
+name: 5.x
 
 on:
   push:
-    branches: [ 4.x ]
+    branches: [ 5.x ]
   pull_request:
-    branches: [ 4.x ]
+    branches: [ 5.x ]
 
 permissions:
   contents: read
 
 jobs:
   test:
-    name: Test 4.x on ${{matrix.server}}
+    name: Test 5.x on ${{matrix.server}}
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       matrix:
-        server: [ wildfly-mojarra4, liberty-myfaces3, glassfish-mojarra4, tomee-myfaces3, tomcat-mojarra4, tomcat-mojarra3, tomcat-myfaces4, tomcat-myfaces3 ]
+        server: [ wildfly-mojarra, glassfish-mojarra, tomcat-mojarra, tomcat-myfaces ]
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'adopt'
         cache: maven
     - name: Test with Maven
       run: mvn -B verify -P ${{matrix.server}}
 
   deploy:
-    name: Deploy 4.x SNAPSHOT
+    name: Deploy 5.x SNAPSHOT
     needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'adopt'
         server-id: ossrh
         server-username: OSSRH_USERNAME
@@ -69,7 +69,7 @@ jobs:
         OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
 
   analyze:
-    name: Analyze 4.x with Sonar
+    name: Analyze 5.x with Sonar
     needs: test
     runs-on: ubuntu-latest
     steps:
