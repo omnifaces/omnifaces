@@ -121,7 +121,7 @@ public final class Json {
             encodeString(((Class<?>) object).getName(), builder);
         }
         else if (object instanceof Record) {
-        	encodeRecord((Record) object, builder, propertyNameFormatter);
+            encodeRecord((Record) object, builder, propertyNameFormatter);
         }
         else {
             encodeBean(object, builder, propertyNameFormatter);
