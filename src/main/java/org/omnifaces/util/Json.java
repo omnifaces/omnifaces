@@ -20,6 +20,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.RecordComponent;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Date;
@@ -119,6 +120,9 @@ public final class Json {
         else if (object instanceof Class<?>) {
             encodeString(((Class<?>) object).getName(), builder);
         }
+        else if (object instanceof Record) {
+        	encodeRecord((Record) object, builder, propertyNameFormatter);
+        }
         else {
             encodeBean(object, builder, propertyNameFormatter);
         }
@@ -182,6 +186,38 @@ public final class Json {
             encodePropertyName(String.valueOf(entry.getKey()), builder, propertyNameFormatter);
             builder.append(':');
             encode(entry.getValue(), builder, propertyNameFormatter);
+        }
+
+        builder.append('}');
+    }
+
+    /**
+     * Encode a Java record as JS object.
+     */
+    private static void encodeRecord(Record record, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
+        builder.append('{');
+        int i = 0;
+
+        for (RecordComponent component : record.getClass().getRecordComponents()) {
+            Object value;
+
+            try {
+                value = component.getAccessor().invoke(record);
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(
+                    format(ERROR_INVALID_GETTER, component.getName(), record.getClass()), e);
+            }
+
+            if (value != null) {
+                if (i++ > 0) {
+                    builder.append(',');
+                }
+
+                encodePropertyName(component.getName(), builder, propertyNameFormatter);
+                builder.append(':');
+                encode(value, builder, propertyNameFormatter);
+            }
         }
 
         builder.append('}');
