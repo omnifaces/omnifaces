@@ -77,12 +77,6 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.omnifaces.component.ParamHolder;
-import org.omnifaces.component.SimpleParam;
-import org.omnifaces.component.input.Form;
-import org.omnifaces.config.OmniFaces;
-import org.omnifaces.el.ScopedRunner;
-
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import jakarta.faces.application.Application;
@@ -126,6 +120,12 @@ import jakarta.faces.event.MethodExpressionActionListener;
 import jakarta.faces.render.RenderKit;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.facelets.FaceletContext;
+
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.SimpleParam;
+import org.omnifaces.component.input.Form;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>

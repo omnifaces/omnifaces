@@ -39,11 +39,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.omnifaces.util.Beans;
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.FacesLocal;
-import org.omnifaces.util.Json;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
@@ -60,6 +55,11 @@ import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.ViewScoped;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.omnifaces.util.Beans;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.FacesLocal;
+import org.omnifaces.util.Json;
 
 /**
  * <p>

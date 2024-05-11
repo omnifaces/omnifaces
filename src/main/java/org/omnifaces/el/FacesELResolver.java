@@ -21,11 +21,11 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.omnifaces.util.Faces;
-
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
+
+import org.omnifaces.util.Faces;
 
 /**
  * This EL resolver basically creates an implicit object <code>#{faces}</code> in EL scope.

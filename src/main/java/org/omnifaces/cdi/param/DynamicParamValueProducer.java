@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.omnifaces.cdi.Param;
-
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.Typed;
@@ -33,6 +31,8 @@ import jakarta.enterprise.inject.spi.PassivationCapable;
 import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.validator.Validator;
+
+import org.omnifaces.cdi.Param;
 
 /**
  * Dynamic CDI producer used to work around CDI's restriction to create true generic producers.
