@@ -13,11 +13,19 @@
 package org.omnifaces.converter;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static org.omnifaces.el.ExpressionInspector.getMethodReference;
+import static org.omnifaces.util.Components.getAttribute;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isOneOf;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
 import javax.faces.context.FacesContext;
@@ -93,6 +101,7 @@ public class GenericEnumConverter implements Converter {
 
 		if (modelValue instanceof Enum) {
 			Class<Enum> enumType = ((Enum) modelValue).getDeclaringClass();
+			component.getAttributes().put(ATTRIBUTE_ENUM_TYPE, enumType);
 			setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
 			return ((Enum) modelValue).name();
 		}
@@ -108,7 +117,22 @@ public class GenericEnumConverter implements Converter {
 			return null;
 		}
 
-		Class<Enum> enumType = getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+		Class<Enum> enumType = coalesce(
+			getAttribute(component, ATTRIBUTE_ENUM_TYPE),
+			getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)))
+		);
+
+		if (enumType == null) {
+			try {
+				ValueExpression valueExpression = component.getValueExpression("value");
+				Method getter = getMethodReference(context.getELContext(), valueExpression).getMethod();
+				enumType = (Class<Enum>) ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments()[0];
+				component.getAttributes().put(ATTRIBUTE_ENUM_TYPE, requireNonNull(enumType));
+			}
+			catch (Exception e) {
+				throw new ConverterException(createError(ERROR_NO_ENUM_TYPE), e);
+			}
+		}
 
 		try {
 			return Enum.valueOf(enumType, submittedValue);
