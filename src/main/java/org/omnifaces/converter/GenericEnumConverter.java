@@ -13,11 +13,21 @@
 package org.omnifaces.converter;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static org.omnifaces.el.ExpressionInspector.getMethodReference;
+import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
+import static org.omnifaces.util.Components.getAttribute;
+import static org.omnifaces.util.Components.setAttribute;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isOneOf;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+
+import jakarta.el.ValueExpression;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UISelectMany;
 import jakarta.faces.context.FacesContext;
@@ -109,6 +119,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 
     private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
     private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
+    private static final String ERROR_NO_ENUM_TYPE = "Cannot determine enum type, use standard EnumConverter instead.";
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -119,6 +130,7 @@ public class GenericEnumConverter implements Converter<Enum> {
         }
 
         Class<Enum> enumType = modelValue.getDeclaringClass();
+        setAttribute(component, ATTRIBUTE_ENUM_TYPE, enumType);
         setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
         return modelValue.name();
     }
@@ -129,7 +141,22 @@ public class GenericEnumConverter implements Converter<Enum> {
             return null;
         }
 
-        Class<Enum> enumType = getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+        Class<Enum> enumType = coalesce(
+            getAttribute(component, ATTRIBUTE_ENUM_TYPE),
+            getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)))
+        );
+
+        if (enumType == null) {
+            try {
+                ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
+                Method getter = getMethodReference(context.getELContext(), valueExpression).getMethod();
+                enumType = (Class<Enum>) ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments()[0];
+                setAttribute(component, ATTRIBUTE_ENUM_TYPE, requireNonNull(enumType));
+            }
+            catch (Exception e) {
+                throw new ConverterException(createError(ERROR_NO_ENUM_TYPE), e);
+            }
+        }
 
         try {
             return Enum.valueOf(enumType, submittedValue);
