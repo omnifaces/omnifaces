@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<facelet-taglib
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_4_0.xsd"
+    version="4.0"
+>
+    <description>
+        This is a copy of omnifaces-functions.taglib.xml with old namespace for sake of backwards compatibility.
+        This will be removed in a future OmniFaces version.
+        So you need to migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions namespace as soon as possible.
+    </description>
+    <namespace>http://omnifaces.org/functions</namespace>
+    <short-name>of</short-name>
+
+    <!-- Strings ================================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>abbreviate</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String abbreviate(java.lang.String, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>concat</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String concat(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>capitalize</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String capitalize(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>parenthesize</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String parenthesize(java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>replaceAll</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String replaceAll(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>matches</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String matches(java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>prettyURL</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String prettyURL(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>encodeURL</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeURL(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>encodeURI</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeURI(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>encodeBase64</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String encodeBase64(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>escapeJS</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>format1</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format1(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>format2</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format2(java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>format3</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format3(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>format4</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format4(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>format5</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String format5(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>stripTags</function-name>
+        <function-class>org.omnifaces.el.functions.Strings</function-class>
+        <function-signature>java.lang.String stripTags(java.lang.String)</function-signature>
+    </function>
+
+    <!-- Arrays =================================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>createArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.Object[] createArray(int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>createIntegerArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.int[] createIntegerArray(int, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>contains</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>reverseArray</function-name>
+        <function-class>org.omnifaces.el.functions.Arrays</function-class>
+        <function-signature>java.lang.Object[] reverseArray(java.lang.Object[])</function-signature>
+    </function>
+
+    <!-- Converters =============================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>setToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List setToList(java.util.Set)</function-signature>
+    </function>
+    
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>iterableToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List iterableToList(java.lang.Iterable)</function-signature>
+    </function>
+    
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>iterableToModel</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>jakarta.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>mapToList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List mapToList(java.util.Map)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>joinArray</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinArray(java.lang.Object, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>joinCollection</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinCollection(java.util.Collection, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>joinMap</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String joinMap(java.util.Map, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>splitArray</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.Object[] splitArray(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>splitList</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.util.List splitList(java.util.List, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>toJson</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String toJson(java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>printStackTrace</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>convert</function-name>
+        <function-class>org.omnifaces.el.functions.Converters</function-class>
+        <function-signature>java.lang.String convert(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <!-- Dates ==================================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatDate</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String formatDate(java.lang.Object, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatDateWithTimezone</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String formatDateWithTimezone(java.lang.Object, java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addYears</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addYears(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addMonths(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addWeeks</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addWeeks(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addDays</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addDays(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addHours</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addHours(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addMinutes</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addMinutes(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>addSeconds</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.Object addSeconds(java.lang.Object, int)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>yearsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int yearsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>monthsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int monthsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>weeksBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int weeksBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>daysBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int daysBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>hoursBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int hoursBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>minutesBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int minutesBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>secondsBetween</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>int secondsBetween(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getMonths()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getShortMonths</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getShortMonths()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getDaysOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getDaysOfWeek()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getShortDaysOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.util.Map getShortDaysOfWeek()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getMonth</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getMonth(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getShortMonth</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getShortMonth(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getDayOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getDayOfWeek(java.lang.Integer)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getShortDayOfWeek</function-name>
+        <function-class>org.omnifaces.el.functions.Dates</function-class>
+        <function-signature>java.lang.String getShortDayOfWeek(java.lang.Integer)</function-signature>
+    </function>
+
+    <!-- Numbers ================================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatBytes</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatCurrency</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatCurrency(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatNumber</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumber(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatNumberDefault</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatNumberDefaultForLocale</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatNumberDefaultForLocale(java.lang.Number, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatPercent</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatPercent(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatThousands</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatThousands(java.lang.Number)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>formatThousandsUnit</function-name>
+        <function-class>org.omnifaces.el.functions.Numbers</function-class>
+        <function-signature>java.lang.String formatThousandsUnit(java.lang.Number, java.lang.String)</function-signature>
+    </function>
+
+    <!-- Objects ================================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>coalesce</function-name>
+        <function-class>org.omnifaces.el.functions.Objects</function-class>
+        <function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>isInstance</function-name>
+        <function-class>org.omnifaces.el.functions.Objects</function-class>
+        <function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <!-- Components =============================================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>evalAttribute</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.Object evalAttribute(jakarta.faces.component.UIComponent, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>graphicImageURL</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURL(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>graphicImageURLWithType</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURLWithType(java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>graphicImageURLWithTypeAndLastModified</function-name>
+        <function-class>org.omnifaces.el.functions.Components</function-class>
+        <function-signature>java.lang.String graphicImageURLWithTypeAndLastModified(java.lang.String, java.lang.String, java.lang.Object)</function-signature>
+    </function>
+
+    <!-- Faces (request URL/header shortcuts) ===================================================================== -->
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getRequestBaseURL</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestBaseURL()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getRequestDomainURL</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestDomainURL()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getRequestURLWithQueryString</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRequestURLWithQueryString()</function-signature>
+    </function>
+
+    <function>
+        <description>Please migrate XML namespace from http://omnifaces.org/functions to omnifaces.functions as soon as possible.</description>
+        <function-name>getRemoteAddr</function-name>
+        <function-class>org.omnifaces.util.Faces</function-class>
+        <function-signature>java.lang.String getRemoteAddr()</function-signature>
+    </function>
+
+</facelet-taglib>

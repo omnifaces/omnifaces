@@ -20,7 +20,7 @@
     version="4.0"
 >
     <description>OmniFaces EL functions.</description>
-    <namespace>http://omnifaces.org/functions</namespace>
+    <namespace>omnifaces.functions</namespace>
     <short-name>of</short-name>
 
     <!-- Strings ================================================================================================== -->
