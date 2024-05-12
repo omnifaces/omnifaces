@@ -32,7 +32,6 @@ import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.isDevelopment;
-import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getRequestParts;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.faces.component.FacesComponent;
@@ -63,15 +61,13 @@ import org.omnifaces.util.Utils;
 /**
  * <p>
  * The <code>&lt;o:inputFile&gt;</code> is a component that extends the standard <code>&lt;h:inputFile&gt;</code> and
- * adds support for <code>multiple</code>, <code>directory</code>, <code>accept</code> and <code>maxsize</code>
+ * adds support for <code>directory</code> and <code>maxsize</code>
  * attributes, along with built-in server side validation on <code>accept</code> and <code>maxsize</code> attributes.
- * Additionally, it makes sure that the value of HTML file input element is never rendered. The standard
- * <code>&lt;h:inputFile&gt;</code> renders <code>Part#toString()</code> to it which is unnecessary.
  *
  * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;h:inputFile&gt;</code>, you only need to change <code>h:</code> into
- * <code>o:</code> to get the extra support for <code>multiple</code>, <code>directory</code> and <code>accept</code>
+ * <code>o:</code> to get the extra support for <code>accept</code>, <code>directory</code> and <code>maxsize</code>
  * attributes. Here's are some usage examples.
  *
  * <h3>Single file selection</h3>
@@ -88,10 +84,10 @@ import org.omnifaces.util.Utils;
  *
  * public void upload() {
  *     if (file != null) {
- *         String name = Servlets.getSubmittedFileName(file);
- *         String type = file.getContentType();
- *         long size = file.getSize();
- *         InputStream content = file.getInputStream();
+ *         var name = Servlets.getSubmittedFileName(file);
+ *         var type = file.getContentType();
+ *         var size = file.getSize();
+ *         var content = file.getInputStream();
  *         // ...
  *     }
  * }
@@ -105,6 +101,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>multiple</code> attribute can be set to <code>true</code> to enable multiple file selection.
  * With this setting the enduser can use control/command/shift keys to select multiple files.
+ * It is basically also not different from <code>&lt;h:inputFile&gt;</code>. You might as good use it instead.
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile value="#{bean.files}" multiple="true" /&gt;
@@ -116,11 +113,11 @@ import org.omnifaces.util.Utils;
  *
  * public void upload() {
  *     if (files != null) {
- *         for (Part file : files) {
- *             String name = Servlets.getSubmittedFileName(file);
- *             String type = file.getContentType();
- *             long size = file.getSize();
- *             InputStream content = file.getInputStream();
+ *         for (var file : files) {
+ *             var name = Servlets.getSubmittedFileName(file);
+ *             var type = file.getContentType();
+ *             var size = file.getSize();
+ *             var content = file.getInputStream();
  *             // ...
  *         }
  *     }
@@ -143,11 +140,11 @@ import org.omnifaces.util.Utils;
  *
  * public void upload() {
  *     if (files != null) {
- *         for (Part file : files) {
- *             String name = Servlets.getSubmittedFileName(file);
- *             String type = file.getContentType();
- *             long size = file.getSize();
- *             InputStream content = file.getInputStream();
+ *         for (var file : files) {
+ *             var name = Servlets.getSubmittedFileName(file);
+ *             var type = file.getContentType();
+ *             var size = file.getSize();
+ *             var content = file.getInputStream();
  *             // ...
  *         }
  *     }
@@ -275,7 +272,7 @@ public class InputFile extends HtmlInputFile {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        multiple, directory, accept, acceptMessage, maxsize, maxsizeMessage;
+        directory, acceptMessage, maxsize, maxsizeMessage;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -312,7 +309,7 @@ public class InputFile extends HtmlInputFile {
         if ("validationFailed".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME))
             && getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME)))
         {
-            String fileName = getRequestParameter(context, "fileName");
+            var fileName = getRequestParameter(context, "fileName");
             addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));
             setValid(false);
             context.validationFailed();
@@ -321,10 +318,9 @@ public class InputFile extends HtmlInputFile {
         }
         else {
             super.decode(context);
-            Object submittedValue = getSubmittedValue();
 
-            if (submittedValue instanceof Part && isMultiple()) {
-                setSubmittedValue(getRequestParts(context, ((Part) submittedValue).getName()));
+            if (getSubmittedValue() instanceof Part part && isMultiple()) {
+                setSubmittedValue(getRequestParts(context, part.getName()));
             }
         }
     }
@@ -343,18 +339,16 @@ public class InputFile extends HtmlInputFile {
         if (isMultiple()) {
             List<Part> convertedParts = new ArrayList<>();
 
-            for (Part submittedPart : (List<Part>) submittedValue) {
-                Object convertedPart = super.getConvertedValue(context, submittedPart);
-
-                if (convertedPart instanceof Part && !Utils.isEmpty(convertedPart)) { // Do not import static! UIInput has an isEmpty() as well.
-                    convertedParts.add((Part) convertedPart);
+            for (var submittedPart : (List<Part>) submittedValue) {
+                if (super.getConvertedValue(context, submittedPart) instanceof Part convertedPart && !Utils.isEmpty(convertedPart)) { // Do not import static! UIInput has an isEmpty() as well.
+                    convertedParts.add(convertedPart);
                 }
             }
 
             return unmodifiableList(convertedParts);
         }
 
-        Object convertedPart = super.getConvertedValue(context, submittedValue);
+        var convertedPart = super.getConvertedValue(context, submittedValue);
         return Utils.isEmpty(convertedPart) ? null : convertedPart;
     }
 
@@ -366,11 +360,11 @@ public class InputFile extends HtmlInputFile {
     protected void validateValue(FacesContext context, Object convertedValue) {
         Collection<Part> convertedParts = null;
 
-        if (convertedValue instanceof Part) {
-            convertedParts = singleton((Part) convertedValue);
+        if (convertedValue instanceof Part part) {
+            convertedParts = singleton(part);
         }
-        else if (convertedValue instanceof List) {
-            convertedParts = (List<Part>) convertedValue;
+        else if (convertedValue instanceof List parts) {
+            convertedParts = parts;
         }
 
         if (convertedParts != null) {
@@ -386,16 +380,6 @@ public class InputFile extends HtmlInputFile {
     }
 
     /**
-     * This override returns null during render response as it doesn't make sense to render <code>Part#toString()</code>
-     * as value of file input, moreover it's for HTML security reasons discouraged to prefill the value of a file input
-     * even though browsers will ignore it.
-     */
-    @Override
-    public Object getValue() {
-        return isRenderResponse() ? null : super.getValue();
-    }
-
-    /**
      * This override will render <code>multiple</code>, <code>directory</code> and <code>accept</code> attributes
      * accordingly. As the <code>directory</code> attribute is relatively new, for better browser compatibility the
      * <code>webkitdirectory</code> attribute will also be written along it.
@@ -405,7 +389,7 @@ public class InputFile extends HtmlInputFile {
      */
     @Override
     public void encodeEnd(FacesContext context) throws IOException {
-        Map<String, Object> passThroughAttributes = getPassThroughAttributes();
+        var passThroughAttributes = getPassThroughAttributes();
 
         if (isMultiple()) {
             passThroughAttributes.put("multiple", true); // https://caniuse.com/#feat=input-file-multiple
@@ -413,16 +397,16 @@ public class InputFile extends HtmlInputFile {
 
         if (isDirectory()) {
             passThroughAttributes.put("directory", true); // Firefox 46+ (Firefox 42-45 requires enabling via about:config).
-            passThroughAttributes.put("webkitdirectory", true); // Chrome 11+, Safari 4+ and Edge.
+            passThroughAttributes.put("webkitdirectory", true); // https://caniuse.com/input-file-directory
         }
 
-        String accept = getAccept();
+        var accept = getAccept();
 
         if (accept != null) {
             passThroughAttributes.put("accept", accept); // https://caniuse.com/#feat=input-file-accept
         }
 
-        Long maxsize = getMaxsize();
+        var maxsize = getMaxsize();
 
         if (maxsize != null) {
             validateHierarchy();
@@ -465,23 +449,6 @@ public class InputFile extends HtmlInputFile {
     }
 
     /**
-     * Returns whether or not to allow multiple file selection.
-     * This implicitly defaults to <code>true</code> when <code>directory</code> attribute is <code>true</code>.
-     * @return Whether or not to allow multiple file selection.
-     */
-    public boolean isMultiple() {
-        return state.get(PropertyKeys.multiple, isDirectory());
-    }
-
-    /**
-     * Sets whether or not to allow multiple file selection.
-     * @param multiple Whether or not to allow multiple file selection.
-     */
-    public void setMultiple(boolean multiple) {
-        state.put(PropertyKeys.multiple, multiple);
-    }
-
-    /**
      * Returns whether or not to enable directory selection.
      * @return Whether or not to enable directory selection.
      */
@@ -496,23 +463,6 @@ public class InputFile extends HtmlInputFile {
      */
     public void setDirectory(boolean directory) {
         state.put(PropertyKeys.directory, directory);
-    }
-
-    /**
-     * Returns comma separated string of mime types of files to filter in client side file browse dialog.
-     * This is also validated in server side.
-     * @return Comma separated string of mime types of files to filter in client side file browse dialog.
-     */
-    public String getAccept() {
-        return state.get(PropertyKeys.accept);
-    }
-
-    /**
-     * Sets comma separated string of media types of files to filter in client side file browse dialog.
-     * @param accept Comma separated string of mime types of files to filter in client side file browse dialog.
-     */
-    public void setAccept(String accept) {
-        state.put(PropertyKeys.accept, accept);
     }
 
     /**
@@ -569,25 +519,25 @@ public class InputFile extends HtmlInputFile {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private void validateParts(FacesContext context, Collection<Part> parts) {
-        String accept = getAccept();
-        Long maxsize = getMaxsize();
+        var accept = getAccept();
+        var maxsize = getMaxsize();
 
         if (accept == null && maxsize == null) {
             return;
         }
 
-        for (Part part : parts) {
+        for (var part : parts) {
             validatePart(context, part, accept, maxsize);
         }
     }
 
     private void validatePart(FacesContext context, Part part, String accept, Long maxsize) {
-        String fileName = getSubmittedFileName(part);
+        var fileName = getSubmittedFileName(part);
         String message = null;
         String param = null;
 
         if (accept != null) {
-            String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
+            var contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
 
             if (contentType == null || !contentType.matches(convertAcceptToRegex(accept))) {
                 message = getAcceptMessage();
@@ -606,15 +556,15 @@ public class InputFile extends HtmlInputFile {
         }
     }
 
-    private String convertAcceptToRegex(String accept) {
-        String[] parts = accept.replaceAll("\\s*", "").split("(?<=[*,])|(?=[*,])");
-        StringBuilder regex = new StringBuilder();
+    private static String convertAcceptToRegex(String accept) {
+        var acceptTokens = accept.replaceAll("\\s*", "").split("(?<=[*,])|(?=[*,])");
+        var regex = new StringBuilder();
 
-        for (String part : parts) {
-            switch (part) {
-                case "*": regex.append(".*"); break;
-                case ",": regex.append("|"); break;
-                default: regex.append(Pattern.quote(part)); break;
+        for (var acceptToken : acceptTokens) {
+            switch (acceptToken) {
+                case "*" -> regex.append(".*");
+                case "," -> regex.append("|");
+                default -> regex.append(Pattern.quote(acceptToken));
             }
         }
 
@@ -632,7 +582,7 @@ public class InputFile extends HtmlInputFile {
             component = getMessagesComponent();
         }
 
-        messageComponentClientId = (component != null && component.getId() != null) ? component.getClientId() : null;
+        messageComponentClientId = component != null && component.getId() != null ? component.getClientId() : null;
         return messageComponentClientId;
     }
 
