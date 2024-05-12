@@ -3313,7 +3313,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
                 made available as a value expression. This handler should be placed inside a Facelets tag as follows:
                 <pre>
 &lt;ui:composition
-    xmlns:h="jakarta.faces.facelets"
+    xmlns:ui="jakarta.faces.facelets"
     xmlns:h="jakarta.faces.html"
     xmlns:o="omnifaces.ui"
 &gt;
