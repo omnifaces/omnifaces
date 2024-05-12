@@ -3315,7 +3315,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 &lt;ui:composition
     xmlns:h="jakarta.faces.facelets"
     xmlns:h="jakarta.faces.html"
-    xmlns:o="http://omnifaces.org/ui"
+    xmlns:o="omnifaces.ui"
 &gt;
     &lt;o:methodParam name="method" value="#{action}"/&gt;
 
