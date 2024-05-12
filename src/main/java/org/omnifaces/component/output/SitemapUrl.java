@@ -88,7 +88,7 @@ import org.omnifaces.util.State;
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;urlset
  *     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
- *     xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+ *     xmlns:h="jakarta.faces.facelets"
  *     xmlns:o="http://omnifaces.org/ui"
  * &gt;
  *     &lt;ui:repeat value="#{sitemapBean.products}" var="product"&gt;

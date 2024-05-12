@@ -710,11 +710,11 @@ public final class Components {
     /**
      * Create and include the composite component of the given library and resource name as child of the given UI
      * component parent and return the created composite component.
-     * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
+     * This has the same effect as using <code>xmlns:my="jakarta.faces.composite/libraryName</code> and
      * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
      * container parent and is mandatory for functioning of input components inside the composite, if any.
      * @param parent The parent component to include the composite component in.
-     * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
+     * @param libraryName The library name of the composite component (path after "jakarta.faces.composite/").
      * @param tagName The tag name of the composite component.
      * @param id The component ID of the composite component.
      * @return The created composite component, which can if necessary be used to set more custom attributes on it.
@@ -727,7 +727,7 @@ public final class Components {
     /**
      * Create and include the composite component of the given library and resource name as child of the given UI
      * component parent, set the given attributes on it and return the created composite component.
-     * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
+     * This has the same effect as using <code>xmlns:my="jakarta.faces.composite/libraryName</code> and
      * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
      * container parent and is mandatory for functioning of input components inside the composite, if any.
      * <p>
@@ -739,7 +739,7 @@ public final class Components {
      * attributes.put("baz", "#{bean.baz(" + someId + ")}");
      * </pre>
      * @param parent The parent component to include the composite component in.
-     * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
+     * @param libraryName The library name of the composite component (path after "jakarta.faces.composite/").
      * @param tagName The tag name of the composite component.
      * @param id The component ID of the composite component.
      * @param attributes The attributes to be set on the composite component.
@@ -747,7 +747,7 @@ public final class Components {
      * @since 2.2
      */
     public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
-        String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
+        String taglibURI = "jakarta.faces.composite/" + libraryName;
         Map<String, Object> attrs = (attributes == null) ? null : new HashMap<>(attributes);
 
         FacesContext context = FacesContext.getCurrentInstance();

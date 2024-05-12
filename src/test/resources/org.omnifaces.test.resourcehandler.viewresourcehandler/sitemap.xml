@@ -15,7 +15,7 @@
 -->
 <urlset
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="jakarta.faces.facelets"
     xmlns:o="http://omnifaces.org/ui"
 >
     <ui:repeat value="#{viewResourceHandlerITBean.entities}" var="entity">
