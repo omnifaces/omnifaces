@@ -57,7 +57,7 @@ export module InputFile {
                 
                 const params: Record<string, string> = { fileName: fileName };
                 params[EVENT] = "validationFailed";
-                const faces = window.faces || window.jsf;
+                const faces = window.faces;
                 faces.ajax.request(inputFile.id, event, params);
 
                 if (originalEnctype) {

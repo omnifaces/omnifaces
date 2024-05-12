@@ -43,7 +43,7 @@ export module ScriptParam {
 
         params["execute"] = scriptParamId;
         params[EVENT] = "setScriptParamValues";
-        const faces = window.faces || window.jsf;
+        const faces = window.faces;
         faces.ajax.request(form, null, params);
     }
 

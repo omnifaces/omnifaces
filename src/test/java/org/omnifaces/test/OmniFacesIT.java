@@ -132,7 +132,7 @@ public abstract class OmniFacesIT {
 
     protected void guardAjax(Runnable action) {
         var uuid = UUID.randomUUID().toString();
-        executeScript("window.$ajax=true;(window.jsf?jsf:faces).ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
+        executeScript("window.$ajax=true;faces.ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
         action.run();
         waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be falsey when ajax redirect has occurred.
     }

@@ -27,7 +27,7 @@ export module Form {
     // Private static functions ---------------------------------------------------------------------------------------
 
     function init() {
-        const faces = window.faces || window.jsf;
+        const faces = window.faces;
 
         if (faces) { // Standard JSF API.
             const originalAjaxRequest = faces.ajax.request;

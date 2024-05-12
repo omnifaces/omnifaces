@@ -105,7 +105,7 @@ export module Util {
             }
         }
 
-        const faces = window.faces || window.jsf;
+        const faces = window.faces;
 
         if ((!faces || faces.getProjectStage() == "Development") && window.console && console.error) {
             console.error(ERROR_MISSING_FORM);
