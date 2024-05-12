@@ -33,7 +33,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
@@ -42,8 +41,6 @@ import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
@@ -73,7 +70,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
@@ -197,7 +193,7 @@ public final class Utils {
      * @since 2.6
      */
     public static boolean isEmpty(Part part) {
-        return part == null || (isEmpty(getSubmittedFileName(part)) && part.getSize() <= 0);
+        return part == null || isEmpty(getSubmittedFileName(part)) && part.getSize() <= 0;
     }
 
     /**
@@ -462,11 +458,11 @@ public final class Utils {
      * @throws IOException When an I/O error occurs.
      */
     public static long stream(InputStream input, OutputStream output) throws IOException {
-        try (ReadableByteChannel inputChannel = Channels.newChannel(input);
-            WritableByteChannel outputChannel = Channels.newChannel(output))
+        try (var inputChannel = Channels.newChannel(input);
+            var outputChannel = Channels.newChannel(output))
         {
-            ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
-            long size = 0;
+            var buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
+            var size = 0L;
 
             while (inputChannel.read(buffer) != -1) {
                 buffer.flip();
@@ -495,10 +491,10 @@ public final class Utils {
             return stream(new FileInputStream(file), output);
         }
 
-        try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
-            WritableByteChannel outputChannel = Channels.newChannel(output);
-            ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
-            long size = 0;
+        try (var fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+            var outputChannel = Channels.newChannel(output);
+            var buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
+            var size = 0L;
 
             while (fileChannel.read(buffer, start + size) != -1) {
                 buffer.flip();
@@ -518,20 +514,6 @@ public final class Utils {
 
             return size;
         }
-    }
-
-    /**
-     * Read the given input stream into a byte array. The given input stream will implicitly be closed after streaming,
-     * regardless of whether an exception is been thrown or not.
-     * @param input The input stream.
-     * @return The input stream as a byte array.
-     * @throws IOException When an I/O error occurs.
-     * @since 2.0
-     */
-    public static byte[] toByteArray(InputStream input) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        stream(input, output);
-        return output.toByteArray();
     }
 
     /**
@@ -563,7 +545,7 @@ public final class Utils {
      * @since 2.4
      */
     public static boolean isSerializable(Object object) {
-        try (ObjectOutputStream output = new ObjectOutputStream(OutputStream.nullOutputStream())) {
+        try (var output = new ObjectOutputStream(OutputStream.nullOutputStream())) {
             output.writeObject(object);
             return true;
         }
@@ -687,7 +669,7 @@ public final class Utils {
         List<String> list = new ArrayList<>();
 
         for (String value : values.split(quote(delimiter))) {
-            String trimmedValue = value.trim();
+            var trimmedValue = value.trim();
             if (!isEmpty(trimmedValue)) {
                 list.add(trimmedValue);
             }
@@ -842,7 +824,7 @@ public final class Utils {
      * @since 1.2
      */
     public static String formatRFC1123(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
+        var sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
         sdf.setTimeZone(TIMEZONE_GMT);
         return sdf.format(date);
     }
@@ -856,7 +838,7 @@ public final class Utils {
      * @since 1.2
      */
     public static Date parseRFC1123(String string) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
+        var sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
         return sdf.parse(string);
     }
 
@@ -880,9 +862,7 @@ public final class Utils {
         else if (date instanceof Calendar) {
             return ((Calendar) date).getTimeZone().toZoneId();
         }
-        else if (date instanceof Temporal) {
-            Temporal temporal = (Temporal) date;
-
+        else if (date instanceof Temporal temporal) {
             if (temporal.isSupported(ChronoField.OFFSET_SECONDS)) {
                 return ZoneId.from((Temporal) date);
             }
@@ -942,7 +922,7 @@ public final class Utils {
             return null;
         }
 
-        ZoneId zone = getZoneId(date);
+        var zone = getZoneId(date);
 
         if (date instanceof java.util.Date) {
             return ZonedDateTime.ofInstant(Instant.ofEpochMilli(((java.util.Date) date).getTime()), zone);
@@ -969,7 +949,7 @@ public final class Utils {
             return ((OffsetTime) date).atDate(LocalDate.now()).toZonedDateTime();
         }
         else if (date instanceof LocalTime) {
-            return (((LocalTime) date).atDate(LocalDate.now())).atZone(zone);
+            return ((LocalTime) date).atDate(LocalDate.now()).atZone(zone);
         }
         else if (date instanceof TemporalDate) {
             return ((TemporalDate) date).getZonedDateTime();
@@ -984,18 +964,18 @@ public final class Utils {
 
     private static ZonedDateTime fromTemporalToZonedDateTime(Temporal temporal, ZoneId zone) {
         if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
-            long epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
-            long nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
+            var epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
+            var nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
             return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch, nano), zone);
         }
 
-        int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : 1;
-        int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : 1;
-        int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : 1;
-        int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : 0;
-        int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : 0;
-        int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : 0;
-        int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : 0;
+        var year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : 1;
+        var month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : 1;
+        var day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : 1;
+        var hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : 0;
+        var minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : 0;
+        var second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : 0;
+        var nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : 0;
         return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
     }
 
@@ -1047,7 +1027,7 @@ public final class Utils {
 
     @SuppressWarnings("unchecked")
     private static <C> C fromZonedDateTimeToCalendar(ZonedDateTime zonedDateTime) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
+        var calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
         calendar.setTime(java.util.Date.from(zonedDateTime.toInstant()));
         return (C) calendar;
     }
@@ -1083,7 +1063,7 @@ public final class Utils {
         // This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
         // There might be custom implementations supporting this as well although this is undocumented.
         // We just try our best :)
-        Optional<Method> converter = stream(type.getMethods()).filter(method
+        var converter = stream(type.getMethods()).filter(method
             -> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
             && method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
             && type.isAssignableFrom(method.getReturnType())
@@ -1123,12 +1103,12 @@ public final class Utils {
             return (Locale) locale;
         }
         else {
-            String localeString = locale.toString();
+            var localeString = locale.toString();
 
             if (PATTERN_ISO639_ISO3166_LOCALE.matcher(localeString).matches()) {
-                String[] languageAndCountry = localeString.split("_");
-                String language = languageAndCountry[0];
-                String country = languageAndCountry.length > 1 ? languageAndCountry[1] : "";
+                var languageAndCountry = localeString.split("_");
+                var language = languageAndCountry[0];
+                var country = languageAndCountry.length > 1 ? languageAndCountry[1] : "";
                 return new Locale(language, country);
             }
             else {
@@ -1156,7 +1136,7 @@ public final class Utils {
 
         try {
             InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
-            ByteArrayOutputStream deflated = new ByteArrayOutputStream();
+            var deflated = new ByteArrayOutputStream();
             stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(deflated.toByteArray());
         }
@@ -1181,7 +1161,7 @@ public final class Utils {
 
         try {
             InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
-            return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
+            return new String(new InflaterInputStream(deflated).readAllBytes(), UTF_8);
         }
         catch (UnsupportedEncodingException e) {
             // This will occur when UTF-8 is not supported, but this is not to be expected these days.
@@ -1258,7 +1238,7 @@ public final class Utils {
      * @since 3.0
      */
     public static String formatURLWithQueryString(String url, String queryString) {
-        String normalizedURL = url.isEmpty() ? "/" : url;
+        var normalizedURL = url.isEmpty() ? "/" : url;
 
         if (isEmpty(queryString)) {
             return normalizedURL;
@@ -1275,13 +1255,13 @@ public final class Utils {
      * @since 3.14.5
      */
     public static boolean containsQueryStringParameter(String url, String parameterName) {
-        String[] pathAndQueryString = url.split(quote("?"));
+        var pathAndQueryString = url.split(quote("?"));
 
         if (pathAndQueryString.length > 1) {
-            String[] parameters = pathAndQueryString[1].split(quote("&"));
+            var parameters = pathAndQueryString[1].split(quote("&"));
 
             for (String parameter : parameters) {
-                String[] nameAndValue = parameter.split(quote("="));
+                var nameAndValue = parameter.split(quote("="));
 
                 if (nameAndValue.length > 0 && parameterName.equals(decodeURL(nameAndValue[0]))) {
                     return true;
@@ -1308,7 +1288,7 @@ public final class Utils {
             return null;
         }
 
-        StringBuilder builder = new StringBuilder(string.length());
+        var builder = new StringBuilder(string.length());
 
         for (char c : string.toCharArray()) {
             if (c > UNICODE_3_BYTES) {

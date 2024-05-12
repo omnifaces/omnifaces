@@ -30,7 +30,6 @@ import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneAnnotationPresent;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.isOneOf;
-import static org.omnifaces.util.Utils.toByteArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +48,6 @@ import java.util.logging.Logger;
 import jakarta.el.ValueExpression;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.spi.Bean;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.faces.FacesException;
 import jakarta.faces.application.Resource;
@@ -78,7 +76,7 @@ public class GraphicResource extends DynamicResource {
     private static final String DEFAULT_CONTENT_TYPE = "image";
     private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
     private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
-    private static final String[] EMPTY_PARAMS = new String[0];
+    private static final String[] EMPTY_PARAMS = {};
 
     @SuppressWarnings({ "unchecked" })
     private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
@@ -92,7 +90,7 @@ public class GraphicResource extends DynamicResource {
         byte[].class
     };
 
-    private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
+    private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<>() {
         private static final long serialVersionUID = 1L;
     };
 
@@ -166,7 +164,7 @@ public class GraphicResource extends DynamicResource {
             setLastModified(((Date) lastModified).getTime());
         }
         else if (isNumber(String.valueOf(lastModified))) {
-            setLastModified(Long.valueOf(lastModified.toString()));
+            setLastModified(Long.parseLong(lastModified.toString()));
         }
         else if (lastModified != null) {
             throw new IllegalArgumentException(format(ERROR_INVALID_LASTMODIFIED, lastModified));
@@ -188,15 +186,15 @@ public class GraphicResource extends DynamicResource {
      * <code>&lt;mime-mapping&gt;</code> in <code>web.xml</code>).
      */
     public static GraphicResource create(FacesContext context, ValueExpression value, String type, Object lastModified) {
-        MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
-        Method beanMethod = methodReference.getMethod();
+        var methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
+        var beanMethod = methodReference.getMethod();
 
         if (beanMethod == null) {
             throw new IllegalArgumentException(format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
         }
 
         Class<?> beanClass = methodReference.getBase().getClass();
-        String name = getResourceBaseName(beanClass, beanMethod);
+        var name = getResourceBaseName(beanClass, beanMethod);
 
         if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
             if (!isOneAnnotationPresent(beanClass, REQUIRED_ANNOTATION_TYPES)) {
@@ -210,8 +208,8 @@ public class GraphicResource extends DynamicResource {
             ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), beanMethod));
         }
 
-        Object[] params = methodReference.getActualParameters();
-        String[] convertedParams = convertToStrings(context, params, beanMethod.getParameterTypes());
+        var params = methodReference.getActualParameters();
+        var convertedParams = convertToStrings(context, params, beanMethod.getParameterTypes());
         return new GraphicResource(name + (isEmpty(type) ? "" :  "." + type), convertedParams, lastModified);
     }
 
@@ -224,14 +222,14 @@ public class GraphicResource extends DynamicResource {
             return "data:" + getContentType() + ";base64," + base64;
         }
         else {
-            String queryString = isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params))));
+            var queryString = isEmpty(params) ? "" : "&" + toQueryString(singletonMap("p", asList(params)));
             return super.getRequestPath() + queryString;
         }
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        MethodReference methodReference = ALLOWED_METHODS.get(getResourceName().split("\\.", 2)[0]);
+        var methodReference = ALLOWED_METHODS.get(getResourceName().split("\\.", 2)[0]);
 
         Method method;
         Object[] convertedParams;
@@ -289,7 +287,7 @@ public class GraphicResource extends DynamicResource {
      * @throws IllegalArgumentException When bean method is missing.
      */
     public static void registerGraphicImageBeans() {
-        BeanManager beanManager = getManager();
+        var beanManager = getManager();
 
         for (Bean<?> bean : beanManager.getBeans(Object.class, ANY)) {
             Class<?> beanClass = bean.getBeanClass();
@@ -299,12 +297,12 @@ public class GraphicResource extends DynamicResource {
             }
 
             Object instance = getReference(beanManager, bean);
-            boolean registered = false;
+            var registered = false;
 
             for (Method method : beanClass.getMethods()) {
                 if (isPublic(method.getModifiers()) && isOneInstanceOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
-                    String resourceBaseName = getResourceBaseName(beanClass, method);
-                    MethodReference methodReference = new MethodReference(instance, method);
+                    var resourceBaseName = getResourceBaseName(beanClass, method);
+                    var methodReference = new MethodReference(instance, method);
                     ALLOWED_METHODS.put(resourceBaseName, methodReference);
                     registered = true;
                 }
@@ -332,7 +330,7 @@ public class GraphicResource extends DynamicResource {
             return DEFAULT_CONTENT_TYPE;
         }
 
-        String contentType = getExternalContext().getMimeType(resourceName);
+        var contentType = getExternalContext().getMimeType(resourceName);
 
         if (contentType == null) {
             throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, resourceName.split("\\.", 2)[1]));
@@ -361,16 +359,16 @@ public class GraphicResource extends DynamicResource {
     private static String convertToBase64(Object content) {
         byte[] bytes;
 
-        if (content instanceof InputStream) {
+        if (content instanceof InputStream inputStream) {
             try {
-                bytes = toByteArray((InputStream) content);
+                bytes = inputStream.readAllBytes();
             }
             catch (IOException e) {
                 throw new FacesException(e);
             }
         }
-        else if (content instanceof byte[]) {
-            bytes = (byte[]) content;
+        else if (content instanceof byte[] byteArray) {
+            bytes = byteArray;
         }
         else {
             throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, content));
@@ -385,13 +383,13 @@ public class GraphicResource extends DynamicResource {
      */
     private static String[] convertToStrings(FacesContext context, Object[] values, Class<?>[] types) {
         validateParamLength(values, types);
-        String[] strings = new String[values.length];
+        var strings = new String[values.length];
         UIComponent dummyComponent = new UIOutput();
 
-        for (int i = 0; i < values.length; i++) {
-            Object value = values[i];
+        for (var i = 0; i < values.length; i++) {
+            var value = values[i];
             Converter<Object> converter = createConverter(context, types[i]);
-            strings[i] = (converter != null)
+            strings[i] = converter != null
                 ? converter.getAsString(context, dummyComponent, value)
                 : coalesce(value, "").toString();
         }
@@ -405,13 +403,13 @@ public class GraphicResource extends DynamicResource {
      */
     private static Object[] convertToObjects(FacesContext context, String[] values, Class<?>[] types) {
         validateParamLength(values, types);
-        Object[] objects = new Object[values.length];
+        var objects = new Object[values.length];
         UIComponent dummyComponent = new UIOutput();
 
-        for (int i = 0; i < values.length; i++) {
-            String value = isEmpty(values[i]) ? null : values[i];
+        for (var i = 0; i < values.length; i++) {
+            var value = isEmpty(values[i]) ? null : values[i];
             Converter<Object> converter = createConverter(context, types[i]);
-            objects[i] = (converter != null)
+            objects[i] = converter != null
                 ? converter.getAsObject(context, dummyComponent, value)
                 : value;
         }

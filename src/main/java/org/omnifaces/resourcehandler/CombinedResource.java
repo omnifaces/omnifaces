@@ -13,7 +13,6 @@
 package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Faces.getMimeType;
-import static org.omnifaces.util.Utils.toByteArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.io.InputStream;
 import jakarta.faces.application.Resource;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.util.cache.Cache;
 import org.omnifaces.util.cache.CacheFactory;
 
 /**
@@ -55,7 +53,7 @@ public class CombinedResource extends DynamicResource {
      */
     public CombinedResource(String resourceName, Integer cacheTTL) {
         super(resourceName, CombinedResourceHandler.LIBRARY_NAME, getMimeType(resourceName));
-        String[] resourcePathParts = resourceName.split("\\.", 2)[0].split("/");
+        var resourcePathParts = resourceName.split("\\.", 2)[0].split("/");
         resourceId = resourcePathParts[resourcePathParts.length - 1];
         info = CombinedResourceInfo.get(resourceId);
         this.cacheTTL = cacheTTL;
@@ -65,7 +63,7 @@ public class CombinedResource extends DynamicResource {
 
     @Override
     public long getLastModified() {
-        return (info != null) ? info.getLastModified() : super.getLastModified();
+        return info != null ? info.getLastModified() : super.getLastModified();
     }
 
     @Override
@@ -87,7 +85,7 @@ public class CombinedResource extends DynamicResource {
      * Returns the cached input stream, or if there is none, then create one.
      */
     private InputStream getInputStreamFromCache() throws IOException {
-        Cache combinedResourceCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), CACHE_SCOPE);
+        var combinedResourceCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), CACHE_SCOPE);
         byte[] cachedCombinedResource;
 
         synchronized (CombinedResourceHandler.class) {
@@ -95,7 +93,9 @@ public class CombinedResource extends DynamicResource {
         }
 
         if (cachedCombinedResource == null) {
-            cachedCombinedResource = toByteArray(new CombinedResourceInputStream(info.getResources()));
+            try (var combinedResourceInputStream = new CombinedResourceInputStream(info.getResources())) {
+                cachedCombinedResource = combinedResourceInputStream.readAllBytes();
+            }
 
             synchronized (CombinedResourceHandler.class) {
                 if (combinedResourceCache.getObject(resourceId) == null) {
