@@ -52,22 +52,6 @@ public class BeanStorage implements Serializable {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Create and return the bean associated with given context and creational context.
-     * @param <T> The generic bean type.
-     * @param type The contextual type of the CDI managed bean.
-     * @param context The context to create the bean in.
-     * @return The bean associated with given context and creational context.
-     * @throws ClassCastException When the bean doesn't implement serializable.
-     * @deprecated Replaced by {@link #getBean(Contextual, CreationalContext)}.
-     */
-    @Deprecated(since = "4.5", forRemoval = true)
-    public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-        var bean = type.create(context);
-        beans.put(getBeanId(type), (Serializable) bean);
-        return bean;
-    }
-
-    /**
      * Returns the bean associated with the given context, or if there is none, then create one with the given creational context.
      * @param <T> The generic bean type.
      * @param type The contextual type of the CDI managed bean.
@@ -94,14 +78,14 @@ public class BeanStorage implements Serializable {
      * Returns the bean identifier of the given type.
      */
     private static String getBeanId(Contextual<?> type) {
-        return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
+        return type instanceof PassivationCapable passivationCapable ? passivationCapable.getId() : type.getClass().getName();
     }
 
     /**
      * Destroy all beans managed so far.
      */
     public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
-        for (Object bean : beans.values()) {
+        for (var bean : beans.values()) {
             destroy(bean);
         }
 

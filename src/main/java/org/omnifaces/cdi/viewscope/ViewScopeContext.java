@@ -57,7 +57,7 @@ public class ViewScopeContext implements Context {
      */
     @Override
     public boolean isActive() {
-        FacesContext context = FacesContext.getCurrentInstance();
+        var context = FacesContext.getCurrentInstance();
         return context != null && context.getViewRoot() != null && isInitialized();
     }
 

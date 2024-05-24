@@ -108,19 +108,6 @@ public class ViewScopeManager {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Create and returns the CDI view scoped managed bean from the current Faces view scope.
-     * @param <T> The expected return type.
-     * @param type The contextual type of the CDI managed bean.
-     * @param context The CDI context to create the CDI managed bean in.
-     * @return The created CDI view scoped managed bean from the current Faces view scope.
-     * @deprecated Replaced by {@link #getBean(Contextual, CreationalContext)}.
-     */
-    @Deprecated(since = "4.5", forRemoval = true)
-    public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-        return getBeanStorage(type).createBean(type, context);
-    }
-
-    /**
      * Returns the CDI view scoped managed bean from the current Faces view scope, and auto-creates one if it doesn't exist.
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
@@ -147,7 +134,7 @@ public class ViewScopeManager {
      * current active view scope.
      */
     public void preDestroyView() {
-        FacesContext context = FacesContext.getCurrentInstance();
+        var context = FacesContext.getCurrentInstance();
         UUID beanStorageId = null;
 
         if (isUnloadRequest(context)) {
@@ -180,15 +167,15 @@ public class ViewScopeManager {
 
     private <T> BeanStorage getBeanStorage(Contextual<T> type) {
         ViewScopeStorage storage = storageInSession;
-        Class<?> beanClass = ((Bean<T>) type).getBeanClass();
-        ViewScoped annotation = beanClass.getAnnotation(ViewScoped.class);
+        var beanClass = ((Bean<T>) type).getBeanClass();
+        var annotation = beanClass.getAnnotation(ViewScoped.class);
 
         if (annotation != null && annotation.saveInViewState()) { // Can be null when declared on producer method.
             checkStateSavingMethod(beanClass);
             storage = storageInViewState;
         }
 
-        UUID beanStorageId = storage.getBeanStorageId();
+        var beanStorageId = storage.getBeanStorageId();
 
         if (beanStorageId == null) {
             beanStorageId = UUID.randomUUID();
@@ -203,7 +190,7 @@ public class ViewScopeManager {
             }
         }
 
-        BeanStorage beanStorage = storage.getBeanStorage(beanStorageId);
+        var beanStorage = storage.getBeanStorage(beanStorageId);
 
         if (beanStorage == null) {
             beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
@@ -213,8 +200,8 @@ public class ViewScopeManager {
         return beanStorage;
     }
 
-    private void checkStateSavingMethod(Class<?> beanClass) {
-        FacesContext context = FacesContext.getCurrentInstance();
+    private static void checkStateSavingMethod(Class<?> beanClass) {
+        var context = FacesContext.getCurrentInstance();
 
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
             throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
