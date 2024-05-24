@@ -52,7 +52,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
-    /** The component type, which is {@value org.omnifaces.component.script.CriticalStylesheet#COMPONENT_TYPE}. */
+    /** The component type, which is {@value org.omnifaces.component.stylesheet.CriticalStylesheet#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.stylesheet.CriticalStylesheet";
 
     // Constructors ---------------------------------------------------------------------------------------------------
