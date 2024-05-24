@@ -113,16 +113,30 @@ public class ViewScopeManager {
      * @param type The contextual type of the CDI managed bean.
      * @param context The CDI context to create the CDI managed bean in.
      * @return The created CDI view scoped managed bean from the current Faces view scope.
+     * @deprecated Replaced by {@link #getBean(Contextual, CreationalContext)}.
      */
+    @Deprecated(since = "4.5", forRemoval = true)
     public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
         return getBeanStorage(type).createBean(type, context);
     }
 
     /**
-     * Returns the CDI view scoped managed bean from the current Faces view scope.
+     * Returns the CDI view scoped managed bean from the current Faces view scope, and auto-creates one if it doesn't exist.
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
-     * @return The CDI view scoped managed bean from the current Faces view scope.
+     * @param context The CDI context to create the CDI managed bean in.
+     * @return The auto-created CDI view scoped managed bean from the current Faces view scope.
+     * @since 4.5
+     */
+    public <T> T getBean(Contextual<T> type, CreationalContext<T> context) {
+        return getBeanStorage(type).getBean(type, context);
+    }
+
+    /**
+     * Returns the CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
+     * @param <T> The expected return type.
+     * @param type The contextual type of the CDI managed bean.
+     * @return The CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
      */
     public <T> T getBean(Contextual<T> type) {
         return getBeanStorage(type).getBean(type);

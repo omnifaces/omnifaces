@@ -58,11 +58,25 @@ public class BeanStorage implements Serializable {
      * @param context The context to create the bean in.
      * @return The bean associated with given context and creational context.
      * @throws ClassCastException When the bean doesn't implement serializable.
+     * @deprecated Replaced by {@link #getBean(Contextual, CreationalContext)}.
      */
+    @Deprecated(since = "4.5", forRemoval = true)
     public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-        T bean = type.create(context);
+        var bean = type.create(context);
         beans.put(getBeanId(type), (Serializable) bean);
         return bean;
+    }
+
+    /**
+     * Returns the bean associated with the given context, or if there is none, then create one with the given creational context.
+     * @param <T> The generic bean type.
+     * @param type The contextual type of the CDI managed bean.
+     * @return The bean associated with given context and creational context.
+     * @since 4.5
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getBean(Contextual<T> type, CreationalContext<T> context) {
+        return (T) beans.computeIfAbsent(getBeanId(type), $ -> (Serializable) type.create(context));
     }
 
     /**
