@@ -19,6 +19,7 @@ import static java.util.Optional.ofNullable;
 import static org.omnifaces.util.Reflection.invokeStaticMethod;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -112,7 +113,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
          */
         public boolean accepts(HttpServletRequest request) {
             return isAvailable() && list(request.getHeaders("Accept-Encoding")).stream()
-                    .flatMap(value -> stream(value.split(",")).map(String::trim))
+                    .flatMap(value -> splitAndTrim(value, ","))
                     .anyMatch(encodingDirective::equals);
         }
 
@@ -231,7 +232,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
     }
 
     private static boolean isCacheControlNoTransform(String value) {
-        return stream(value.toLowerCase().split(",")).map(String::trim).anyMatch("no-transform"::equals);
+        return splitAndTrim(value.toLowerCase(), ",").anyMatch("no-transform"::equals);
     }
 
     @Override
