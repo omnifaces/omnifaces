@@ -118,6 +118,12 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * &lt;/init-param&gt;
  * </pre>
  * <p>
+ * The default <code>algorithm</code> is thus automatic. It will then find the best matching algorithm depending on
+ * whether the algorithm is available and the client supports it, in this order: Brotli, GZIP or Deflate. In case you
+ * explicitly specify a value of <code>Brotli</code>, and it is not available, then an exception will be thrown. In case
+ * you happen to have Brotli libraries (transitively) included for other purposes and you actually want to use GZIP,
+ * then specify a value of <code>GZIP</code>.
+ * <p>
  * The default <code>threshold</code> is thus 150 bytes. This means that when the response is not larger than 150 bytes,
  * then it will not be compressed. Only when it's larger than 150 bytes, then it will be compressed. A
  * threshold of between 150 and 1000 bytes is recommended due to overhead and latency of compression/decompression.
