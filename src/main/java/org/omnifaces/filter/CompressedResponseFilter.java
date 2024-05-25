@@ -13,12 +13,12 @@
 package org.omnifaces.filter;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.servlet.CompressedHttpServletResponse.Algorithm.BROTLI;
+import static org.omnifaces.util.Utils.splitAndTrim;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
@@ -222,7 +222,7 @@ public class CompressedResponseFilter extends HttpFilter {
         String mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
 
         if (mimetypesParam != null) {
-            mimetypes = new HashSet<>(Arrays.asList(mimetypesParam.split("\\s*,\\s*")));
+            mimetypes = splitAndTrim(mimetypesParam, ",").collect(toSet());
         }
     }
 

@@ -17,13 +17,14 @@ import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -37,14 +38,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.omnifaces.filter.GzipResponseFilter;
+import org.omnifaces.filter.CompressedResponseFilter;
 import org.omnifaces.util.Servlets;
 
 /**
  * <p>
  * The well known "<a href="https://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
  * as an abstract template, slightly refactored, rewritten and modernized with a.o. fast NIO stuff instead of legacy
- * RandomAccessFile. GZIP support is stripped off as that can be done application wide via {@link GzipResponseFilter}.
+ * RandomAccessFile. GZIP support is stripped off as that can be done application wide via {@link CompressedResponseFilter}.
  * <p>
  * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code>
  * caching requests, hereby improving browser caching. This servlet also properly deals with <code>Range</code> and
@@ -423,10 +424,8 @@ public abstract class FileServlet extends HttpServlet {
      * Returns true if the given match header matches the given ETag value.
      */
     private static boolean matches(String matchHeader, String eTag) {
-        String[] matchValues = matchHeader.split("\\s*,\\s*");
-        Arrays.sort(matchValues);
-        return Arrays.binarySearch(matchValues, eTag) > -1
-            || Arrays.binarySearch(matchValues, "*") > -1;
+        return splitAndTrim(matchHeader, ",")
+            .anyMatch(matchValue -> isOneOf(matchValue, eTag, "*"));
     }
 
     /**
@@ -449,11 +448,8 @@ public abstract class FileServlet extends HttpServlet {
      * Returns true if the given accept header accepts the given value.
      */
     private static boolean accepts(String acceptHeader, String toAccept) {
-        String[] acceptValues = acceptHeader.split("\\s*[,;]\\s*");
-        Arrays.sort(acceptValues);
-        return Arrays.binarySearch(acceptValues, toAccept) > -1
-            || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-            || Arrays.binarySearch(acceptValues, "*/*") > -1;
+        return splitAndTrim(acceptHeader, ",").map(acceptValue -> splitAndTrim(acceptValue, ";", 2)[0])
+            .anyMatch(acceptValue -> isOneOf(acceptValue, toAccept, toAccept.replaceAll("/.*$", "/*"), "*/*"));
     }
 
     // Nested classes -------------------------------------------------------------------------------------------------

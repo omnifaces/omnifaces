@@ -26,6 +26,7 @@ import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -406,9 +407,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         String configuredResources = getInitParameter(name);
 
         if (configuredResources != null) {
-            for (String resourceIdentifier : configuredResources.split("\\s*,\\s*")) {
-                resources.add(new ResourceIdentifier(resourceIdentifier));
-            }
+            splitAndTrim(configuredResources, ",").forEach(id -> resources.add(new ResourceIdentifier(id)));
         }
 
         return resources;

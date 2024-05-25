@@ -16,6 +16,7 @@ import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -264,8 +265,8 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
         Map<ResourceIdentifier, String> cdnResources = new HashMap<>();
 
-        for (String cdnResource : cdnResourcesParam.split("\\s*,\\s*")) {
-            String[] cdnResourceIdAndURL = cdnResource.split("\\s*=\\s*", 2);
+        splitAndTrim(cdnResourcesParam, ",").forEach(cdnResource -> {
+            String[] cdnResourceIdAndURL = splitAndTrim(cdnResource, "=", 2);
 
             if (cdnResourceIdAndURL.length != 2) {
                 throw new IllegalArgumentException(ERROR_INVALID_INIT_PARAM);
@@ -278,7 +279,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
             }
 
             cdnResources.put(id, cdnResourceIdAndURL[1]);
-        }
+        });
 
         return cdnResources;
     }
