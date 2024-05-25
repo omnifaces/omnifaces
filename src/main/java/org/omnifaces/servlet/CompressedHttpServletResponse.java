@@ -22,11 +22,9 @@ import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -114,7 +112,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
          */
         public boolean accepts(HttpServletRequest request) {
             return isAvailable() && list(request.getHeaders("Accept-Encoding")).stream()
-                    .map(COMMA_SEPARATED::split).flatMap(Arrays::stream)
+                    .flatMap(value -> stream(value.split(",")).map(String::trim))
                     .anyMatch(encodingDirective::equals);
         }
 
@@ -153,11 +151,6 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
                     .map($ -> toClassOrNull(outputStreamClassName)).orElse(null);
         }
     }
-
-    // Private constants ----------------------------------------------------------------------------------------------
-
-    private static final Pattern COMMA_SEPARATED = Pattern.compile("\\s*,\\s*");
-    private static final Pattern NO_TRANSFORM = Pattern.compile("((.*)[\\s,])?no-transform([\\s,](.*))?", Pattern.CASE_INSENSITIVE);
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -213,7 +206,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
                 dontCompress = (value != null);
             }
             else if ("cache-control".equals(lowerCasedName)) {
-                dontCompress = (value != null && NO_TRANSFORM.matcher(value).matches());
+                dontCompress = (value != null && isCacheControlNoTransform(value));
             }
         }
     }
@@ -232,9 +225,13 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
                 dontCompress = true;
             }
             else if ("cache-control".equals(lowerCasedName)) {
-                dontCompress = (dontCompress || NO_TRANSFORM.matcher(value).matches());
+                dontCompress = (dontCompress || isCacheControlNoTransform(value));
             }
         }
+    }
+
+    private static boolean isCacheControlNoTransform(String value) {
+        return stream(value.toLowerCase().split(",")).map(String::trim).anyMatch("no-transform"::equals);
     }
 
     @Override
