@@ -30,7 +30,9 @@ import org.omnifaces.io.ResettableBufferedOutputStream;
  *
  * @author Bauke Scholtz
  * @since 1.1
+ * @deprecated Use {@link CompressedHttpServletResponse} instead.
  */
+@Deprecated(since = "4.5", forRemoval = true)
 public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
     // Constants ------------------------------------------------------------------------------------------------------
