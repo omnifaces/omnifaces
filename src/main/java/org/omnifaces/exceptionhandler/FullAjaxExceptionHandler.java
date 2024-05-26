@@ -31,6 +31,7 @@ import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -394,7 +395,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         String typesParam = context.getInitParameter(paramName);
 
         if (!isEmpty(typesParam)) {
-            for (String typeParam : typesParam.split("\\s*,\\s*")) {
+            splitAndTrim(typesParam, ",").forEach(typeParam -> {
                 try {
                     types.add((Class<? extends Throwable>) Class.forName(typeParam));
                 }
@@ -402,7 +403,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
                     throw new IllegalArgumentException(
                         format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
                 }
-            }
+            });
         }
 
         return types.toArray(new Class[types.size()]);

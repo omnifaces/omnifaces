@@ -26,6 +26,7 @@ import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,8 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 
 import org.omnifaces.component.script.DeferredScript;
+import org.omnifaces.component.stylesheet.CriticalStylesheet;
+import org.omnifaces.renderer.CriticalStylesheetRenderer;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
@@ -77,11 +80,12 @@ import org.omnifaces.util.cache.Cache;
  * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
  * <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its <code>target</code> attribute to
  * <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design
- * limitation. This is not necessary for <code>&lt;o:deferredScript&gt;</code>.
+ * limitation. This is not necessary for <code>&lt;o:criticalStylesheet&gt;</code> nor <code>&lt;o:deferredScript&gt;</code>.
  * <pre>
  * &lt;h:head&gt;
  *     ...
- *     &lt;h:outputStylesheet name="style.css" /&gt;
+ *     &lt;h:criticalStylesheet name="layout.css" /&gt;
+ *     &lt;h:outputStylesheet name="page.css" /&gt;
  *     &lt;h:outputScript name="script.js" target="head" /&gt;
  *     &lt;o:deferredScript name="onload.js" /&gt;
  * &lt;/h:head&gt;
@@ -89,7 +93,8 @@ import org.omnifaces.util.cache.Cache;
  * <p>
  * If you want them to appear <em>after</em> any auto-included resources of standard Faces implementation or Faces component
  * libraries, then move the declarations to top of the <code>&lt;h:body&gt;</code>. This is not necessary for
- * <code>&lt;o:deferredScript&gt;</code>.
+ * <code>&lt;o:criticalStylesheet&gt;</code> nor <code>&lt;o:deferredScript&gt;</code> as they already auto-relocate by 
+ * themselves.
  * <pre>
  * &lt;h:body&gt;
  *     &lt;h:outputStylesheet name="style.css" /&gt;
@@ -402,9 +407,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         String configuredResources = getInitParameter(name);
 
         if (configuredResources != null) {
-            for (String resourceIdentifier : configuredResources.split("\\s*,\\s*")) {
-                resources.add(new ResourceIdentifier(resourceIdentifier));
-            }
+            splitAndTrim(configuredResources, ",").forEach(id -> resources.add(new ResourceIdentifier(id)));
         }
 
         return resources;
@@ -473,12 +476,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
         // General stylesheet/script builder --------------------------------------------------------------------------
 
+        private Builder criticalStylesheets;
         private Builder stylesheets;
         private Builder scripts;
         private Map<String, Builder> deferredScripts;
         private List<UIComponent> componentResourcesToRemove;
 
         public CombinedResourceBuilder() {
+            criticalStylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : CriticalStylesheetRenderer.RENDERER_TYPE);
             stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
             scripts = new Builder(EXTENSION_JS, TARGET_HEAD, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
             deferredScripts = new LinkedHashMap<>();
@@ -489,8 +494,11 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             if (LIBRARY_NAME.equals(id.getLibrary())) {
                 addCombined(context, component, rendererType, id, target); // Found an already combined resource. Extract and recombine it.
             }
+            else if (component instanceof CriticalStylesheet) {
+                addStylesheet(context, component, id, criticalStylesheets);
+            }
             else if (rendererType.equals(RENDERER_TYPE_CSS)) {
-                addStylesheet(context, component, id);
+                addStylesheet(context, component, id, stylesheets);
             }
             else if (rendererType.equals(RENDERER_TYPE_JS)) {
                 addScript(context, component, id);
@@ -518,7 +526,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             }
         }
 
-        private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
+        private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id, Builder builder) {
             if (component != null && "print".equals(component.getAttributes().get("media"))) {
                 return;
             }
@@ -528,7 +536,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) {
                 componentResourcesToRemove.add(component);
             }
-            else if (stylesheets.add(component, id)) {
+            else if (builder.add(component, id)) {
                 resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
             }
         }
@@ -550,6 +558,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         public void create(FacesContext context) {
+            criticalStylesheets.create(context);
             stylesheets.create(context);
             scripts.create(context);
 
@@ -589,8 +598,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
                 infoBuilder.add(resourceIdentifier);
                 boolean deferredScript = (componentResource instanceof DeferredScript);
+                boolean specialized = deferredScript || (componentResource instanceof CriticalStylesheet);
 
-                if (this.componentResource == null && (deferredScript || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
+                if (this.componentResource == null && (specialized || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
                     this.componentResource = componentResource;
                 }
                 else {

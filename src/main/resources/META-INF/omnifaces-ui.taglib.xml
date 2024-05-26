@@ -6656,4 +6656,78 @@ String name2 = Faces.getRequestParameter("name2"); // value2
         </validator>
     </tag>
 
+    <tag>
+        <description>
+            <![CDATA[
+                <strong>CriticalStylesheet</strong> is a component which renders a <code>&lt;link rel="preload" as="style"&gt;</code> instead of <code>&lt;link rel="stylesheet"&gt;</code>.
+            ]]>
+        </description>
+        <tag-name>criticalStylesheet</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.stylesheet.CriticalStylesheet</component-type>
+        </component>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The component identifier for this component. This value must be unique within the closest parent
+                    component that is a naming container.
+                ]]>
+            </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+                    processed on any subsequent form submit. The default value for this property is true.
+                ]]>
+            </description>
+            <name>rendered</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The <code>ValueExpression</code> linking this component to a property in a backing bean.
+                ]]>
+            </description>
+            <name>binding</name>
+            <required>false</required>
+            <type>jakarta.faces.component.UIComponent</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The "library name" part of the resource identifier.
+                ]]>
+            </description>
+            <name>library</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The "resource name" part of the resource identifier.
+                ]]>
+            </description>
+            <name>name</name>
+            <required>true</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The media that the stylesheet applies to.
+                ]]>
+            </description>
+            <name>media</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
 </facelet-taglib>

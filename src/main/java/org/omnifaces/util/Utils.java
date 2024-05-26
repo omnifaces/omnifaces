@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.function.Predicate.not;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
@@ -444,6 +445,31 @@ public final class Utils {
         else {
             return object.getClass().getClassLoader();
         }
+    }
+
+    /**
+     * Split given string on given delimiter and makes sure each part is already trimmed via {@link String#trim()} and
+     * that any empty strings are already filtered.
+     * @param string String to split.
+     * @param delimiter Delimiter to split on.
+     * @return A stream of the split parts, already trimmed, will not contain empty strings.
+     * @since 4.5
+     */
+    public static Stream<String> splitAndTrim(String string, String delimiter) {
+        return stream(string.split(quote(delimiter))).map(String::trim).filter(not(String::isEmpty));
+    }
+
+    /**
+     * Split given string on given delimiter until the given threshold and makes sure each part is already trimmed via
+     * {@link String#trim()}.
+     * @param string String to split.
+     * @param delimiter Delimiter to split on.
+     * @param limit the result threshold, as described in {@link String#split(String, int)}.
+     * @return An array of the split parts, already trimmed, can contain empty strings.
+     * @since 4.5
+     */
+    public static String[] splitAndTrim(String string, String delimiter, int limit) {
+        return stream(string.split(quote(delimiter), limit)).map(String::trim).toArray(String[]::new);
     }
 
     // I/O ------------------------------------------------------------------------------------------------------------

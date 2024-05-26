@@ -121,7 +121,9 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * @see ResettableBufferedOutputStream
  * @see ResettableBufferedWriter
  * @see HttpFilter
+ * @deprecated Use {@link CompressedResponseFilter} instead.
  */
+@Deprecated(since = "4.5", forRemoval = true)
 public class GzipResponseFilter extends HttpFilter {
 
     // Constants ------------------------------------------------------------------------------------------------------

@@ -13,12 +13,14 @@
 package org.omnifaces.resourcehandler;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
 import static org.omnifaces.util.FacesLocal.getResource;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -114,7 +116,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
         if (facesServletRegistration != null) {
             Collection<String> existingMappings = facesServletRegistration.getMappings();
 
-            for (String viewResource : viewResourcesParam.split("\\s*,\\s*")) {
+            for (String viewResource : splitAndTrim(viewResourcesParam, ",").collect(toList())) {
                 if (!viewResource.startsWith("/")) {
                     throw new IllegalArgumentException(format(ERROR_MISSING_FORWARD_SLASH, viewResource));
                 }

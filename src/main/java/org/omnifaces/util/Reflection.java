@@ -587,7 +587,7 @@ public final class Reflection {
 
         List<Method> methods = new ArrayList<>();
 
-        for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
+        for (Class<?> cls = base instanceof Class ? (Class<?>) base : base.getClass(); cls != null; cls = cls.getSuperclass()) {
             collectMethods(methods, cls, false, methodName, params);
 
             for (Class<?> iface : cls.getInterfaces()) {
@@ -977,6 +977,37 @@ public final class Reflection {
                 throw new IllegalStateException(
                     format(ERROR_INVOKE_METHOD, method.getName(), instance.getClass(), "[]"), e);
             }
+        }
+    }
+
+    /**
+     * Invoke a static method of the given type on the given method name with the given parameters and return the result.
+     * <p>
+     * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of
+     * them is still null, a NullPointerException will be thrown.
+     * @param <T> The expected return type.
+     * @param type The type to invoke the given static method on.
+     * @param methodName The name of the static method to be invoked on the given type.
+     * @param parameters The method parameters, if any.
+     * @return The result of the method invocation, if any.
+     * @throws NullPointerException When one of the given parameters is null.
+     * @throws IllegalStateException If the method cannot be invoked.
+     * @throws ClassCastException When <code>T</code> is of wrong type.
+     * @since 4.5
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeStaticMethod(Class<?> type, String methodName, Object... parameters) {
+        try {
+            Method method = findMethod(type, methodName, parameters);
+
+            if (method == null) {
+                throw new NoSuchMethodException();
+            }
+
+            return (T) method.invoke(null, parameters);
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(format(ERROR_INVOKE_METHOD, methodName, type, Arrays.toString(parameters)), e);
         }
     }
 

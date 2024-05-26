@@ -35,6 +35,7 @@ import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitAndTrim;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
@@ -445,7 +446,7 @@ public final class Servlets {
      */
     public static String getRemoteAddr(HttpServletRequest request) {
         String forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
-        return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+        return isEmpty(forwardedFor) ? request.getRemoteAddr() : splitAndTrim(forwardedFor, ",", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
     }
 
     /**
@@ -562,7 +563,7 @@ public final class Servlets {
             }
 
             if ((!quoted && c == ';') || i + 1 == header.length()) {
-                String[] entry = builder.toString().replaceAll(";$", "").trim().split("\\s*=\\s*", 2);
+                String[] entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
                 String name = entry[0].toLowerCase();
                 String value = entry.length == 1 ? ""
                     : entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
