@@ -185,7 +185,7 @@ public class CompressedResponseFilter extends HttpFilter {
      */
     @Override
     public void init() throws ServletException {
-        String algorithmParam = getInitParameter(INIT_PARAM_ALGORITHM);
+        var algorithmParam = getInitParameter(INIT_PARAM_ALGORITHM);
 
         if (algorithmParam != null) {
             try {
@@ -208,18 +208,18 @@ public class CompressedResponseFilter extends HttpFilter {
             }
         }
 
-        String thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
+        var thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
 
         if (thresholdParam != null) {
             if (!thresholdParam.matches("[0-9]{1,4}")) {
                 throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
             }
             else {
-                threshold = Integer.valueOf(thresholdParam);
+                threshold = Integer.parseInt(thresholdParam);
             }
         }
 
-        String mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
+        var mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
 
         if (mimetypesParam != null) {
             mimetypes = splitAndTrim(mimetypesParam, ",").collect(toSet());
@@ -235,10 +235,10 @@ public class CompressedResponseFilter extends HttpFilter {
         (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
             throws ServletException, IOException
     {
-        Algorithm acceptedAlgorithm = (algorithm == null) ? Algorithm.find(request).orElse(null) : algorithm.accepts(request) ? algorithm : null;
+        var acceptedAlgorithm = algorithm == null ? Algorithm.find(request).orElse(null) : algorithm.accepts(request) ? algorithm : null;
 
         if (acceptedAlgorithm != null) {
-            CompressedHttpServletResponse compressedResponse = new CompressedHttpServletResponse(response, acceptedAlgorithm, threshold, mimetypes);
+            var compressedResponse = new CompressedHttpServletResponse(response, acceptedAlgorithm, threshold, mimetypes);
             chain.doFilter(request, compressedResponse);
             compressedResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
         }

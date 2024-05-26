@@ -76,7 +76,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         private final String encodingDirective;
         private final Optional<Class<? extends OutputStream>> outputStreamClass;
 
-        private Algorithm(String encodingDirective, Class<? extends OutputStream>... outputStreamClasses) {
+        Algorithm(String encodingDirective, Class<? extends OutputStream>... outputStreamClasses) {
             this.encodingDirective = encodingDirective;
             this.outputStreamClass = stream(outputStreamClasses).filter(Objects::nonNull).findFirst();
         }
@@ -146,7 +146,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
                 return toClassOrNull(outputStreamClassName);
             }
 
-            String[] loader = loaderSignature.split("#");
+            var loader = loaderSignature.split("#");
             return ofNullable(toClassOrNull(loader[0]))
                     .filter(loaderClass -> invokeStaticMethod(loaderClass, loader[1]) != FALSE)
                     .map($ -> toClassOrNull(outputStreamClassName)).orElse(null);
@@ -198,16 +198,16 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         super.setHeader(name, value);
 
         if (name != null) {
-            String lowerCasedName = name.toLowerCase();
+            var lowerCasedName = name.toLowerCase();
 
             if ("vary".equals(lowerCasedName)) {
                 vary = value;
             }
             else if ("content-range".equals(lowerCasedName)) {
-                dontCompress = (value != null);
+                dontCompress = value != null;
             }
             else if ("cache-control".equals(lowerCasedName)) {
-                dontCompress = (value != null && isCacheControlNoTransform(value));
+                dontCompress = value != null && isCacheControlNoTransform(value);
             }
         }
     }
@@ -217,16 +217,16 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         super.addHeader(name, value);
 
         if (name != null && value != null) {
-            String lowerCasedName = name.toLowerCase();
+            var lowerCasedName = name.toLowerCase();
 
             if ("vary".equals(lowerCasedName)) {
-                vary = ((vary != null) ? (vary + ",") : "") + value;
+                vary = (vary != null ? vary + "," : "") + value;
             }
             else if ("content-range".equals(lowerCasedName)) {
                 dontCompress = true;
             }
             else if ("cache-control".equals(lowerCasedName)) {
-                dontCompress = (dontCompress || isCacheControlNoTransform(value));
+                dontCompress = dontCompress || isCacheControlNoTransform(value);
             }
         }
     }
@@ -298,14 +298,14 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
          */
         @Override
         public OutputStream createOutputStream(boolean doCompress) throws IOException {
-            HttpServletResponse originalResponse = (HttpServletResponse) getResponse();
+            var originalResponse = (HttpServletResponse) getResponse();
 
             if (doCompress && !dontCompress && (closing || !isCommitted())) {
-                String contentType = getContentType();
+                var contentType = getContentType();
 
                 if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
                     addHeader("Content-Encoding", algorithm.getEncodingDirective());
-                    setHeader("Vary", (!isOneOf(vary, null, "*") ? (vary + ",") : "") + "Accept-Encoding");
+                    setHeader("Vary", (!isOneOf(vary, null, "*") ? vary + "," : "") + "Accept-Encoding");
                     return algorithm.createOutputStream(originalResponse);
                 }
             }
