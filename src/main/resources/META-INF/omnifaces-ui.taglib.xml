@@ -6733,4 +6733,390 @@ String name2 = Faces.getRequestParameter("name2"); // value2
         </attribute>
     </tag>
 
+    <tag>
+        <description>
+            <![CDATA[
+                The <code>&lt;o:link&gt;</code> is a component that extends the standard <code>&lt;h:link&gt;</code> and allows
+                including the request query string parameters of the current URL into the link's target URL. Standard Faces
+                <code>&lt;h:link&gt;</code> does not include any query string parameters which are not declared as view parameters.
+                This is particularly useful if you expect some state in the target page and don't want to repeat
+                <code>&lt;f|o:param&gt;</code> all over place.
+             ]]>
+        </description>
+        <tag-name>link</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.Link</component-type>
+        </component>
+        <attribute>
+            <description>
+                The component identifier for this component. This value must be
+                unique within the closest parent component that is a naming
+                container.
+            </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    Whether to include request query string parameters in the target URL.
+                    Defaults to false.
+                ]]>
+            </description>
+            <name>includeRequestParams</name>
+            <required>false</required>
+            <type>boolean</type>
+            </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Per the WAI-ARIA spec and its
+                    relationship to HTML5 (Section title ARIA Role Attriubute),
+                    every HTML element may have a "role" attribute whose value
+                    must be passed through unmodified on the element on which it
+                    is declared in the final rendered markup.  The attribute, if
+                    specified, must have a value that is a string literal that is,
+                    or an EL Expression that evaluates to, a set of
+                    space-separated tokens representing the various WAI-ARIA roles
+                    that the element belongs to.]]>
+                </description>
+            <name>role</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Disable appending the <code>ClientWindow</code> on the rendering of this element.]]>
+                </description>
+            <name>disableClientWindow</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The component identifier for this component.  This value must be
+                    unique within the closest parent component that is a naming
+                    container.]]>
+                </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Whether to include page parameters in the target URI.]]>
+                </description>
+            <name>includeViewParams</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The logical outcome used to resolve a navigation case.]]>
+                </description>
+            <name>outcome</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Flag indicating whether or not this component should be rendered
+                    (during Render Response Phase), or processed on any subsequent
+                    form submit.  The default value for this property is true.]]>
+                </description>
+            <name>rendered</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The current value of this component.]]>
+                </description>
+            <name>value</name>
+            <required>false</required>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Access key that, when pressed, transfers focus
+                    to this element.]]>
+                </description>
+            <name>accesskey</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The character encoding of the resource designated
+                    by this hyperlink.]]>
+                </description>
+            <name>charset</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The position and shape of the hot spot on the screen
+                    (for use in client-side image maps).]]>
+                </description>
+            <name>coords</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Direction indication for text that does not inherit directionality.
+                    Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).]]>
+                </description>
+            <name>dir</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Flag indicating that this element must never
+                    receive focus or be included in a subsequent
+                    submit.]]>
+                </description>
+            <name>disabled</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The identifier of the page fragment which should
+                    be brought into focus when the target page is
+                    rendered. The value of this attribute is appended
+                    to the end of target URL following a hash (#) mark.
+                    This notation is part of the standard URL syntax.]]>
+                </description>
+            <name>fragment</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The language code of the resource designated
+                    by this hyperlink.]]>
+                </description>
+            <name>hreflang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Code describing the language used in the generated markup
+                    for this component.]]>
+                </description>
+            <name>lang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when this element loses focus.]]>
+                </description>
+            <name>onblur</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    clicked over this element.]]>
+                </description>
+            <name>onclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    double clicked over this element.]]>
+                </description>
+            <name>ondblclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when this element receives focus.]]>
+                </description>
+            <name>onfocus</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a key is
+                    pressed down over this element.]]>
+                </description>
+            <name>onkeydown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a key is
+                    pressed and released over this element.]]>
+                </description>
+            <name>onkeypress</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a key is
+                    released over this element.]]>
+                </description>
+            <name>onkeyup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    pressed down over this element.]]>
+                </description>
+            <name>onmousedown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    moved within this element.]]>
+                </description>
+            <name>onmousemove</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    moved away from this element.]]>
+                </description>
+            <name>onmouseout</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    moved onto this element.]]>
+                </description>
+            <name>onmouseover</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Javascript code executed when a pointer button is
+                    released over this element.]]>
+                </description>
+            <name>onmouseup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The relationship from the current document
+                    to the anchor specified by this hyperlink.
+                    The value of this attribute is a space-separated
+                    list of link types.]]>
+                </description>
+            <name>rel</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[A reverse link from the anchor specified
+                    by this hyperlink to the current document.
+                    The value of this attribute is a space-separated
+                    list of link types.]]>
+                </description>
+            <name>rev</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The shape of the hot spot on the screen
+                    (for use in client-side image maps).  Valid
+                    values are:  default (entire region); rect
+                    (rectangular region); circle (circular region);
+                    and poly (polygonal region).]]>
+                </description>
+            <name>shape</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[CSS style(s) to be applied when this component is rendered.]]>
+                </description>
+            <name>style</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Space-separated list of CSS style class(es) to be applied when
+                    this element is rendered.  This value must be passed through
+                    as the "class" attribute on generated markup.]]>
+                </description>
+            <name>styleClass</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Position of this element in the tabbing order
+                    for the current document.  This value must be
+                    an integer between 0 and 32767.]]>
+                </description>
+            <name>tabindex</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Name of a frame where the resource
+                    retrieved via this hyperlink is to
+                    be displayed.]]>
+                </description>
+            <name>target</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[Advisory title information about markup elements generated
+                    for this component.]]>
+                </description>
+            <name>title</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    <![CDATA[The content type of the resource designated
+                    by this hyperlink.]]>
+                </description>
+            <name>type</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                    The ValueExpression linking this component to a property in a
+                    backing bean
+                </description>
+            <name>binding</name>
+            <required>false</required>
+            <type>jakarta.faces.component.UIComponent</type>
+        </attribute>
+    </tag>
+
 </facelet-taglib>
