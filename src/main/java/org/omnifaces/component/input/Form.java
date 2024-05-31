@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.input;
 
-import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
@@ -20,20 +19,10 @@ import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
-import static org.omnifaces.util.Components.getParams;
-import static org.omnifaces.util.FacesLocal.getRequestAttribute;
-import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getRequestURI;
-import static org.omnifaces.util.Servlets.toQueryString;
-import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 
-import jakarta.faces.application.Application;
-import jakarta.faces.application.ApplicationWrapper;
 import jakarta.faces.application.ResourceDependency;
-import jakarta.faces.application.ViewHandler;
-import jakarta.faces.application.ViewHandlerWrapper;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UICommand;
 import jakarta.faces.component.UIForm;
@@ -41,6 +30,7 @@ import jakarta.faces.component.html.HtmlForm;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.FacesContextWrapper;
 
+import org.omnifaces.component.ActionURLDecorator;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
 
@@ -121,6 +111,7 @@ import org.omnifaces.util.State;
  * @since 1.1
  * @author Arjan Tijms
  * @author Bauke Scholtz
+ * @see ActionURLDecorator
  */
 @FacesComponent(Form.COMPONENT_TYPE)
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
@@ -171,7 +162,7 @@ public class Form extends HtmlForm {
             getPassThroughAttributes().put("data-partialsubmit", "true");
         }
 
-        super.encodeBegin(new ActionURLDecorator(context, this));
+        super.encodeBegin(new ActionURLDecorator(context, this, isUseRequestURI(), isIncludeRequestParams()));
     }
 
     // Getters/setters ------------------------------------------------------------------------------------------------
@@ -274,69 +265,4 @@ public class Form extends HtmlForm {
             // NOOP.
         }
     }
-
-    /**
-     * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler
-     * -&gt; getActionURL.
-     *
-     * @author Arjan Tijms
-     */
-    private static class ActionURLDecorator extends FacesContextWrapper {
-
-        private Form form;
-
-        public ActionURLDecorator(FacesContext wrapped, Form form) {
-            super(wrapped);
-            this.form = form;
-        }
-
-        @Override
-        public Application getApplication() {
-            return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
-        }
-    }
-
-    private static class ActionURLDecoratorApplication extends ApplicationWrapper {
-
-        private Form form;
-
-        public ActionURLDecoratorApplication(Application wrapped, Form form) {
-            super(wrapped);
-            this.form = form;
-        }
-
-        @Override
-        public ViewHandler getViewHandler() {
-            return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
-        }
-    }
-
-    private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
-
-        private Form form;
-
-        public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
-            super(wrapped);
-            this.form = form;
-        }
-
-        /**
-         * The actual method we're decorating in order to either include the view parameters into the
-         * action URL, or include the request parameters into the action URL, or use request URI as
-         * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
-         * in the query string, overriding any existing view or request parameters on same name.
-         */
-        @Override
-        public String getActionURL(FacesContext context, String viewId) {
-            String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
-            String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), false));
-            return formatURLWithQueryString(actionURL, queryString);
-        }
-
-        private String getActionURL(FacesContext context) {
-            String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
-            return actionURL.isEmpty() ? "/" : actionURL;
-        }
-    }
-
 }
