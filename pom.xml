@@ -320,6 +320,63 @@
                 </executions>
             </plugin>
 
+            <!-- Configure the *.old.taglib.xml generators -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-old-taglib-files</id>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>src/main/resources/META-INF</dir>
+                            <includes><include>omnifaces-ui.taglib.xml</include></includes>
+                            <stylesheet>src/main/generate-omnifaces-ui.old.taglib.xsl</stylesheet>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/resources/META-INF</dir>
+                            <includes><include>omnifaces-functions.taglib.xml</include></includes>
+                            <stylesheet>src/main/generate-omnifaces-functions.old.taglib.xsl</stylesheet>
+                        </transformationSet>
+                    </transformationSets>
+                </configuration>
+            </plugin>
+
+            <!-- Rename these *.old.taglib.xml files and put them back in the right place -->
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>rename-old-taglib-files</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <fileSets>
+                                <fileSet>
+                                    <sourceFile>target/generated-resources/xml/xslt/omnifaces-ui.taglib.xml</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/omnifaces-ui.old.taglib.xml</destinationFile>
+                                </fileSet>
+                                <fileSet>
+                                    <sourceFile>target/generated-resources/xml/xslt/omnifaces-functions.taglib.xml</sourceFile>
+                                    <destinationFile>${project.build.outputDirectory}/META-INF/omnifaces-functions.old.taglib.xml</destinationFile>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Configure the jar with the binaries. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
