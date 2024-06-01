@@ -61,7 +61,8 @@ public class ParamITBean {
     @Param(
         validatorClasses = LongRangeValidator.class,
         validatorAttributes = @Attribute(name = "minimum", value="42"),
-        label = "Long param list")
+        label = "Long param list",
+        globalMessage = true)
     private List<Long> longParamList;
 
     @Param(

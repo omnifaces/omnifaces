@@ -63,6 +63,12 @@ public class ParamIT extends OmniFacesIT {
     @FindBy(id="messages")
     private WebElement messages;
 
+    @FindBy(id="viewRootMessages")
+    private WebElement viewRootMessages;
+
+    @FindBy(id="globalMessages")
+    private WebElement globalMessages;
+
     @Deployment(testable=false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ParamIT.class)
@@ -75,7 +81,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParam=foo");
         assertEquals("foo", stringParam.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -83,7 +89,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParam=f");
         assertEquals("", stringParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("size must be between 2 and 2147483647", messages.getText());
+        assertMessageEquals("size must be between 2 and 2147483647");
     }
 
     @Test
@@ -133,7 +139,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParamArray=foo&stringParamArray=bar");
         assertEquals("[foo, bar]", stringParamArray.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -141,7 +147,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParamArray=foo&stringParamArray=b");
         assertEquals("", stringParamArray.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("String param array: Validation Error: Length is less than allowable minimum of '2'", messages.getText());
+        assertMessageEquals("String param array: Validation Error: Length is less than allowable minimum of '2'");
     }
 
     @Test
@@ -149,7 +155,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParamList=foo&stringParamList=bar");
         assertEquals("[foo, bar]", stringParamList.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -157,7 +163,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("stringParamList=f&stringParamArray=bar");
         assertEquals("", stringParamList.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Invalid length", messages.getText());
+        assertMessageEquals("Invalid length");
     }
 
     @Test
@@ -165,7 +171,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParam=42");
         assertEquals("42", longParam.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -173,7 +179,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParam=foo");
         assertEquals("", longParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("longParam: 'foo' must be a number consisting of one or more digits.", messages.getText());
+        assertMessageEquals("longParam: 'foo' must be a number consisting of one or more digits.");
     }
 
     @Test
@@ -181,7 +187,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParam=13");
         assertEquals("", longParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Invalid range", messages.getText());
+        assertMessageEquals("Invalid range");
     }
 
     @Test
@@ -189,7 +195,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParamArray=42&longParamArray=64");
         assertEquals("[42, 64]", longParamArray.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -197,7 +203,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParamArray=42&longParamArray=foo");
         assertEquals("", longParamArray.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("longParamArray: 'foo' must be a number consisting of one or more digits.", messages.getText());
+        assertMessageEquals("longParamArray: 'foo' must be a number consisting of one or more digits.");
     }
 
     @Test
@@ -205,7 +211,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParamArray=24&longParamArray=64");
         assertEquals("", longParamArray.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Invalid range", messages.getText());
+        assertMessageEquals("Invalid range");
     }
 
     @Test
@@ -214,7 +220,7 @@ public class ParamIT extends OmniFacesIT {
         assertEquals("[42, 64]", longParamList.getText());
         assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit JSF converters are also invoked when List<T> is used instead of T[].
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertGlobalMessageEquals("");
     }
 
     @Test
@@ -222,7 +228,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParamList=42&longParamList=foo");
         assertEquals("", longParamList.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Long param list: 'foo' must be a number consisting of one or more digits.", messages.getText());
+        assertGlobalMessageEquals("Long param list: 'foo' must be a number consisting of one or more digits.");
     }
 
     @Test
@@ -230,7 +236,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("longParamList=24&longParamList=64");
         assertEquals("", longParamList.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Long param list: Validation Error: Value is less than allowable minimum of '42'", messages.getText());
+        assertGlobalMessageEquals("Long param list: Validation Error: Value is less than allowable minimum of '42'");
     }
 
     @Test
@@ -238,7 +244,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("dateParam=19780326");
         assertEquals("1978-03-26", dateParam.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -246,7 +252,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("dateParam=foo");
         assertEquals("", dateParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("dateParam: \"foo\" is not the date format we had in mind! Please use the format yyyyMMdd.", messages.getText());
+        assertMessageEquals("dateParam: \"foo\" is not the date format we had in mind! Please use the format yyyyMMdd.");
     }
 
     @Test
@@ -254,7 +260,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("entityParam=42");
         assertEquals("ParamITEntity[42]", entityParam.getText());
         assertEquals("initSuccess", initResult.getText());
-        assertEquals("", messages.getText());
+        assertMessageEquals("");
     }
 
     @Test
@@ -262,7 +268,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("entityParam=foo");
         assertEquals("", entityParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("Cannot convert because it threw java.lang.NumberFormatException: For input string: \"foo\"", messages.getText());
+        assertMessageEquals("Cannot convert because it threw java.lang.NumberFormatException: For input string: \"foo\"");
     }
 
     @Test
@@ -270,7 +276,7 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("entityParam=24");
         assertEquals("", entityParam.getText());
         assertEquals("initValidationFailed", initResult.getText());
-        assertEquals("That's not the right answer", messages.getText());
+        assertMessageEquals("That's not the right answer");
     }
 
     @Test
@@ -292,6 +298,22 @@ public class ParamIT extends OmniFacesIT {
         openWithQueryString("entityViewParam=24");
         assertEquals("", entityViewParam.getText());
         assertEquals("That's not the right answer", messages.getText());
+    }
+
+    void assertMessageEquals(String expectedMessage) {
+        assertMessageEquals(expectedMessage, false);
+    }
+
+    void assertGlobalMessageEquals(String expectedMessage) {
+        assertMessageEquals(expectedMessage, true);
+    }
+
+    void assertMessageEquals(String expectedMessage, boolean globalMessage) {
+        assertEquals(expectedMessage, messages.getText());
+
+        if (!expectedMessage.isEmpty()) {
+            assertEquals(messages.getText(), (globalMessage ? globalMessages : viewRootMessages).getText());
+        }
     }
 
 }
