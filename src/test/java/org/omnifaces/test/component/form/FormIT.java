@@ -21,6 +21,7 @@ import jakarta.faces.render.ResponseStateManager;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
@@ -48,7 +49,7 @@ public class FormIT extends OmniFacesIT {
     @Test
     void testFormDefault() {
         guardAjax(formDefaultSubmit::click);
-        String params = formDefaultParams.getText();
+        var params = formDefaultParams.getText();
         assertTrue(params.contains("formDefault"), "formDefault");
         assertFalse(params.contains("formDefault:input1"), "formDefault:input1");
         assertTrue(params.contains("formDefault:input2"), "formDefault:input2");
@@ -62,10 +63,10 @@ public class FormIT extends OmniFacesIT {
         assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME), PartialViewContext.PARTIAL_RENDER_PARAM_NAME);
     }
 
-    @Test
+    @Test @Disabled("Partial submit is currently integrated in Faces 5.0")
     void testFormDisabledPartialSubmit() {
         guardAjax(formDisabledSubmit::click);
-        String params = formDisabledParams.getText();
+        var params = formDisabledParams.getText();
         assertTrue(params.contains("formDisabled"), "formDisabled");
         assertTrue(params.contains("formDisabled:input1"), "formDisabled:input1");
         assertTrue(params.contains("formDisabled:input2"), "formDisabled:input2");
