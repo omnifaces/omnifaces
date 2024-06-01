@@ -17,7 +17,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Reflection.modifyField;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -28,7 +27,6 @@ import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
 import jakarta.enterprise.inject.spi.Annotated;
-import jakarta.enterprise.inject.spi.AnnotatedConstructor;
 import jakarta.enterprise.inject.spi.AnnotatedField;
 import jakarta.enterprise.inject.spi.AnnotatedParameter;
 import jakarta.enterprise.inject.spi.Bean;
@@ -69,14 +67,14 @@ public class ParamExtension implements Extension {
      * @param event The process injection target event.
      */
     public <T> void collectParams(@Observes ProcessInjectionTarget<T> event) {
-        Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
+        var paramsWithoutInject = new HashSet<AnnotatedField<?>>();
 
-        for (AnnotatedField<?> field : event.getAnnotatedType().getFields()) {
+        for (var field : event.getAnnotatedType().getFields()) {
             collectParams(field, paramsWithInject, paramsWithoutInject);
         }
 
-        for (AnnotatedConstructor<?> constructor : event.getAnnotatedType().getConstructors()) {
-            for (AnnotatedParameter<?> parameter : constructor.getParameters()) {
+        for (var constructor : event.getAnnotatedType().getConstructors()) {
+            for (var parameter : constructor.getParameters()) {
                 collectParams(parameter, paramsWithInject, null); // Without inject CDI won't invoke constructor in first place, so pass empty list.
             }
         }
@@ -86,17 +84,17 @@ public class ParamExtension implements Extension {
 
     private static void collectParams(Annotated annotated, Set<Type> paramsWithInject, Set<AnnotatedField<?>> paramsWithoutInject) {
         if (annotated.isAnnotationPresent(Param.class)) {
-            Type type = annotated.getBaseType();
+            var type = annotated.getBaseType();
 
             if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
                 return; // Skip ParamValue as it is already handled by RequestParameterProducer.
             }
 
-            if (annotated.isAnnotationPresent(Inject.class) || (annotated instanceof AnnotatedParameter && ((AnnotatedParameter<?>) annotated).getDeclaringCallable().isAnnotationPresent(Inject.class))) {
+            if (annotated.isAnnotationPresent(Inject.class) || annotated instanceof AnnotatedParameter<?> annotatedParameter && annotatedParameter.getDeclaringCallable().isAnnotationPresent(Inject.class)) {
                 paramsWithInject.add(type);
             }
-            else if (annotated instanceof AnnotatedField) {
-                paramsWithoutInject.add((AnnotatedField<?>) annotated);
+            else if (annotated instanceof AnnotatedField<?> annotatedField) {
+                paramsWithoutInject.add(annotatedField);
             }
         }
     }
@@ -106,7 +104,7 @@ public class ParamExtension implements Extension {
      * @param event The after bean discovery event.
      */
     public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
-        for (Type paramWithInject : paramsWithInject) {
+        for (var paramWithInject : paramsWithInject) {
             event.addBean(new DynamicParamValueProducer(paramWithInject));
         }
     }
@@ -135,11 +133,11 @@ public class ParamExtension implements Extension {
 
         @Override
         public void inject(T instance, CreationalContext<T> ctx) {
-            Class<?> beanClass = Beans.unwrapIfNecessary(instance.getClass());
+            var beanClass = Beans.unwrapIfNecessary(instance.getClass());
 
-            for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
-                ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(beanClass, paramWithoutInject));
-                Field field = paramWithoutInject.getJavaMember();
+            for (var paramWithoutInject : paramsWithoutInject) {
+                var paramValue = new ParamProducer().produce(new ParamInjectionPoint(beanClass, paramWithoutInject));
+                var field = paramWithoutInject.getJavaMember();
                 modifyField(instance, field, paramValue.getValue());
             }
 

@@ -127,7 +127,7 @@ public class ParamValue<V> implements Serializable {
     }
 
     /**
-     * Returns the param's client ID. In case {@link Param#globalMessage()} returns {@code true} then it returns 
+     * Returns the param's client ID. In case {@link Param#globalMessage()} returns {@code true} then it returns
      * {@code null}, else {@link UIViewRoot#getClientId(FacesContext)}.
      * @param context The involved faces context.
      * @return The param's client ID.

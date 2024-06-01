@@ -186,7 +186,7 @@ import org.omnifaces.util.Utils;
  *
  * <h2>Faces Messages</h2>
  * <p>
- * By default, faces messages are attached to the client ID of the current {@link UIViewRoot}, so you can use the 
+ * By default, faces messages are attached to the client ID of the current {@link UIViewRoot}, so you can use the
  * following {@code for} attribute to separate faces messages coming from {@code @Param} from the rest:
  * <pre>
  * &lt;h:messages for="#{view.id}" /&gt;
@@ -201,7 +201,7 @@ import org.omnifaces.util.Utils;
  * <pre>
  * &lt;h:messages globalOnly="true" /&gt;
  * </pre>
- * 
+ *
  * <h2>Historical note</h2>
  * <p>
  * Before OmniFaces 3.6, the <code>&#64;</code>{@link Param} which is not of type {@link ParamValue} also required

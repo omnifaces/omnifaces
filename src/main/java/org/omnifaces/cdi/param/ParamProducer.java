@@ -16,6 +16,8 @@ import static jakarta.faces.component.UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME;
 import static jakarta.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toMap;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
@@ -40,24 +42,18 @@ import static org.omnifaces.util.Validators.validateBeanProperty;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
-import jakarta.el.ValueExpression;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.AnnotatedParameter;
 import jakarta.enterprise.inject.spi.InjectionPoint;
-import jakarta.faces.application.Application;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
@@ -100,30 +96,29 @@ public class ParamProducer {
     @Produces
     @Param
     public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
-        Param param = getQualifier(injectionPoint, Param.class);
-        String name = getName(param, injectionPoint);
-        String label = getLabel(param, injectionPoint);
-        Type type = getType(injectionPoint);
+        var param = getQualifier(injectionPoint, Param.class);
+        var name = getName(param, injectionPoint);
+        var label = getLabel(param, injectionPoint);
+        var type = getType(injectionPoint);
 
-        FacesContext context = FacesContext.getCurrentInstance();
-        String[] submittedValues = param.pathIndex() > -1 ? getPathParameter(context, param.pathIndex()) : getSubmittedValues(context, name);
-        Class<?> sourceType = getSourceType(type);
+        var context = FacesContext.getCurrentInstance();
+        var submittedValues = param.pathIndex() > -1 ? getPathParameter(context, param.pathIndex()) : getSubmittedValues(context, name);
+        var sourceType = getSourceType(type);
         Class<V> targetType = getTargetType(type);
-        ParamValue<V> paramValue = new ParamValue<>(param, name, label, sourceType, submittedValues, targetType);
-        Object[] convertedValues = getConvertedValues(context, paramValue);
-        V value = coerceValues(sourceType, convertedValues);
+        var paramValue = new ParamValue<>(param, name, label, sourceType, submittedValues, targetType);
+        var convertedValues = getConvertedValues(context, paramValue);
+        var value = (V) coerceValues(sourceType, convertedValues);
         paramValue.setValue(validateValues(context, paramValue, convertedValues, value, injectionPoint) ? value : null);
 
         return paramValue;
     }
 
     private static String getName(Param requestParameter, InjectionPoint injectionPoint) {
-        String name = requestParameter.name();
+        var name = requestParameter.name();
 
         if (isEmpty(name)) {
-            if (injectionPoint.getAnnotated() instanceof AnnotatedParameter) {
-                AnnotatedParameter<?> annotatedParameter = (AnnotatedParameter<?>) injectionPoint.getAnnotated();
-                Parameter javaParameter = annotatedParameter.getJavaParameter();
+            if (injectionPoint.getAnnotated() instanceof AnnotatedParameter<?> annotatedParameter) {
+                var javaParameter = annotatedParameter.getJavaParameter();
 
                 if (javaParameter.isNamePresent()) {
                     return javaParameter.getName();
@@ -140,7 +135,7 @@ public class ParamProducer {
     }
 
     private static String getLabel(Param requestParameter, InjectionPoint injectionPoint) {
-        String label = requestParameter.label();
+        var label = requestParameter.label();
 
         if (isEmpty(label)) {
             label = getName(requestParameter, injectionPoint);
@@ -153,24 +148,24 @@ public class ParamProducer {
     }
 
     private static Type getType(InjectionPoint injectionPoint) {
-        Type type = injectionPoint.getType();
+        var type = injectionPoint.getType();
 
-        if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
-            type = ((ParameterizedType) type).getActualTypeArguments()[0];
+        if (type instanceof ParameterizedType parameterizedType && ParamValue.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
+            type = parameterizedType.getActualTypeArguments()[0];
         }
 
         return type;
     }
 
     private static String[] getPathParameter(FacesContext context, int pathIndex) {
-        String pathInfo = getRequestPathInfo(context);
+        var pathInfo = getRequestPathInfo(context);
 
         if (!isEmpty(pathInfo)) {
             if (pathInfo.charAt(0) == '/') {
                 pathInfo = pathInfo.substring(1);
             }
 
-            String[] pathParts = pathInfo.split("/");
+            var pathParts = pathInfo.split("/");
 
             if (pathIndex < pathParts.length) {
                 return new String[] { pathParts[pathIndex] };
@@ -181,16 +176,16 @@ public class ParamProducer {
     }
 
     private static String[] getSubmittedValues(FacesContext context, String name) {
-        String[] requestParameterValues = getRequestParameterValues(context, name);
+        var requestParameterValues = getRequestParameterValues(context, name);
 
         if (requestParameterValues == null) {
             return null;
         }
 
-        String[] submittedValues = new String[requestParameterValues.length];
+        var submittedValues = new String[requestParameterValues.length];
 
-        for (int i = 0; i < requestParameterValues.length; i++) {
-            String requestParameterValue = requestParameterValues[i];
+        for (var i = 0; i < requestParameterValues.length; i++) {
+            var requestParameterValue = requestParameterValues[i];
 
             if (requestParameterValue != null && requestParameterValue.isEmpty() && interpretEmptyStringSubmittedValuesAsNull(context)) {
                 submittedValues[i] = null;
@@ -218,8 +213,8 @@ public class ParamProducer {
             return null;
         }
 
-        Object[] convertedValues = new Object[paramValue.submittedValues.length];
-        boolean valid = runWithSimulatedLabelAndValueOnViewRoot(context, paramValue, () -> invokeConverter(context, paramValue, convertedValues));
+        var convertedValues = new Object[paramValue.submittedValues.length];
+        var valid = runWithSimulatedLabelAndValueOnViewRoot(context, paramValue, () -> invokeConverter(context, paramValue, convertedValues));
 
         if (!valid) {
             context.validationFailed();
@@ -230,14 +225,14 @@ public class ParamProducer {
     }
 
     private static boolean invokeConverter(FacesContext context, ParamValue paramValue, Object[] convertedValues) {
-        boolean valid = true;
-        Converter converter = getConverter(paramValue);
+        var valid = true;
+        var converter = getConverter(paramValue);
 
-        for (int i = 0; i < paramValue.submittedValues.length; i++) {
-            String submittedValue = paramValue.submittedValues[i];
+        for (var i = 0; i < paramValue.submittedValues.length; i++) {
+            var submittedValue = paramValue.submittedValues[i];
 
             try {
-                convertedValues[i] = (converter != null) ? converter.getAsObject(context, context.getViewRoot(), submittedValue) : submittedValue;
+                convertedValues[i] = converter != null ? converter.getAsObject(context, context.getViewRoot(), submittedValue) : submittedValue;
             }
             catch (ConverterException e) {
                 valid = false;
@@ -249,7 +244,7 @@ public class ParamProducer {
     }
 
     private static Converter getConverter(ParamValue paramValue) {
-        Object classIdentifier = paramValue.param.converterClass() == Converter.class ? paramValue.targetType : paramValue.param.converterClass();
+        var classIdentifier = paramValue.param.converterClass() == Converter.class ? paramValue.targetType : paramValue.param.converterClass();
         Converter converter = createConverter(coalesce(evaluateExpressionGet(paramValue.param.converter()), classIdentifier));
 
         if (converter != null) {
@@ -261,8 +256,8 @@ public class ParamProducer {
 
     private static boolean runWithSimulatedLabelAndValueOnViewRoot(FacesContext context, ParamValue paramValue, BooleanSupplier callback) {
         UIComponent component = context.getViewRoot();
-        Object originalLabel = getAttribute(component, LABEL_ATTRIBUTE);
-        Object originalValue = getAttribute(component, VALUE_ATTRIBUTE);
+        var originalLabel = getAttribute(component, LABEL_ATTRIBUTE);
+        var originalValue = getAttribute(component, VALUE_ATTRIBUTE);
 
         try {
             setAttribute(component, LABEL_ATTRIBUTE, paramValue.label);
@@ -276,7 +271,7 @@ public class ParamProducer {
     }
 
     private static Object getAttribute(UIComponent component, String name) {
-        ValueExpression valueExpression = component.getValueExpression(name);
+        var valueExpression = component.getValueExpression(name);
 
         if (valueExpression != null) {
             return valueExpression;
@@ -293,7 +288,7 @@ public class ParamProducer {
             if (sourceType.isArray()) {
                 coercedValue = Array.newInstance(sourceType.getComponentType(), values.length);
 
-                for (int i = 0; i < values.length; i++) {
+                for (var i = 0; i < values.length; i++) {
                     Array.set(coercedValue, i, coerceValues(sourceType.getComponentType(), values[i]));
                 }
             }
@@ -313,7 +308,7 @@ public class ParamProducer {
     }
 
     private static <V> boolean validateValues(FacesContext context, ParamValue paramValue, Object[] convertedValues, V value, InjectionPoint injectionPoint) {
-        boolean valid = runWithSimulatedLabelAndValueOnViewRoot(context, paramValue, () -> invokeValidators(context, paramValue, convertedValues, value, injectionPoint));
+        var valid = runWithSimulatedLabelAndValueOnViewRoot(context, paramValue, () -> invokeValidators(context, paramValue, convertedValues, value, injectionPoint));
 
         if (!valid) {
             context.validationFailed();
@@ -323,7 +318,7 @@ public class ParamProducer {
     }
 
     private static <V> boolean invokeValidators(FacesContext context, ParamValue paramValue, Object[] convertedValues, V value, InjectionPoint injectionPoint) {
-        boolean valid = validateRequired(context, paramValue, convertedValues);
+        var valid = validateRequired(context, paramValue, convertedValues);
 
         if (valid) {
             valid = validateBean(context, paramValue, value, injectionPoint);
@@ -350,7 +345,7 @@ public class ParamProducer {
             Set<ConstraintViolation<?>> violations = doBeanValidation(value, injectionPoint);
 
             if (!violations.isEmpty()) {
-                for (ConstraintViolation<?> violation : violations) {
+                for (var violation : violations) {
                     context.addMessage(paramValue.getClientId(context), createError(violation.getMessage(), paramValue.label));
                 }
 
@@ -362,12 +357,12 @@ public class ParamProducer {
     }
 
     private static boolean validateFaces(FacesContext context, ParamValue paramValue, Object[] convertedValues) {
-        boolean valid = true;
+        var valid = true;
 
-        for (Validator validator : getValidators(paramValue.param)) {
-            int i = 0;
+        for (var validator : getValidators(paramValue.param)) {
+            var i = 0;
 
-            for (Object convertedValue : convertedValues) {
+            for (var convertedValue : convertedValues) {
                 try {
                     validator.validate(context, context.getViewRoot(), convertedValue);
                 }
@@ -384,8 +379,8 @@ public class ParamProducer {
     }
 
     static Class<?> getSourceType(Type type) {
-        if (type instanceof ParameterizedType) {
-            return (Class<?>) ((ParameterizedType) type).getRawType();
+        if (type instanceof ParameterizedType parameterizedType) {
+            return (Class<?>) parameterizedType.getRawType();
         }
         else {
             return (Class<?>) type;
@@ -393,11 +388,11 @@ public class ParamProducer {
     }
 
     static <V> Class<V> getTargetType(Type type) {
-        if (type instanceof Class && ((Class<?>) type).isArray()) {
-            return (Class<V>) ((Class<?>) type).getComponentType();
+        if (type instanceof Class<?> classType && classType.isArray()) {
+            return (Class<V>) classType.getComponentType();
         }
-        else if (type instanceof ParameterizedType) {
-            return (Class<V>) ((ParameterizedType) type).getActualTypeArguments()[0];
+        else if (type instanceof ParameterizedType parameterizedType) {
+            return (Class<V>) parameterizedType.getActualTypeArguments()[0];
         }
         else {
             return (Class<V>) type;
@@ -421,7 +416,7 @@ public class ParamProducer {
             return expression;
         }
 
-        Object expressionResult = evaluateExpressionGet(expression);
+        var expressionResult = evaluateExpressionGet(expression);
 
         if (expressionResult == null) {
             return null;
@@ -433,17 +428,11 @@ public class ParamProducer {
     private static boolean shouldDoBeanValidation(Param requestParameter, InjectionPoint injectionPoint) {
 
         // If bean validation is explicitly disabled for this instance, immediately return false
-        if (requestParameter.disableBeanValidation()) {
-            return false;
-        }
+
 
         // Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
-        if (!requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
-            return false;
-        }
-
         // Next check if this is a field injection; other cases are not supported by Validator#validateValue().
-        if (!(injectionPoint.getMember() instanceof Field)) {
+        if (requestParameter.disableBeanValidation() || !requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME)) || !(injectionPoint.getMember() instanceof Field)) {
             return false;
         }
 
@@ -452,17 +441,17 @@ public class ParamProducer {
     }
 
     private static <V> Set<ConstraintViolation<?>> doBeanValidation(V value, InjectionPoint injectionPoint) {
-        Class<?> base = injectionPoint.getBean().getBeanClass();
-        String property = injectionPoint.getMember().getName();
-        Type type = injectionPoint.getType();
+        var base = injectionPoint.getBean().getBeanClass();
+        var property = injectionPoint.getMember().getName();
+        var type = injectionPoint.getType();
 
         // Check if the target property in which we are injecting in our special holder/wrapper type
         // ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
         // would not match)
         Object valueToValidate = value;
 
-        if (type instanceof ParameterizedType) {
-            Type propertyRawType = ((ParameterizedType) type).getRawType();
+        if (type instanceof ParameterizedType parameterizedType) {
+            var propertyRawType = parameterizedType.getRawType();
             if (propertyRawType.equals(ParamValue.class)) {
                 valueToValidate = new ParamValue<>(value);
             }
@@ -472,19 +461,19 @@ public class ParamProducer {
     }
 
     private static List<Validator> getValidators(Param requestParameter) {
-        List<Validator> validators = new ArrayList<>();
+        var validators = new ArrayList<Validator>();
 
-        for (String validatorIdentifier : requestParameter.validators()) {
-            Object evaluatedValidatorIdentifier = evaluateExpressionGet(validatorIdentifier);
-            Validator validator = createValidator(evaluatedValidatorIdentifier);
+        for (var validatorIdentifier : requestParameter.validators()) {
+            var evaluatedValidatorIdentifier = evaluateExpressionGet(validatorIdentifier);
+            var validator = createValidator(evaluatedValidatorIdentifier);
 
             if (validator != null) {
                 validators.add(validator);
             }
         }
 
-        for (Class<? extends Validator> validatorClass : requestParameter.validatorClasses()) {
-            Validator validator = createValidator(validatorClass);
+        for (var validatorClass : requestParameter.validatorClasses()) {
+            var validator = createValidator(validatorClass);
 
             if (validator != null) {
                 validators.add(validator);
@@ -492,25 +481,24 @@ public class ParamProducer {
         }
 
         // Process the default validators
-        Application application = getApplication();
+        var application = getApplication();
 
-        for (Entry<String, String> validatorEntry : application.getDefaultValidatorInfo().entrySet()) {
-
-            String validatorID = validatorEntry.getKey();
-            String validatorClassName = validatorEntry.getValue();
+        for (var validatorEntry : application.getDefaultValidatorInfo().entrySet()) {
+            var validatorID = validatorEntry.getKey();
+            var validatorClassName = validatorEntry.getValue();
 
             // Check that the validator ID is not the BeanValidator one which we handle in a special way.
             // And make sure the default validator is not already set manually as well.
-            if (!validatorID.equals(BeanValidator.VALIDATOR_ID) && !containsByClassName(validators, validatorClassName)) {
+            if (!BeanValidator.VALIDATOR_ID.equals(validatorID) && !containsByClassName(validators, validatorClassName)) {
                 validators.add(application.createValidator(validatorID));
             }
         }
 
         // Set the attributes on all instantiated validators. We don't distinguish here
         // which attribute should go to which validator.
-        Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
+        var validatorAttributes = getValidatorAttributes(requestParameter);
 
-        for (Validator validator : validators) {
+        for (var validator : validators) {
             setPropertiesWithCoercion(validator, validatorAttributes);
         }
 
@@ -518,29 +506,19 @@ public class ParamProducer {
     }
 
     private static Map<String, Object> getConverterAttributes(Param requestParameter) {
-        Map<String, Object> attributeMap = new HashMap<>();
-
-        Attribute[] attributes = requestParameter.converterAttributes();
-        for (Attribute attribute : attributes) {
-            attributeMap.put(attribute.name(), evaluateExpressionGet(attribute.value()));
-        }
-
-        return attributeMap;
+        return getEvaluatedAttributes(requestParameter.converterAttributes());
     }
 
     private static Map<String, Object> getValidatorAttributes(Param requestParameter) {
-        Map<String, Object> attributeMap = new HashMap<>();
+        return getEvaluatedAttributes(requestParameter.validatorAttributes());
+    }
 
-        Attribute[] attributes = requestParameter.validatorAttributes();
-        for (Attribute attribute : attributes) {
-            attributeMap.put(attribute.name(), evaluateExpressionGet(attribute.value()));
-        }
-
-        return attributeMap;
+    private static Map<String, Object> getEvaluatedAttributes(Attribute[] attributes) {
+        return stream(attributes).collect(toMap(Attribute::name, attribute -> evaluateExpressionGet(attribute.value())));
     }
 
     private static void addConverterMessage(FacesContext context, ParamValue paramValue, String submittedValue, ConverterException ce) {
-        String converterMessage = getConverterMessage(paramValue.param);
+        var converterMessage = getConverterMessage(paramValue.param);
         FacesMessage message;
 
         if (!isEmpty(converterMessage)) {
@@ -559,7 +537,7 @@ public class ParamProducer {
     }
 
     private static void addRequiredMessage(FacesContext context, ParamValue paramValue) {
-        String requiredMessage = getRequiredMessage(paramValue.param);
+        var requiredMessage = getRequiredMessage(paramValue.param);
         FacesMessage message = null;
 
         if (!isEmpty(requiredMessage)) {
@@ -576,8 +554,8 @@ public class ParamProducer {
 
             if (message == null) {
                 // RequiredValidator didn't throw or its exception did not have a message set.
-                ResourceBundle messageBundle = getMessageBundle(context);
-                String defaultRequiredMessage = (messageBundle != null) ? messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID) : null;
+                var messageBundle = getMessageBundle(context);
+                var defaultRequiredMessage = messageBundle != null ? messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID) : null;
                 message = createError(coalesce(defaultRequiredMessage, requiredMessage, DEFAULT_REQUIRED_MESSAGE), paramValue.label);
             }
         }
@@ -586,21 +564,21 @@ public class ParamProducer {
     }
 
     private static void addValidatorMessages(FacesContext context, ParamValue paramValue, String submittedValue, ValidatorException ve) {
-        String validatorMessage = getValidatorMessage(paramValue.param);
-        String clientId = paramValue.getClientId(context);
+        var validatorMessage = getValidatorMessage(paramValue.param);
+        var clientId = paramValue.getClientId(context);
 
         if (!isEmpty(validatorMessage)) {
             context.addMessage(clientId, createError(validatorMessage, submittedValue, paramValue.label));
         }
         else {
-            for (FacesMessage facesMessage : getFacesMessages(ve)) {
+            for (var facesMessage : getFacesMessages(ve)) {
                 context.addMessage(clientId, facesMessage);
             }
         }
     }
 
     private static List<FacesMessage> getFacesMessages(ValidatorException ve) {
-        List<FacesMessage> facesMessages = new ArrayList<>();
+        var facesMessages = new ArrayList<FacesMessage>();
 
         if (ve.getFacesMessages() != null) {
             facesMessages.addAll(ve.getFacesMessages());

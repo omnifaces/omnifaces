@@ -14,11 +14,11 @@ package org.omnifaces.cdi.param;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,14 +72,14 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-        InjectionPoint injectionPoint = getCurrentInjectionPoint(creationalContext);
-        ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
+        var injectionPoint = getCurrentInjectionPoint(creationalContext);
+        var paramValue = new ParamProducer().produce(injectionPoint);
         return paramValue.getValue();
     }
 
     @Override
     public Set<Annotation> getQualifiers() {
-        return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
+        return singleton((Annotation) new DefaultParamAnnotationLiteral());
     }
 
     @Override
