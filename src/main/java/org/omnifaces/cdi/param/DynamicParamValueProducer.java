@@ -207,5 +207,10 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
         public boolean overrideGlobalBeanValidationDisabled() {
             return false;
         }
+
+        @Override
+        public boolean globalMessage() {
+            return false;
+        }
     }
 }

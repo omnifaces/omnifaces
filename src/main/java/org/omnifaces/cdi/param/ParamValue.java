@@ -20,6 +20,9 @@ import static org.omnifaces.util.Utils.isSerializable;
 
 import java.io.Serializable;
 
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
+
 import org.omnifaces.cdi.Param;
 
 /**
@@ -121,6 +124,17 @@ public class ParamValue<V> implements Serializable {
      */
     public String[] getSubmittedValues() {
         return submittedValues == null ? null : submittedValues.clone();
+    }
+
+    /**
+     * Returns the param's client ID. In case {@link Param#globalMessage()} returns {@code true} then it returns 
+     * {@code null}, else {@link UIViewRoot#getClientId(FacesContext)}.
+     * @param context The involved faces context.
+     * @return The param's client ID.
+     * @since 4.5
+     */
+    public String getClientId(FacesContext context) {
+        return param.globalMessage() ? null : context.getViewRoot().getClientId(context);
     }
 
 }
