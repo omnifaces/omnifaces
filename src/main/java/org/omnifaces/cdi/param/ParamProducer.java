@@ -20,6 +20,7 @@ import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Components.createValueExpression;
+import static org.omnifaces.util.Components.setAttribute;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -282,18 +283,6 @@ public class ParamProducer {
         }
         else {
             return component.getAttributes().get(name);
-        }
-    }
-
-    private static void setAttribute(UIComponent component, String name, Object value) {
-        if (value instanceof ValueExpression) {
-            component.setValueExpression(name, (ValueExpression) value);
-        }
-        else if (value != null) {
-            component.getAttributes().put(name, value);
-        }
-        else {
-            component.getAttributes().remove(name);
         }
     }
 
