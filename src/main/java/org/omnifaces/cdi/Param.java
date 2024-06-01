@@ -24,6 +24,7 @@ import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.util.Nonbinding;
+import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.validator.BeanValidator;
@@ -183,6 +184,24 @@ import org.omnifaces.util.Utils;
  * value. In both cases, the conversion and validation messages (if any) will be set in the Faces context then, and
  * {@link FacesContext#isValidationFailed()} will return <code>true</code>.
  *
+ * <h2>Faces Messages</h2>
+ * <p>
+ * By default, faces messages are attached to the client ID of the current {@link UIViewRoot}, so you can use the 
+ * following {@code for} attribute to separate faces messages coming from {@code @Param} from the rest:
+ * <pre>
+ * &lt;h:messages for="#{view.id}" /&gt;
+ * </pre>
+ * <p>
+ * In case you wish to make it a global message, then you can since OmniFaces 4.5 set the {@code globalMessage}
+ * attribute to {@code true}:
+ * <pre>
+ * &#64;Param(globalMessage=true)
+ * </pre>
+ * So that these can only be displayed via below tag:
+ * <pre>
+ * &lt;h:messages globalOnly="true" /&gt;
+ * </pre>
+ * 
  * <h2>Historical note</h2>
  * <p>
  * Before OmniFaces 3.6, the <code>&#64;</code>{@link Param} which is not of type {@link ParamValue} also required
@@ -222,7 +241,7 @@ public @interface Param {
      *
      * @return The name of the request parameter.
      */
-    @Nonbinding    String name() default "";
+    @Nonbinding String name() default "";
 
     /**
      * (Optional) The index of the path parameter. If specified the parameter will be extracted from the request path
@@ -232,14 +251,14 @@ public @interface Param {
      * @return The index of the path parameter.
      * @since 2.5
      */
-    @Nonbinding    int pathIndex() default -1;
+    @Nonbinding int pathIndex() default -1;
 
     /**
      * (Optional) the label used to refer to the parameter.
      *
      * @return The label used to refer the parameter, defaults to the <code>name</code> attribute.
      */
-    @Nonbinding    String label() default "";
+    @Nonbinding String label() default "";
 
     /**
      * (Optional/Required) The converter to be used for converting the parameter to the type that is to be injected.
@@ -360,6 +379,13 @@ public @interface Param {
      * @return The error message to be used on empty submit while {@link #required()} is <code>true</code>.
      */
     @Nonbinding String requiredMessage() default "";
+
+    /**
+     * (Optional) Whether to add the faces message as a global message instead of a message for the current {@link UIViewRoot}.
+     * @return Whether to add the faces message as a global message instead of a message for the current {@link UIViewRoot}.
+     * @since 4.5
+     */
+    @Nonbinding boolean globalMessage() default false;
 
     /**
      * (Optional) Flag that disables bean validation for this instance.

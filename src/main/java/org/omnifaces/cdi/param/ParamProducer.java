@@ -20,6 +20,7 @@ import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.Components.createValueExpression;
+import static org.omnifaces.util.Components.setAttribute;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -240,7 +241,7 @@ public class ParamProducer {
             }
             catch (ConverterException e) {
                 valid = false;
-                addConverterMessage(context, context.getViewRoot(), paramValue.label, submittedValue, e, getConverterMessage(paramValue.param));
+                addConverterMessage(context, paramValue, submittedValue, e);
             }
         }
 
@@ -282,18 +283,6 @@ public class ParamProducer {
         }
         else {
             return component.getAttributes().get(name);
-        }
-    }
-
-    private static void setAttribute(UIComponent component, String name, Object value) {
-        if (value instanceof ValueExpression) {
-            component.setValueExpression(name, (ValueExpression) value);
-        }
-        else if (value != null) {
-            component.getAttributes().put(name, value);
-        }
-        else {
-            component.getAttributes().remove(name);
         }
     }
 
@@ -349,7 +338,7 @@ public class ParamProducer {
 
     private static boolean validateRequired(FacesContext context, ParamValue paramValue, Object[] convertedValues) {
         if (paramValue.param.required() && (isEmpty(convertedValues) || asList(convertedValues).contains(null))) {
-            addRequiredMessage(context, context.getViewRoot(), paramValue.label, getRequiredMessage(paramValue.param));
+            addRequiredMessage(context, paramValue);
             return false;
         }
 
@@ -362,7 +351,7 @@ public class ParamProducer {
 
             if (!violations.isEmpty()) {
                 for (ConstraintViolation<?> violation : violations) {
-                    context.addMessage(context.getViewRoot().getClientId(context), createError(violation.getMessage(), paramValue.label));
+                    context.addMessage(paramValue.getClientId(context), createError(violation.getMessage(), paramValue.label));
                 }
 
                 return false;
@@ -383,7 +372,7 @@ public class ParamProducer {
                     validator.validate(context, context.getViewRoot(), convertedValue);
                 }
                 catch (ValidatorException e) {
-                    addValidatorMessages(context, context.getViewRoot(), paramValue.label, paramValue.submittedValues[i], e, getValidatorMessage(paramValue.param));
+                    addValidatorMessages(context, paramValue, paramValue.submittedValues[i], e);
                     valid = false;
                 }
 
@@ -505,7 +494,7 @@ public class ParamProducer {
         // Process the default validators
         Application application = getApplication();
 
-        for (Entry<String, String> validatorEntry :    application.getDefaultValidatorInfo().entrySet()) {
+        for (Entry<String, String> validatorEntry : application.getDefaultValidatorInfo().entrySet()) {
 
             String validatorID = validatorEntry.getKey();
             String validatorClassName = validatorEntry.getValue();
@@ -550,11 +539,12 @@ public class ParamProducer {
         return attributeMap;
     }
 
-    private static void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
+    private static void addConverterMessage(FacesContext context, ParamValue paramValue, String submittedValue, ConverterException ce) {
+        String converterMessage = getConverterMessage(paramValue.param);
         FacesMessage message;
 
         if (!isEmpty(converterMessage)) {
-            message = createError(converterMessage, submittedValue, label);
+            message = createError(converterMessage, submittedValue, paramValue.label);
         }
         else {
             message = ce.getFacesMessage();
@@ -565,20 +555,20 @@ public class ParamProducer {
             }
         }
 
-        context.addMessage(component.getClientId(context), message);
+        context.addMessage(paramValue.getClientId(context), message);
     }
 
-    private static void addRequiredMessage(FacesContext context, UIComponent component, String label, String requiredMessage) {
-
+    private static void addRequiredMessage(FacesContext context, ParamValue paramValue) {
+        String requiredMessage = getRequiredMessage(paramValue.param);
         FacesMessage message = null;
 
         if (!isEmpty(requiredMessage)) {
-            message = createError(requiredMessage, null, label);
+            message = createError(requiredMessage, null, paramValue.label);
         }
         else {
             // (Ab)use RequiredValidator to get the same message that all required attributes are using.
             try {
-                new RequiredValidator().validate(context, component, null);
+                new RequiredValidator().validate(context, context.getViewRoot(), null);
             }
             catch (ValidatorException ve) {
                 message = ve.getFacesMessage();
@@ -588,18 +578,19 @@ public class ParamProducer {
                 // RequiredValidator didn't throw or its exception did not have a message set.
                 ResourceBundle messageBundle = getMessageBundle(context);
                 String defaultRequiredMessage = (messageBundle != null) ? messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID) : null;
-                message = createError(coalesce(defaultRequiredMessage, requiredMessage, DEFAULT_REQUIRED_MESSAGE), label);
+                message = createError(coalesce(defaultRequiredMessage, requiredMessage, DEFAULT_REQUIRED_MESSAGE), paramValue.label);
             }
         }
 
-        context.addMessage(component.getClientId(context), message);
+        context.addMessage(paramValue.getClientId(context), message);
     }
 
-    private static void addValidatorMessages(FacesContext context, UIComponent component, String label, String submittedValue, ValidatorException ve, String validatorMessage) {
-        String clientId = component.getClientId(context);
+    private static void addValidatorMessages(FacesContext context, ParamValue paramValue, String submittedValue, ValidatorException ve) {
+        String validatorMessage = getValidatorMessage(paramValue.param);
+        String clientId = paramValue.getClientId(context);
 
         if (!isEmpty(validatorMessage)) {
-            context.addMessage(clientId, createError(validatorMessage, submittedValue, label));
+            context.addMessage(clientId, createError(validatorMessage, submittedValue, paramValue.label));
         }
         else {
             for (FacesMessage facesMessage : getFacesMessages(ve)) {

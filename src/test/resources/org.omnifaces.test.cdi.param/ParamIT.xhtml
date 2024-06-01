@@ -41,5 +41,7 @@
         <h:outputText id="entityViewParam" value="#{paramITBean.entityViewParam}" />
         <h:outputText id="initResult" value="#{paramITBean.initResult}" />
         <h:messages id="messages" />
+        <h:messages id="viewRootMessages" for="#{view.id}" />
+        <h:messages id="globalMessages" globalOnly="true" />
     </h:body>
 </html>

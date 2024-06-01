@@ -250,11 +250,21 @@ public final class Components {
      * Set the attribute value on the specified component for the specified name.
      * @param component The component on which to set the attribute.
      * @param name The name of the attribute.
-     * @param value The value of the attribute.
+     * @param value The value of the attribute, can be a {@link ValueExpression} or {@code null}. In case of a 
+     * {@link ValueExpression}, {@link UIComponent#setValueExpression(String, ValueExpression)} will be invoked instead.
+     * In case of {@code null}, {@link Map#remove(Object)} will be invoked on {@link UIComponent#getAttributes()}.
      * @since 4.5
      */
     public static void setAttribute(UIComponent component, String name, Object value) {
-        component.getAttributes().put(name, value);
+        if (value instanceof ValueExpression) {
+            component.setValueExpression(name, (ValueExpression) value);
+        }
+        else if (value != null) {
+            component.getAttributes().put(name, value);
+        }
+        else {
+            component.getAttributes().remove(name);
+        }
     }
 
     /**
