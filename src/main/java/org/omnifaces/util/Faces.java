@@ -2325,23 +2325,6 @@ public final class Faces {
         FacesLocal.setSessionMaxInactiveInterval(getContext(), seconds);
     }
 
-    /**
-     * Returns whether the HTTP session has been timed out for the current request. This is helpful if you need to
-     * distinguish between a first-time request on a fresh session and a first-time request on a timed out session, for
-     * example to display "Oops, you have been logged out because your session has been timed out!".
-     * @return <code>true</code> if the HTTP session has been timed out for the current request, otherwise
-     * <code>false</code>.
-     * @throws NullPointerException When faces context is unavailable.
-     * @see HttpServletRequest#getRequestedSessionId()
-     * @see HttpServletRequest#isRequestedSessionIdValid()
-     * @since 1.1
-     * @deprecated Use {@link Faces#isRequestedSessionExpired()} instead.
-     */
-    @Deprecated(since = "4.5", forRemoval = true)
-    public static boolean hasSessionTimedOut() {
-        return FacesLocal.hasSessionTimedOut(getContext());
-    }
-
     // Servlet context ------------------------------------------------------------------------------------------------
 
     /**
