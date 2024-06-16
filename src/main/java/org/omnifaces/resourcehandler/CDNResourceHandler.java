@@ -206,6 +206,10 @@ public class CDNResourceHandler extends DefaultResourceHandler {
         super(wrapped);
         disabledParam = getInitParameter(PARAM_NAME_CDN_DISABLED);
         cdnResources = initCDNResources();
+
+        if (cdnResources == null) {
+            throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
+        }
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -259,7 +263,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
         var cdnResourcesParam = getInitParameter(PARAM_NAME_CDN_RESOURCES);
 
         if (isEmpty(cdnResourcesParam)) {
-            throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
+            return null; // For CombinedResourceHandler.
         }
 
         var cdnResources = new HashMap<ResourceIdentifier, String>();
