@@ -1571,7 +1571,9 @@ public final class FacesLocal {
 
     /**
      * @see Faces#hasSessionTimedOut()
+     * @deprecated Use {@link Faces#isRequestedSessionExpired()} instead.
      */
+    @Deprecated(since = "4.5", forRemoval = true)
     public static boolean hasSessionTimedOut(FacesContext context) {
         var request = getRequest(context);
         return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
