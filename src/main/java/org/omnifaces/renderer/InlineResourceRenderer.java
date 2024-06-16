@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import jakarta.faces.application.Resource;
 import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.Renderer;
@@ -33,7 +33,7 @@ import org.omnifaces.resourcehandler.CombinedResourceHandler;
  * @since 1.2
  * @see CombinedResourceHandler
  */
-public abstract class InlineResourceRenderer extends Renderer {
+public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -51,15 +51,15 @@ public abstract class InlineResourceRenderer extends Renderer {
      * {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in sequence.
      */
     @Override
-    public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
-        ResponseWriter writer = context.getResponseWriter();
-        String name = (String) component.getAttributes().get("name");
-        String library = (String) component.getAttributes().get("library");
-        Resource resource = createResource(context, library, name);
+    public void encodeChildren(FacesContext context, UIOutput component) throws IOException {
+        var writer = context.getResponseWriter();
+        var name = (String) component.getAttributes().get("name");
+        var library = (String) component.getAttributes().get("library");
+        var resource = createResource(context, library, name);
 
-        startElement(writer, component);
+        startElement(context, writer, component);
 
-        try (Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding())) {
+        try (var reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding())) {
             writeResource(reader, writer);
         }
 
@@ -72,7 +72,7 @@ public abstract class InlineResourceRenderer extends Renderer {
      * @param component The {@link UIComponent} to which this element corresponds.
      * @throws IOException When an I/O error occurs.
      */
-    public abstract void startElement(ResponseWriter writer, UIComponent component) throws IOException;
+    public abstract void startElement(FacesContext context, ResponseWriter writer, UIOutput component) throws IOException;
 
     /**
      * Write the resource inline.

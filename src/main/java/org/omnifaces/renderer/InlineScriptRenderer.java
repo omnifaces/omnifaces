@@ -12,11 +12,13 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
+
 import java.io.IOException;
 import java.io.Reader;
 
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 
@@ -43,15 +45,19 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
     // Actions --------------------------------------------------------------------------------------------------------
 
     @Override
-    public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
+    public void startElement(FacesContext context, ResponseWriter writer, UIOutput component) throws IOException {
         writer.startElement("script", component);
-        writer.writeAttribute("type", "text/javascript", "type");
+
+        if (!isOutputHtml5Doctype(context)) {
+            writer.writeAttribute("type", "text/javascript", "type");
+        }
+
         writer.write("//<![CDATA[\n");
     }
 
     @Override
     public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-        for (int c = reader.read(); c != -1; c = reader.read()) {
+        for (var c = reader.read(); c != -1; c = reader.read()) {
             writer.write(c);
 
             if (c == '<') {
@@ -60,10 +66,10 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
         }
     }
 
-    private void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
-        int length = 0;
+    private static void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
+        var length = 0;
 
-        for (int ch = reader.read(); ch != -1; ch = reader.read()) {
+        for (var ch = reader.read(); ch != -1; ch = reader.read()) {
             if (Character.toLowerCase(ch) != END_SCRIPT[length]) {
                 if (length > 0) {
                     writer.write(END_SCRIPT, 0, length);

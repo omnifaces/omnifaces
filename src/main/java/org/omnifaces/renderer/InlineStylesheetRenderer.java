@@ -12,12 +12,14 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
 
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 
@@ -44,15 +46,19 @@ public class InlineStylesheetRenderer extends InlineResourceRenderer {
     // Actions --------------------------------------------------------------------------------------------------------
 
     @Override
-    public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
+    public void startElement(FacesContext context, ResponseWriter writer, UIOutput component) throws IOException {
         writer.startElement("style", component);
-        writer.writeAttribute("type", "text/css", "type");
+
+        if (!isOutputHtml5Doctype(context)) {
+            writer.writeAttribute("type", "text/css", "type");
+        }
+
         writer.write("/*<![CDATA[*/\n");
     }
 
     @Override
     public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-        CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
+        var buffer = CharBuffer.allocate(BUFFER_SIZE);
 
         while (reader.read(buffer) != -1) {
             buffer.flip();

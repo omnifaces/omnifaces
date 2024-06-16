@@ -73,9 +73,9 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * Will be rendered as:
  * <pre>
- * &lt;script type="text/javascript" src="https://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
- * &lt;script type="text/javascript" src="https://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
- * &lt;link type="text/css" rel="stylesheet" href="https://cdn.example.com/otherlib/style.css" /&gt;
+ * &lt;script src="https://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
+ * &lt;script src="https://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
+ * &lt;link rel="stylesheet" href="https://cdn.example.com/otherlib/style.css" /&gt;
  * &lt;img src="https://cdn.example.com/logo.png" /&gt;
  * </pre>
  * <p>
@@ -98,8 +98,8 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * Will be rendered as:
  * <pre>
- * &lt;link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /&gt;
- * &lt;script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
+ * &lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /&gt;
+ * &lt;script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
  * </pre>
  *
  * <h2>Wildcard configuration</h2>
@@ -121,8 +121,8 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * Will be rendered as:
  * <pre>
- * &lt;script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
- * &lt;script type="text/javascript" src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
+ * &lt;script src="https://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
+ * &lt;script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
  * </pre>
  *
  * <h2>EL expressions</h2>

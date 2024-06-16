@@ -12,14 +12,13 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
 import static org.omnifaces.util.Renderers.writeAttribute;
 
 import java.io.IOException;
 
 import jakarta.faces.component.UIComponentBase;
-import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.PostAddToViewEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
@@ -67,7 +66,7 @@ public abstract class ScriptFamily extends UIComponentBase {
         pushComponentToEL(context, this);
 
         if (isRendered()) {
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
 
             if (getId() != null || !getClientBehaviors().isEmpty()) {
                 writer.startElement("input", this);
@@ -77,7 +76,10 @@ public abstract class ScriptFamily extends UIComponentBase {
             }
 
             writer.startElement("script", this);
-            writeAttribute(writer, "type", "text/javascript");
+
+            if (!isOutputHtml5Doctype(context)) {
+                writeAttribute(writer, "type", "text/javascript");
+            }
         }
     }
 
@@ -109,12 +111,12 @@ public abstract class ScriptFamily extends UIComponentBase {
      * @return <code>true</code> if the move has taken place.
      */
     protected boolean moveToBody(ComponentSystemEvent event) {
-        if (!(event instanceof PostAddToViewEvent || event instanceof PostRestoreStateEvent)) {
+        if ((!(event instanceof PostAddToViewEvent) && !(event instanceof PostRestoreStateEvent))) {
             return false;
         }
 
-        FacesContext context = event.getFacesContext();
-        UIViewRoot view = context.getViewRoot();
+        var context = event.getFacesContext();
+        var view = context.getViewRoot();
 
         if (context.isPostback() ? !view.getComponentResources(context, "body").contains(this) : event instanceof PostAddToViewEvent) {
             view.addComponentResource(context, this, "body");
