@@ -47,7 +47,7 @@ public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
 
     /**
      * Obtain the resource, construct a {@link Reader} around it using the character encoding as obtained from the
-     * response writer and then invoke {@link #startElement(ResponseWriter, UIComponent)},
+     * response writer and then invoke {@link #startElement(FacesContext, ResponseWriter, UIOutput)}
      * {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in sequence.
      */
     @Override
