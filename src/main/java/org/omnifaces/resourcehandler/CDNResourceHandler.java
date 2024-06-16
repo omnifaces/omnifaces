@@ -219,8 +219,12 @@ public class CDNResourceHandler extends DefaultResourceHandler {
      */
     @Override
     public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
-        if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
-            return resource;
+        if (disabledParam != null) {
+            var disabled = evaluateExpressionGet(disabledParam);
+
+            if (parseBoolean(String.valueOf(disabled))) {
+                return resource;
+            }
         }
 
         String requestPath = null;
