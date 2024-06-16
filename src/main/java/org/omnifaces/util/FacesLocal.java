@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
@@ -47,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,22 +58,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
-import jakarta.el.ValueExpression;
 import jakarta.faces.FacesException;
 import jakarta.faces.FacesWrapper;
 import jakarta.faces.FactoryFinder;
-import jakarta.faces.application.Application;
 import jakarta.faces.application.ProjectStage;
 import jakarta.faces.application.Resource;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.UIViewParameter;
-import jakarta.faces.component.UIViewRoot;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.Flash;
-import jakarta.faces.context.PartialViewContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.event.PhaseId;
@@ -193,11 +184,13 @@ public final class FacesLocal {
     @SuppressWarnings("unchecked")
     public static Package getPackage(FacesContext context) {
         if (context != null) {
-            while (context instanceof FacesWrapper) {
-                context = ((FacesWrapper<FacesContext>) context).getWrapped();
+            var unwrappedContext = context;
+
+            while (unwrappedContext instanceof FacesWrapper) {
+                unwrappedContext = ((FacesWrapper<FacesContext>) unwrappedContext).getWrapped();
             }
 
-            return context.getClass().getPackage();
+            return unwrappedContext.getClass().getPackage();
         }
         else {
             return FacesContext.class.getPackage();
@@ -208,7 +201,7 @@ public final class FacesLocal {
      * @see Faces#getImplInfo()
      */
     public static String getImplInfo(FacesContext context) {
-        Package facesPackage = getPackage(context);
+        var facesPackage = getPackage(context);
         return facesPackage.getImplementationTitle() + " " + facesPackage.getImplementationVersion();
     }
 
@@ -251,11 +244,11 @@ public final class FacesLocal {
      * @see Faces#getMapping()
      */
     public static String getMapping(FacesContext context) {
-        ExternalContext externalContext = context.getExternalContext();
+        var externalContext = context.getExternalContext();
 
         if (externalContext.getRequestPathInfo() == null) {
-            String path = externalContext.getRequestServletPath();
-            int suffixPos = path.lastIndexOf('.');
+            var path = externalContext.getRequestServletPath();
+            var suffixPos = path.lastIndexOf('.');
 
             if (suffixPos > -1) {
                 return path.substring(suffixPos);
@@ -295,8 +288,8 @@ public final class FacesLocal {
      * @see Faces#evaluateExpressionSet(String, Object)
      */
     public static void evaluateExpressionSet(FacesContext context, String expression, Object value) {
-        ELContext elContext = context.getELContext();
-        ValueExpression valueExpression = context.getApplication().getExpressionFactory()
+        var elContext = context.getELContext();
+        var valueExpression = context.getApplication().getExpressionFactory()
             .createValueExpression(elContext, expression, Object.class);
         valueExpression.setValue(elContext, value);
     }
@@ -306,7 +299,7 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> T resolveExpressionGet(FacesContext context, Object base, String property) {
-        ELResolver elResolver = context.getApplication().getELResolver();
+        var elResolver = context.getApplication().getELResolver();
         return (T) elResolver.getValue(context.getELContext(), base, property);
     }
 
@@ -314,7 +307,7 @@ public final class FacesLocal {
      * @see Faces#resolveExpressionSet(Object, String, Object)
      */
     public static void resolveExpressionSet(FacesContext context, Object base, String property, Object value) {
-        ELResolver elResolver = context.getApplication().getELResolver();
+        var elResolver = context.getApplication().getELResolver();
         elResolver.setValue(context.getELContext(), base, property, value);
     }
 
@@ -330,15 +323,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getContextAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getContextAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getContextAttribute(context, name);
+        var value = getContextAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setContextAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -353,14 +347,14 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> Converter<T> createConverter(FacesContext context, Object identifier) {
-        if (identifier instanceof String) {
-            return createConverter(context, (String) identifier);
+        if (identifier instanceof String converterId) {
+            return createConverter(context, converterId);
         }
-        else if (identifier instanceof Class) {
-            return createConverter(context, (Class<T>) identifier);
+        else if (identifier instanceof Class<?> converterClass) {
+            return createConverter(context, converterClass);
         }
-        else if (identifier instanceof Converter) {
-            return (Converter<T>) identifier;
+        else if (identifier instanceof Converter<?> converterInstance) {
+            return (Converter<T>) converterInstance;
         }
         else {
             return null;
@@ -387,7 +381,7 @@ public final class FacesLocal {
     @SuppressWarnings("unchecked")
     public static <T> Converter<T> createConverter(FacesContext context, Class<?> identifier) {
         if (Converter.class.isAssignableFrom(identifier)) {
-            FacesConverter annotation = identifier.getAnnotation(FacesConverter.class);
+            var annotation = identifier.getAnnotation(FacesConverter.class);
 
             if (annotation != null) {
                 return (Converter<T>) getReference(identifier, annotation);
@@ -406,14 +400,14 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> Validator<T> createValidator(FacesContext context, Object identifier) {
-        if (identifier instanceof String) {
-            return createValidator(context, (String) identifier);
+        if (identifier instanceof String validatorId) {
+            return createValidator(context, validatorId);
         }
-        else if (identifier instanceof Class) {
-            return createValidator(context, (Class<T>) identifier);
+        else if (identifier instanceof Class<?> validatorClass) {
+            return createValidator(context, validatorClass);
         }
-        else if (identifier instanceof Validator) {
-            return (Validator<T>) identifier;
+        else if (identifier instanceof Validator<?> validatorInstance) {
+            return (Validator<T>) validatorInstance;
         }
         else {
             return null;
@@ -440,7 +434,7 @@ public final class FacesLocal {
     @SuppressWarnings({ "unchecked", "unused" })
     public static <T> Validator<T> createValidator(FacesContext context, Class<?> identifier) {
         if (Validator.class.isAssignableFrom(identifier)) {
-            FacesValidator annotation = identifier.getAnnotation(FacesValidator.class);
+            var annotation = identifier.getAnnotation(FacesValidator.class);
 
             if (annotation != null) {
                 return (Validator<T>) getReference(identifier, annotation);
@@ -495,26 +489,26 @@ public final class FacesLocal {
      * @see Faces#getViewId()
      */
     public static String getViewId(FacesContext context) {
-        UIViewRoot viewRoot = context.getViewRoot();
-        return (viewRoot != null) ? viewRoot.getViewId() : null;
+        var viewRoot = context.getViewRoot();
+        return viewRoot != null ? viewRoot.getViewId() : null;
     }
 
     /**
      * @see Faces#getViewIdWithParameters()
      */
     public static String getViewIdWithParameters(FacesContext context) {
-        String viewId = coalesce(getViewId(context), "");
-        String viewParameters = toQueryString(getViewParameterMap(context));
-        String hashParameters = getHashQueryString(context);
-        return ((viewParameters == null) ? viewId : (viewId + "?" + viewParameters)) + ((hashParameters == null) ? "" : ("#" + hashParameters));
+        var viewId = coalesce(getViewId(context), "");
+        var viewParameters = toQueryString(getViewParameterMap(context));
+        var hashParameters = getHashQueryString(context);
+        return (viewParameters == null ? viewId : viewId + "?" + viewParameters) + (hashParameters == null ? "" : "#" + hashParameters);
     }
 
     /**
      * @see Faces#getViewName()
      */
     public static String getViewName(FacesContext context) {
-        String viewId = getViewId(context);
-        return (viewId != null) ? viewId.substring(viewId.lastIndexOf('/') + 1).split("\\.")[0] : null;
+        var viewId = getViewId(context);
+        return viewId != null ? viewId.substring(viewId.lastIndexOf('/') + 1).split("\\.")[0] : null;
     }
 
     /**
@@ -529,15 +523,15 @@ public final class FacesLocal {
      */
     public static RenderKit getRenderKit(FacesContext context) {
         String renderKitId = null;
-        UIViewRoot view = context.getViewRoot();
+        var view = context.getViewRoot();
 
         if (view != null) {
             renderKitId = view.getRenderKitId();
         }
 
         if (renderKitId == null) {
-            Application application = context.getApplication();
-            ViewHandler viewHandler = application.getViewHandler();
+            var application = context.getApplication();
+            var viewHandler = application.getViewHandler();
 
             if (viewHandler != null) {
                 renderKitId = viewHandler.calculateRenderKitId(context);
@@ -559,7 +553,7 @@ public final class FacesLocal {
      * @see Faces#normalizeViewId(String)
      */
     public static String normalizeViewId(FacesContext context, String path) {
-        String mapping = getMapping(context);
+        var mapping = getMapping(context);
 
         if (Faces.isPrefixMapping(mapping)) {
             if (path.startsWith(mapping)) {
@@ -577,15 +571,15 @@ public final class FacesLocal {
      * @see Faces#getViewParameters()
      */
     public static Collection<UIViewParameter> getViewParameters(FacesContext context) {
-        UIViewRoot viewRoot = context.getViewRoot();
-        return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
+        var viewRoot = context.getViewRoot();
+        return viewRoot != null ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
     }
 
     /**
      * @see Faces#getViewParameterMap()
      */
     public static Map<String, List<String>> getViewParameterMap(FacesContext context) {
-        Collection<UIViewParameter> viewParameters = getViewParameters(context);
+        var viewParameters = getViewParameters(context);
 
         if (viewParameters.isEmpty()) {
             return new LinkedHashMap<>(0);
@@ -594,7 +588,7 @@ public final class FacesLocal {
         Map<String, List<String>> parameterMap = new LinkedHashMap<>(viewParameters.size());
 
         for (UIViewParameter viewParameter : viewParameters) {
-            String value = viewParameter.getStringValue(context);
+            var value = viewParameter.getStringValue(context);
 
             if (value != null) {
                 // <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
@@ -610,15 +604,15 @@ public final class FacesLocal {
      * @see Faces#getHashParameters()
      */
     public static Collection<HashParam> getHashParameters(FacesContext context) {
-        UIViewRoot viewRoot = context.getViewRoot();
-        return (viewRoot != null) ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), HashParam.class) : Collections.<HashParam>emptyList();
+        var viewRoot = context.getViewRoot();
+        return viewRoot != null ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), HashParam.class) : Collections.<HashParam>emptyList();
     }
 
     /**
      * @see Faces#getHashParameterMap()
      */
     public static Map<String, List<String>> getHashParameterMap(FacesContext context) {
-        Collection<HashParam> hashParameters = getHashParameters(context);
+        var hashParameters = getHashParameters(context);
 
         if (hashParameters.isEmpty()) {
             return new LinkedHashMap<>(0);
@@ -631,7 +625,7 @@ public final class FacesLocal {
                 continue;
             }
 
-            String value = hashParameter.getRenderedValue(context);
+            var value = hashParameter.getRenderedValue(context);
 
             if (!isEmpty(value)) {
                 // <o:hashParam> doesn't support multiple values anyway, so having multiple <o:hashParam> on the
@@ -654,19 +648,19 @@ public final class FacesLocal {
      * @see Faces#getScriptParameters()
      */
     public static Collection<ScriptParam> getScriptParameters(FacesContext context) {
-        UIViewRoot viewRoot = context.getViewRoot();
-        return (viewRoot != null) ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), ScriptParam.class) : Collections.<ScriptParam>emptyList();
+        var viewRoot = context.getViewRoot();
+        return viewRoot != null ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), ScriptParam.class) : Collections.<ScriptParam>emptyList();
     }
 
     /**
      * @see Faces#getMetadataAttributes(String)
      */
     public static Map<String, Object> getMetadataAttributes(FacesContext context, String viewId) {
-        ViewHandler viewHandler = context.getApplication().getViewHandler();
-        ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-        ViewMetadata metadata = vdl.getViewMetadata(context, viewId);
+        var viewHandler = context.getApplication().getViewHandler();
+        var vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+        var metadata = vdl.getViewMetadata(context, viewId);
 
-        return (metadata != null)
+        return metadata != null
             ? metadata.createMetadataView(context).getAttributes()
             : Collections.<String, Object>emptyMap();
     }
@@ -701,7 +695,7 @@ public final class FacesLocal {
         Locale locale = null;
 
         if (context != null) {
-            UIViewRoot viewRoot = context.getViewRoot();
+            var viewRoot = context.getViewRoot();
 
             // Prefer the locale set in the view.
             if (viewRoot != null) {
@@ -710,7 +704,7 @@ public final class FacesLocal {
 
             // Then the client preferred locale.
             if (locale == null) {
-                Locale clientLocale = context.getExternalContext().getRequestLocale();
+                var clientLocale = context.getExternalContext().getRequestLocale();
 
                 if (getSupportedLocales(context).contains(clientLocale)) {
                     locale = clientLocale;
@@ -742,16 +736,16 @@ public final class FacesLocal {
      * @see Faces#getSupportedLocales()
      */
     public static List<Locale> getSupportedLocales(FacesContext context) {
-        Application application = context.getApplication();
+        var application = context.getApplication();
         List<Locale> supportedLocales = new ArrayList<>();
-        Locale defaultLocale = application.getDefaultLocale();
+        var defaultLocale = application.getDefaultLocale();
 
         if (defaultLocale != null) {
             supportedLocales.add(defaultLocale);
         }
 
-        for (Iterator<Locale> iter = application.getSupportedLocales(); iter.hasNext();) {
-            Locale supportedLocale = iter.next();
+        for (var iter = application.getSupportedLocales(); iter.hasNext();) {
+            var supportedLocale = iter.next();
 
             if (!supportedLocale.equals(defaultLocale)) {
                 supportedLocales.add(supportedLocale);
@@ -765,7 +759,7 @@ public final class FacesLocal {
      * @see Faces#setLocale(Locale)
      */
     public static void setLocale(FacesContext context, Locale locale) {
-        UIViewRoot viewRoot = context.getViewRoot();
+        var viewRoot = context.getViewRoot();
 
         if (viewRoot == null) {
             throw new IllegalStateException(ERROR_NO_VIEW);
@@ -778,7 +772,7 @@ public final class FacesLocal {
      * @see Faces#getMessageBundle()
      */
     public static ResourceBundle getMessageBundle(FacesContext context) {
-        String messageBundle = context.getApplication().getMessageBundle();
+        var messageBundle = context.getApplication().getMessageBundle();
 
         if (messageBundle == null) {
             return null;
@@ -790,19 +784,19 @@ public final class FacesLocal {
     /**
      * @see Faces#getResourceBundle(String)
      */
-    public static ResourceBundle getResourceBundle(FacesContext context, String var) {
-        return context.getApplication().getResourceBundle(context, var);
+    public static ResourceBundle getResourceBundle(FacesContext context, String varName) {
+        return context.getApplication().getResourceBundle(context, varName);
     }
 
     /**
      * @see Faces#getResourceBundles()
      */
     public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
-        Map<String, String> resourceBundles = FacesConfigXml.instance().getResourceBundles();
+        var resourceBundles = FacesConfigXml.instance().getResourceBundles();
         Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
 
-        for (String var : resourceBundles.keySet()) {
-            map.put(var, getResourceBundle(context, var));
+        for (String varName : resourceBundles.keySet()) {
+            map.put(varName, getResourceBundle(context, varName));
         }
 
         return map;
@@ -837,7 +831,7 @@ public final class FacesLocal {
     public static String getBookmarkableURL
         (FacesContext context, Map<String, List<String>> params, boolean includeViewParams)
     {
-        String viewId = getViewId(context);
+        var viewId = getViewId(context);
 
         if (viewId == null) {
             throw new IllegalStateException(ERROR_NO_VIEW);
@@ -871,7 +865,7 @@ public final class FacesLocal {
     public static String getBookmarkableURL
         (FacesContext context, Collection<? extends ParamHolder<?>> params, boolean includeViewParams)
     {
-        String viewId = getViewId(context);
+        var viewId = getViewId(context);
 
         if (viewId == null) {
             throw new IllegalStateException(ERROR_NO_VIEW);
@@ -897,13 +891,32 @@ public final class FacesLocal {
         return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
     }
 
+    /**
+     * @see Faces#isOutputHtml5Doctype()
+     */
+    public static boolean isOutputHtml5Doctype(FacesContext context) {
+        var viewRoot = context.getViewRoot();
+
+        if (viewRoot == null) {
+            return false; // Can happen when view build time hasn't started yet.
+        }
+
+        var doctype = viewRoot.getDoctype();
+
+        if (doctype == null) {
+            return false; // Can happen when there is no doctype declared at all.
+        }
+
+        return "html".equalsIgnoreCase(doctype.getRootElement()) && doctype.getPublic() == null && doctype.getSystem() == null;
+    }
+
     // Facelets -------------------------------------------------------------------------------------------------------
 
     /**
      * @see Faces#getFaceletContext()
      */
     public static FaceletContext getFaceletContext(FacesContext context) {
-        FaceletContext faceletContext = getContextAttribute(context, FACELET_CONTEXT_KEY);
+        var faceletContext = (FaceletContext) getContextAttribute(context, FACELET_CONTEXT_KEY);
 
         if (faceletContext != null) {
             return faceletContext;
@@ -947,7 +960,7 @@ public final class FacesLocal {
      * @see Faces#isAjaxRequestWithPartialRendering()
      */
     public static boolean isAjaxRequestWithPartialRendering(FacesContext context) {
-        PartialViewContext pvc = context.getPartialViewContext();
+        var pvc = context.getPartialViewContext();
         return pvc.isAjaxRequest() && !pvc.isRenderAll();
     }
 
@@ -1020,7 +1033,7 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] getRequestParameterValues(FacesContext context, String name, Class<T> type) {
-        String[] values = getRequestParameterValues(context, name);
+        var values = getRequestParameterValues(context, name);
 
         if (values == null) {
             return null;
@@ -1032,9 +1045,9 @@ public final class FacesLocal {
             return (T[]) values;
         }
 
-        Object convertedValues = Array.newInstance(type, values.length);
+        var convertedValues = Array.newInstance(type, values.length);
 
-        for (int i = 0; i < values.length; i++) {
+        for (var i = 0; i < values.length; i++) {
             Array.set(convertedValues, i, converter.getAsObject(context, context.getViewRoot(), values[i]));
         }
 
@@ -1266,7 +1279,7 @@ public final class FacesLocal {
      * @see Faces#redirect(String, Object...)
      */
     public static void redirect(FacesContext context, String url, Object... paramValues) {
-        ExternalContext externalContext = context.getExternalContext();
+        var externalContext = context.getExternalContext();
         externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
         externalContext.getFlash().keep(FLASH_ATTRIBUTE_VIEW_EXPIRED);
 
@@ -1409,8 +1422,8 @@ public final class FacesLocal {
      * @see Faces#getRequestCookie(String)
      */
     public static String getRequestCookie(FacesContext context, String name) {
-        Cookie cookie = (Cookie) context.getExternalContext().getRequestCookieMap().get(name);
-        return (cookie != null) ? Utils.decodeURL(cookie.getValue()) : null;
+        var cookie = (Cookie) context.getExternalContext().getRequestCookieMap().get(name);
+        return cookie != null ? Utils.decodeURL(cookie.getValue()) : null;
     }
 
     /**
@@ -1438,18 +1451,18 @@ public final class FacesLocal {
      * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
      */
     public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
-        addResponseCookie(context, name, value, domain, path, maxAge, true, null);
+        addResponseCookie(context, name, value, domain, path, maxAge, httpOnly, null);
     }
 
     /**
      * @see Faces#addResponseCookie(String, String, String, String, int, boolean, Map)
      */
     public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly, Map<String, String> attributes) {
-        ExternalContext externalContext = context.getExternalContext();
-        Map<String, Object> properties = new HashMap<>();
+        var externalContext = context.getExternalContext();
+        var properties = new HashMap<String, Object>();
 
         if (!"localhost".equals(domain)) { // Chrome doesn't like domain:"localhost" on cookies.
-            properties.put("domain", (domain == null) ? getRequestHostname(context) : domain);
+            properties.put("domain", domain == null ? getRequestHostname(context) : domain);
         }
 
         if (path != null) {
@@ -1494,8 +1507,8 @@ public final class FacesLocal {
      * @see Faces#getSessionId()
      */
     public static String getSessionId(FacesContext context) {
-        HttpSession session = getSession(context, false);
-        return (session != null) ? session.getId() : null;
+        var session = getSession(context, false);
+        return session != null ? session.getId() : null;
     }
 
     /**
@@ -1516,15 +1529,15 @@ public final class FacesLocal {
      * @see Faces#isSessionNew()
      */
     public static boolean isSessionNew(FacesContext context) {
-        HttpSession session = getSession(context, false);
-        return (session != null && session.isNew());
+        var session = getSession(context, false);
+        return session != null && session.isNew();
     }
 
     /**
      * @see Faces#isRequestedSessionExpired()
      */
     public static boolean isRequestedSessionExpired(FacesContext context) {
-        HttpServletRequest request = getRequest(context);
+        var request = getRequest(context);
         return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
     }
 
@@ -1560,7 +1573,7 @@ public final class FacesLocal {
      * @see Faces#hasSessionTimedOut()
      */
     public static boolean hasSessionTimedOut(FacesContext context) {
-        HttpServletRequest request = getRequest(context);
+        var request = getRequest(context);
         return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
     }
 
@@ -1598,7 +1611,7 @@ public final class FacesLocal {
      * @see Faces#getMimeType(String)
      */
     public static String getMimeType(FacesContext context, String name) {
-        String mimeType = context.getExternalContext().getMimeType(name);
+        var mimeType = context.getExternalContext().getMimeType(name);
 
         if (mimeType == null) {
             mimeType = DEFAULT_MIME_TYPE;
@@ -1655,15 +1668,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getRequestAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getRequestAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getRequestAttribute(context, name);
+        var value = getRequestAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setRequestAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -1701,15 +1715,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getFlashAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getFlashAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getFlashAttribute(context, name);
+        var value = getFlashAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setFlashAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -1747,15 +1762,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getViewAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getViewAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getViewAttribute(context, name);
+        var value = getViewAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setViewAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -1793,15 +1809,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getSessionAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getSessionAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getSessionAttribute(context, name);
+        var value = getSessionAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setSessionAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -1839,15 +1856,16 @@ public final class FacesLocal {
     /**
      * @see Faces#getApplicationAttribute(String, Supplier)
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getApplicationAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
-        T value = getApplicationAttribute(context, name);
+        var value = getApplicationAttribute(context, name);
 
         if (value == null) {
             value = computeIfAbsent.get();
             setApplicationAttribute(context, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     /**
@@ -1913,7 +1931,7 @@ public final class FacesLocal {
      * @see Faces#sendFile(String, boolean, org.omnifaces.util.Callback.Output)
      */
     public static void sendFile(FacesContext context, String filename, boolean attachment, Callback.Output outputCallback) {
-        ExternalContext externalContext = context.getExternalContext();
+        var externalContext = context.getExternalContext();
 
         // Prepare the response and set the necessary headers.
         externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
@@ -1926,7 +1944,7 @@ public final class FacesLocal {
             externalContext.setResponseHeader("Pragma", "public");
         }
 
-        try (OutputStream output = externalContext.getResponseOutputStream()) {
+        try (var output = externalContext.getResponseOutputStream()) {
             outputCallback.writeTo(output);
         }
         catch (IOException e) {
@@ -1946,14 +1964,14 @@ public final class FacesLocal {
      */
     private static void sendFile(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment) {
         sendFile(context, filename, attachment, output -> {
-            ExternalContext externalContext = context.getExternalContext();
+            var externalContext = context.getExternalContext();
 
             // If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
             if (contentLength != -1) {
                 externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
             }
 
-            long size = Utils.stream(input, output);
+            var size = Utils.stream(input, output);
 
             // This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
             if (contentLength == -1 && !externalContext.isResponseCommitted()) {

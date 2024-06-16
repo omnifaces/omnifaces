@@ -422,7 +422,7 @@ public final class Faces {
      * @throws NullPointerException When mapping is <code>null</code>.
      */
     public static boolean isPrefixMapping(String mapping) {
-        return (mapping.charAt(0) == '/');
+        return mapping.charAt(0) == '/';
     }
 
     /**
@@ -1020,7 +1020,7 @@ public final class Faces {
      * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>. If there is no
      * <code>&lt;resource-bundle&gt;</code> with the given <code>&lt;var&gt;</code>, then this method just returns
      * <code>null</code>.
-     * @param var The value of the <code>&lt;var&gt;</code> which identifies the <code>&lt;resource-bundle&gt;</code> in
+     * @param varName The value of the <code>&lt;var&gt;</code> which identifies the <code>&lt;resource-bundle&gt;</code> in
      * <code>faces-config.xml</code>.
      * @return The application resource bundle as identified by the given <code>&lt;var&gt;</code> of the
      * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>.
@@ -1030,8 +1030,8 @@ public final class Faces {
      * @see Application#getResourceBundle(FacesContext, String)
      * @since 2.0
      */
-    public static ResourceBundle getResourceBundle(String var) {
-        return FacesLocal.getResourceBundle(getContext(), var);
+    public static ResourceBundle getResourceBundle(String varName) {
+        return FacesLocal.getResourceBundle(getContext(), varName);
     }
 
     /**
@@ -1148,6 +1148,17 @@ public final class Faces {
      */
     public static String getBookmarkableURL(String viewId, Collection<? extends ParamHolder<?>> params, boolean includeViewParams) {
         return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
+    }
+
+    /**
+     * Returns whether the output of the current view is using HTML5 doctype.
+     * @return Whether the output of the current view is using HTML5 doctype.
+     * @see FacesContext#getViewRoot()
+     * @see UIViewRoot#getDoctype()
+     * @since 5.0
+     */
+    public static boolean isOutputHtml5Doctype() {
+        return FacesLocal.isOutputHtml5Doctype(getContext());
     }
 
     // Facelets -------------------------------------------------------------------------------------------------------
