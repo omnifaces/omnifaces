@@ -26,6 +26,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.inject.Qualifier;
 import jakarta.websocket.CloseReason.CloseCode;
+import jakarta.websocket.CloseReason.CloseCodes;
 
 /**
  * <p>
@@ -46,13 +47,13 @@ public final class SocketEvent implements Serializable {
     private final String channel;
     private final Serializable user;
     private final Serializable previousUser;
-    private final CloseCode code;
+    private final int closeCode;
 
-    SocketEvent(String channel, Serializable user, Serializable previousUser, CloseCode code) {
+    SocketEvent(String channel, Serializable user, Serializable previousUser, CloseCode closeCode) {
         this.channel = channel;
         this.user = user;
         this.previousUser = previousUser;
-        this.code = code;
+        this.closeCode = closeCode.getCode();
     }
 
     /**
@@ -93,12 +94,12 @@ public final class SocketEvent implements Serializable {
      * @return The close code.
      */
     public CloseCode getCloseCode() {
-        return code;
+        return CloseCodes.getCloseCode(closeCode);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + Objects.hash(channel, user, code);
+        return super.hashCode() + Objects.hash(channel, user, closeCode);
     }
 
     @Override
@@ -107,16 +108,16 @@ public final class SocketEvent implements Serializable {
             return false;
         }
 
-        SocketEvent other = (SocketEvent) object;
+        var other = (SocketEvent) object;
 
         return Objects.equals(channel, other.channel)
             && Objects.equals(user, other.user)
-            && Objects.equals(code, other.code);
+            && Objects.equals(closeCode, other.closeCode);
     }
 
     @Override
     public String toString() {
-        return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, code);
+        return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, getCloseCode());
     }
 
     /**
@@ -139,7 +140,7 @@ public final class SocketEvent implements Serializable {
          * The literal of {@link Opened}.
          * @since 3.2
          */
-        public static final AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<Opened>() {
+        public static final AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }
@@ -163,7 +164,7 @@ public final class SocketEvent implements Serializable {
         /**
          * The literal of {@link Switched}.
          */
-        public static final AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<Switched>() {
+        public static final AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }
@@ -188,7 +189,7 @@ public final class SocketEvent implements Serializable {
          * The literal of {@link Closed}.
          * @since 3.2
          */
-        public static final AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<Closed>() {
+        public static final AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }
