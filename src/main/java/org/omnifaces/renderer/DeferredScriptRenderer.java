@@ -19,7 +19,6 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
@@ -38,7 +37,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  * @since 1.8
  */
 @FacesRenderer(componentFamily=ScriptFamily.COMPONENT_FAMILY, rendererType=DeferredScriptRenderer.RENDERER_TYPE)
-public class DeferredScriptRenderer extends Renderer {
+public class DeferredScriptRenderer extends Renderer<DeferredScript> {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
@@ -53,7 +52,7 @@ public class DeferredScriptRenderer extends Renderer {
      * not resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
      */
     @Override
-    public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
+    public void encodeBegin(FacesContext context, DeferredScript component) throws IOException {
         var id = new ResourceIdentifier(component);
         var resource = createResource(context, id);
 
@@ -98,7 +97,7 @@ public class DeferredScriptRenderer extends Renderer {
         }
     }
 
-    private void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
+    private static void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
         if (hasFunction) {
             writer.write(",function() {");
             writer.write(function);
@@ -110,7 +109,7 @@ public class DeferredScriptRenderer extends Renderer {
     }
 
     @Override
-    public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
+    public void encodeEnd(FacesContext context, DeferredScript component) throws IOException {
         var writer = context.getResponseWriter();
         writer.endElement("script");
     }

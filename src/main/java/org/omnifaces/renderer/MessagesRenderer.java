@@ -31,11 +31,9 @@ import java.util.Map;
 
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.application.FacesMessage.Severity;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.component.UIMessages;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 import jakarta.faces.render.Renderer;
 
@@ -50,7 +48,7 @@ import org.omnifaces.component.messages.OmniMessages;
  * @since 1.5
  */
 @FacesRenderer(componentFamily=UIMessages.COMPONENT_FAMILY, rendererType=MessagesRenderer.RENDERER_TYPE)
-public class MessagesRenderer extends Renderer {
+public class MessagesRenderer extends Renderer<OmniMessages> {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
@@ -82,13 +80,13 @@ public class MessagesRenderer extends Renderer {
     }
 
     @Override
-    public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
+    public void encodeChildren(FacesContext context, OmniMessages component) throws IOException {
         if (!component.isRendered()) {
             return;
         }
 
-        OmniMessages omniMessages = (OmniMessages) component;
-        List<FacesMessage> messages = getMessages(context, omniMessages);
+        var omniMessages = component;
+        var messages = getMessages(context, omniMessages);
 
         if (!isEmpty(omniMessages.getVar()) && omniMessages.getChildCount() > 0) {
             encodeMessagesRepeater(context, omniMessages, messages);
@@ -97,7 +95,7 @@ public class MessagesRenderer extends Renderer {
             encodeEmptyMessages(context, omniMessages);
         }
         else {
-            String message = omniMessages.getMessage();
+            var message = omniMessages.getMessage();
 
             if (!isEmpty(message)) {
                 messages = Arrays.asList(createInfo(message));
@@ -115,7 +113,7 @@ public class MessagesRenderer extends Renderer {
      * @return All messages associated with components identified by <code>for</code> attribute.
      */
     protected List<FacesMessage> getMessages(FacesContext context, OmniMessages component) {
-        String forClientIds = component.getFor();
+        var forClientIds = component.getFor();
 
         if (forClientIds == null) {
             return component.isGlobalOnly() ? context.getMessageList(null) : context.getMessageList();
@@ -123,8 +121,8 @@ public class MessagesRenderer extends Renderer {
 
         List<FacesMessage> messages = new ArrayList<>();
 
-        for (String forClientId : forClientIds.split("\\s+")) {
-            UIComponent forComponent = component.findComponent(forClientId);
+        for (var forClientId : forClientIds.split("\\s+")) {
+            var forComponent = component.findComponent(forClientId);
 
             if (forComponent == null) {
                 continue;
@@ -153,19 +151,19 @@ public class MessagesRenderer extends Renderer {
     protected void encodeMessagesRepeater(FacesContext context, OmniMessages component, List<FacesMessage> messages)
         throws IOException
     {
-        String var = component.getVar();
-        Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
-        Object originalVar = requestMap.get(var);
+        var varName = component.getVar();
+        var requestMap = context.getExternalContext().getRequestMap();
+        var originalVar = requestMap.get(varName);
 
         try {
-            for (FacesMessage message : messages) {
+            for (var message : messages) {
                 if (message.isRendered() && !component.isRedisplay()) {
                     continue;
                 }
 
-                requestMap.put(var, message);
+                requestMap.put(varName, message);
 
-                for (UIComponent child : component.getChildren()) {
+                for (var child : component.getChildren()) {
                     child.encodeAll(context);
                 }
 
@@ -174,10 +172,10 @@ public class MessagesRenderer extends Renderer {
         }
         finally {
             if (originalVar != null) {
-                requestMap.put(var, originalVar);
+                requestMap.put(varName, originalVar);
             }
             else {
-                requestMap.remove(var);
+                requestMap.remove(varName);
             }
         }
     }
@@ -189,10 +187,10 @@ public class MessagesRenderer extends Renderer {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
-        String id = component.getId();
+        var id = component.getId();
 
         if (!isOneOf(id, null, "jakarta_faces_developmentstage_messages")) {
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
             writer.startElement("div", component);
             writeAttribute(writer, "id", component.getClientId(context));
             writeAttribute(writer, component, "styleClass", "class");
@@ -212,13 +210,13 @@ public class MessagesRenderer extends Renderer {
         (FacesContext context, OmniMessages component, List<FacesMessage> messages, boolean table)
             throws IOException
     {
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement(table ? LAYOUT_TABLE : "ul", component);
         writeAttribute(writer, "id", component.getClientId(context));
         writeAttribute(writer, component, "styleClass", "class");
         writeAttributes(writer, component, "style", "title", "lang", "dir");
 
-        for (FacesMessage message : messages) {
+        for (var message : messages) {
             if (!message.isRendered() || component.isRedisplay()) {
                 encodeMessage(context, component, message, table);
                 message.rendered();
@@ -237,9 +235,9 @@ public class MessagesRenderer extends Renderer {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeMessage(FacesContext context, OmniMessages component, FacesMessage message, boolean table) throws IOException {
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement(table ? "tr" : "li", component);
-        String severityName = SEVERITY_NAMES.get(message.getSeverity());
+        var severityName = SEVERITY_NAMES.get(message.getSeverity());
         writeAttribute(writer, component, severityName + "Style", "style");
         writeAttribute(writer, component, severityName + "Class", "class", "styleClass");
 
@@ -247,8 +245,8 @@ public class MessagesRenderer extends Renderer {
             writer.startElement("td", component);
         }
 
-        String summary = coalesce(message.getSummary(), "");
-        String detail = coalesce(message.getDetail(), summary);
+        var summary = coalesce(message.getSummary(), "");
+        var detail = coalesce(message.getDetail(), summary);
 
         if (component.isTooltip() && isEmpty(component.getTitle())) {
             writeAttribute(writer, "title", detail);

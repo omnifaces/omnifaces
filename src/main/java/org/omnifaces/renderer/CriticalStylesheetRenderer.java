@@ -21,9 +21,7 @@ import static org.omnifaces.util.Renderers.writeAttribute;
 import java.io.IOException;
 
 import jakarta.faces.application.Resource;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 import jakarta.faces.render.Renderer;
 
@@ -38,7 +36,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  * @since 4.5
  */
 @FacesRenderer(componentFamily=StylesheetFamily.COMPONENT_FAMILY, rendererType=CriticalStylesheetRenderer.RENDERER_TYPE)
-public class CriticalStylesheetRenderer extends Renderer {
+public class CriticalStylesheetRenderer extends Renderer<CriticalStylesheet> {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
@@ -53,13 +51,13 @@ public class CriticalStylesheetRenderer extends Renderer {
      * <code>RES_NOT_FOUND</code> will be written to the <code>href</code> attribute instead.
      */
     @Override
-    public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
-        ResourceIdentifier id = new ResourceIdentifier(component);
-        Resource resource = createResource(context, id);
-        String href = (resource != null) ? resource.getRequestPath() : RES_NOT_FOUND;
+    public void encodeBegin(FacesContext context, CriticalStylesheet component) throws IOException {
+        var id = new ResourceIdentifier(component);
+        var resource = createResource(context, id);
+        var href = resource != null ? resource.getRequestPath() : RES_NOT_FOUND;
         setAttribute(component, "href", href);
 
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement("link", component);
         writeAttribute(writer, "rel", "preload");
         writer.writeURIAttribute("href", href, "href");
@@ -73,8 +71,8 @@ public class CriticalStylesheetRenderer extends Renderer {
      * <code>&lt;link rel="stylesheet"&gt;</code>
      */
     @Override
-    public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
-        ResponseWriter writer = context.getResponseWriter();
+    public void encodeEnd(FacesContext context, CriticalStylesheet component) throws IOException {
+        var writer = context.getResponseWriter();
         writer.endElement("link");
         writer.startElement("noscript", component);
         writer.startElement("link", component);
