@@ -47,13 +47,13 @@ public final class SocketEvent implements Serializable {
     private final String channel;
     private final Serializable user;
     private final Serializable previousUser;
-    private final int closeCode;
+    private final Integer closeCode;
 
     SocketEvent(String channel, Serializable user, Serializable previousUser, CloseCode closeCode) {
         this.channel = channel;
         this.user = user;
         this.previousUser = previousUser;
-        this.closeCode = closeCode.getCode();
+        this.closeCode = closeCode == null ? null : closeCode.getCode();
     }
 
     /**
@@ -94,7 +94,7 @@ public final class SocketEvent implements Serializable {
      * @return The close code.
      */
     public CloseCode getCloseCode() {
-        return CloseCodes.getCloseCode(closeCode);
+        return closeCode == null ? null : CloseCodes.getCloseCode(closeCode);
     }
 
     @Override
