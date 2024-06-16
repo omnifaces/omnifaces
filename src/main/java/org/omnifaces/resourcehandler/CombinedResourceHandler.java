@@ -93,7 +93,7 @@ import org.omnifaces.util.cache.Cache;
  * <p>
  * If you want them to appear <em>after</em> any auto-included resources of standard Faces implementation or Faces component
  * libraries, then move the declarations to top of the <code>&lt;h:body&gt;</code>. This is not necessary for
- * <code>&lt;o:criticalStylesheet&gt;</code> nor <code>&lt;o:deferredScript&gt;</code> as they already auto-relocate by 
+ * <code>&lt;o:criticalStylesheet&gt;</code> nor <code>&lt;o:deferredScript&gt;</code> as they already auto-relocate by
  * themselves.
  * <pre>
  * &lt;h:body&gt;
@@ -140,7 +140,7 @@ import org.omnifaces.util.cache.Cache;
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
  * from combining. For example:
- * <br><code>&lt;param-value&gt;primefaces:primefaces.css, jakarta.faces:jsf.js&lt;/param-value&gt;</code>
+ * <br><code>&lt;param-value&gt;primefaces:primefaces.css, jakarta.faces:faces.js&lt;/param-value&gt;</code>
  * <br>Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
  * <tr><td class="colFirst">
@@ -334,7 +334,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
      */
     @Override
     public boolean isListenerForSource(Object source) {
-        return (source instanceof UIViewRoot);
+        return source instanceof UIViewRoot;
     }
 
     /**
@@ -349,17 +349,17 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
      */
     @Override
     public void processEvent(SystemEvent event) {
-        Object disabled = evaluateExpressionGet(disabledParam);
+        var disabled = evaluateExpressionGet(disabledParam);
 
         if (disabledParam != null && parseBoolean(String.valueOf(disabled))) {
             return;
         }
 
-        FacesContext context = FacesContext.getCurrentInstance();
-        UIViewRoot view = context.getViewRoot();
-        CombinedResourceBuilder builder = new CombinedResourceBuilder();
+        var context = FacesContext.getCurrentInstance();
+        var view = context.getViewRoot();
+        var builder = new CombinedResourceBuilder();
 
-        for (UIComponent component : view.getComponentResources(context, TARGET_HEAD)) {
+        for (var component : view.getComponentResources(context, TARGET_HEAD)) {
             if (component.getAttributes().get("name") == null) {
                 continue; // It's likely an inline script, they can't be combined as it might contain EL expressions.
             }
@@ -367,7 +367,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             builder.add(context, component, component.getRendererType(), new ResourceIdentifier(component), TARGET_HEAD);
         }
 
-        for (UIComponent component : view.getComponentResources(context, TARGET_BODY)) {
+        for (var component : view.getComponentResources(context, TARGET_BODY)) {
             if (!(component instanceof DeferredScript)) {
                 continue; // We currently only support deferred scripts. TODO: support body scripts as well?
             }
@@ -404,7 +404,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
      */
     private static Set<ResourceIdentifier> initResources(String name) {
         Set<ResourceIdentifier> resources = new HashSet<>(1);
-        String configuredResources = getInitParameter(name);
+        var configuredResources = getInitParameter(name);
 
         if (configuredResources != null) {
             splitAndTrim(configuredResources, ",").forEach(id -> resources.add(new ResourceIdentifier(id)));
@@ -418,8 +418,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
      * @return The set of CDN resources.
      */
     private static Set<ResourceIdentifier> initCDNResources() {
-        Map<ResourceIdentifier, String> cdnResources = CDNResourceHandler.initCDNResources();
-        return (cdnResources != null) ? cdnResources.keySet() : Collections.<ResourceIdentifier>emptySet();
+        var cdnResources = CDNResourceHandler.initCDNResources();
+        return cdnResources != null ? cdnResources.keySet() : Collections.<ResourceIdentifier>emptySet();
     }
 
     /**
@@ -428,7 +428,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
     private static Integer initCacheTTL(String cacheTTLParam) {
         if (!isDevelopment() && cacheTTLParam != null) {
             if (isNumber(cacheTTLParam)) {
-                int cacheTTL = Integer.parseInt(cacheTTLParam);
+                var cacheTTL = Integer.parseInt(cacheTTLParam);
 
                 if (cacheTTL > 0) {
                     return cacheTTL;
@@ -443,11 +443,11 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
     }
 
     private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
-        UIViewRoot view = context.getViewRoot();
+        var view = context.getViewRoot();
 
-        for (UIComponent resourceToRemove : componentResourcesToRemove) {
+        for (var resourceToRemove : componentResourcesToRemove) {
             if (resourceToRemove != null) {
-                UIComponent container = coalesce(isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove);
+                var container = coalesce(isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove);
 
                 // setInView(false) forces Faces to not save dynamic remove action in state.
                 // Otherwise Faces will re-execute dynamic remove during restore view phase.
@@ -497,10 +497,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             else if (component instanceof CriticalStylesheet) {
                 addStylesheet(context, component, id, criticalStylesheets);
             }
-            else if (rendererType.equals(RENDERER_TYPE_CSS)) {
+            else if (RENDERER_TYPE_CSS.equals(rendererType)) {
                 addStylesheet(context, component, id, stylesheets);
             }
-            else if (rendererType.equals(RENDERER_TYPE_JS)) {
+            else if (RENDERER_TYPE_JS.equals(rendererType)) {
                 addScript(context, component, id);
             }
             else if (component instanceof DeferredScript) {
@@ -509,13 +509,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private void addCombined(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
-            String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
-            String resourceId = resourcePathParts[resourcePathParts.length - 1];
-            CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
-            boolean added = false;
+            var resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
+            var resourceId = resourcePathParts[resourcePathParts.length - 1];
+            var info = CombinedResourceInfo.get(resourceId);
+            var added = false;
 
             if (info != null) {
-                for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
+                for (var combinedId : info.getResourceIdentifiers()) {
                     add(context, added ? null : component, rendererType, combinedId, target);
                     added = true;
                 }
@@ -531,7 +531,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
                 return;
             }
 
-            ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+            var resourceHandler = context.getApplication().getResourceHandler();
 
             if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) {
                 componentResourcesToRemove.add(component);
@@ -542,7 +542,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
-            ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+            var resourceHandler = context.getApplication().getResourceHandler();
 
             if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) { // This is true when o:deferredScript is used.
                 componentResourcesToRemove.add(component);
@@ -553,7 +553,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
-            String group = (String) component.getAttributes().get("group");
+            var group = (String) component.getAttributes().get("group");
             deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY, DeferredScriptRenderer.RENDERER_TYPE)).add(component, id);
         }
 
@@ -562,7 +562,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             stylesheets.create(context);
             scripts.create(context);
 
-            for (Builder builder : deferredScripts.values()) {
+            for (var builder : deferredScripts.values()) {
                 builder.create(context);
             }
 
@@ -591,16 +591,16 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-            if ((componentResource != null && !isRendered(componentResource)) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
+            if (componentResource != null && !isRendered(componentResource) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
                 componentResourcesToRemove.add(componentResource);
                 return true;
             }
             else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
                 infoBuilder.add(resourceIdentifier);
-                boolean deferredScript = (componentResource instanceof DeferredScript);
-                boolean specialized = deferredScript || (componentResource instanceof CriticalStylesheet);
+                var deferredScript = componentResource instanceof DeferredScript;
+                var specialized = deferredScript || componentResource instanceof CriticalStylesheet;
 
-                if (this.componentResource == null && (specialized || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
+                if (this.componentResource == null && (specialized || componentResource != null && componentResource.getAttributes().containsKey("target"))) {
                     this.componentResource = componentResource;
                 }
                 else {
@@ -623,15 +623,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private void mergeAttribute(UIComponent originalComponent, UIComponent newComponent, String name) {
-            String originalAttribute = getAttribute(originalComponent, name);
-            String newAttribute = getAttribute(newComponent, name);
-            String separator = (originalAttribute.isEmpty() || originalAttribute.endsWith(";") ? "" : ";");
+            var originalAttribute = getAttribute(originalComponent, name);
+            var newAttribute = getAttribute(newComponent, name);
+            var separator = originalAttribute.isEmpty() || originalAttribute.endsWith(";") ? "" : ";";
             originalComponent.getAttributes().put(name, originalAttribute + separator + newAttribute);
         }
 
         private String getAttribute(UIComponent component, String name) {
-            String attribute = (String) component.getAttributes().get(name);
-            return (attribute == null) ? "" : attribute.trim();
+            var attribute = (String) component.getAttributes().get(name);
+            return attribute == null ? "" : attribute.trim();
         }
 
         private void create(FacesContext context) {
@@ -648,14 +648,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
                     componentResource.getAttributes().remove(COMPONENT_ADDED);
                 }
 
-                String resourceName = infoBuilder.create() + extension;
+                var resourceName = infoBuilder.create() + extension;
                 componentResource.getAttributes().put("library", LIBRARY_NAME);
                 componentResource.getAttributes().put("name", resourceName);
                 componentResource.setRendererType(rendererType);
-                Resource resource = FacesLocal.createResource(context, LIBRARY_NAME, resourceName);
+                var resource = FacesLocal.createResource(context, LIBRARY_NAME, resourceName);
 
-                if (resource instanceof CDNResource) {
-                    setFallbackURL(context, (CDNResource) resource);
+                if (resource instanceof CDNResource cdnResource) {
+                    setFallbackURL(context, cdnResource);
                 }
                 else if (isOneOf(rendererType, RENDERER_TYPE_JS, RENDERER_TYPE_CSS)) {
                     componentResource.getPassThroughAttributes().put("crossorigin", crossorigin);
@@ -667,7 +667,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
         }
 
         private void setFallbackURL(FacesContext context, CDNResource cdnResource) {
-            String fallbackURL = cdnResource.getLocalRequestPath();
+            var fallbackURL = cdnResource.getLocalRequestPath();
 
             if (RENDERER_TYPE_JS.equals(rendererType)) {
                 componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallbackURL
@@ -677,8 +677,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
                 componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallbackURL + "'");
             }
             else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
-                String callbacks = "";
-                String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
+                var callbacks = "";
+                var onsuccess = (String) componentResource.getAttributes().get("onsuccess");
 
                 if (onsuccess != null) {
                     callbacks = ",null,function(){" + onsuccess + "}";

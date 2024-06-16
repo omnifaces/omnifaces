@@ -23,7 +23,7 @@ export module Util {
 
     // "Constant" fields ----------------------------------------------------------------------------------------------
 
-    const ERROR_MISSING_FORM = "OmniFaces: Cannot find a JSF form in the document. Please add one.";
+    const ERROR_MISSING_FORM = "OmniFaces: Cannot find a Faces form in the document. Please add one.";
 
     // Public static functions ----------------------------------------------------------------------------------------
 
@@ -64,14 +64,14 @@ export module Util {
     }
 
     /**
-     * Add submit listener to the document and all synchronous JSF submit handler functions.
+     * Add submit listener to the document and all synchronous Faces submit handler functions.
      * @param listener The listener to invoke before the (synchronous) submit.
      */
     export function addSubmitListener(listener: Function) {
         addEventListener(document, "submit", listener); // Invoke given listener on any (propagated!) submit event (e.g. h:commandLink and p:commandButton ajax=false).
 
         if (window.mojarra) {
-            decorateFacesSubmit(window.mojarra, window.faces ? "cljs" : "jsfcljs", listener); // Decorate Mojarra h:commandLink submit handler to invoke given listener first.
+            decorateFacesSubmit(window.mojarra, "cljs", listener); // Decorate Mojarra h:commandLink submit handler to invoke given listener first.
         }
 
         if (window.myfaces) {
@@ -93,8 +93,8 @@ export module Util {
     }
 
     /**
-     * Get the first JSF form containing view state param from the current document.
-     * @return The first JSF form of the current document.
+     * Get the first Faces form containing view state param from the current document.
+     * @return The first Faces form of the current document.
      */
     export function getFacesForm(): HTMLFormElement | null {
         for (var i = 0; i < document.forms.length; i++) {
@@ -207,10 +207,10 @@ export module Util {
     }
 
     /**
-     * Decorate the JavaScript based submit function of the JSF implementation to invoke the given listener first.
-     * @param {object} facesImpl The JSF implementation script object holding the submit function.
-     * @param {string} functionName The name of the JSF submit function to decorate.
-     * @param {Function} listener The listener to invoke before the JSF submit function.
+     * Decorate the JavaScript based submit function of the Faces implementation to invoke the given listener first.
+     * @param {object} facesImpl The Faces implementation script object holding the submit function.
+     * @param {string} functionName The name of the Faces submit function to decorate.
+     * @param {Function} listener The listener to invoke before the Faces submit function.
      */
     function decorateFacesSubmit(facesImpl: any, functionName: string, listener: Function) {
         const submitFunction = facesImpl[functionName];

@@ -35,9 +35,9 @@ export module Unload {
 
     /**
      * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-     * current document has a JSF form with a view state element. If so, then register the <code>unload</code> event to
-     * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
-     * parameters. Also register the all JSF <code>submit</code> events to disable the unload event listener.
+     * current document has a Faces form with a view state element. If so, then register the <code>unload</code> event to
+     * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the Faces view state value as
+     * parameters. Also register the all Faces <code>submit</code> events to disable the unload event listener.
      * @param viewScopeId The OmniFaces view scope ID.
      */
     export function init(viewScopeId: string) {

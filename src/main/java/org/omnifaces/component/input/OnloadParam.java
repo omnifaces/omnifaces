@@ -62,10 +62,10 @@ public abstract class OnloadParam extends UIViewParameter {
     }
 
     private void registerScriptsIfNecessary() {
-        FacesContext context = getFacesContext();
+        var context = getFacesContext();
 
         if (!isOnloadParamRequest(context)) {
-            addFormIfNecessary(); // Required by jsf.ajax.request.
+            addFormIfNecessary(); // Required by faces.ajax.request.
 
             // This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
             // ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
@@ -75,7 +75,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
             if (!isAjaxRequestWithPartialRendering(context)) {
                 if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered OnloadParam.
-                    String initScript = getInitScript(context);
+                    var initScript = getInitScript(context);
 
                     if (initScript != null) {
                         addScript(initScript);
@@ -83,7 +83,7 @@ public abstract class OnloadParam extends UIViewParameter {
                 }
             }
             else {
-                String updateScript = getUpdateScript(context);
+                var updateScript = getUpdateScript(context);
 
                 if (updateScript != null) {
                     addScript(updateScript);
@@ -124,8 +124,7 @@ public abstract class OnloadParam extends UIViewParameter {
      * @param context The involved faces context.
      * @return <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
      */
-    protected boolean isOnloadParamRequest(FacesContext context)
-    {
+    protected boolean isOnloadParamRequest(FacesContext context) {
         return isOnloadParamRequest(context, getEventValue(context));
     }
 
@@ -162,7 +161,7 @@ public abstract class OnloadParam extends UIViewParameter {
             setValid(true); // Don't leave OnloadParam in an invalid state for next postback as it would block processing of regular forms.
         }
 
-        String render = getRender();
+        var render = getRender();
 
         if (render != null) {
             update(render.split("\\s+"));
@@ -211,8 +210,7 @@ public abstract class OnloadParam extends UIViewParameter {
      * @param onloadEvent The onload param event.
      * @return <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
      */
-    protected static boolean isOnloadParamRequest(FacesContext context, String onloadEvent)
-    {
+    protected static boolean isOnloadParamRequest(FacesContext context, String onloadEvent) {
         return context.isPostback() && onloadEvent.equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
     }
 

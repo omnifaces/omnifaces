@@ -29,7 +29,7 @@ export module Form {
     function init() {
         const faces = window.faces;
 
-        if (faces) { // Standard JSF API.
+        if (faces) {
             const originalAjaxRequest = faces.ajax.request;
 
             faces.ajax.request = function(source: HTMLElement, event: any, options: any) {

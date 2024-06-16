@@ -27,7 +27,7 @@
         <description>
             <![CDATA[
                 The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
-                hierarchy by declaring the appropriate JSF components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
+                hierarchy by declaring the appropriate Faces components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
                 does namely not render any HTML markup by itself.
                 <p>
                 The component value must point to a tree of data objects represented by a <code>TreeModel</code> instance, typically
@@ -2823,7 +2823,7 @@ It's very similar to the <code>&lt;o:viewParam&gt;</code>.
 &lt;/f:metadata&gt;
 </pre>
 <p>
-This only requires that the JSF page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
+This only requires that the Faces page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
 or <code>&lt;o:form&gt;</code>, otherwise the <code>&lt;o:hashParam&gt;</code> won't be able to fire the ajax
 request which sets the with hash query parameter values in bean. In such case an error will be printed to JS console
 when the project stage is <code>Development</code>.
@@ -3864,7 +3864,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
             <![CDATA[
                 The <code>&lt;o:graphicImage&gt;</code> is a component that extends the standard <code>&lt;h:graphicImage&gt;</code>
                 with support for referencing an <code>InputStream</code> or <code>byte[]</code> property in <code>value</code> attribute.
-                This property must point to a <strong>stateless</strong> <code>@ApplicationScoped</code> bean (both JSF and CDI
+                This property must point to a <strong>stateless</strong> <code>@ApplicationScoped</code> bean (both Faces and CDI
                 scopes are supported).
              ]]>
         </description>
@@ -4188,7 +4188,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
     <tag>
         <description>
             <![CDATA[
-                The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or JSF view ID as a bookmarkable
+                The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or Faces view ID as a bookmarkable
                 URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
                 and <code>&lt;o:param&gt;</code>, and for exposing it into the request scope by the variable name as specified by
                 the <code>var</code> attribute instead of rendering it.
@@ -4306,7 +4306,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
     <tag>
         <description>
             <![CDATA[
-                The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or JSF view ID as a sitemap
+                The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or Faces view ID as a sitemap
                 URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
                 and <code>&lt;o:param&gt;</code>.
              ]]>
@@ -5499,7 +5499,7 @@ public enum Baz {
                 You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
                 is not the documented approach and the behavior is unspecified.
                 <p>
-                You can <strong>not</strong> change the HTTP status code of a redirect. This is not a JSF limitation, but a HTTP
+                You can <strong>not</strong> change the HTTP status code of a redirect. This is not a Faces limitation, but a HTTP
                 limitation. The status code of a redirect will <strong>always</strong> end up the one of the redirected response.
                 If you intend to "redirect" with a different HTTP status code, then you should be using <code>sendError</code>
                 instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.
@@ -5547,7 +5547,7 @@ public enum Baz {
         <description>
             <![CDATA[
                 <p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
-                function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
+                function in the global JavaScript scope which allows the enduser to execute a Facesaces ajax request by a just function
                 call <code>functionName()</code> in the JavaScript context.
                 <p>
                 The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in an <code>UIForm</code> component. The
@@ -5745,7 +5745,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
                 attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
                 already registered for the target class.
                 Also, if no value is specified, but children are present, then the encoded output of children will be returned as
-                value. This is useful when you want to supply JSF components or HTML as parameter of an unescaped
+                value. This is useful when you want to supply Faces components or HTML as parameter of an unescaped
                 <code>&lt;h:outputFormat&gt;</code>. For example,
                 <pre>
                 &lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
@@ -6356,7 +6356,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
             <![CDATA[
                 The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a nested collection representing groups of select items.
                 This is the {@link UIComponent} counterpart of <code>jakarta.faces.model.SelectItemGroup</code>.
-                There is no equivalent (yet) in the standard JSF API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end up to be quite verbose.
+                There is no equivalent (yet) in the standard Faces API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end up to be quite verbose.
                 <p>
                 Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a <code>List&lt;Product&gt;</code>.
                 <pre>

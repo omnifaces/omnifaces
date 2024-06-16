@@ -50,6 +50,6 @@ public @interface Push {
      *
      * @return The name of the push channel.
      */
-    @Nonbinding    String channel() default "";
+    @Nonbinding String channel() default "";
 
 }

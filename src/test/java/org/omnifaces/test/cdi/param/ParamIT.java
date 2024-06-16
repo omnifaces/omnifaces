@@ -218,7 +218,7 @@ public class ParamIT extends OmniFacesIT {
     void testLongParamList() {
         openWithQueryString("longParamList=42&longParamList=64");
         assertEquals("[42, 64]", longParamList.getText());
-        assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit JSF converters are also invoked when List<T> is used instead of T[].
+        assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit Faces converters are also invoked when List<T> is used instead of T[].
         assertEquals("initSuccess", initResult.getText());
         assertGlobalMessageEquals("");
     }

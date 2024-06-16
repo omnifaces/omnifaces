@@ -34,7 +34,7 @@ export module InputFile {
      */
     export function validate(event: Event, inputFile: HTMLInputElement, messageClientId: string, maxsize: number) {
         if (!window.FileReader) {
-            return true; // File API not supported (IE6-9). End of story. Let standard JSF code continue.
+            return true; // File API not supported (IE6-9). End of story. Let standard Faces code continue.
         }
 
         document.getElementById(messageClientId).innerHTML = ""; // Clear out any previously rendered message.

@@ -97,7 +97,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * in case of client side state saving.
  * <p>
  * In case you are using client side state saving by having the <code>jakarta.faces.STATE_SAVING_METHOD</code> context
- * parameter set to <code>true</code> along with a valid <code>jsf/ClientSideSecretKey</code> in <code>web.xml</code>
+ * parameter set to <code>true</code> along with a valid <code>faces/ClientSideSecretKey</code> in <code>web.xml</code>
  * as below,
  * <pre>
  * &lt;context-param&gt;
@@ -105,7 +105,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  *     &lt;param-value&gt;client&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * &lt;env-entry&gt;
- *     &lt;env-entry-name&gt;jsf/ClientSideSecretKey&lt;/env-entry-name&gt;
+ *     &lt;env-entry-name&gt;faces/ClientSideSecretKey&lt;/env-entry-name&gt;
  *     &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
  *     &lt;env-entry-value&gt;&lt;!-- See https://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
  * &lt;/env-entry&gt;
@@ -252,6 +252,6 @@ public @interface ViewScoped {
      * @throws IllegalStateException When enabled while not using client side state saving.
      * @since 2.6
      */
-    @Nonbinding    boolean saveInViewState() default false;
+    @Nonbinding boolean saveInViewState() default false;
 
 }

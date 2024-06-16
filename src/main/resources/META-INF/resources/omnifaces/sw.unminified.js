@@ -100,7 +100,7 @@ self.addEventListener("fetch", function(event) {
             }));
         }
     }
-    else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with JSF because its POST requests are by default postback.
+    else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with Faces because its POST requests are by default postback.
         fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "omnifaces.event=sw.js").then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
     }
 });

@@ -115,7 +115,7 @@ public class Highlight extends OnloadScript {
     private void registerScriptsIfNecessary() {
         // This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
         // resource name which cannot be resolved statically.
-        addFacesScriptResource(); // Required for jsf.ajax.request.
+        addFacesScriptResource(); // Required for faces.ajax.request.
         addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
     }
 
@@ -134,20 +134,20 @@ public class Highlight extends OnloadScript {
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        UIForm form = getCurrentForm();
+        var form = getCurrentForm();
 
         if (form == null) {
             return;
         }
 
-        StringBuilder clientIds = new StringBuilder();
+        var clientIds = new StringBuilder();
         form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
-            if (component instanceof UIInput && !((UIInput) component).isValid()) {
+            if (component instanceof UIInput input && !input.isValid()) {
                 if (clientIds.length() > 0) {
                     clientIds.append(',');
                 }
 
-                String clientId = component.getClientId(visitContext.getFacesContext());
+                var clientId = component.getClientId(visitContext.getFacesContext());
                 clientIds.append('"').append(clientId).append('"');
             }
 
@@ -165,7 +165,7 @@ public class Highlight extends OnloadScript {
      */
     @Override
     public boolean isRendered() {
-        FacesContext context = getFacesContext();
+        var context = getFacesContext();
         return context.isPostback() && context.isValidationFailed() && super.isRendered();
     }
 

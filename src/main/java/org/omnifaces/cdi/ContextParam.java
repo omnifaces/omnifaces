@@ -61,6 +61,6 @@ public @interface ContextParam {
      *
      * @return The name of the context parameter.
      */
-    @Nonbinding    String name() default "";
+    @Nonbinding String name() default "";
 
 }

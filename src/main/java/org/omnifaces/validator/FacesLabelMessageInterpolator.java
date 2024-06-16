@@ -28,11 +28,11 @@ import jakarta.validation.MessageInterpolator;
  * Unlike native Faces validation error messages, in a bean validation message by default the label of the component where
  * a validation constraint violation originated from can not be displayed in the middle of a message. Using the
  * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
- * message, but that's it. With this {@link JsfLabelMessageInterpolator} a label can appear in the middle of a message,
- * by using the special placeholder <code>{jsf.label}</code> in bean validation messages.
+ * message, but that's it. With this {@link FacesLabelMessageInterpolator} a label can appear in the middle of a message,
+ * by using the special placeholder <code>{faces.label}</code> in bean validation messages.
  * <p>
  * Note that Bean Validation is not only called from within Faces, and as such Faces might not be available. If Faces
- * is not available occurrences of <code>{jsf.label}</code> will be replaced by an empty string. The user should take
+ * is not available occurrences of <code>{faces.label}</code> will be replaced by an empty string. The user should take
  * care that messages are compatible with both situations if needed.
  * <p>
  * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean
@@ -51,24 +51,24 @@ import jakarta.validation.MessageInterpolator;
  *     xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
  *     version="3.0"
  * &gt;
- *     &lt;message-interpolator&gt;org.omnifaces.validator.JsfLabelMessageInterpolator&lt;/message-interpolator&gt;
+ *     &lt;message-interpolator&gt;org.omnifaces.validator.FacesLabelMessageInterpolator&lt;/message-interpolator&gt;
  * &lt;/validation-config&gt;
  * </pre>
  *
  * <h2>Usage</h2>
  * <p>As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
  * <pre>
- * jakarta.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters
+ * jakarta.validation.constraints.Size.message = The size of {faces.label} must be between {min} and {max} characters
  * </pre>
  *
  * @author Arjan Tijms
  * @since 1.5
  */
-public class JsfLabelMessageInterpolator implements MessageInterpolator {
+public class FacesLabelMessageInterpolator implements MessageInterpolator {
 
     private final MessageInterpolator wrapped;
 
-    public JsfLabelMessageInterpolator() {
+    public FacesLabelMessageInterpolator() {
         wrapped = byDefaultProvider().configure().getDefaultMessageInterpolator();
     }
 
@@ -79,16 +79,16 @@ public class JsfLabelMessageInterpolator implements MessageInterpolator {
 
     @Override
     public String interpolate(String messageTemplate, Context context, Locale locale) {
-        String message = wrapped.interpolate(messageTemplate, context, locale);
+        var message = wrapped.interpolate(messageTemplate, context, locale);
 
-        if (message.contains("{jsf.label}")) {
+        if (message.contains("{faces.label}")) {
 
-            String label = "";
+            var label = "";
             if (hasContext()) {
                 label = getLabel(getCurrentComponent());
             }
 
-            message = message.replace("{jsf.label}", label);
+            message = message.replace("{faces.label}", label);
         }
 
         return message;

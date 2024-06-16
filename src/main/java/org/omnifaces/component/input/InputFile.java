@@ -293,7 +293,7 @@ public class InputFile extends HtmlInputFile {
     private void registerScriptsIfNecessary() {
         // This is supposed to be declared via @ResourceDependency, but Faces 3 and Faces 4 use a different script
         // resource name which cannot be resolved statically.
-        addFacesScriptResource(); // Required for jsf.ajax.request.
+        addFacesScriptResource(); // Required for faces.ajax.request.
         addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
     }
 

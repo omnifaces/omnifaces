@@ -40,7 +40,6 @@ export { GraphicImage } from "./GraphicImage";
 declare global {
     interface Window { 
         faces: any,
-        jsf: any,
         mojarra: any, 
         myfaces: any, 
         PrimeFaces: any, 

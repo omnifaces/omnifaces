@@ -61,8 +61,8 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
     public RemappedResource(Resource resource, String requestPath) {
         super(resource);
 
-        if (resource instanceof Serializable) {
-            serializableResource = (Serializable) resource;
+        if (resource instanceof Serializable serializable) {
+            this.serializableResource = serializable;
         }
 
         this.resource = resource;
@@ -89,14 +89,14 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     @Override
     public String getResourceName() {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) ? wrapped.getResourceName() : resourceName;
+        var wrapped = getWrapped();
+        return wrapped != null ? wrapped.getResourceName() : resourceName;
     }
 
     @Override
     public void setResourceName(String resourceName) {
-        String previousResourceName = getResourceName();
-        Resource wrapped = getWrapped();
+        var previousResourceName = getResourceName();
+        var wrapped = getWrapped();
 
         if (wrapped != null) {
             wrapped.setResourceName(resourceName);
@@ -110,14 +110,14 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     @Override
     public String getLibraryName() {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
+        var wrapped = getWrapped();
+        return wrapped != null ? wrapped.getLibraryName() : libraryName;
     }
 
     @Override
     public void setLibraryName(String libraryName) {
-        String previousLibraryName = getLibraryName();
-        Resource wrapped = getWrapped();
+        var previousLibraryName = getLibraryName();
+        var wrapped = getWrapped();
 
         if (wrapped != null) {
             wrapped.setLibraryName(libraryName);
@@ -126,14 +126,14 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
             this.libraryName = libraryName;
         }
 
-        String queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
+        var queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
         requestPath = requestPath.replaceFirst(quote(queryParam + previousLibraryName), queryParam + libraryName);
     }
 
     @Override
     public String getContentType() {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) ? wrapped.getContentType() : null;
+        var wrapped = getWrapped();
+        return wrapped != null ? wrapped.getContentType() : null;
     }
 
     @Override
@@ -143,21 +143,21 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     @Override
     public InputStream getInputStream() throws IOException {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) ? wrapped.getInputStream() : getURL().openStream();
+        var wrapped = getWrapped();
+        return wrapped != null ? wrapped.getInputStream() : getURL().openStream();
     }
 
     @Override
     public Map<String, String> getResponseHeaders() {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
+        var wrapped = getWrapped();
+        return wrapped != null ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
     }
 
     @Override
     public URL getURL() {
         try {
-            Resource wrapped = getWrapped();
-            return (wrapped != null) ? wrapped.getURL() : new URL(requestPath);
+            var wrapped = getWrapped();
+            return wrapped != null ? wrapped.getURL() : new URL(requestPath);
         }
         catch (MalformedURLException e) {
             throw new FacesException(e);
@@ -166,8 +166,8 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     @Override
     public boolean userAgentNeedsUpdate(FacesContext context) {
-        Resource wrapped = getWrapped();
-        return (wrapped != null) && wrapped.userAgentNeedsUpdate(context);
+        var wrapped = getWrapped();
+        return wrapped != null && wrapped.userAgentNeedsUpdate(context);
     }
 
     @Override
@@ -180,14 +180,14 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
             return false;
         }
 
-        RemappedResource other = (RemappedResource) object;
-        Resource wrapped = getWrapped();
+        var other = (RemappedResource) object;
+        var wrapped = getWrapped();
         return Objects.equals(wrapped, other.getWrapped()) && requestPath.equals(other.requestPath);
     }
 
     @Override
     public int hashCode() {
-        Resource wrapped = getWrapped();
+        var wrapped = getWrapped();
         return Objects.hash(wrapped, requestPath);
     }
 

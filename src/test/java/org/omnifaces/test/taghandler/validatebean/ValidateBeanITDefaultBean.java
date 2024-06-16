@@ -30,7 +30,7 @@ public class ValidateBeanITDefaultBean {
     private String input;
 
     @NotNull
-    private String unused; // This one is not referenced in JSF form and should therefore not trigger validation fail on it.
+    private String unused; // This one is not referenced in Faces form and should therefore not trigger validation fail on it.
 
     public void action() {
         if (isValidationFailed()) {

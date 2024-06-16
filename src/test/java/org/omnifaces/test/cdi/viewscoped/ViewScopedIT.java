@@ -63,7 +63,7 @@ public class ViewScopedIT extends OmniFacesIT {
     @Test @Order(1)
     void nonAjax() {
         assertEquals("init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
         // Unload.
         guardHttp(unload::click);
@@ -124,7 +124,7 @@ public class ViewScopedIT extends OmniFacesIT {
 
         // Unloaded bean is from previous test.
         assertEquals("unload init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
 
         // Submit then unload.
@@ -180,8 +180,8 @@ public class ViewScopedIT extends OmniFacesIT {
 
         // Unloaded bean is from previous test.
         assertEquals("unload init", getMessagesText());
-        String firstBean = bean.getText();
-        String firstTab = browser.getWindowHandle();
+        var firstBean = bean.getText();
+        var firstTab = browser.getWindowHandle();
 
         // Open three new tabs and close them immediately.
         openNewTab(newtab);
@@ -199,7 +199,7 @@ public class ViewScopedIT extends OmniFacesIT {
         assertNotEquals(firstBean, bean.getText());
         closeCurrentTabAndSwitchTo(firstTab);
 
-        // Submit form in first tab. As JSF is instructed to store only 3 views in session,
+        // Submit form in first tab. As Faces is instructed to store only 3 views in session,
         // and the @ViewScoped unload in three previously opened tabs should also physically
         // destroy the view state, the submit in first tab should not throw ViewExpiredException.
         guardAjax(ajaxSubmit::click);

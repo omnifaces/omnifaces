@@ -29,8 +29,8 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the
  * default local URLs for Faces resources. This also works on auto-included resources provided as
- * {@link ResourceDependency} by the Faces implementation and/or component libraries. For example, Faces's own
- * <code>jakarta.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
+ * {@link ResourceDependency} by the Faces implementation and/or component libraries. For example, Faces' own
+ * <code>jakarta.faces:faces.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
  * pointed to a CDN.
  *
  * <h2>Installation</h2>
@@ -206,10 +206,6 @@ public class CDNResourceHandler extends DefaultResourceHandler {
         super(wrapped);
         disabledParam = getInitParameter(PARAM_NAME_CDN_DISABLED);
         cdnResources = initCDNResources();
-
-        if (cdnResources == null) {
-            throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
-        }
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -223,7 +219,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
      */
     @Override
     public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
-        if (disabledParam != null && parseBoolean(String.valueOf((Object) evaluateExpressionGet(disabledParam)))) {
+        if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
             return resource;
         }
 
@@ -245,8 +241,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
             return resource;
         }
 
-        String evaluatedRequestPath = evaluateExpressionGet(requestPath);
-        return new RemappedResource(resourceName, libraryName, evaluatedRequestPath);
+        return new RemappedResource(resourceName, libraryName, evaluateExpressionGet(requestPath));
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
@@ -257,22 +252,22 @@ public class CDNResourceHandler extends DefaultResourceHandler {
      * @throws IllegalArgumentException When the context parameter value is in invalid format.
      */
     static Map<ResourceIdentifier, String> initCDNResources() {
-        String cdnResourcesParam = getInitParameter(PARAM_NAME_CDN_RESOURCES);
+        var cdnResourcesParam = getInitParameter(PARAM_NAME_CDN_RESOURCES);
 
         if (isEmpty(cdnResourcesParam)) {
-            return null;
+            throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
         }
 
-        Map<ResourceIdentifier, String> cdnResources = new HashMap<>();
+        var cdnResources = new HashMap<ResourceIdentifier, String>();
 
         splitAndTrim(cdnResourcesParam, ",").forEach(cdnResource -> {
-            String[] cdnResourceIdAndURL = splitAndTrim(cdnResource, "=", 2);
+            var cdnResourceIdAndURL = splitAndTrim(cdnResource, "=", 2);
 
             if (cdnResourceIdAndURL.length != 2) {
                 throw new IllegalArgumentException(ERROR_INVALID_INIT_PARAM);
             }
 
-            ResourceIdentifier id = new ResourceIdentifier(cdnResourceIdAndURL[0]);
+            var id = new ResourceIdentifier(cdnResourceIdAndURL[0]);
 
             if (id.getName().contains("*") && (!"*".equals(id.getName()) || !cdnResourceIdAndURL[1].endsWith("/*"))) {
                 throw new IllegalArgumentException(ERROR_INVALID_WILDCARD);
