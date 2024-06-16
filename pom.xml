@@ -68,19 +68,19 @@
         <maven.source.excludeResources>true</maven.source.excludeResources>
 
         <!-- Test server versions. -->
-        <test.wildfly-mojarra.version>32.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
-        <test.glassfish-mojarra.version>8.0.0-JDK17-M5</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.wildfly-mojarra.version>32.0.1.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+        <test.glassfish-mojarra.version>8.0.0-JDK17-M6</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
         <test.tomcat.version>11.0.0-M20</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
-        <test.mojarra.version>4.1.0-M1</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra.version>4.1.0</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.myfaces.version>4.1.0-RC2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
         <test.weld.version>6.0.0.Beta1</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
         <test.hibernateValidator.version>8.0.1.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
         <test.tyrus.version>2.2.0-M1</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>14.0.0</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.primefaces.version>14.0.1</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>jakarta.faces</groupId>
             <artifactId>jakarta.faces-api</artifactId>
-            <version>4.1.0-M1</version>
+            <version>4.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.1.0-M2</version>
+            <version>6.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -120,13 +120,13 @@
         <dependency>
             <groupId>jakarta.websocket</groupId>
             <artifactId>jakarta.websocket-api</artifactId>
-            <version>2.2.0-M1</version>
+            <version>2.2.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.websocket</groupId>
             <artifactId>jakarta.websocket-client-api</artifactId>
-            <version>2.2.0-M1</version>
+            <version>2.2.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -134,15 +134,16 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.1.0-M2</version>
+            <version>3.1.0</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- Test dependencies. -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
-            <version>11.0.0-M2</version>
+            <version>11.0.0-M3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -166,7 +167,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.20.0</version>
+            <version>4.21.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -197,7 +198,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -219,7 +220,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.4</version>
+                <version>4.5</version>
                 <configuration>
                     <licenseSets>
                         <licenseSet>
@@ -416,7 +417,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.3</version>
+                <version>3.7.0</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <javadocVersion>${javase.version}</javadocVersion>
@@ -442,7 +443,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <version>1.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -502,7 +503,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7.0</version>
                     <executions>
                         <execution>
                             <phase>process-test-classes</phase>
@@ -518,12 +519,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <goals>
@@ -560,7 +561,7 @@
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>5.1.0.Beta2</version>
+                    <version>5.1.0.Beta3</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -647,8 +648,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
+                    <artifactId>arquillian-tomcat-managed-10</artifactId>
+                    <version>1.2.1.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -727,8 +728,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
+                    <artifactId>arquillian-tomcat-managed-10</artifactId>
+                    <version>1.2.1.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
