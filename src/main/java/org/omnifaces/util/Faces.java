@@ -2324,7 +2324,9 @@ public final class Faces {
      * @see HttpServletRequest#getRequestedSessionId()
      * @see HttpServletRequest#isRequestedSessionIdValid()
      * @since 1.1
+     * @deprecated Use {@link Faces#isRequestedSessionExpired()} instead.
      */
+    @Deprecated(since = "4.5", forRemoval = true)
     public static boolean hasSessionTimedOut() {
         return FacesLocal.hasSessionTimedOut(getContext());
     }
