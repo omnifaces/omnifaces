@@ -109,26 +109,26 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-        boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+        var insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
 
         if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
             // If it's not new nor inside a composite component, we're finished.
             return;
         }
 
-        if (!(parent instanceof EditableValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+        if (!(parent instanceof EditableValueHolder editableValueHolder) || insideCompositeComponent && getAttribute("for") == null) {
             // It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
             super.apply(context, parent);
             return;
         }
 
-        ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
-        ValueExpression id = getValueExpression(context, this, "validatorId", String.class);
-        ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
-        ValueExpression message = getValueExpression(context, this, "message", String.class);
-        jakarta.faces.validator.Validator<Object> validator = createInstance(context.getFacesContext(), context, binding, id);
-        DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
-        ((EditableValueHolder) parent).addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
+        var binding = getValueExpression(context, this, "binding", Object.class);
+        var id = getValueExpression(context, this, "validatorId", String.class);
+        var disabled = getValueExpression(context, this, "disabled", Boolean.class);
+        var message = getValueExpression(context, this, "message", String.class);
+        var validator = createInstance(context.getFacesContext(), context, binding, id);
+        var attributes = collectDeferredAttributes(context, this, validator);
+        editableValueHolder.addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
     }
 
     @Override
@@ -209,12 +209,12 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
             return validator;
         }
 
-        private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
+        private static void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
             if (message != null) {
-                String validatorMessage = (String) message.getValue(context.getELContext());
+                var validatorMessage = (String) message.getValue(context.getELContext());
 
                 if (validatorMessage != null) {
-                    String label = getLabel(component);
+                    var label = getLabel(component);
                     throw new ValidatorException(Messages.create(validatorMessage, label)
                         .detail(validatorMessage, label).error().get(), e.getCause());
                 }

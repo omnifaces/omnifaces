@@ -171,9 +171,9 @@ public class Url extends OutputFamily {
 
     @Override
     public void encodeEnd(FacesContext context) throws IOException {
-        String value = getValue();
-        Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-        String url = (value != null) ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
+        var value = getValue();
+        var params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
+        var url = value != null ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
 
         if (getVar() != null) {
             setRequestAttribute(context, getVar(), url);
@@ -184,8 +184,8 @@ public class Url extends OutputFamily {
     }
 
     private String getBookmarkableURLWithDomain(FacesContext context, Map<String, List<String>> params) {
-        String uri = getBookmarkableURL(context, getViewId(), params, false);
-        String domain = getDomain();
+        var uri = getBookmarkableURL(context, getViewId(), params, false);
+        var domain = getDomain();
         return getBookmarkableURLWithDomain(context, uri, domain, ERROR_INVALID_DOMAIN);
     }
 
@@ -194,10 +194,10 @@ public class Url extends OutputFamily {
             return getRequestDomainURL(context).split(":", 2)[1] + uri;
         }
         else if (!"/".equals(domain)) {
-            String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
+            var normalizedDomain = domain.contains("//") ? domain : "//" + domain;
 
             try {
-                new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
+                new URL(normalizedDomain.startsWith("//") ? "http:" + normalizedDomain : normalizedDomain).toExternalForm();
             }
             catch (MalformedURLException e) {
                 throw new IllegalArgumentException(format(errorMessage, domain), e);

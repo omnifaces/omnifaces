@@ -63,7 +63,7 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
     }
 
     @Override
-    public Object getValue(ELContext context) {
+    public <T> T getValue(ELContext context) {
         return getWrapped().getValue(context);
     }
 

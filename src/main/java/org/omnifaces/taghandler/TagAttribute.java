@@ -16,8 +16,6 @@ import static org.omnifaces.util.Components.createValueExpression;
 
 import java.io.IOException;
 
-import jakarta.el.ValueExpression;
-import jakarta.el.VariableMapper;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
@@ -90,8 +88,8 @@ public class TagAttribute extends TagHandler {
 
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-        DelegatingVariableMapper variableMapper = getDelegatingVariableMapper(context);
-        ValueExpression valueExpression = variableMapper.resolveWrappedVariable(name);
+        var variableMapper = getDelegatingVariableMapper(context);
+        var valueExpression = variableMapper.resolveWrappedVariable(name);
 
         if (valueExpression == null) {
             if (defaultValue != null) {
@@ -107,15 +105,15 @@ public class TagAttribute extends TagHandler {
         variableMapper.setVariable(name, valueExpression);
     }
 
-    private DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
-        VariableMapper variableMapper = context.getVariableMapper();
+    private static DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
+        var variableMapper = context.getVariableMapper();
 
-        if (variableMapper instanceof DelegatingVariableMapper) {
-            return (DelegatingVariableMapper) variableMapper;
+        if (variableMapper instanceof DelegatingVariableMapper delegatingVariableMapper) {
+            return delegatingVariableMapper;
         }
 
-        DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
-        ValueExpression valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
+        var delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+        var valueExpression = variableMapper.resolveVariable(ID_ATTRIBUTE);
 
         if (valueExpression != null && valueExpression.getExpressionString().startsWith("#{'" + ID_PREFIX)) {
             delegatingVariableMapper.setWrappedVariable(ID_ATTRIBUTE, null);

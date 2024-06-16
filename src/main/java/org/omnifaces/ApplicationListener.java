@@ -20,7 +20,6 @@ import static org.omnifaces.util.Reflection.toClass;
 
 import java.util.logging.Logger;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.annotation.WebListener;
 
@@ -80,8 +79,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        ServletContext servletContext = event.getServletContext();
-        boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
+        var servletContext = event.getServletContext();
+        var skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
 
         if (!skipDeploymentException) {
             checkFacesAvailable();
@@ -112,7 +111,7 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
     }
 
-    private void checkFacesAvailable() {
+    private static void checkFacesAvailable() {
         try {
             checkFacesAPIAvailable();
             // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
@@ -132,7 +131,7 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
      }
 
-    private void checkCDIAvailable() {
+    private static void checkCDIAvailable() {
         try {
             checkCDIAPIAvailable();
             // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.

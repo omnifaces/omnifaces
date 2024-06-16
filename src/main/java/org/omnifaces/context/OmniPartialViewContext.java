@@ -122,21 +122,21 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
         super.processPartial(phaseId);
     }
 
-    private boolean redirectToFormLoginPageIfNecessary() {
-        String loginURL = WebXml.instance().getFormLoginPage();
+    private static boolean redirectToFormLoginPageIfNecessary() {
+        var loginURL = WebXml.instance().getFormLoginPage();
 
         if (loginURL == null) {
             return false;
         }
 
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        String loginViewId = normalizeViewId(facesContext, loginURL);
+        var facesContext = FacesContext.getCurrentInstance();
+        var loginViewId = normalizeViewId(facesContext, loginURL);
 
         if (!loginViewId.equals(getViewId(facesContext))) {
             return false;
         }
 
-        String originalURL = getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
+        var originalURL = (String) getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
 
         if (originalURL == null) {
             return false;
@@ -228,7 +228,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
      * {@link PartialViewContext} implementation which doesn't properly delegate through the wrapped instance.
      */
     public static OmniPartialViewContext getCurrentInstance(FacesContext context) {
-        OmniPartialViewContext instance = getContextAttribute(context, OmniPartialViewContext.class.getName());
+        var instance = (OmniPartialViewContext) getContextAttribute(context, OmniPartialViewContext.class.getName());
 
         if (instance != null) {
             return instance;
@@ -251,14 +251,14 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     }
 
     private static OmniPartialViewContext unwrap(PartialViewContext context) {
-        PartialViewContext unwrappedContext = context;
+        var unwrappedContext = context;
 
-        while (!(unwrappedContext instanceof OmniPartialViewContext) && unwrappedContext instanceof PartialViewContextWrapper) {
-            unwrappedContext = ((PartialViewContextWrapper) unwrappedContext).getWrapped();
+        while (!(unwrappedContext instanceof OmniPartialViewContext) && unwrappedContext instanceof PartialViewContextWrapper partialViewContextWrapper) {
+            unwrappedContext = partialViewContextWrapper.getWrapped();
         }
 
-        if (unwrappedContext instanceof OmniPartialViewContext) {
-            return (OmniPartialViewContext) unwrappedContext;
+        if (unwrappedContext instanceof OmniPartialViewContext omniPartialViewContext) {
+            return omniPartialViewContext;
         }
         else {
             return null;

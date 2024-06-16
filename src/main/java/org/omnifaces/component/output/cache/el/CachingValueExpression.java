@@ -19,7 +19,6 @@ import java.util.Objects;
 
 import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
-import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.el.ValueExpressionWrapper;
@@ -51,16 +50,17 @@ public class CachingValueExpression extends ValueExpressionWrapper {
     }
 
     @Override
-    public Object getValue(ELContext elContext) {
-        FacesContext facesContext = getContext(elContext);
+    @SuppressWarnings("unchecked")
+    public <T> T getValue(ELContext elContext) {
+        var facesContext = getContext(elContext);
 
-        Serializable value = cache.getCacheAttribute(facesContext, name);
+        var value = cache.getCacheAttribute(facesContext, name);
         if (value == null) {
             value = (Serializable) super.getValue(elContext);
             cache.setCacheAttribute(facesContext, name, value);
         }
 
-        return value;
+        return (T) value;
     }
 
     @Override

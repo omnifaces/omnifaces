@@ -124,8 +124,8 @@ public class ConverterManager {
      * or <code>null</code> if there is none.
      */
     public Converter createConverter(Application application, String converterId) {
-        Converter converter = application.createConverter(converterId);
-        Bean<Converter> bean = convertersById.get(converterId);
+        var converter = application.createConverter(converterId);
+        var bean = convertersById.get(converterId);
 
         if (bean == null && !convertersById.containsKey(converterId)) {
 
@@ -156,13 +156,13 @@ public class ConverterManager {
      * or <code>null</code> if there is none.
      */
     public Converter createConverter(Application application, Class<?> converterForClass) {
-        Converter converter = application.createConverter(converterForClass);
-        Bean<Converter> bean = convertersByForClass.get(converterForClass);
+        var converter = application.createConverter(converterForClass);
+        var bean = convertersByForClass.get(converterForClass);
 
         if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
 
             if (isUnmanaged(converter)) {
-                Class<? extends Converter> converterClass = converter.getClass();
+                var converterClass = converter.getClass();
 
                 if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
                     bean = resolve(converterClass, "", converterForClass);
@@ -185,12 +185,12 @@ public class ConverterManager {
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    private boolean isUnmanaged(Converter converter) {
+    private static boolean isUnmanaged(Converter converter) {
         if (converter == null) {
             return false;
         }
 
-        FacesConverter annotation = converter.getClass().getAnnotation(FacesConverter.class);
+        var annotation = converter.getClass().getAnnotation(FacesConverter.class);
 
         if (annotation == null) {
             return false;
@@ -203,10 +203,10 @@ public class ConverterManager {
     private Bean<Converter> resolve(Class<? extends Converter> converterClass, String converterId, Class<?> converterForClass) {
 
         // First try by class.
-        Bean<Converter> bean = (Bean<Converter>) resolveExact(manager, converterClass);
+        var bean = (Bean<Converter>) resolveExact(manager, converterClass);
 
         if (bean == null) {
-            FacesConverter annotation = converterClass.getAnnotation(FacesConverter.class);
+            var annotation = converterClass.getAnnotation(FacesConverter.class);
 
             if (annotation != null) {
                 // Then by own annotation, if any.
@@ -240,8 +240,8 @@ public class ConverterManager {
     }
 
     private void setDefaultPropertiesIfNecessary(Converter converter) {
-        if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
-            ((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
+        if (converter instanceof DateTimeConverter dateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
+            dateTimeConverter.setTimeZone(dateTimeConverterDefaultTimeZone);
         }
     }
 

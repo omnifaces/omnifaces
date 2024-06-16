@@ -61,9 +61,10 @@ public class ReadOnlyValueExpression extends ValueExpression {
     }
 
     @Override
-    public Object getValue(ELContext context) {
+    @SuppressWarnings("unchecked")
+    public <T> T getValue(ELContext context) {
         if (callback != null) {
-            return callback.invoke();
+            return (T) callback.invoke();
         }
 
         return null;
@@ -81,7 +82,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     @Override
     public Class<?> getType(ELContext context) {
-        Object value = getValue(context);
+        var value = getValue(context);
         return value == null ? null : value.getClass();
     }
 
@@ -106,9 +107,9 @@ public class ReadOnlyValueExpression extends ValueExpression {
         }
 
         // Property checks.
-        ReadOnlyValueExpression other = (ReadOnlyValueExpression) object;
-        Object value = getValue(null);
-        Object otherValue = other.getValue(null);
+        var other = (ReadOnlyValueExpression) object;
+        var value = getValue(null);
+        var otherValue = other.getValue(null);
         if (value == null ? otherValue != null : !value.equals(otherValue)) {
             return false;
         }
@@ -119,7 +120,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     @Override
     public int hashCode() {
-        Object value = getValue(null);
+        var value = getValue(null);
         return value == null ? 0 : value.hashCode();
     }
 

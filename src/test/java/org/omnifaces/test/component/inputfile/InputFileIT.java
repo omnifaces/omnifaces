@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -122,7 +121,7 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingle() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleFile.sendKeys(txtFile.getAbsolutePath());
         guardHttp(uploadSingleSubmit::click);
         assertTrue(uploadSingleFile.getText().isEmpty());
@@ -137,7 +136,7 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingleAjax() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleAjaxFile.sendKeys(txtFile.getAbsolutePath());
         guardAjaxUpload(uploadSingleAjaxSubmit::click, messages);
         assertEquals("uploadSingle: " + txtFile.length() + ", " + txtFile.getName(), getMessagesText());
@@ -145,13 +144,13 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingleAcceptAnyImage() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleAcceptAnyImageFile.sendKeys(txtFile.getAbsolutePath());
         guardHttp(uploadSingleAcceptAnyImageSubmit::click);
         assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
         assertEquals("label: " + txtFile.getName() + " is not image/*", getMessagesText());
 
-        File gifFile = createTempFile("file", "gif", "GIF89a");
+        var gifFile = createTempFile("file", "gif", "GIF89a");
         uploadSingleAcceptAnyImageFile.sendKeys(gifFile.getAbsolutePath());
         guardHttp(uploadSingleAcceptAnyImageSubmit::click);
         assertTrue(uploadSingleAcceptAnyImageFile.getText().isEmpty());
@@ -160,13 +159,13 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingleAcceptSvgImage() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleAcceptSvgImageFile.sendKeys(txtFile.getAbsolutePath());
         guardHttp(uploadSingleAcceptSvgImageSubmit::click);
         assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
         assertEquals("label: " + txtFile.getName() + " is not image/svg+xml", getMessagesText());
 
-        File svgFile = createTempFile("file", "svg", "<svg/>");
+        var svgFile = createTempFile("file", "svg", "<svg/>");
         uploadSingleAcceptSvgImageFile.sendKeys(svgFile.getAbsolutePath());
         guardHttp(uploadSingleAcceptSvgImageSubmit::click);
         assertTrue(uploadSingleAcceptSvgImageFile.getText().isEmpty());
@@ -176,14 +175,14 @@ public class InputFileIT extends OmniFacesIT {
     @Test
     @DisabledIfSystemProperty(named = "arquillian.browser", matches = "chrome", disabledReason = "triggerOnchange doesn't work?")
     void uploadSingleMaxsizeClient() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleMaxsizeClientFile.sendKeys(txtFile.getAbsolutePath());
         triggerOnchange(uploadSingleMaxsizeClientFile, "uploadSingleMaxsizeClient:message");
         assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
-        String message = uploadSingleMaxsizeClientMessage.getText();
+        var message = uploadSingleMaxsizeClientMessage.getText();
         assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B"));
 
-        File gifFile = createTempFile("file", "gif", "GIF89a");
+        var gifFile = createTempFile("file", "gif", "GIF89a");
         uploadSingleMaxsizeClientFile.sendKeys(gifFile.getAbsolutePath());
         guardHttp(uploadSingleMaxsizeClientSubmit::click);
         assertTrue(uploadSingleMaxsizeClientFile.getText().isEmpty());
@@ -192,13 +191,13 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingleMaxsizeServer() throws IOException {
-        File txtFile = createTempFile("file", "txt", "hello world");
+        var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
         guardHttp(uploadSingleMaxsizeServerSubmit::click);
         assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
         assertEquals("label: " + txtFile.getName() + " larger than 10 B", getMessagesText());
 
-        File gifFile = createTempFile("file", "gif", "GIF89a");
+        var gifFile = createTempFile("file", "gif", "GIF89a");
         uploadSingleMaxsizeServerFile.sendKeys(gifFile.getAbsolutePath());
         guardHttp(uploadSingleMaxsizeServerSubmit::click);
         assertTrue(uploadSingleMaxsizeServerFile.getText().isEmpty());
@@ -207,8 +206,8 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadMultiple() throws IOException {
-        File txtFile1 = createTempFile("file1", "txt", "hello");
-        File txtFile2 = createTempFile("file2", "txt", "world");
+        var txtFile1 = createTempFile("file1", "txt", "hello");
+        var txtFile2 = createTempFile("file2", "txt", "world");
         uploadMultipleFile1.sendKeys(txtFile1.getAbsolutePath());
         uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath());
         guardHttp(uploadMultipleSubmit::click);
@@ -218,8 +217,8 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadMultipleAjax() throws IOException {
-        File txtFile1 = createTempFile("file1", "txt", "hello");
-        File txtFile2 = createTempFile("file2", "txt", "world");
+        var txtFile1 = createTempFile("file1", "txt", "hello");
+        var txtFile2 = createTempFile("file2", "txt", "world");
         uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
         uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
         guardAjaxUpload(uploadMultipleAjaxSubmit::click, messages);
@@ -229,13 +228,13 @@ public class InputFileIT extends OmniFacesIT {
     @Test
     @DisabledIfSystemProperty(named = "arquillian.browser", matches = "chrome", disabledReason = "triggerOnchange doesn't work?")
     void uploadMultipleMaxsizeClient() throws IOException {
-        File txtFile1 = createTempFile("file1", "txt", "hello hello");
-        File txtFile2 = createTempFile("file2", "txt", "world");
+        var txtFile1 = createTempFile("file1", "txt", "hello hello");
+        var txtFile2 = createTempFile("file2", "txt", "world");
         uploadMultipleMaxsizeClientFile1.sendKeys(txtFile1.getAbsolutePath());
         uploadMultipleMaxsizeClientFile2.sendKeys(txtFile2.getAbsolutePath());
         triggerOnchange(uploadMultipleMaxsizeClientFile1, "uploadMultipleMaxsizeClient:message");
         assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
-        String message = uploadMultipleMaxsizeClientMessage.getText();
+        var message = uploadMultipleMaxsizeClientMessage.getText();
         assertTrue(message.startsWith("label: ") && message.endsWith(" larger than 10 B"));
 
         txtFile1 = createTempFile("file1", "txt", "hello");
@@ -248,8 +247,8 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadMultipleMaxsizeServer() throws IOException {
-        File txtFile1 = createTempFile("file1", "txt", "hello");
-        File txtFile2 = createTempFile("file2", "txt", "world world");
+        var txtFile1 = createTempFile("file1", "txt", "hello");
+        var txtFile2 = createTempFile("file2", "txt", "world world");
         uploadMultipleMaxsizeServerFile1.sendKeys(txtFile1.getAbsolutePath());
         uploadMultipleMaxsizeServerFile2.sendKeys(txtFile2.getAbsolutePath());
         guardHttp(uploadMultipleMaxsizeServerSubmit::click);
@@ -266,10 +265,10 @@ public class InputFileIT extends OmniFacesIT {
         assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
     }
 
-    private File createTempFile(String name, String extension, String content) throws IOException {
-        Path path = Files.createTempFile(name + "-", "." + extension);
+    private static File createTempFile(String name, String extension, String content) throws IOException {
+        var path = Files.createTempFile(name + "-", "." + extension);
         Files.write(path, content.getBytes(UTF_8));
-        File file = path.toFile();
+        var file = path.toFile();
         file.deleteOnExit();
         return file;
     }

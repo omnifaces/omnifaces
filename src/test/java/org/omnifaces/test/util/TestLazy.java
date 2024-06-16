@@ -13,6 +13,7 @@
 package org.omnifaces.test.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,8 +43,10 @@ class TestLazy {
 
     @Test
     void lazy() {
-        Expensive expensive = new Expensive();
-        Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
+        var expensive = new Expensive();
+        assertNotNull(expensive);
+        assertEquals(1, numCreations.get());
+        var cheap = new Lazy<>(Expensive::new);
         assertEquals(1, numCreations.get());
         assertEquals(Expensive.class, cheap.get().getClass());
         assertEquals(2, numCreations.get());

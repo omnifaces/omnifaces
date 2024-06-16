@@ -75,7 +75,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
         }
     }
 
-    private void logOmniFacesVersion() {
+    private static void logOmniFacesVersion() {
         logger.info("Using OmniFaces version " + OmniFaces.getVersion());
     }
 

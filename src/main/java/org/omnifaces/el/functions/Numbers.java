@@ -18,7 +18,6 @@ import static org.omnifaces.util.Utils.parseLocale;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -82,8 +81,8 @@ public final class Numbers {
             return null;
         }
 
-        DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
-        DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
+        var formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
+        var symbols = formatter.getDecimalFormatSymbols();
         symbols.setCurrencySymbol(currencySymbol);
         formatter.setDecimalFormatSymbols(symbols);
         return formatter.format(number);
@@ -104,7 +103,7 @@ public final class Numbers {
             return null;
         }
 
-        DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
+        var formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
         formatter.applyPattern(pattern);
         return formatter.format(number);
     }
@@ -236,7 +235,7 @@ public final class Numbers {
         BigDecimal decimal;
 
         try {
-            decimal = (number instanceof BigDecimal) ? ((BigDecimal) number) : new BigDecimal(number.toString());
+            decimal = number instanceof BigDecimal bigDecimal ? bigDecimal : new BigDecimal(number.toString());
         }
         catch (NumberFormatException e) {
             return null;
@@ -246,16 +245,16 @@ public final class Numbers {
     }
 
     private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
-        int exponent = (int) (Math.log(decimal.abs().longValue()) / Math.log(base));
-        BigDecimal divisor = BigDecimal.valueOf(Math.pow(base, exponent));
-        BigDecimal divided = (divisor.signum() == 0) ? divisor : decimal.divide(divisor);
-        int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.abs().longValue()).length());
-        String format = "%." + maxfractions + "f";
-        String formatted = format(getLocale(), format, divided);
+        var exponent = (int) (Math.log(decimal.abs().longValue()) / Math.log(base));
+        var divisor = BigDecimal.valueOf(Math.pow(base, exponent));
+        var divided = divisor.signum() == 0 ? divisor : decimal.divide(divisor);
+        var maxfractions = fractions != null ? fractions : PRECISION - String.valueOf(divided.abs().longValue()).length();
+        var format = "%." + maxfractions + "f";
+        var formatted = format(getLocale(), format, divided);
         BigDecimal reparsed;
 
         try {
-            DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
+            var formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
             formatter.setParseBigDecimal(true);
             reparsed = (BigDecimal) formatter.parse(formatted);
         }
@@ -267,18 +266,14 @@ public final class Numbers {
             return formatBase(reparsed, base, fractions, iec, unit);
         }
         else {
-            return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && (fractions == null || (iec && exponent == 0)));
+            return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && (fractions == null || iec && exponent == 0));
         }
     }
 
     private static String formatUnit(String formatted, boolean iec, String unit, int exponent, boolean stripZeroes) {
-        if (stripZeroes) {
-            formatted = formatted.replaceAll("\\D?0+$", "");
-        }
-
-        String separator = (unit == null) ? "" : " ";
-        String unitString = (unit == null) ? "" : unit;
-        return formatted + separator + getUnitPrefix(iec, exponent) + unitString;
+        var separator = unit == null ? "" : " ";
+        var unitString = unit == null ? "" : unit;
+        return (stripZeroes ? formatted.replaceAll("\\D?0+$", "") : formatted) + separator + getUnitPrefix(iec, exponent) + unitString;
     }
 
     private static String getUnitPrefix(boolean iec, int exponent) {
@@ -286,8 +281,8 @@ public final class Numbers {
             return "";
         }
 
-        char unitPrefix = ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1);
-        String binaryPrefix = (iec ? "i" : "");
+        var unitPrefix = ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1);
+        var binaryPrefix = iec ? "i" : "";
         return unitPrefix + binaryPrefix;
     }
 

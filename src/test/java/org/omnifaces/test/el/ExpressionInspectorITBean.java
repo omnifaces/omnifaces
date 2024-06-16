@@ -17,9 +17,7 @@ import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getELContext;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
-import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
@@ -42,19 +40,19 @@ public class ExpressionInspectorITBean {
 
     @PostConstruct
     public void init() {
-        ELContext elContext = getELContext();
+        var elContext = getELContext();
 
-        ValueExpression valueExpression = createValueExpression("#{bar.selected}", Baz.class);
+        var valueExpression = createValueExpression("#{bar.selected}", Baz.class);
         valueReference = ExpressionInspector.getValueReference(elContext, valueExpression);
         getterReference = ExpressionInspector.getMethodReference(elContext, valueExpression);
 
-        MethodExpression methodExpression = Components.createMethodExpression("#{foo.create(bar.selected)}", Void.class, Baz.class);
+        var methodExpression = Components.createMethodExpression("#{foo.create(bar.selected)}", Void.class, Baz.class);
         methodReference = ExpressionInspector.getMethodReference(elContext, methodExpression);
 
-        MethodExpressionValueExpressionAdapter methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
+        var methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
         valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
 
-        ValueExpression valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
+        var valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
         methodValueReference = ExpressionInspector.getValueReference(elContext, valueExpressionMethodExpression);
         methodMethodReference = ExpressionInspector.getMethodReference(elContext, valueExpressionMethodExpression);
     }
@@ -86,7 +84,7 @@ public class ExpressionInspectorITBean {
     @Named
     @RequestScoped
     public static class Foo {
-        public void create(Baz baz) {
+        public void create(@SuppressWarnings("unused") Baz baz) {
             //
         }
     }

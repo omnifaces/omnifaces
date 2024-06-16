@@ -39,8 +39,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,7 +68,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     @Override
     public void init() throws ServletException {
-        ServletContext servletContext = getServletContext();
+        var servletContext = getServletContext();
 
         try {
             extensionAction = getExtensionAction(servletContext);
@@ -83,7 +81,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-        if (!(filterExtensionLess(request, response, chain) || filterExtension(request, response) || filterPublicPath(request, response))) {
+        if (!filterExtensionLess(request, response, chain) && !filterExtension(request, response) && !filterPublicPath(request, response)) {
             chain.doFilter(request, response);
         }
     }
@@ -95,17 +93,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException
     {
-        String servletPath = request.getServletPath();
+        var servletPath = request.getServletPath();
 
         if (!isExtensionless(servletPath)) {
             return false;
         }
 
-        ServletContext servletContext = getServletContext();
-        boolean multiViews = isMultiViewsEnabled(request);
-        Map<String, String> resources = getMappedResources(servletContext);
-        String normalizedServletPath = stripTrailingSlash(servletPath);
-        String resource = normalizedServletPath + (multiViews ? "/*" : "");
+        var servletContext = getServletContext();
+        var multiViews = isMultiViewsEnabled(request);
+        var resources = getMappedResources(servletContext);
+        var normalizedServletPath = stripTrailingSlash(servletPath);
+        var resource = normalizedServletPath + (multiViews ? "/*" : "");
 
         if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
             // Check if the resource was dynamically added by scanning the faces-views location(s) again.
@@ -120,7 +118,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
             resource = getMultiViewsWelcomeFile(servletContext, resources, servletPath);
 
             if (resource != null) {
-                String pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
+                var pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
                 request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo.isEmpty() ? "/" : pathInfo);
                 request.getRequestDispatcher(resource).forward(request, response);
                 return true;
@@ -130,7 +128,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
     }
 
-    private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+    private static boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Map<String, String> resources, String resource, String path) throws IOException, ServletException
     {
         if (resources.containsKey(resource)) {
@@ -138,7 +136,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
                 return true;
             }
 
-            String servletPathWithExtension = path + getExtension(resources.get(resource));
+            var servletPathWithExtension = path + getExtension(resources.get(resource));
 
             if (resources.containsKey(servletPathWithExtension)) {
                 filterExtensionLessToExtension(request, response, chain, servletPathWithExtension);
@@ -155,15 +153,15 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     /**
      * Check if a welcome file was explicitly requested and if so, redirect back to its parent folder.
      */
-    private boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(HttpServletRequest request, HttpServletResponse response, String normalizedServletPath) {
+    private static boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(HttpServletRequest request, HttpServletResponse response, String normalizedServletPath) {
         if ((getRequestRelativeURI(request) + "/").startsWith(normalizedServletPath + "/")) {
-            String servletPath = request.getServletPath();
-            String normalizedResource = stripWelcomeFilePrefix(request.getServletContext(), servletPath);
+            var servletPath = request.getServletPath();
+            var normalizedResource = stripWelcomeFilePrefix(request.getServletContext(), servletPath);
 
             if (!servletPath.equals(normalizedResource)) {
-                String uri = request.getContextPath() + normalizedResource;
-                String queryString = request.getQueryString();
-                redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
+                var uri = request.getContextPath() + normalizedResource;
+                var queryString = request.getQueryString();
+                redirectPermanent(response, uri + (queryString != null ? "?" + queryString : ""));
                 return true;
             }
         }
@@ -175,10 +173,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * Continue the chain, but make the request appear to be to the resource with an extension.
      * This assumes that the FacesServlet has been mapped to something that includes the extensionless request.
      */
-    private void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath) throws IOException, ServletException {
+    private static void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath) throws IOException, ServletException {
         try {
             request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
-            String pathInfo = request.getPathInfo();
+            var pathInfo = request.getPathInfo();
 
             if (pathInfo != null) {
                 request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
@@ -197,8 +195,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * Technically it matters most that the Facelets Servlet picks up the request,
      * and the exact extension or even prefix is perhaps less relevant.
      */
-    private boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension) throws ServletException, IOException {
-        RequestDispatcher requestDispatcher = request.getServletContext().getRequestDispatcher(servletPathWithExtension);
+    private static boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension) throws ServletException, IOException {
+        var requestDispatcher = request.getServletContext().getRequestDispatcher(servletPathWithExtension);
 
         if (requestDispatcher != null) {
             requestDispatcher.forward(request, response);
@@ -213,8 +211,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * The user setting "extensionAction" determines how we handle this.
      */
     private boolean filterExtension(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String resource = request.getServletPath();
-        Map<String, String> resources = getMappedResources(getServletContext());
+        var resource = request.getServletPath();
+        var resources = getMappedResources(getServletContext());
 
         if (resources.containsKey(resource)) {
             if (resources.get(resource) != null) {
@@ -239,13 +237,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * The user setting "pathAction" determines how we handle this.
      */
     private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String resource = request.getServletPath();
+        var resource = request.getServletPath();
 
         if (!isResourceInPublicPath(getServletContext(), resource)) {
             return false;
         }
 
-        Map<String, String> reverseResources = getReverseMappedResources(getServletContext());
+        var reverseResources = getReverseMappedResources(getServletContext());
 
         if (reverseResources.containsKey(resource)) {
             switch (pathAction) {

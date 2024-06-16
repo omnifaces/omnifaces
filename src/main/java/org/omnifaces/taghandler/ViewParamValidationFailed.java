@@ -193,11 +193,11 @@ public class ViewParamValidationFailed extends TagHandler {
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-        if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
+        if (!(parent instanceof UIViewRoot) && !(parent instanceof UIViewParameter)) {
             throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
         }
 
-        FacesContext facesContext = context.getFacesContext();
+        var facesContext = context.getFacesContext();
 
         if (!ComponentHandler.isNew(parent) || facesContext.isPostback() || facesContext.getRenderResponse()) {
             return;
@@ -227,18 +227,14 @@ public class ViewParamValidationFailed extends TagHandler {
      * HTTP status code.
      */
     protected void processViewParamValidationFailed(ComponentSystemEvent event) {
-        FacesContext context = getContext();
-        UIComponent component = event.getComponent();
+        var context = getContext();
+        var component = event.getComponent();
 
-        if (component instanceof UIViewParameter ? ((UIViewParameter) component).isValid() : !context.isValidationFailed()) {
-            return; // Validation has not failed.
-        }
-
-        if (TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
+        if ((component instanceof UIViewParameter viewParamter ? viewParamter.isValid() : !context.isValidationFailed()) || TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
             return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
         }
 
-        String firstFacesMessage = coalesce(
+        var firstFacesMessage = coalesce(
             cleanupFacesMessagesAndGetFirst(context.getMessages(component.getClientId(context))), // Prefer own message.
             cleanupFacesMessagesAndGetFirst(context.getMessages(null)), // Then global messages.
             cleanupFacesMessagesAndGetFirst(context.getMessages()) // Cleanup remainder.
@@ -247,11 +243,11 @@ public class ViewParamValidationFailed extends TagHandler {
         evaluateAttributesAndHandleSendRedirectOrError(context, firstFacesMessage);
     }
 
-    private String cleanupFacesMessagesAndGetFirst(Iterator<FacesMessage> facesMessages) {
+    private static String cleanupFacesMessagesAndGetFirst(Iterator<FacesMessage> facesMessages) {
         String firstFacesMessage = null;
 
         while (facesMessages.hasNext()) {
-            FacesMessage facesMessage = facesMessages.next();
+            var facesMessage = facesMessages.next();
 
             if (firstFacesMessage == null) {
                 firstFacesMessage = facesMessage.getSummary();
@@ -264,15 +260,15 @@ public class ViewParamValidationFailed extends TagHandler {
     }
 
     private void evaluateAttributesAndHandleSendRedirectOrError(FacesContext context, String defaultMessage) {
-        ELContext elContext = context.getELContext();
-        String evaluatedMessage = evaluate(elContext, message, false);
+        var elContext = context.getELContext();
+        var evaluatedMessage = evaluate(elContext, message, false);
 
         if (evaluatedMessage == null) {
             evaluatedMessage = defaultMessage;
         }
 
         if (sendRedirect != null) {
-            String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+            var evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
 
             if (!isEmpty(evaluatedMessage)) {
                 addFlashGlobalError(evaluatedMessage);
@@ -281,14 +277,14 @@ public class ViewParamValidationFailed extends TagHandler {
             redirect(context, evaluatedSendRedirect);
         }
         else {
-            String evaluatedSendError = evaluate(elContext, sendError, true);
+            var evaluatedSendError = evaluate(elContext, sendError, true);
 
             if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
                 throw new IllegalArgumentException(
                     format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
             }
 
-            responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
+            responseSendError(context, Integer.parseInt(evaluatedSendError), evaluatedMessage);
         }
     }
 
@@ -298,13 +294,13 @@ public class ViewParamValidationFailed extends TagHandler {
      * Evaluate the given value expression as string.
      */
     private static String evaluate(ELContext context, ValueExpression expression, boolean required) {
-        Object value = (expression != null) ? expression.getValue(context) : null;
+        var value = expression != null ? expression.getValue(context) : null;
 
         if (required && isEmpty(value)) {
             throw new IllegalArgumentException(format(ERROR_REQUIRED_ATTRIBUTE, expression));
         }
 
-        return (value != null) ? value.toString() : null;
+        return value != null ? value.toString() : null;
     }
 
 }

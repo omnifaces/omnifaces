@@ -172,10 +172,10 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     }
 
     private void doProcess() {
-        String forValue = getFor();
+        var forValue = getFor();
 
         if (!isEmpty(forValue)) {
-            UIComponent component = findComponentRelatively(this, forValue);
+            var component = findComponentRelatively(this, forValue);
 
             if (component == null) {
                 component = findComponent(forValue);
@@ -185,7 +185,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
 
-            List<UIComponent> children = getChildrenInNewList();
+            var children = getChildrenInNewList();
 
             switch (getDestination()) {
                 case BEFORE:
@@ -210,14 +210,14 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         }
     }
 
-    private void moveBefore(UIComponent component, List<UIComponent> children) {
+    private static void moveBefore(UIComponent component, List<UIComponent> children) {
         // Find the index the target component has among its siblings, this directly
         // becomes the target index of where to insert all the components that are
         // to be moved.
-        int targetIndex = component.getParent().getChildren().indexOf(component);
+        var targetIndex = component.getParent().getChildren().indexOf(component);
 
-        for (int i = 0; i < children.size(); i++) {
-            UIComponent childComponent = children.get(i);
+        for (var i = 0; i < children.size(); i++) {
+            var childComponent = children.get(i);
             component.getParent().getChildren().add(targetIndex + i, childComponent);
             // Setting a component's ID to its own ID is necessary for MyFaces, who doesn't update the client-id
             // for the new location of the component in the tree. This action causes the client id to be nulled
@@ -226,32 +226,31 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         }
     }
 
-    private void moveAddFirst(UIComponent component, List<UIComponent> children) {
-        for (int i = 0; i < children.size(); i++) {
-            UIComponent childComponent = children.get(i);
+    private static void moveAddFirst(UIComponent component, List<UIComponent> children) {
+        for (var i = 0; i < children.size(); i++) {
+            var childComponent = children.get(i);
             component.getChildren().add(i, childComponent);
             childComponent.setId(childComponent.getId());
         }
     }
 
-    private void moveAddLast(UIComponent component, List<UIComponent> children) {
-        for (UIComponent childComponent : children) {
+    private static void moveAddLast(UIComponent component, List<UIComponent> children) {
+        for (var childComponent : children) {
             component.getChildren().add(childComponent);
             childComponent.setId(childComponent.getId());
         }
     }
 
     private void moveFacet(UIComponent component, List<UIComponent> children) {
-        for (UIComponent childComponent : children) {
+        for (var childComponent : children) {
             component.getFacets().put(getFacet(), childComponent);
             childComponent.setId(childComponent.getId());
         }
     }
 
-    private void moveBehavior(UIComponent component, String event, ClientBehavior behavior) {
-        if (component instanceof ClientBehaviorHolder) {
-            ClientBehaviorHolder clientBehaviorHolder = (ClientBehaviorHolder) component;
-            List<ClientBehavior> behaviors = clientBehaviorHolder.getClientBehaviors().get(event);
+    private static void moveBehavior(UIComponent component, String event, ClientBehavior behavior) {
+        if (component instanceof ClientBehaviorHolder clientBehaviorHolder) {
+            var behaviors = clientBehaviorHolder.getClientBehaviors().get(event);
 
             if (behaviors == null || !behaviors.contains(behavior)) { // Guard against adding ourselves twice
                 clientBehaviorHolder.addClientBehavior(event, behavior);
@@ -259,18 +258,18 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         }
     }
 
-    private void moveAfter(UIComponent component, List<UIComponent> children) {
+    private static void moveAfter(UIComponent component, List<UIComponent> children) {
         // Find the index the target component has among its siblings
-        int targetComponentIndex = component.getParent().getChildren().indexOf(component);
+        var targetComponentIndex = component.getParent().getChildren().indexOf(component);
 
         // The insertion point will be AFTER the target component
-        int targetIndex = targetComponentIndex + 1;
+        var targetIndex = targetComponentIndex + 1;
 
         // If the target component was not the last sibling, add all the components that are to be moved
         // to the position after the target component, continuously shifting the subsequent siblings
         // to the right, otherwise they will be added as the last siblings
-        for (int i = 0; i < children.size(); i++) {
-            UIComponent childComponent = children.get(i);
+        for (var i = 0; i < children.size(); i++) {
+            var childComponent = children.get(i);
             component.getParent().getChildren().add(targetIndex + i, childComponent);
             childComponent.setId(childComponent.getId());
         }
