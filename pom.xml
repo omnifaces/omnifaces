@@ -70,17 +70,17 @@
         <!-- Test server versions. -->
         <test.wildfly-mojarra.version>32.0.1.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.glassfish-mojarra.version>8.0.0-JDK17-M6</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>11.0.0-M20</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+        <test.tomcat.version>10.1.25</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat --> <!-- NOTE: Tomcat 11 is not working with Arquillian. Latest tested: 11.0.0-M22 -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
         <test.mojarra.version>4.1.0</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.myfaces.version>4.1.0-RC2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
-        <test.weld.version>6.0.0.Beta1</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+        <test.weld.version>6.0.0.Beta4</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
         <test.hibernateValidator.version>8.0.1.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
         <test.tyrus.version>2.2.0-M1</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>14.0.1</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.primefaces.version>14.0.2</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -679,7 +679,7 @@
                         <version>3.3.1</version>
                         <executions>
                             <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
@@ -759,7 +759,7 @@
                         <version>3.3.1</version>
                         <executions>
                             <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
