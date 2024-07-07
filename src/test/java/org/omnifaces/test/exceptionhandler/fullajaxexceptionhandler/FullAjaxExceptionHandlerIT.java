@@ -177,6 +177,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "glassfish-.*", disabledReason = "It fails to set the proper content-type header.")
     void throwNonAjaxDuringInvokeApplication() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringInvokeApplication::click);
@@ -185,6 +186,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "glassfish-.*", disabledReason = "It fails to set the proper content-type header.")
     void throwNonAjaxDuringUpdateModelValues() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringUpdateModelValues::click);
@@ -213,9 +215,8 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     private void assertStylesheetResourceRendered(String library, String name) {
-        List<WebElement> stylesheets = new ArrayList<>();
-        stylesheets.addAll(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : ("[href*='ln=" + library + "']")))));
-        stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : ("[contains(text(),'ln=" + library + "')]")))));
+        List<WebElement> stylesheets = new ArrayList<>(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : "[href*='ln=" + library + "']"))));
+        stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : "[contains(text(),'ln=" + library + "')]"))));
 
         if (stylesheets.isEmpty()) {
             fail("Missing stylesheet " + new ResourceIdentifier(library, name));
@@ -226,7 +227,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     private void assertScriptResourceRendered(String library, String name) {
-        List<WebElement> scripts = browser.findElements(By.cssSelector("script[src*='" + name + "']" + (library == null ? "" : ("[src*='ln=" + library + "']"))));
+        var scripts = browser.findElements(By.cssSelector("script[src*='" + name + "']" + (library == null ? "" : "[src*='ln=" + library + "']")));
 
         if (scripts.isEmpty()) {
             fail("Missing script " + new ResourceIdentifier(library, name));
