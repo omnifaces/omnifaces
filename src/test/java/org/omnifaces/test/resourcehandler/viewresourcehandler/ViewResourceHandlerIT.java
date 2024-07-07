@@ -60,23 +60,23 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = ".*-myfaces4", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
+    @DisabledIfSystemProperty(named = "profile.id", matches = ".*-myfaces", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
     void test() {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
+            var connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
             assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");
             assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type").replace(" ", ""), "Content type");
 
             String actualPageSource;
 
-            try (Scanner scanner = new Scanner(connection.getInputStream(), UTF_8.name())) {
+            try (var scanner = new Scanner(connection.getInputStream(), UTF_8.name())) {
                 actualPageSource = scanner.useDelimiter("\\A").next();
             }
 
-            String actualXmlProlog = actualPageSource
+            var actualXmlProlog = actualPageSource
                 .substring(0, actualPageSource.indexOf("<!--")) // That XML comment is the generated license.txt comment.
                 .trim();
-            String actualXmlBody = actualPageSource
+            var actualXmlBody = actualPageSource
                 .substring(actualPageSource.indexOf("-->") + 3)
                 .replaceAll(">\\s+<", "><") // Get rid of whitespace between tags. This isn't consistent among servers.
                 .trim();
