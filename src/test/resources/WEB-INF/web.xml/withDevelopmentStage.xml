@@ -42,4 +42,9 @@
         <error-code>500</error-code>
         <location>/WEB-INF/500.xhtml</location>
     </error-page>
+
+    <mime-mapping>
+        <extension>xhtml</extension>
+        <mime-type>text/html</mime-type> <!-- work around for failing error page rendering in GlassFish -->
+    </mime-mapping>
 </web-app>

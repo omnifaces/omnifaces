@@ -42,4 +42,9 @@
         <error-code>404</error-code>
         <location>/WEB-INF/404.xhtml</location>
     </error-page>
+
+    <mime-mapping>
+        <extension>xhtml</extension>
+        <mime-type>text/html</mime-type> <!-- work around for failing error page rendering in GlassFish -->
+    </mime-mapping>
 </web-app>
