@@ -19,6 +19,11 @@
     xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
     version="6.0"
 >
+    <context-param>
+        <param-name>jakarta.faces.FACELETS_BUFFER_SIZE</param-name>
+        <param-value>1048576</param-value> <!-- 1MB -->
+    </context-param>
+
     <servlet>
         <servlet-name>facesServlet</servlet-name>
         <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>

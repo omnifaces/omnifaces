@@ -28,6 +28,7 @@ import static org.omnifaces.util.FacesLocal.getRemoteAddr;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.FacesLocal.resetResponse;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
@@ -570,16 +571,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             OmniPartialViewContext.getCurrentInstance(context).closePartialResponse();
             return false;
         }
-    }
-
-    private static void resetResponse(FacesContext context) {
-        var externalContext = context.getExternalContext();
-        var contentType = externalContext.getResponseContentType(); // Remember content type.
-        var characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
-        externalContext.responseReset();
-        OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
-        externalContext.setResponseContentType(contentType);
-        externalContext.setResponseCharacterEncoding(characterEncoding);
     }
 
     private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)

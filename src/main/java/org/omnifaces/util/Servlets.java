@@ -58,9 +58,7 @@ import java.util.logging.Logger;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.spi.Context;
 import jakarta.enterprise.inject.spi.Bean;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.faces.FactoryFinder;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
@@ -165,8 +163,8 @@ public final class Servlets {
      */
     public static String getRequestDomainURL(HttpServletRequest request) {
         try {
-            URL url = new URL(request.getRequestURL().toString());
-            String fullURL = url.toString();
+            var url = new URL(request.getRequestURL().toString());
+            var fullURL = url.toString();
             return fullURL.substring(0, fullURL.length() - url.getPath().length());
         }
         catch (MalformedURLException e) {
@@ -237,7 +235,7 @@ public final class Servlets {
      * @return The HTTP request query string as parameter values map.
      */
     public static Map<String, List<String>> getRequestQueryStringMap(HttpServletRequest request) {
-        String queryString = getRequestQueryString(request);
+        var queryString = getRequestQueryString(request);
 
         if (isEmpty(queryString)) {
             return new LinkedHashMap<>(0);
@@ -286,9 +284,9 @@ public final class Servlets {
      * @see #getRequestQueryString(HttpServletRequest)
      */
     public static String getRequestURIWithQueryString(HttpServletRequest request) {
-        String requestURI = getRequestURI(request);
-        String queryString = getRequestQueryString(request);
-        return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
+        var requestURI = getRequestURI(request);
+        var queryString = getRequestQueryString(request);
+        return queryString == null ? requestURI : requestURI + "?" + queryString;
     }
 
     /**
@@ -344,19 +342,19 @@ public final class Servlets {
      * @since 1.7
      */
     public static Map<String, List<String>> toParameterMap(String queryString) {
-        String[] parameters = queryString.split(quote("&"));
+        var parameters = queryString.split(quote("&"));
         Map<String, List<String>> parameterMap = new LinkedHashMap<>(parameters.length);
 
         for (String parameter : parameters) {
             if (parameter.contains("=")) {
-                String[] pair = parameter.split(quote("="));
+                var pair = parameter.split(quote("="));
 
                 if (pair.length == 0) {
                     continue;
                 }
 
-                String key = decodeURLWithFallback(pair[0]);
-                String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURLWithFallback(pair[1]) : "";
+                var key = decodeURLWithFallback(pair[0]);
+                var value = pair.length > 1 && !isEmpty(pair[1]) ? decodeURLWithFallback(pair[1]) : "";
                 addParamToMapIfNecessary(parameterMap, key, value);
             }
         }
@@ -381,14 +379,14 @@ public final class Servlets {
      * @since 2.0
      */
     public static String toQueryString(Map<String, List<String>> parameterMap) {
-        StringBuilder queryString = new StringBuilder();
+        var queryString = new StringBuilder();
 
         for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
             if (isEmpty(entry.getKey())) {
                 continue;
             }
 
-            String name = encodeURL(entry.getKey());
+            var name = encodeURL(entry.getKey());
 
             for (String value : entry.getValue()) {
                 if (value == null) {
@@ -414,14 +412,14 @@ public final class Servlets {
      * @since 2.2
      */
     public static String toQueryString(List<? extends ParamHolder<?>> params) {
-        StringBuilder queryString = new StringBuilder();
+        var queryString = new StringBuilder();
 
         for (ParamHolder<?> param : params) {
             if (isEmpty(param.getName())) {
                 continue;
             }
 
-            String value = param.getValue();
+            var value = param.getValue();
 
             if (value != null) {
                 if (queryString.length() > 0) {
@@ -445,7 +443,7 @@ public final class Servlets {
      * @since 2.3
      */
     public static String getRemoteAddr(HttpServletRequest request) {
-        String forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
+        var forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
         return isEmpty(forwardedFor) ? request.getRemoteAddr() : splitAndTrim(forwardedFor, ",", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
     }
 
@@ -506,12 +504,12 @@ public final class Servlets {
      * @since 2.5
      */
     public static String getSubmittedFileName(Part part) {
-        Map<String, String> entries = headerToMap(part.getHeader("Content-Disposition"));
-        String encodedFileName = entries.get("filename*");
+        var entries = headerToMap(part.getHeader("Content-Disposition"));
+        var encodedFileName = entries.get("filename*");
         String fileName = null;
 
         if (encodedFileName != null) {
-            String[] parts = encodedFileName.split("'", 3);
+            var parts = encodedFileName.split("'", 3);
 
             if (parts.length == 3 && !isEmpty(parts[0])) {
                 try {
@@ -551,21 +549,21 @@ public final class Servlets {
         }
 
         Map<String, String> map = new HashMap<>();
-        StringBuilder builder = new StringBuilder();
-        boolean quoted = false;
+        var builder = new StringBuilder();
+        var quoted = false;
 
-        for (int i = 0; i < header.length(); i++) {
-            char c = header.charAt(i);
+        for (var i = 0; i < header.length(); i++) {
+            var c = header.charAt(i);
             builder.append(c);
 
-            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
+            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || i > 1 && header.charAt(i - 2) == '\\')) {
                 quoted = !quoted;
             }
 
-            if ((!quoted && c == ';') || i + 1 == header.length()) {
-                String[] entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
-                String name = entry[0].toLowerCase();
-                String value = entry.length == 1 ? ""
+            if (!quoted && c == ';' || i + 1 == header.length()) {
+                var entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
+                var name = entry[0].toLowerCase();
+                var value = entry.length == 1 ? ""
                     : entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
                         .replace("\\\"", "\"") // Unescape quotes.
                         .replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
@@ -641,7 +639,7 @@ public final class Servlets {
      * @since 2.6
      */
     public static String formatContentDispositionHeader(String filename, boolean attachment) {
-        return format(CONTENT_DISPOSITION_HEADER, (attachment ? "attachment" : "inline"), encodeURI(filename));
+        return format(CONTENT_DISPOSITION_HEADER, attachment ? "attachment" : "inline", encodeURI(filename));
     }
 
     /**
@@ -658,6 +656,26 @@ public final class Servlets {
         response.setHeader("Connection", "close");
     }
 
+    /**
+     * Resets the HTTP response. This basically clears out any uncommitted data written to headers/body, and sets the
+     * content type and character encoding to originally set values, with fall back to "text/html" and "UTF-8".
+     * @param response The involved HTTP servlet response.
+     * @throws IllegalStateException When the response has already been committed.
+     * @see HttpServletResponse#getContentType()
+     * @see HttpServletResponse#getCharacterEncoding()
+     * @see HttpServletResponse#reset()
+     * @see HttpServletResponse#setContentType(String)
+     * @see HttpServletResponse#setCharacterEncoding(String)
+     * @since 5.0
+     */
+    public static void resetResponse(HttpServletResponse response) {
+        var contentType = coalesce(response.getContentType(), "text/html");
+        var characterEncoding = coalesce(response.getCharacterEncoding(), UTF_8.name());
+        response.reset();
+        response.setContentType(contentType);
+        response.setCharacterEncoding(characterEncoding);
+    }
+
     // Cookies --------------------------------------------------------------------------------------------------------
 
     /**
@@ -671,7 +689,7 @@ public final class Servlets {
      * @since 2.0
      */
     public static String getRequestCookie(HttpServletRequest request, String name) {
-        Cookie[] cookies = request.getCookies();
+        var cookies = request.getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -758,7 +776,7 @@ public final class Servlets {
     public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
         String name, String value, String domain, String path, int maxAge)
     {
-        Cookie cookie = new Cookie(name, encodeURL(value));
+        var cookie = new Cookie(name, encodeURL(value));
 
         if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
             cookie.setDomain(domain);
@@ -806,7 +824,7 @@ public final class Servlets {
             return Faces.getServletContext();
         }
 
-        BeanManager beanManager = Beans.getManager();
+        var beanManager = Beans.getManager();
 
         if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
             return BeansLocal.getInstance(beanManager, ServletContext.class);
@@ -815,7 +833,7 @@ public final class Servlets {
             // #522 For some reason Weld by default searches for the ServletContext in the request scope.
             // But this won't work during e.g. startup. So we need to explicitly search in application scope.
             Bean<ServletContext> bean = BeansLocal.resolve(beanManager, ServletContext.class);
-            Context context = beanManager.getContext(ApplicationScoped.class);
+            var context = beanManager.getContext(ApplicationScoped.class);
             return context.get(bean, beanManager.createCreationalContext(bean));
         }
     }
@@ -844,7 +862,7 @@ public final class Servlets {
      * @since 2.5
      */
     public static Lifecycle getFacesLifecycle(ServletContext context) {
-        String lifecycleId = coalesce(context.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
+        var lifecycleId = coalesce(context.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
         return ((LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY)).getLifecycle(lifecycleId);
     }
 
@@ -931,7 +949,7 @@ public final class Servlets {
      * @since 2.0
      */
     public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, Object... paramValues) {
-        String redirectURL = prepareRedirectURL(request, url, paramValues);
+        var redirectURL = prepareRedirectURL(request, url, paramValues);
 
         try {
             if (isFacesAjaxRequest(request)) {
@@ -959,7 +977,7 @@ public final class Servlets {
      * @since 3.14
      */
     public static URL getWebXmlURL(ServletContext context) throws IOException {
-        URL webXml = context.getResource(WEB_XML);
+        var webXml = context.getResource(WEB_XML);
         return webXml != null ? webXml : Thread.currentThread().getContextClassLoader().getResource(QUARKUS_WEB_XML);
     }
 
@@ -969,7 +987,7 @@ public final class Servlets {
      * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
      */
     static String prepareRedirectURL(HttpServletRequest request, String url, Object... paramValues) {
-        String redirectURL = url;
+        var redirectURL = url;
 
         if (!startsWithOneOf(url, "http://", "https://", "/")) {
             redirectURL = request.getContextPath() + "/" + url;
@@ -979,11 +997,11 @@ public final class Servlets {
             return redirectURL;
         }
 
-        Object[] encodedParams = new Object[paramValues.length];
+        var encodedParams = new Object[paramValues.length];
 
-        for (int i = 0; i < paramValues.length; i++) {
-            Object paramValue = paramValues[i];
-            encodedParams[i] = (paramValue instanceof String) ? encodeURL((String) paramValue) : paramValue;
+        for (var i = 0; i < paramValues.length; i++) {
+            var paramValue = paramValues[i];
+            encodedParams[i] = paramValue instanceof String ? encodeURL((String) paramValue) : paramValue;
         }
 
         return format(redirectURL, encodedParams);

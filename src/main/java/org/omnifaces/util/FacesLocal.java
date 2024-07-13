@@ -90,6 +90,7 @@ import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
 import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
@@ -1312,6 +1313,14 @@ public final class FacesLocal {
      */
     public static void refreshWithQueryString(FacesContext context) {
         redirect(context, getRequestURIWithQueryString(context));
+    }
+
+    /**
+     * @see Faces#resetResponse()
+     */
+    public static void resetResponse(FacesContext context) {
+        Servlets.resetResponse(getResponse(context));
+        OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
     }
 
     /**

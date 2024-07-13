@@ -75,6 +75,7 @@ import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
 import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.filter.MutableRequestFilter;
@@ -1849,6 +1850,23 @@ public final class Faces {
      */
     public static void refreshWithQueryString() {
         FacesLocal.refreshWithQueryString(getContext());
+    }
+
+    /**
+     * Resets the HTTP response. This basically clears out any uncommitted data written to headers/body, and sets the
+     * content type and character encoding to originally set values, with fall back to "text/html" and "UTF-8".
+     * This also resets the Faces partial response.
+     * @throws IllegalStateException When the response has already been committed.
+     * @see ExternalContext#getResponseContentType()
+     * @see ExternalContext#getResponseCharacterEncoding()
+     * @see ExternalContext#responseReset()
+     * @see ExternalContext#setResponseContentType(String)
+     * @see ExternalContext#setResponseCharacterEncoding(String)
+     * @see OmniPartialViewContext#resetPartialResponse()
+     * @since 5.0
+     */
+    public static void resetResponse() {
+        FacesLocal.resetResponse(getContext());
     }
 
     /**

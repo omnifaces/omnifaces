@@ -177,7 +177,6 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "glassfish-.*", disabledReason = "It fails to set the proper content-type header.")
     void throwNonAjaxDuringInvokeApplication() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringInvokeApplication::click);
@@ -186,7 +185,6 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "glassfish-.*", disabledReason = "It fails to set the proper content-type header.")
     void throwNonAjaxDuringUpdateModelValues() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringUpdateModelValues::click);

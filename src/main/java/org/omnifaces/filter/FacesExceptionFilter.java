@@ -20,6 +20,7 @@ import static org.omnifaces.exceptionhandler.FullAjaxExceptionHandler.getExcepti
 import static org.omnifaces.exceptionhandler.FullAjaxExceptionHandler.getExceptionTypesToUnwrap;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Servlets.getRemoteAddr;
+import static org.omnifaces.util.Servlets.resetResponse;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.FileNotFoundException;
@@ -97,8 +98,11 @@ public class FacesExceptionFilter extends HttpFilter {
     private static final Logger logger = Logger.getLogger(FacesExceptionFilter.class.getName());
 
     private static final String LOG_EXCEPTION_HANDLED =
-        "FacesExceptionFilter: An exception occurred during processing servlet request."
-            + " Error page '%s' will be shown.";
+            "FacesExceptionFilter: An exception occurred during processing servlet request."
+                + " Error page '%s' will be shown.";
+    private static final String LOG_EXCEPTION_UNHANDLED =
+            "FacesExceptionFilter: An exception occurred during processing servlet request."
+                + " Error page '%s' CANNOT be shown as response is already committed.";
 
     private Class<? extends Throwable>[] exceptionTypesToUnwrap;
     private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
@@ -123,9 +127,16 @@ public class FacesExceptionFilter extends HttpFilter {
         }
         catch (Throwable exception) {
             request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
-            Throwable cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
-            String location = WebXml.instance().findErrorPageLocation(cause);
-            logException(request, cause, location, LOG_EXCEPTION_HANDLED, location);
+            var cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
+            var location = WebXml.instance().findErrorPageLocation(cause);
+
+            if (!response.isCommitted()) {
+                logException(request, cause, location, LOG_EXCEPTION_HANDLED, location);
+                resetResponse(response);
+            }
+            else {
+                logException(request, cause, location, LOG_EXCEPTION_UNHANDLED, location);
+            }
 
             if (Objects.equals(exception, cause)) {
                 throw exception;
@@ -133,8 +144,8 @@ public class FacesExceptionFilter extends HttpFilter {
 
             logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", exception);
 
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
             }
             else {
                 throw new ServletException(cause);
