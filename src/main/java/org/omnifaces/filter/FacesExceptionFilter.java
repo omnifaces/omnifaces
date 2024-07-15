@@ -21,6 +21,7 @@ import static org.omnifaces.exceptionhandler.FullAjaxExceptionHandler.getExcepti
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Servlets.getRemoteAddr;
 import static org.omnifaces.util.Servlets.resetResponse;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.FileNotFoundException;
@@ -127,7 +128,7 @@ public class FacesExceptionFilter extends HttpFilter {
         }
         catch (Throwable exception) {
             request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
-            var cause = unwrap(exception instanceof ServletException ? exception.getCause() : exception, exceptionTypesToUnwrap);
+            var cause = unwrap(exception instanceof ServletException ? coalesce(exception.getCause(), exception) : exception, exceptionTypesToUnwrap);
             var location = WebXml.instance().findErrorPageLocation(cause);
 
             if (!response.isCommitted()) {
