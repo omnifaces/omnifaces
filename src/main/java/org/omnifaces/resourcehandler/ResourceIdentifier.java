@@ -20,7 +20,9 @@ import static org.omnifaces.util.Utils.toByteArray;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import jakarta.faces.application.Resource;
@@ -56,8 +58,8 @@ public class ResourceIdentifier {
      * @param resourceIdentifier The standard Faces resource identifier.
      */
     public ResourceIdentifier(String resourceIdentifier) {
-        String[] parts = resourceIdentifier.split(":");
-        setLibraryAndName((parts.length > 1) ? parts[0] : null, parts[parts.length - 1]);
+        var parts = resourceIdentifier.split(":");
+        setLibraryAndName(parts.length > 1 ? parts[0] : null, parts[parts.length - 1]);
     }
 
     /**
@@ -65,7 +67,7 @@ public class ResourceIdentifier {
      * @param componentResource The component resource.
      */
     public ResourceIdentifier(UIComponent componentResource) {
-        Map<String, Object> attributes = componentResource.getAttributes();
+        var attributes = componentResource.getAttributes();
         setLibraryAndName((String) attributes.get("library"), (String) attributes.get("name"));
     }
 
@@ -89,7 +91,7 @@ public class ResourceIdentifier {
 
     private void setLibraryAndName(String library, String name) {
         this.library = library;
-        this.name = (name != null) ? name.split("[?#;]", 2)[0] : null; // Split gets rid of query string and path fragment.
+        this.name = name != null ? name.split("[?#;]", 2)[0] : null; // Split gets rid of query string and path fragment.
     }
 
     // Getters --------------------------------------------------------------------------------------------------------
@@ -134,25 +136,14 @@ public class ResourceIdentifier {
         }
 
         // Property checks.
-        ResourceIdentifier other = (ResourceIdentifier) object;
-        if (library == null ? other.library != null : !library.equals(other.library)) {
-            return false;
-        }
-        if (name == null ? other.name != null : !name.equals(other.name)) {
-            return false;
-        }
-
-        // All passed.
-        return true;
+        var other = (ResourceIdentifier) object;
+        return Objects.equals(library, other.library)
+            && Objects.equals(name, other.name);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((library == null) ? 0 : library.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+        return Objects.hash(library, name);
     }
 
     /**
@@ -161,15 +152,15 @@ public class ResourceIdentifier {
      */
     @Override
     public String toString() {
-        return (library != null ? (library + ":") : "") + name;
+        return (library != null ? library + ":" : "") + name;
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private static String computeIntegrity(FacesContext context, ResourceIdentifier id) {
         try {
-            byte[] content = toByteArray(createResource(context, id).getInputStream());
-            byte[] sha384 = MessageDigest.getInstance("SHA-384").digest(content);
+            var content = toByteArray(createResource(context, id).getInputStream());
+            var sha384 = MessageDigest.getInstance("SHA-384").digest(content);
             return "sha384-" + Base64.getEncoder().encodeToString(sha384);
         }
         catch (Exception e) {
@@ -178,4 +169,7 @@ public class ResourceIdentifier {
         }
     }
 
+    static void clearIntegrity(Predicate<String> keyPredicate) {
+        INTEGRITIES.keySet().removeIf(keyPredicate::test);
+    }
 }
