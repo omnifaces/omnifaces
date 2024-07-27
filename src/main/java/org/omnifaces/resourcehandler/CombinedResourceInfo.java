@@ -15,7 +15,9 @@ package org.omnifaces.resourcehandler;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
+import static org.omnifaces.resourcehandler.CombinedResourceHandler.LIBRARY_NAME;
 import static org.omnifaces.util.FacesLocal.createResource;
+import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.openConnection;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -171,11 +173,13 @@ public final class CombinedResourceInfo {
 	 * resources empty.
 	 */
 	private synchronized void loadResources() {
-		if (!isEmpty(resources)) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (!isEmpty(resources) && !isDevelopment(context)) {
 			return;
 		}
 
-		FacesContext context = FacesContext.getCurrentInstance();
+		long previousLastModified = lastModified;
 		resources = new LinkedHashSet<>();
 		contentLength = 0;
 		lastModified = 0;
@@ -205,6 +209,11 @@ public final class CombinedResourceInfo {
 			if (resourceLastModified > lastModified) {
 				lastModified = resourceLastModified;
 			}
+		}
+
+		if (previousLastModified != 0 && lastModified != previousLastModified) {
+			String keyPrefix = LIBRARY_NAME + ":" + id + ".";
+			ResourceIdentifier.clearIntegrity(key -> key.startsWith(keyPrefix));
 		}
 	}
 

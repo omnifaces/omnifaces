@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
@@ -178,4 +179,7 @@ public class ResourceIdentifier {
 		}
 	}
 
+	static void clearIntegrity(Predicate<String> keyPredicate) {
+		INTEGRITIES.keySet().removeIf(keyPredicate::test);
+	}
 }
