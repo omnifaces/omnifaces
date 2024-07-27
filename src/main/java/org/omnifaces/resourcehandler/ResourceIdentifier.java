@@ -21,6 +21,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import jakarta.faces.application.Resource;
@@ -135,12 +136,8 @@ public class ResourceIdentifier {
 
         // Property checks.
         var other = (ResourceIdentifier) object;
-        if ((library == null ? other.library != null : !library.equals(other.library)) || (name == null ? other.name != null : !name.equals(other.name))) {
-            return false;
-        }
-
-        // All passed.
-        return true;
+        return Objects.equals(library, other.library)
+            && Objects.equals(name, other.name);
     }
 
     @Override
@@ -172,4 +169,7 @@ public class ResourceIdentifier {
         }
     }
 
+    static void clearIntegrity(Predicate<String> keyPredicate) {
+        INTEGRITIES.keySet().removeIf(keyPredicate::test);
+    }
 }

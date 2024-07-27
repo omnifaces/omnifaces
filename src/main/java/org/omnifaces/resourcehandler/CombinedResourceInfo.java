@@ -15,13 +15,14 @@ package org.omnifaces.resourcehandler;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
+import static org.omnifaces.resourcehandler.CombinedResourceHandler.LIBRARY_NAME;
 import static org.omnifaces.util.FacesLocal.createResource;
+import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.openConnection;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -120,7 +121,7 @@ public final class CombinedResourceInfo {
                 throw new IllegalStateException(ERROR_EMPTY_RESOURCES);
             }
 
-            String id = toUniqueId(resourceIdentifiers);
+            var id = toUniqueId(resourceIdentifiers);
 
             if (!CACHE.containsKey(id)) {
                 CombinedResourceInfo.create(id, resourceIdentifiers);
@@ -138,10 +139,10 @@ public final class CombinedResourceInfo {
      * @return The combined resource info identified by the given ID from the cache.
      */
     public static CombinedResourceInfo get(String id) {
-        CombinedResourceInfo info = CACHE.get(id);
+        var info = CACHE.get(id);
 
         if (info == null) {
-            Set<ResourceIdentifier> resourceIdentifiers = fromUniqueId(id);
+            var resourceIdentifiers = fromUniqueId(id);
 
             if (resourceIdentifiers != null) {
                 info = create(id, resourceIdentifiers);
@@ -158,7 +159,7 @@ public final class CombinedResourceInfo {
      * @return New combined resource info identified by given ID.
      */
     private static CombinedResourceInfo create(String id, Set<ResourceIdentifier> resourceIdentifiers) {
-        CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
+        var info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
         CACHE.put(id, info);
         return info;
     }
@@ -171,17 +172,19 @@ public final class CombinedResourceInfo {
      * resources empty.
      */
     private synchronized void loadResources() {
-        if (!isEmpty(resources)) {
+        var context = FacesContext.getCurrentInstance();
+
+        if (!isEmpty(resources) && !isDevelopment(context)) {
             return;
         }
 
-        FacesContext context = FacesContext.getCurrentInstance();
+        var previousLastModified = lastModified;
         resources = new LinkedHashSet<>();
         contentLength = 0;
         lastModified = 0;
 
-        for (ResourceIdentifier resourceIdentifier : resourceIdentifiers) {
-            Resource resource = createResource(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName());
+        for (var resourceIdentifier : resourceIdentifiers) {
+            var resource = createResource(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName());
 
             if (resource == null) {
                 if (logger.isLoggable(WARNING)) {
@@ -193,18 +196,23 @@ public final class CombinedResourceInfo {
             }
 
             resources.add(resource);
-            URLConnection connection = openConnection(context, resource);
+            var connection = openConnection(context, resource);
 
             if (connection == null) {
                 return;
             }
 
             contentLength += connection.getContentLength();
-            long resourceLastModified = connection.getLastModified();
+            var resourceLastModified = connection.getLastModified();
 
             if (resourceLastModified > lastModified) {
                 lastModified = resourceLastModified;
             }
+        }
+
+        if (previousLastModified != 0 && lastModified != previousLastModified) {
+            var keyPrefix = LIBRARY_NAME + ":" + id + ".";
+            ResourceIdentifier.clearIntegrity(key -> key.startsWith(keyPrefix));
         }
     }
 
@@ -214,7 +222,7 @@ public final class CombinedResourceInfo {
      */
     @Override
     public boolean equals(Object other) {
-        return (other instanceof CombinedResourceInfo) && ((CombinedResourceInfo) other).id.equals(id);
+        return other instanceof CombinedResourceInfo && ((CombinedResourceInfo) other).id.equals(id);
     }
 
     /**
