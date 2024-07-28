@@ -384,6 +384,24 @@ public class ValidateBeanIT extends OmniFacesIT {
     @FindBy(id="validateClassLevelWithFormEntityComposite:form:command")
     private WebElement validateClassLevelWithFormEntityCompositeCommand;
 
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:0:input")
+    private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber1;
+
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:0:message")
+    private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber1Message;
+
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:1:input")
+    private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber2;
+
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:1:message")
+    private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber2Message;
+
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:command")
+    private WebElement validateBeanWithCustomTypeAsPropertyCommand;
+
+    @FindBy(id="validateBeanWithCustomTypeAsProperty:messages")
+    private WebElement validateBeanWithCustomTypeAsPropertyMessages;
+
     @Deployment(testable=false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ValidateBeanIT.class)
@@ -416,7 +434,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 //        input.clear();
 //        input.sendKeys("x");
 //        guardAjax(validateDefaultAndGroupByCommand::click);
-//        var message = getMessagesText();
+//        var message = getMessagesText()
 //        assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's unordered.
 
         input.clear();
@@ -901,4 +919,34 @@ public class ValidateBeanIT extends OmniFacesIT {
         return messages.getText().replaceAll("\\s+", " ");
     }
 
+    @Test
+    void validateBeanWithCustomTypeAsProperty() {
+        open("ValidateBeanITWithCustomTypeAsProperty.xhtml");
+        validateBeanWithCustomTypeAsPropertyFlightNumber2.sendKeys("AA11");
+        guardAjax(validateBeanWithCustomTypeAsPropertyCommand::click);
+        assertEquals("", validateBeanWithCustomTypeAsPropertyFlightNumber1Message.getText());
+        assertEquals("flightNumberLabel: Invalid flight number", validateBeanWithCustomTypeAsPropertyFlightNumber2Message.getText());
+        assertEquals("", validateBeanWithCustomTypeAsPropertyMessages.getText());
+
+        validateBeanWithCustomTypeAsPropertyFlightNumber1.clear();
+        validateBeanWithCustomTypeAsPropertyFlightNumber1.sendKeys("AA11");
+        guardAjax(validateBeanWithCustomTypeAsPropertyCommand::click);
+        assertEquals("flightNumberLabel: Invalid flight number", validateBeanWithCustomTypeAsPropertyFlightNumber1Message.getText());
+        assertEquals("flightNumberLabel: Invalid flight number", validateBeanWithCustomTypeAsPropertyFlightNumber2Message.getText());
+        assertEquals("", validateBeanWithCustomTypeAsPropertyMessages.getText());
+
+        validateBeanWithCustomTypeAsPropertyFlightNumber2.clear();
+        validateBeanWithCustomTypeAsPropertyFlightNumber2.sendKeys("AA22");
+        guardAjax(validateBeanWithCustomTypeAsPropertyCommand::click);
+        assertEquals("flightNumberLabel: Invalid flight number", validateBeanWithCustomTypeAsPropertyFlightNumber1Message.getText());
+        assertEquals("", validateBeanWithCustomTypeAsPropertyFlightNumber2Message.getText());
+        assertEquals("", validateBeanWithCustomTypeAsPropertyMessages.getText());
+
+        validateBeanWithCustomTypeAsPropertyFlightNumber1.clear();
+        validateBeanWithCustomTypeAsPropertyFlightNumber1.sendKeys("AA33");
+        guardAjax(validateBeanWithCustomTypeAsPropertyCommand::click);
+        assertEquals("", validateBeanWithCustomTypeAsPropertyFlightNumber1Message.getText());
+        assertEquals("", validateBeanWithCustomTypeAsPropertyFlightNumber2Message.getText());
+        assertEquals("actionSuccess", validateBeanWithCustomTypeAsPropertyMessages.getText());
+    }
 }
