@@ -549,10 +549,19 @@ public class ValidateBean extends TagHandler {
 
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+					Object referencedBase = valueReference.getBase();
+					Object referencedProperty = valueReference.getProperty();
 
-					if (bases.contains(valueReference.getBase()) && (property == null || property.equals(valueReference.getProperty()))) {
+                    if (bases.contains(referencedBase) && (property == null || property.equals(referencedProperty))) {
 						callback.invoke(input);
 					}
+                    else if (property == null && referencedBase instanceof List && referencedProperty instanceof Integer) {
+                        Object referencedItem = ((List<?>) referencedBase).get((Integer) referencedProperty);
+
+                        if (bases.contains(referencedItem)) {
+                            callback.invoke(input);
+                        }
+                    }
 				}
 			});
 	}
