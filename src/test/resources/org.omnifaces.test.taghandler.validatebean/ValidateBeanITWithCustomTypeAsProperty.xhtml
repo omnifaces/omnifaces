@@ -1,0 +1,51 @@
+<!--
+
+    Copyright OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:cc="http://xmlns.jcp.org/jsf/composite/components"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
+>
+    <h:head>
+        <title>ValidateBeanITWithCustomTypeAsProperty</title>
+    </h:head>
+
+    <h:body>
+        <h:form id="validateBeanWithCustomTypeAsProperty">
+            <ol>
+                <ui:repeat id="flightNumbers" value="#{validateBeanITWithCustomTypeAsProperty.flightNumbers}" varStatus="loop">
+                    <li>
+                        <h:inputText id="input" value="#{validateBeanITWithCustomTypeAsProperty.flightNumbers[loop.index]}" label="flightNumberLabel" required="true">
+                            <f:converter converterId="flightNumberConverter" />
+                        </h:inputText>
+                        <h:message id="message" for="input" />
+                    </li>
+                </ui:repeat>
+            </ol>
+
+            <h:commandButton id="command" value="submit" action="#{validateBeanITWithCustomTypeAsProperty.action}">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+
+            <h:messages id="messages" redisplay="false" />
+
+            <o:validateBean value="#{validateBeanITWithCustomTypeAsProperty}" showMessageFor="@violating" />
+        </h:form>
+    </h:body>
+</html>
