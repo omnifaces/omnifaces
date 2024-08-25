@@ -79,7 +79,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	@Override
 	public UUID getBeanStorageId() {
 		UUID beanStorageId = getViewAttribute(getClass().getName());
-		return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+		return beanStorageId != null && activeViewScopes.containsKey(beanStorageId) ? beanStorageId : null;
 	}
 
 	@Override
@@ -98,10 +98,11 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 * @param beanStorageId The bean storage identifier.
 	 */
 	public void destroyBeans(UUID beanStorageId) {
-		BeanStorage storage = activeViewScopes.remove(beanStorageId);
+		BeanStorage storage = activeViewScopes.get(beanStorageId);
 
 		if (storage != null) {
 			storage.destroyBeans();
+			activeViewScopes.remove(beanStorageId);
 		}
 	}
 
