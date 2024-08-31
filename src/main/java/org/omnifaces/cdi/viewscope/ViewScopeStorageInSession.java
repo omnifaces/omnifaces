@@ -75,7 +75,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     @Override
     public UUID getBeanStorageId() {
         UUID beanStorageId = getViewAttribute(getClass().getName());
-        return (beanStorageId != null && activeViewScopes.containsKey(beanStorageId)) ? beanStorageId : null;
+        return beanStorageId != null && activeViewScopes.containsKey(beanStorageId) ? beanStorageId : null;
     }
 
     @Override
@@ -94,10 +94,11 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
      * @param beanStorageId The bean storage identifier.
      */
     public void destroyBeans(UUID beanStorageId) {
-        BeanStorage storage = activeViewScopes.remove(beanStorageId);
+        var storage = activeViewScopes.get(beanStorageId);
 
         if (storage != null) {
             storage.destroyBeans();
+            activeViewScopes.remove(beanStorageId);
         }
     }
 
@@ -106,7 +107,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
      */
     @PreDestroy
     public void preDestroySession() {
-        for (BeanStorage storage : activeViewScopes.values()) {
+        for (var storage : activeViewScopes.values()) {
             storage.destroyBeans();
         }
     }
@@ -123,8 +124,8 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
             return maxActiveViewScopes;
         }
 
-        for (String name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
-            String value = getInitParameter(name);
+        for (var name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
+            var value = getInitParameter(name);
 
             if (value != null) {
                 try {

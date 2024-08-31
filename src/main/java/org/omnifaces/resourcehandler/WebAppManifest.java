@@ -24,15 +24,9 @@ import static org.omnifaces.util.Utils.containsQueryStringParameter;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 import static org.omnifaces.util.Utils.openConnection;
 
-import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
-
-import jakarta.faces.application.Resource;
-import jakarta.faces.application.ViewHandler;
-import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.util.Faces;
@@ -59,7 +53,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private Dir() {
+        Dir() {
             value = name().toLowerCase();
         }
 
@@ -78,7 +72,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private Display() {
+        Display() {
             value = name().toLowerCase().replace('_', '-');
         }
 
@@ -97,7 +91,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private Orientation() {
+        Orientation() {
             value = name().toLowerCase().replace('_', '-');
         }
 
@@ -118,7 +112,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private Category() {
+        Category() {
             value = name().toLowerCase();
         }
 
@@ -137,7 +131,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private Platform() {
+        Platform() {
             value = name().toLowerCase().replace('_', '-');
         }
 
@@ -200,10 +194,9 @@ public abstract class WebAppManifest {
     /**
      * Returns the default orientation mode of your web application. The default implementation returns {@code null} to let the device handle the orientation
      * based on the combination of device orientation and user auto-orientation setting.
+     * Since OmniFaces 4.5, the default implementation returns {@code null}. The previous default value was {@link Orientation#ANY}.
      * @return The default orientation mode of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation</a>
-     * @since 4.5 The default implementation returns {@code null}. The previous default value was {@link Orientation#ANY}
-     *
      */
     public Orientation getOrientation() {
         return null;
@@ -228,13 +221,12 @@ public abstract class WebAppManifest {
      */
     protected Collection<String> getCacheableViewIds() {
         if (cacheableViewIds == null) {
-            FacesContext context = Faces.getContext();
-            String contextPath = FacesLocal.getRequestContextPath(context);
-
-            Set<String> welcomeFileURLs = WebXml.instance().getWelcomeFiles().stream().map(welcomeFile -> contextPath + addLeadingSlashIfNecessary(welcomeFile)).collect(toSet());
+            var context = Faces.getContext();
+            var contextPath = FacesLocal.getRequestContextPath(context);
+            var welcomeFileURLs = WebXml.instance().getWelcomeFiles().stream().map(welcomeFile -> contextPath + addLeadingSlashIfNecessary(welcomeFile)).collect(toSet());
             welcomeFileURLs.add(contextPath + "/");
 
-            ViewHandler viewHandler = context.getApplication().getViewHandler();
+            var viewHandler = context.getApplication().getViewHandler();
             cacheableViewIds = viewHandler.getViews(context, "/").filter(viewId -> welcomeFileURLs.contains(viewHandler.getActionURL(context, viewId))).collect(toSet());
         }
 
@@ -370,17 +362,17 @@ public abstract class WebAppManifest {
 
         private ImageResource(String resourceIdentifier, Size... sizes) {
             requireNonNull(resourceIdentifier, "resourceIdentifier");
-            FacesContext context = Faces.getContext();
-            Resource resource = createResource(context, new ResourceIdentifier(resourceIdentifier));
+            var context = Faces.getContext();
+            var resource = createResource(context, new ResourceIdentifier(resourceIdentifier));
 
             if (resource == null) {
                 throw new IllegalArgumentException("Cannot find resource '" + resourceIdentifier + "'");
             }
 
-            String requestPath = resource.getRequestPath();
+            var requestPath = resource.getRequestPath();
 
             if (!containsQueryStringParameter(requestPath, "v")) {
-                URLConnection connection = openConnection(context, resource);
+                var connection = openConnection(context, resource);
 
                 if (connection != null) {
                     requestPath = formatURLWithQueryString(requestPath, "v=" + connection.getLastModified());
@@ -439,7 +431,7 @@ public abstract class WebAppManifest {
             }
 
             // Property checks.
-            ImageResource other = (ImageResource) object;
+            var other = (ImageResource) object;
             return Objects.equals(src, other.src)
                     && Objects.equals(sizes, other.sizes)
                     && Objects.equals(type, other.type);
@@ -559,7 +551,7 @@ public abstract class WebAppManifest {
             }
 
             // Property checks.
-            Size other = (Size) object;
+            var other = (Size) object;
             return Objects.equals(value, other.value);
         }
 
@@ -645,7 +637,7 @@ public abstract class WebAppManifest {
             }
 
             // Property checks.
-            RelatedApplication other = (RelatedApplication) object;
+            var other = (RelatedApplication) object;
             return Objects.equals(platform, other.platform)
                     && Objects.equals(url, other.url)
                     && Objects.equals(id, other.id);
@@ -667,7 +659,7 @@ public abstract class WebAppManifest {
 
         private final String value;
 
-        private ScreenshotFormFactor() {
+        ScreenshotFormFactor() {
             value = name().toLowerCase();
         }
 
@@ -730,7 +722,7 @@ public abstract class WebAppManifest {
                 return false;
             }
 
-            Screenshot screenshot = (Screenshot) object;
+            var screenshot = (Screenshot) object;
             return Objects.equals(image, screenshot.image)
                     && Objects.equals(formFactor, screenshot.formFactor);
         }
@@ -804,7 +796,7 @@ public abstract class WebAppManifest {
                 return false;
             }
 
-            Shortcut shortcut = (Shortcut) object;
+            var shortcut = (Shortcut) object;
             return Objects.equals(url, shortcut.url);
         }
 
