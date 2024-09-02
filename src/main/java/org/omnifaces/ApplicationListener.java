@@ -20,7 +20,6 @@ import static org.omnifaces.util.Reflection.toClass;
 
 import java.util.logging.Logger;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.annotation.WebListener;
 
@@ -80,8 +79,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        ServletContext servletContext = event.getServletContext();
-        boolean skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
+        var servletContext = event.getServletContext();
+        var skipDeploymentException = OmniFaces.skipDeploymentException(servletContext);
 
         if (!skipDeploymentException) {
             checkFacesAvailable();
@@ -92,12 +91,12 @@ public class ApplicationListener extends DefaultServletContextListener {
             CacheInitializer.loadProviderAndRegisterFilter(servletContext);
             FacesViews.addFacesServletMappings(servletContext);
             ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
-            FullAjaxExceptionHandler.registerFacesExceptionFilterIfNecessary(servletContext);
 
             if (skipDeploymentException) {
-                checkCDIImplAvailable(); // Because below three initializations require CDI impl being available, see #703
+                checkCDIImplAvailable(); // Because below initializations require CDI impl being available, see #703
             }
 
+            FullAjaxExceptionHandler.registerFacesExceptionFilterIfNecessary(servletContext);
             EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
             GraphicResource.registerGraphicImageBeans();
             Socket.registerEndpointIfNecessary(servletContext);
