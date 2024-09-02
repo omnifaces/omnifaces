@@ -20,6 +20,10 @@ import static org.omnifaces.util.Reflection.toClass;
 
 import java.util.logging.Logger;
 
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.ExternalContextWrapper;
+import jakarta.faces.context.FacesContextWrapper;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.annotation.WebListener;
 
@@ -36,6 +40,8 @@ import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Servlets;
 import org.omnifaces.util.cache.CacheInitializer;
 
 /**
@@ -88,15 +94,17 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
 
         try {
+            Faces.setContext(new ServletContextFacesContext(servletContext));
+
             CacheInitializer.loadProviderAndRegisterFilter(servletContext);
             FacesViews.addFacesServletMappings(servletContext);
             ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
+            FullAjaxExceptionHandler.registerFacesExceptionFilterIfNecessary(servletContext);
 
             if (skipDeploymentException) {
                 checkCDIImplAvailable(); // Because below initializations require CDI impl being available, see #703
             }
 
-            FullAjaxExceptionHandler.registerFacesExceptionFilterIfNecessary(servletContext);
             EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
             GraphicResource.registerGraphicImageBeans();
             Socket.registerEndpointIfNecessary(servletContext);
@@ -108,6 +116,9 @@ public class ApplicationListener extends DefaultServletContextListener {
             else {
                 throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
             }
+        }
+        finally {
+            Faces.setContext(null);
         }
     }
 
@@ -204,4 +215,38 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
     }
 
+    // Inner classes --------------------------------------------------------------------------------------------------
+
+    /**
+     * This faces context wrapper basically makes ServletContext available by {@link Servlets#getContext()} further down
+     * in the chain and ignores all the other things Faces. It's currently only used by
+     * {@link FullAjaxExceptionHandler#registerFacesExceptionFilterIfNecessary(ServletContext)}. See also #831.
+     */
+    private static class ServletContextFacesContext extends FacesContextWrapper {
+        private ExternalContext externalContext;
+
+        public ServletContextFacesContext(ServletContext servletContext) {
+            super(null);
+            this.externalContext = new ServletContextExternalContext(servletContext);
+        }
+
+        @Override
+        public ExternalContext getExternalContext() {
+            return externalContext;
+        }
+
+        private static class ServletContextExternalContext extends ExternalContextWrapper {
+            private ServletContext servletContext;
+
+            public ServletContextExternalContext(ServletContext servletContext) {
+                super(null);
+                this.servletContext = servletContext;
+            }
+
+            @Override
+            public Object getContext() {
+                return servletContext;
+            }
+        }
+    }
 }

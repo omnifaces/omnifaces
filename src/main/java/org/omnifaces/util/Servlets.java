@@ -56,6 +56,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.faces.FactoryFinder;
 import jakarta.faces.application.Application;
@@ -794,9 +795,19 @@ public final class Servlets {
             return Faces.getServletContext();
         }
 
-        // #522 #831 Explicitly search for ServletContext in ApplicationScoped.class.
-        // Beans.getInstance(ServletContext.class) won't work during startup when using Weld or Quarkus.
         var beanManager = Beans.getManager();
+
+        if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
+            try {
+                return BeansLocal.getInstance(beanManager, ServletContext.class);
+            }
+            catch (Exception ignore) {
+                logger.log(FINEST, "Ignoring thrown exception; will fall back to explicitly searching in application scope.", ignore);
+            }
+        }
+
+        // #522 For some reason Weld by default searches for the ServletContext in the request scope.
+        // But this won't work during e.g. startup. So we need to explicitly search in application scope.
         var bean = BeansLocal.resolve(beanManager, ServletContext.class);
         var context = beanManager.getContext(ApplicationScoped.class);
         return context.get(bean, beanManager.createCreationalContext(bean));
