@@ -51,16 +51,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.spi.Context;
 import jakarta.enterprise.inject.spi.Bean;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.faces.FactoryFinder;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
@@ -165,8 +161,8 @@ public final class Servlets {
      */
     public static String getRequestDomainURL(HttpServletRequest request) {
         try {
-            URL url = new URL(request.getRequestURL().toString());
-            String fullURL = url.toString();
+            var url = new URL(request.getRequestURL().toString());
+            var fullURL = url.toString();
             return fullURL.substring(0, fullURL.length() - url.getPath().length());
         }
         catch (MalformedURLException e) {
@@ -237,7 +233,7 @@ public final class Servlets {
      * @return The HTTP request query string as parameter values map.
      */
     public static Map<String, List<String>> getRequestQueryStringMap(HttpServletRequest request) {
-        String queryString = getRequestQueryString(request);
+        var queryString = getRequestQueryString(request);
 
         if (isEmpty(queryString)) {
             return new LinkedHashMap<>(0);
@@ -255,9 +251,9 @@ public final class Servlets {
      * @since 2.6
      */
     public static Map<String, List<String>> getRequestParameterMap(HttpServletRequest request) {
-        Map<String, List<String>> parameterMap = new HashMap<>(request.getParameterMap().size());
+        var parameterMap = new HashMap<String, List<String>>(request.getParameterMap().size());
 
-        for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+        for (var entry : request.getParameterMap().entrySet()) {
             parameterMap.put(entry.getKey(), asList(entry.getValue()));
         }
 
@@ -286,9 +282,9 @@ public final class Servlets {
      * @see #getRequestQueryString(HttpServletRequest)
      */
     public static String getRequestURIWithQueryString(HttpServletRequest request) {
-        String requestURI = getRequestURI(request);
-        String queryString = getRequestQueryString(request);
-        return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
+        var requestURI = getRequestURI(request);
+        var queryString = getRequestQueryString(request);
+        return queryString == null ? requestURI : requestURI + "?" + queryString;
     }
 
     /**
@@ -344,19 +340,19 @@ public final class Servlets {
      * @since 1.7
      */
     public static Map<String, List<String>> toParameterMap(String queryString) {
-        String[] parameters = queryString.split(quote("&"));
-        Map<String, List<String>> parameterMap = new LinkedHashMap<>(parameters.length);
+        var parameters = queryString.split(quote("&"));
+        var parameterMap = new LinkedHashMap<String, List<String>>(parameters.length);
 
-        for (String parameter : parameters) {
+        for (var parameter : parameters) {
             if (parameter.contains("=")) {
-                String[] pair = parameter.split(quote("="));
+                var pair = parameter.split(quote("="));
 
                 if (pair.length == 0) {
                     continue;
                 }
 
-                String key = decodeURLWithFallback(pair[0]);
-                String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURLWithFallback(pair[1]) : "";
+                var key = decodeURLWithFallback(pair[0]);
+                var value = pair.length > 1 && !isEmpty(pair[1]) ? decodeURLWithFallback(pair[1]) : "";
                 addParamToMapIfNecessary(parameterMap, key, value);
             }
         }
@@ -381,16 +377,16 @@ public final class Servlets {
      * @since 2.0
      */
     public static String toQueryString(Map<String, List<String>> parameterMap) {
-        StringBuilder queryString = new StringBuilder();
+        var queryString = new StringBuilder();
 
-        for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
+        for (var entry : parameterMap.entrySet()) {
             if (isEmpty(entry.getKey())) {
                 continue;
             }
 
-            String name = encodeURL(entry.getKey());
+            var name = encodeURL(entry.getKey());
 
-            for (String value : entry.getValue()) {
+            for (var value : entry.getValue()) {
                 if (value == null) {
                     continue;
                 }
@@ -414,14 +410,14 @@ public final class Servlets {
      * @since 2.2
      */
     public static String toQueryString(List<? extends ParamHolder<?>> params) {
-        StringBuilder queryString = new StringBuilder();
+        var queryString = new StringBuilder();
 
-        for (ParamHolder<?> param : params) {
+        for (var param : params) {
             if (isEmpty(param.getName())) {
                 continue;
             }
 
-            String value = param.getValue();
+            var value = param.getValue();
 
             if (value != null) {
                 if (queryString.length() > 0) {
@@ -445,7 +441,7 @@ public final class Servlets {
      * @since 2.3
      */
     public static String getRemoteAddr(HttpServletRequest request) {
-        String forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
+        var forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
         return isEmpty(forwardedFor) ? request.getRemoteAddr() : splitAndTrim(forwardedFor, ",", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
     }
 
@@ -506,12 +502,12 @@ public final class Servlets {
      * @since 2.5
      */
     public static String getSubmittedFileName(Part part) {
-        Map<String, String> entries = headerToMap(part.getHeader("Content-Disposition"));
-        String encodedFileName = entries.get("filename*");
+        var entries = headerToMap(part.getHeader("Content-Disposition"));
+        var encodedFileName = entries.get("filename*");
         String fileName = null;
 
         if (encodedFileName != null) {
-            String[] parts = encodedFileName.split("'", 3);
+            var parts = encodedFileName.split("'", 3);
 
             if (parts.length == 3 && !isEmpty(parts[0])) {
                 try {
@@ -550,22 +546,22 @@ public final class Servlets {
             return emptyMap();
         }
 
-        Map<String, String> map = new HashMap<>();
-        StringBuilder builder = new StringBuilder();
-        boolean quoted = false;
+        var map = new HashMap<String, String>();
+        var builder = new StringBuilder();
+        var quoted = false;
 
-        for (int i = 0; i < header.length(); i++) {
-            char c = header.charAt(i);
+        for (var i = 0; i < header.length(); i++) {
+            var c = header.charAt(i);
             builder.append(c);
 
-            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
+            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || i > 1 && header.charAt(i - 2) == '\\')) {
                 quoted = !quoted;
             }
 
-            if ((!quoted && c == ';') || i + 1 == header.length()) {
-                String[] entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
-                String name = entry[0].toLowerCase();
-                String value = entry.length == 1 ? ""
+            if (!quoted && c == ';' || i + 1 == header.length()) {
+                var entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
+                var name = entry[0].toLowerCase();
+                var value = entry.length == 1 ? ""
                     : entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
                         .replace("\\\"", "\"") // Unescape quotes.
                         .replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
@@ -641,7 +637,7 @@ public final class Servlets {
      * @since 2.6
      */
     public static String formatContentDispositionHeader(String filename, boolean attachment) {
-        return format(CONTENT_DISPOSITION_HEADER, (attachment ? "attachment" : "inline"), encodeURI(filename));
+        return format(CONTENT_DISPOSITION_HEADER, attachment ? "attachment" : "inline", encodeURI(filename));
     }
 
     /**
@@ -671,10 +667,10 @@ public final class Servlets {
      * @since 2.0
      */
     public static String getRequestCookie(HttpServletRequest request, String name) {
-        Cookie[] cookies = request.getCookies();
+        var cookies = request.getCookies();
 
         if (cookies != null) {
-            for (Cookie cookie : cookies) {
+            for (var cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     return decodeURL(cookie.getValue());
                 }
@@ -702,9 +698,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String value, int maxAge)
-    {
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, int maxAge) {
         addResponseCookie(request, response, name, value, getRequestHostname(request), null, maxAge);
     }
 
@@ -728,9 +722,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String value, String path, int maxAge)
-    {
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, String path, int maxAge) {
         addResponseCookie(request, response, name, value, getRequestHostname(request), path, maxAge);
     }
 
@@ -755,10 +747,8 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String value, String domain, String path, int maxAge)
-    {
-        Cookie cookie = new Cookie(name, encodeURL(value));
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, String domain, String path, int maxAge) {
+        var cookie = new Cookie(name, encodeURL(value));
 
         if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
             cookie.setDomain(domain);
@@ -784,9 +774,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String path)
-    {
+    public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String path) {
         addResponseCookie(request, response, name, null, path, 0);
     }
 
@@ -806,18 +794,12 @@ public final class Servlets {
             return Faces.getServletContext();
         }
 
-        BeanManager beanManager = Beans.getManager();
-
-        if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
-            return BeansLocal.getInstance(beanManager, ServletContext.class);
-        }
-        else {
-            // #522 For some reason Weld by default searches for the ServletContext in the request scope.
-            // But this won't work during e.g. startup. So we need to explicitly search in application scope.
-            Bean<ServletContext> bean = BeansLocal.resolve(beanManager, ServletContext.class);
-            Context context = beanManager.getContext(ApplicationScoped.class);
-            return context.get(bean, beanManager.createCreationalContext(bean));
-        }
+        // #522 #831 Explicitly search for ServletContext in ApplicationScoped.class.
+        // Beans.getInstance(ServletContext.class) won't work during startup when using Weld or Quarkus.
+        var beanManager = Beans.getManager();
+        var bean = BeansLocal.resolve(beanManager, ServletContext.class);
+        var context = beanManager.getContext(ApplicationScoped.class);
+        return context.get(bean, beanManager.createCreationalContext(bean));
     }
 
     /**
@@ -844,7 +826,7 @@ public final class Servlets {
      * @since 2.5
      */
     public static Lifecycle getFacesLifecycle(ServletContext context) {
-        String lifecycleId = coalesce(context.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
+        var lifecycleId = coalesce(context.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
         return ((LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY)).getLifecycle(lifecycleId);
     }
 
@@ -931,7 +913,7 @@ public final class Servlets {
      * @since 2.0
      */
     public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, Object... paramValues) {
-        String redirectURL = prepareRedirectURL(request, url, paramValues);
+        var redirectURL = prepareRedirectURL(request, url, paramValues);
 
         try {
             if (isFacesAjaxRequest(request)) {
@@ -959,7 +941,7 @@ public final class Servlets {
      * @since 3.14
      */
     public static URL getWebXmlURL(ServletContext context) throws IOException {
-        URL webXml = context.getResource(WEB_XML);
+        var webXml = context.getResource(WEB_XML);
         return webXml != null ? webXml : Thread.currentThread().getContextClassLoader().getResource(QUARKUS_WEB_XML);
     }
 
@@ -969,7 +951,7 @@ public final class Servlets {
      * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
      */
     static String prepareRedirectURL(HttpServletRequest request, String url, Object... paramValues) {
-        String redirectURL = url;
+        var redirectURL = url;
 
         if (!startsWithOneOf(url, "http://", "https://", "/")) {
             redirectURL = request.getContextPath() + "/" + url;
@@ -979,11 +961,11 @@ public final class Servlets {
             return redirectURL;
         }
 
-        Object[] encodedParams = new Object[paramValues.length];
+        var encodedParams = new Object[paramValues.length];
 
-        for (int i = 0; i < paramValues.length; i++) {
-            Object paramValue = paramValues[i];
-            encodedParams[i] = (paramValue instanceof String) ? encodeURL((String) paramValue) : paramValue;
+        for (var i = 0; i < paramValues.length; i++) {
+            var paramValue = paramValues[i];
+            encodedParams[i] = paramValue instanceof String ? encodeURL((String) paramValue) : paramValue;
         }
 
         return format(redirectURL, encodedParams);
