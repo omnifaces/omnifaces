@@ -25,7 +25,7 @@ import jakarta.faces.model.SelectItem;
  */
 public class SelectItemsBuilder {
 
-    private List<SelectItem> selectItems = new ArrayList<>();
+    private final List<SelectItem> selectItems = new ArrayList<>();
 
     public SelectItemsBuilder add(Object value, String label) {
         selectItems.add(new SelectItem(value, label));

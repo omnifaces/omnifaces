@@ -187,7 +187,7 @@ final class DeferredTagHandlerHelper {
 
         private static final long serialVersionUID = 1L;
 
-        private Map<String, ValueExpression> attributes;
+        private final Map<String, ValueExpression> attributes;
 
         private DeferredAttributes() {
             attributes = new HashMap<>();
@@ -217,8 +217,8 @@ final class DeferredTagHandlerHelper {
      */
     static class DeferredTagHandlerDelegate extends TagHandlerDelegate implements AttachedObjectHandler {
 
-        private DelegatingMetaTagHandler tag;
-        private TagHandlerDelegate delegate;
+        private final DelegatingMetaTagHandler tag;
+        private final TagHandlerDelegate delegate;
 
         public DeferredTagHandlerDelegate(DelegatingMetaTagHandler tag, TagHandlerDelegate delegate) {
             this.tag = tag;

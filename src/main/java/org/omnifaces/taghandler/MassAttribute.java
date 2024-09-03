@@ -96,8 +96,8 @@ public class MassAttribute extends TagHandler {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private String name;
-    private TagAttribute value;
+    private final String name;
+    private final TagAttribute value;
     private Class<UIComponent>[] targetClasses;
 
     // Constructors ---------------------------------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import static org.omnifaces.util.Facelets.getStringLiteral;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -97,9 +98,9 @@ public class ImportFunctions extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String varValue;
-    private TagAttribute typeAttribute;
-    private TagAttribute loaderAttribute;
+    private final String varValue;
+    private final TagAttribute typeAttribute;
+    private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -174,9 +175,9 @@ public class ImportFunctions extends TagHandler {
 
     private static class ImportFunctionsMapper extends FunctionMapper {
 
-        private FunctionMapper originalFunctionMapper;
-        private String var;
-        private Class<?> type;
+        private final FunctionMapper originalFunctionMapper;
+        private final String var;
+        private final Class<?> type;
 
         public ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
             this.originalFunctionMapper = originalFunctionMapper;

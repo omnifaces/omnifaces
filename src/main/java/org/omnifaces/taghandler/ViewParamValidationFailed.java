@@ -288,7 +288,7 @@ public class ViewParamValidationFailed extends TagHandler {
                     format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
             }
 
-            responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
+            responseSendError(context, Integer.parseInt(evaluatedSendError), evaluatedMessage);
         }
     }
 
