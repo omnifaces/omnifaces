@@ -73,6 +73,7 @@ public class ParamIT extends OmniFacesIT {
     public static WebArchive createDeployment() {
         return buildWebArchive(ParamIT.class)
             .withWebXml(WebXml.withInterpretEmptyStringSubmittedValuesAsNull)
+            //.withFacesConfig(FacesConfig.basic)
             .createDeployment();
     }
 

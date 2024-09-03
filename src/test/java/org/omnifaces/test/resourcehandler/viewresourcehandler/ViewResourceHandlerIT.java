@@ -69,7 +69,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 
             String actualPageSource;
 
-            try (Scanner scanner = new Scanner(connection.getInputStream(), UTF_8.name())) {
+            try (Scanner scanner = new Scanner(connection.getInputStream(), UTF_8)) {
                 actualPageSource = scanner.useDelimiter("\\A").next();
             }
 
