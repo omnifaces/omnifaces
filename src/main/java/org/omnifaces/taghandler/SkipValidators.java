@@ -138,8 +138,8 @@ public class SkipValidators extends TagHandler {
      */
     static class SkipValidatorsEventListener implements SystemEventListener {
 
-        private Map<String, Object> attributes = new HashMap<>();
-        private Map<String, Validator<?>[]> allValidators = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Validator<?>[]> allValidators = new HashMap<>();
 
         @Override
         public boolean isListenerForSource(Object source) {

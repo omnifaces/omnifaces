@@ -98,9 +98,9 @@ public class ImportFunctions extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String varValue;
-    private TagAttribute typeAttribute;
-    private TagAttribute loaderAttribute;
+    private final String varValue;
+    private final TagAttribute typeAttribute;
+    private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -178,9 +178,9 @@ public class ImportFunctions extends TagHandler {
         /** a {@link Comparator} based on the Method's parameter count */
         private static final Comparator<Method> METHOD_PARAM_COUNT_COMPARATOR = Comparator.comparingInt(Method::getParameterCount);
 
-        private FunctionMapper originalFunctionMapper;
-        private String var;
-        private Class<?> type;
+        private final FunctionMapper originalFunctionMapper;
+        private final String var;
+        private final Class<?> type;
 
         public ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
             this.originalFunctionMapper = originalFunctionMapper;

@@ -64,9 +64,9 @@ public class LoadBundle extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String varValue;
-    private TagAttribute basenameAttribute;
-    private TagAttribute loaderAttribute;
+    private final String varValue;
+    private final TagAttribute basenameAttribute;
+    private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ public class LoadBundle extends TagHandler {
 
         private static final long serialVersionUID = 1L;
 
-        private transient ResourceBundle bundle;
+        private final transient ResourceBundle bundle;
 
         public BundleMap(ResourceBundle bundle) {
             super(list(bundle.getKeys()).stream().collect(toUnmodifiableMap(identity(), bundle::getString)));
