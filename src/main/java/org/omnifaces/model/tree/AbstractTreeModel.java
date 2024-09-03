@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A base implementation of {@link TreeModel}. Implementors basically only need to implement {@link #createChildren()}
@@ -37,6 +40,8 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     private static final long serialVersionUID = 1L;
 
     // Properties -----------------------------------------------------------------------------------------------------
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     private T data;
     private AbstractTreeModel<T> parent;
@@ -86,7 +91,8 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     @Override
     public TreeModel<T> remove() {
         if (!isRoot()) {
-            synchronized (parent.children) {
+
+            execAtomic(lock, () -> {
                 parent.children.remove(this);
 
                 // Fix the indexes of the children (that's why it needs to be synchronized).
@@ -95,7 +101,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
                     ((AbstractTreeModel<T>) child).index = newIndex;
                     newIndex++;
                 }
-            }
+            });
         }
 
         return parent;
@@ -242,7 +248,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
             return true;
         }
 
-        if (thiz.data == null ? other.data != null : !thiz.data.equals(other.data)) {
+        if (!Objects.equals(thiz.data, other.data)) {
             return false;
         }
 
@@ -266,16 +272,43 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int hashCode = 1;
-        hashCode = prime * hashCode + ((data == null) ? 0 : data.hashCode());
-        hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
-        return hashCode;
+        return Objects.hash(data, children);
     }
 
     @Override
     public String toString() {
         return (data == null ? "" : data) + "" + (children == null ? "" : children);
+    }
+
+    // Concurrency ----------------------------------------------------------------------------------------------------
+
+    /**
+     * A {@link FunctionalInterface} to be used with {@link #execAtomic(Lock, Action)}
+     * @since 4.6
+     */
+    @FunctionalInterface
+    public interface Action {
+        void execute() throws Exception;
+    }
+
+    /**
+     * Execute the passed task and return the computed result atomically using the passed lock.
+     * @param lock The {@link Lock} to be used for atomic execution
+     * @param task The {@link FunctionalInterface} to be executed atomically
+     * @since 4.6
+     */
+    public static void execAtomic(Lock lock, Action task) {
+        lock.lock();
+
+        try {
+            task.execute();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 }
