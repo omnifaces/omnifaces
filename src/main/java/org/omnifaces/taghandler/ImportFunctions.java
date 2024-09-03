@@ -19,7 +19,6 @@ import static org.omnifaces.util.Facelets.getStringLiteral;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
