@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Faces.createResource;
-import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
 import java.io.IOException;
@@ -312,7 +312,7 @@ public final class Ajax {
             throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
         }
 
-        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8.name())) {
+        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8)) {
             oncomplete(scanner.useDelimiter("\\A").next());
         }
         catch (IOException e) {
@@ -328,11 +328,23 @@ public final class Ajax {
      * @see OmniPartialViewContext#addCallbackScript(String)
      */
     public static void oncomplete(String... scripts) {
-        if (!isAjaxRequestWithPartialRendering()) {
+        oncomplete(Faces.getContext(), scripts);
+    }
+
+    /**
+     * Execute the given scripts on complete of the current ajax response.
+     * @param facesContext The current {@link FacesContext}
+     * @param scripts The scripts to be executed.
+     * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+     * {@link Components#addScript(String)} instead.
+     * @see OmniPartialViewContext#addCallbackScript(String)
+     */
+    public static void oncomplete(FacesContext facesContext, String... scripts) {
+        if (!isAjaxRequestWithPartialRendering(facesContext)) {
             throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
         }
 
-        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
+        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance(facesContext);
 
         for (String script : scripts) {
             context.addCallbackScript(script);
