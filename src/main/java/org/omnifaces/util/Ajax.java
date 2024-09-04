@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Faces.createResource;
-import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
 import java.io.IOException;
@@ -93,14 +93,14 @@ public final class Ajax {
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final String ERROR_NO_SCRIPT_RESOURCE =
-        "";
+            "";
     private static final String ERROR_NO_PARTIAL_RENDERING =
-        "The current request is not an ajax request with partial rendering."
-            + " Use Components#addScriptXxx() methods instead.";
+            "The current request is not an ajax request with partial rendering."
+                    + " Use Components#addScriptXxx() methods instead.";
     private static final String ERROR_ARGUMENTS_LENGTH =
-        "The arguments length must be even. Encountered %d items.";
+            "The arguments length must be even. Encountered %d items.";
     private static final String ERROR_ARGUMENT_TYPE =
-        "The argument name must be a String. Encountered type '%s' with value '%s'.";
+            "The argument name must be a String. Encountered type '%s' with value '%s'.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -306,14 +306,15 @@ public final class Ajax {
      * @since 2.3
      */
     public static void load(String libraryName, String resourceName) {
-        Resource resource = createResource(libraryName, resourceName);
+        final FacesContext facesContext = FacesContext.getCurrentInstance();
+        Resource resource = FacesLocal.createResource(facesContext, libraryName, resourceName);
 
         if (resource == null) {
             throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
         }
 
         try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8)) {
-            oncomplete(scanner.useDelimiter("\\A").next());
+            oncomplete(facesContext, scanner.useDelimiter("\\A").next());
         }
         catch (IOException e) {
             throw new FacesException(e);
@@ -328,11 +329,24 @@ public final class Ajax {
      * @see OmniPartialViewContext#addCallbackScript(String)
      */
     public static void oncomplete(String... scripts) {
-        if (!isAjaxRequestWithPartialRendering()) {
+        oncomplete(Faces.getContext(), scripts);
+    }
+
+    /**
+     * Execute the given scripts on complete of the current ajax response.
+     * @param facesContext The current {@link FacesContext}
+     * @param scripts The scripts to be executed.
+     * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+     * {@link Components#addScript(String)} instead.
+     * @see OmniPartialViewContext#addCallbackScript(String)
+     * @since 4.6
+     */
+    public static void oncomplete(FacesContext facesContext, String... scripts) {
+        if (!isAjaxRequestWithPartialRendering(facesContext)) {
             throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
         }
 
-        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
+        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance(facesContext);
 
         for (String script : scripts) {
             context.addCallbackScript(script);
