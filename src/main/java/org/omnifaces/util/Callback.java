@@ -33,7 +33,10 @@ import org.omnifaces.el.ReadOnlyValueExpression;
  * </ul>
  *
  * @author Bauke Scholtz
+ * @deprecated Use {@link FunctionalInterfaces} instead. Main reason is utilizing improved naming conventions matching
+ * those of the new functional interfaces introduced in Java 1.8.
  */
+@Deprecated(since = "4.6", forRemoval = true)
 public final class Callback {
 
     // Interfaces -----------------------------------------------------------------------------------------------------
