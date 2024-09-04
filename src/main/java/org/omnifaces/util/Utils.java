@@ -235,13 +235,7 @@ public final class Utils {
      * @since 1.8
      */
     public static boolean isAnyEmpty(Object... values) {
-        for (var value : values) {
-            if (isEmpty(value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(values).anyMatch(Utils::isEmpty);
     }
 
     /**
@@ -304,13 +298,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static <T> T coalesce(T... objects) {
-        for (var object : objects) {
-            if (object != null) {
-                return object;
-            }
-        }
-
-        return null;
+        return stream(objects).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -322,13 +310,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static <T> boolean isOneOf(T object, T... objects) {
-        for (var other : objects) {
-            if (Objects.equals(object, other)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(objects).anyMatch(other -> Objects.equals(object, other));
     }
 
     /**
@@ -339,13 +321,7 @@ public final class Utils {
      * @since 1.4
      */
     public static boolean startsWithOneOf(String string, String... prefixes) {
-        for (var prefix : prefixes) {
-            if (string.startsWith(prefix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(prefixes).anyMatch(string::startsWith);
     }
 
     /**
@@ -356,13 +332,7 @@ public final class Utils {
      * @since 3.1
      */
     public static boolean endsWithOneOf(String string, String... suffixes) {
-        for (var suffix : suffixes) {
-            if (string.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(suffixes).anyMatch(string::endsWith);
     }
 
     /**
@@ -373,13 +343,7 @@ public final class Utils {
      * @since 2.0
      */
     public static boolean isOneInstanceOf(Class<?> cls, Class<?>... classes) {
-        for (var other : classes) {
-            if (cls == null ? other == null : other.isAssignableFrom(cls)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(classes).anyMatch(other -> cls == null ? other == null : other.isAssignableFrom(cls));
     }
 
     /**
@@ -391,13 +355,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static boolean isOneAnnotationPresent(Class<?> cls, Class<? extends Annotation>... annotations) {
-        for (var annotation : annotations) {
-            if (cls.isAnnotationPresent(annotation)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(annotations).anyMatch(cls::isAnnotationPresent);
     }
 
     /**
@@ -615,14 +573,10 @@ public final class Utils {
 
         for (var value : values) {
             if (value instanceof Object[]) {
-                for (var item : (Object[]) value) {
-                    set.add((E) item);
-                }
+                stream((E[]) value).forEach(set::add);
             }
             else if (value instanceof Collection<?>) {
-                for (var item : (Collection<?>) value) {
-                    set.add((E) item);
-                }
+                stream((Collection<E>) value).forEach(set::add);
             }
             else {
                 set.add((E) value);
@@ -653,10 +607,7 @@ public final class Utils {
         }
         else {
             var list = new ArrayList<E>();
-            for (var element : iterable) {
-                list.add(element);
-            }
-
+            iterable.forEach(list::add);
             return list;
         }
     }
@@ -732,11 +683,7 @@ public final class Utils {
      */
     public static <T> Map<T, T> reverse(Map<T, T> source) {
         var target = new HashMap<T, T>();
-
-        for (var entry : source.entrySet()) {
-            target.put(entry.getValue(), entry.getKey());
-        }
-
+        source.entrySet().forEach(entry -> target.put(entry.getValue(), entry.getKey()));
         return target;
     }
 
@@ -750,14 +697,7 @@ public final class Utils {
      */
     public static boolean containsByClassName(Collection<?> objects, String className) {
         var cls = toClassOrNull(className);
-
-        for (var object : objects) {
-            if (object.getClass() == cls) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(objects).anyMatch(object -> object.getClass() == cls);
     }
 
     /**
@@ -1180,7 +1120,7 @@ public final class Utils {
         }
 
         try {
-            InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
+            var raw = new ByteArrayInputStream(string.getBytes(UTF_8));
             var deflated = new ByteArrayOutputStream();
             stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(deflated.toByteArray());
@@ -1205,7 +1145,7 @@ public final class Utils {
         }
 
         try {
-            InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
+            var deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
             return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
         }
         catch (UnsupportedEncodingException e) {

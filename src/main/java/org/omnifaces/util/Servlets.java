@@ -253,11 +253,7 @@ public final class Servlets {
      */
     public static Map<String, List<String>> getRequestParameterMap(HttpServletRequest request) {
         var parameterMap = new HashMap<String, List<String>>(request.getParameterMap().size());
-
-        for (var entry : request.getParameterMap().entrySet()) {
-            parameterMap.put(entry.getKey(), asList(entry.getValue()));
-        }
-
+        request.getParameterMap().entrySet().forEach(entry -> parameterMap.put(entry.getKey(), asList(entry.getValue())));
         return parameterMap;
     }
 

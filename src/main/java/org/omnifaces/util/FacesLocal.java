@@ -15,9 +15,9 @@ package org.omnifaces.util;
 import static jakarta.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
 import static java.util.logging.Level.FINEST;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
@@ -51,7 +51,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -586,7 +585,7 @@ public final class FacesLocal {
             return new LinkedHashMap<>(0);
         }
 
-        Map<String, List<String>> parameterMap = new LinkedHashMap<>(viewParameters.size());
+        var parameterMap = new LinkedHashMap<String, List<String>>(viewParameters.size());
 
         for (var viewParameter : viewParameters) {
             var value = viewParameter.getStringValue(context);
@@ -619,7 +618,7 @@ public final class FacesLocal {
             return new LinkedHashMap<>(0);
         }
 
-        Map<String, List<String>> parameterMap = new LinkedHashMap<>(hashParameters.size());
+        var parameterMap = new LinkedHashMap<String, List<String>>(hashParameters.size());
 
         for (var hashParameter : hashParameters) {
             if (isEmpty(hashParameter.getName())) {
@@ -794,12 +793,8 @@ public final class FacesLocal {
      */
     public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
         var resourceBundles = FacesConfigXml.instance().getResourceBundles();
-        Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
-
-        for (var var : resourceBundles.keySet()) {
-            map.put(var, getResourceBundle(context, var));
-        }
-
+        var map = new HashMap<String, ResourceBundle>(resourceBundles.size());
+        resourceBundles.keySet().forEach(var -> map.put(var, getResourceBundle(context, var)));
         return map;
     }
 
@@ -850,11 +845,7 @@ public final class FacesLocal {
         var map = new HashMap<String, List<String>>();
 
         if (params != null) {
-            for (var param : params.entrySet()) {
-                for (String value : param.getValue()) {
-                    addParamToMapIfNecessary(map, param.getKey(), value);
-                }
-            }
+            params.entrySet().forEach(param -> param.getValue().forEach(value -> addParamToMapIfNecessary(map, param.getKey(), value)));
         }
 
         return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
@@ -884,9 +875,7 @@ public final class FacesLocal {
         var map = new HashMap<String, List<String>>();
 
         if (params != null) {
-            for (var param : params) {
-                addParamToMapIfNecessary(map, param.getName(), param.getValue());
-            }
+            params.forEach(param -> addParamToMapIfNecessary(map, param.getName(), param.getValue()));
         }
 
         return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
@@ -1065,15 +1054,7 @@ public final class FacesLocal {
      */
     public static Collection<Part> getRequestParts(FacesContext context, String name) {
         try {
-            var parts = new ArrayList<Part>();
-
-            for (var part : getRequest(context).getParts()) {
-                if (name.equals(part.getName())) {
-                    parts.add(part);
-                }
-            }
-
-            return unmodifiableList(parts);
+            return getRequest(context).getParts().stream().filter(part -> name.equals(part.getName())).collect(toUnmodifiableList());
         }
         catch (ServletException | IOException e) {
             throw new FacesException(e);
@@ -1433,7 +1414,7 @@ public final class FacesLocal {
      * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
      */
     public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
-        addResponseCookie(context, name, value, domain, path, maxAge, true, null);
+        addResponseCookie(context, name, value, domain, path, maxAge, httpOnly, null);
     }
 
     /**
