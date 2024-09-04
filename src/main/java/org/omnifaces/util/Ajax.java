@@ -12,27 +12,14 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.omnifaces.util.Components.getCurrentComponent;
-import static org.omnifaces.util.Components.getCurrentForm;
-import static org.omnifaces.util.Faces.createResource;
-import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
-
 import java.beans.Introspector;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
 
-import jakarta.faces.FacesException;
-import jakarta.faces.application.Resource;
 import jakarta.faces.component.UIColumn;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIData;
-import jakarta.faces.component.UINamingContainer;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.PartialViewContext;
 
@@ -87,20 +74,9 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * @see Json
  * @see OmniPartialViewContext
  * @see OmniPartialViewContextFactory
+ * @see AjaxLocal
  */
 public final class Ajax {
-
-    // Constants ------------------------------------------------------------------------------------------------------
-
-    private static final String ERROR_NO_SCRIPT_RESOURCE =
-        "";
-    private static final String ERROR_NO_PARTIAL_RENDERING =
-        "The current request is not an ajax request with partial rendering."
-            + " Use Components#addScriptXxx() methods instead.";
-    private static final String ERROR_ARGUMENTS_LENGTH =
-        "The arguments length must be even. Encountered %d items.";
-    private static final String ERROR_ARGUMENT_TYPE =
-        "The argument name must be a String. Encountered type '%s' with value '%s'.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -120,7 +96,7 @@ public final class Ajax {
      * @see FacesContext#getPartialViewContext()
      */
     public static PartialViewContext getContext() {
-        return Faces.getContext().getPartialViewContext();
+        return AjaxLocal.getContext(Faces.getContext());
     }
 
     /**
@@ -134,31 +110,7 @@ public final class Ajax {
      * @see PartialViewContext#getRenderIds()
      */
     public static void update(String... clientIds) {
-        PartialViewContext context = getContext();
-        Collection<String> renderIds = context.getRenderIds();
-
-        for (String clientId : clientIds) {
-            if (clientId.charAt(0) != '@') {
-                renderIds.add(clientId);
-            }
-            else if ("@all".equals(clientId)) {
-                context.setRenderAll(true);
-            }
-            else if ("@form".equals(clientId)) {
-                UIComponent currentForm = getCurrentForm();
-
-                if (currentForm != null) {
-                    renderIds.add(currentForm.getClientId());
-                }
-            }
-            else if ("@this".equals(clientId)) {
-                UIComponent currentComponent = getCurrentComponent();
-
-                if (currentComponent != null) {
-                    renderIds.add(currentComponent.getClientId());
-                }
-            }
-        }
+        AjaxLocal.update(Faces.getContext(), clientIds);
     }
 
     /**
@@ -167,7 +119,7 @@ public final class Ajax {
      * @since 1.5
      */
     public static void updateAll() {
-        getContext().setRenderAll(true);
+        AjaxLocal.updateAll(Faces.getContext());
     }
 
     /**
@@ -183,53 +135,7 @@ public final class Ajax {
      * @since 1.3
      */
     public static void updateRow(UIData table, int index) {
-        if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
-            return;
-        }
-
-        updateRowCells(table, index);
-    }
-
-    private static void updateRowCells(UIData table, int index) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        String parentId = table.getParent().getNamingContainer().getClientId(context);
-        String tableId = table.getId();
-        char separator = UINamingContainer.getSeparatorChar(context);
-        Collection<String> renderIds = getContext().getRenderIds();
-
-        for (UIComponent column : table.getChildren()) {
-            if (column instanceof UIColumn) {
-                if (!column.isRendered()) {
-                    continue;
-                }
-
-                for (UIComponent cell : column.getChildren()) {
-                    if (!cell.isRendered()) {
-                        continue;
-                    }
-
-                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
-                }
-            }
-            else if (column instanceof UIData) { // <p:columns>.
-                updateRowCells((UIData) column, renderIds, tableId, index, separator);
-            }
-        }
-    }
-
-    private static void updateRowCells(UIData columns, Collection<String> renderIds, String tableId, int index, char separator) {
-        String columnId = columns.getId();
-        int columnCount = columns.getRowCount();
-
-        for (UIComponent cell : columns.getChildren()) {
-            if (!cell.isRendered()) {
-                continue;
-            }
-
-            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-                renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
-            }
-        }
+        AjaxLocal.updateRow(Faces.getContext(), table, index);
     }
 
     /**
@@ -247,52 +153,7 @@ public final class Ajax {
      * @since 1.3
      */
     public static void updateColumn(UIData table, int index) {
-        if (index < 0 || table.getRowCount() < 1 || index > table.getChildCount()) {
-            return;
-        }
-
-        int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
-
-        if (rowCount == 0) {
-            return;
-        }
-
-        updateColumnCells(table, index, rowCount);
-    }
-
-    private static void updateColumnCells(UIData table, int index, int rowCount) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        String parentId = table.getParent().getNamingContainer().getClientId(context);
-        String tableId = table.getId();
-        char separator = UINamingContainer.getSeparatorChar(context);
-        Collection<String> renderIds = getContext().getRenderIds();
-        UIColumn column = findColumn(table, index);
-
-        if (column != null && column.isRendered()) {
-            for (UIComponent cell : column.getChildren()) {
-                if (!cell.isRendered()) {
-                    continue;
-                }
-
-                String cellId = cell.getId();
-
-                for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, rowIndex, separator, cellId));
-                }
-            }
-        }
-    }
-
-    private static UIColumn findColumn(UIData table, int index) {
-        int columnIndex = 0;
-
-        for (UIComponent column : table.getChildren()) {
-            if (column instanceof UIColumn && columnIndex++ == index) {
-                return (UIColumn) column;
-            }
-        }
-
-        return null;
+        AjaxLocal.updateColumn(Faces.getContext(), table, index);
     }
 
     /**
@@ -306,18 +167,7 @@ public final class Ajax {
      * @since 2.3
      */
     public static void load(String libraryName, String resourceName) {
-        Resource resource = createResource(libraryName, resourceName);
-
-        if (resource == null) {
-            throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
-        }
-
-        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8)) {
-            oncomplete(scanner.useDelimiter("\\A").next());
-        }
-        catch (IOException e) {
-            throw new FacesException(e);
-        }
+        AjaxLocal.load(Faces.getContext(), libraryName, resourceName);
     }
 
     /**
@@ -328,15 +178,7 @@ public final class Ajax {
      * @see OmniPartialViewContext#addCallbackScript(String)
      */
     public static void oncomplete(String... scripts) {
-        if (!isAjaxRequestWithPartialRendering()) {
-            throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
-        }
-
-        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
-
-        for (String script : scripts) {
-            context.addCallbackScript(script);
-        }
+        AjaxLocal.oncomplete(Faces.getContext(), scripts);
     }
 
     /**
@@ -347,7 +189,7 @@ public final class Ajax {
      * @see OmniPartialViewContext#addArgument(String, Object)
      */
     public static void data(String name, Object value) {
-        OmniPartialViewContext.getCurrentInstance().addArgument(name, value);
+        AjaxLocal.data(Faces.getContext(), name, value);
     }
 
     /**
@@ -359,20 +201,7 @@ public final class Ajax {
      * @see OmniPartialViewContext#addArgument(String, Object)
      */
     public static void data(Object... namesValues) {
-        if (namesValues.length % 2 != 0) {
-            throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
-        }
-
-        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
-
-        for (int i = 0; i < namesValues.length; i+= 2) {
-            if (!(namesValues[i] instanceof String)) {
-                String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
-                throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
-            }
-
-            context.addArgument((String) namesValues[i], namesValues[i + 1]);
-        }
+        AjaxLocal.data(Faces.getContext(), namesValues);
     }
 
     /**
@@ -382,11 +211,7 @@ public final class Ajax {
      * @see OmniPartialViewContext#addArgument(String, Object)
      */
     public static void data(Map<String, Object> data) {
-        OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
-
-        for (Entry<String, Object> entry : data.entrySet()) {
-            context.addArgument(entry.getKey(), entry.getValue());
-        }
+        AjaxLocal.data(Faces.getContext(), data);
     }
 
     /**
@@ -396,7 +221,7 @@ public final class Ajax {
      * @since 3.6
      */
     public static boolean isExecuted(String clientId) {
-        return getContext().getExecuteIds().contains(clientId);
+        return AjaxLocal.isExecuted(Faces.getContext(), clientId);
     }
 
 }
