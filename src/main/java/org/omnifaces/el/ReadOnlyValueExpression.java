@@ -141,7 +141,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
     /**
      * Sets the functional interface that will be called when the value expression is resolved
      *
-     * @param callbackReturning functional interface returning what the value expression will return
+     * @param callback functional interface returning what the value expression will return
      * @since 2.1
      */
     public void setCallback(SerializableSupplier<Object> callback) {

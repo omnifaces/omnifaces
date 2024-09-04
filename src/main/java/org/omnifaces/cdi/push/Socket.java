@@ -609,7 +609,7 @@ import org.omnifaces.util.State;
  * }
  * </pre>
  * <p>
- * Note that OmniFaces own {@link Callback} interfaces are insuitable as it is not allowed to use WAR (front end)
+ * Note that OmniFaces own {@link FunctionalInterface} interfaces are insuitable as it is not allowed to use WAR (front end)
  * frameworks and libraries like Faces and OmniFaces in EAR/EJB (back end) side.
  *
  *
