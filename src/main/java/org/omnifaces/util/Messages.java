@@ -126,6 +126,7 @@ import org.omnifaces.cdi.Startup;
  * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
  * @author Bauke Scholtz
+ * @see MessagesLocal
  */
 public final class Messages {
 

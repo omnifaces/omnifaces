@@ -21,11 +21,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.spi.AlterableContext;
-import jakarta.enterprise.context.spi.Context;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.Typed;
 import jakarta.enterprise.inject.spi.Annotated;
@@ -46,6 +44,7 @@ import org.omnifaces.cdi.beans.InjectionPointGenerator;
  *
  * @author Bauke Scholtz
  * @since 2.0
+ * @see Beans
  */
 @Typed
 public final class BeansLocal {
@@ -67,7 +66,7 @@ public final class BeansLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
-        Set<Bean<?>> beans = beanManager.getBeans(beanClass, qualifiers);
+        var beans = beanManager.getBeans(beanClass, qualifiers);
 
         for (Bean<?> bean : beans) {
             if (bean.getBeanClass() == beanClass) {
@@ -83,7 +82,7 @@ public final class BeansLocal {
      */
     public static <T> Bean<T> resolveExact(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
         Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
-        return (bean != null) && (bean.getBeanClass() == beanClass) ? bean : null;
+        return bean != null && bean.getBeanClass() == beanClass ? bean : null;
     }
 
     /**
@@ -91,7 +90,7 @@ public final class BeansLocal {
      */
     public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
         Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
-        return (bean != null) ? getReference(beanManager, bean, beanClass) : null;
+        return bean != null ? getReference(beanManager, bean, beanClass) : null;
     }
 
     /**
@@ -118,14 +117,14 @@ public final class BeansLocal {
      */
     public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create, Annotation... qualifiers) {
         Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
-        return (bean != null) ? getInstance(beanManager, bean, create) : null;
+        return bean != null ? getInstance(beanManager, bean, create) : null;
     }
 
     /**
      * @see Beans#getInstance(Bean, boolean)
      */
     public static <T> T getInstance(BeanManager beanManager, Bean<T> bean, boolean create) {
-        Context context = beanManager.getContext(bean.getScope());
+        var context = beanManager.getContext(bean.getScope());
 
         if (create) {
             return context.get(bean, beanManager.createCreationalContext(bean));
@@ -140,9 +139,9 @@ public final class BeansLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(BeanManager beanManager, String name, boolean create) {
-        Set<Bean<?>> beans = beanManager.getBeans(name);
+        var beans = beanManager.getBeans(name);
         Bean<?> bean = beanManager.resolve(beans);
-        return (bean != null) ? (T) getInstance(beanManager, bean, create) : null;
+        return bean != null ? (T) getInstance(beanManager, bean, create) : null;
     }
 
     /**
@@ -191,8 +190,8 @@ public final class BeansLocal {
      */
     public static <S extends Annotation> Map<Object, String> getActiveInstances(BeanManager beanManager, Class<S> scope) {
         Map<Object, String> activeInstances = new HashMap<>();
-        Set<Bean<?>> beans = beanManager.getBeans(Object.class);
-        Context context = beanManager.getContext(scope);
+        var beans = beanManager.getBeans(Object.class);
+        var context = beanManager.getContext(scope);
 
         for (Bean<?> bean : beans) {
             Object instance = context.get(bean);
@@ -220,13 +219,13 @@ public final class BeansLocal {
      * @see Beans#destroy(Bean)
      */
     public static <T> void destroy(BeanManager beanManager, Bean<T> bean) {
-        Context context = beanManager.getContext(bean.getScope());
+        var context = beanManager.getContext(bean.getScope());
 
         if (context instanceof AlterableContext) {
             ((AlterableContext) context).destroy(bean);
         }
         else {
-            T instance = context.get(bean);
+            var instance = context.get(bean);
 
             if (instance != null) {
                 destroy(beanManager, bean, instance);
@@ -240,11 +239,11 @@ public final class BeansLocal {
     @SuppressWarnings("unchecked")
     public static <T> void destroy(BeanManager beanManager, T instance) {
         if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
-            destroy(beanManager, (Class<T>) instance, new Annotation[0]);
+            destroy(beanManager, (Class<T>) instance);
         }
         else {
             for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {
-                Bean<T> bean = (Bean<T>) resolve(beanManager, beanClass);
+                var bean = (Bean<T>) resolve(beanManager, beanClass);
 
                 if (bean != null) {
                     destroy(beanManager, bean, instance);
@@ -276,7 +275,7 @@ public final class BeansLocal {
         Queue<Annotation> annotations = new LinkedList<>(annotated.getAnnotations());
 
         while (!annotations.isEmpty()) {
-            Annotation annotation = annotations.remove();
+            var annotation = annotations.remove();
 
             if (annotation.annotationType().equals(annotationType)) {
                 return annotationType.cast(annotation);
@@ -295,7 +294,7 @@ public final class BeansLocal {
      */
     public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
         Bean<InjectionPointGenerator> bean = resolve(beanManager, InjectionPointGenerator.class);
-        return (bean != null) ? (InjectionPoint) beanManager.getInjectableReference(bean.getInjectionPoints().iterator().next(), creationalContext) : null;
+        return bean != null ? (InjectionPoint) beanManager.getInjectableReference(bean.getInjectionPoints().iterator().next(), creationalContext) : null;
     }
 
     /**

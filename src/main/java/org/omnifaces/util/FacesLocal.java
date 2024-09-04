@@ -136,6 +136,7 @@ import org.omnifaces.util.FunctionalInterfaces.ThrowingConsumer;
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @since 1.6
+ * @see Faces
  * @see Servlets
  */
 public final class FacesLocal {
