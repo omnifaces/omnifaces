@@ -63,7 +63,8 @@ public class ViewScopedIT extends OmniFacesIT {
     @Test @Order(1)
     void nonAjax() {
         // Make sure browser is clean during 1st test.
-        browser.manage().deleteAllCookies();
+        teardown();
+        setup();
 
         // Initial load.
         init();
