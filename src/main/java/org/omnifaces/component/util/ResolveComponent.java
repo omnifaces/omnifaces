@@ -32,8 +32,8 @@ import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.taghandler.ComponentExtraHandler;
-import org.omnifaces.util.Callback.SerializableReturning;
 import org.omnifaces.util.Components;
+import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 import org.omnifaces.util.State;
 
 /**
@@ -110,10 +110,10 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     }
 
     private void doProcess() {
-        String forValue = getFor();
+        var forValue = getFor();
 
         if (!isEmpty(forValue)) {
-            UIComponent component = findComponentRelatively(this, forValue);
+            var component = findComponentRelatively(this, forValue);
 
             if (component == null) {
                 component = findComponent(forValue);
@@ -123,12 +123,12 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
 
-            String scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
+            var scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
 
             if (DEFAULT_SCOPE.equals(scope)) {
                 // Component will be resolved again dynamically when the value expression is evaluated.
                 if (readOnlyValueExpression != null) {
-                    readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+                    readOnlyValueExpression.setCallback(new ComponentClientIdResolver(component.getClientId()));
                 }
             }
             else if ("request".equals(scope)) {
@@ -140,7 +140,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
         }
     }
 
-    private static class ComponentClientIdResolver implements SerializableReturning<Object> {
+    private static class ComponentClientIdResolver implements SerializableSupplier<Object> {
 
         private static final long serialVersionUID = 1L;
 
@@ -152,7 +152,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
         }
 
         @Override
-        public Object invoke() {
+        public Object get() {
             if (foundComponent == null) {
                 foundComponent = Components.findComponent(foundComponentId);
             }

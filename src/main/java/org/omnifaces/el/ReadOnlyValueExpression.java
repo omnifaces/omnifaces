@@ -16,7 +16,7 @@ import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
 
-import org.omnifaces.util.Callback;
+import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 
 /**
  * Implementation of a read only value expression that can be used when the value is not yet available at construction time, or when the
@@ -32,7 +32,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     private static final long serialVersionUID = 1L;
 
-    private Callback.SerializableReturning<Object> callback;
+    private SerializableSupplier<Object> callback;
     private Class<?> expectedType;
 
     /**
@@ -40,7 +40,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      * @param callback The functional interface that will be called when the value expression is resolved.
      */
-    public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
+    public ReadOnlyValueExpression(Class<?> expectedType, SerializableSupplier<Object> callback) {
         this(expectedType);
         this.callback = callback;
     }
@@ -63,7 +63,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
     @Override
     public Object getValue(ELContext context) {
         if (callback != null) {
-            return callback.invoke();
+            return callback.get();
         }
 
         return null;
@@ -81,7 +81,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     @Override
     public Class<?> getType(ELContext context) {
-        Object value = getValue(context);
+        var value = getValue(context);
         return value == null ? null : value.getClass();
     }
 
@@ -106,9 +106,9 @@ public class ReadOnlyValueExpression extends ValueExpression {
         }
 
         // Property checks.
-        ReadOnlyValueExpression other = (ReadOnlyValueExpression) object;
-        Object value = getValue(null);
-        Object otherValue = other.getValue(null);
+        var other = (ReadOnlyValueExpression) object;
+        var value = getValue(null);
+        var otherValue = other.getValue(null);
         if (value == null ? otherValue != null : !value.equals(otherValue)) {
             return false;
         }
@@ -119,7 +119,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     @Override
     public int hashCode() {
-        Object value = getValue(null);
+        var value = getValue(null);
         return value == null ? 0 : value.hashCode();
     }
 
@@ -134,7 +134,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
      * @return the functional interface that will be called when the value expression is resolved
      * @since 2.1
      */
-    public Callback.SerializableReturning<Object> getCallbackReturning() {
+    public SerializableSupplier<Object> getCallback() {
         return callback;
     }
 
@@ -144,8 +144,8 @@ public class ReadOnlyValueExpression extends ValueExpression {
      * @param callbackReturning functional interface returning what the value expression will return
      * @since 2.1
      */
-    public void setCallbackReturning(Callback.SerializableReturning<Object> callbackReturning) {
-        this.callback = callbackReturning;
+    public void setCallback(SerializableSupplier<Object> callback) {
+        this.callback = callback;
     }
 
 }
