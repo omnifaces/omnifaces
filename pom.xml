@@ -68,7 +68,7 @@
         <maven.source.excludeResources>true</maven.source.excludeResources>
 
         <!-- Test server versions. -->
-        <test.wildfly-mojarra4.version>33.0.1.Final</test.wildfly-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+        <test.wildfly-mojarra4.version>31.0.1.Final</test.wildfly-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.liberty-myfaces3.version>24.0.0.8</test.liberty-myfaces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
         <test.glassfish-mojarra4.version>7.0.17</test.glassfish-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
         <test.tomcat.version>10.1.28</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
@@ -518,7 +518,7 @@
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>5.0.1.Final</version>
+                    <version>5.1.0.Beta4</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
