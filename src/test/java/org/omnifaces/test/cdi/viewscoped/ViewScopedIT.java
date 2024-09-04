@@ -18,8 +18,8 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSession;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.omnifaces.test.OmniFacesIT;
@@ -60,13 +60,15 @@ public class ViewScopedIT extends OmniFacesIT {
             .createDeployment();
     }
 
-    @Test @Order(1)
-    void nonAjax() {
-        // Make sure browser is clean during 1st test.
+    @BeforeEach
+    void resetBrowser() {
+        // Make sure browser is crisp clean before starting each test.
         teardown();
         setup();
+    }
 
-        // Initial load.
+    @Test
+    void nonAjax() {
         init();
         assertEquals("init", getMessagesText());
         var previousBean = bean.getText();
@@ -125,11 +127,10 @@ public class ViewScopedIT extends OmniFacesIT {
         assertEquals("unload init", getMessagesText());
     }
 
-    @Test @Order(2)
+    @Test
     void ajax() {
-
-        // Unloaded bean is from previous test.
-        assertEquals("unload init", getMessagesText());
+        init();
+        assertEquals("init", getMessagesText());
         var previousBean = bean.getText();
 
 
@@ -181,11 +182,19 @@ public class ViewScopedIT extends OmniFacesIT {
         assertEquals("unload init", getMessagesText());
     }
 
-    @Test @Order(3)
-    void destroyViewState() {
+    @Test
+    void destroyViewStateWithXhtmlMapping() {
+        destroyViewState("ViewScopedIT.xhtml");
+    }
 
-        // Unloaded bean is from previous test.
-        assertEquals("unload init", getMessagesText());
+    @Test
+    void destroyViewStateWithJsfMapping() {
+        destroyViewState("ViewScopedIT.jsf");
+    }
+
+    private void destroyViewState(String pageName) {
+        open(pageName);
+        assertEquals("init", getMessagesText());
         var firstBean = bean.getText();
         var firstTab = browser.getWindowHandle();
 
@@ -216,11 +225,4 @@ public class ViewScopedIT extends OmniFacesIT {
     private String getMessagesText() {
         return messages.getText().replaceAll("\\s+", " ");
     }
-
-    @Test @Order(4)
-    public void destroyViewStateWithJsfMapping() {
-        open("ViewScopedIT.jsf");
-        destroyViewState();
-    }
-
 }

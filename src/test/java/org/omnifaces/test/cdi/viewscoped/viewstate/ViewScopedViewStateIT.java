@@ -18,8 +18,8 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withClientStateSaving;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.omnifaces.test.OmniFacesIT;
@@ -66,10 +66,18 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
             .createDeployment();
     }
 
-    @Test @Order(1)
+    @BeforeEach
+    void resetBrowser() {
+        // Make sure browser is crisp clean before starting each test.
+        teardown();
+        setup();
+    }
+
+    @Test
     void nonAjax() {
+        init();
         assertEquals("init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
 
         // Unload.
@@ -126,10 +134,11 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertEquals("init", getMessagesText());
     }
 
-    @Test @Order(2)
+    @Test
     void ajax() {
+        init();
         assertEquals("init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
 
         // Submit then unload.
@@ -180,16 +189,17 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertEquals("init", getMessagesText());
     }
 
-    @Test @Order(3)
+    @Test
     void copyViewState() {
+        init();
         assertEquals("init", getMessagesText());
-        String firstBean = bean.getText();
+        var firstBean = bean.getText();
         String firstViewState = ajaxViewState.getAttribute("value");
-        String firstTab = browser.getWindowHandle();
+        var firstTab = browser.getWindowHandle();
 
         // Open new tab, copy view state from first tab into second tab and re-execute via ajax.
         openNewTab(newtab);
-        String secondBean = bean.getText();
+        var secondBean = bean.getText();
         String secondViewState = nonAjaxViewState.getAttribute("value");
         assertEquals("init", getMessagesText());
         assertNotEquals(secondBean, firstBean);
