@@ -312,7 +312,7 @@ public final class Ajax {
             throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
         }
 
-        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8.name())) {
+        try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8)) {
             oncomplete(scanner.useDelimiter("\\A").next());
         }
         catch (IOException e) {
