@@ -682,8 +682,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
+                    <artifactId>arquillian-tomcat-managed-10</artifactId>
+                    <version>1.2.1.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -712,7 +712,7 @@
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
@@ -761,8 +761,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-tomcat-managed-8</artifactId>
-                    <version>1.2.0.Alpha1</version>
+                    <artifactId>arquillian-tomcat-managed-10</artifactId>
+                    <version>1.2.1.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -791,7 +791,7 @@
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
+                                <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
