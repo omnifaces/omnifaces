@@ -62,8 +62,13 @@ public class ViewScopedIT extends OmniFacesIT {
 
     @Test @Order(1)
     void nonAjax() {
+        // Make sure browser is clean during 1st test.
+        browser.manage().deleteAllCookies();
+
+        // Initial load.
+        init();
         assertEquals("init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
         // Unload.
         guardHttp(unload::click);
@@ -124,7 +129,7 @@ public class ViewScopedIT extends OmniFacesIT {
 
         // Unloaded bean is from previous test.
         assertEquals("unload init", getMessagesText());
-        String previousBean = bean.getText();
+        var previousBean = bean.getText();
 
 
         // Submit then unload.
@@ -180,8 +185,8 @@ public class ViewScopedIT extends OmniFacesIT {
 
         // Unloaded bean is from previous test.
         assertEquals("unload init", getMessagesText());
-        String firstBean = bean.getText();
-        String firstTab = browser.getWindowHandle();
+        var firstBean = bean.getText();
+        var firstTab = browser.getWindowHandle();
 
         // Open three new tabs and close them immediately.
         openNewTab(newtab);
