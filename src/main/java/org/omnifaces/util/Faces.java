@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -80,6 +81,7 @@ import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.filter.MutableRequestFilter;
 import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
+import org.omnifaces.util.FunctionalInterfaces.ThrowingConsumer;
 
 /**
  * <p>
@@ -422,7 +424,7 @@ public final class Faces {
      * @throws NullPointerException When mapping is <code>null</code>.
      */
     public static boolean isPrefixMapping(String mapping) {
-        return (mapping.charAt(0) == '/');
+        return mapping.charAt(0) == '/';
     }
 
     /**
@@ -2903,7 +2905,7 @@ public final class Faces {
      * @throws UncheckedIOException When HTTP response is not available anymore.
      * @since 2.3
      */
-    public static void sendFile(String filename, boolean attachment, Callback.Output outputCallback) {
+    public static void sendFile(String filename, boolean attachment, ThrowingConsumer<OutputStream> outputCallback) {
         FacesLocal.sendFile(getContext(), filename, attachment, outputCallback);
     }
 

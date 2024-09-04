@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.omnifaces.util.Callback.SerializableBiConsumer;
+import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 
 /**
  * Minimal implementation of thread safe LRU cache with support for eviction listener.
@@ -99,7 +99,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     public V get(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         return withLock(() -> {
-            V value = entries.remove(key);
+            var value = entries.remove(key);
             if (value != null) {
                 entries.put((K) key, value);
                 return value;
@@ -122,7 +122,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
         Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-        V previousValue = withLock(() -> {
+        var previousValue = withLock(() -> {
             V existingValue = entries.remove(key);
 
             while (entries.size() >= maximumCapacity) {
@@ -130,7 +130,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
                 evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
             }
 
-            entries.put(key, (onlyIfAbsent && existingValue != null) ? existingValue : value);
+            entries.put(key, onlyIfAbsent && existingValue != null ? existingValue : value);
             return existingValue;
         });
 
@@ -236,7 +236,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         }
     }
 
-    private final class ReadOnlyIterator<E> implements Iterator<E> {
+    private static final class ReadOnlyIterator<E> implements Iterator<E> {
 
         private final Iterator<E> iterator;
 
