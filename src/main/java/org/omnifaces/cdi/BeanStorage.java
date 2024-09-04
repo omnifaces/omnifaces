@@ -12,14 +12,14 @@
  */
 package org.omnifaces.cdi;
 
-import static org.omnifaces.util.Beans.destroy;
-
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.enterprise.context.spi.Contextual;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.PassivationCapable;
+
+import org.omnifaces.util.Beans;
 
 /**
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
@@ -62,7 +62,7 @@ public class BeanStorage implements Serializable {
      */
     @Deprecated(since = "4.5", forRemoval = true)
     public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-        T bean = type.create(context);
+        var bean = type.create(context);
         beans.put(getBeanId(type), (Serializable) bean);
         return bean;
     }
@@ -101,11 +101,7 @@ public class BeanStorage implements Serializable {
      * Destroy all beans managed so far.
      */
     public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
-        for (Object bean : beans.values()) {
-            destroy(bean);
-        }
-
+        beans.values().forEach(Beans::destroy);
         beans.clear();
     }
-
 }
