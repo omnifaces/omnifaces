@@ -155,9 +155,9 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private Algorithm algorithm;
-    private int threshold;
-    private Set<String> mimetypes;
+    private final Algorithm algorithm;
+    private final int threshold;
+    private final Set<String> mimetypes;
     private long contentLength;
     private String vary;
     private boolean dontCompress;

@@ -237,10 +237,10 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
      */
     private static class UniqueColumnValueChecker implements VisitCallback {
 
-        private UIData table;
-        private int rowIndex;
-        private UIInput input;
-        private Object value;
+        private final UIData table;
+        private final int rowIndex;
+        private final UIInput input;
+        private final Object value;
         private boolean duplicate;
         private int duplicateIndex;
 

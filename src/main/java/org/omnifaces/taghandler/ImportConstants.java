@@ -102,9 +102,9 @@ public class ImportConstants extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String varValue;
-    private TagAttribute typeAttribute;
-    private TagAttribute loaderAttribute;
+    private final String varValue;
+    private final TagAttribute typeAttribute;
+    private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -182,7 +182,7 @@ public class ImportConstants extends TagHandler {
         Set<Class<?>> declaredTypes = new LinkedHashSet<>();
         declaredTypes.add(type);
         fillAllSuperClasses(type, declaredTypes);
-        new LinkedHashSet<>(declaredTypes).stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
+        new LinkedHashSet<>(declaredTypes).forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
         return Collections.unmodifiableSet(declaredTypes);
     }
 
@@ -222,7 +222,7 @@ public class ImportConstants extends TagHandler {
 
         private static final long serialVersionUID = 1L;
 
-        private String type;
+        private final String type;
 
         public ConstantsMap(Map<String, Object> map, String type) {
             super(Collections.unmodifiableMap(map));
