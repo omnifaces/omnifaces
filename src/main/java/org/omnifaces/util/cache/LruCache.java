@@ -13,6 +13,7 @@
 package org.omnifaces.util.cache;
 
 import static java.util.Objects.requireNonNull;
+import static org.omnifaces.util.Utils.executeAtomically;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
@@ -79,26 +80,13 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         this.entries = new LinkedHashMap<>(maximumCapacity);
     }
 
-    // Internal -------------------------------------------------------------------------------------------------------
-
-    private <R> R withLock(Supplier<R> task) {
-        lock.lock();
-
-        try {
-            return task.get();
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
     // Mutation methods -----------------------------------------------------------------------------------------------
 
     @Override
     @SuppressWarnings("unchecked")
     public V get(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> {
+        return executeAtomically(lock, () -> {
             var value = entries.remove(key);
             if (value != null) {
                 entries.put((K) key, value);
@@ -122,11 +110,11 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
         Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-        var previousValue = withLock(() -> {
-            V existingValue = entries.remove(key);
+        var previousValue = executeAtomically(lock, () -> {
+            var existingValue = entries.remove(key);
 
             while (entries.size() >= maximumCapacity) {
-                K leastRecentlyUsedKey = entries.keySet().iterator().next();
+                var leastRecentlyUsedKey = entries.keySet().iterator().next();
                 evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
             }
 
@@ -146,21 +134,21 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     @Override
     public V remove(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> entries.remove(key));
+        return executeAtomically(lock, () -> entries.remove(key));
     }
 
     @Override
     public boolean remove(Object key, Object value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> value.equals(entries.get(key)) && entries.remove(key) != null);
+        return executeAtomically(lock, () -> value.equals(entries.get(key)) && entries.remove(key) != null);
     }
 
     @Override
     public V replace(K key, V value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> entries.containsKey(key) ? put(key, value, false) : null);
+        return executeAtomically(lock, () -> entries.containsKey(key) ? put(key, value, false) : null);
     }
 
     @Override
@@ -168,12 +156,12 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(oldValue, ERROR_NULL_VALUE_DISALLOWED);
         requireNonNull(newValue, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
+        return executeAtomically(lock, () -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
     }
 
     @Override
     public void clear() {
-        withLock(() -> { entries.clear(); return null; });
+        executeAtomically(lock, entries::clear);
     }
 
     // Readonly methods -----------------------------------------------------------------------------------------------

@@ -13,12 +13,15 @@
 package org.omnifaces.model.tree;
 
 import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Utils.executeAtomically;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A base implementation of {@link TreeModel}. Implementors basically only need to implement {@link #createChildren()}
@@ -43,6 +46,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     private Collection<TreeModel<T>> children;
     private List<TreeModel<T>> unmodifiableChildren = Collections.emptyList();
     private int index;
+    private final ReentrantLock lock = new ReentrantLock();
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -62,7 +66,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     @Override
     @SuppressWarnings("unchecked")
     public TreeModel<T> addChild(T data) {
-        AbstractTreeModel<T> child = instance(getClass());
+        var child = instance(getClass());
         child.data = data;
         return addChildNode(child);
     }
@@ -86,16 +90,16 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     @Override
     public TreeModel<T> remove() {
         if (!isRoot()) {
-            synchronized (parent.children) {
+            executeAtomically(lock, () -> {
                 parent.children.remove(this);
 
                 // Fix the indexes of the children (that's why it needs to be synchronized).
-                int newIndex = 0;
-                for (TreeModel<T> child : parent.children) {
+                var newIndex = 0;
+                for (var child : parent.children) {
                     ((AbstractTreeModel<T>) child).index = newIndex;
                     newIndex++;
                 }
-            }
+            });
         }
 
         return parent;
@@ -129,7 +133,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
             return parent.getChildren().get(index);
         }
         else {
-            TreeModel<T> nextParent = parent.getNextSibling();
+            var nextParent = parent.getNextSibling();
             return getNextSibling(nextParent, 0);
         }
     }
@@ -150,7 +154,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
             return parent.getChildren().get(index);
         }
         else {
-            TreeModel<T> previousParent = parent.getPreviousSibling();
+            var previousParent = parent.getPreviousSibling();
             return getPreviousSibling(previousParent, (previousParent != null ? previousParent.getChildCount() : 0) - 1);
         }
     }
@@ -163,7 +167,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     @Override
     public List<TreeModel<T>> getChildren() {
         if (unmodifiableChildren.size() != getChildCount()) {
-            unmodifiableChildren = Collections.unmodifiableList((children instanceof List)
+            unmodifiableChildren = Collections.unmodifiableList(children instanceof List
                 ? (List<TreeModel<T>>) children : new ArrayList<>(children));
         }
 
@@ -242,7 +246,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
             return true;
         }
 
-        if (thiz.data == null ? other.data != null : !thiz.data.equals(other.data)) {
+        if (!Objects.equals(thiz.data, other.data)) {
             return false;
         }
 
@@ -266,11 +270,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int hashCode = 1;
-        hashCode = prime * hashCode + ((data == null) ? 0 : data.hashCode());
-        hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
-        return hashCode;
+        return Objects.hash(data, children);
     }
 
     @Override
