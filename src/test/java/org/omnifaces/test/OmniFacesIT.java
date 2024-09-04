@@ -30,7 +30,6 @@ import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenResolverSystem;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,12 +59,12 @@ public abstract class OmniFacesIT {
 
     @BeforeAll
     public void setup() {
-        String arquillianBrowser = System.getProperty("arquillian.browser");
+        var arquillianBrowser = System.getProperty("arquillian.browser");
 
         switch (arquillianBrowser) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
-                ChromeDriver chrome = new ChromeDriver(new ChromeOptions().addArguments("--no-sandbox", "--headless"));
+                var chrome = new ChromeDriver(new ChromeOptions().addArguments("--no-sandbox", "--headless"));
                 chrome.setLogLevel(Level.INFO);
                 browser = chrome;
                 break;
@@ -95,12 +94,13 @@ public abstract class OmniFacesIT {
     }
 
     protected String openNewTab(WebElement elementWhichOpensNewTab) {
-        Set<String> oldTabs = browser.getWindowHandles();
+        var oldTabs = browser.getWindowHandles();
         elementWhichOpensNewTab.click();
         Set<String> newTabs = new HashSet<>(browser.getWindowHandles());
         newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
-        String newTab = newTabs.iterator().next();
+        var newTab = newTabs.iterator().next();
         browser.switchTo().window(newTab);
+        waitUntil(() -> executeScript("return document.readyState=='complete'"));
         return newTab;
     }
 
@@ -133,7 +133,7 @@ public abstract class OmniFacesIT {
     }
 
     protected void guardAjax(Runnable action) {
-        String uuid = UUID.randomUUID().toString();
+        var uuid = UUID.randomUUID().toString();
         executeScript("window.$ajax=true;(window.jsf?jsf:faces).ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
         action.run();
         waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be falsey when ajax redirect has occurred.
@@ -195,7 +195,7 @@ public abstract class OmniFacesIT {
 
     protected static String stripHostAndJsessionid(String url) {
         try {
-            URIBuilder builder = new URIBuilder(url);
+            var builder = new URIBuilder(url);
             builder.setScheme(null);
             builder.setHost(null);
             return stripJsessionid(builder.toString());
@@ -229,9 +229,9 @@ public abstract class OmniFacesIT {
         private boolean primeFacesSet;
 
         private <T extends OmniFacesIT> ArchiveBuilder(Class<T> testClass) {
-            String packageName = testClass.getPackage().getName();
-            String className = testClass.getSimpleName();
-            String warName = className + ".war";
+            var packageName = testClass.getPackage().getName();
+            var className = testClass.getSimpleName();
+            var warName = className + ".war";
 
             archive = create(WebArchive.class, warName)
                 .addPackage(packageName)
@@ -239,7 +239,7 @@ public abstract class OmniFacesIT {
                 .addAsWebInfResource("WEB-INF/beans.xml", "beans.xml")
                 .addAsLibrary(new File(System.getProperty("omnifaces.jar")));
 
-            String warLibraries = System.getProperty("war.libraries");
+            var warLibraries = System.getProperty("war.libraries");
 
             if (warLibraries != null) {
                 archive.addAsLibraries(Maven.resolver().resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
@@ -250,7 +250,7 @@ public abstract class OmniFacesIT {
 
         private void addWebResources(File root, String directory) {
             for (File file : root.listFiles()) {
-                String path = directory + "/" + file.getName();
+                var path = directory + "/" + file.getName();
 
                 if (file.isFile()) {
                     archive.addAsWebResource(file, path);
@@ -306,7 +306,7 @@ public abstract class OmniFacesIT {
                 throw new IllegalStateException("There can be only one PrimeFaces library");
             }
 
-            MavenResolverSystem maven = Maven.resolver();
+            var maven = Maven.resolver();
             archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
             primeFacesSet = true;
             return this;
@@ -325,7 +325,7 @@ public abstract class OmniFacesIT {
         }
     }
 
-    public static enum FacesConfig {
+    public enum FacesConfig {
         basic,
         withFullAjaxExceptionHandler,
         withCombinedResourceHandler,
@@ -336,7 +336,7 @@ public abstract class OmniFacesIT {
         withViewResourceHandler;
     }
 
-    public static enum WebXml {
+    public enum WebXml {
         basic,
         distributable,
         withDevelopmentStage,
