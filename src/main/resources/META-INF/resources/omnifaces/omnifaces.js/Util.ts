@@ -97,7 +97,7 @@ export module Util {
      * @return The first JSF form of the current document.
      */
     export function getFacesForm(): HTMLFormElement | null {
-        for (var i = 0; i < document.forms.length; i++) {
+        for (let i = 0; i < document.forms.length; i++) {
             const form = document.forms[i];
 
             if (form[VIEW_STATE_PARAM]) {
