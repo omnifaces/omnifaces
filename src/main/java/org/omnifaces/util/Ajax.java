@@ -93,14 +93,14 @@ public final class Ajax {
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final String ERROR_NO_SCRIPT_RESOURCE =
-            "";
+        "";
     private static final String ERROR_NO_PARTIAL_RENDERING =
-            "The current request is not an ajax request with partial rendering."
-                    + " Use Components#addScriptXxx() methods instead.";
+        "The current request is not an ajax request with partial rendering."
+            + " Use Components#addScriptXxx() methods instead.";
     private static final String ERROR_ARGUMENTS_LENGTH =
-            "The arguments length must be even. Encountered %d items.";
+        "The arguments length must be even. Encountered %d items.";
     private static final String ERROR_ARGUMENT_TYPE =
-            "The argument name must be a String. Encountered type '%s' with value '%s'.";
+        "The argument name must be a String. Encountered type '%s' with value '%s'.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
