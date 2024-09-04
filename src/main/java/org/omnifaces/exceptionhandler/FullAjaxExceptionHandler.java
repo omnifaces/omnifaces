@@ -309,11 +309,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             + " Trying to render a hardcoded error page now.";
     private static final String ERROR_PAGE_ERROR =
         "<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
-            + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
-                + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
-                + " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
-                + " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
-            + "</body></html>]]></update></changes></partial-response>";
+        + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
+            + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
+            + " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
+            + " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
+        + "</body></html>]]></update></changes></partial-response>";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
