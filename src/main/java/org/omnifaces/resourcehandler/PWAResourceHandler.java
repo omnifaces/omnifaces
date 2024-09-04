@@ -412,7 +412,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return "";
         }
         else {
-            try (Scanner scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8.name())) {
+            try (Scanner scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8)) {
                 return scanner.useDelimiter("\\A").next()
                     .replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
                     .replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
