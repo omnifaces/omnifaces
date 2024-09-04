@@ -32,6 +32,8 @@ import jakarta.faces.event.SystemEventListener;
 import org.omnifaces.eventlistener.CallbackPhaseListener;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 import org.omnifaces.eventlistener.DefaultSystemEventListener;
+import org.omnifaces.util.FunctionalInterfaces.SerializableConsumer;
+import org.omnifaces.util.FunctionalInterfaces.SerializableRunnable;
 
 /**
  * <p>
@@ -100,7 +102,7 @@ public final class Events {
      * @since 2.0
      * @see #subscribeToApplicationEvent(Class, SystemEventListener)
      */
-    public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
+    public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, SerializableRunnable callback) {
         subscribeToApplicationEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
     }
 
@@ -112,7 +114,7 @@ public final class Events {
      * @since 2.0
      * @see #subscribeToApplicationEvent(Class, SystemEventListener)
      */
-    public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
+    public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, SerializableConsumer<SystemEvent> callback) {
         subscribeToApplicationEvent(type, createSystemEventListener(callback));
     }
 
@@ -138,7 +140,7 @@ public final class Events {
      * @since 1.2
      * @see #subscribeToViewEvent(Class, SystemEventListener)
      */
-    public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
+    public static void subscribeToViewEvent(Class<? extends SystemEvent> type, SerializableRunnable callback) {
         subscribeToViewEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
     }
 
@@ -150,7 +152,7 @@ public final class Events {
      * @since 2.0
      * @see #subscribeToViewEvent(Class, SystemEventListener)
      */
-    public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
+    public static void subscribeToViewEvent(Class<? extends SystemEvent> type, SerializableConsumer<SystemEvent> callback) {
         subscribeToViewEvent(type, createSystemEventListener(callback));
     }
 
@@ -319,7 +321,7 @@ public final class Events {
     public static void unsubscribeFromComponentEvent
         (UIComponent component, Class<? extends SystemEvent> event, ComponentSystemEventListener listener)
     {
-        PhaseId currentPhaseId = getCurrentPhaseId();
+        var currentPhaseId = getCurrentPhaseId();
 
         if (currentPhaseId == PhaseId.RENDER_RESPONSE) {
             throw new IllegalStateException(ERROR_UNSUBSCRIBE_TOO_LATE);
@@ -334,16 +336,16 @@ public final class Events {
         return argument -> callback.run();
     }
 
-    private static <A> Callback.SerializableWithArgument<A> wrap(Callback.SerializableVoid callback) {
-        return argument -> callback.invoke();
+    private static <A> SerializableConsumer<A> wrap(SerializableRunnable callback) {
+        return argument -> callback.run();
     }
 
-    private static SystemEventListener createSystemEventListener(Callback.SerializableWithArgument<SystemEvent> callback) {
+    private static SystemEventListener createSystemEventListener(SerializableConsumer<SystemEvent> callback) {
         return new DefaultSystemEventListener() {
 
             @Override
             public void processEvent(SystemEvent event) {
-                callback.invoke(event);
+                callback.accept(event);
             }
         };
     }

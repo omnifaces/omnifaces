@@ -34,6 +34,7 @@ public class InputHiddenITBean {
         addGlobalInfo("submitted");
     }
 
+    @SuppressWarnings("unused")
     public void validate(FacesContext context, UIComponent component, Object value) {
         addGlobalInfo("validated " + value);
     }

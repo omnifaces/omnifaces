@@ -17,13 +17,13 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,9 +96,7 @@ public class SocketSessionManager {
      * @param channelIds The channel identifiers to register.
      */
     protected void register(Iterable<String> channelIds) {
-        for (String channelId : channelIds) {
-            register(channelId);
-        }
+        channelIds.forEach(this::register);
     }
 
     /**
@@ -109,11 +107,11 @@ public class SocketSessionManager {
      * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
      */
     protected boolean add(Session session) {
-        String channelId = getChannelId(session);
-        Collection<Session> sessions = socketSessions.get(channelId);
+        var channelId = getChannelId(session);
+        var sessions = socketSessions.get(channelId);
 
         if (sessions != null && sessions.add(session)) {
-            Serializable user = socketUsers.getUser(getChannel(session), channelId);
+            var user = socketUsers.getUser(getChannel(session), channelId);
 
             if (user != null) {
                 session.getUserProperties().put("user", user);
@@ -135,18 +133,10 @@ public class SocketSessionManager {
      * message was successfully delivered and otherwise throw {@link ExecutionException}.
      */
     protected Set<Future<Void>> send(String channelId, String message) {
-        Collection<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
+        var sessions = channelId != null ? socketSessions.get(channelId) : null;
 
-        if (sessions != null && !sessions.isEmpty()) {
-            Set<Future<Void>> results = new HashSet<>(sessions.size());
-
-            for (Session session : sessions) {
-                if (session.isOpen()) {
-                    results.add(send(session, message, true));
-                }
-            }
-
-            return results;
+        if (sessions != null) {
+            return sessions.stream().filter(Session::isOpen).map(session -> send(session, message, true)).collect(toUnmodifiableSet());
         }
 
         return emptySet();
@@ -172,7 +162,7 @@ public class SocketSessionManager {
     }
 
     private Void retrySendTomcatWebSocket(Session session, String text) {
-        int retries = 0;
+        var retries = 0;
         Exception cause = null;
 
         try {
@@ -183,7 +173,7 @@ public class SocketSessionManager {
                     throw new IllegalStateException("Too bad, session is now closed");
                 }
 
-                Future<Void> result = send(session, text, false);
+                var result = send(session, text, false);
 
                 if (result != null) {
                     if (logger.isLoggable(WARNING)) {
@@ -211,7 +201,7 @@ public class SocketSessionManager {
      * @param reason The close reason.
      */
     protected void remove(Session session, CloseReason reason) {
-        Collection<Session> sessions = socketSessions.get(getChannelId(session));
+        var sessions = socketSessions.get(getChannelId(session));
 
         if (sessions != null && sessions.remove(session)) {
             fireEvent(session, reason, Closed.LITERAL);
@@ -223,13 +213,11 @@ public class SocketSessionManager {
      * @param channelIds The channel identifiers to deregister.
      */
     protected void deregister(Iterable<String> channelIds) {
-        for (String channelId : channelIds) {
-            Collection<Session> sessions = socketSessions.remove(channelId);
+        for (var channelId : channelIds) {
+            var sessions = socketSessions.remove(channelId);
 
             if (sessions != null) {
-                for (Session session : sessions) {
-                    close(session);
-                }
+                sessions.forEach(SocketSessionManager::close);
             }
         }
     }
@@ -238,7 +226,7 @@ public class SocketSessionManager {
      * Close given web socket session.
      * @param session The web socket session to close.
      */
-    private void close(Session session) {
+    private static void close(Session session) {
         if (session.isOpen()) {
             try {
                 session.close(REASON_EXPIRED);
@@ -273,8 +261,8 @@ public class SocketSessionManager {
     }
 
     private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
-        Serializable user = (Serializable) session.getUserProperties().get("user");
-        Beans.fireEvent(new SocketEvent(getChannel(session), user, null, (reason != null) ? reason.getCloseCode() : null), qualifier);
+        var user = (Serializable) session.getUserProperties().get("user");
+        Beans.fireEvent(new SocketEvent(getChannel(session), user, null, reason != null ? reason.getCloseCode() : null), qualifier);
     }
 
 }

@@ -122,15 +122,15 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
         super.processPartial(phaseId);
     }
 
-    private boolean redirectToFormLoginPageIfNecessary() {
-        String loginURL = WebXml.instance().getFormLoginPage();
+    private static boolean redirectToFormLoginPageIfNecessary() {
+        var loginURL = WebXml.instance().getFormLoginPage();
 
         if (loginURL == null) {
             return false;
         }
 
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        String loginViewId = normalizeViewId(facesContext, loginURL);
+        var facesContext = FacesContext.getCurrentInstance();
+        var loginViewId = normalizeViewId(facesContext, loginURL);
 
         if (!loginViewId.equals(getViewId(facesContext))) {
             return false;
@@ -251,7 +251,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     }
 
     private static OmniPartialViewContext unwrap(PartialViewContext context) {
-        PartialViewContext unwrappedContext = context;
+        var unwrappedContext = context;
 
         while (!(unwrappedContext instanceof OmniPartialViewContext) && unwrappedContext instanceof PartialViewContextWrapper) {
             unwrappedContext = ((PartialViewContextWrapper) unwrappedContext).getWrapped();

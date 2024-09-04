@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -46,18 +45,13 @@ import java.util.logging.Logger;
 
 import jakarta.el.ELException;
 import jakarta.faces.FacesException;
-import jakarta.faces.application.ViewHandler;
-import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.ExceptionHandler;
 import jakarta.faces.context.ExceptionHandlerFactory;
 import jakarta.faces.context.ExceptionHandlerWrapper;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AbortProcessingException;
-import jakarta.faces.event.ExceptionQueuedEvent;
 import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PreRenderViewEvent;
-import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.webapp.FacesServlet;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.ServletContext;
@@ -267,7 +261,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
         private final String message;
 
-        private LogReason(String message) {
+        LogReason(String message) {
             this.message = message;
         }
 
@@ -330,12 +324,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
      */
     public static void registerFacesExceptionFilterIfNecessary(ServletContext servletContext) {
         if (FacesConfigXml.instance().getExceptionHandlerFactories().stream()
-                .noneMatch(FullAjaxExceptionHandlerFactory.class::equals))
-        {
-            return; // FullAjaxExceptionHandler is not registered.
-        }
-
-        if (servletContext.getFilterRegistrations().values().stream()
+                .noneMatch(FullAjaxExceptionHandlerFactory.class::equals) || servletContext.getFilterRegistrations().values().stream()
                 .map(FilterRegistration::getClassName)
                 .map(Reflection::toClassOrNull).filter(Objects::nonNull)
                 .anyMatch(FacesExceptionFilter.class::equals))
@@ -392,7 +381,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             types.addAll(defaults);
         }
 
-        String typesParam = context.getInitParameter(paramName);
+        var typesParam = context.getInitParameter(paramName);
 
         if (!isEmpty(typesParam)) {
             splitAndTrim(typesParam, ",").forEach(typeParam -> {
@@ -433,13 +422,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             return; // Unexpected, most likely buggy Faces implementation or parent exception handler.
         }
 
-        Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
+        var unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
         if (!unhandledExceptionQueuedEvents.hasNext()) {
             return; // There's no unhandled exception.
         }
 
-        Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+        var exception = unhandledExceptionQueuedEvents.next().getContext().getException();
 
         if (exception instanceof AbortProcessingException) {
             return; // Let Faces handle it itself.
@@ -452,7 +441,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             return; // A subclass apparently want to do it differently.
         }
 
-        String errorPageLocation = findErrorPageLocation(context, exception);
+        var errorPageLocation = findErrorPageLocation(context, exception);
 
         if (errorPageLocation == null) {
             throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
@@ -467,7 +456,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         }
 
         // Set the necessary servlet request attributes which a bit decent error page may expect.
-        HttpServletRequest request = getRequest(context);
+        var request = getRequest(context);
         request.setAttribute(ERROR_EXCEPTION, exception);
         request.setAttribute(ERROR_EXCEPTION_TYPE, exception.getClass());
         request.setAttribute(ERROR_MESSAGE, exception.getMessage());
@@ -583,10 +572,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         }
     }
 
-    private void resetResponse(FacesContext context) {
-        ExternalContext externalContext = context.getExternalContext();
-        String contentType = externalContext.getResponseContentType(); // Remember content type.
-        String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
+    private static void resetResponse(FacesContext context) {
+        var externalContext = context.getExternalContext();
+        var contentType = externalContext.getResponseContentType(); // Remember content type.
+        var characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
         externalContext.responseReset();
         OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
         externalContext.setResponseContentType(contentType);
@@ -596,15 +585,15 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)
         throws IOException
     {
-        String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
-        ViewHandler viewHandler = context.getApplication().getViewHandler();
-        UIViewRoot viewRoot = viewHandler.createView(context, viewId);
+        var viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
+        var viewHandler = context.getApplication().getViewHandler();
+        var viewRoot = viewHandler.createView(context, viewId);
         Hacks.removeResourceDependencyState(context);
         context.setViewRoot(viewRoot);
         context.getPartialViewContext().setRenderAll(true);
 
         try {
-            ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+            var vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
             vdl.buildView(context, viewRoot);
             context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
             vdl.renderView(context, viewRoot);
@@ -613,7 +602,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         catch (Exception e) {
             // Apparently, the error page itself contained an error.
             logException(context, e, errorPageLocation, LogReason.ERROR_PAGE_ERROR);
-            ExternalContext externalContext = context.getExternalContext();
+            var externalContext = context.getExternalContext();
 
             if (!externalContext.isResponseCommitted()) {
                 // Okay, reset the response and tell that the error page itself contained an error.
@@ -635,8 +624,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         }
     }
 
-    private String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
-        String[] parts = errorPageLocation.split("\\?", 2);
+    private static String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
+        var parts = errorPageLocation.split("\\?", 2);
 
         // TODO: #287: make params available via #{param(Values)}. Request wrapper needed :|
 

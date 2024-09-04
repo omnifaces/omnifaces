@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -169,7 +168,7 @@ public abstract class FileServlet extends HttpServlet {
             return;
         }
 
-        List<Range> ranges = getRanges(request, resource);
+        var ranges = getRanges(request, resource);
 
         if (ranges == null) {
             response.setHeader("Content-Range", "bytes */" + resource.length);
@@ -184,7 +183,7 @@ public abstract class FileServlet extends HttpServlet {
             ranges.add(new Range(0, resource.length - 1)); // Full content.
         }
 
-        String contentType = setContentHeaders(request, response, resource, ranges);
+        var contentType = setContentHeaders(request, response, resource, ranges);
 
         if (head) {
             return;
@@ -256,7 +255,7 @@ public abstract class FileServlet extends HttpServlet {
      * type.
      */
     protected boolean isAttachment(HttpServletRequest request, String contentType) {
-        String accept = request.getHeader("Accept");
+        var accept = request.getHeader("Accept");
         return !startsWithOneOf(contentType, "text", "image") && (accept == null || !accepts(accept, contentType));
     }
 
@@ -279,16 +278,16 @@ public abstract class FileServlet extends HttpServlet {
     /**
      * Returns true if it's a conditional request which must return 412.
      */
-    private boolean preconditionFailed(HttpServletRequest request, Resource resource) {
-        String match = request.getHeader("If-Match");
-        long unmodified = request.getDateHeader("If-Unmodified-Since");
-        return (match != null) ? !matches(match, resource.eTag) : (unmodified != -1 && modified(unmodified, resource.lastModified));
+    private static boolean preconditionFailed(HttpServletRequest request, Resource resource) {
+        var match = request.getHeader("If-Match");
+        var unmodified = request.getDateHeader("If-Unmodified-Since");
+        return match != null ? !matches(match, resource.eTag) : unmodified != -1 && modified(unmodified, resource.lastModified);
     }
 
     /**
      * Set cache headers.
      */
-    private void setCacheHeaders(HttpServletResponse response, Resource resource, long expires) {
+    private static void setCacheHeaders(HttpServletResponse response, Resource resource, long expires) {
         Servlets.setCacheHeaders(response, expires);
         response.setHeader("ETag", resource.eTag);
         response.setDateHeader("Last-Modified", resource.lastModified);
@@ -297,18 +296,18 @@ public abstract class FileServlet extends HttpServlet {
     /**
      * Returns true if it's a conditional request which must return 304.
      */
-    private boolean notModified(HttpServletRequest request, Resource resource) {
-        String noMatch = request.getHeader("If-None-Match");
-        long modified = request.getDateHeader("If-Modified-Since");
-        return (noMatch != null) ? matches(noMatch, resource.eTag) : (modified != -1 && !modified(modified, resource.lastModified));
+    private static boolean notModified(HttpServletRequest request, Resource resource) {
+        var noMatch = request.getHeader("If-None-Match");
+        var modified = request.getDateHeader("If-Modified-Since");
+        return noMatch != null ? matches(noMatch, resource.eTag) : modified != -1 && !modified(modified, resource.lastModified);
     }
 
     /**
      * Get requested ranges. If this is null, then we must return 416. If this is empty, then we must return full file.
      */
-    private List<Range> getRanges(HttpServletRequest request, Resource resource) {
+    private static List<Range> getRanges(HttpServletRequest request, Resource resource) {
         List<Range> ranges = new ArrayList<>(1);
-        String rangeHeader = request.getHeader("Range");
+        var rangeHeader = request.getHeader("Range");
 
         if (rangeHeader == null) {
             return ranges;
@@ -317,11 +316,11 @@ public abstract class FileServlet extends HttpServlet {
             return null; // Syntax error.
         }
 
-        String ifRange = request.getHeader("If-Range");
+        var ifRange = request.getHeader("If-Range");
 
         if (ifRange != null && !ifRange.equals(resource.eTag)) {
             try {
-                long ifRangeTime = request.getDateHeader("If-Range");
+                var ifRangeTime = request.getDateHeader("If-Range");
 
                 if (ifRangeTime != -1 && modified(ifRangeTime, resource.lastModified)) {
                     return ranges;
@@ -334,7 +333,7 @@ public abstract class FileServlet extends HttpServlet {
         }
 
         for (String rangeHeaderPart : rangeHeader.split("=")[1].split(",")) {
-            Range range = parseRange(rangeHeaderPart, resource.length);
+            var range = parseRange(rangeHeaderPart, resource.length);
 
             if (range == null) {
                 return null; // Logic error.
@@ -349,9 +348,9 @@ public abstract class FileServlet extends HttpServlet {
     /**
      * Parse range header part. Returns null if there's a logic error (i.e. start after end).
      */
-    private Range parseRange(String range, long length) {
-        long start = sublong(range, 0, range.indexOf('-'));
-        long end = sublong(range, range.indexOf('-') + 1, range.length());
+    private static Range parseRange(String range, long length) {
+        var start = sublong(range, 0, range.indexOf('-'));
+        var end = sublong(range, range.indexOf('-') + 1, range.length());
 
         if (start == -1) {
             start = length - end;
@@ -372,14 +371,14 @@ public abstract class FileServlet extends HttpServlet {
      * Set content headers.
      */
     private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, Resource resource, List<Range> ranges) {
-        String contentType = getContentType(request, resource.file);
-        String filename = getAttachmentName(request, resource.file);
-        boolean attachment = isAttachment(request, contentType);
+        var contentType = getContentType(request, resource.file);
+        var filename = getAttachmentName(request, resource.file);
+        var attachment = isAttachment(request, contentType);
         response.setHeader("Content-Disposition", formatContentDispositionHeader(filename, attachment));
         response.setHeader("Accept-Ranges", "bytes");
 
         if (ranges.size() == 1) {
-            Range range = ranges.get(0);
+            var range = ranges.get(0);
             response.setContentType(contentType);
             response.setHeader("Content-Length", String.valueOf(range.length));
 
@@ -397,11 +396,11 @@ public abstract class FileServlet extends HttpServlet {
     /**
      * Write given file to response with given content type and ranges.
      */
-    private void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException {
-        ServletOutputStream output = response.getOutputStream();
+    private static void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException {
+        var output = response.getOutputStream();
 
         if (ranges.size() == 1) {
-            Range range = ranges.get(0);
+            var range = ranges.get(0);
             stream(resource.file, output, range.start, range.length);
         }
         else {
@@ -432,7 +431,7 @@ public abstract class FileServlet extends HttpServlet {
      * Returns true if the given modified header is older than the given last modified value.
      */
     private static boolean modified(long modifiedHeader, long lastModified) {
-        return (modifiedHeader + ONE_SECOND_IN_MILLIS <= lastModified); // That second is because the header is in seconds, not millis.
+        return modifiedHeader + ONE_SECOND_IN_MILLIS <= lastModified; // That second is because the header is in seconds, not millis.
     }
 
     /**
@@ -440,7 +439,7 @@ public abstract class FileServlet extends HttpServlet {
      * If the substring is empty, then -1 will be returned.
      */
     private static long sublong(String value, int beginIndex, int endIndex) {
-        String substring = value.substring(beginIndex, endIndex);
+        var substring = value.substring(beginIndex, endIndex);
         return substring.isEmpty() ? -1 : Long.parseLong(substring);
     }
 

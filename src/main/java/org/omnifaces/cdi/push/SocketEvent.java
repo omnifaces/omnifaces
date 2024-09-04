@@ -107,7 +107,7 @@ public final class SocketEvent implements Serializable {
             return false;
         }
 
-        SocketEvent other = (SocketEvent) object;
+        var other = (SocketEvent) object;
 
         return Objects.equals(channel, other.channel)
             && Objects.equals(user, other.user)
@@ -139,7 +139,7 @@ public final class SocketEvent implements Serializable {
          * The literal of {@link Opened}.
          * @since 3.2
          */
-        public static final AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<Opened>() {
+        public static final AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }
@@ -163,7 +163,7 @@ public final class SocketEvent implements Serializable {
         /**
          * The literal of {@link Switched}.
          */
-        public static final AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<Switched>() {
+        public static final AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }
@@ -188,7 +188,7 @@ public final class SocketEvent implements Serializable {
          * The literal of {@link Closed}.
          * @since 3.2
          */
-        public static final AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<Closed>() {
+        public static final AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<>() {
             private static final long serialVersionUID = 1L;
         };
     }

@@ -26,7 +26,6 @@ import jakarta.faces.event.PreValidateEvent;
 import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 import jakarta.faces.validator.BeanValidator;
-import jakarta.faces.validator.Validator;
 
 /**
  * Overrides {@link BeanValidator#setValidationGroups(String)} for all components in the current view. This allows to
@@ -92,14 +91,14 @@ public class BeanValidationEventListener implements SystemEventListener {
      * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value from the tag attribute.
      */
     private void handlePreValidate(UIInput component) {
-        BeanValidator beanValidator = getBeanValidator(component);
+        var beanValidator = getBeanValidator(component);
 
         if (beanValidator == null) {
             return;
         }
 
-        String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
-        String originalValidationGroups = beanValidator.getValidationGroups();
+        var newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
+        var originalValidationGroups = beanValidator.getValidationGroups();
 
         if (originalValidationGroups != null) {
             component.getAttributes().put(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS, originalValidationGroups);
@@ -116,11 +115,11 @@ public class BeanValidationEventListener implements SystemEventListener {
     /**
      * Restores the original value of {@link BeanValidator#getValidationGroups()}.
      */
-    private void handlePostValidate(UIInput component) {
-        BeanValidator beanValidator = getBeanValidator(component);
+    private static void handlePostValidate(UIInput component) {
+        var beanValidator = getBeanValidator(component);
 
         if (beanValidator != null) {
-            String originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
+            var originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
             beanValidator.setValidationGroups(originalValidationGroups);
         }
     }
@@ -131,9 +130,7 @@ public class BeanValidationEventListener implements SystemEventListener {
      * Obtain the bean validator instance of the given editable value holder component.
      */
     private static BeanValidator getBeanValidator(EditableValueHolder component) {
-        Validator<?>[] validators = component.getValidators();
-
-        for (Validator<?> validator : validators) {
+        for (var validator : component.getValidators()) {
             if (validator instanceof BeanValidator) {
                 return (BeanValidator) validator;
             }

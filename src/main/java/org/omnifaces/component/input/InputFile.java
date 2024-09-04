@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.faces.component.FacesComponent;
@@ -116,11 +115,11 @@ import org.omnifaces.util.Utils;
  *
  * public void upload() {
  *     if (files != null) {
- *         for (Part file : files) {
- *             String name = Servlets.getSubmittedFileName(file);
- *             String type = file.getContentType();
- *             long size = file.getSize();
- *             InputStream content = file.getInputStream();
+ *         for (var file : files) {
+ *             var name = Servlets.getSubmittedFileName(file);
+ *             var type = file.getContentType();
+ *             var size = file.getSize();
+ *             var content = file.getInputStream();
  *             // ...
  *         }
  *     }
@@ -143,11 +142,11 @@ import org.omnifaces.util.Utils;
  *
  * public void upload() {
  *     if (files != null) {
- *         for (Part file : files) {
- *             String name = Servlets.getSubmittedFileName(file);
- *             String type = file.getContentType();
- *             long size = file.getSize();
- *             InputStream content = file.getInputStream();
+ *         for (var file : files) {
+ *             var name = Servlets.getSubmittedFileName(file);
+ *             var type = file.getContentType();
+ *             var size = file.getSize();
+ *             var content = file.getInputStream();
  *             // ...
  *         }
  *     }
@@ -312,7 +311,7 @@ public class InputFile extends HtmlInputFile {
         if ("validationFailed".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME))
             && getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME)))
         {
-            String fileName = getRequestParameter(context, "fileName");
+            var fileName = getRequestParameter(context, "fileName");
             addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));
             setValid(false);
             context.validationFailed();
@@ -321,7 +320,7 @@ public class InputFile extends HtmlInputFile {
         }
         else {
             super.decode(context);
-            Object submittedValue = getSubmittedValue();
+            var submittedValue = getSubmittedValue();
 
             if (submittedValue instanceof Part && isMultiple()) {
                 setSubmittedValue(getRequestParts(context, ((Part) submittedValue).getName()));
@@ -341,10 +340,10 @@ public class InputFile extends HtmlInputFile {
         }
 
         if (isMultiple()) {
-            List<Part> convertedParts = new ArrayList<>();
+            var convertedParts = new ArrayList<Part>();
 
-            for (Part submittedPart : (List<Part>) submittedValue) {
-                Object convertedPart = super.getConvertedValue(context, submittedPart);
+            for (var submittedPart : (List<Part>) submittedValue) {
+                var convertedPart = super.getConvertedValue(context, submittedPart);
 
                 if (convertedPart instanceof Part && !Utils.isEmpty(convertedPart)) { // Do not import static! UIInput has an isEmpty() as well.
                     convertedParts.add((Part) convertedPart);
@@ -354,7 +353,7 @@ public class InputFile extends HtmlInputFile {
             return unmodifiableList(convertedParts);
         }
 
-        Object convertedPart = super.getConvertedValue(context, submittedValue);
+        var convertedPart = super.getConvertedValue(context, submittedValue);
         return Utils.isEmpty(convertedPart) ? null : convertedPart;
     }
 
@@ -405,7 +404,7 @@ public class InputFile extends HtmlInputFile {
      */
     @Override
     public void encodeEnd(FacesContext context) throws IOException {
-        Map<String, Object> passThroughAttributes = getPassThroughAttributes();
+        var passThroughAttributes = getPassThroughAttributes();
 
         if (isMultiple()) {
             passThroughAttributes.put("multiple", true); // https://caniuse.com/#feat=input-file-multiple
@@ -416,13 +415,13 @@ public class InputFile extends HtmlInputFile {
             passThroughAttributes.put("webkitdirectory", true); // Chrome 11+, Safari 4+ and Edge.
         }
 
-        String accept = getAccept();
+        var accept = getAccept();
 
         if (accept != null) {
             passThroughAttributes.put("accept", accept); // https://caniuse.com/#feat=input-file-accept
         }
 
-        Long maxsize = getMaxsize();
+        var maxsize = getMaxsize();
 
         if (maxsize != null) {
             validateHierarchy();
@@ -569,25 +568,23 @@ public class InputFile extends HtmlInputFile {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private void validateParts(FacesContext context, Collection<Part> parts) {
-        String accept = getAccept();
-        Long maxsize = getMaxsize();
+        var accept = getAccept();
+        var maxsize = getMaxsize();
 
         if (accept == null && maxsize == null) {
             return;
         }
 
-        for (Part part : parts) {
-            validatePart(context, part, accept, maxsize);
-        }
+        parts.forEach(part -> validatePart(context, part, accept, maxsize));
     }
 
     private void validatePart(FacesContext context, Part part, String accept, Long maxsize) {
-        String fileName = getSubmittedFileName(part);
+        var fileName = getSubmittedFileName(part);
         String message = null;
         String param = null;
 
         if (accept != null) {
-            String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
+            var contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
 
             if (contentType == null || !contentType.matches(convertAcceptToRegex(accept))) {
                 message = getAcceptMessage();
@@ -606,11 +603,11 @@ public class InputFile extends HtmlInputFile {
         }
     }
 
-    private String convertAcceptToRegex(String accept) {
-        String[] parts = accept.replaceAll("\\s*", "").split("(?<=[*,])|(?=[*,])");
-        StringBuilder regex = new StringBuilder();
+    private static String convertAcceptToRegex(String accept) {
+        var parts = accept.replaceAll("\\s*", "").split("(?<=[*,])|(?=[*,])");
+        var regex = new StringBuilder();
 
-        for (String part : parts) {
+        for (var part : parts) {
             switch (part) {
                 case "*": regex.append(".*"); break;
                 case ",": regex.append("|"); break;
@@ -632,7 +629,7 @@ public class InputFile extends HtmlInputFile {
             component = getMessagesComponent();
         }
 
-        messageComponentClientId = (component != null && component.getId() != null) ? component.getClientId() : null;
+        messageComponentClientId = component != null && component.getId() != null ? component.getClientId() : null;
         return messageComponentClientId;
     }
 

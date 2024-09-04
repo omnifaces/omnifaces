@@ -122,7 +122,7 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
     }
 
-    private void checkFacesAvailable() {
+    private static void checkFacesAvailable() {
         try {
             checkFacesAPIAvailable();
             // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
@@ -142,7 +142,7 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
      }
 
-    private void checkCDIAvailable() {
+    private static void checkCDIAvailable() {
         try {
             checkCDIAPIAvailable();
             // No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.

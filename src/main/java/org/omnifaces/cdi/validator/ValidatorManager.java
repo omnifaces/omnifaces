@@ -95,8 +95,8 @@ public class ValidatorManager {
      * or <code>null</code> if there is none.
      */
     public Validator createValidator(Application application, String validatorId) {
-        Validator validator = application.createValidator(validatorId);
-        Bean<Validator> bean = validatorsById.get(validatorId);
+        var validator = application.createValidator(validatorId);
+        var bean = validatorsById.get(validatorId);
 
         if (bean == null && !validatorsById.containsKey(validatorId)) {
 
@@ -107,17 +107,17 @@ public class ValidatorManager {
             validatorsById.put(validatorId, bean);
         }
 
-        return (bean != null) ? getReference(manager, bean) : validator;
+        return bean != null ? getReference(manager, bean) : validator;
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    private boolean isUnmanaged(Validator validator) {
+    private static boolean isUnmanaged(Validator validator) {
         if (validator == null) {
             return false;
         }
 
-        FacesValidator annotation = validator.getClass().getAnnotation(FacesValidator.class);
+        var annotation = validator.getClass().getAnnotation(FacesValidator.class);
 
         if (annotation == null) {
             return false;
@@ -130,10 +130,10 @@ public class ValidatorManager {
     private Bean<Validator> resolve(Class<? extends Validator> validatorClass, String validatorId) {
 
         // First try by class.
-        Bean<Validator> bean = (Bean<Validator>) resolveExact(manager, validatorClass);
+        var bean = (Bean<Validator>) resolveExact(manager, validatorClass);
 
         if (bean == null) {
-            FacesValidator annotation = validatorClass.getAnnotation(FacesValidator.class);
+            var annotation = validatorClass.getAnnotation(FacesValidator.class);
 
             if (annotation != null) {
                 // Then by own annotation, if any.

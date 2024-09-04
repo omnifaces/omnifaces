@@ -51,7 +51,7 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
 
     @Override
     public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-        for (int c = reader.read(); c != -1; c = reader.read()) {
+        for (var c = reader.read(); c != -1; c = reader.read()) {
             writer.write(c);
 
             if (c == '<') {
@@ -60,10 +60,10 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
         }
     }
 
-    private void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
-        int length = 0;
+    private static void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
+        var length = 0;
 
-        for (int ch = reader.read(); ch != -1; ch = reader.read()) {
+        for (var ch = reader.read(); ch != -1; ch = reader.read()) {
             if (Character.toLowerCase(ch) != END_SCRIPT[length]) {
                 if (length > 0) {
                     writer.write(END_SCRIPT, 0, length);

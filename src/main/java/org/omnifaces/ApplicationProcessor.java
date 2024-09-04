@@ -19,14 +19,12 @@ import static org.omnifaces.ApplicationInitializer.WARNING_OMNIFACES_INITIALIZAT
 import static org.omnifaces.util.Faces.getServletContext;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
-import jakarta.servlet.ServletContext;
 
 import org.omnifaces.component.search.MessagesKeywordResolver;
 import org.omnifaces.config.FacesConfigXml;
@@ -71,10 +69,10 @@ public class ApplicationProcessor implements SystemEventListener {
 
     @Override
     public void processEvent(SystemEvent event) {
-        ServletContext servletContext = getServletContext();
+        var servletContext = getServletContext();
 
         try {
-            Application application = (Application) event.getSource();
+            var application = (Application) event.getSource();
             checkDuplicateResourceHandler();
             FacesViews.registerViewHandler(servletContext, application);
             MessagesKeywordResolver.register(application);
@@ -89,10 +87,10 @@ public class ApplicationProcessor implements SystemEventListener {
         }
     }
 
-    private void checkDuplicateResourceHandler() {
-        Set<Class<? extends ResourceHandler>> allResourceHandlers = new HashSet<>();
+    private static void checkDuplicateResourceHandler() {
+        var allResourceHandlers = new HashSet<Class<? extends ResourceHandler>>();
 
-        for (Class<? extends ResourceHandler> resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
+        for (var resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
             if (!allResourceHandlers.add(resourceHandler)) {
                 throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler));
             }

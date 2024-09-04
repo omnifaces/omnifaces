@@ -145,7 +145,7 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
         verifyIntegrity(combinedStylesheets.get(0), HEAD_COMBINED_STYLESHEET_INTEGRITY);
     }
 
-    private void verifyIntegrity(WebElement element, String integrity) {
+    private static void verifyIntegrity(WebElement element, String integrity) {
         assertEquals("anonymous", element.getAttribute("crossorigin"));
         assertEquals(integrity, element.getAttribute("integrity"));
     }

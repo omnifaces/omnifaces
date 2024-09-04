@@ -17,9 +17,7 @@ import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
-import java.util.Map;
 
-import jakarta.faces.application.Resource;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
@@ -55,10 +53,10 @@ public class DeferredScriptRenderer extends Renderer {
      */
     @Override
     public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
-        ResourceIdentifier id = new ResourceIdentifier(component);
-        Resource resource = createResource(context, id);
+        var id = new ResourceIdentifier(component);
+        var resource = createResource(context, id);
 
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement("script", component);
         writer.writeAttribute("type", "text/javascript", "type");
 
@@ -69,13 +67,13 @@ public class DeferredScriptRenderer extends Renderer {
             writer.write(id.getIntegrity(context));
             writer.write("'");
 
-            Map<String, Object> attributes = component.getAttributes();
-            String onbegin = (String) attributes.get("onbegin");
-            String onsuccess = (String) attributes.get("onsuccess");
-            String onerror = (String) attributes.get("onerror");
-            boolean hasOnbegin = !isEmpty(onbegin);
-            boolean hasOnsuccess = !isEmpty(onsuccess);
-            boolean hasOnerror = !isEmpty(onerror);
+            var attributes = component.getAttributes();
+            var onbegin = (String) attributes.get("onbegin");
+            var onsuccess = (String) attributes.get("onsuccess");
+            var onerror = (String) attributes.get("onerror");
+            var hasOnbegin = !isEmpty(onbegin);
+            var hasOnsuccess = !isEmpty(onsuccess);
+            var hasOnerror = !isEmpty(onerror);
 
             if (hasOnbegin || hasOnsuccess || hasOnerror) {
                 encodeFunctionArgument(writer, onbegin, hasOnbegin);
@@ -96,7 +94,7 @@ public class DeferredScriptRenderer extends Renderer {
         }
     }
 
-    private void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
+    private static void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
         if (hasFunction) {
             writer.write(",function() {");
             writer.write(function);
@@ -109,7 +107,7 @@ public class DeferredScriptRenderer extends Renderer {
 
     @Override
     public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.endElement("script");
     }
 

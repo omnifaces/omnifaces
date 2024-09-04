@@ -44,7 +44,7 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public Serializable getObject(String key) {
-        CacheEntry entry = cacheStore.get(key);
+        var entry = cacheStore.get(key);
 
         if (entry != null) {
             if (entry.isValid()) {
@@ -73,7 +73,7 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public void putObject(String key, Serializable value, int timeToLive) {
-        CacheEntry entry = cacheStore.get(key);
+        var entry = cacheStore.get(key);
 
         if (entry == null || !entry.isValid()) {
             cacheStore.put(key, new CacheEntry(value,
@@ -86,7 +86,7 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public void putAttribute(String key, String name, Serializable value, int timeToLive) {
-        CacheEntry entry = cacheStore.get(key);
+        var entry = cacheStore.get(key);
 
         if (entry == null || !entry.isValid()) {
             // NOTE: timeToLive is only used when a new entry is created
@@ -99,7 +99,7 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public Serializable getAttribute(String key, String name) {
-        CacheEntry entry = cacheStore.get(key);
+        var entry = cacheStore.get(key);
 
         if (entry != null) {
             if (entry.isValid()) {
@@ -126,7 +126,7 @@ public abstract class TimeToLiveCache implements Cache {
         this.cacheStore = cacheStore;
     }
 
-    private Date timeToLiveToDate(int timeToLive) {
+    private static Date timeToLiveToDate(int timeToLive) {
         if (timeToLive != -1) {
             return new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive));
         } else {

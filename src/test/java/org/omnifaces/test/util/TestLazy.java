@@ -41,9 +41,10 @@ class TestLazy {
     }
 
     @Test
+    @SuppressWarnings("unused")
     void lazy() {
-        Expensive expensive = new Expensive();
-        Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
+        var expensive = new Expensive();
+        var cheap = new Lazy<Expensive>(Expensive::new);
         assertEquals(1, numCreations.get());
         assertEquals(Expensive.class, cheap.get().getClass());
         assertEquals(2, numCreations.get());

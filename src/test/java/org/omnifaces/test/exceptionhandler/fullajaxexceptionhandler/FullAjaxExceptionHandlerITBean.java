@@ -27,6 +27,7 @@ public class FullAjaxExceptionHandlerITBean {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public Object setThrowDuringUpdateModelValues(Object input) {
         throw new RuntimeException("throwDuringUpdateModelValues");
     }

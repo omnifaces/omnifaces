@@ -125,7 +125,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             return unloadView(context, viewId);
         }
 
-        UIViewRoot restoredView = super.restoreView(context, viewId);
+        var restoredView = super.restoreView(context, viewId);
 
         if (isRestorableViewRequest(context, restoredView)) {
             return createRestorableViewIfNecessary(viewId);
@@ -145,10 +145,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         }
 
         if (isViewResourceRequest(context)) {
-            String contentType = getMimeType(context, getRequestServletPath(context));
-            String characterEncoding = UTF_8.name();
+            var contentType = getMimeType(context, getRequestServletPath(context));
+            var characterEncoding = UTF_8.name();
 
-            ExternalContext externalContext = context.getExternalContext();
+            var externalContext = context.getExternalContext();
             externalContext.setResponseContentType(contentType);
             externalContext.setResponseCharacterEncoding(characterEncoding);
             context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
@@ -171,7 +171,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * Create a dummy view and trigger {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
      */
     private UIViewRoot createServiceWorkerView(FacesContext context, String viewId) {
-        UIViewRoot createdView = super.createView(context, viewId);
+        var createdView = super.createView(context, viewId);
         context.responseComplete();
         return createdView;
     }
@@ -183,8 +183,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
-        UIViewRoot createdView = super.createView(context, viewId);
-        ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
+        var createdView = super.createView(context, viewId);
+        var manager = getRenderKit(context).getResponseStateManager();
 
         if (restoreViewRootState(context, manager, createdView)) {
             context.setProcessingEvents(true);
@@ -206,14 +206,14 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * components in the tree. This is unnecessary during an unload request.
      */
     @SuppressWarnings("rawtypes")
-    private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
-        Object state = manager.getState(context, view.getViewId());
+    private static boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
+        var state = manager.getState(context, view.getViewId());
 
         if (!(state instanceof Object[]) || ((Object[]) state).length < 2) {
             return false;
         }
 
-        Object componentState = ((Object[]) state)[1];
+        var componentState = ((Object[]) state)[1];
         Object viewRootState = null;
 
         if (componentState instanceof Map) { // Partial state saving.
@@ -240,9 +240,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     /**
      * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
      */
-    private UIViewRoot createRestorableViewIfNecessary(String viewId) {
+    private static UIViewRoot createRestorableViewIfNecessary(String viewId) {
         try {
-            UIViewRoot createdView = buildView(viewId);
+            var createdView = buildView(viewId);
             return isRestorableView(createdView) ? createdView : null;
         }
         catch (IOException e) {
@@ -279,10 +279,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
         private RenderViewResourceFacesContext(FacesContext wrapped) {
             super(wrapped);
-            String defaultMapping = getDefaultFacesServletMapping(getServletContext(getWrapped()));
-            boolean prefixMapping = isPrefixMapping(defaultMapping);
-            String requestPathInfo = prefixMapping ? defaultMapping : null;
-            String requestServletPath = getRequestServletPath(getWrapped()) + (prefixMapping ? "" : defaultMapping);
+            var defaultMapping = getDefaultFacesServletMapping(getServletContext(getWrapped()));
+            var prefixMapping = isPrefixMapping(defaultMapping);
+            var requestPathInfo = prefixMapping ? defaultMapping : null;
+            var requestServletPath = getRequestServletPath(getWrapped()) + (prefixMapping ? "" : defaultMapping);
             this.externalContext = new RenderViewResourceExternalContext(getWrapped().getExternalContext(), requestPathInfo, requestServletPath);
         }
 

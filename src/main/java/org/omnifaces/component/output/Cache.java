@@ -35,7 +35,6 @@ import java.io.Writer;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.event.SystemEvent;
 
@@ -189,7 +188,7 @@ public class Cache extends OutputFamily {
      * Constructs the component.
      */
     public Cache() {
-        FacesContext context = FacesContext.getCurrentInstance();
+        var context = FacesContext.getCurrentInstance();
 
         // Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
         // have not been set, and there is no @PostContruct for UIComponents.
@@ -236,21 +235,21 @@ public class Cache extends OutputFamily {
             return;
         }
 
-        String key = getKeyWithDefault(context);
+        var key = getKeyWithDefault(context);
 
-        ResponseWriter responseWriter = context.getResponseWriter();
-        org.omnifaces.util.cache.Cache scopedCache = getCacheImpl(context);
+        var responseWriter = context.getResponseWriter();
+        var scopedCache = getCacheImpl(context);
 
         if (isReset()) {
             scopedCache.remove(key);
         }
 
-        String childRendering = scopedCache.get(key);
+        var childRendering = scopedCache.get(key);
 
         if (childRendering == null) {
             Writer bufferWriter = new StringWriter();
 
-            ResponseWriter bufferedResponseWriter = responseWriter.cloneWithWriter(bufferWriter);
+            var bufferedResponseWriter = responseWriter.cloneWithWriter(bufferWriter);
 
             context.setResponseWriter(bufferedResponseWriter);
 
@@ -305,7 +304,7 @@ public class Cache extends OutputFamily {
     @Override
     protected boolean isVisitable(VisitContext visitContext) {
 
-        FacesContext context = visitContext.getFacesContext();
+        var context = visitContext.getFacesContext();
 
         // Visit us and our children if a value for the cache was set in this request, or
         // if no value was cached yet.
@@ -329,7 +328,7 @@ public class Cache extends OutputFamily {
     }
 
     private String getKeyWithDefault(FacesContext context) {
-        String key = getKey();
+        var key = getKey();
         if (key == null) {
             key = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
         }
@@ -346,7 +345,7 @@ public class Cache extends OutputFamily {
      * @param context the FacesContext
      * @return true if a value was inserted in the cache during this request, false otherwise
      */
-    private boolean isCachedValueJustSet(FacesContext context) {
+    private static boolean isCachedValueJustSet(FacesContext context) {
         return TRUE.equals(context.getExternalContext().getRequestMap().get(VALUE_SET));
     }
 
@@ -368,13 +367,13 @@ public class Cache extends OutputFamily {
     }
 
     private String getContentFromBuffer(String buffer) {
-        String startMarker = getStartContentMarker();
-        int startIndex = buffer.indexOf(startMarker);
+        var startMarker = getStartContentMarker();
+        var startIndex = buffer.indexOf(startMarker);
 
         if (startIndex != -1) {
 
-            String endMarker = getEndContentMarker();
-            int endIndex = buffer.indexOf(endMarker);
+            var endMarker = getEndContentMarker();
+            var endIndex = buffer.indexOf(endMarker);
 
             if (endIndex != -1) {
 
