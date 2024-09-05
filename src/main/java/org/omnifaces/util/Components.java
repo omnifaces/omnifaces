@@ -1889,11 +1889,27 @@ public final class Components {
         return getIterationIndexPattern().matcher(clientId).matches();
     }
 
+    private static Pattern ITERATION_INDEX_PATTERN = null;
+
     private static Pattern getIterationIndexPattern() {
-        return getApplicationAttribute("omnifaces.IterationIndexPattern", () -> {
-            String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
-            return Pattern.compile("(^|.*" + quote(separatorChar) + ")([0-9]+" + quote(separatorChar) + ")(.*)");
-        });
+        if (ITERATION_INDEX_PATTERN == null) {
+            String separatorCharQuoted = quote(getSeparatorChar());
+            ITERATION_INDEX_PATTERN = getApplicationAttribute("omnifaces.IterationIndexPattern", () -> Pattern.compile("(^|.*" + separatorCharQuoted + ")([0-9]+" + separatorCharQuoted + ")(.*)"));
+        }
+
+        return ITERATION_INDEX_PATTERN;
+    }
+
+    private static String SEPARATOR_CHAR = null;
+
+    /**
+     * @return the {@link UINamingContainer} separator char and cache the value for this Application
+     */
+    private static String getSeparatorChar() {
+        if (SEPARATOR_CHAR == null) {
+            SEPARATOR_CHAR = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
+        }
+        return SEPARATOR_CHAR;
     }
 
     /**
