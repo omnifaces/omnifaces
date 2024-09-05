@@ -477,8 +477,9 @@ public final class Utils {
             return stream(new FileInputStream(file), output);
         }
 
-        try (var fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
-            var outputChannel = Channels.newChannel(output);
+        try (var fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ);
+            var outputChannel = Channels.newChannel(output))
+        {
             var buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
             var size = 0L;
 

@@ -18,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.enterprise.context.spi.Contextual;
 import jakarta.enterprise.context.spi.CreationalContext;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.PassivationCapable;
 
 import org.omnifaces.util.Beans;
@@ -109,7 +108,7 @@ public class BeanStorage implements Serializable {
         final var manager = Beans.getManager();
         // Not sure if synchronization is absolutely necessary. Just to be on safe side.
         Utils.executeAtomically(lock, () -> {
-            beans.values().forEach( (bean) -> BeansLocal.destroy(manager, bean));
+            beans.values().forEach(bean -> BeansLocal.destroy(manager, bean));
             beans.clear();
         });
     }
