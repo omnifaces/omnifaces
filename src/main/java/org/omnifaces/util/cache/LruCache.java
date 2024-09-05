@@ -20,11 +20,11 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 
@@ -166,44 +166,42 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     @Override
     public int size() {
-        return executeAtomically(lock, entries::size);
+        return entries.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return executeAtomically(lock, entries::isEmpty);
+        return entries.isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return executeAtomically(lock, () -> entries.containsKey(key));
+        return entries.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return executeAtomically(lock, () -> entries.containsValue(value));
+        return entries.containsValue(value);
     }
 
     // Readonly views -------------------------------------------------------------------------------------------------
 
     @Override
     public Set<K> keySet() {
-        return executeAtomically(lock, () -> Set.copyOf(entries.keySet()));
+        return copyAtomically(entries::keySet);
     }
 
     @Override
     public Collection<V> values() {
-        return executeAtomically(lock, () -> List.copyOf(entries.values()));
+        return copyAtomically(entries::values);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return executeAtomically(lock, () -> Set.copyOf(entries.entrySet()));
+        return copyAtomically(entries::entrySet);
     }
 
-    @Override
-    public String toString() {
-        return executeAtomically(lock, entries::toString);
+    private <E> Set<E> copyAtomically(Supplier<Collection<E>> collectionSupplier) {
+        return executeAtomically(lock, () -> Set.copyOf(collectionSupplier.get()));
     }
-
 }
