@@ -17,16 +17,14 @@ import static org.omnifaces.util.Utils.executeAtomically;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 
@@ -168,79 +166,44 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     @Override
     public int size() {
-        return entries.size();
+        return executeAtomically(lock, entries::size);
     }
 
     @Override
     public boolean isEmpty() {
-        return entries.isEmpty();
+        return executeAtomically(lock, entries::isEmpty);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return entries.containsKey(key);
+        return executeAtomically(lock, () -> entries.containsKey(key));
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return entries.containsValue(value);
+        return executeAtomically(lock, () -> entries.containsValue(value));
     }
 
     // Readonly views -------------------------------------------------------------------------------------------------
 
     @Override
     public Set<K> keySet() {
-        return new ReadOnlyCollection<>(entries::keySet);
+        return executeAtomically(lock, () -> Set.copyOf(entries.keySet()));
     }
 
     @Override
     public Collection<V> values() {
-        return new ReadOnlyCollection<>(entries::values);
+        return executeAtomically(lock, () -> List.copyOf(entries.values()));
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return new ReadOnlyCollection<>(entries::entrySet);
+        return executeAtomically(lock, () -> Set.copyOf(entries.entrySet()));
     }
 
-    // Inner classes --------------------------------------------------------------------------------------------------
-
-    private final class ReadOnlyCollection<E> extends AbstractSet<E> {
-
-        private final Supplier<Collection<E>> collectionSupplier;
-
-        public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
-            this.collectionSupplier = collectionSupplier;
-        }
-
-        @Override
-        public int size() {
-            return entries.size();
-        }
-
-        @Override
-        public Iterator<E> iterator() {
-            return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
-        }
-    }
-
-    private static final class ReadOnlyIterator<E> implements Iterator<E> {
-
-        private final Iterator<E> iterator;
-
-        private ReadOnlyIterator(Iterator<E> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public E next() {
-            return iterator.next();
-        }
+    @Override
+    public String toString() {
+        return executeAtomically(lock, entries::toString);
     }
 
 }
