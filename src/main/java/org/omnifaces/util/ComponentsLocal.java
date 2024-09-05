@@ -128,7 +128,7 @@ import org.omnifaces.el.ScopedRunner;
  *
  * @author Bauke Scholtz
  * @since 4.6
- * @see ComponentsLocal
+ * @see Components
  */
 public final class ComponentsLocal {
 
@@ -186,6 +186,7 @@ public final class ComponentsLocal {
     /**
      * Returns the UI component matching the given client ID search expression.
      * @param <C> The expected component type.
+     * @param context The involved {@link FacesContext}.
      * @param clientId The client ID search expression.
      * @return The UI component matching the given client ID search expression.
      * @throws ClassCastException When <code>C</code> is of wrong type.
@@ -204,6 +205,7 @@ public final class ComponentsLocal {
      * first, then children.
      *
      * @param <C> The expected component type.
+     * @param context The involved {@link FacesContext}.
      * @param component the component from which the relative search is started.
      * @param clientId The client ID search expression.
      * @return The UI component matching the given client ID search expression.
@@ -305,6 +307,7 @@ public final class ComponentsLocal {
      * Returns a list of UI components matching the given type in children of the currently submitted form.
      * The currently submitted form is obtained by {@link #getCurrentForm(FacesContext)}.
      * @param <C> The generic component type.
+     * @param context The involved {@link FacesContext}.
      * @param type The type of the UI components to be searched in children of the currently submitted form.
      * @return A list of UI components matching the given type in children of the currently submitted form.
      * @since 4.6
@@ -325,12 +328,12 @@ public final class ComponentsLocal {
      * <p>
      * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
      *
-     * @param facesContext the faces context used for tree visiting
+     * @param context the faces context used for tree visiting
      * @return A new instance of {@link Components.ForEach}, using the given faces context.
      * @since 4.6
      */
-    public static Components.ForEach forEachComponent(FacesContext facesContext) {
-        return new Components.ForEach(facesContext);
+    public static Components.ForEach forEachComponent(FacesContext context) {
+        return new Components.ForEach(context);
     }
 
     // Creation -------------------------------------------------------------------------------------------------------
@@ -356,6 +359,7 @@ public final class ComponentsLocal {
      * Include the Facelet file at the given (relative) path as child of the given UI component parent. This has the
      * same effect as using <code>&lt;ui:include&gt;</code>. The path is relative to the current view ID and absolute
      * to the web content root.
+     * @param context The involved {@link FacesContext}.
      * @param parent The parent component to include the Facelet file in.
      * @param path The (relative) path to the Facelet file.
      * @throws IOException Whenever given path cannot be read.
@@ -380,6 +384,7 @@ public final class ComponentsLocal {
      * attributes.put("bar", "true");
      * attributes.put("baz", "#{bean.baz(" + someId + ")}");
      * </pre>
+     * @param context The involved {@link FacesContext}.
      * @param parent The parent component to include the composite component in.
      * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
      * @param tagName The tag name of the composite component.
@@ -404,6 +409,7 @@ public final class ComponentsLocal {
      * Add given JavaScript code to the current view which is to be executed as an inline script when the rendering is
      * completed. When the current request is {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate
      * to {@link Ajax#oncomplete(String...)}, else it will add given JavaScript code as inline script to end of body.
+     * @param context The involved {@link FacesContext}.
      * @param script JavaScript code which is to be executed as an inline script.
      * @since 4.6
      */
@@ -430,6 +436,7 @@ public final class ComponentsLocal {
      * head.</li>
      * <li>Else add given JavaScript resource to end of the <code>&lt;h:body&gt;</code>.</li>
      * </ul>
+     * @param context The involved {@link FacesContext}.
      * @param libraryName Library name of the JavaScript resource.
      * @param resourceName Resource name of the JavaScript resource.
      * @since 4.6
@@ -456,6 +463,7 @@ public final class ComponentsLocal {
     /**
      * Add the Faces JavaScript resource to current view. If Faces 4.0+ is present, then it will add the
      * <code>jakarta.faces:faces.js</code> resource, else it will add the <code>jakarta.faces:jsf.js</code> resource.
+     * @param context The involved {@link FacesContext}.
      * @since 4.6
      */
     public static void addFacesScriptResource(FacesContext context) {
@@ -512,6 +520,7 @@ public final class ComponentsLocal {
 
     /**
      * Creates and builds a local view for the given view ID independently from the current view.
+     * @param context The involved {@link FacesContext}.
      * @param viewId The ID of the view which needs to be created and built.
      * @return A fully populated component tree of the given view ID.
      * @throws IOException Whenever something fails at I/O level. This can happen when the given view ID is unavailable or malformed.
@@ -546,6 +555,7 @@ public final class ComponentsLocal {
      * added components, component event listeners, then it should mostly be safe.
      * In other words, use this at most for "simple templates" only, e.g. an HTML based mail template, which usually
      * already doesn't have an HTML head nor body.
+     * @param context The involved {@link FacesContext}.
      * @param component The component to capture HTML output for.
      * @return The encoded HTML output of the given component.
      * @throws UncheckedIOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
@@ -581,6 +591,7 @@ public final class ComponentsLocal {
      * @param context The current {@link FacesContext}
      * @return The currently submitted UI form component.
      * @see UIForm#isSubmitted()
+     * @since 4.6
      */
     public static UIForm getCurrentForm(FacesContext context) {
 
@@ -624,6 +635,7 @@ public final class ComponentsLocal {
      * Returns the currently invoked UI command component, or <code>null</code> if there is none, which may happen when
      * the current request is not a postback request at all, or when the view has been changed by for example a
      * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
+     * @param context The involved {@link FacesContext}.
      * @return The currently invoked UI command component.
      * @since 4.6
      */
@@ -637,6 +649,7 @@ public final class ComponentsLocal {
      * the current request is not a postback request at all, or when the view has been changed by for example a
      * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
      * @param <C> The expected component type.
+     * @param context The involved {@link FacesContext}.
      * @return The source of the currently invoked action.
      * @since 4.6
      */
@@ -692,23 +705,13 @@ public final class ComponentsLocal {
     }
 
     /**
-     * Returns whether the given UI input component is editable. That is when it is rendered, not disabled and not
-     * readonly.
-     * @param input The UI input component to be checked.
-     * @return <code>true</code> if the given UI input component is editable.
-     */
-    public static boolean isEditable(UIInput input) {
-        return isRendered(input)
-                && !Boolean.TRUE.equals(input.getAttributes().get("disabled"))
-                && !Boolean.TRUE.equals(input.getAttributes().get("readonly"));
-    }
-
-    /**
      * Returns the value of the <code>label</code> attribute associated with the given UI component if any, else
      * the client ID. It never returns null.
+     * @param context The involved {@link FacesContext}.
      * @param component The UI component for which the label is to be retrieved.
      * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
      * the client ID.
+     * @since 4.6
      */
     public static String getLabel(FacesContext context, UIComponent component) {
         String label = getOptionalLabel(context, component);
@@ -718,9 +721,11 @@ public final class ComponentsLocal {
     /**
      * Returns the value of the <code>label</code> attribute associated with the given UI component if any, else
      * null.
+     * @param context The involved {@link FacesContext}.
      * @param component The UI component for which the label is to be retrieved.
      * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
      * null.
+     * @since 4.6
      */
     public static String getOptionalLabel(FacesContext context, UIComponent component) {
         Object[] result = new Object[1];
