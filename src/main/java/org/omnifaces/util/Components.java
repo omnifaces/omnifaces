@@ -516,7 +516,7 @@ public final class Components {
      */
     public static class ForEach {
 
-        private FacesContext facesContext;
+        private final FacesContext facesContext;
         private UIComponent root;
         private Collection<String> ids;
         private Set<VisitHint> hints;
@@ -653,8 +653,8 @@ public final class Components {
 
         private static class TypesVisitCallback implements VisitCallback {
 
-            private Class<?>[] types;
-            private VisitCallback next;
+            private final Class<?>[] types;
+            private final VisitCallback next;
 
             public TypesVisitCallback(Class<?>[] types, VisitCallback next) {
                 this.types = types;
