@@ -1891,9 +1891,12 @@ public final class Components {
 
     private static Pattern ITERATION_INDEX_PATTERN = null;
 
+    /**
+     * @return the {@link Pattern} to match the iteration index and cache the value
+     */
     private static Pattern getIterationIndexPattern() {
         if (ITERATION_INDEX_PATTERN == null) {
-            String separatorCharQuoted = quote(getSeparatorChar());
+            final String separatorCharQuoted = quote(getSeparatorChar());
             ITERATION_INDEX_PATTERN = getApplicationAttribute("omnifaces.IterationIndexPattern", () -> Pattern.compile("(^|.*" + separatorCharQuoted + ")([0-9]+" + separatorCharQuoted + ")(.*)"));
         }
 
@@ -1903,7 +1906,7 @@ public final class Components {
     private static String SEPARATOR_CHAR = null;
 
     /**
-     * @return the {@link UINamingContainer} separator char and cache the value for this Application
+     * @return the {@link UINamingContainer} separator char and cache the value
      */
     private static String getSeparatorChar() {
         if (SEPARATOR_CHAR == null) {
