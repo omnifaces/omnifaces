@@ -47,6 +47,7 @@ jobs:
   deploy:
     name: Deploy 4.x SNAPSHOT
     needs: test
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -71,6 +72,7 @@ jobs:
   analyze:
     name: Analyze 4.x with Sonar
     needs: test
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
