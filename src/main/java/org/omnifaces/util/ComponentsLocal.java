@@ -28,8 +28,6 @@ import static org.omnifaces.util.Components.createScriptResource;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Components.getBehaviorListeners;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.isRendered;
-import static org.omnifaces.util.Components.setAttribute;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.setContext;
@@ -769,6 +767,7 @@ public final class ComponentsLocal {
      * Returns the expected type of the "value" attribute of the given component. This is useful in among others a
      * "generic entity converter".
      * @param <T> The expected type of the expected type of the "value" attribute of the given component.
+     * @param context The involved {@link FacesContext}.
      * @param component The component to obtain the expected type of the "value" attribute for.
      * @return The expected type of the "value" attribute of the given component, or <code>null</code> when there is no such value.
      * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -797,6 +796,7 @@ public final class ComponentsLocal {
      * {@link ValueExpression#getExpectedType()} returns a specific type, i.e. not <code>java.lang.Object</code>, and
      * then returns it, else it inspects the actual type of the property behind the expression string.
      * @param <T> The expected type of the expected type of the given value expression.
+     * @param context The involved {@link FacesContext}.
      * @param valueExpression The value expression to obtain the expected type for.
      * @return The expected type of the given value expression.
      * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -920,6 +920,7 @@ public final class ComponentsLocal {
     /**
      * Reset all child {@link UIInput} components enclosed in the given {@link UIForm} component, or the closest
      * {@link UIForm} parent of it.
+     * @param context The involved {@link FacesContext}.
      * @param component The component representing the {@link UIForm} itself, or to find the closest {@link UIForm}
      * parent for.
      * @throws IllegalArgumentException When given component is not an {@link UIForm}, or does not have a {@link UIForm}
@@ -938,20 +939,12 @@ public final class ComponentsLocal {
 
     /**
      * Reset all child {@link UIInput} components enclosed in the given parent component.
+     * @param context The involved {@link FacesContext}.
      * @param component The parent component to reset all child {@link UIInput} components in.
      * @since 4.6
      */
     public static void resetInputs(FacesContext context, UIComponent component) {
         forEachComponent(context).fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
-    }
-
-    /**
-     * Disable the passed {@link UIInput} component.
-     * @param input The {@link UIInput} component to disable.
-     * @since 4.6
-     */
-    public static void disableInput(UIInput input) {
-        setAttribute(input, "disabled", true);
     }
 
     /**
@@ -961,12 +954,13 @@ public final class ComponentsLocal {
      * @since 4.6
      */
     public static void disableInput(FacesContext context, String clientId) {
-        disableInput(findComponent(context, clientId));
+        Components.disableInput(findComponent(context, clientId));
     }
 
     /**
      * Add an {@link UIForm} to the current view if absent.
      * This might be needed for scripts which rely on Faces view state identifier and/or on functioning of jsf.ajax.request().
+     * @param context The involved {@link FacesContext}.
      * @since 4.6
      */
     public static void addFormIfNecessary(FacesContext context) {
@@ -1149,6 +1143,7 @@ public final class ComponentsLocal {
      * @param type The type of the property referenced by the value expression.
      * @return The created editable value expression, ready to be used as
      * {@link UIComponent#setValueExpression(String, ValueExpression)}.
+     * @since 4.6
      */
     public static ValueExpression createValueExpression(FacesContext context, String expression, Class<?> type) {
         return context.getApplication()
@@ -1176,12 +1171,14 @@ public final class ComponentsLocal {
      * <li><code>createMethodExpression("#{bean.submit5('foo', 0)}", Void.class, String.class, Long.class);</code></li>
      * <li><code>createMethodExpression("#{bean.submit6(0, 'foo')}", String.class, Long.class, String.class);</code></li>
      * </ul>
+     * @param context The involved {@link FacesContext}.
      * @param expression The EL expression to create a method expression for.
      * @param returnType The return type of the method expression. Can be <code>null</code> if you don't care about the
      * return type (e.g. <code>void</code> or <code>String</code>).
      * @param parameterTypes The parameter types of the method expression.
      * @return The created method expression, ready to be used as
      * {@link UICommand#setActionExpression(MethodExpression)}.
+     * @since 4.6
      */
     public static MethodExpression createMethodExpression
     (FacesContext context, String expression, Class<?> returnType, Class<?>... parameterTypes)
@@ -1210,6 +1207,7 @@ public final class ComponentsLocal {
      * @param parameterTypes The parameter types of the void method expression.
      * @return The created void method expression, ready to be used as
      * {@link UICommand#setActionExpression(MethodExpression)}.
+     * @since 4.6
      */
     public static MethodExpression createVoidMethodExpression(FacesContext context, String expression, Class<?>... parameterTypes) {
         return createMethodExpression(context, expression, Void.class, parameterTypes);
@@ -1230,6 +1228,7 @@ public final class ComponentsLocal {
      * @param expression The EL expression to create an action listener method expression for.
      * @return The created action listener method expression, ready to be used as
      * {@link UICommand#addActionListener(jakarta.faces.event.ActionListener)}.
+     * @since 4.6
      */
     public static MethodExpressionActionListener createActionListenerMethodExpression(FacesContext context, String expression) {
         return new MethodExpressionActionListener(createVoidMethodExpression(context,expression, ActionEvent.class));
@@ -1246,12 +1245,14 @@ public final class ComponentsLocal {
      * <ul>
      * <li><code>createAjaxBehavior("#{bean.ajaxListener}");</code></li>
      * </ul>
-     * <p>Note that this is essentially the programmatic equivalent of <code>&lt;f:ajax&gt;</code>. So if you intented
+     * <p>Note that this is essentially the programmatic equivalent of <code>&lt;f:ajax&gt;</code>. So if you intended
      * to create for example a <code>&lt;p:ajax&gt;</code> programmatically, then don't use this method.
+     * @param context The involved {@link FacesContext}.
      * @param expression The EL expression to be invoked when the created ajax behavior is processed.
      * @return The created ajax behavior, ready to be used as
      * {@link UIComponentBase#addClientBehavior(String, ClientBehavior)} whereby the string argument represents the
      * client event name, such as "action", "valueChange", "click", "blur", etc.
+     * @since 4.6
      */
     public static AjaxBehavior createAjaxBehavior(FacesContext context, String expression) {
         AjaxBehavior behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
@@ -1301,9 +1302,11 @@ public final class ComponentsLocal {
     /**
      * Validate in development stage if the given component has a parent of given parent type.
      * @param <C> The generic component type.
+     * @param context The involved {@link FacesContext}.
      * @param component The component to be validated.
      * @param parentType The parent type to be checked.
      * @throws IllegalStateException When the given component doesn't have any parent of the given type.
+     * @since 4.6
      */
     public static <C extends UIComponent> void validateHasParent(FacesContext context, UIComponent component, Class<C> parentType) {
         if (!isDevelopment(context)) {
@@ -1323,6 +1326,7 @@ public final class ComponentsLocal {
      * @param component The component to be validated.
      * @param parentType The parent type to be checked.
      * @throws IllegalStateException When the given component doesn't have a direct parent of the given type.
+     * @since 4.6
      */
     public static <C extends UIComponent> void validateHasDirectParent(FacesContext context, UIComponent component, Class<C> parentType) {
         if (!isDevelopment(context)) {
@@ -1358,6 +1362,7 @@ public final class ComponentsLocal {
     /**
      * Validate in development stage if the given component has at least a child of given child type.
      * @param <C> The generic component type.
+     * @param context The involved {@link FacesContext}.
      * @param component The component to be validated.
      * @param childType The child type to be checked.
      * @throws IllegalStateException When the given component doesn't have any children of the given type.
@@ -1377,6 +1382,7 @@ public final class ComponentsLocal {
     /**
      * Validate in development stage if the given component has only children of given child type.
      * @param <C> The generic component type.
+     * @param context The involved {@link FacesContext}.
      * @param component The component to be validated.
      * @param childType The child type to be checked.
      * @throws IllegalStateException When the given component has children of a different type.
@@ -1450,10 +1456,10 @@ public final class ComponentsLocal {
     }
 
     private static Pattern getIterationIndexPattern(FacesContext context) {
-        final String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(context));
+        final String quotedSeparatorChar = quote(Character.toString(UINamingContainer.getSeparatorChar(context))); //todo: cache this value
         return getApplicationAttribute(
                 "omnifaces.IterationIndexPattern",
-                () -> Pattern.compile("(^|.*" + quote(separatorChar) + ")([0-9]+" + quote(separatorChar) + ")(.*)")
+                () -> Pattern.compile("(^|.*" + quotedSeparatorChar + ")([0-9]+" + quotedSeparatorChar + ")(.*)")
         );
     }
 
