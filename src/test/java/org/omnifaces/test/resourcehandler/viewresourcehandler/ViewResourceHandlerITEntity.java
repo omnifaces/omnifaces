@@ -16,8 +16,8 @@ import java.time.temporal.Temporal;
 
 public class ViewResourceHandlerITEntity {
 
-    private Long id;
-    private Temporal lastModified;
+    private final Long id;
+    private final Temporal lastModified;
 
     public ViewResourceHandlerITEntity(Long id, Temporal lastModified) {
         this.id = id;

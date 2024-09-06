@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withViewResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withViewResources;
+import static org.omnifaces.test.resourcehandler.viewresourcehandler.ViewResourceHandlerITBean.LAST_MODIFIED;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Scanner;
 
@@ -41,7 +41,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
         + "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
             + "<url><loc>{baseURL}entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
             + "<url><loc>{baseURL}entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-            + "<url><loc>{baseURL}entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10" + ZoneId.systemDefault().getRules().getOffset(Instant.now()) + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+            + "<url><loc>{baseURL}entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10" + ZoneId.systemDefault().getRules().getOffset(LAST_MODIFIED.toLocalDateTime()) + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
             + "<url><loc>{baseURL}entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
         + "</urlset>";
 
