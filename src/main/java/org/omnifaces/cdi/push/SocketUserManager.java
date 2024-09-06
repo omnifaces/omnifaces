@@ -13,9 +13,9 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.synchronizedSet;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,13 +62,7 @@ public class SocketUserManager {
      * @param userId The session based user ID.
      */
     protected void register(Serializable user, String userId) {
-        synchronized (applicationUsers) {
-            if (!applicationUsers.containsKey(user)) {
-                applicationUsers.putIfAbsent(user, synchronizedSet(new HashSet<>(ESTIMATED_SESSIONS_PER_USER)));
-            }
-
-            applicationUsers.get(user).add(userId);
-        }
+        applicationUsers.computeIfAbsent(user, ($) -> newConcurrentHashSet(ESTIMATED_CHANNELS_IDS_PER_USER, userId));
     }
 
     /**
@@ -78,17 +72,8 @@ public class SocketUserManager {
      * @param channelId The channel identifier.
      */
     protected void addChannelId(String userId, String channel, String channelId) {
-        if (!userChannels.containsKey(userId)) {
-            userChannels.putIfAbsent(userId, new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
-        }
-
-        ConcurrentHashMap<String, Set<String>> channelIds = userChannels.get(userId);
-
-        if (!channelIds.containsKey(channel)) {
-            channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
-        }
-
-        channelIds.get(channel).add(channelId);
+        userChannels.computeIfAbsent(userId, ($) -> new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
+        userChannels.get(userId).computeIfAbsent(channel, ($) -> newConcurrentHashSet(ESTIMATED_USER_CHANNELS_PER_SESSION, channelId) );
     }
 
     /**
@@ -172,6 +157,14 @@ public class SocketUserManager {
         }
 
         return emptySet();
+    }
+
+    @SafeVarargs
+    private static <V> Set<V> newConcurrentHashSet(int initialCapacity, V... elements) {
+        final Set<V> set = ConcurrentHashMap.newKeySet(initialCapacity);
+        if (elements.length > 0)
+            Collections.addAll(set, elements);
+        return set;
     }
 
 }
