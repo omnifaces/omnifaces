@@ -21,9 +21,7 @@ import static org.omnifaces.test.resourcehandler.viewresourcehandler.ViewResourc
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Scanner;
 
 import org.apache.http.HttpStatus;
