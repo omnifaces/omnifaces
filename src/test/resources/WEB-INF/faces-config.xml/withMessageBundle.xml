@@ -21,5 +21,6 @@
 >
     <application>
         <message-bundle>messages</message-bundle>
+        <locale-config><default-locale>en</default-locale></locale-config>
     </application>
 </faces-config>
