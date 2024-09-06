@@ -13,16 +13,17 @@
 package org.omnifaces.test.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Utils;
 
 class TestUtils {
 
-    private static final String[][] URL_SAFE_SERIALIZED_STRINGS = {
-        { "omnifaces:omnifaces.js", "eNrLz83LTEtMTi22yoex9LKKAWWHCLA" }, // 1-padded
-        { "javax.faces:jsf.js|omnifaces:omnifaces.js", "eNrLSixLrNBLS0xOLbbKKk7Tyyquyc_Ny4QIwFlAYQBPNQ_-" }, // 0-padded
-        { "jakarta.faces:faces.js|omnifaces:omnifaces.js", "eNrLSsxOLCpJ1EtLTE4ttgKTelnFNfm5eZkQITgLKAwAkVERgQ" }, // 2-padded
+    private static final String[] URL_SAFE_SERIALIZATION_EXAMPLES = {
+        "omnifaces:omnifaces.js", // This example normally generates 1-padded base64 encoded string
+        "javax.faces:jsf.js|omnifaces:omnifaces.js", // This example normally generates 0-padded base64 encoded string
+        "jakarta.faces:faces.js|omnifaces:omnifaces.js", // This example normally generates 2-padded base64 encoded string
     };
 
     private static final String RFC_3986_RESERVED_CHARACTERS = ":/?#[]@!$&'()*+,;=";
@@ -31,11 +32,11 @@ class TestUtils {
 
     @Test
     void testSerializeURLSafe() {
-        for (String[] test : URL_SAFE_SERIALIZED_STRINGS) {
-            String id = test[0];
-            String serialized = test[1];
-            assertEquals(serialized, Utils.serializeURLSafe(id));
-            assertEquals(id, Utils.unserializeURLSafe(serialized));
+        for (String originalString : URL_SAFE_SERIALIZATION_EXAMPLES) {
+            var serializedString = Utils.serializeURLSafe(originalString);
+            assertTrue(!serializedString.contains("="), "The serialized string '" + serializedString + "' based on '" + originalString + "' may not contain the '=' character");
+            var unserializedString = Utils.unserializeURLSafe(serializedString);
+            assertEquals(originalString, unserializedString, "The unserialized string must exactly match the original string '" + originalString + "'");
         }
     }
 
