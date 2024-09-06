@@ -17,10 +17,8 @@ import static org.omnifaces.util.Utils.executeAtomically;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -190,57 +188,20 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     @Override
     public Set<K> keySet() {
-        return new ReadOnlyCollection<>(entries::keySet);
+        return copyAtomically(entries::keySet);
     }
 
     @Override
     public Collection<V> values() {
-        return new ReadOnlyCollection<>(entries::values);
+        return copyAtomically(entries::values);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return new ReadOnlyCollection<>(entries::entrySet);
+        return copyAtomically(entries::entrySet);
     }
 
-    // Inner classes --------------------------------------------------------------------------------------------------
-
-    private final class ReadOnlyCollection<E> extends AbstractSet<E> {
-
-        private final Supplier<Collection<E>> collectionSupplier;
-
-        public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
-            this.collectionSupplier = collectionSupplier;
-        }
-
-        @Override
-        public int size() {
-            return entries.size();
-        }
-
-        @Override
-        public Iterator<E> iterator() {
-            return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
-        }
+    private <E> Set<E> copyAtomically(Supplier<Collection<E>> collectionSupplier) {
+        return executeAtomically(lock, () -> Set.copyOf(collectionSupplier.get()));
     }
-
-    private static final class ReadOnlyIterator<E> implements Iterator<E> {
-
-        private final Iterator<E> iterator;
-
-        private ReadOnlyIterator(Iterator<E> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public E next() {
-            return iterator.next();
-        }
-    }
-
 }
