@@ -25,7 +25,8 @@ import jakarta.inject.Named;
 @RequestScoped
 public class ViewResourceHandlerITBean {
 
-    private static final ZonedDateTime LAST_MODIFIED = ZonedDateTime.of(2020, 12, 22, 15, 20, 10, 0, ZoneOffset.ofHours(-4));
+    public static final ZonedDateTime LAST_MODIFIED = ZonedDateTime.of(2020, 12, 22, 15, 20, 10, 0, ZoneOffset.ofHours(-4));
+
     private List<ViewResourceHandlerITEntity> entities;
 
     @PostConstruct

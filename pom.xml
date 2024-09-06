@@ -476,11 +476,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.5.0</version>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <user.language>en</user.language>
-                        </systemPropertyVariables>
-                    </configuration> 
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -497,7 +492,6 @@
                     <configuration>
                         <rerunFailingTestsCount>2</rerunFailingTestsCount>
                         <systemPropertyVariables>
-                            <user.language>en</user.language>
                             <profile.id>${project.activeProfiles[0].id}</profile.id>
                             <omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
                             <arquillian.browser>${arquillian.browser}</arquillian.browser>
