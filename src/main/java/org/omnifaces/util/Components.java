@@ -12,16 +12,10 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.component.search.SearchExpressionHint.IGNORE_NO_RESULT;
-import static jakarta.faces.component.search.SearchExpressionHint.RESOLVE_SINGLE_COMPONENT;
 import static jakarta.faces.component.visit.VisitContext.createVisitContext;
 import static jakarta.faces.component.visit.VisitResult.ACCEPT;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.omnifaces.util.ComponentsLocal.findAndInvalidateInputs;
 import static org.omnifaces.util.Faces.getContext;
-import static org.omnifaces.util.FacesLocal.createConverter;
-import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
@@ -34,11 +28,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
@@ -58,19 +50,14 @@ import jakarta.faces.component.UIParameter;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.ValueHolder;
 import jakarta.faces.component.behavior.AjaxBehavior;
-import jakarta.faces.component.behavior.BehaviorBase;
 import jakarta.faces.component.behavior.ClientBehavior;
-import jakarta.faces.component.behavior.ClientBehaviorHolder;
-import jakarta.faces.component.search.SearchExpressionHint;
 import jakarta.faces.component.visit.VisitCallback;
 import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.component.visit.VisitHint;
 import jakarta.faces.component.visit.VisitResult;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.event.AjaxBehaviorEvent;
-import jakarta.faces.event.BehaviorListener;
 import jakarta.faces.event.MethodExpressionActionListener;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.facelets.FaceletContext;
@@ -138,30 +125,11 @@ public final class Components {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(Components.class.getName());
-
     /** The name of the label attribute. */
     public static final String LABEL_ATTRIBUTE = "label";
 
     /** The name of the value attribute. */
     public static final String VALUE_ATTRIBUTE = "value";
-
-    private static final String ERROR_MISSING_PARENT =
-            "Component '%s' must have a parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_DIRECT_PARENT =
-            "Component '%s' must have a direct parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_CHILD =
-            "Component '%s' must have at least one child of type '%s', but it cannot be found.";
-    private static final String ERROR_ILLEGAL_PARENT =
-            "Component '%s' may not have a parent of type '%s'.";
-    private static final String ERROR_ILLEGAL_CHILDREN =
-            "Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
-    private static final String ERROR_CHILDREN_DISALLOWED =
-            "Component '%s' may not have any children. Encountered children of types '%s'.";
-    private static final String ERROR_ILLEGAL_UIINPUT =
-            "Relative client ID '%s' must represent an UIInput component, but encountered '%s'.";
-
-    private static final Set<SearchExpressionHint> RESOLVE_LABEL_FOR = EnumSet.of(RESOLVE_SINGLE_COMPONENT, IGNORE_NO_RESULT);
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -395,7 +363,9 @@ public final class Components {
      * @param facesContext the faces context used for tree visiting
      * @return A new instance of {@link ForEach}, using the given faces context.
      * @since 2.0
+     * @deprecated use {@link ComponentsLocal#forEachComponent(FacesContext)}
      */
+    @Deprecated(since = "4.6", forRemoval = true)
     public static ForEach forEachComponent(FacesContext facesContext) {
         return new ForEach(facesContext);
     }
@@ -590,7 +560,7 @@ public final class Components {
      * @see Application#createComponent(String)
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @since 4.4
-     * @deprecated use {@link ComponentsLocal#createComponent(FacesContext,String}
+     * @deprecated use {@link ComponentsLocal#createComponent(FacesContext,String)}
      */
     @Deprecated(since = "4.6", forRemoval = true)
     @SuppressWarnings("unchecked")
@@ -1078,36 +1048,8 @@ public final class Components {
      * @return The conversion result, may be {@code null}, depending on the value and the converter implementation.
      * @since 4.1
      */
-    @SuppressWarnings("unchecked")
     public static <T> String convertToString(FacesContext context, ValueHolder holder, T value) {
-        Converter<T> converter = holder.getConverter();
-
-        if (converter == null && value != null) {
-            converter = createConverter(context, value.getClass());
-        }
-
-        if (converter != null) {
-            UIComponent component = null;
-
-            if (holder instanceof UIComponent) {
-                component = (UIComponent) holder;
-            }
-            else if (holder instanceof ParamHolder) {
-                UIParameter parameter = new UIParameter();
-                parameter.setName(((ParamHolder<T>) holder).getName());
-                parameter.setValue(value);
-                component = parameter;
-            }
-            else {
-                UIOutput output = new UIOutput();
-                output.setValue(value);
-                component = output;
-            }
-
-            return converter.getAsString(context, component, value);
-        }
-
-        return (value == null) ? null : value.toString();
+        return ComponentsLocal.convertToString(context, holder, value);
     }
 
     /**
@@ -1124,25 +1066,7 @@ public final class Components {
      * @since 4.2
      */
     public static String getRenderedValue(FacesContext context, ValueHolder holder) {
-        Object value = null;
-
-        if (holder instanceof EditableValueHolder) {
-            EditableValueHolder editableValueHolder = (EditableValueHolder) holder;
-            Object submittedValue = editableValueHolder.getSubmittedValue();
-
-            if (submittedValue != null) {
-                return submittedValue.toString();
-            }
-
-            if (editableValueHolder.isLocalValueSet()) {
-                value = editableValueHolder.getLocalValue();
-            }
-        }
-        else {
-            value = holder.getValue();
-        }
-
-        return Objects.toString(convertToString(context, holder, value), "");
+        return ComponentsLocal.getRenderedValue(context, holder);
     }
 
     /**
@@ -1155,7 +1079,7 @@ public final class Components {
      * @since 4.2
      */
     public static void invalidateInputs(String... relativeClientIds) {
-        findAndInvalidateInputs(getContext(), relativeClientIds);
+        ComponentsLocal.invalidateInputs(getContext(), relativeClientIds);
     }
 
     /**
@@ -1257,7 +1181,7 @@ public final class Components {
      * {@link UICommand#addActionListener(jakarta.faces.event.ActionListener)}.
      */
     public static MethodExpressionActionListener createActionListenerMethodExpression(String expression) {
-        return new MethodExpressionActionListener(createVoidMethodExpression(expression, ActionEvent.class));
+        return ComponentsLocal.createActionListenerMethodExpression(getContext(), expression);
     }
 
     /**
@@ -1363,41 +1287,6 @@ public final class Components {
      */
     public static void validateHasNoChildren(UIComponent component) {
         ComponentsLocal.validateHasNoChildren(getContext(), component);
-    }
-
-    // Helpers --------------------------------------------------------------------------------------------------------
-
-    /**
-     * If given method expression is not null, extract expression string from it and add to given list.
-     */
-    static void addExpressionStringIfNotNull(MethodExpression expression, List<String> list) {
-        if (expression != null) {
-            list.add(expression.getExpressionString());
-        }
-    }
-
-    /**
-     * Get all behavior listeners of given behavior event from the given component.
-     */
-    @SuppressWarnings("unchecked")
-    static List<BehaviorListener> getBehaviorListeners(ClientBehaviorHolder component, String behaviorEvent) {
-        List<ClientBehavior> behaviors = component.getClientBehaviors().get(behaviorEvent);
-
-        if (behaviors == null) {
-            return emptyList();
-        }
-
-        List<BehaviorListener> allListeners = new ArrayList<>();
-
-        for (ClientBehavior behavior : behaviors) {
-            List<BehaviorListener> listeners = accessField(behavior, BehaviorBase.class, List.class);
-
-            if (listeners != null) {
-                allListeners.addAll(listeners);
-            }
-        }
-
-        return allListeners;
     }
 
 }
