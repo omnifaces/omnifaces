@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -64,7 +65,7 @@ public abstract class OmniFacesIT {
         switch (arquillianBrowser) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
-                var chrome = new ChromeDriver(new ChromeOptions().addArguments("--no-sandbox", "--headless"));
+                var chrome = new ChromeDriver(new ChromeOptions().addArguments("--lang=en", "--no-sandbox", "--headless"));
                 chrome.setLogLevel(Level.INFO);
                 browser = chrome;
                 break;
@@ -72,6 +73,7 @@ public abstract class OmniFacesIT {
                 throw new UnsupportedOperationException("arquillian.browser='" + arquillianBrowser + "' is not yet supported");
         }
 
+        Locale.setDefault(Locale.ENGLISH);
         PageFactory.initElements(browser, this);
     }
 
