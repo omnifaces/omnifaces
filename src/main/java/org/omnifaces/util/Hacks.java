@@ -20,7 +20,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.getCurrentActionSource;
+import static org.omnifaces.util.ComponentsLocal.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getPackage;
