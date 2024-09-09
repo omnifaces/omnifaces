@@ -87,7 +87,7 @@ public class SocketSessionManager {
      * @param channelId The channel identifier to register.
      */
     protected void register(String channelId) {
-        socketSessions.computeIfAbsent(channelId, ($) -> new ConcurrentLinkedQueue<>());
+        socketSessions.computeIfAbsent(channelId, $ -> new ConcurrentLinkedQueue<>());
     }
 
     /**
@@ -135,10 +135,11 @@ public class SocketSessionManager {
         var sessions = channelId != null ? socketSessions.get(channelId) : null;
 
         if (sessions != null) {
-            return sessions.stream().filter(Session::isOpen)
-                                    .map(session -> send(session, message, true)) // can be null!
-                                    .filter(Objects::nonNull)
-                                    .collect(toUnmodifiableSet());
+            return sessions.stream()
+                    .filter(Session::isOpen)
+                    .map(session -> send(session, message, true))
+                    .filter(Objects::nonNull)
+                    .collect(toUnmodifiableSet());
         }
 
         return emptySet();
