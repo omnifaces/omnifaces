@@ -47,13 +47,13 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
 
     @Override
     public void setBeanStorage(FacesContext context, UUID beanStorageId, BeanStorage beanStorage) {
-        UIViewRoot viewRoot = context.getViewRoot();
+        var viewRoot = context.getViewRoot();
 
         if (!viewRoot.initialStateMarked()) {
             viewRoot.markInitialState(); // Forces Faces to start recording changes in view state.
         }
 
-        Map<String, Object> viewState = viewRoot.getAttributes();
+        var viewState = viewRoot.getAttributes();
         viewState.put(getClass().getName(), beanStorageId);
         viewState.put(beanStorageId.toString(), beanStorage);
     }
