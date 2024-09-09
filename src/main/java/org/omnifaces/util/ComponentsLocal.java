@@ -25,7 +25,6 @@ import static org.omnifaces.util.AjaxLocal.load;
 import static org.omnifaces.util.AjaxLocal.oncomplete;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
-import static org.omnifaces.util.Components.createScriptResource;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
@@ -43,6 +42,7 @@ import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Hacks.isFacesScriptResourceAvailable;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Reflection.accessField;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -58,14 +58,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
-import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.ActionSource2;
 import jakarta.faces.component.EditableValueHolder;
 import jakarta.faces.component.NamingContainer;
@@ -82,21 +80,15 @@ import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.ValueHolder;
 import jakarta.faces.component.behavior.AjaxBehavior;
 import jakarta.faces.component.behavior.BehaviorBase;
-import jakarta.faces.component.behavior.ClientBehavior;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.component.html.HtmlBody;
-import jakarta.faces.component.search.SearchExpressionContext;
 import jakarta.faces.component.search.SearchExpressionHint;
 import jakarta.faces.component.visit.VisitCallback;
-import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.component.visit.VisitHint;
 import jakarta.faces.component.visit.VisitResult;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.FacesContextWrapper;
-import jakarta.faces.context.ResponseWriter;
-import jakarta.faces.convert.Converter;
 import jakarta.faces.event.ActionEvent;
-import jakarta.faces.event.ActionListener;
 import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.faces.event.BehaviorListener;
 import jakarta.faces.event.MethodExpressionActionListener;
@@ -177,13 +169,12 @@ public final class ComponentsLocal {
      */
     @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentRelatively(FacesContext context, UIComponent component, String clientId) {
-
         if (isEmpty(clientId)) {
             return null;
         }
 
         // Search first in the naming container parents of the given component
-        UIComponent result = findComponentInParents(context, component, clientId);
+        var result = findComponentInParents(context, component, clientId);
 
         if (result == null) {
             // If not in the parents, search from the root
@@ -198,14 +189,13 @@ public final class ComponentsLocal {
      */
     @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentInParents(FacesContext context, UIComponent component, String clientId) {
-
         if (isEmpty(clientId)) {
             return null;
         }
 
-        for (UIComponent parent = component; parent != null; parent = parent.getParent()) {
+        for (var parent = component; parent != null; parent = parent.getParent()) {
             if (parent instanceof NamingContainer || parent instanceof UIViewRoot) {
-                UIComponent result = findComponentIgnoringIAE(context, parent, clientId);
+                var result = findComponentIgnoringIAE(context, parent, clientId);
 
                 if (result != null) {
                     return (C) result;
@@ -221,12 +211,11 @@ public final class ComponentsLocal {
      */
     @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentInChildren(FacesContext context, UIComponent component, String clientId) {
-
         if (isEmpty(clientId)) {
             return null;
         }
 
-        for (UIComponent child : component.getChildren()) {
+        for (var child : component.getChildren()) {
 
             UIComponent result = null;
             if (child instanceof NamingContainer) {
@@ -249,23 +238,14 @@ public final class ComponentsLocal {
      * @see Components#findComponentsInCurrentForm(Class)
      */
     public static <C extends UIComponent> List<C> findComponentsInCurrentForm(FacesContext context, Class<C> type) {
-        UIForm currentForm = getCurrentForm(context);
+        var currentForm = getCurrentForm(context);
         return currentForm != null ? findComponentsInChildren(currentForm, type) : emptyList();
     }
 
     // Iteration / Visiting -------------------------------------------------------------------------------------------
 
     /**
-     * Invokes an operation on every component in the component tree.
-     * <p>
-     * This is a simplified version of regular component visiting that uses the builder pattern to provide the various
-     * optional parameters. Includes supports for only visiting components of a certain class type and two
-     * simplified functional interfaces / lambdas.
-     * <p>
-     * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
-     *
-     * @param context the faces context used for tree visiting
-     * @return A new instance of {@link Components.ForEach}, using the given faces context.
+     * @see Components#forEachComponent()
      */
     public static Components.ForEach forEachComponent(FacesContext context) {
         return new Components.ForEach(context);
@@ -301,10 +281,10 @@ public final class ComponentsLocal {
      * @see Components#includeCompositeComponent(UIComponent, String, String, String, Map)
      */
     public static UIComponent includeCompositeComponent(FacesContext context, UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
-        String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
-        Map<String, Object> attrs = (attributes == null) ? null : new HashMap<>(attributes);
+        var taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
+        var attrs = attributes == null ? null : new HashMap<String, Object>(attributes);
 
-        UIComponent composite = context.getApplication().getViewHandler()
+        var composite = context.getApplication().getViewHandler()
                 .getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
                 .createComponent(context, taglibURI, tagName, attrs);
 
@@ -317,7 +297,6 @@ public final class ComponentsLocal {
      * @see Components#addScript(String)
      */
     public static void addScript(FacesContext context, String script) {
-
         if (isAjaxRequestWithPartialRendering(context)) {
             oncomplete(context, script);
         }
@@ -333,7 +312,6 @@ public final class ComponentsLocal {
      * @see Components#addScriptResource(String, String)
      */
     public static void addScriptResource(FacesContext context, String libraryName, String resourceName) {
-
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
                 load(context, libraryName, resourceName);
@@ -359,15 +337,15 @@ public final class ComponentsLocal {
     }
 
     private static UIComponent addScriptResourceToTarget(FacesContext context, String libraryName, String resourceName, String target) {
-        String id = (libraryName != null ? (libraryName.replaceAll("\\W+", "_") + "_") : "") + resourceName.replaceAll("\\W+", "_");
+        var id = (libraryName != null ? libraryName.replaceAll("\\W+", "_") + "_" : "") + resourceName.replaceAll("\\W+", "_");
 
-        for (UIComponent existingResource : context.getViewRoot().getComponentResources(context)) {
+        for (var existingResource : context.getViewRoot().getComponentResources(context)) {
             if (id.equals(existingResource.getId())) {
                 return existingResource;
             }
         }
 
-        UIOutput outputScript = createScriptResource();
+        var outputScript = createScriptResource();
         outputScript.setId(id);
 
         if (libraryName != null) {
@@ -376,6 +354,12 @@ public final class ComponentsLocal {
 
         outputScript.getAttributes().put("name", resourceName);
         return addComponentResource(context, outputScript, target);
+    }
+
+    private static UIOutput createScriptResource() {
+        var outputScript = new UIOutput();
+        outputScript.setRendererType(RENDERER_TYPE_JS);
+        return outputScript;
     }
 
     private static void addScriptResourceToHead(FacesContext context, String libraryName, String resourceName) {
@@ -387,7 +371,6 @@ public final class ComponentsLocal {
     }
 
     private static UIComponent addComponentResource(FacesContext context, UIComponent resource, String target) {
-
         if (resource.getId() == null) {
             Hacks.setComponentResourceUniqueId(context, resource);
         }
@@ -397,8 +380,8 @@ public final class ComponentsLocal {
     }
 
     private static void addScriptToBody(FacesContext context, String script) {
-        UIOutput outputScript = createScriptResource();
-        UIOutput content = new UIOutput();
+        var outputScript = createScriptResource();
+        var content = new UIOutput();
         content.setValue(script);
         outputScript.getChildren().add(content);
         addComponentResource(context, outputScript, "body");
@@ -410,9 +393,9 @@ public final class ComponentsLocal {
      * @see Components#buildView(String)
      */
     public static UIViewRoot buildView(FacesContext context, String viewId) throws IOException {
-        String normalizedViewId = normalizeViewId(context, viewId);
-        ViewHandler viewHandler = context.getApplication().getViewHandler();
-        UIViewRoot view = viewHandler.createView(context, normalizedViewId);
+        var normalizedViewId = normalizeViewId(context, viewId);
+        var viewHandler = context.getApplication().getViewHandler();
+        var view = viewHandler.createView(context, normalizedViewId);
         FacesContext temporaryContext = new TemporaryViewFacesContext(context, view);
 
         try {
@@ -430,8 +413,8 @@ public final class ComponentsLocal {
      * @see Components#encodeHtml(UIComponent)
      */
     public static String encodeHtml(FacesContext context, UIComponent component) {
-        ResponseWriter originalWriter = context.getResponseWriter();
-        StringWriter output = new StringWriter(2048); // is 2kb enough for simple templates?
+        var originalWriter = context.getResponseWriter();
+        var output = new StringWriter(2048); // is 2kb enough for simple templates?
         context.setResponseWriter(getRenderKit(context).createResponseWriter(output, "text/html", "UTF-8"));
 
         try {
@@ -460,7 +443,7 @@ public final class ComponentsLocal {
             return null;
         }
 
-        UIViewRoot viewRoot = context.getViewRoot();
+        var viewRoot = context.getViewRoot();
 
         if (viewRoot == null) {
             return null;
@@ -470,18 +453,18 @@ public final class ComponentsLocal {
         // But with testing it turns out to return false on ajax requests where the form is not included in execute!
         // The current implementation just walks through the request parameter map instead.
 
-        for (String name : context.getExternalContext().getRequestParameterMap().keySet()) {
+        for (var name : context.getExternalContext().getRequestParameterMap().keySet()) {
             if (name.startsWith("jakarta.faces.")) {
                 continue; // Quick skip.
             }
 
-            UIComponent component = findComponentIgnoringIAE(context, viewRoot, name);
+            var component = findComponentIgnoringIAE(context, viewRoot, name);
 
             if (component instanceof UIForm) {
                 return (UIForm) component;
             }
             else if (component != null) {
-                UIForm form = getClosestParent(component, UIForm.class);
+                var form = getClosestParent(component, UIForm.class);
 
                 if (form != null) {
                     return form;
@@ -496,7 +479,7 @@ public final class ComponentsLocal {
      * @see Components#getCurrentCommand()
      */
     public static UICommand getCurrentCommand(FacesContext context) {
-        UIComponent source = getCurrentActionSource(context);
+        var source = getCurrentActionSource(context);
         return source instanceof UICommand ? (UICommand) source : null;
     }
 
@@ -516,18 +499,18 @@ public final class ComponentsLocal {
     /**
      * Helper method for {@link #getCurrentActionSource(FacesContext)}.
      */
-    static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
+    private static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
         if (parent == null) {
             return null;
         }
 
-        Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+        var params = context.getExternalContext().getRequestParameterMap();
 
         if (context.getPartialViewContext().isAjaxRequest()) {
-            String sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
+            var sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
 
             if (sourceClientId != null) {
-                UIComponent actionSource = findComponentIgnoringIAE(context, parent, sourceClientId);
+                var actionSource = findComponentIgnoringIAE(context, parent, sourceClientId);
 
                 if (actionSource != null) {
                     return actionSource;
@@ -535,12 +518,12 @@ public final class ComponentsLocal {
             }
         }
 
-        for (String name : params.keySet()) {
+        for (var name : params.keySet()) {
             if (name.startsWith("jakarta.faces.")) {
                 continue; // Quick skip.
             }
 
-            UIComponent actionSource = findComponentIgnoringIAE(context, parent, name);
+            var actionSource = findComponentIgnoringIAE(context, parent, name);
 
             if (actionSource instanceof UICommand) {
                 return actionSource;
@@ -555,24 +538,24 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#getLabel(UIComponent) 
+     * @see Components#getLabel(UIComponent)
      */
     public static String getLabel(FacesContext context, UIComponent component) {
-        String label = getOptionalLabel(context, component);
-        return (label != null) ? label : component.getClientId();
+        var label = getOptionalLabel(context, component);
+        return label != null ? label : component.getClientId();
     }
 
     /**
-     * @see Components#getOptionalLabel(UIComponent) 
+     * @see Components#getOptionalLabel(UIComponent)
      */
     public static String getOptionalLabel(FacesContext context, UIComponent component) {
-        Object[] result = new Object[1];
+        var result = new Object[1];
 
         new ScopedRunner(context).with("cc", getCompositeComponentParent(component)).invoke(() -> {
-            Object label = component.getAttributes().get(LABEL_ATTRIBUTE);
+            var label = component.getAttributes().get(LABEL_ATTRIBUTE);
 
             if (isEmpty(label)) {
-                ValueExpression labelExpression = component.getValueExpression(LABEL_ATTRIBUTE);
+                var labelExpression = component.getValueExpression(LABEL_ATTRIBUTE);
 
                 if (labelExpression != null) {
                     label = labelExpression.getValue(context.getELContext());
@@ -582,11 +565,11 @@ public final class ComponentsLocal {
             result[0] = label;
         });
 
-        return (result[0] != null) ? result[0].toString() : null;
+        return result[0] != null ? result[0].toString() : null;
     }
 
     /**
-     * @see Components#getImmediateValue(UIInput) 
+     * @see Components#getImmediateValue(UIInput)
      */
     @SuppressWarnings("unchecked")
     public static <T> T getImmediateValue(FacesContext context, UIInput input) {
@@ -598,17 +581,17 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#getExpectedValueType(UIComponent) 
+     * @see Components#getExpectedValueType(UIComponent)
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getExpectedValueType(FacesContext context, UIComponent component) {
-        ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
+        var valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
         if (valueExpression != null) {
             return getExpectedType(context, valueExpression);
         }
         else {
-            Object value = component.getAttributes().get(VALUE_ATTRIBUTE);
+            var value = component.getAttributes().get(VALUE_ATTRIBUTE);
 
             if (value != null) {
                 return (Class<T>) value.getClass();
@@ -619,11 +602,11 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#getExpectedType(ValueExpression) 
+     * @see Components#getExpectedType(ValueExpression)
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getExpectedType(FacesContext context, ValueExpression valueExpression) {
-        Class<?> expectedType = valueExpression.getExpectedType();
+        var expectedType = valueExpression.getExpectedType();
 
         if (expectedType == Object.class) {
             expectedType = valueExpression.getType(context.getELContext());
@@ -633,15 +616,15 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#hasInvokedSubmit(UIComponent) 
+     * @see Components#hasInvokedSubmit(UIComponent)
      */
     public static boolean hasInvokedSubmit(FacesContext context, UIComponent component) {
-        UIComponent source = getCurrentActionSource(context);
+        var source = getCurrentActionSource(context);
         return source != null && source.equals(component);
     }
 
     /**
-     * @see Components#getParams(UIComponent, boolean, boolean)  
+     * @see Components#getParams(UIComponent, boolean, boolean)
      */
     public static Map<String, List<String>> getParams(FacesContext context, UIComponent component, boolean includeRequestParams, boolean includeViewParams) {
         Map<String, List<String>> params;
@@ -656,8 +639,8 @@ public final class ComponentsLocal {
             params = new LinkedHashMap<>(0);
         }
 
-        for (ParamHolder<Object> param : Components.getParams(component)) {
-            String value = param.getValue();
+        for (var param : Components.getParams(component)) {
+            var value = param.getValue();
 
             if (isEmpty(value)) {
                 continue;
@@ -670,20 +653,20 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#getMessageComponent(UIInput) 
+     * @see Components#getMessageComponent(UIInput)
      */
     public static UIMessage getMessageComponent(FacesContext context, UIInput input) {
-        UIMessage[] found = new UIMessage[1];
+        var found = new UIMessage[1];
 
         forEachComponent(context).ofTypes(UIMessage.class).withHints(SKIP_ITERATION).invoke((visitContext, target) -> {
-            UIMessage messageComponent = (UIMessage) target;
-            String forValue = messageComponent.getFor();
+            var messageComponent = (UIMessage) target;
+            var forValue = messageComponent.getFor();
 
             if (!isEmpty(forValue)) {
-                FacesContext facesContext = visitContext.getFacesContext();
-                SearchExpressionContext searchExpressionContext = createSearchExpressionContext(facesContext, messageComponent, RESOLVE_LABEL_FOR, null);
-                String forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
-                UIComponent forComponent = findComponentRelatively(facesContext, messageComponent, forClientId);
+                var facesContext = visitContext.getFacesContext();
+                var searchExpressionContext = createSearchExpressionContext(facesContext, messageComponent, RESOLVE_LABEL_FOR, null);
+                var forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
+                var forComponent = findComponentRelatively(facesContext, messageComponent, forClientId);
 
                 if (input.equals(forComponent)) {
                     found[0] = messageComponent;
@@ -698,10 +681,10 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#getMessagesComponent() 
+     * @see Components#getMessagesComponent()
      */
     public static UIMessages getMessagesComponent(FacesContext context) {
-        UIMessages[] found = new UIMessages[1];
+        var found = new UIMessages[1];
 
         forEachComponent(context).ofTypes(UIMessages.class).withHints(SKIP_ITERATION).invoke((visitContext, target) -> {
             found[0] = (UIMessages) target;
@@ -712,10 +695,10 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#resetForm(UIComponent) 
+     * @see Components#resetForm(UIComponent)
      */
     public static void resetForm(FacesContext context, UIComponent component) {
-        UIForm form = (component instanceof UIForm) ? (UIForm) component : getClosestParent(component, UIForm.class);
+        var form = component instanceof UIForm ? (UIForm) component : getClosestParent(component, UIForm.class);
 
         if (form == null) {
             throw new IllegalArgumentException(format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
@@ -725,59 +708,58 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#resetInputs(UIComponent) 
+     * @see Components#resetInputs(UIComponent)
      */
     public static void resetInputs(FacesContext context, UIComponent component) {
         forEachComponent(context).fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
     }
 
     /**
-     * @see Components#disableInput(String)  
+     * @see Components#disableInput(String)
      */
     public static void disableInput(FacesContext context, String clientId) {
         Components.disableInput(findComponent(context, clientId));
     }
 
     /**
-     * @see Components#addFormIfNecessary() 
+     * @see Components#addFormIfNecessary()
      */
     public static void addFormIfNecessary(FacesContext context) {
-
         if (isAjaxRequestWithPartialRendering(context)) {
             return; // It's impossible to have this condition without an UIForm in first place.
         }
 
-        UIViewRoot viewRoot = context.getViewRoot();
+        var viewRoot = context.getViewRoot();
 
         if (viewRoot == null || viewRoot.getChildCount() == 0) {
             return; // Empty view. Nothing to do against. The client should probably find a better moment to invoke this.
         }
 
-        VisitCallback visitCallback = (visitContext, target) -> (target instanceof UIForm) ? VisitResult.COMPLETE : VisitResult.ACCEPT;
-        boolean formFound = viewRoot.visitTree(createVisitContext(context, null, EnumSet.of(VisitHint.SKIP_ITERATION)), visitCallback);
+        VisitCallback visitCallback = (visitContext, target) -> target instanceof UIForm ? VisitResult.COMPLETE : VisitResult.ACCEPT;
+        var formFound = viewRoot.visitTree(createVisitContext(context, null, EnumSet.of(VisitHint.SKIP_ITERATION)), visitCallback);
 
         if (formFound) {
             return; // UIForm present. No need to add a new one.
         }
 
-        Optional<UIComponent> body = viewRoot.getChildren().stream().filter(HtmlBody.class::isInstance).findFirst();
+        var body = viewRoot.getChildren().stream().filter(HtmlBody.class::isInstance).findFirst();
 
         if (body.isEmpty()) {
             return; // No <h:body> present. Not possible to add a new UIForm then.
         }
 
-        Form form = new Form();
+        var form = new Form();
         form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
         form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
         body.get().getChildren().add(form);
     }
 
     /**
-     * @see Components#convertToString(FacesContext, ValueHolder, Object) 
+     * @see Components#convertToString(FacesContext, ValueHolder, Object)
      */
     @SuppressWarnings("unchecked")
     public static <T> String convertToString(FacesContext context, ValueHolder holder, T value) {
-        Converter<T> converter = holder.getConverter();
+        var converter = holder.getConverter();
 
         if (converter == null && value != null) {
             converter = createConverter(context, value.getClass());
@@ -790,13 +772,13 @@ public final class ComponentsLocal {
                 component = (UIComponent) holder;
             }
             else if (holder instanceof ParamHolder) {
-                UIParameter parameter = new UIParameter();
+                var parameter = new UIParameter();
                 parameter.setName(((ParamHolder<T>) holder).getName());
                 parameter.setValue(value);
                 component = parameter;
             }
             else {
-                UIOutput output = new UIOutput();
+                var output = new UIOutput();
                 output.setValue(value);
                 component = output;
             }
@@ -804,18 +786,18 @@ public final class ComponentsLocal {
             return converter.getAsString(context, component, value);
         }
 
-        return (value == null) ? null : value.toString();
+        return value == null ? null : value.toString();
     }
 
     /**
-     * @see Components#getRenderedValue(FacesContext, ValueHolder) 
+     * @see Components#getRenderedValue(FacesContext, ValueHolder)
      */
     public static String getRenderedValue(FacesContext context, ValueHolder holder) {
         Object value = null;
 
         if (holder instanceof EditableValueHolder) {
-            EditableValueHolder editableValueHolder = (EditableValueHolder) holder;
-            Object submittedValue = editableValueHolder.getSubmittedValue();
+            var editableValueHolder = (EditableValueHolder) holder;
+            var submittedValue = editableValueHolder.getSubmittedValue();
 
             if (submittedValue != null) {
                 return submittedValue.toString();
@@ -847,20 +829,20 @@ public final class ComponentsLocal {
     }
 
     private static Set<String> findAndInvalidateInputs(FacesContext context, String... relativeClientIds) {
-        UIComponent root = coalesce(getCurrentForm(context), context.getViewRoot());
-        boolean needsVisit = stream(relativeClientIds).anyMatch(clientId -> containsIterationIndex(context, clientId));
-        Set<String> fullClientIds = new LinkedHashSet<>();
+        var root = coalesce(getCurrentForm(context), context.getViewRoot());
+        var needsVisit = stream(relativeClientIds).anyMatch(clientId -> containsIterationIndex(context, clientId));
+        var fullClientIds = new LinkedHashSet<String>();
 
-        for (String relativeClientId : relativeClientIds) {
-            UIComponent component = findComponentRelatively(context, root, relativeClientId);
+        for (var relativeClientId : relativeClientIds) {
+            var component = findComponentRelatively(context, root, relativeClientId);
 
             if (!(component instanceof UIInput)) {
-                String type = (component == null) ? "null" : component.getClass().getName();
+                var type = component == null ? "null" : component.getClass().getName();
                 throw new IllegalArgumentException(format(ERROR_ILLEGAL_UIINPUT, relativeClientId, type));
             }
 
-            UIInput input = (UIInput) component;
-            String fullClientId = input.getClientId();
+            var input = (UIInput) component;
+            var fullClientId = input.getClientId();
 
             if (!needsVisit) {
                 fullClientIds.add(fullClientId);
@@ -886,7 +868,8 @@ public final class ComponentsLocal {
      * @see Components#createValueExpression(String, Class)
      */
     public static ValueExpression createValueExpression(FacesContext context, String expression, Class<?> type) {
-        return context.getApplication()
+        return context
+                .getApplication()
                 .getExpressionFactory()
                 .createValueExpression(context.getELContext(), expression, type);
     }
@@ -894,10 +877,9 @@ public final class ComponentsLocal {
     /**
      * @see Components#createMethodExpression(String, Class, Class[])
      */
-    public static MethodExpression createMethodExpression
-    (FacesContext context, String expression, Class<?> returnType, Class<?>... parameterTypes)
-    {
-        return context.getApplication()
+    public static MethodExpression createMethodExpression(FacesContext context, String expression, Class<?> returnType, Class<?>... parameterTypes) {
+        return context
+                .getApplication()
                 .getExpressionFactory()
                 .createMethodExpression(context.getELContext(), expression, returnType, parameterTypes);
     }
@@ -920,8 +902,8 @@ public final class ComponentsLocal {
      * @see Components#createAjaxBehavior(String)
      */
     public static AjaxBehavior createAjaxBehavior(FacesContext context, String expression) {
-        AjaxBehavior behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
-        MethodExpression method = createVoidMethodExpression(context, expression, AjaxBehaviorEvent.class);
+        var behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
+        var method = createVoidMethodExpression(context, expression, AjaxBehaviorEvent.class);
         behavior.addAjaxBehaviorListener(event -> method.invoke(context.getELContext(), new Object[] { event }));
         return behavior;
     }
@@ -930,22 +912,22 @@ public final class ComponentsLocal {
      * @see Components#getActionExpressionsAndListeners(UIComponent)
      */
     public static List<String> getActionExpressionsAndListeners(FacesContext context, UIComponent component) {
-        List<String> actions = new ArrayList<>();
+        var actions = new ArrayList<String>();
 
         if (component instanceof ActionSource2) {
-            ActionSource2 source = (ActionSource2) component;
+            var source = (ActionSource2) component;
             addExpressionStringIfNotNull(source.getActionExpression(), actions);
 
-            for (ActionListener listener : source.getActionListeners()) {
+            for (var listener : source.getActionListeners()) {
                 addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
             }
         }
 
         if (component instanceof ClientBehaviorHolder) {
-            String behaviorEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
+            var behaviorEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
 
             if (behaviorEvent != null) {
-                for (BehaviorListener listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {
+                for (var listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {
                     addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
                 }
             }
@@ -1016,9 +998,9 @@ public final class ComponentsLocal {
             return;
         }
 
-        StringBuilder childClassNames = new StringBuilder();
+        var childClassNames = new StringBuilder();
 
-        for (UIComponent child : component.getChildren()) {
+        for (var child : component.getChildren()) {
             if (!childType.isAssignableFrom(child.getClass())) {
                 if (childClassNames.length() > 0) {
                     childClassNames.append(", ");
@@ -1035,7 +1017,7 @@ public final class ComponentsLocal {
     }
 
     /**
-     * @see Components#validateHasNoChildren(UIComponent) 
+     * @see Components#validateHasNoChildren(UIComponent)
      */
     public static void validateHasNoChildren(FacesContext context, UIComponent component) {
         if (!isDevelopment(context)) {
@@ -1043,9 +1025,9 @@ public final class ComponentsLocal {
         }
 
         if (component.getChildCount() > 0) {
-            StringBuilder childClassNames = new StringBuilder();
+            var childClassNames = new StringBuilder();
 
-            for (UIComponent child : component.getChildren()) {
+            for (var child : component.getChildren()) {
                 if (childClassNames.length() > 0) {
                     childClassNames.append(", ");
                 }
@@ -1076,7 +1058,7 @@ public final class ComponentsLocal {
 
     private static Pattern getIterationIndexPattern(FacesContext context) {
         return getApplicationAttribute("omnifaces.IterationIndexPattern", () -> {
-            String quotedSeparatorChar = quote(Character.toString(UINamingContainer.getSeparatorChar(context)));
+            var quotedSeparatorChar = quote(Character.toString(UINamingContainer.getSeparatorChar(context)));
             return Pattern.compile("(^|.*" + quotedSeparatorChar + ")([0-9]+" + quotedSeparatorChar + ")(.*)");
         });
     }
@@ -1109,16 +1091,16 @@ public final class ComponentsLocal {
      */
     @SuppressWarnings("unchecked")
     private static List<BehaviorListener> getBehaviorListeners(ClientBehaviorHolder component, String behaviorEvent) {
-        List<ClientBehavior> behaviors = component.getClientBehaviors().get(behaviorEvent);
+        var behaviors = component.getClientBehaviors().get(behaviorEvent);
 
         if (behaviors == null) {
             return emptyList();
         }
 
-        List<BehaviorListener> allListeners = new ArrayList<>();
+        var allListeners = new ArrayList<BehaviorListener>();
 
-        for (ClientBehavior behavior : behaviors) {
-            List<BehaviorListener> listeners = accessField(behavior, BehaviorBase.class, List.class);
+        for (var behavior : behaviors) {
+            var listeners = accessField(behavior, BehaviorBase.class, List.class);
 
             if (listeners != null) {
                 allListeners.addAll(listeners);
@@ -1157,7 +1139,5 @@ public final class ComponentsLocal {
         public RenderKit getRenderKit() {
             return FacesLocal.getRenderKit(this);
         }
-
     }
-
 }

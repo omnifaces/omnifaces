@@ -13,12 +13,10 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.synchronizedSet;
+import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,13 +60,7 @@ public class SocketUserManager {
      * @param userId The session based user ID.
      */
     protected void register(Serializable user, String userId) {
-        synchronized (applicationUsers) {
-            if (!applicationUsers.containsKey(user)) {
-                applicationUsers.putIfAbsent(user, synchronizedSet(new HashSet<>(ESTIMATED_SESSIONS_PER_USER)));
-            }
-
-            applicationUsers.get(user).add(userId);
-        }
+        applicationUsers.computeIfAbsent(user, $ -> newKeySet(ESTIMATED_CHANNELS_IDS_PER_USER)).add(userId);
     }
 
     /**
@@ -78,17 +70,10 @@ public class SocketUserManager {
      * @param channelId The channel identifier.
      */
     protected void addChannelId(String userId, String channel, String channelId) {
-        if (!userChannels.containsKey(userId)) {
-            userChannels.putIfAbsent(userId, new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
-        }
-
-        ConcurrentHashMap<String, Set<String>> channelIds = userChannels.get(userId);
-
-        if (!channelIds.containsKey(channel)) {
-            channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
-        }
-
-        channelIds.get(channel).add(channelId);
+        userChannels
+                .computeIfAbsent(userId, $ -> new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION))
+                .computeIfAbsent(channel, $ -> newKeySet(ESTIMATED_USER_CHANNELS_PER_SESSION))
+                .add(channelId);
     }
 
     /**
@@ -98,8 +83,8 @@ public class SocketUserManager {
      * @return The user associated with given channel name and ID.
      */
     protected Serializable getUser(String channel, String channelId) {
-        for (Entry<Serializable, Set<String>> applicationUser : applicationUsers.entrySet()) {
-            for (String userId : applicationUser.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
+        for (var applicationUser : applicationUsers.entrySet()) {
+            for (var userId : applicationUser.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
                 if (getApplicationUserChannelIds(userId, channel).contains(channelId)) {
                     return applicationUser.getKey();
                 }
@@ -116,11 +101,11 @@ public class SocketUserManager {
      * @return The user-specific channel IDs associated with given user and channel name.
      */
     protected Set<String> getChannelIds(Serializable user, String channel) {
-        Set<String> channelIds = new HashSet<>(ESTIMATED_CHANNELS_IDS_PER_USER);
-        Set<String> userIds = applicationUsers.get(user);
+        var channelIds = new HashSet<String>(ESTIMATED_CHANNELS_IDS_PER_USER);
+        var userIds = applicationUsers.get(user);
 
         if (userIds != null) {
-            for (String userId : userIds) {
+            for (var userId : userIds) {
                 channelIds.addAll(getApplicationUserChannelIds(userId, channel));
             }
         }
@@ -135,15 +120,10 @@ public class SocketUserManager {
      */
     protected void deregister(Serializable user, String userId) {
         userChannels.remove(userId);
-
-        synchronized (applicationUsers) {
-            Set<String> userIds = applicationUsers.get(user);
+        applicationUsers.computeIfPresent(user, ($, userIds) -> {
             userIds.remove(userId);
-
-            if (userIds.isEmpty()) {
-                applicationUsers.remove(user);
-            }
-        }
+            return userIds.isEmpty() ? null : userIds;
+        });
     }
 
     // Internal -------------------------------------------------------------------------------------------------------
@@ -161,17 +141,7 @@ public class SocketUserManager {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private Set<String> getApplicationUserChannelIds(String userId, String channel) {
-        Map<String, Set<String>> channels = userChannels.get(userId);
-
-        if (channels != null) {
-            Set<String> channelIds = channels.get(channel);
-
-            if (channelIds != null) {
-                return channelIds;
-            }
-        }
-
-        return emptySet();
+        var channels = userChannels.get(userId);
+        return channels != null ? channels.getOrDefault(channel, emptySet()) : emptySet();
     }
-
 }
