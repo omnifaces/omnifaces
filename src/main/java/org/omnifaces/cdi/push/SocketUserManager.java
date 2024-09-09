@@ -15,12 +15,12 @@ package org.omnifaces.cdi.push;
 import static java.util.Collections.emptySet;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -62,7 +62,8 @@ public class SocketUserManager {
      * @param userId The session based user ID.
      */
     protected void register(Serializable user, String userId) {
-        applicationUsers.computeIfAbsent(user, ($) -> newConcurrentHashSet(ESTIMATED_CHANNELS_IDS_PER_USER, userId));
+        applicationUsers.computeIfAbsent(user, ($) -> ConcurrentHashMap.newKeySet(ESTIMATED_CHANNELS_IDS_PER_USER))
+                        .add(userId);
     }
 
     /**
@@ -72,8 +73,9 @@ public class SocketUserManager {
      * @param channelId The channel identifier.
      */
     protected void addChannelId(String userId, String channel, String channelId) {
-        userChannels.computeIfAbsent(userId, ($) -> new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
-        userChannels.get(userId).computeIfAbsent(channel, ($) -> newConcurrentHashSet(ESTIMATED_USER_CHANNELS_PER_SESSION, channelId) );
+        userChannels.computeIfAbsent(userId, ($) -> new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION))
+                    .computeIfAbsent(channel, ($) -> ConcurrentHashMap.newKeySet(ESTIMATED_USER_CHANNELS_PER_SESSION))
+                    .add(channelId);
     }
 
     /**
@@ -120,15 +122,7 @@ public class SocketUserManager {
      */
     protected void deregister(Serializable user, String userId) {
         userChannels.remove(userId);
-
-        synchronized (applicationUsers) {
-            Set<String> userIds = applicationUsers.get(user);
-            userIds.remove(userId);
-
-            if (userIds.isEmpty()) {
-                applicationUsers.remove(user);
-            }
-        }
+        removeIfLastElement(applicationUsers, user, userId);
     }
 
     // Internal -------------------------------------------------------------------------------------------------------
@@ -146,25 +140,23 @@ public class SocketUserManager {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private Set<String> getApplicationUserChannelIds(String userId, String channel) {
-        Map<String, Set<String>> channels = userChannels.get(userId);
+        var channels = userChannels.get(userId);
 
-        if (channels != null) {
-            Set<String> channelIds = channels.get(channel);
-
-            if (channelIds != null) {
-                return channelIds;
-            }
-        }
-
-        return emptySet();
+        return channels != null ? channels.getOrDefault(channel, emptySet()) : emptySet();
     }
 
-    @SafeVarargs
-    private static <V> Set<V> newConcurrentHashSet(int initialCapacity, V... elements) {
-        final Set<V> set = ConcurrentHashMap.newKeySet(initialCapacity);
-        if (elements.length > 0)
-            Collections.addAll(set, elements);
-        return set;
+    /**
+     * Remove the mapping identified by the passed key from the passed multiMap
+     * if and only if the multiMap contains the passed key and the associated Set
+     * of values is empty after removing the passed value.
+     * <p>
+     * Note that if the {@link Map} is a {@link ConcurrentMap} the operation is atomic.
+     */
+    private static <K,V> void removeIfLastElement(Map<K,Set<V>> multiMap, K key, V value) {
+        multiMap.computeIfPresent(key, (k,set) -> {
+            set.remove(value);
+            return set.isEmpty() ? null : set;  // returning null removes the mapping
+        });
     }
 
 }
