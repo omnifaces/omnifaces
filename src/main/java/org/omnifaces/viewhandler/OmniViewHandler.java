@@ -21,7 +21,6 @@ import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Faces.isPrefixMapping;
-import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
@@ -195,7 +194,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             redirectPermanent(context, getRequestURIWithQueryString(context));
         }
 
-        responseComplete();
+        context.responseComplete();
         return createdView;
     }
 
