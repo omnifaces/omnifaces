@@ -427,7 +427,7 @@ public final class Hacks {
             return false;
         }
 
-        var actionSource = getCurrentActionSource(context, context.getViewRoot());
+        var actionSource = getCurrentActionSource(context);
 
         if (actionSource == null) {
             return false;

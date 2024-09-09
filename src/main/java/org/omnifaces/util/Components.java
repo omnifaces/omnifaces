@@ -16,7 +16,6 @@ import static jakarta.faces.component.visit.VisitContext.createVisitContext;
 import static jakarta.faces.component.visit.VisitResult.ACCEPT;
 import static java.util.Arrays.asList;
 import static org.omnifaces.util.Faces.getContext;
-import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
@@ -45,7 +44,6 @@ import jakarta.faces.component.UIForm;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.component.UIMessage;
 import jakarta.faces.component.UIMessages;
-import jakarta.faces.component.UIOutput;
 import jakarta.faces.component.UIParameter;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.ValueHolder;
@@ -168,7 +166,7 @@ public final class Components {
      * Set the attribute value on the specified component for the specified name.
      * @param component The component on which to set the attribute.
      * @param name The name of the attribute.
-     * @param value The value of the attribute, can be a {@link ValueExpression} or {@code null}. In case of a 
+     * @param value The value of the attribute, can be a {@link ValueExpression} or {@code null}. In case of a
      * {@link ValueExpression}, {@link UIComponent#setValueExpression(String, ValueExpression)} will be invoked instead.
      * In case of {@code null}, {@link Map#remove(Object)} will be invoked on {@link UIComponent#getAttributes()}.
      * @since 4.5
@@ -193,7 +191,7 @@ public final class Components {
      * @since 1.8
      */
     public static boolean isRendered(UIComponent component) {
-        for (UIComponent current = component; current.getParent() != null; current = current.getParent()) {
+        for (var current = component; current.getParent() != null; current = current.getParent()) {
             if (!current.isRendered()) {
                 return false;
             }
@@ -271,7 +269,7 @@ public final class Components {
      * @return A list of UI components matching the given type in children of the given component.
      */
     public static <C extends UIComponent> List<C> findComponentsInChildren(UIComponent component, Class<C> type) {
-        List<C> components = new ArrayList<>();
+        var components = new ArrayList<C>();
         findComponentsInChildren(component, type, components);
         return components;
     }
@@ -281,7 +279,7 @@ public final class Components {
      */
     @SuppressWarnings("unchecked")
     private static <C extends UIComponent> void findComponentsInChildren(UIComponent component, Class<C> type, List<C> matches) {
-        for (UIComponent child : component.getChildren()) {
+        for (var child : component.getChildren()) {
             if (type.isInstance(child)) {
                 matches.add((C) child);
             }
@@ -312,7 +310,7 @@ public final class Components {
      * is found.
      */
     public static <C extends UIComponent> C getClosestParent(UIComponent component, Class<C> parentType) {
-        UIComponent parent = component.getParent();
+        var parent = component.getParent();
 
         while (parent != null && !parentType.isInstance(parent)) {
             parent = parent.getParent();
@@ -488,8 +486,8 @@ public final class Components {
          * @param operation the operation to invoke on each component
          */
         public void invoke(VisitCallback operation) {
-            VisitContext visitContext = createVisitContext(getFacesContext(), getIds(), getHints());
-            VisitCallback visitCallback = (types == null) ? operation : new TypesVisitCallback(types, operation);
+            var visitContext = createVisitContext(getFacesContext(), getIds(), getHints());
+            var visitCallback = types == null ? operation : new TypesVisitCallback(types, operation);
 
             if (getFacesContext().getViewRoot().equals(getRoot())) {
                 getRoot().visitTree(visitContext, visitCallback);
@@ -560,7 +558,7 @@ public final class Components {
      * @see Application#createComponent(String)
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @since 4.4
-     * @deprecated use {@link ComponentsLocal#createComponent(FacesContext,String)}
+     * @deprecated use {@link ComponentsLocal#createComponent(FacesContext, String)}
      */
     @Deprecated(since = "4.6", forRemoval = true)
     @SuppressWarnings("unchecked")
@@ -666,60 +664,6 @@ public final class Components {
         ComponentsLocal.addFacesScriptResource(getContext());
     }
 
-    static UIOutput createScriptResource() {
-        UIOutput outputScript = new UIOutput();
-        outputScript.setRendererType(RENDERER_TYPE_JS);
-        return outputScript;
-    }
-
-    private static UIComponent addScriptResourceToTarget(String libraryName, String resourceName, String target) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        String id = (libraryName != null ? (libraryName.replaceAll("\\W+", "_") + "_") : "") + resourceName.replaceAll("\\W+", "_");
-
-        for (UIComponent existingResource : context.getViewRoot().getComponentResources(context)) {
-            if (id.equals(existingResource.getId())) {
-                return existingResource;
-            }
-        }
-
-        UIOutput outputScript = createScriptResource();
-        outputScript.setId(id);
-
-        if (libraryName != null) {
-            outputScript.getAttributes().put("library", libraryName);
-        }
-
-        outputScript.getAttributes().put("name", resourceName);
-        return addComponentResource(outputScript, target);
-    }
-
-    private static void addScriptResourceToHead(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "head");
-    }
-
-    private static void addScriptResourceToBody(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "body");
-    }
-
-    private static UIComponent addComponentResource(UIComponent resource, String target) {
-        FacesContext context = FacesContext.getCurrentInstance();
-
-        if (resource.getId() == null) {
-            Hacks.setComponentResourceUniqueId(context, resource);
-        }
-
-        context.getViewRoot().addComponentResource(context, resource, target);
-        return resource;
-    }
-
-    private static void addScriptToBody(String script) {
-        UIOutput outputScript = createScriptResource();
-        UIOutput content = new UIOutput();
-        content.setValue(script);
-        outputScript.getChildren().add(content);
-        addComponentResource(outputScript, "body");
-    }
-
     // Building / rendering -------------------------------------------------------------------------------------------
 
     /**
@@ -812,8 +756,8 @@ public final class Components {
      * the client ID.
      */
     public static String getLabel(UIComponent component) {
-        String label = getOptionalLabel(component);
-        return (label != null) ? label : component.getClientId();
+        var label = getOptionalLabel(component);
+        return label != null ? label : component.getClientId();
     }
 
     /**
@@ -856,8 +800,8 @@ public final class Components {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getValue(EditableValueHolder component) {
-        Object submittedValue = component.getSubmittedValue();
-        return (T) ((submittedValue != null) ? submittedValue : component.getLocalValue());
+        var submittedValue = component.getSubmittedValue();
+        return (T) (submittedValue != null ? submittedValue : component.getLocalValue());
     }
 
     /**
@@ -936,11 +880,11 @@ public final class Components {
             return Collections.emptyList();
         }
 
-        List<ParamHolder<T>> params = new ArrayList<>(component.getChildCount());
+        var params = new ArrayList<ParamHolder<T>>(component.getChildCount());
 
-        for (UIComponent child : component.getChildren()) {
+        for (var child : component.getChildren()) {
             if (child instanceof UIParameter) {
-                UIParameter param = (UIParameter) child;
+                var param = (UIParameter) child;
 
                 if (!isEmpty(param.getName()) && !param.isDisable()) {
                     params.add(new SimpleParam<>(param));
