@@ -12,13 +12,12 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.Faces.getViewRoot;
-
 import java.util.Map;
 import java.util.UUID;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -37,18 +36,18 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
     // Actions --------------------------------------------------------------------------------------------------------
 
     @Override
-    public UUID getBeanStorageId() {
-        return (UUID) getViewRoot().getAttributes().get(getClass().getName());
+    public UUID getBeanStorageId(FacesContext context) {
+        return (UUID) context.getViewRoot().getAttributes().get(getClass().getName());
     }
 
     @Override
-    public BeanStorage getBeanStorage(UUID id) {
-        return (BeanStorage) getViewRoot().getAttributes().get(id.toString());
+    public BeanStorage getBeanStorage(FacesContext context, UUID id) {
+        return (BeanStorage) context.getViewRoot().getAttributes().get(id.toString());
     }
 
     @Override
-    public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-        UIViewRoot viewRoot = getViewRoot();
+    public void setBeanStorage(FacesContext context, UUID beanStorageId, BeanStorage beanStorage) {
+        UIViewRoot viewRoot = context.getViewRoot();
 
         if (!viewRoot.initialStateMarked()) {
             viewRoot.markInitialState(); // Forces Faces to start recording changes in view state.

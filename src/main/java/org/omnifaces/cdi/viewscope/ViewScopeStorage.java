@@ -14,6 +14,8 @@ package org.omnifaces.cdi.viewscope;
 
 import java.util.UUID;
 
+import jakarta.faces.context.FacesContext;
+
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 
@@ -29,22 +31,66 @@ public interface ViewScopeStorage {
 
     /**
      * Returns currently active bean storage ID, or null if it does not exist.
+     * <p>
+     * The default implementation call {@link #setBeanStorage(FacesContext, UUID, BeanStorage)}
+     * passing the current {@link FacesContext}
      * @return Currently active bean storage ID, or null if it does not exist.
      */
-    public UUID getBeanStorageId();
+    default UUID getBeanStorageId() {
+        var context = FacesContext.getCurrentInstance();
+        return getBeanStorageId(context);
+    }
+
+    /**
+     * Returns currently active bean storage ID, or null if it does not exist.
+     * @param context The involved {@link FacesContext}
+     * @return Currently active bean storage ID, or null if it does not exist.
+     * @since 4.6
+     */
+    UUID getBeanStorageId(FacesContext context);
 
     /**
      * Returns the bean storage identified by given ID, or null if it does not exist.
+     * <p>
+     * The default implementation call {@link #setBeanStorage(FacesContext, UUID, BeanStorage)}
+     * passing the current {@link FacesContext}
      * @param beanStorageId The bean storage identifier.
      * @return The bean storage identified by given ID, or null if it does not exist.
      */
-    public BeanStorage getBeanStorage(UUID beanStorageId);
+    default BeanStorage getBeanStorage(UUID beanStorageId) {
+        var context = FacesContext.getCurrentInstance();
+        return getBeanStorage(context, beanStorageId);
+    }
+
+    /**
+     * Returns the bean storage identified by given ID, or null if it does not exist.
+     * @param context The involved {@link FacesContext}
+     * @param beanStorageId The bean storage identifier.
+     * @return The bean storage identified by given ID, or null if it does not exist.
+     * @since 4.6
+     */
+    BeanStorage getBeanStorage(FacesContext context, UUID beanStorageId);
 
     /**
      * Sets the given bean storage identified by the given ID.
+     * <p>
+     * The default implementation call {@link #setBeanStorage(FacesContext, UUID, BeanStorage)}
+     * passing the current {@link FacesContext}
      * @param beanStorageId The bean storage identifier.
      * @param beanStorage The bean storage.
      */
-    public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage);
+    default void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
+        var context = FacesContext.getCurrentInstance();
+        setBeanStorage(context, beanStorageId, beanStorage);
+    }
+
+    /**
+     * Sets the given bean storage identified by the given ID.
+     * @param context The involved {@link FacesContext}
+     * @param beanStorageId The bean storage identifier.
+     * @param beanStorage The bean storage.
+     * @since 4.6
+     */
+    void setBeanStorage(FacesContext context, UUID beanStorageId, BeanStorage beanStorage);
 
 }

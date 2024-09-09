@@ -18,14 +18,13 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.BeansLocal.getInstance;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addFormIfNecessary;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.addScriptResource;
-import static org.omnifaces.util.Faces.getViewId;
-import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addFormIfNecessary;
+import static org.omnifaces.util.ComponentsLocal.addScript;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
+import static org.omnifaces.util.FacesLocal.getViewId;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.util.UUID;
@@ -165,7 +164,7 @@ public class ViewScopeManager {
 
         if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for nothing.
             if (beanStorageId == null) {
-                beanStorageId = storageInSession.getBeanStorageId();
+                beanStorageId = storageInSession.getBeanStorageId(context);
             }
 
             if (beanStorageId != null) {
@@ -179,43 +178,42 @@ public class ViewScopeManager {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private <T> BeanStorage getBeanStorage(Contextual<T> type) {
+        var context = FacesContext.getCurrentInstance();
         ViewScopeStorage storage = storageInSession;
         var beanClass = ((Bean<T>) type).getBeanClass();
         var annotation = beanClass.getAnnotation(ViewScoped.class);
 
         if (annotation != null && annotation.saveInViewState()) { // Can be null when declared on producer method.
-            checkStateSavingMethod(beanClass);
+            checkStateSavingMethod(context, beanClass);
             storage = storageInViewState;
         }
 
-        var beanStorageId = storage.getBeanStorageId();
+        var beanStorageId = storage.getBeanStorageId(context);
 
         if (beanStorageId == null) {
             beanStorageId = UUID.randomUUID();
 
             if (storage instanceof ViewScopeStorageInSession) {
-                if (getViewRoot().isTransient()) {
-                    logger.log(Level.WARNING, format(WARNING_UNSUPPORTED_STATE_SAVING, beanClass.getName(), getViewId()));
+                if (context.getViewRoot().isTransient()) {
+                    logger.log(Level.WARNING, format(WARNING_UNSUPPORTED_STATE_SAVING, beanClass.getName(), getViewId(context)));
                 }
                 else {
-                    registerUnloadScript(beanStorageId);
+                    registerUnloadScript(context, beanStorageId);
                 }
             }
         }
 
-        var beanStorage = storage.getBeanStorage(beanStorageId);
+        var beanStorage = storage.getBeanStorage(context, beanStorageId);
 
         if (beanStorage == null) {
             beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
-            storage.setBeanStorage(beanStorageId, beanStorage);
+            storage.setBeanStorage(context, beanStorageId, beanStorage);
         }
 
         return beanStorage;
     }
 
-    private static void checkStateSavingMethod(Class<?> beanClass) {
-        var context = FacesContext.getCurrentInstance();
-
+    private static void checkStateSavingMethod(FacesContext context, Class<?> beanClass) {
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
             throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
         }
@@ -224,11 +222,11 @@ public class ViewScopeManager {
     /**
      * Register unload script.
      */
-    private static void registerUnloadScript(UUID beanStorageId) {
-        addFormIfNecessary(); // Required to get view state ID.
-        addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
-        addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-        addScript(format(SCRIPT_INIT, beanStorageId));
+    private static void registerUnloadScript(FacesContext context, UUID beanStorageId) {
+        addFormIfNecessary(context); // Required to get view state ID.
+        addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
+        addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+        addScript(context, format(SCRIPT_INIT, beanStorageId));
     }
 
     /**
