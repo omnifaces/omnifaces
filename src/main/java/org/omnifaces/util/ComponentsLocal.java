@@ -29,6 +29,7 @@ import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.setContext;
 import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.FacesLocal.getFaceletContext;
@@ -301,7 +302,7 @@ public final class ComponentsLocal {
             oncomplete(context, script);
         }
         else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(context, script)); // Just to avoid it misses when view rebuilds in the meanwhile.
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(getContext(), script)); // Just to avoid it misses when view rebuilds in the meanwhile.
         }
         else {
             addScriptToBody(context, script);
@@ -318,7 +319,7 @@ public final class ComponentsLocal {
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
                 addScriptResourceToHead(context, libraryName, resourceName);
-                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(context, libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
+                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
             }
             else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
                 addScriptResourceToHead(context, libraryName, resourceName);
