@@ -271,7 +271,7 @@ public final class Numbers {
     }
 
     private static String formatUnit(String value, boolean iec, String unit, int exponent, boolean stripZeroes) {
-        var formatted = stripZeroes ? value.replaceAll("\\D?0+$", "") : value;
+        var formatted = stripZeroes ? value.replaceAll("0+$", "").replaceAll("\\D$", "") : value;
         var separator = unit == null ? "" : " ";
         var unitString = unit == null ? "" : unit;
         return formatted + separator + getUnitPrefix(iec, exponent) + unitString;
