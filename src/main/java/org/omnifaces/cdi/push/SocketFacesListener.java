@@ -15,8 +15,8 @@ package org.omnifaces.cdi.push;
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static java.lang.String.format;
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.forEachComponent;
+import static org.omnifaces.util.ComponentsLocal.addScript;
+import static org.omnifaces.util.ComponentsLocal.forEachComponent;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
@@ -24,7 +24,6 @@ import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -74,8 +73,8 @@ public class SocketFacesListener implements SystemEventListener {
             return;
         }
 
-        FacesContext context = FacesContext.getCurrentInstance();
-        Map<String, Entry<Serializable, Boolean>> sockets = getSockets(context);
+        var context = FacesContext.getCurrentInstance();
+        var sockets = getSockets(context);
 
         if (!isAjaxRequest(context)) {
             sockets.clear();
@@ -86,11 +85,11 @@ public class SocketFacesListener implements SystemEventListener {
                 return;
             }
 
-            boolean connected = socket.isRendered() && socket.isConnected();
+            var connected = socket.isRendered() && socket.isConnected();
             boolean previouslyConnected = sockets.get(socket.getChannel()).setValue(connected);
 
             if (connected != previouslyConnected) {
-                addScript(format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel()));
+                addScript(context, format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel()));
             }
         });
     }
@@ -101,8 +100,8 @@ public class SocketFacesListener implements SystemEventListener {
      * Subscribe this socket faces listener to the current view if necessary.
      */
     static void subscribeIfNecessary() {
-        UIViewRoot view = getViewRoot();
-        List<SystemEventListener> listeners = view.getListenersForEventClass(PostAddToViewEvent.class);
+        var view = getViewRoot();
+        var listeners = view.getListenersForEventClass(PostAddToViewEvent.class);
 
         if (listeners != null) {
             for (SystemEventListener listener : listeners) {
@@ -121,7 +120,7 @@ public class SocketFacesListener implements SystemEventListener {
      */
     static boolean register(FacesContext context, Socket socket) {
         Entry<Serializable, Boolean> currentlyConnectedUser = new AbstractMap.SimpleEntry<>(socket.getUser(), socket.isConnected());
-        Entry<Serializable, Boolean> previouslyConnectedUser = getSockets(context).put(socket.getChannel(), currentlyConnectedUser);
+        var previouslyConnectedUser = getSockets(context).put(socket.getChannel(), currentlyConnectedUser);
 
         if (previouslyConnectedUser != null && !Objects.equals(previouslyConnectedUser.getKey(), socket.getUser())) {
             SocketChannelManager.getInstance().switchUser(socket.getChannel(), socket.getScope(), previouslyConnectedUser.getKey(), socket.getUser());

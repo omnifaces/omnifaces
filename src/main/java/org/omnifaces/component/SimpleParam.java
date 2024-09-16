@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component;
 
-import static org.omnifaces.util.Components.convertToString;
+import static org.omnifaces.util.ComponentsLocal.convertToString;
 import static org.omnifaces.util.Faces.getContext;
 
 import jakarta.faces.component.UIParameter;
@@ -76,7 +76,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
         name = param.getName();
 
         if (param instanceof ParamHolder) {
-            ParamHolder<T> holder = (ParamHolder<T>) param;
+            var holder = (ParamHolder<T>) param;
             value = holder.getLocalValue();
             converter = holder.getConverter();
         }

@@ -25,11 +25,11 @@ import static java.util.logging.Level.WARNING;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
-import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.getCurrentForm;
-import static org.omnifaces.util.Components.getLabel;
-import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.ComponentsLocal.forEachComponent;
+import static org.omnifaces.util.ComponentsLocal.getCurrentForm;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
+import static org.omnifaces.util.ComponentsLocal.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
@@ -388,7 +388,7 @@ public class ValidateBean extends TagHandler {
             throw new IllegalStateException(ERROR_MISSING_FORM);
         }
 
-        if (!form.equals(getCurrentForm()) || !(component instanceof UIForm) && !hasInvokedSubmit(component)) {
+        if (!form.equals(getCurrentForm(context)) || !(component instanceof UIForm) && !hasInvokedSubmit(context, component)) {
             return;
         }
 
@@ -614,7 +614,7 @@ public class ValidateBean extends TagHandler {
                     context.validationFailed();
                     input.setValid(false);
                     var clientId = input.getClientId(context);
-                    addError(clientId, formatMessage(violation.getMessage(), getLabel(input), messageFormat));
+                    addError(clientId, formatMessage(violation.getMessage(), getLabel(context, input), messageFormat));
                     undisplayed.remove(violation);
                     displayed[0] = true;
                 });
@@ -642,7 +642,7 @@ public class ValidateBean extends TagHandler {
             }
 
             var clientId = component.getClientId(context);
-            addErrors(clientId, violations, getLabel(component), messageFormat);
+            addErrors(clientId, violations, getLabel(context, component), messageFormat);
         }
     }
 
@@ -658,7 +658,7 @@ public class ValidateBean extends TagHandler {
                     labels.append(", ");
                 }
 
-                labels.append(getLabel(input));
+                labels.append(getLabel(context, input));
             });
         }
 

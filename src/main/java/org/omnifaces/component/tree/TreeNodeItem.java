@@ -14,8 +14,8 @@ package org.omnifaces.component.tree;
 
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.validateHasNoParent;
-import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasParent;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -59,9 +59,9 @@ public class TreeNodeItem extends TreeFamily {
      * nested in another {@link TreeNodeItem}.
      */
     @Override
-    protected void validateHierarchy() {
-        validateHasParent(this, TreeNode.class);
-        validateHasNoParent(this, TreeNodeItem.class);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasParent(context, this, TreeNode.class);
+        validateHasNoParent(context, this, TreeNodeItem.class);
     }
 
     /**
@@ -89,7 +89,7 @@ public class TreeNodeItem extends TreeFamily {
 
         process(context, tree -> {
             if (tree.getCurrentModelNode() != null) {
-                for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+                for (var childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
                     tree.setCurrentModelNode(context, childModelNode);
 
                     if (isRendered()) {
@@ -122,7 +122,7 @@ public class TreeNodeItem extends TreeFamily {
 
         return process(context.getFacesContext(), tree -> {
             if (tree.getCurrentModelNode() != null) {
-                for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+                for (var childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
                     tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
                     if (TreeNodeItem.super.visitTree(context, callback)) {
@@ -143,10 +143,9 @@ public class TreeNodeItem extends TreeFamily {
      * @param callback The callback to be invoked.
      * @return The callback result.
      */
-    @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
     private <R> R process(FacesContext context, Function<Tree, R> callback) {
-        Tree tree = getClosestParent(this, Tree.class);
-        TreeModel originalModelNode = tree.getCurrentModelNode();
+        var tree = getClosestParent(this, Tree.class);
+        var originalModelNode = tree.getCurrentModelNode();
 
         try {
             return callback.apply(tree);

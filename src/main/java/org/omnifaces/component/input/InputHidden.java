@@ -13,7 +13,7 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
-import static org.omnifaces.util.Components.convertToString;
+import static org.omnifaces.util.ComponentsLocal.convertToString;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlInputHidden;

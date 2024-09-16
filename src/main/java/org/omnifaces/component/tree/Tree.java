@@ -13,9 +13,9 @@
 package org.omnifaces.component.tree;
 
 import static java.lang.String.format;
-import static org.omnifaces.util.Components.validateHasChild;
-import static org.omnifaces.util.Components.validateHasNoParent;
-import static org.omnifaces.util.Components.validateHasOnlyChildren;
+import static org.omnifaces.util.ComponentsLocal.validateHasChild;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasOnlyChildren;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.NamingContainer;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UINamingContainer;
 import jakarta.faces.component.visit.VisitCallback;
 import jakarta.faces.component.visit.VisitContext;
@@ -156,8 +155,8 @@ public class Tree extends TreeFamily implements NamingContainer {
      */
     @Override
     public String getContainerClientId(FacesContext context) {
-        String containerClientId = super.getContainerClientId(context);
-        String currentModelNodeIndex = (currentModelNode != null) ? currentModelNode.getIndex() : null;
+        var containerClientId = super.getContainerClientId(context);
+        var currentModelNodeIndex = currentModelNode != null ? currentModelNode.getIndex() : null;
 
         if (currentModelNodeIndex != null) {
             containerClientId = new StringBuilder(containerClientId)
@@ -198,10 +197,10 @@ public class Tree extends TreeFamily implements NamingContainer {
      * children of type {@link TreeNode}.
      */
     @Override
-    protected void validateHierarchy() {
-        validateHasNoParent(this, Tree.class);
-        validateHasChild(this, TreeNode.class);
-        validateHasOnlyChildren(this, TreeNode.class);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasNoParent(context, this, Tree.class);
+        validateHasChild(context, this, TreeNode.class);
+        validateHasOnlyChildren(context, this, TreeNode.class);
     }
 
     /**
@@ -215,7 +214,7 @@ public class Tree extends TreeFamily implements NamingContainer {
             return;
         }
 
-        final boolean processValidations = (phaseId == PhaseId.PROCESS_VALIDATIONS);
+        final var processValidations = phaseId == PhaseId.PROCESS_VALIDATIONS;
 
         process(context, getModel(phaseId), () -> {
             if (processValidations) {
@@ -244,14 +243,14 @@ public class Tree extends TreeFamily implements NamingContainer {
             return false;
         }
 
-        TreeModel model = getModel(PhaseId.ANY_PHASE);
+        var model = getModel(PhaseId.ANY_PHASE);
 
         if (model.isLeaf()) {
             return super.visitTree(context, callback);
         }
 
         return process(context.getFacesContext(), model, () -> {
-            VisitResult result = context.invokeVisitCallback(Tree.this, callback);
+            var result = context.invokeVisitCallback(Tree.this, callback);
 
             if (result == VisitResult.COMPLETE) {
                 return true;
@@ -278,12 +277,12 @@ public class Tree extends TreeFamily implements NamingContainer {
     @Override
     public void broadcast(FacesEvent event) {
         if (event instanceof TreeFacesEvent) {
-            FacesContext context = FacesContext.getCurrentInstance();
-            TreeFacesEvent treeEvent = (TreeFacesEvent) event;
-            FacesEvent wrapped = treeEvent.getWrapped();
+            var context = FacesContext.getCurrentInstance();
+            var treeEvent = (TreeFacesEvent) event;
+            var wrapped = treeEvent.getWrapped();
 
             process(context, treeEvent.getNode(), () -> {
-                UIComponent source = wrapped.getComponent();
+                var source = wrapped.getComponent();
                 pushComponentToEL(context, getCompositeComponentParent(source));
 
                 try {
@@ -351,8 +350,8 @@ public class Tree extends TreeFamily implements NamingContainer {
      * @return The callback result.
      */
     private <R> R process(FacesContext context, TreeModel node, Supplier<R> callback) {
-        Object[] originalVars = captureOriginalVars(context);
-        TreeModel originalModelNode = currentModelNode;
+        var originalVars = captureOriginalVars(context);
+        var originalModelNode = currentModelNode;
         pushComponentToEL(context, null);
 
         try {
@@ -397,8 +396,8 @@ public class Tree extends TreeFamily implements NamingContainer {
         if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
             nodes = new HashMap<>(getChildCount());
 
-            for (UIComponent child : getChildren()) {
-                TreeNode node = (TreeNode) child;
+            for (var child : getChildren()) {
+                var node = (TreeNode) child;
 
                 if (nodes.put(node.getLevel(), node) != null) {
                     throw new IllegalStateException(format(ERROR_DUPLICATE_NODE, node.getLevel()));
@@ -417,7 +416,7 @@ public class Tree extends TreeFamily implements NamingContainer {
      */
     private TreeModel getModel(PhaseId phaseId) {
         if (phaseId == PhaseId.RENDER_RESPONSE || currentModel == null) {
-            Object value = getValue();
+            var value = getValue();
 
             if (value == null) {
                 currentModel = new ListTreeModel();
@@ -440,11 +439,11 @@ public class Tree extends TreeFamily implements NamingContainer {
      * @return An object array with the two values.
      */
     private Object[] captureOriginalVars(FacesContext context) {
-        Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
+        var requestMap = context.getExternalContext().getRequestMap();
         String[] names = { getVar(), getVarNode() };
-        Object[] vars = new Object[names.length];
+        var vars = new Object[names.length];
 
-        for (int i = 0; i < names.length; i++) {
+        for (var i = 0; i < names.length; i++) {
             if (names[i] != null) {
                 vars[i] = requestMap.get(names[i]);
             }
@@ -459,10 +458,10 @@ public class Tree extends TreeFamily implements NamingContainer {
      * @param vars An object array with the two values.
      */
     private void setVars(FacesContext context, Object... vars) {
-        Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
+        var requestMap = context.getExternalContext().getRequestMap();
         String[] names = { getVar(), getVarNode() };
 
-        for (int i = 0; i < names.length; i++) {
+        for (var i = 0; i < names.length; i++) {
             if (names[i] != null) {
                 if (vars[i] != null) {
                     requestMap.put(names[i], vars[i]);
@@ -489,7 +488,7 @@ public class Tree extends TreeFamily implements NamingContainer {
         EditableValueHolderStateHelper.save(context, getStateHelper(), getFacetsAndChildren());
 
         this.currentModelNode = currentModelNode;
-        setVars(context, (currentModelNode != null ? currentModelNode.getData() : null), currentModelNode);
+        setVars(context, currentModelNode != null ? currentModelNode.getData() : null, currentModelNode);
 
         // Restore any saved state of any child input fields of current model node before continuing.
         EditableValueHolderStateHelper.restore(context, getStateHelper(), getFacetsAndChildren());

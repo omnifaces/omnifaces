@@ -14,7 +14,6 @@ package org.omnifaces.component.validator;
 
 import java.io.IOException;
 
-import jakarta.faces.application.Application;
 import jakarta.faces.component.UIComponentBase;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PostValidateEvent;
@@ -51,11 +50,11 @@ public abstract class ValidatorFamily extends UIComponentBase {
     }
 
     /**
-     * Calls {@link #validateHierarchy()}.
+     * Calls {@link #validateHierarchy(FacesContext)}.
      */
     @Override
     public void processDecodes(FacesContext context) {
-        validateHierarchy();
+        validateHierarchy(context);
     }
 
     /**
@@ -63,7 +62,7 @@ public abstract class ValidatorFamily extends UIComponentBase {
      */
     @Override
     public void processValidators(FacesContext context) {
-        Application application = context.getApplication();
+        var application = context.getApplication();
         application.publishEvent(context, PreValidateEvent.class, this);
         validateComponents(context);
         application.publishEvent(context, PostValidateEvent.class, this);
@@ -78,11 +77,11 @@ public abstract class ValidatorFamily extends UIComponentBase {
     }
 
     /**
-     * Calls {@link #validateHierarchy()}.
+     * Calls {@link #validateHierarchy(FacesContext)}.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        validateHierarchy();
+        validateHierarchy(context);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -90,8 +89,20 @@ public abstract class ValidatorFamily extends UIComponentBase {
     /**
      * Validate our own component hierarchy.
      * @throws IllegalStateException When component hierarchy is wrong.
+     * @deprecated Use {@link #validateHierarchy(FacesContext)} instead.
      */
-    protected abstract void validateHierarchy();
+    @Deprecated(since = "4.6", forRemoval = true)
+    protected void validateHierarchy() {
+        validateHierarchy(getFacesContext());
+    }
+
+    /**
+     * Validate our own component hierarchy.
+     * @param context The faces context to work with.
+     * @throws IllegalStateException When component hierarchy is wrong.
+     * @since 4.6
+     */
+    protected abstract void validateHierarchy(FacesContext context);
 
     /**
      * Perform the actual validation.

@@ -17,18 +17,17 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.omnifaces.util.Components.findComponentsInChildren;
-import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Components.getValue;
 import static org.omnifaces.util.Components.isEditable;
-import static org.omnifaces.util.Components.validateHasNoChildren;
-import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoChildren;
+import static org.omnifaces.util.ComponentsLocal.validateHasParent;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import jakarta.faces.component.FacesComponent;
@@ -195,9 +194,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
      */
     @Override
-    protected void validateHierarchy() {
-        validateHasParent(this, UIForm.class);
-        validateHasNoChildren(this);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasParent(context, this, UIForm.class);
+        validateHasNoChildren(context, this);
     }
 
     /**
@@ -212,20 +211,20 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
             return;
         }
 
-        List<UIInput> inputs = collectComponents();
+        var inputs = collectComponents();
 
         if (inputs.isEmpty()) {
             return;
         }
 
-        List<Object> values = collectValues(inputs);
+        var values = collectValues(inputs);
 
         if (!validateValues(context, inputs, values)) {
-            int i = 0;
+            var i = 0;
 
             for (UIInput input : inputs) {
                 if (Components.isRendered(input)) {
-                    input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+                    input.setValid(!isInvalidateAll() && !shouldInvalidateInput(context, input, values.get(i)));
 
                     if (!input.isValid() && input.isLocalValueSet()) {
                         input.setSubmittedValue(getRequestParameter(input.getClientId(context)));
@@ -249,14 +248,14 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * non-existing component, or when it references a non-input component.
      */
     protected List<UIInput> collectComponents() {
-        String components = getComponents();
+        var components = getComponents();
 
         if (components.isEmpty()) {
             throw new IllegalArgumentException(format(
                 ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
         }
 
-        UIComponent namingContainerParent = getNamingContainer();
+        var namingContainerParent = getNamingContainer();
         List<UIInput> inputs = new ArrayList<>();
 
         for (String clientId : components.split("\\s+")) {
@@ -281,7 +280,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         List<Object> values = new ArrayList<>(inputs.size());
 
         for (UIInput input : inputs) {
-            Object value = isEditable(input) ? getValue(input) : input.getValue();
+            var value = isEditable(input) ? getValue(input) : input.getValue();
 
             if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
                 value = null;
@@ -319,10 +318,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * @param inputs The validated input components.
      */
     protected void showMessage(FacesContext context, List<UIInput> inputs) {
-        StringBuilder labels = new StringBuilder();
+        var labels = new StringBuilder();
 
-        for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
-            labels.append(getLabel(iterator.next()));
+        for (var iterator = inputs.iterator(); iterator.hasNext();) {
+            labels.append(getLabel(context, iterator.next()));
 
             if (iterator.hasNext()) {
                 labels.append(", ");
@@ -333,7 +332,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     }
 
     private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
-        UIComponent found = parent.findComponent(clientId);
+        var found = parent.findComponent(clientId);
 
         if (found == null) {
             throw new IllegalArgumentException(format(
@@ -348,7 +347,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     }
 
     private List<UIInput> findInputComponents(UIComponent parent, String clientId, PropertyKeys property) {
-        UIComponent found = parent.findComponent(clientId);
+        var found = parent.findComponent(clientId);
 
         if (found == null) {
             throw new IllegalArgumentException(format(
@@ -388,10 +387,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
             addGlobalError(message, labels);
         }
         else {
-            UIComponent namingContainerParent = getNamingContainer();
+            var namingContainerParent = getNamingContainer();
 
             for (String clientId : showMessageFor.split("\\s+")) {
-                UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
+                var input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
                 addError(input.getClientId(context), message, labels);
             }
         }

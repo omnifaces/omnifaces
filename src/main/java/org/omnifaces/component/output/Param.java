@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.util.Components.convertToString;
+import static org.omnifaces.util.ComponentsLocal.convertToString;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,7 +22,6 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIParameter;
 import jakarta.faces.component.ValueHolder;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.convert.Converter;
 
 import org.omnifaces.component.ParamHolder;
@@ -98,12 +97,12 @@ public class Param<T> extends UIParameter implements ParamHolder<T> {
     @Override
     @SuppressWarnings("unchecked")
     public String getValue() {
-        FacesContext context = getFacesContext();
+        var context = getFacesContext();
         Object value = getLocalValue();
 
         if (value == null && getChildCount() > 0) {
-            ResponseWriter originalResponseWriter = context.getResponseWriter();
-            StringWriter output = new StringWriter();
+            var originalResponseWriter = context.getResponseWriter();
+            var output = new StringWriter();
             context.setResponseWriter(originalResponseWriter.cloneWithWriter(output));
 
             try {

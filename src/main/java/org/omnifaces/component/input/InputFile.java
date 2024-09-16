@@ -24,11 +24,11 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.getMessage;
 import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addScriptResource;
-import static org.omnifaces.util.Components.getMessageComponent;
-import static org.omnifaces.util.Components.getMessagesComponent;
-import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.ComponentsLocal.getMessageComponent;
+import static org.omnifaces.util.ComponentsLocal.getMessagesComponent;
+import static org.omnifaces.util.ComponentsLocal.validateHasParent;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.isDevelopment;
@@ -295,8 +295,9 @@ public class InputFile extends HtmlInputFile {
     private void registerScriptsIfNecessary() {
         // This is supposed to be declared via @ResourceDependency, but Faces 3 and Faces 4 use a different script
         // resource name which cannot be resolved statically.
-        addFacesScriptResource(); // Required for jsf.ajax.request.
-        addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+        var context = getFacesContext();
+        addFacesScriptResource(context); // Required for jsf.ajax.request.
+        addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -315,7 +316,7 @@ public class InputFile extends HtmlInputFile {
             addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));
             setValid(false);
             context.validationFailed();
-            update(getMessageComponentClientId());
+            update(getMessageComponentClientId(context));
             context.renderResponse();
         }
         else {
@@ -380,7 +381,7 @@ public class InputFile extends HtmlInputFile {
             super.validateValue(context, convertedValue);
         }
         else if (isAjaxRequest(context)) {
-            update(getMessageComponentClientId());
+            update(getMessageComponentClientId(context));
         }
     }
 
@@ -424,8 +425,8 @@ public class InputFile extends HtmlInputFile {
         var maxsize = getMaxsize();
 
         if (maxsize != null) {
-            validateHierarchy();
-            setOnchange(format(SCRIPT_ONCHANGE, getMessageComponentClientId(), maxsize, coalesce(getOnchange(), "")));
+            validateHierarchy(context);
+            setOnchange(format(SCRIPT_ONCHANGE, getMessageComponentClientId(context), maxsize, coalesce(getOnchange(), "")));
         }
 
         super.encodeEnd(context);
@@ -435,10 +436,10 @@ public class InputFile extends HtmlInputFile {
      * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
      * @throws IllegalStateException When component hierarchy is wrong.
      */
-    protected void validateHierarchy() {
-        validateHasParent(this, UIForm.class);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasParent(context, this, UIForm.class);
 
-        if (isDevelopment() && getMessageComponentClientId() == null) {
+        if (isDevelopment() && getMessageComponentClientId(context) == null) {
             throw new IllegalStateException(ERROR_MISSING_MESSAGE_COMPONENT);
         }
     }
@@ -618,18 +619,18 @@ public class InputFile extends HtmlInputFile {
         return regex.toString();
     }
 
-    private String getMessageComponentClientId() {
+    private String getMessageComponentClientId(FacesContext context) {
         if (messageComponentClientId != null) {
             return messageComponentClientId;
         }
 
-        UIComponent component = getMessageComponent(this);
+        UIComponent component = getMessageComponent(context, this);
 
         if (component == null || component.getId() == null) {
-            component = getMessagesComponent();
+            component = getMessagesComponent(context);
         }
 
-        messageComponentClientId = component != null && component.getId() != null ? component.getClientId() : null;
+        messageComponentClientId = component != null && component.getId() != null ? component.getClientId(context) : null;
         return messageComponentClientId;
     }
 

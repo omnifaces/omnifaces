@@ -14,7 +14,7 @@ package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
-import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -214,7 +214,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
                 var validatorMessage = (String) message.getValue(context.getELContext());
 
                 if (validatorMessage != null) {
-                    var label = getLabel(component);
+                    var label = getLabel(context, component);
                     throw new ValidatorException(Messages.create(validatorMessage, label)
                         .detail(validatorMessage, label).error().get(), e.getCause());
                 }

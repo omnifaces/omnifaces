@@ -543,7 +543,7 @@ public final class ComponentsLocal {
      */
     public static String getLabel(FacesContext context, UIComponent component) {
         var label = getOptionalLabel(context, component);
-        return label != null ? label : component.getClientId();
+        return label != null ? label : component.getClientId(context);
     }
 
     /**

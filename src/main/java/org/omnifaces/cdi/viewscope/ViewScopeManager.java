@@ -18,12 +18,12 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.BeansLocal.getInstance;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addFormIfNecessary;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.addScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addFormIfNecessary;
+import static org.omnifaces.util.ComponentsLocal.addScript;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getViewId;
-import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
@@ -147,7 +147,7 @@ public class ViewScopeManager {
      * current active view scope.
      */
     public void preDestroyView() {
-        var context = FacesContext.getCurrentInstance();
+        var context = getContext();
         UUID beanStorageId = null;
 
         if (isUnloadRequest(context)) {
@@ -194,11 +194,12 @@ public class ViewScopeManager {
             beanStorageId = UUID.randomUUID();
 
             if (storage instanceof ViewScopeStorageInSession) {
-                if (getViewRoot().isTransient()) {
+                var context = getContext();
+                if (context.getViewRoot().isTransient()) {
                     logger.log(Level.WARNING, format(WARNING_UNSUPPORTED_STATE_SAVING, beanClass.getName(), getViewId()));
                 }
                 else {
-                    registerUnloadScript(beanStorageId);
+                    registerUnloadScript(context, beanStorageId);
                 }
             }
         }
@@ -214,7 +215,7 @@ public class ViewScopeManager {
     }
 
     private static void checkStateSavingMethod(Class<?> beanClass) {
-        var context = FacesContext.getCurrentInstance();
+        var context = getContext();
 
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
             throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
@@ -224,11 +225,11 @@ public class ViewScopeManager {
     /**
      * Register unload script.
      */
-    private static void registerUnloadScript(UUID beanStorageId) {
-        addFormIfNecessary(); // Required to get view state ID.
-        addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
-        addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-        addScript(format(SCRIPT_INIT, beanStorageId));
+    private static void registerUnloadScript(FacesContext context, UUID beanStorageId) {
+        addFormIfNecessary(context); // Required to get view state ID.
+        addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
+        addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+        addScript(context, format(SCRIPT_INIT, beanStorageId));
     }
 
     /**
