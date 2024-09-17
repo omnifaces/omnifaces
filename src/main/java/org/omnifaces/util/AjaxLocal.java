@@ -14,8 +14,8 @@ package org.omnifaces.util;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.omnifaces.util.Components.getCurrentComponent;
-import static org.omnifaces.util.Components.getCurrentForm;
+import static org.omnifaces.util.ComponentsLocal.getCurrentComponent;
+import static org.omnifaces.util.ComponentsLocal.getCurrentForm;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
@@ -92,17 +92,17 @@ public final class AjaxLocal {
                 updateAll(context);
             }
             else if ("@form".equals(clientId)) {
-                UIComponent currentForm = getCurrentForm();
+                UIComponent currentForm = getCurrentForm(context);
 
                 if (currentForm != null) {
-                    renderIds.add(currentForm.getClientId());
+                    renderIds.add(currentForm.getClientId(context));
                 }
             }
             else if ("@this".equals(clientId)) {
-                var currentComponent = getCurrentComponent();
+                var currentComponent = getCurrentComponent(context);
 
                 if (currentComponent != null) {
-                    renderIds.add(currentComponent.getClientId());
+                    renderIds.add(currentComponent.getClientId(context));
                 }
             }
         }

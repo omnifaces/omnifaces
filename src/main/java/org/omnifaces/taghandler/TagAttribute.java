@@ -12,7 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
-import static org.omnifaces.util.Components.createValueExpression;
+import static org.omnifaces.util.ComponentsLocal.createValueExpression;
 
 import java.io.IOException;
 
@@ -96,7 +96,7 @@ public class TagAttribute extends TagHandler {
                 valueExpression = defaultValue.getValueExpression(context, Object.class);
             }
             else if (ID_ATTRIBUTE.equals(name)) {
-                valueExpression = createValueExpression("#{'" + ID_PREFIX + context.generateUniqueId(this.tagId) + "'}", String.class);
+                valueExpression = createValueExpression(context.getFacesContext(), "#{'" + ID_PREFIX + context.generateUniqueId(this.tagId) + "'}", String.class);
                 variableMapper.setWrappedVariable(name, valueExpression);
                 return;
             }

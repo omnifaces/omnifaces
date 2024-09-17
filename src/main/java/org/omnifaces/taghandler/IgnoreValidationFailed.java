@@ -22,7 +22,6 @@ import java.io.IOException;
 import jakarta.faces.component.UICommand;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIForm;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.facelets.ComponentHandler;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
@@ -90,9 +89,9 @@ public class IgnoreValidationFailed extends TagHandler {
             throw new IllegalStateException(ERROR_INVALID_PARENT);
         }
 
-        FacesContext facesContext = context.getFacesContext();
+        var facesContext = context.getFacesContext();
 
-        if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
+        if (!ComponentHandler.isNew(parent) || !facesContext.isPostback() || facesContext.getCurrentPhaseId() != RESTORE_VIEW) {
             return;
         }
 
@@ -112,7 +111,7 @@ public class IgnoreValidationFailed extends TagHandler {
             return;
         }
 
-        Form form = getClosestParent(command, Form.class);
+        var form = getClosestParent(command, Form.class);
 
         if (form == null) {
             throw new IllegalStateException(ERROR_INVALID_FORM);

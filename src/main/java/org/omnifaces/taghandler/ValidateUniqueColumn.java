@@ -15,7 +15,7 @@ package org.omnifaces.taghandler;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Messages.addError;
 
@@ -33,7 +33,6 @@ import jakarta.faces.event.ValueChangeEvent;
 import jakarta.faces.event.ValueChangeListener;
 import jakarta.faces.view.facelets.ComponentHandler;
 import jakarta.faces.view.facelets.FaceletContext;
-import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
@@ -137,7 +136,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
      * Get the value of the tag attribute associated with the given attribute name as a value expression.
      */
     private ValueExpression getValueExpression(String attributeName, FaceletContext context) {
-        TagAttribute attribute = getAttribute(attributeName);
+        var attribute = getAttribute(attributeName);
 
         if (attribute != null) {
             return attribute.getValueExpression(context, Object.class);
@@ -157,25 +156,25 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
             return;
         }
 
-        UIInput input = (UIInput) event.getComponent();
+        var input = (UIInput) event.getComponent();
 
         if (!input.isValid() || input.getLocalValue() == null) {
             return;
         }
 
-        UIData table = getClosestParent(input, UIData.class);
-        int originalRows = table.getRows();
+        var table = getClosestParent(input, UIData.class);
+        var originalRows = table.getRows();
         table.setRows(0); // We want to visit all rows.
 
-        FacesContext context = FacesContext.getCurrentInstance();
-        UniqueColumnValueChecker checker = new UniqueColumnValueChecker(table, input);
+        var context = FacesContext.getCurrentInstance();
+        var checker = new UniqueColumnValueChecker(table, input);
         table.visitTree(VisitContext.createVisitContext(context), checker);
         table.setRows(originalRows);
 
         if (checker.isDuplicate()) {
             input.setValid(false);
             context.validationFailed();
-            addError(input.getClientId(context), getMessage(), getLabel(input), checker.getDuplicateIndex() + 1);
+            addError(input.getClientId(context), getMessage(), getLabel(context, input), checker.getDuplicateIndex() + 1);
         }
     }
 
@@ -219,7 +218,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
     @SuppressWarnings("unchecked")
     private static <T> T getValue(ValueExpression expression, T defaultValue) {
         if (expression != null) {
-            T value = (T) expression.getValue(getELContext());
+            var value = (T) expression.getValue(getELContext());
 
             if (value != null) {
                 return value;

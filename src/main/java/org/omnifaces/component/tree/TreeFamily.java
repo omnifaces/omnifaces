@@ -86,13 +86,13 @@ public abstract class TreeFamily extends UIComponentBase {
     }
 
     /**
-     * Calls {@link #validateHierarchy()} when project stage is <code>Development</code> and then
+     * Calls {@link #validateHierarchy(FacesContext)} when project stage is <code>Development</code> and then
      * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
         if (isDevelopment(context)) {
-            validateHierarchy();
+            validateHierarchy(context);
         }
 
         process(context, PhaseId.RENDER_RESPONSE);
@@ -103,8 +103,20 @@ public abstract class TreeFamily extends UIComponentBase {
     /**
      * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
      * @throws IllegalStateException When component hierarchy is wrong.
+     * @deprecated Use {@link #validateHierarchy(FacesContext)} instead.
      */
-    protected abstract void validateHierarchy();
+    @Deprecated(since = "4.6", forRemoval = true)
+    protected void validateHierarchy() {
+        validateHierarchy(getFacesContext());
+    }
+
+    /**
+     * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
+     * @param context The faces context to work with.
+     * @throws IllegalStateException When component hierarchy is wrong.
+     * @since 4.6
+     */
+    protected abstract void validateHierarchy(FacesContext context);
 
     /**
      * Process the component according to the rules of the given phase ID.

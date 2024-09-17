@@ -23,8 +23,8 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
-import static org.omnifaces.util.Components.getActionExpressionsAndListeners;
-import static org.omnifaces.util.Components.getCurrentActionSource;
+import static org.omnifaces.util.ComponentsLocal.getActionExpressionsAndListeners;
+import static org.omnifaces.util.ComponentsLocal.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getRemoteAddr;
 import static org.omnifaces.util.FacesLocal.getRemoteUser;
 import static org.omnifaces.util.FacesLocal.getRequest;
@@ -43,7 +43,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -125,7 +124,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
      */
     @Override
     public void beforePhase(PhaseEvent event) {
-        FacesContext context = event.getFacesContext();
+        var context = event.getFacesContext();
         getPhaseTimer(context).start(event.getPhaseId());
     }
 
@@ -135,10 +134,10 @@ public class FacesRequestLogger extends DefaultPhaseListener {
      */
     @Override
     public void afterPhase(PhaseEvent event) {
-        FacesContext context = event.getFacesContext();
+        var context = event.getFacesContext();
         getPhaseTimer(context).stop(event.getPhaseId());
 
-        if (!(event.getPhaseId() == RENDER_RESPONSE || context.getResponseComplete()) || !logger.isLoggable(INFO)) {
+        if (event.getPhaseId() != RENDER_RESPONSE && !context.getResponseComplete() || !logger.isLoggable(INFO)) {
             return;
         }
 
@@ -188,11 +187,11 @@ public class FacesRequestLogger extends DefaultPhaseListener {
      * @return Action details.
      */
     protected Map<String, Object> getActionDetails(FacesContext context) {
-        UIComponent actionSource = getCurrentActionSource();
-        Map<String, Object> actionDetails = new LinkedHashMap<>();
+        var actionSource = getCurrentActionSource(context);
+        var actionDetails = new LinkedHashMap<String, Object>();
         actionDetails.put("source", actionSource != null ? actionSource.getClientId(context) : null);
         actionDetails.put("event", coalesce(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME), getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME)));
-        actionDetails.put("methods", getActionExpressionsAndListeners(actionSource));
+        actionDetails.put("methods", getActionExpressionsAndListeners(context, actionSource));
         actionDetails.put("validationFailed", context.isValidationFailed());
         return actionDetails;
     }
@@ -203,18 +202,18 @@ public class FacesRequestLogger extends DefaultPhaseListener {
      * @return Request parameters.
      */
     protected Map<String, String> getRequestParameters(FacesContext context) {
-        Set<Entry<String, String[]>> params = getRequestParameterValuesMap(context).entrySet();
+        var params = getRequestParameterValuesMap(context).entrySet();
         Map<String, String> filteredParams = new TreeMap<>();
 
         for (Entry<String, String[]> entry : params) {
-            String name = entry.getKey();
+            var name = entry.getKey();
 
             if (name.startsWith("jakarta.faces.")) {
                 continue; // Faces internal stuff is not interesting.
             }
 
-            String[] values = entry.getValue();
-            String value = (values != null && values.length == 1) ? values[0] : Arrays.toString(values);
+            var values = entry.getValue();
+            var value = values != null && values.length == 1 ? values[0] : Arrays.toString(values);
 
             if (value != null && getPasswordRequestParameterPattern(context).matcher(name).matches()) {
                 value = "********"; // Mask passwords and tokens.
@@ -275,9 +274,9 @@ public class FacesRequestLogger extends DefaultPhaseListener {
         }
 
         public String getDuration(PhaseId phase) {
-            Long startTime = startTimes.get(phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal());
-            Long endTime = endTimes.get(phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal());
-            return (startTime != null && endTime != null ?  ((endTime - startTime) / 1_000_000) : -1) + "ms";
+            var startTime = startTimes.get(phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal());
+            var endTime = endTimes.get(phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal());
+            return (startTime != null && endTime != null ?  (endTime - startTime) / 1_000_000 : -1) + "ms";
         }
 
         @Override

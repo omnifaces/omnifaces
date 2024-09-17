@@ -493,7 +493,7 @@ public final class Components {
                 getRoot().visitTree(visitContext, visitCallback);
             }
             else {
-                forEachComponent().havingIds(getRoot().getClientId()).invoke(viewRoot -> viewRoot.visitTree(visitContext, visitCallback));
+                forEachComponent().havingIds(getRoot().getClientId(getFacesContext())).invoke(viewRoot -> viewRoot.visitTree(visitContext, visitCallback));
             }
         }
 
@@ -756,8 +756,7 @@ public final class Components {
      * the client ID.
      */
     public static String getLabel(UIComponent component) {
-        var label = getOptionalLabel(component);
-        return label != null ? label : component.getClientId();
+        return ComponentsLocal.getLabel(getContext(), component);
     }
 
     /**

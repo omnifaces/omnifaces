@@ -14,8 +14,8 @@ package org.omnifaces.taghandler;
 
 import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.ComponentsLocal.createValueExpression;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 
@@ -28,7 +28,6 @@ import jakarta.faces.component.UICommand;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PostValidateEvent;
 import jakarta.faces.event.PreValidateEvent;
 import jakarta.faces.event.SystemEvent;
@@ -102,13 +101,13 @@ public class SkipValidators extends TagHandler {
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-        if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
+        if (!(parent instanceof UICommand) && !(parent instanceof ClientBehaviorHolder)) {
             throw new IllegalStateException(ERROR_INVALID_PARENT);
         }
 
-        FacesContext facesContext = context.getFacesContext();
+        var facesContext = context.getFacesContext();
 
-        if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
+        if (!ComponentHandler.isNew(parent) || !facesContext.isPostback() || facesContext.getCurrentPhaseId() != RESTORE_VIEW) {
             return;
         }
 
@@ -128,7 +127,7 @@ public class SkipValidators extends TagHandler {
             return;
         }
 
-        SkipValidatorsEventListener listener = new SkipValidatorsEventListener();
+        var listener = new SkipValidatorsEventListener();
         subscribeToViewEvent(PreValidateEvent.class, listener);
         subscribeToViewEvent(PostValidateEvent.class, listener);
     }
@@ -148,7 +147,7 @@ public class SkipValidators extends TagHandler {
 
         @Override
         public void processEvent(SystemEvent event) {
-            UIComponent source = (UIComponent) event.getSource();
+            var source = (UIComponent) event.getSource();
 
             if (source instanceof UIInput) {
                 processEventForUIInput(event, (UIInput) source);
@@ -159,14 +158,14 @@ public class SkipValidators extends TagHandler {
         }
 
         private void processEventForUIInput(SystemEvent event, UIInput input) {
-            String clientId = input.getClientId();
+            var clientId = input.getClientId(event.getFacesContext());
 
             if (event instanceof PreValidateEvent) {
-                ValueExpression requiredExpression = input.getValueExpression(UIINPUT_REQUIRED_PROPERTY);
+                var requiredExpression = input.getValueExpression(UIINPUT_REQUIRED_PROPERTY);
 
                 if (requiredExpression != null) {
                     attributes.put(clientId, requiredExpression);
-                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, createValueExpression("#{false}", Boolean.class));
+                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, createValueExpression(event.getFacesContext(), "#{false}", Boolean.class));
                 }
                 else {
                     attributes.put(clientId, input.isRequired());
@@ -185,7 +184,7 @@ public class SkipValidators extends TagHandler {
                     input.addValidator(validator);
                 }
 
-                Object requiredValue = attributes.remove(clientId);
+                var requiredValue = attributes.remove(clientId);
 
                 if (requiredValue instanceof ValueExpression) {
                     input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, (ValueExpression) requiredValue);
@@ -197,15 +196,15 @@ public class SkipValidators extends TagHandler {
         }
 
         private void processEventForValidateMultipleFields(SystemEvent event, ValidateMultipleFields validator) {
-            String clientId = validator.getClientId();
+            var clientId = validator.getClientId(event.getFacesContext());
 
             if (event instanceof PreValidateEvent) {
-                ValueExpression disabledExpression = validator.getValueExpression(UIINPUT_DISABLED_PROPERTY);
-                attributes.put(clientId, (disabledExpression != null) ? disabledExpression : validator.isDisabled());
+                var disabledExpression = validator.getValueExpression(UIINPUT_DISABLED_PROPERTY);
+                attributes.put(clientId, disabledExpression != null ? disabledExpression : validator.isDisabled());
                 validator.setDisabled(true);
             }
             else if (event instanceof PostValidateEvent) {
-                Object disabledValue = attributes.remove(clientId);
+                var disabledValue = attributes.remove(clientId);
 
                 if (disabledValue instanceof ValueExpression) {
                     validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, (ValueExpression) disabledValue);

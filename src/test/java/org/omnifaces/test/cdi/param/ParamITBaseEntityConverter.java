@@ -12,7 +12,7 @@
  */
 package org.omnifaces.test.cdi.param;
 
-import static org.omnifaces.util.Components.getExpectedValueType;
+import static org.omnifaces.util.ComponentsLocal.getExpectedValueType;
 import static org.omnifaces.util.Messages.asConverterException;
 
 import jakarta.faces.component.UIComponent;
@@ -39,8 +39,8 @@ public class ParamITBaseEntityConverter implements Converter<ParamITBaseEntity> 
         }
 
         try {
-            Class<? extends ParamITBaseEntity> type = getExpectedValueType(component);
-            Long id = Long.valueOf(value);
+            Class<? extends ParamITBaseEntity> type = getExpectedValueType(context, component);
+            var id = Long.valueOf(value);
             return service.find(type, id);
         }
         catch (Exception e) {

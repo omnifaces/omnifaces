@@ -22,6 +22,7 @@ import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
 import static org.omnifaces.util.ComponentsLocal.addFormIfNecessary;
 import static org.omnifaces.util.ComponentsLocal.addScript;
 import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getViewId;
@@ -146,7 +147,7 @@ public class ViewScopeManager {
      * current active view scope.
      */
     public void preDestroyView() {
-        var context = FacesContext.getCurrentInstance();
+        var context = getContext();
         UUID beanStorageId = null;
 
         if (isUnloadRequest(context)) {
@@ -178,7 +179,7 @@ public class ViewScopeManager {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private <T> BeanStorage getBeanStorage(Contextual<T> type) {
-        var context = FacesContext.getCurrentInstance();
+        var context = getContext();
         ViewScopeStorage storage = storageInSession;
         var beanClass = ((Bean<T>) type).getBeanClass();
         var annotation = beanClass.getAnnotation(ViewScoped.class);
@@ -213,7 +214,9 @@ public class ViewScopeManager {
         return beanStorage;
     }
 
-    private static void checkStateSavingMethod(FacesContext context, Class<?> beanClass) {
+    private static void checkStateSavingMethod(Class<?> beanClass) {
+        var context = getContext();
+
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
             throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
         }

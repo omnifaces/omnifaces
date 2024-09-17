@@ -15,7 +15,7 @@ package org.omnifaces.component.util;
 import static java.lang.String.format;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.name;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.scope;
-import static org.omnifaces.util.Components.findComponentRelatively;
+import static org.omnifaces.util.ComponentsLocal.findComponentRelatively;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Faces.isPostback;
 import static org.omnifaces.util.Faces.setRequestAttribute;
@@ -23,6 +23,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
 import jakarta.faces.event.PreRenderViewEvent;
@@ -99,21 +100,21 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     @Override
     public void processEvent(SystemEvent event) {
-        doProcess();
+        doProcess(event.getFacesContext());
     }
 
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event.
-            doProcess();
+            doProcess(event.getFacesContext());
         }
     }
 
-    private void doProcess() {
+    private void doProcess(FacesContext context) {
         var forValue = getFor();
 
         if (!isEmpty(forValue)) {
-            var component = findComponentRelatively(this, forValue);
+            var component = findComponentRelatively(context, this, forValue);
 
             if (component == null) {
                 component = findComponent(forValue);
@@ -128,7 +129,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
             if (DEFAULT_SCOPE.equals(scope)) {
                 // Component will be resolved again dynamically when the value expression is evaluated.
                 if (readOnlyValueExpression != null) {
-                    readOnlyValueExpression.setCallback(new ComponentClientIdResolver(component.getClientId()));
+                    readOnlyValueExpression.setCallback(new ComponentClientIdResolver(component.getClientId(context)));
                 }
             }
             else if ("request".equals(scope)) {

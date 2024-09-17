@@ -12,7 +12,7 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.util.Components.forEachComponent;
+import static org.omnifaces.util.ComponentsLocal.forEachComponent;
 import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
 import static org.omnifaces.util.Renderers.writeAttributes;
@@ -35,7 +35,6 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.component.UIMessages;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 import jakarta.faces.render.Renderer;
 
@@ -87,8 +86,8 @@ public class MessagesRenderer extends Renderer {
             return;
         }
 
-        OmniMessages omniMessages = (OmniMessages) component;
-        List<FacesMessage> messages = getMessages(context, omniMessages);
+        var omniMessages = (OmniMessages) component;
+        var messages = getMessages(context, omniMessages);
 
         if (!isEmpty(omniMessages.getVar()) && omniMessages.getChildCount() > 0) {
             encodeMessagesRepeater(context, omniMessages, messages);
@@ -97,7 +96,7 @@ public class MessagesRenderer extends Renderer {
             encodeEmptyMessages(context, omniMessages);
         }
         else {
-            String message = omniMessages.getMessage();
+            var message = omniMessages.getMessage();
 
             if (!isEmpty(message)) {
                 messages = Arrays.asList(createInfo(message));
@@ -115,7 +114,7 @@ public class MessagesRenderer extends Renderer {
      * @return All messages associated with components identified by <code>for</code> attribute.
      */
     protected List<FacesMessage> getMessages(FacesContext context, OmniMessages component) {
-        String forClientIds = component.getFor();
+        var forClientIds = component.getFor();
 
         if (forClientIds == null) {
             return component.isGlobalOnly() ? context.getMessageList(null) : context.getMessageList();
@@ -124,7 +123,7 @@ public class MessagesRenderer extends Renderer {
         List<FacesMessage> messages = new ArrayList<>();
 
         for (String forClientId : forClientIds.split("\\s+")) {
-            UIComponent forComponent = component.findComponent(forClientId);
+            var forComponent = component.findComponent(forClientId);
 
             if (forComponent == null) {
                 continue;
@@ -153,9 +152,9 @@ public class MessagesRenderer extends Renderer {
     protected void encodeMessagesRepeater(FacesContext context, OmniMessages component, List<FacesMessage> messages)
         throws IOException
     {
-        String var = component.getVar();
-        Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
-        Object originalVar = requestMap.get(var);
+        var var = component.getVar();
+        var requestMap = context.getExternalContext().getRequestMap();
+        var originalVar = requestMap.get(var);
 
         try {
             for (FacesMessage message : messages) {
@@ -189,10 +188,10 @@ public class MessagesRenderer extends Renderer {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
-        String id = component.getId();
+        var id = component.getId();
 
         if (!isOneOf(id, null, "jakarta_faces_developmentstage_messages")) {
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
             writer.startElement("div", component);
             writeAttribute(writer, "id", component.getClientId(context));
             writeAttribute(writer, component, "styleClass", "class");
@@ -212,7 +211,7 @@ public class MessagesRenderer extends Renderer {
         (FacesContext context, OmniMessages component, List<FacesMessage> messages, boolean table)
             throws IOException
     {
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement(table ? LAYOUT_TABLE : "ul", component);
         writeAttribute(writer, "id", component.getClientId(context));
         writeAttribute(writer, component, "styleClass", "class");
@@ -237,9 +236,9 @@ public class MessagesRenderer extends Renderer {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeMessage(FacesContext context, OmniMessages component, FacesMessage message, boolean table) throws IOException {
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement(table ? "tr" : "li", component);
-        String severityName = SEVERITY_NAMES.get(message.getSeverity());
+        var severityName = SEVERITY_NAMES.get(message.getSeverity());
         writeAttribute(writer, component, severityName + "Style", "style");
         writeAttribute(writer, component, severityName + "Class", "class", "styleClass");
 
@@ -247,8 +246,8 @@ public class MessagesRenderer extends Renderer {
             writer.startElement("td", component);
         }
 
-        String summary = coalesce(message.getSummary(), "");
-        String detail = coalesce(message.getDetail(), summary);
+        var summary = coalesce(message.getSummary(), "");
+        var detail = coalesce(message.getDetail(), summary);
 
         if (component.isTooltip() && isEmpty(component.getTitle())) {
             writeAttribute(writer, "title", detail);

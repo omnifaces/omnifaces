@@ -13,14 +13,16 @@
 package org.omnifaces.validator;
 
 import static jakarta.validation.Validation.byDefaultProvider;
-import static org.omnifaces.util.Components.getCurrentComponent;
-import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.ComponentsLocal.getCurrentComponent;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.hasContext;
 
 import java.util.Locale;
 
 import jakarta.validation.MessageInterpolator;
+
+import org.omnifaces.util.Faces;
 
 
 /**
@@ -79,13 +81,15 @@ public class JsfLabelMessageInterpolator implements MessageInterpolator {
 
     @Override
     public String interpolate(String messageTemplate, Context context, Locale locale) {
-        String message = wrapped.interpolate(messageTemplate, context, locale);
+        var message = wrapped.interpolate(messageTemplate, context, locale);
 
         if (message.contains("{jsf.label}")) {
 
-            String label = "";
-            if (hasContext()) {
-                label = getLabel(getCurrentComponent());
+            var label = "";
+            var facesContext = Faces.getContext();
+
+            if (facesContext != null) {
+                label = getLabel(facesContext, getCurrentComponent(facesContext));
             }
 
             message = message.replace("{jsf.label}", label);

@@ -19,10 +19,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.addScriptResource;
-import static org.omnifaces.util.Components.forEachComponent;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addScript;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.ComponentsLocal.forEachComponent;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
@@ -50,7 +50,6 @@ import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.UIGraphic;
 import jakarta.faces.component.UIOutput;
-import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.view.ViewDeclarationLanguage;
@@ -308,22 +307,22 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return resource;
         }
 
-        boolean manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName) || ALTERNATIVE_MANIFEST_RESOURCE_NAME.equals(resourceName);
-        boolean serviceWorkerResourceRequest = SERVICEWORKER_RESOURCE_NAME.equals(resourceName);
+        var manifestResourceRequest = MANIFEST_RESOURCE_NAME.equals(resourceName) || ALTERNATIVE_MANIFEST_RESOURCE_NAME.equals(resourceName);
+        var serviceWorkerResourceRequest = SERVICEWORKER_RESOURCE_NAME.equals(resourceName);
 
-        if (!(manifestResourceRequest || serviceWorkerResourceRequest)) {
+        if (!manifestResourceRequest && !serviceWorkerResourceRequest) {
             return resource;
         }
 
-        FacesContext context = Faces.getContext();
-        WebAppManifest manifest = loadWebAppManifest(context);
+        var context = Faces.getContext();
+        var manifest = loadWebAppManifest(context);
 
         if (manifestResourceRequest) {
             if (manifest != null) {
                 if (!manifest.getCacheableViewIds().isEmpty()) {
-                    addFacesScriptResource(); // Ensure it's always included BEFORE omnifaces.js.
-                    addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-                    addScript(format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+                    addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
+                    addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+                    addScript(context, format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
                 }
                 else {
                     logger.warning(format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
@@ -338,14 +337,14 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     }
 
 	private WebAppManifest loadWebAppManifest(FacesContext context) {
-		WebAppManifest manifest = Beans.getInstance(manifestBean, false);
+		var manifest = Beans.getInstance(manifestBean, false);
 
         if (manifest == null) {
             manifest = Beans.getInstance(manifestBean, true);
             lastModified = 0;
         }
 
-        boolean resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
+        var resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
 
         if (resourceContentsRequest && lastModified == 0) {
             manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
@@ -389,7 +388,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
             @Override
             public Map<String, String> getResponseHeaders() {
-                Map<String, String> responseHeaders = super.getResponseHeaders();
+                var responseHeaders = super.getResponseHeaders();
                 responseHeaders.put("Service-Worker-Allowed", getServiceWorkerScope(getContext()));
                 return responseHeaders;
             }
@@ -412,7 +411,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return "";
         }
         else {
-            try (Scanner scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8)) {
+            try (var scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8)) {
                 return scanner.useDelimiter("\\A").next()
                     .replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
                     .replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
@@ -421,18 +420,18 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     }
 
     private static Collection<String> getCacheableResources(WebAppManifest manifest) {
-        FacesContext context = Faces.getContext();
-        ViewHandler viewHandler = context.getApplication().getViewHandler();
-        Collection<String> viewIds = new LinkedHashSet<>(manifest.getCacheableViewIds());
-        Collection<String> cacheableResources = new LinkedHashSet<>();
+        var context = Faces.getContext();
+        var viewHandler = context.getApplication().getViewHandler();
+        var viewIds = new LinkedHashSet<>(manifest.getCacheableViewIds());
+        var cacheableResources = new LinkedHashSet<String>();
         cacheableResources.add(manifest.getStartUrl().replaceFirst(Pattern.quote(getRequestDomainURL()), ""));
 
         if (manifest.getOfflineViewId() != null) {
             viewIds.add(manifest.getOfflineViewId());
         }
 
-        for (String viewId : viewIds) {
-    		ViewDeclarationLanguage viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
+        for (var viewId : viewIds) {
+    		var viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
 
     		if (viewDeclarationLanguage.viewExists(context, viewId)) {
     			collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
@@ -449,7 +448,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
 	private static void collectCacheableResources(FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage, Collection<String> cacheableResources) {
 		cacheableResources.add(viewHandler.getActionURL(context, viewId));
-		UIViewRoot view = viewHandler.createView(context, viewId);
+		var view = viewHandler.createView(context, viewId);
 
 		try {
 		    context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
@@ -465,7 +464,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 		        cacheableResources.add(((UIGraphic) component).getValue().toString());
 		    }
 		    else if (component.getAttributes().get("name") != null) {
-		        String url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
+		        var url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
 
 		        if (url != null) {
 		            cacheableResources.add(url);
@@ -476,8 +475,8 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     private static String getOfflineResource(WebAppManifest manifest) {
         if (manifest.getOfflineViewId() != null) {
-            FacesContext context = Faces.getContext();
-            ViewHandler viewHandler = context.getApplication().getViewHandler();
+            var context = Faces.getContext();
+            var viewHandler = context.getApplication().getViewHandler();
             return viewHandler.getActionURL(context, manifest.getOfflineViewId());
         }
         else {
@@ -494,7 +493,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     }
 
     private static String getResourceUrl(FacesContext context, String libraryName, String resourceName) {
-        Resource resource = FacesLocal.createResource(context, libraryName, resourceName);
+        var resource = FacesLocal.createResource(context, libraryName, resourceName);
 
         if (resource == null) {
             return null;
