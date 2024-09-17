@@ -214,9 +214,7 @@ public class ViewScopeManager {
         return beanStorage;
     }
 
-    private static void checkStateSavingMethod(Class<?> beanClass) {
-        var context = getContext();
-
+    private static void checkStateSavingMethod(FacesContext context, Class<?> beanClass) {
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
             throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
         }
