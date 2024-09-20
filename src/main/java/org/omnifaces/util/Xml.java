@@ -17,9 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -76,8 +74,8 @@ public final class Xml {
      * @throws SAXException When a XML parsing error occurs.
      */
     public static Document createDocument(List<URL> urls) throws IOException, SAXException {
-        DocumentBuilder builder = createDocumentBuilder();
-        Document document = builder.newDocument();
+        var builder = createDocumentBuilder();
+        var document = builder.newDocument();
         document.appendChild(document.createElement("root"));
         parseAndAppendChildren(builder, document, urls);
         return document;
@@ -89,7 +87,7 @@ public final class Xml {
      * @return A lenient instance of {@link DocumentBuilder}.
      */
     public static DocumentBuilder createDocumentBuilder() {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        var factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         factory.setNamespaceAware(false);
         factory.setExpandEntityReferences(false);
@@ -126,18 +124,18 @@ public final class Xml {
      * @throws SAXException When a XML parsing error occurs.
      */
     public static void parseAndAppendChildren(DocumentBuilder builder, Document document, List<URL> urls) throws IOException, SAXException {
-        for (URL url : urls) {
+        for (var url : urls) {
             if (url == null) {
                 continue;
             }
 
-            URLConnection connection = url.openConnection();
+            var connection = url.openConnection();
             connection.setUseCaches(false);
 
-            try (InputStream input = connection.getInputStream()) {
-                NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
+            try (var input = connection.getInputStream()) {
+                var children = builder.parse(input).getDocumentElement().getChildNodes();
 
-                for (int i = 0; i < children.getLength(); i++) {
+                for (var i = 0; i < children.getLength(); i++) {
                     document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
                 }
             }
@@ -169,7 +167,7 @@ public final class Xml {
      * @return Trimmed text content of given node.
      */
     public static String getTextContent(Node node) {
-        return node.getFirstChild().getNodeValue().trim();
+        return (node.getChildNodes().getLength() == 1 ? node.getFirstChild().getNodeValue() : node.getTextContent()).trim();
     }
 
     /**
@@ -182,10 +180,10 @@ public final class Xml {
      */
     public static List<String> getNodeTextContents(URL url, String expression) {
         try {
-            NodeList nodeList = getNodeList(createDocument(asList(url)).getDocumentElement(), XPathFactory.newInstance().newXPath(), expression);
-            List<String> nodeTextContents = new ArrayList<>(nodeList.getLength());
+            var nodeList = getNodeList(createDocument(asList(url)).getDocumentElement(), XPathFactory.newInstance().newXPath(), expression);
+            var nodeTextContents = new ArrayList<String>(nodeList.getLength());
 
-            for (int i = 0; i < nodeList.getLength(); i++) {
+            for (var i = 0; i < nodeList.getLength(); i++) {
                 nodeTextContents.add(getTextContent(nodeList.item(i)));
             }
 
