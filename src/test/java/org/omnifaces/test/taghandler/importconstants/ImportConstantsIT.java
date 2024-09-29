@@ -38,6 +38,9 @@ public class ImportConstantsIT extends OmniFacesIT {
     @FindBy(id="enumInterfaceValues")
     private WebElement enumInterfaceValues;
 
+    @FindBy(id="enumInterfaceMembers")
+    private WebElement enumInterfaceMembers;
+
     @Deployment(testable=false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ImportConstantsIT.class)
@@ -67,6 +70,7 @@ public class ImportConstantsIT extends OmniFacesIT {
     @Test
     void testEnumImplementingInterface() {
         assertEquals("[ONE, TWO, THREE, interface]", enumInterfaceValues.getText());
+        assertEquals("[ONE, TWO, THREE]", enumInterfaceMembers.getText());
     }
 
 }
