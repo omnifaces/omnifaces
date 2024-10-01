@@ -12,6 +12,8 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static org.omnifaces.util.Faces.getContext;
+
 import java.util.UUID;
 
 import jakarta.faces.context.FacesContext;
@@ -37,8 +39,7 @@ public interface ViewScopeStorage {
      * @return Currently active bean storage ID, or null if it does not exist.
      */
     default UUID getBeanStorageId() {
-        var context = FacesContext.getCurrentInstance();
-        return getBeanStorageId(context);
+        return getBeanStorageId(getContext());
     }
 
     /**
@@ -58,8 +59,7 @@ public interface ViewScopeStorage {
      * @return The bean storage identified by given ID, or null if it does not exist.
      */
     default BeanStorage getBeanStorage(UUID beanStorageId) {
-        var context = FacesContext.getCurrentInstance();
-        return getBeanStorage(context, beanStorageId);
+        return getBeanStorage(getContext(), beanStorageId);
     }
 
     /**
@@ -80,8 +80,7 @@ public interface ViewScopeStorage {
      * @param beanStorage The bean storage.
      */
     default void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-        var context = FacesContext.getCurrentInstance();
-        setBeanStorage(context, beanStorageId, beanStorage);
+        setBeanStorage(getContext(), beanStorageId, beanStorage);
     }
 
     /**
