@@ -12,14 +12,11 @@
  */
 package org.omnifaces.cdi.param;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.enterprise.context.Dependent;
@@ -50,14 +47,14 @@ import org.omnifaces.cdi.Param;
 @Typed
 public class DynamicParamValueProducer implements Bean<Object>, PassivationCapable {
 
-    private Set<Type> types;
+    private final Set<Type> types;
 
     /**
      * Construct dynamic param value producer for given type.
      * @param type Type to construct dynamic param value producer for.
      */
     public DynamicParamValueProducer(Type type) {
-        types = new HashSet<>(asList(type, Object.class));
+        types = Set.of(type, Object.class);
     }
 
     @Override
@@ -79,7 +76,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
     @Override
     public Set<Annotation> getQualifiers() {
-        return singleton((Annotation) new DefaultParamAnnotationLiteral());
+        return Set.of(new DefaultParamAnnotationLiteral());
     }
 
     @Override
@@ -124,13 +121,14 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
     public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
         private static final long serialVersionUID = 1L;
 
+        private static final String EMPTY_STRING = "";
         private static final String[] EMPTY_STRING_ARRAY = {};
         private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
         private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
 
         @Override
         public String name() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
@@ -140,12 +138,12 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
         @Override
         public String label() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
         public String converter() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
@@ -180,17 +178,17 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
         @Override
         public String converterMessage() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
         public String validatorMessage() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
         public String requiredMessage() {
-            return "";
+            return EMPTY_STRING;
         }
 
         @Override
@@ -208,4 +206,5 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
             return false;
         }
     }
+
 }

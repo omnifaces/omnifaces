@@ -270,10 +270,11 @@ public final class Numbers {
         }
     }
 
-    private static String formatUnit(String formatted, boolean iec, String unit, int exponent, boolean stripZeroes) {
+    private static String formatUnit(String value, boolean iec, String unit, int exponent, boolean stripZeroes) {
+        var formatted = stripZeroes ? value.replaceAll("0+$", "").replaceAll("\\D$", "") : value;
         var separator = unit == null ? "" : " ";
         var unitString = unit == null ? "" : unit;
-        return (stripZeroes ? formatted.replaceAll("\\D?0+$", "") : formatted) + separator + getUnitPrefix(iec, exponent) + unitString;
+        return formatted + separator + getUnitPrefix(iec, exponent) + unitString;
     }
 
     private static String getUnitPrefix(boolean iec, int exponent) {

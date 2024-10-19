@@ -222,6 +222,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
      * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
      */
     @Override
+    @SuppressWarnings("cast")
     public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
         if (disabledParam != null) {
             var disabled = evaluateExpressionGet(disabledParam);

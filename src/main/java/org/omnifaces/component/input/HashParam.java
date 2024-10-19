@@ -14,15 +14,13 @@ package org.omnifaces.component.input;
 
 import static java.lang.String.format;
 import static org.omnifaces.util.Beans.fireEvent;
-import static org.omnifaces.util.Components.convertToString;
+import static org.omnifaces.util.ComponentsLocal.convertToString;
 import static org.omnifaces.util.FacesLocal.getHashParameters;
 import static org.omnifaces.util.FacesLocal.getHashQueryString;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Servlets.toParameterMap;
 import static org.omnifaces.util.Utils.coalesce;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import jakarta.faces.component.FacesComponent;
@@ -162,15 +160,15 @@ public class HashParam extends OnloadParam {
 
     @Override
     protected void decodeAll(FacesContext context) {
-        String oldHashQueryString = getHashQueryString(context);
-        Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
+        var oldHashQueryString = getHashQueryString(context);
+        var hashParams = toParameterMap(getRequestParameter(context, "hash"));
 
         for (HashParam hashParam : getHashParameters(context)) {
-            List<String> values = hashParams.get(hashParam.getName());
+            var values = hashParams.get(hashParam.getName());
             hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
         }
 
-        String newHashQueryString = getHashQueryString(context);
+        var newHashQueryString = getHashQueryString(context);
 
         if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
             fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
@@ -188,7 +186,7 @@ public class HashParam extends OnloadParam {
             return "";
         }
 
-        Object value = getValue();
+        var value = getValue();
 
         if (Objects.equals(value, getDefault())) {
             value = null;

@@ -59,7 +59,7 @@ import org.omnifaces.util.Beans;
  */
 public class ParamExtension implements Extension {
 
-    private Set<Type> paramsWithInject = new HashSet<>();
+    private final Set<Type> paramsWithInject = new HashSet<>();
 
     /**
      * Collect fields annotated with {@link Param}.
@@ -124,7 +124,7 @@ public class ParamExtension implements Extension {
 
     private static final class ParamInjectionTarget<T> extends InjectionTargetWrapper<T> {
 
-        private Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
+        private final Set<AnnotatedField<?>> paramsWithoutInject;
 
         public ParamInjectionTarget(InjectionTarget<T> wrapped, Set<AnnotatedField<?>> paramsWithoutInject) {
             super(wrapped);
@@ -146,8 +146,8 @@ public class ParamExtension implements Extension {
 
         private static final class ParamInjectionPoint implements InjectionPoint {
 
-            private Bean<?> bean;
-            private AnnotatedField<?> paramWithoutInject;
+            private final Bean<?> bean;
+            private final AnnotatedField<?> paramWithoutInject;
 
             public ParamInjectionPoint(Class<?> beanClass, AnnotatedField<?> paramWithoutInject) {
                 this.bean = Beans.resolve(beanClass);

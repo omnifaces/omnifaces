@@ -17,20 +17,14 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.function.BiConsumer;
 
-import org.omnifaces.el.ReadOnlyValueExpression;
-
 /**
  * Collection of callback interfaces. Useful in (mini) visitor and strategy patterns.
- * <p>
- * Currently used by:
- * <ul>
- * <li>{@link ReadOnlyValueExpression}
- * <li>{@link Events}
- * <li>{@link Faces#sendFile(String, boolean, Output)}
- * </ul>
  *
  * @author Bauke Scholtz
+ * @deprecated Use {@link FunctionalInterfaces} instead. Main reason is utilizing improved naming conventions matching
+ * those of the new functional interfaces introduced in Java 1.8.
  */
+@Deprecated(since = "4.6", forRemoval = true)
 public final class Callback {
 
     // Interfaces -----------------------------------------------------------------------------------------------------

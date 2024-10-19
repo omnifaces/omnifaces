@@ -12,13 +12,12 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.util.Components.validateHasNoChildren;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoChildren;
 
 import java.io.IOException;
 
 import jakarta.faces.FacesException;
 import jakarta.faces.component.FacesComponent;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,12 +63,12 @@ public class ResourceInclude extends OutputFamily {
      */
     @Override
     public void encodeBegin(FacesContext context) throws IOException {
-        validateHasNoChildren(this);
+        validateHasNoChildren(context, this);
 
-        ExternalContext externalContext = context.getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-        BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
+        var externalContext = context.getExternalContext();
+        var request = (HttpServletRequest) externalContext.getRequest();
+        var response = (HttpServletResponse) externalContext.getResponse();
+        var bufferedResponse = new BufferedHttpServletResponse(response);
 
         try {
             request.getRequestDispatcher((String) getAttributes().get("path")).include(request, bufferedResponse);

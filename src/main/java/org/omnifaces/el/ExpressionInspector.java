@@ -80,21 +80,21 @@ public final class ExpressionInspector {
      */
     public static ValueReference getValueReference(ELContext context, ValueExpression valueExpression) {
 
-        InspectorElContext inspectorElContext = new InspectorElContext(context);
+        var inspectorElContext = new InspectorElContext(context);
         Class<?> type = valueExpression.getType(inspectorElContext);
 
         if (type != null && MethodExpression.class.isAssignableFrom(type)) {
-            MethodReference methodReference = getMethodReference(inspectorElContext, valueExpression);
-            Object base = methodReference.getBase();
-            String property = decapitalize(methodReference.getName().replaceFirst("(get|is)", ""));
+            var methodReference = getMethodReference(inspectorElContext, valueExpression);
+            var base = methodReference.getBase();
+            var property = decapitalize(methodReference.getName().replaceFirst("(get|is)", ""));
             return new ValueReference(base, property);
         }
 
         inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
         valueExpression.getValue(inspectorElContext);
 
-        Object base = unwrapIfNecessary(inspectorElContext.getBase());
-        Object property = inspectorElContext.getProperty();
+        var base = unwrapIfNecessary(inspectorElContext.getBase());
+        var property = inspectorElContext.getProperty();
 
         if (base instanceof CompositeComponentExpressionHolder) {
             return getValueReference(context, ((CompositeComponentExpressionHolder) base).getExpression(property.toString()));
@@ -118,7 +118,7 @@ public final class ExpressionInspector {
      * @return a MethodReference holding the final base and Method where the value expression evaluated to.
      */
     public static MethodReference getMethodReference(ELContext context, ValueExpression valueExpression) {
-        InspectorElContext inspectorElContext = new InspectorElContext(context);
+        var inspectorElContext = new InspectorElContext(context);
 
         // Invoke getType() on the value expression to have the expression chain resolved.
         // The InspectorElContext contains a special resolver that will record the next to last
@@ -141,14 +141,13 @@ public final class ExpressionInspector {
 
         // Calling getValue() will cause getValue() to be called on the resolver in case the
         // value expresses referred to a property, and invoke() when it's a method.
-        ValueExpressionType valueExpressionType = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
-
-        Object base = unwrapIfNecessary(inspectorElContext.getBase());
-        String property = inspectorElContext.getProperty().toString();
-        boolean fromMethod = (valueExpressionType == ValueExpressionType.METHOD);
-        Object[] params = fromMethod ? inspectorElContext.getParams() : NO_PARAMS;
-        String methodName = fromMethod ? property : ("get" + capitalize(property));
-        Method method = findMethod(base, methodName, params);
+        var valueExpressionType = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
+        var base = unwrapIfNecessary(inspectorElContext.getBase());
+        var property = inspectorElContext.getProperty().toString();
+        var fromMethod = valueExpressionType == ValueExpressionType.METHOD;
+        var params = fromMethod ? inspectorElContext.getParams() : NO_PARAMS;
+        var methodName = fromMethod ? property : "get" + capitalize(property);
+        var method = findMethod(base, methodName, params);
 
         if (method == null && !fromMethod) {
             method = findMethod(base, "is" + capitalize(property), params);
@@ -325,8 +324,8 @@ public final class ExpressionInspector {
                 // If we get called with a FinalBaseHolder, which was set in the next to last node,
                 // we know we're done and can set the base and property as the final ones.
                 // A property can also be a FinalBaseHolder when it is a dynamic property (brace notation).
-                lastBase = (base instanceof FinalBaseHolder) ? ((FinalBaseHolder) base).getBase() : base;
-                lastProperty = (property instanceof FinalBaseHolder) ? ((FinalBaseHolder) property).getBase() : property;
+                lastBase = base instanceof FinalBaseHolder ? ((FinalBaseHolder) base).getBase() : base;
+                lastProperty = property instanceof FinalBaseHolder ? ((FinalBaseHolder) property).getBase() : property;
 
                 context.setPropertyResolved(true);
                 return ValueExpressionType.PROPERTY;

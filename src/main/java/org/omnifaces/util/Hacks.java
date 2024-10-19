@@ -16,8 +16,9 @@ import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EV
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.getCurrentActionSource;
+import static org.omnifaces.util.ComponentsLocal.getCurrentActionSource;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getPackage;
@@ -30,14 +31,13 @@ import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.invokeMethod;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.stream;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -58,7 +58,7 @@ import jakarta.websocket.Session;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
  * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
  * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
@@ -129,7 +129,7 @@ public final class Hacks {
      */
     public static boolean isMojarraUsed() {
         if (mojarraUsed == null) {
-            FacesContext context = FacesContext.getCurrentInstance();
+            var context = FacesContext.getCurrentInstance();
 
             if (context != null) {
                 mojarraUsed = getPackage(context).getName().startsWith(MOJARRA_PACKAGE_PREFIX);
@@ -149,7 +149,7 @@ public final class Hacks {
      */
     public static boolean isMyFacesUsed() {
         if (myFacesUsed == null) {
-            FacesContext context = FacesContext.getCurrentInstance();
+            var context = FacesContext.getCurrentInstance();
 
             if (context != null) {
                 myFacesUsed = getPackage(context).getName().startsWith(MYFACES_PACKAGE_PREFIX);
@@ -170,20 +170,19 @@ public final class Hacks {
      */
     public static long getDefaultResourceMaxAge() {
         if (defaultResourceMaxAge == null) {
-            Long resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
-            FacesContext context = FacesContext.getCurrentInstance();
+            var resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+            var context = FacesContext.getCurrentInstance();
 
             if (context == null) {
                 return resourceMaxAge;
             }
 
-
-            for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
-                String value = getInitParameter(context, name);
+            for (var name : PARAM_NAMES_RESOURCE_MAX_AGE) {
+                var value = getInitParameter(context, name);
 
                 if (value != null) {
                     try {
-                        resourceMaxAge = Long.valueOf(value);
+                        resourceMaxAge = Long.parseLong(value);
                         break;
                     }
                     catch (NumberFormatException e) {
@@ -209,7 +208,7 @@ public final class Hacks {
         if (isRenderResponse(context) || isPrimeFacesAjaxRequest(context)) {
             // Mojarra 2.3+ resource dependency state is not properly cleared during render response, so it needs to be manually cleared.
             // PrimeFaces core.js updateHead() function basically replaces the entire head instead of appending to it, so all state should be cleared nonetheless.
-            context.getAttributes().keySet().remove(ResourceHandler.RESOURCE_IDENTIFIER);
+            context.getAttributes().remove(ResourceHandler.RESOURCE_IDENTIFIER);
         }
 
         // PrimeFaces puts "namelibrary=true" for every rendered resource dependency.
@@ -225,7 +224,7 @@ public final class Hacks {
      * @since 2.6.1
      */
     public static void setComponentResourceUniqueId(FacesContext context, UIComponent resource) {
-        UIViewRoot view = context.getViewRoot();
+        var view = context.getViewRoot();
 
         if (isMyFacesUsed()) {
             view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, TRUE);
@@ -262,21 +261,21 @@ public final class Hacks {
      */
     public static void removeViewState(FacesContext context, ResponseStateManager manager, String viewId) {
         if (isMyFacesUsed()) {
-            Object state = invokeMethod(manager, "getSavedState", context);
+            var state = invokeMethod(manager, "getSavedState", context);
 
             if (!(state instanceof String)) {
                 return;
             }
 
-            Object viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
+            var viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
 
             if (viewCollection == null) {
                 return;
             }
 
-            Object stateCache = invokeMethod(manager, "getStateCache", context);
-            Object stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-            Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
+            var stateCache = invokeMethod(manager, "getStateCache", context);
+            var stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+            var key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
 
             List<Serializable> keys = accessField(viewCollection, "_keys");
             Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
@@ -285,10 +284,10 @@ public final class Hacks {
             synchronized (viewCollection) { // Those fields are not concurrent maps.
                 keys.remove(key);
                 serializedViews.remove(key);
-                Serializable previousKey = precedence.remove(key);
+                var previousKey = precedence.remove(key);
 
                 if (previousKey != null) {
-                    for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
+                    for (var entry : precedence.entrySet()) {
                         if (entry.getValue().equals(key)) {
                             entry.setValue(previousKey);
                         }
@@ -302,12 +301,12 @@ public final class Hacks {
                     return; // Most likely cached page with client side state saving.
                 }
 
-                String viewScopeId = viewScopeIds.remove(key);
-                int count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
+                var viewScopeId = viewScopeIds.remove(key);
+                var count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
 
                 if (count < 1) {
                     viewScopeIdCounts.remove(viewScopeId);
-                    Object viewScopeProvider = getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER);
+                    var viewScopeProvider = getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER);
 
                     if (viewScopeProvider != null) { // This was removed in MyFaces 4.x and leveraged to CDI, see #729.
                         invokeMethod(viewScopeProvider, "destroyViewScopeMap", context, viewScopeId);
@@ -353,7 +352,7 @@ public final class Hacks {
      * @since 4.0
      */
     public static UIComponent getMetadataFacet(UIViewRoot viewRoot) {
-        UIComponent metadataFacet = viewRoot.getFacet(UIViewRoot.METADATA_FACET_NAME);
+        var metadataFacet = viewRoot.getFacet(UIViewRoot.METADATA_FACET_NAME);
 
         if (metadataFacet == null && isMyFacesUsed()) {
             metadataFacet = viewRoot.getFacet("UIViewRoot_faces_metadata");
@@ -391,7 +390,7 @@ public final class Hacks {
      * @since 1.8
      */
     public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
-        Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+        var params = context.getExternalContext().getRequestParameterMap();
         return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
     }
 
@@ -406,7 +405,7 @@ public final class Hacks {
             return false;
         }
 
-        UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
+        var actionSource = getCurrentActionSource(context);
 
         if (actionSource == null) {
             return false;
@@ -420,19 +419,14 @@ public final class Hacks {
             return false;
         }
 
-        String ajaxEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
+        var ajaxEvent = getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME);
 
         if (ajaxEvent == null) {
             return false;
         }
 
-        ClientBehaviorHolder ajaxSource = (ClientBehaviorHolder) actionSource;
-
-        if (ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesAjaxSource)) {
-            return true;
-        }
-
-        return false;
+        var ajaxSource = (ClientBehaviorHolder) actionSource;
+        return ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesAjaxSource);
     }
 
     private static boolean isPrimeFacesAjaxSource(Object object) {
@@ -450,12 +444,7 @@ public final class Hacks {
             return false;
         }
 
-        Set<UIComponent> dialogs = new HashSet<>();
-
-        for (UIComponent component : components) {
-            dialogs.add(getClosestParent(component, PRIMEFACES_DIALOG_CLASS));
-        }
-
+        var dialogs = stream(components).map(component -> getClosestParent(component, PRIMEFACES_DIALOG_CLASS)).collect(toSet());
         return dialogs.size() == 1 && dialogs.iterator().next() != null;
     }
 

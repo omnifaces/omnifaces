@@ -14,8 +14,8 @@ package org.omnifaces.component.tree;
 
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.validateHasNoChildren;
-import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoChildren;
+import static org.omnifaces.util.ComponentsLocal.validateHasParent;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
@@ -50,9 +50,9 @@ public class TreeInsertChildren extends TreeFamily {
      * children.
      */
     @Override
-    protected void validateHierarchy() {
-        validateHasParent(this, TreeNodeItem.class);
-        validateHasNoChildren(this);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasParent(context, this, TreeNodeItem.class);
+        validateHasNoChildren(context, this);
     }
 
     /**

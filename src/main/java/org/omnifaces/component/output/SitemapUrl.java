@@ -34,7 +34,6 @@ import jakarta.faces.application.Application;
 import jakarta.faces.application.ProjectStage;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
@@ -221,7 +220,7 @@ public class SitemapUrl extends OutputFamily {
      * @throws IllegalArgumentException When the {@link #getDomain()} does not represent a valid domain.
      */
     protected void encodeLocation(FacesContext context) throws IOException {
-        String value = getValue();
+        var value = getValue();
         List<ParamHolder<Object>> params = getParams(this);
         String loc;
 
@@ -229,19 +228,19 @@ public class SitemapUrl extends OutputFamily {
             loc = context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params)));
         }
         else {
-            String viewId = getViewId();
+            var viewId = getViewId();
 
             if (viewId == null) {
                 throw new IllegalArgumentException(ERROR_MISSING_VALUE_OR_VIEWID);
             }
 
-            String uri = getBookmarkableURL(context, viewId, params, false);
+            var uri = getBookmarkableURL(context, viewId, params, false);
             loc = Url.getBookmarkableURLWithDomain(context, uri, getDomain(), ERROR_INVALID_DOMAIN);
         }
 
-        ResponseWriter writer = context.getResponseWriter();
+        var writer = context.getResponseWriter();
         writer.startElement("loc", this);
-        writer.writeText(loc, (value != null) ? "value" : "viewId");
+        writer.writeText(loc, value != null ? "value" : "viewId");
         writer.endElement("loc");
     }
 
@@ -252,7 +251,7 @@ public class SitemapUrl extends OutputFamily {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeLastModified(FacesContext context) throws IOException {
-        Temporal lastModified = getLastModified();
+        var lastModified = getLastModified();
 
         if (lastModified != null) {
             if (lastModified instanceof LocalDateTime) {
@@ -263,7 +262,7 @@ public class SitemapUrl extends OutputFamily {
                 lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Time zone names are not supported by spec.
             }
 
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
             writer.startElement("lastmod", this);
             writer.writeText(lastModified.toString(), PropertyKeys.lastModified.name());
             writer.endElement("lastmod");
@@ -276,10 +275,10 @@ public class SitemapUrl extends OutputFamily {
      * @throws IOException When an I/O error occurs.
      */
     protected void encodeChangeFrequency(FacesContext context) throws IOException {
-        ChangeFrequency changeFrequency = getChangeFrequency();
+        var changeFrequency = getChangeFrequency();
 
         if (changeFrequency != null) {
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
             writer.startElement("changefreq", this);
             writer.writeText(changeFrequency, PropertyKeys.changeFrequency.name());
             writer.endElement("changefreq");
@@ -293,14 +292,14 @@ public class SitemapUrl extends OutputFamily {
      * @throws IllegalArgumentException When the {@link #getPriority()} is not between 0.0 and 1.0 (inclusive).
      */
     protected void encodePriority(FacesContext context) throws IOException {
-        BigDecimal priority = getPriority();
+        var priority = getPriority();
 
         if (priority != null) {
             if (priority.compareTo(BigDecimal.ZERO) < 0 || priority.compareTo(BigDecimal.ONE) > 0) {
                 throw new IllegalArgumentException(format(ERROR_INVALID_PRIORITY, priority));
             }
 
-            ResponseWriter writer = context.getResponseWriter();
+            var writer = context.getResponseWriter();
             writer.startElement("priority", this);
             writer.writeText(priority, PropertyKeys.priority.name());
             writer.endElement("priority");

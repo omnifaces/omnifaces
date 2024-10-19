@@ -81,7 +81,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-        if (!filterExtensionLess(request, response, chain) && !filterExtension(request, response) && !filterPublicPath(request, response)) {
+        if (!filterExtensionLessIfNecessary(request, response, chain) && !filterExtension(request, response) && !filterPublicPath(request, response)) {
             chain.doFilter(request, response);
         }
     }
@@ -90,7 +90,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * A mapped resource request without extension is encountered.
      * The user setting "dispatchMethod" determines how we handle this.
      */
-    private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    private boolean filterExtensionLessIfNecessary(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException
     {
         var servletPath = request.getServletPath();

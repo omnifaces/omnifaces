@@ -18,10 +18,10 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Ajax.isExecuted;
 import static org.omnifaces.util.Ajax.update;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addFormIfNecessary;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.addScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addFormIfNecessary;
+import static org.omnifaces.util.ComponentsLocal.addScript;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.FacesLocal.getRequestMap;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -65,20 +65,20 @@ public abstract class OnloadParam extends UIViewParameter {
         var context = getFacesContext();
 
         if (!isOnloadParamRequest(context)) {
-            addFormIfNecessary(); // Required by faces.ajax.request.
+            addFormIfNecessary(context); // Required by faces.ajax.request.
 
             // This is supposed to be declared via @ResourceDependency. But this bugs in Mojarra with NPE on
             // ViewMetadata#createMetadataView because UIViewRoot is null at the moment the f:metadata is processed.
             // Also, JSF 3 and Faces 4 use a different script resource name which cannot be resolved statically.
-            addFacesScriptResource(); // Required for faces.ajax.request.
-            addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+            addFacesScriptResource(context); // Required for faces.ajax.request.
+            addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 
             if (!isAjaxRequestWithPartialRendering(context)) {
                 if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered OnloadParam.
                     var initScript = getInitScript(context);
 
                     if (initScript != null) {
-                        addScript(initScript);
+                        addScript(context, initScript);
                     }
                 }
             }
@@ -86,7 +86,7 @@ public abstract class OnloadParam extends UIViewParameter {
                 var updateScript = getUpdateScript(context);
 
                 if (updateScript != null) {
-                    addScript(updateScript);
+                    addScript(context, updateScript);
                 }
             }
         }

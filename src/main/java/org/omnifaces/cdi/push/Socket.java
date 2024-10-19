@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -58,7 +57,6 @@ import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.util.Beans;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
@@ -610,7 +608,7 @@ import org.omnifaces.util.State;
  * }
  * </pre>
  * <p>
- * Note that OmniFaces own {@link Callback} interfaces are insuitable as it is not allowed to use WAR (front end)
+ * Note that OmniFaces own {@link FunctionalInterface} interfaces are insuitable as it is not allowed to use WAR (front end)
  * frameworks and libraries like Faces and OmniFaces in EAR/EJB (back end) side.
  *
  *
@@ -813,7 +811,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
         }
 
         if (PropertyKeys.user.toString().equals(name)) {
-            Object user = binding.getValue(getFacesContext().getELContext());
+            var user = binding.getValue(getFacesContext().getELContext());
 
             if (user != null && !(user instanceof Serializable)) {
                 throw new IllegalArgumentException(format(ERROR_INVALID_USER, user));
@@ -849,40 +847,40 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
         }
 
         if (SocketFacesListener.register(context, this)) {
-            String channel = getChannel();
+            var channel = getChannel();
 
             if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
                 throw new IllegalArgumentException(format(ERROR_INVALID_CHANNEL, channel));
             }
 
-            Integer port = getPort();
-            String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
-            String channelId = SocketChannelManager.getInstance().register(channel, getScope(), getUser());
-            String functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
-            String behaviors = getBehaviorScripts();
-            boolean connected = isConnected();
+            var port = getPort();
+            var host = (port != null ? ":" + port : "") + getRequestContextPath(context);
+            var channelId = SocketChannelManager.getInstance().register(channel, getScope(), getUser());
+            var functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
+            var behaviors = getBehaviorScripts();
+            var connected = isConnected();
 
-            String script = format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
+            var script = format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
             context.getResponseWriter().write(script);
         }
     }
 
     private String getBehaviorScripts() {
-        Map<String, List<ClientBehavior>> clientBehaviorsByEvent = getClientBehaviors();
+        var clientBehaviorsByEvent = getClientBehaviors();
 
         if (clientBehaviorsByEvent.isEmpty()) {
             return "{}";
         }
 
-        String clientId = getClientId(getFacesContext());
-        StringBuilder scripts = new StringBuilder("{");
+        var clientId = getClientId(getFacesContext());
+        var scripts = new StringBuilder("{");
 
         for (Entry<String, List<ClientBehavior>> entry : clientBehaviorsByEvent.entrySet()) {
-            String event = entry.getKey();
-            List<ClientBehavior> clientBehaviors = entry.getValue();
+            var event = entry.getKey();
+            var clientBehaviors = entry.getValue();
             scripts.append(scripts.length() > 1 ? "," : "").append(event).append(":[");
 
-            for (int i = 0; i < clientBehaviors.size(); i++) {
+            for (var i = 0; i < clientBehaviors.size(); i++) {
                 scripts.append(i > 0 ? "," : "").append("function(event){");
                 scripts.append(clientBehaviors.get(i).getScript(createClientBehaviorContext(getFacesContext(), this, event, clientId, null)));
                 scripts.append("}");
@@ -896,17 +894,13 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
     @Override
     public void decode(FacesContext context) {
-        Map<String, List<ClientBehavior>> clientBehaviors = getClientBehaviors();
+        var clientBehaviors = getClientBehaviors();
 
-        if (clientBehaviors.isEmpty()) {
+        if (clientBehaviors.isEmpty() || !getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME))) {
             return;
         }
 
-        if (!getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME))) {
-            return;
-        }
-
-        List<ClientBehavior> behaviors = clientBehaviors.get(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME));
+        var behaviors = clientBehaviors.get(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME));
 
         if (behaviors == null) {
             return;
@@ -1105,17 +1099,13 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
      * @param context The involved servlet context.
      */
     public static void registerEndpointIfNecessary(ServletContext context) {
-        if (TRUE.equals(context.getAttribute(Socket.class.getName()))) {
-            return;
-        }
-
-        if (!parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
+        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
             return;
         }
 
         try {
-            ServerContainer container = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
-            ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
+            var container = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
+            var config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
             container.addEndpoint(config);
             context.setAttribute(Socket.class.getName(), TRUE);
         }

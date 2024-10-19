@@ -12,79 +12,31 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_LIBRARY_NAME;
-import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
-import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
-import static jakarta.faces.component.UIComponent.getCompositeComponentParent;
-import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
-import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
-import static jakarta.faces.component.search.SearchExpressionContext.createSearchExpressionContext;
-import static jakarta.faces.component.search.SearchExpressionHint.IGNORE_NO_RESULT;
-import static jakarta.faces.component.search.SearchExpressionHint.RESOLVE_SINGLE_COMPONENT;
 import static jakarta.faces.component.visit.VisitContext.createVisitContext;
-import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static jakarta.faces.component.visit.VisitResult.ACCEPT;
-import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
-import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.logging.Level.FINEST;
-import static java.util.regex.Pattern.quote;
-import static org.omnifaces.util.Ajax.load;
-import static org.omnifaces.util.Ajax.oncomplete;
-import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
-import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getContext;
-import static org.omnifaces.util.Faces.getELContext;
-import static org.omnifaces.util.Faces.getFaceletContext;
-import static org.omnifaces.util.Faces.getRequestParameter;
-import static org.omnifaces.util.Faces.getViewRoot;
-import static org.omnifaces.util.Faces.isDevelopment;
-import static org.omnifaces.util.Faces.setContext;
-import static org.omnifaces.util.Faces.validationFailed;
-import static org.omnifaces.util.FacesLocal.createConverter;
-import static org.omnifaces.util.FacesLocal.getRenderKit;
-import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
-import static org.omnifaces.util.FacesLocal.getViewParameterMap;
-import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.normalizeViewId;
-import static org.omnifaces.util.Messages.addError;
-import static org.omnifaces.util.Reflection.accessField;
-import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ViewHandler;
-import jakarta.faces.component.ActionSource;
 import jakarta.faces.component.EditableValueHolder;
-import jakarta.faces.component.NamingContainer;
 import jakarta.faces.component.UICommand;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIComponentBase;
@@ -92,37 +44,24 @@ import jakarta.faces.component.UIForm;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.component.UIMessage;
 import jakarta.faces.component.UIMessages;
-import jakarta.faces.component.UINamingContainer;
-import jakarta.faces.component.UIOutput;
 import jakarta.faces.component.UIParameter;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.ValueHolder;
 import jakarta.faces.component.behavior.AjaxBehavior;
-import jakarta.faces.component.behavior.BehaviorBase;
 import jakarta.faces.component.behavior.ClientBehavior;
-import jakarta.faces.component.behavior.ClientBehaviorHolder;
-import jakarta.faces.component.html.HtmlBody;
-import jakarta.faces.component.search.SearchExpressionHint;
 import jakarta.faces.component.visit.VisitCallback;
 import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.component.visit.VisitHint;
 import jakarta.faces.component.visit.VisitResult;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.FacesContextWrapper;
-import jakarta.faces.convert.Converter;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.event.AjaxBehaviorEvent;
-import jakarta.faces.event.BehaviorListener;
 import jakarta.faces.event.MethodExpressionActionListener;
-import jakarta.faces.render.RenderKit;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
-import org.omnifaces.component.input.Form;
-import org.omnifaces.config.OmniFaces;
-import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>
@@ -184,30 +123,11 @@ public final class Components {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(Components.class.getName());
-
     /** The name of the label attribute. */
     public static final String LABEL_ATTRIBUTE = "label";
 
     /** The name of the value attribute. */
     public static final String VALUE_ATTRIBUTE = "value";
-
-    private static final String ERROR_MISSING_PARENT =
-        "Component '%s' must have a parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_DIRECT_PARENT =
-        "Component '%s' must have a direct parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_CHILD =
-        "Component '%s' must have at least one child of type '%s', but it cannot be found.";
-    private static final String ERROR_ILLEGAL_PARENT =
-        "Component '%s' may not have a parent of type '%s'.";
-    private static final String ERROR_ILLEGAL_CHILDREN =
-        "Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
-    private static final String ERROR_CHILDREN_DISALLOWED =
-        "Component '%s' may not have any children. Encountered children of types '%s'.";
-    private static final String ERROR_ILLEGAL_UIINPUT =
-        "Relative client ID '%s' must represent an UIInput component, but encountered '%s'.";
-
-    private static final Set<SearchExpressionHint> RESOLVE_LABEL_FOR = EnumSet.of(RESOLVE_SINGLE_COMPONENT, IGNORE_NO_RESULT);
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -224,9 +144,8 @@ public final class Components {
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @see UIComponent#getCurrentComponent(FacesContext)
      */
-    @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C getCurrentComponent() {
-        return (C) UIComponent.getCurrentComponent(getContext());
+        return ComponentsLocal.getCurrentComponent(getContext());
     }
 
     /**
@@ -253,8 +172,8 @@ public final class Components {
      * @since 4.5
      */
     public static void setAttribute(UIComponent component, String name, Object value) {
-        if (value instanceof ValueExpression valueExpression) {
-            component.setValueExpression(name, valueExpression);
+        if (value instanceof ValueExpression) {
+            component.setValueExpression(name, (ValueExpression) value);
         }
         else if (value != null) {
             component.getAttributes().put(name, value);
@@ -291,9 +210,8 @@ public final class Components {
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @see UIComponent#findComponent(String)
      */
-    @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponent(String clientId) {
-        return (C) getViewRoot().findComponent(clientId);
+        return ComponentsLocal.findComponent(getContext(), clientId);
     }
 
     /**
@@ -309,22 +227,8 @@ public final class Components {
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @see UIComponent#findComponent(String)
      */
-    @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentRelatively(UIComponent component, String clientId) {
-
-        if (isEmpty(clientId)) {
-            return null;
-        }
-
-        // Search first in the naming container parents of the given component
-        var result = findComponentInParents(component, clientId);
-
-        if (result == null) {
-            // If not in the parents, search from the root
-            result = findComponentInChildren(getViewRoot(), clientId);
-        }
-
-        return (C) result;
+        return ComponentsLocal.findComponentRelatively(getContext(), component, clientId);
     }
 
     /**
@@ -338,24 +242,8 @@ public final class Components {
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @see UIComponent#findComponent(String)
      */
-    @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentInParents(UIComponent component, String clientId) {
-
-        if (isEmpty(clientId)) {
-            return null;
-        }
-
-        for (var parent = component; parent != null; parent = parent.getParent()) {
-            if (parent instanceof NamingContainer || parent instanceof UIViewRoot) {
-                var result = findComponentIgnoringIAE(parent, clientId);
-
-                if (result != null) {
-                    return (C) result;
-                }
-            }
-        }
-
-        return null;
+        return ComponentsLocal.findComponentInParents(getContext(), component, clientId);
     }
 
     /**
@@ -369,30 +257,8 @@ public final class Components {
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @see UIComponent#findComponent(String)
      */
-    @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C findComponentInChildren(UIComponent component, String clientId) {
-
-        if (isEmpty(clientId)) {
-            return null;
-        }
-
-        for (var child : component.getChildren()) {
-
-            UIComponent result = null;
-            if (child instanceof NamingContainer) {
-                result = findComponentIgnoringIAE(child, clientId);
-            }
-
-            if (result == null) {
-                result = findComponentInChildren(child, clientId);
-            }
-
-            if (result != null) {
-                return (C) result;
-            }
-        }
-
-        return null;
+        return ComponentsLocal.findComponentInChildren(getContext(), component, clientId);
     }
 
     /**
@@ -403,7 +269,7 @@ public final class Components {
      * @return A list of UI components matching the given type in children of the given component.
      */
     public static <C extends UIComponent> List<C> findComponentsInChildren(UIComponent component, Class<C> type) {
-        List<C> components = new ArrayList<>();
+        var components = new ArrayList<C>();
         findComponentsInChildren(component, type, components);
         return components;
     }
@@ -431,8 +297,7 @@ public final class Components {
      * @since 3.1
      */
     public static <C extends UIComponent> List<C> findComponentsInCurrentForm(Class<C> type) {
-        var currentForm = getCurrentForm();
-        return currentForm != null ? findComponentsInChildren(currentForm, type) : emptyList();
+        return ComponentsLocal.findComponentsInCurrentForm(getContext(), type);
     }
 
     /**
@@ -496,7 +361,9 @@ public final class Components {
      * @param facesContext the faces context used for tree visiting
      * @return A new instance of {@link ForEach}, using the given faces context.
      * @since 2.0
+     * @deprecated use {@link ComponentsLocal#forEachComponent(FacesContext)}
      */
+    @Deprecated(since = "4.6", forRemoval = true)
     public static ForEach forEachComponent(FacesContext facesContext) {
         return new ForEach(facesContext);
     }
@@ -511,7 +378,7 @@ public final class Components {
      */
     public static class ForEach {
 
-        private FacesContext facesContext;
+        private final FacesContext facesContext;
         private UIComponent root;
         private Collection<String> ids;
         private Set<VisitHint> hints;
@@ -626,7 +493,7 @@ public final class Components {
                 getRoot().visitTree(visitContext, visitCallback);
             }
             else {
-                forEachComponent().havingIds(getRoot().getClientId()).invoke(viewRoot -> viewRoot.visitTree(visitContext, visitCallback));
+                forEachComponent().havingIds(getRoot().getClientId(getFacesContext())).invoke(viewRoot -> viewRoot.visitTree(visitContext, visitCallback));
             }
         }
 
@@ -648,8 +515,8 @@ public final class Components {
 
         private static class TypesVisitCallback implements VisitCallback {
 
-            private Class<?>[] types;
-            private VisitCallback next;
+            private final Class<?>[] types;
+            private final VisitCallback next;
 
             public TypesVisitCallback(Class<?>[] types, VisitCallback next) {
                 this.types = types;
@@ -679,7 +546,7 @@ public final class Components {
      * @since 4.4
      */
     public static <C extends UIComponent> C createComponent(String componentType) {
-        return createComponent(getContext(), componentType);
+        return ComponentsLocal.createComponent(getContext(), componentType);
     }
 
     /**
@@ -691,7 +558,9 @@ public final class Components {
      * @see Application#createComponent(String)
      * @throws ClassCastException When <code>C</code> is of wrong type.
      * @since 4.4
+     * @deprecated use {@link ComponentsLocal#createComponent(FacesContext, String)}
      */
+    @Deprecated(since = "4.6", forRemoval = true)
     @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C createComponent(FacesContext context, String componentType) {
         return (C) context.getApplication().createComponent(componentType);
@@ -703,7 +572,7 @@ public final class Components {
     /**
      * Include the Facelet file at the given (relative) path as child of the given UI component parent. This has the
      * same effect as using <code>&lt;ui:include&gt;</code>. The path is relative to the current view ID and absolute
-     * to the webcontent root.
+     * to the web content root.
      * @param parent The parent component to include the Facelet file in.
      * @param path The (relative) path to the Facelet file.
      * @throws IOException Whenever given path cannot be read.
@@ -711,17 +580,17 @@ public final class Components {
      * @since 1.5
      */
     public static void includeFacelet(UIComponent parent, String path) throws IOException {
-        getFaceletContext().includeFacelet(parent, path);
+        ComponentsLocal.includeFacelet(getContext(), parent, path);
     }
 
     /**
      * Create and include the composite component of the given library and resource name as child of the given UI
      * component parent and return the created composite component.
-     * This has the same effect as using <code>xmlns:my="jakarta.faces.composite/libraryName</code> and
+     * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
      * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
      * container parent and is mandatory for functioning of input components inside the composite, if any.
      * @param parent The parent component to include the composite component in.
-     * @param libraryName The library name of the composite component (path after "jakarta.faces.composite/").
+     * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
      * @param tagName The tag name of the composite component.
      * @param id The component ID of the composite component.
      * @return The created composite component, which can if necessary be used to set more custom attributes on it.
@@ -734,7 +603,7 @@ public final class Components {
     /**
      * Create and include the composite component of the given library and resource name as child of the given UI
      * component parent, set the given attributes on it and return the created composite component.
-     * This has the same effect as using <code>xmlns:my="jakarta.faces.composite/libraryName</code> and
+     * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
      * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
      * container parent and is mandatory for functioning of input components inside the composite, if any.
      * <p>
@@ -746,7 +615,7 @@ public final class Components {
      * attributes.put("baz", "#{bean.baz(" + someId + ")}");
      * </pre>
      * @param parent The parent component to include the composite component in.
-     * @param libraryName The library name of the composite component (path after "jakarta.faces.composite/").
+     * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
      * @param tagName The tag name of the composite component.
      * @param id The component ID of the composite component.
      * @param attributes The attributes to be set on the composite component.
@@ -754,15 +623,7 @@ public final class Components {
      * @since 2.2
      */
     public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
-        var taglibURI = "jakarta.faces.composite/" + libraryName;
-        var attrs = attributes == null ? null : new HashMap<String, Object>(attributes);
-        var context = FacesContext.getCurrentInstance();
-        var composite = context.getApplication().getViewHandler()
-            .getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
-            .createComponent(context, taglibURI, tagName, attrs);
-        composite.setId(id);
-        parent.getChildren().add(composite);
-        return composite;
+        return ComponentsLocal.includeCompositeComponent(getContext(), parent, libraryName, tagName, id, attributes);
     }
 
     /**
@@ -773,17 +634,7 @@ public final class Components {
      * @since 3.6
      */
     public static void addScript(String script) {
-        var context = FacesContext.getCurrentInstance();
-
-        if (isAjaxRequestWithPartialRendering(context)) {
-            oncomplete(script);
-        }
-        else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(script)); // Just to avoid it misses when view rebuilds in the meanwhile.
-        }
-        else {
-            addScriptToBody(script);
-        }
+        ComponentsLocal.addScript(getContext(), script);
     }
 
     /**
@@ -801,85 +652,16 @@ public final class Components {
      * @since 3.6
      */
     public static void addScriptResource(String libraryName, String resourceName) {
-        var context = FacesContext.getCurrentInstance();
-
-        if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
-            if (isAjaxRequestWithPartialRendering(context)) {
-                load(libraryName, resourceName);
-            }
-            else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-                addScriptResourceToHead(libraryName, resourceName);
-                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
-            }
-            else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
-                addScriptResourceToHead(libraryName, resourceName);
-            }
-            else {
-                addScriptResourceToBody(libraryName, resourceName);
-            }
-        }
+        ComponentsLocal.addScriptResource(getContext(), libraryName, resourceName);
     }
 
     /**
-     * Add the <code>jakarta.faces:faces.js</code> Faces JavaScript resource to current view.
+     * Add the Faces JavaScript resource to current view. If Faces 4.0+ is present, then it will add the
+     * <code>jakarta.faces:faces.js</code> resource, else it will add the <code>jakarta.faces:jsf.js</code> resource.
      * @since 4.0
      */
     public static void addFacesScriptResource() {
-        addScriptResource(FACES_SCRIPT_LIBRARY_NAME, FACES_SCRIPT_RESOURCE_NAME);
-    }
-
-    private static UIOutput createScriptResource() {
-        var outputScript = new UIOutput();
-        outputScript.setRendererType(RENDERER_TYPE_JS);
-        return outputScript;
-    }
-
-    private static UIComponent addScriptResourceToTarget(String libraryName, String resourceName, String target) {
-        var context = FacesContext.getCurrentInstance();
-        var id = (libraryName != null ? libraryName.replaceAll("\\W+", "_") + "_" : "") + resourceName.replaceAll("\\W+", "_");
-
-        for (var existingResource : context.getViewRoot().getComponentResources(context)) {
-            if (id.equals(existingResource.getId())) {
-                return existingResource;
-            }
-        }
-
-        var outputScript = createScriptResource();
-        outputScript.setId(id);
-
-        if (libraryName != null) {
-            outputScript.getAttributes().put("library", libraryName);
-        }
-
-        outputScript.getAttributes().put("name", resourceName);
-        return addComponentResource(outputScript, target);
-    }
-
-    private static void addScriptResourceToHead(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "head");
-    }
-
-    private static void addScriptResourceToBody(String libraryName, String resourceName) {
-        addScriptResourceToTarget(libraryName, resourceName, "body");
-    }
-
-    private static UIComponent addComponentResource(UIComponent resource, String target) {
-        var context = FacesContext.getCurrentInstance();
-
-        if (resource.getId() == null) {
-            Hacks.setComponentResourceUniqueId(context, resource);
-        }
-
-        context.getViewRoot().addComponentResource(context, resource, target);
-        return resource;
-    }
-
-    private static void addScriptToBody(String script) {
-        var outputScript = createScriptResource();
-        var content = new UIOutput();
-        content.setValue(script);
-        outputScript.getChildren().add(content);
-        addComponentResource(outputScript, "body");
+        ComponentsLocal.addFacesScriptResource(getContext());
     }
 
     // Building / rendering -------------------------------------------------------------------------------------------
@@ -894,21 +676,7 @@ public final class Components {
      * @see ViewDeclarationLanguage#buildView(FacesContext, UIViewRoot)
      */
     public static UIViewRoot buildView(String viewId) throws IOException {
-        var context = FacesContext.getCurrentInstance();
-        var normalizedViewId = normalizeViewId(context, viewId);
-        var viewHandler = context.getApplication().getViewHandler();
-        var view = viewHandler.createView(context, normalizedViewId);
-        FacesContext temporaryContext = new TemporaryViewFacesContext(context, view);
-
-        try {
-            setContext(temporaryContext);
-            viewHandler.getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, view);
-        }
-        finally {
-            setContext(context);
-        }
-
-        return view;
+        return ComponentsLocal.buildView(getContext(), viewId);
     }
 
     /**
@@ -928,24 +696,7 @@ public final class Components {
      * @see UIComponent#encodeAll(FacesContext)
      */
     public static String encodeHtml(UIComponent component) {
-        var context = FacesContext.getCurrentInstance();
-        var originalWriter = context.getResponseWriter();
-        var output = new StringWriter();
-        context.setResponseWriter(getRenderKit(context).createResponseWriter(output, "text/html", "UTF-8"));
-
-        try {
-            component.encodeAll(context);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        finally {
-            if (originalWriter != null) {
-                context.setResponseWriter(originalWriter);
-            }
-        }
-
-        return output.toString();
+        return ComponentsLocal.encodeHtml(getContext(), component);
     }
 
     // Forms ----------------------------------------------------------------------------------------------------------
@@ -958,42 +709,7 @@ public final class Components {
      * @see UIForm#isSubmitted()
      */
     public static UIForm getCurrentForm() {
-        var context = FacesContext.getCurrentInstance();
-
-        if (!context.isPostback()) {
-            return null;
-        }
-
-        var viewRoot = context.getViewRoot();
-
-        if (viewRoot == null) {
-            return null;
-        }
-
-        // The initial implementation has visited the tree for UIForm components which returns true on isSubmitted().
-        // But with testing it turns out to return false on ajax requests where the form is not included in execute!
-        // The current implementation just walks through the request parameter map instead.
-
-        for (var name : context.getExternalContext().getRequestParameterMap().keySet()) {
-            if (name.startsWith("jakarta.faces.")) {
-                continue; // Quick skip.
-            }
-
-            var component = findComponentIgnoringIAE(viewRoot, name);
-
-            if (component instanceof UIForm form) {
-                return form;
-            }
-            else if (component != null) {
-                var form = getClosestParent(component, UIForm.class);
-
-                if (form != null) {
-                    return form;
-                }
-            }
-        }
-
-        return null;
+        return ComponentsLocal.getCurrentForm(getContext());
     }
 
     /**
@@ -1004,8 +720,7 @@ public final class Components {
      * @since 1.6
      */
     public static UICommand getCurrentCommand() {
-        var source = getCurrentActionSource();
-        return source instanceof UICommand command ? command : null;
+        return ComponentsLocal.getCurrentCommand(getContext());
     }
 
     /**
@@ -1018,54 +733,7 @@ public final class Components {
      */
     @SuppressWarnings("unchecked")
     public static <C extends UIComponent> C getCurrentActionSource() {
-        var context = FacesContext.getCurrentInstance();
-
-        if (!context.isPostback()) {
-            return null;
-        }
-
-        return (C) getCurrentActionSource(context, context.getViewRoot());
-    }
-
-    /**
-     * Helper method for {@link #getCurrentActionSource()}.
-     */
-    static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
-        if (parent == null) {
-            return null;
-        }
-
-        var params = context.getExternalContext().getRequestParameterMap();
-
-        if (context.getPartialViewContext().isAjaxRequest()) {
-            var sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
-
-            if (sourceClientId != null) {
-                var actionSource = findComponentIgnoringIAE(parent, sourceClientId);
-
-                if (actionSource != null) {
-                    return actionSource;
-                }
-            }
-        }
-
-        for (var name : params.keySet()) {
-            if (name.startsWith("jakarta.faces.")) {
-                continue; // Quick skip.
-            }
-
-            var actionSource = findComponentIgnoringIAE(parent, name);
-
-            if (actionSource instanceof UICommand) {
-                return actionSource;
-            }
-        }
-
-        if (parent instanceof UIViewRoot) { // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
-            return getCurrentActionSource(context, getCurrentForm());
-        }
-
-        return null;
+        return (C) ComponentsLocal.getCurrentActionSource(getContext());
     }
 
     /**
@@ -1088,8 +756,7 @@ public final class Components {
      * the client ID.
      */
     public static String getLabel(UIComponent component) {
-        var label = getOptionalLabel(component);
-        return label != null ? label : component.getClientId();
+        return ComponentsLocal.getLabel(getContext(), component);
     }
 
     /**
@@ -1100,23 +767,7 @@ public final class Components {
      * null.
      */
     public static String getOptionalLabel(UIComponent component) {
-        var result = new Object[1];
-
-        new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(() -> {
-            var label = component.getAttributes().get(LABEL_ATTRIBUTE);
-
-            if (isEmpty(label)) {
-                var labelExpression = component.getValueExpression(LABEL_ATTRIBUTE);
-
-                if (labelExpression != null) {
-                    label = labelExpression.getValue(getELContext());
-                }
-            }
-
-            result[0] = label;
-        });
-
-        return result[0] != null ? result[0].toString() : null;
+        return ComponentsLocal.getOptionalLabel(getContext(), component);
     }
 
     /**
@@ -1125,8 +776,8 @@ public final class Components {
      * @param label The label to be set on the given UI component.
      */
     public static void setLabel(UIComponent component, Object label) {
-        if (label instanceof ValueExpression labelExpression) {
-            component.setValueExpression(LABEL_ATTRIBUTE, labelExpression);
+        if (label instanceof ValueExpression) {
+            component.setValueExpression(LABEL_ATTRIBUTE, (ValueExpression) label);
         }
         else if (label != null) {
             component.getAttributes().put(LABEL_ATTRIBUTE, label);
@@ -1161,13 +812,8 @@ public final class Components {
      * @throws ClassCastException When <code>T</code> is of wrong type.
      * @since 1.2
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getImmediateValue(UIInput input) {
-        if (input.isValid() && input.getSubmittedValue() != null) {
-            input.validate(getContext());
-        }
-
-        return input.isLocalValueSet() ? (T) input.getValue() : null;
+        return ComponentsLocal.getImmediateValue(getContext(), input);
     }
 
     /**
@@ -1189,22 +835,8 @@ public final class Components {
      * @throws ClassCastException When <code>T</code> is of wrong type.
      * @since 3.8
      */
-    @SuppressWarnings("unchecked")
     public static <T> Class<T> getExpectedValueType(UIComponent component) {
-        var valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
-
-        if (valueExpression != null) {
-            return getExpectedType(valueExpression);
-        }
-        else {
-            var value = component.getAttributes().get(VALUE_ATTRIBUTE);
-
-            if (value != null) {
-                return (Class<T>) value.getClass();
-            }
-
-            return null;
-        }
+        return ComponentsLocal.getExpectedValueType(getContext(), component);
     }
 
     /**
@@ -1217,15 +849,8 @@ public final class Components {
      * @throws ClassCastException When <code>T</code> is of wrong type.
      * @since 3.8
      */
-    @SuppressWarnings("unchecked")
     public static <T> Class<T> getExpectedType(ValueExpression valueExpression) {
-        Class<?> expectedType = valueExpression.getExpectedType();
-
-        if (expectedType == Object.class) {
-            expectedType = valueExpression.getType(getELContext());
-        }
-
-        return (Class<T>) expectedType;
+        return ComponentsLocal.getExpectedType(getContext(), valueExpression);
     }
 
     /**
@@ -1236,8 +861,7 @@ public final class Components {
      * @since 1.3
      */
     public static boolean hasInvokedSubmit(UIComponent component) {
-        var source = getCurrentActionSource();
-        return source != null && source.equals(component);
+        return ComponentsLocal.hasInvokedSubmit(getContext(), component);
     }
 
     /**
@@ -1255,11 +879,15 @@ public final class Components {
             return Collections.emptyList();
         }
 
-        List<ParamHolder<T>> params = new ArrayList<>(component.getChildCount());
+        var params = new ArrayList<ParamHolder<T>>(component.getChildCount());
 
         for (var child : component.getChildren()) {
-            if (child instanceof UIParameter param && !isEmpty(param.getName()) && !param.isDisable()) {
-                params.add(new SimpleParam<>(param));
+            if (child instanceof UIParameter) {
+                var param = (UIParameter) child;
+
+                if (!isEmpty(param.getName()) && !param.isDisable()) {
+                    params.add(new SimpleParam<>(param));
+                }
             }
         }
 
@@ -1280,30 +908,7 @@ public final class Components {
      * @since 2.4
      */
     public static Map<String, List<String>> getParams(UIComponent component, boolean includeRequestParams, boolean includeViewParams) {
-        var context = FacesContext.getCurrentInstance();
-        Map<String, List<String>> params;
-
-        if (includeRequestParams) {
-            params = getRequestQueryStringMap(context);
-        }
-        else if (includeViewParams) {
-            params = getViewParameterMap(context);
-        }
-        else {
-            params = new LinkedHashMap<>(0);
-        }
-
-        for (var param : getParams(component)) {
-            var value = param.getValue();
-
-            if (isEmpty(value)) {
-                continue;
-            }
-
-            params.put(param.getName(), asList(value));
-        }
-
-        return Collections.unmodifiableMap(params);
+        return ComponentsLocal.getParams(getContext(), component, includeRequestParams, includeViewParams);
     }
 
     /**
@@ -1314,28 +919,7 @@ public final class Components {
      * @since 2.5
      */
     public static UIMessage getMessageComponent(UIInput input) {
-        var found = new UIMessage[1];
-
-        forEachComponent().ofTypes(UIMessage.class).withHints(SKIP_ITERATION).invoke((context, target) -> {
-            var messageComponent = (UIMessage) target;
-            var forValue = messageComponent.getFor();
-
-            if (!isEmpty(forValue)) {
-                var facesContext = context.getFacesContext();
-                var searchExpressionContext = createSearchExpressionContext(facesContext, messageComponent, RESOLVE_LABEL_FOR, null);
-                var forClientId = facesContext.getApplication().getSearchExpressionHandler().resolveClientId(searchExpressionContext, forValue);
-                var forComponent = findComponentRelatively(messageComponent, forClientId);
-
-                if (input.equals(forComponent)) {
-                    found[0] = messageComponent;
-                    return VisitResult.COMPLETE;
-                }
-            }
-
-            return VisitResult.ACCEPT;
-        });
-
-        return found[0];
+        return ComponentsLocal.getMessageComponent(getContext(), input);
     }
 
     /**
@@ -1345,14 +929,7 @@ public final class Components {
      * @since 2.5
      */
     public static UIMessages getMessagesComponent() {
-        var found = new UIMessages[1];
-
-        forEachComponent().ofTypes(UIMessages.class).withHints(SKIP_ITERATION).invoke((context, target) -> {
-            found[0] = (UIMessages) target;
-            return VisitResult.COMPLETE;
-        });
-
-        return found[0];
+        return ComponentsLocal.getMessagesComponent(getContext());
     }
 
     /**
@@ -1365,13 +942,7 @@ public final class Components {
      * @since 2.5
      */
     public static void resetForm(UIComponent component) {
-        var form = component instanceof UIForm self ? self: getClosestParent(component, UIForm.class);
-
-        if (form == null) {
-            throw new IllegalArgumentException(format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
-        }
-
-        resetInputs(form);
+        ComponentsLocal.resetForm(getContext(), component);
     }
 
     /**
@@ -1380,7 +951,7 @@ public final class Components {
      * @since 2.5
      */
     public static void resetInputs(UIComponent component) {
-        forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
+        ComponentsLocal.resetInputs(getContext(), component);
     }
 
     /**
@@ -1398,7 +969,7 @@ public final class Components {
      * @since 4.5
      */
     public static void disableInput(String clientId) {
-        disableInput(findComponent(clientId));
+        ComponentsLocal.disableInput(getContext(), clientId);
     }
 
     /**
@@ -1407,35 +978,7 @@ public final class Components {
      * @since 3.6
      */
     public static void addFormIfNecessary() {
-        var context = FacesContext.getCurrentInstance();
-
-        if (isAjaxRequestWithPartialRendering(context)) {
-            return; // It's impossible to have this condition without an UIForm in first place.
-        }
-
-        var viewRoot = context.getViewRoot();
-
-        if (viewRoot == null || viewRoot.getChildCount() == 0) {
-            return; // Empty view. Nothing to do against. The client should probably find a better moment to invoke this.
-        }
-
-        VisitCallback visitCallback = (visitContext, target) -> target instanceof UIForm ? VisitResult.COMPLETE : VisitResult.ACCEPT;
-        var formFound = viewRoot.visitTree(createVisitContext(context, null, EnumSet.of(VisitHint.SKIP_ITERATION)), visitCallback);
-
-        if (formFound) {
-            return; // UIForm present. No need to add a new one.
-        }
-
-        var body = viewRoot.getChildren().stream().filter(HtmlBody.class::isInstance).findFirst();
-
-        if (!body.isPresent()) {
-            return; // No <h:body> present. Not possible to add a new UIForm then.
-        }
-
-        var form = new Form();
-        form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
-        form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
-        body.get().getChildren().add(form);
+        ComponentsLocal.addFormIfNecessary(getContext());
     }
 
     /**
@@ -1448,36 +991,8 @@ public final class Components {
      * @return The conversion result, may be {@code null}, depending on the value and the converter implementation.
      * @since 4.1
      */
-    @SuppressWarnings("unchecked")
     public static <T> String convertToString(FacesContext context, ValueHolder holder, T value) {
-        Converter<T> converter = holder.getConverter();
-
-        if (converter == null && value != null) {
-            converter = createConverter(context, value.getClass());
-        }
-
-        if (converter != null) {
-            UIComponent component = null;
-
-            if (holder instanceof UIComponent componentHolder) {
-                component = componentHolder;
-            }
-            else if (holder instanceof ParamHolder<?> paramHolder) {
-                var parameter = new UIParameter();
-                parameter.setName(paramHolder.getName());
-                parameter.setValue(value);
-                component = parameter;
-            }
-            else {
-                var output = new UIOutput();
-                output.setValue(value);
-                component = output;
-            }
-
-            return converter.getAsString(context, component, value);
-        }
-
-        return value == null ? null : value.toString();
+        return ComponentsLocal.convertToString(context, holder, value);
     }
 
     /**
@@ -1494,24 +1009,7 @@ public final class Components {
      * @since 4.2
      */
     public static String getRenderedValue(FacesContext context, ValueHolder holder) {
-        Object value = null;
-
-        if (holder instanceof EditableValueHolder editableValueHolder) {
-            var submittedValue = editableValueHolder.getSubmittedValue();
-
-            if (submittedValue != null) {
-                return submittedValue.toString();
-            }
-
-            if (editableValueHolder.isLocalValueSet()) {
-                value = editableValueHolder.getLocalValue();
-            }
-        }
-        else {
-            value = holder.getValue();
-        }
-
-        return Objects.toString(convertToString(context, holder, value), "");
+        return ComponentsLocal.getRenderedValue(context, holder);
     }
 
     /**
@@ -1524,7 +1022,7 @@ public final class Components {
      * @since 4.2
      */
     public static void invalidateInputs(String... relativeClientIds) {
-        findAndInvalidateInputs(relativeClientIds);
+        ComponentsLocal.invalidateInputs(getContext(), relativeClientIds);
     }
 
     /**
@@ -1538,41 +1036,8 @@ public final class Components {
      * @since 4.2
      */
     public static void invalidateInput(String relativeClientId, String message, Object... params) {
-        addError(findAndInvalidateInputs(relativeClientId).iterator().next(), message, params);
+        ComponentsLocal.invalidateInput(getContext(), relativeClientId, message, params);
     }
-
-    private static Set<String> findAndInvalidateInputs(String... relativeClientIds) {
-        UIComponent root = coalesce(getCurrentForm(), getViewRoot());
-        var needsVisit = stream(relativeClientIds).anyMatch(Components::containsIterationIndex);
-        Set<String> fullClientIds = new LinkedHashSet<>();
-
-        for (var relativeClientId : relativeClientIds) {
-            var component = findComponentRelatively(root, relativeClientId);
-
-            if (!(component instanceof UIInput input)) {
-                var type = component == null ? "null" : component.getClass().getName();
-                throw new IllegalArgumentException(format(ERROR_ILLEGAL_UIINPUT, relativeClientId, type));
-            }
-
-            var fullClientId = input.getClientId();
-
-            if (!needsVisit) {
-                fullClientIds.add(fullClientId);
-                input.setValid(false);
-            }
-            else {
-                fullClientIds.add(stripIterationIndex(fullClientId).replaceAll(quote(stripIterationIndex(relativeClientId)) + "$", relativeClientId));
-            }
-        }
-
-        if (needsVisit) {
-            forEachComponent().havingIds(fullClientIds).<UIInput>invoke(input -> input.setValid(false));
-        }
-
-        validationFailed();
-        return fullClientIds;
-    }
-
 
     // Expressions ----------------------------------------------------------------------------------------------------
 
@@ -1584,9 +1049,7 @@ public final class Components {
      * {@link UIComponent#setValueExpression(String, ValueExpression)}.
      */
     public static ValueExpression createValueExpression(String expression, Class<?> type) {
-        var context = FacesContext.getCurrentInstance();
-        return context.getApplication().getExpressionFactory().createValueExpression(
-            context.getELContext(), expression, type);
+        return ComponentsLocal.createValueExpression(getContext(), expression, type);
     }
 
     /**
@@ -1619,9 +1082,7 @@ public final class Components {
     public static MethodExpression createMethodExpression
         (String expression, Class<?> returnType, Class<?>... parameterTypes)
     {
-        var context = FacesContext.getCurrentInstance();
-        return context.getApplication().getExpressionFactory().createMethodExpression(
-            context.getELContext(), expression, returnType, parameterTypes);
+        return ComponentsLocal.createMethodExpression(getContext(), expression, returnType, parameterTypes);
     }
 
     /**
@@ -1663,7 +1124,7 @@ public final class Components {
      * {@link UICommand#addActionListener(jakarta.faces.event.ActionListener)}.
      */
     public static MethodExpressionActionListener createActionListenerMethodExpression(String expression) {
-        return new MethodExpressionActionListener(createVoidMethodExpression(expression, ActionEvent.class));
+        return ComponentsLocal.createActionListenerMethodExpression(getContext(), expression);
     }
 
     /**
@@ -1685,11 +1146,7 @@ public final class Components {
      * client event name, such as "action", "valueChange", "click", "blur", etc.
      */
     public static AjaxBehavior createAjaxBehavior(String expression) {
-        var context = FacesContext.getCurrentInstance();
-        var behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
-        var method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
-        behavior.addAjaxBehaviorListener(event -> method.invoke(getELContext(), new Object[] { event }));
-        return behavior;
+        return ComponentsLocal.createAjaxBehavior(getContext(), expression);
     }
 
     /**
@@ -1703,27 +1160,7 @@ public final class Components {
      * @since 2.4
      */
     public static List<String> getActionExpressionsAndListeners(UIComponent component) {
-        List<String> actions = new ArrayList<>();
-
-        if (component instanceof ActionSource source) {
-            addExpressionStringIfNotNull(source.getActionExpression(), actions);
-
-            for (var listener : source.getActionListeners()) {
-                addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
-            }
-        }
-
-        if (component instanceof ClientBehaviorHolder holder) {
-            var behaviorEvent = getRequestParameter(BEHAVIOR_EVENT_PARAM_NAME);
-
-            if (behaviorEvent != null) {
-                for (var listener : getBehaviorListeners(holder, behaviorEvent)) {
-                    addExpressionStringIfNotNull(accessField(listener, MethodExpression.class), actions);
-                }
-            }
-        }
-
-        return unmodifiableList(actions);
+        return ComponentsLocal.getActionExpressionsAndListeners(getContext(), component);
     }
 
     // Hierarchy validation -------------------------------------------------------------------------------------------
@@ -1736,14 +1173,7 @@ public final class Components {
      * @throws IllegalStateException When the given component doesn't have any parent of the given type.
      */
     public static <C extends UIComponent> void validateHasParent(UIComponent component, Class<C> parentType) {
-        if (!isDevelopment()) {
-            return;
-        }
-
-        if (getClosestParent(component, parentType) == null) {
-            throw new IllegalStateException(format(
-                ERROR_MISSING_PARENT, component.getClass().getSimpleName(), parentType));
-        }
+        ComponentsLocal.validateHasParent(getContext(), component, parentType);
     }
 
     /**
@@ -1754,14 +1184,7 @@ public final class Components {
      * @throws IllegalStateException When the given component doesn't have a direct parent of the given type.
      */
     public static <C extends UIComponent> void validateHasDirectParent(UIComponent component, Class<C> parentType) {
-        if (!isDevelopment()) {
-            return;
-        }
-
-        if (!parentType.isInstance(component.getParent())) {
-            throw new IllegalStateException(format(
-                ERROR_MISSING_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
-        }
+        ComponentsLocal.validateHasDirectParent(getContext(), component, parentType);
     }
 
     /**
@@ -1773,14 +1196,7 @@ public final class Components {
      * @since 2.5
      */
     public static <C extends UIComponent> void validateHasNoParent(UIComponent component, Class<C> parentType) {
-        if (!isDevelopment()) {
-            return;
-        }
-
-        if (getClosestParent(component, parentType) != null) {
-            throw new IllegalStateException(format(
-                ERROR_ILLEGAL_PARENT, component.getClass().getSimpleName(), parentType));
-        }
+        ComponentsLocal.validateHasNoParent(getContext(), component, parentType);
     }
 
     /**
@@ -1792,14 +1208,7 @@ public final class Components {
      * @since 2.5
      */
     public static <C extends UIComponent> void validateHasChild(UIComponent component, Class<C> childType) {
-        if (!isDevelopment()) {
-            return;
-        }
-
-        if (findComponentsInChildren(component, childType).isEmpty()) {
-            throw new IllegalStateException(format(
-                ERROR_MISSING_CHILD, component.getClass().getSimpleName(), childType));
-        }
+        ComponentsLocal.validateHasChild(getContext(), component, childType);
     }
 
     /**
@@ -1811,26 +1220,7 @@ public final class Components {
      * @since 2.5
      */
     public static <C extends UIComponent> void validateHasOnlyChildren(UIComponent component, Class<C> childType) {
-        if (!isDevelopment() || component.getChildCount() == 0) {
-            return;
-        }
-
-        var childClassNames = new StringBuilder();
-
-        for (var child : component.getChildren()) {
-            if (!childType.isAssignableFrom(child.getClass())) {
-                if (childClassNames.length() > 0) {
-                    childClassNames.append(", ");
-                }
-
-                childClassNames.append(child.getClass().getName());
-            }
-        }
-
-        if (childClassNames.length() > 0) {
-            throw new IllegalStateException(format(
-                ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
-        }
+        ComponentsLocal.validateHasOnlyChildren(getContext(), component, childType);
     }
 
     /**
@@ -1839,126 +1229,7 @@ public final class Components {
      * @throws IllegalStateException When the given component has any children.
      */
     public static void validateHasNoChildren(UIComponent component) {
-        if (!isDevelopment()) {
-            return;
-        }
-
-        if (component.getChildCount() > 0) {
-            var childClassNames = new StringBuilder();
-
-            for (var child : component.getChildren()) {
-                if (childClassNames.length() > 0) {
-                    childClassNames.append(", ");
-                }
-
-                childClassNames.append(child.getClass().getName());
-            }
-
-            throw new IllegalStateException(format(
-                ERROR_CHILDREN_DISALLOWED, component.getClass().getSimpleName(), childClassNames));
-        }
-    }
-
-    // Helpers --------------------------------------------------------------------------------------------------------
-
-    /**
-     * Strip UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code> from given component client ID.
-     */
-    private static String stripIterationIndex(String clientId) {
-        return getIterationIndexPattern().matcher(clientId).replaceAll(result -> result.group(1) + result.group(3));
-    }
-
-    /**
-     * Checks if given component client ID contains UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code>.
-     */
-    private static boolean containsIterationIndex(String clientId) {
-        return getIterationIndexPattern().matcher(clientId).matches();
-    }
-
-    private static Pattern getIterationIndexPattern() {
-        return getApplicationAttribute("omnifaces.IterationIndexPattern", () -> {
-            var separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
-            return Pattern.compile("(^|.*" + quote(separatorChar) + ")([0-9]+" + quote(separatorChar) + ")(.*)");
-        });
-    }
-
-    /**
-     * Use {@link UIComponent#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
-     * returning null instead.
-     */
-    private static UIComponent findComponentIgnoringIAE(UIComponent parent, String clientId) {
-        try {
-            return parent.findComponent(stripIterationIndex(clientId));
-        }
-        catch (IllegalArgumentException ignore) {
-            logger.log(FINEST, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
-            return null;
-        }
-    }
-
-    /**
-     * If given method expression is not null, extract expression string from it and add to given list.
-     */
-    private static void addExpressionStringIfNotNull(MethodExpression expression, List<String> list) {
-        if (expression != null) {
-            list.add(expression.getExpressionString());
-        }
-    }
-
-    /**
-     * Get all behavior listeners of given behavior event from the given component.
-     */
-    @SuppressWarnings("unchecked")
-    private static List<BehaviorListener> getBehaviorListeners(ClientBehaviorHolder component, String behaviorEvent) {
-        var behaviors = component.getClientBehaviors().get(behaviorEvent);
-
-        if (behaviors == null) {
-            return emptyList();
-        }
-
-        List<BehaviorListener> allListeners = new ArrayList<>();
-
-        for (var behavior : behaviors) {
-            var listeners = accessField(behavior, BehaviorBase.class, List.class);
-
-            if (listeners != null) {
-                allListeners.addAll(listeners);
-            }
-        }
-
-        return allListeners;
-    }
-
-    // Inner classes --------------------------------------------------------------------------------------------------
-
-    /**
-     * This faces context wrapper allows returning the given temporary view on {@link #getViewRoot()} and its
-     * associated renderer in {@link #getRenderKit()}. This can then be used in cases when a different view needs to be
-     * built within the current view. Using {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be
-     * cleared afterwards when the current view is actually <code>null</code>. The {@link #setViewRoot(UIViewRoot)}
-     * doesn't accept a <code>null</code> being set.
-     *
-     * @author Bauke Scholtz
-     */
-    private static class TemporaryViewFacesContext extends FacesContextWrapper {
-
-        private UIViewRoot temporaryView;
-
-        public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
-            super(wrapped);
-            this.temporaryView = temporaryView;
-        }
-
-        @Override
-        public UIViewRoot getViewRoot() {
-            return temporaryView;
-        }
-
-        @Override
-        public RenderKit getRenderKit() {
-            return FacesLocal.getRenderKit(this);
-        }
-
+        ComponentsLocal.validateHasNoChildren(getContext(), component);
     }
 
 }

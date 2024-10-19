@@ -3,7 +3,9 @@ package org.omnifaces.test.util.cache;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static java.util.stream.IntStream.rangeClosed;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,7 +52,7 @@ class TestLruCache {
 
         if (evicted.size() == ITERATIONS - SIZE + 1) {
             // Very sometimes the last existing key is evicted while put by another thread, just inevitable nature of the test using overlapping keys, we'll want to remove the known key from the eviction set.
-            String keyOfLastIteration = "k" + LAST_EXISTING_KEY;
+            var keyOfLastIteration = "k" + LAST_EXISTING_KEY;
             List<String> leftIntersecting = evicted.stream().filter(lruCache::containsKey).collect(toList());
             List<String> rightIntersecting = lruCache.keySet().stream().filter(evicted::contains).collect(toList());
 
@@ -89,7 +91,7 @@ class TestLruCache {
     @Test
     void testMixedThreadSafetyWithSameKey() {
         testThreadSafety((i, tasks) -> {
-            String k = "k" + i;
+            var k = "k" + i;
             tasks.add(runAsync(() -> lruCache.put(k, "v" + i)));
             tasks.add(runAsync(() -> lruCache.get(k)));
             tasks.add(runAsync(() -> lruCache.remove(k)));
@@ -101,13 +103,35 @@ class TestLruCache {
         );
     }
 
+    @Test
+    void testImmutableViewsThreadSafety() {
+        // The default values are too big for this test.
+        final var CACHE_SIZE = 8;
+        final var ROUNDS = 10;
+        final var MAX_VALUE = 32;
+        final var cache = new LruCache<Integer, Integer>(CACHE_SIZE);
+
+        testThreadSafety((i, tasks) -> {
+            rangeClosed(0, MAX_VALUE).boxed().forEach(index -> {
+                tasks.add(runAsync(() -> {
+                    cache.put(index, index);
+                    assertDoesNotThrow(() -> (cache.size() + "," + cache.entrySet().size()), "calling size() and entrySet().size() at same time may not throw ConcurrentModificationException");
+                }));
+            });
+        }, ROUNDS);
+    }
+
     private static void testThreadSafety(Consumer<Integer> task) {
         testThreadSafety((i, tasks) -> tasks.add(runAsync(() -> task.accept(i))));
     }
 
     private static void testThreadSafety(BiConsumer<Integer, Set<CompletableFuture<Void>>> task) {
+        testThreadSafety(task, ITERATIONS);
+    }
+
+    private static void testThreadSafety(BiConsumer<Integer, Set<CompletableFuture<Void>>> task, int iterations) {
         Set<CompletableFuture<Void>> tasks = ConcurrentHashMap.newKeySet();
-        range(0, ITERATIONS).forEach(i -> task.accept(i, tasks));
+        range(0, iterations).forEach(i -> task.accept(i, tasks));
         awaitCompletion(tasks);
     }
 
@@ -169,8 +193,8 @@ class TestLruCache {
 
     @Test
     void testNullKeyAndValueDisallowed() {
-        String key = "key";
-        String value = "value";
+        var key = "key";
+        var value = "value";
 
         assertAll(
             () -> assertThrows(NullPointerException.class, () -> lruCache.get(null), "lruCache.get(null)"),

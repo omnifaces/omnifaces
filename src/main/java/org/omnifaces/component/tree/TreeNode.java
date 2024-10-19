@@ -12,9 +12,9 @@
  */
 package org.omnifaces.component.tree;
 
-import static org.omnifaces.util.Components.validateHasChild;
-import static org.omnifaces.util.Components.validateHasDirectParent;
-import static org.omnifaces.util.Components.validateHasNoParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasChild;
+import static org.omnifaces.util.ComponentsLocal.validateHasDirectParent;
+import static org.omnifaces.util.ComponentsLocal.validateHasNoParent;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
@@ -65,10 +65,10 @@ public class TreeNode extends TreeFamily {
      * component is nested in another {@link TreeNode}, or when there aren't any children of type {@link TreeNodeItem}.
      */
     @Override
-    protected void validateHierarchy() {
-        validateHasDirectParent(this, Tree.class);
-        validateHasNoParent(this, TreeNode.class);
-        validateHasChild(this, TreeNodeItem.class);
+    protected void validateHierarchy(FacesContext context) {
+        validateHasDirectParent(context, this, Tree.class);
+        validateHasNoParent(context, this, TreeNode.class);
+        validateHasChild(context, this, TreeNodeItem.class);
     }
 
     /**

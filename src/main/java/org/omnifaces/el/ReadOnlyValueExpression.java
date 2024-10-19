@@ -16,7 +16,7 @@ import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
 
-import org.omnifaces.util.Callback;
+import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 
 /**
  * Implementation of a read only value expression that can be used when the value is not yet available at construction time, or when the
@@ -32,7 +32,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     private static final long serialVersionUID = 1L;
 
-    private Callback.SerializableReturning<Object> callback;
+    private SerializableSupplier<Object> callback;
     private Class<?> expectedType;
 
     /**
@@ -40,7 +40,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      * @param callback The functional interface that will be called when the value expression is resolved.
      */
-    public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
+    public ReadOnlyValueExpression(Class<?> expectedType, SerializableSupplier<Object> callback) {
         this(expectedType);
         this.callback = callback;
     }
@@ -64,7 +64,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
     @SuppressWarnings("unchecked")
     public <T> T getValue(ELContext context) {
         if (callback != null) {
-            return (T) callback.invoke();
+            return (T) callback.get();
         }
 
         return null;
@@ -135,18 +135,18 @@ public class ReadOnlyValueExpression extends ValueExpression {
      * @return the functional interface that will be called when the value expression is resolved
      * @since 2.1
      */
-    public Callback.SerializableReturning<Object> getCallbackReturning() {
+    public SerializableSupplier<Object> getCallback() {
         return callback;
     }
 
     /**
      * Sets the functional interface that will be called when the value expression is resolved
      *
-     * @param callbackReturning functional interface returning what the value expression will return
+     * @param callback functional interface returning what the value expression will return
      * @since 2.1
      */
-    public void setCallbackReturning(Callback.SerializableReturning<Object> callbackReturning) {
-        this.callback = callbackReturning;
+    public void setCallback(SerializableSupplier<Object> callback) {
+        this.callback = callback;
     }
 
 }

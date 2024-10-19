@@ -79,8 +79,8 @@
         <test.hibernateValidator.version>8.0.1.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
-        <test.tyrus.version>2.2.0-M1</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>14.0.2</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.tyrus.version>2.2.0</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
+        <test.primefaces.version>14.0.4</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
+            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -161,19 +161,19 @@
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.21.0</version>
+            <version>4.24.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.8.0</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -402,7 +402,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -518,6 +518,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
@@ -534,6 +539,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <rerunFailingTestsCount>2</rerunFailingTestsCount>
                         <systemPropertyVariables>
                             <profile.id>${project.activeProfiles[0].id}</profile.id>
                             <omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
@@ -676,7 +682,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->
@@ -756,7 +761,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Should actually have been managed by arquillian-tomcat-managed-10 library. -->

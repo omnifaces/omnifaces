@@ -1,7 +1,7 @@
 package org.omnifaces.component;
 
 import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
-import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.ComponentsLocal.getParams;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
@@ -71,13 +71,13 @@ public class ActionURLDecorator extends FacesContextWrapper {
              */
             @Override
             public String getActionURL(FacesContext context, String viewId) {
-                String actionURL = useRequestURI && !includeRequestParams ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
-                String queryString = toQueryString(getParams(component, useRequestURI || includeRequestParams, false));
+                var actionURL = useRequestURI && !includeRequestParams ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+                var queryString = toQueryString(getParams(context, component, useRequestURI || includeRequestParams, false));
                 return formatURLWithQueryString(actionURL, queryString);
             }
 
             private String getActionURL(FacesContext context) {
-                String actionURL = getRequestAttribute(context, ERROR_REQUEST_URI) != null ? getRequestContextPath(context) : getRequestURI(context);
+                var actionURL = getRequestAttribute(context, ERROR_REQUEST_URI) != null ? getRequestContextPath(context) : getRequestURI(context);
                 return actionURL.isEmpty() ? "/" : actionURL;
             }
         }

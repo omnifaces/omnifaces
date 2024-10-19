@@ -312,8 +312,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private Class<? extends Throwable>[] exceptionTypesToUnwrap;
-    private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
+    private final Class<? extends Throwable>[] exceptionTypesToUnwrap;
+    private final Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
 
     // Initialization -------------------------------------------------------------------------------------------------
 

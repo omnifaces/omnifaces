@@ -13,14 +13,13 @@
 package org.omnifaces.component.output;
 
 import static java.lang.String.format;
-import static org.omnifaces.util.Components.findComponentRelatively;
-import static org.omnifaces.util.Components.getOptionalLabel;
 import static org.omnifaces.util.Components.setLabel;
+import static org.omnifaces.util.ComponentsLocal.findComponentRelatively;
+import static org.omnifaces.util.ComponentsLocal.getOptionalLabel;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.html.HtmlOutputLabel;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
@@ -50,9 +49,10 @@ public class OutputLabel extends HtmlOutputLabel {
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostRestoreStateEvent) {
-            String forValue = (String) getAttributes().get("for");
+            var forValue = (String) getAttributes().get("for");
             if (!isEmpty(forValue)) {
-                UIComponent forComponent = findComponentRelatively(this, forValue);
+                var context = getContext();
+                var forComponent = findComponentRelatively(context, this, forValue);
 
                 if (forComponent == null) {
                     throw new IllegalArgumentException(format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
@@ -61,8 +61,8 @@ public class OutputLabel extends HtmlOutputLabel {
                 // To be sure, check if the target component doesn't have a label already. This
                 // is unlikely, since otherwise people have no need to use this outputLabel component
                 // but check to be sure.
-                if (getOptionalLabel(forComponent) == null) {
-                    ValueExpression valueExpression = getValueExpression("value");
+                if (getOptionalLabel(context, forComponent) == null) {
+                    var valueExpression = getValueExpression("value");
                     setLabel(forComponent, valueExpression != null ? valueExpression : getValue());
                 }
             }

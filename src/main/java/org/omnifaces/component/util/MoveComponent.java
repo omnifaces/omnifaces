@@ -18,7 +18,7 @@ import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorDe
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorEvents;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.destination;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.facet;
-import static org.omnifaces.util.Components.findComponentRelatively;
+import static org.omnifaces.util.ComponentsLocal.findComponentRelatively;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Faces.isPostback;
 import static org.omnifaces.util.Utils.csvToList;
@@ -33,6 +33,7 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.component.behavior.ClientBehavior;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PostAddToViewEvent;
 import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.event.SystemEvent;
@@ -147,7 +148,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     @Override
     public void processEvent(SystemEvent event) {
         if (event instanceof PreRenderViewEvent || event instanceof PostAddToViewEvent) {
-            doProcess();
+            doProcess(event.getFacesContext());
         }
     }
 
@@ -171,11 +172,11 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         return csvToList(getBehaviorEvents());
     }
 
-    private void doProcess() {
+    private void doProcess(FacesContext context) {
         var forValue = getFor();
 
         if (!isEmpty(forValue)) {
-            var component = findComponentRelatively(this, forValue);
+            var component = findComponentRelatively(context, this, forValue);
 
             if (component == null) {
                 component = findComponent(forValue);

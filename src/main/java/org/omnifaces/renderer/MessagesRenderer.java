@@ -12,7 +12,7 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.util.Components.forEachComponent;
+import static org.omnifaces.util.ComponentsLocal.forEachComponent;
 import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
 import static org.omnifaces.util.Renderers.writeAttributes;

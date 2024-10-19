@@ -73,6 +73,7 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  *
  * @author Bauke Scholtz
  * @since 1.6.1
+ * @see BeansLocal
  */
 @Typed
 public final class Beans {

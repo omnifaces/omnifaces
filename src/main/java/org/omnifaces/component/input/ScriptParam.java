@@ -22,7 +22,6 @@ import static org.omnifaces.util.Reflection.invokeMethods;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
@@ -158,10 +157,10 @@ public class ScriptParam extends OnloadParam {
 
     @Override
     protected String getInitScript(FacesContext context) {
-        StringBuilder scripts = new StringBuilder("{");
+        var scripts = new StringBuilder("{");
 
         for (ScriptParam scriptParam : getScriptParameters(context)) {
-            scripts.append("'").append(scriptParam.getClientId()).append("':").append(scriptParam.getScript()).append(',');
+            scripts.append("'").append(scriptParam.getClientId(context)).append("':").append(scriptParam.getScript()).append(',');
         }
 
         scripts.append("}");
@@ -181,9 +180,9 @@ public class ScriptParam extends OnloadParam {
         Set<Object> beans = new HashSet<>();
 
         for (ScriptParam scriptParam : getScriptParameters(context)) {
-            String value = getRequestParameter(context, scriptParam.getClientId());
+            var value = getRequestParameter(context, scriptParam.getClientId(context));
             scriptParam.decodeImmediately(context, value);
-            ValueExpression valueExpression = scriptParam.getValueExpression(VALUE_ATTRIBUTE);
+            var valueExpression = scriptParam.getValueExpression(VALUE_ATTRIBUTE);
 
             if (valueExpression != null) {
                 beans.add(getValueReference(context.getELContext(), valueExpression).getBase());

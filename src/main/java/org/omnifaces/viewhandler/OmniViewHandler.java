@@ -19,9 +19,8 @@ import static org.omnifaces.resourcehandler.PWAResourceHandler.isServiceWorkerRe
 import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
-import static org.omnifaces.util.Components.buildView;
+import static org.omnifaces.util.ComponentsLocal.buildView;
 import static org.omnifaces.util.Faces.isPrefixMapping;
-import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
@@ -128,7 +127,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         var restoredView = super.restoreView(context, viewId);
 
         if (isRestorableViewRequest(context, restoredView)) {
-            return createRestorableViewIfNecessary(viewId);
+            return createRestorableViewIfNecessary(context, viewId);
         }
 
         return restoredView;
@@ -195,7 +194,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             redirectPermanent(context, getRequestURIWithQueryString(context));
         }
 
-        responseComplete();
+        context.responseComplete();
         return createdView;
     }
 
@@ -239,9 +238,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     /**
      * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
      */
-    private static UIViewRoot createRestorableViewIfNecessary(String viewId) {
+    private static UIViewRoot createRestorableViewIfNecessary(FacesContext context, String viewId) {
         try {
-            var createdView = buildView(viewId);
+            var createdView = buildView(context, viewId);
             return isRestorableView(createdView) ? createdView : null;
         }
         catch (IOException e) {
@@ -254,7 +253,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     private void checkNestedForms(FacesContext context, UIComponent parent, UIForm nestedParent) {
-        for (UIComponent child : parent.getChildren()) { // Historical note: UIViewRoot#visitTree() is inappropriate for this task: #653
+        for (var child : parent.getChildren()) { // Historical note: UIViewRoot#visitTree() is inappropriate for this task: #653
             UIForm form = null;
 
             if (child instanceof UIForm formChild) {
@@ -262,7 +261,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
                 if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
                     throw new IllegalStateException(
-                        format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
+                        format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(context), nestedParent.getClientId(context)));
                 }
             }
 

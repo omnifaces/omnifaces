@@ -115,7 +115,7 @@ public final class SelectItemsUtils {
      */
     static class ArrayIterator implements Iterator<SelectItem> {
 
-        private SelectItem[] items;
+        private final SelectItem[] items;
         private int index = 0;
 
         public ArrayIterator(SelectItem[] items) {

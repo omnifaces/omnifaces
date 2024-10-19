@@ -17,13 +17,14 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,9 +87,7 @@ public class SocketSessionManager {
      * @param channelId The channel identifier to register.
      */
     protected void register(String channelId) {
-        if (!socketSessions.containsKey(channelId)) {
-            socketSessions.putIfAbsent(channelId, new ConcurrentLinkedQueue<>());
-        }
+        socketSessions.computeIfAbsent(channelId, $ -> new ConcurrentLinkedQueue<>());
     }
 
     /**
@@ -96,9 +95,7 @@ public class SocketSessionManager {
      * @param channelIds The channel identifiers to register.
      */
     protected void register(Iterable<String> channelIds) {
-        for (var channelId : channelIds) {
-            register(channelId);
-        }
+        channelIds.forEach(this::register);
     }
 
     /**
@@ -137,16 +134,12 @@ public class SocketSessionManager {
     protected Set<Future<Void>> send(String channelId, String message) {
         var sessions = channelId != null ? socketSessions.get(channelId) : null;
 
-        if (sessions != null && !sessions.isEmpty()) {
-            Set<Future<Void>> results = new HashSet<>(sessions.size());
-
-            for (var session : sessions) {
-                if (session.isOpen()) {
-                    results.add(send(session, message, true));
-                }
-            }
-
-            return results;
+        if (sessions != null) {
+            return sessions.stream()
+                    .filter(Session::isOpen)
+                    .map(session -> send(session, message, true))
+                    .filter(Objects::nonNull)
+                    .collect(toUnmodifiableSet());
         }
 
         return emptySet();
@@ -223,13 +216,11 @@ public class SocketSessionManager {
      * @param channelIds The channel identifiers to deregister.
      */
     protected void deregister(Iterable<String> channelIds) {
-        for (String channelId : channelIds) {
+        for (var channelId : channelIds) {
             var sessions = socketSessions.remove(channelId);
 
             if (sessions != null) {
-                for (var session : sessions) {
-                    close(session);
-                }
+                sessions.forEach(SocketSessionManager::close);
             }
         }
     }

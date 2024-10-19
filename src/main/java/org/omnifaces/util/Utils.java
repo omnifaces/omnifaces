@@ -73,7 +73,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -233,13 +235,7 @@ public final class Utils {
      * @since 1.8
      */
     public static boolean isAnyEmpty(Object... values) {
-        for (Object value : values) {
-            if (isEmpty(value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(values).anyMatch(Utils::isEmpty);
     }
 
     /**
@@ -302,13 +298,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static <T> T coalesce(T... objects) {
-        for (T object : objects) {
-            if (object != null) {
-                return object;
-            }
-        }
-
-        return null;
+        return stream(objects).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -320,13 +310,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static <T> boolean isOneOf(T object, T... objects) {
-        for (Object other : objects) {
-            if (Objects.equals(object, other)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(objects).anyMatch(other -> Objects.equals(object, other));
     }
 
     /**
@@ -337,13 +321,7 @@ public final class Utils {
      * @since 1.4
      */
     public static boolean startsWithOneOf(String string, String... prefixes) {
-        for (String prefix : prefixes) {
-            if (string.startsWith(prefix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(prefixes).anyMatch(string::startsWith);
     }
 
     /**
@@ -354,13 +332,7 @@ public final class Utils {
      * @since 3.1
      */
     public static boolean endsWithOneOf(String string, String... suffixes) {
-        for (String suffix : suffixes) {
-            if (string.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(suffixes).anyMatch(string::endsWith);
     }
 
     /**
@@ -371,13 +343,7 @@ public final class Utils {
      * @since 2.0
      */
     public static boolean isOneInstanceOf(Class<?> cls, Class<?>... classes) {
-        for (Class<?> other : classes) {
-            if (cls == null ? other == null : other.isAssignableFrom(cls)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(classes).anyMatch(other -> cls == null ? other == null : other.isAssignableFrom(cls));
     }
 
     /**
@@ -389,13 +355,7 @@ public final class Utils {
      */
     @SafeVarargs
     public static boolean isOneAnnotationPresent(Class<?> cls, Class<? extends Annotation>... annotations) {
-        for (Class<? extends Annotation> annotation : annotations) {
-            if (cls.isAnnotationPresent(annotation)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream(annotations).anyMatch(cls::isAnnotationPresent);
     }
 
     /**
@@ -517,8 +477,10 @@ public final class Utils {
             return stream(new FileInputStream(file), output);
         }
 
-        try (var fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+        try (
+            var fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ);
             var outputChannel = Channels.newChannel(output);
+        ) {
             var buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
             var size = 0L;
 
@@ -595,18 +557,14 @@ public final class Utils {
      */
     @SuppressWarnings("unchecked")
     public static <E> Set<E> unmodifiableSet(Object... values) {
-        Set<E> set = new HashSet<>();
+        var set = new HashSet<E>();
 
-        for (Object value : values) {
+        for (var value : values) {
             if (value instanceof Object[]) {
-                for (Object item : (Object[]) value) {
-                    set.add((E) item);
-                }
+                stream((E[]) value).forEach(set::add);
             }
             else if (value instanceof Collection<?>) {
-                for (Object item : (Collection<?>) value) {
-                    set.add((E) item);
-                }
+                stream((Collection<E>) value).forEach(set::add);
             }
             else {
                 set.add((E) value);
@@ -636,11 +594,8 @@ public final class Utils {
             return new ArrayList<>((Collection<E>) iterable);
         }
         else {
-            List<E> list = new ArrayList<>();
-            for (E element : iterable) {
-                list.add(element);
-            }
-
+            var list = new ArrayList<E>();
+            iterable.forEach(list::add);
             return list;
         }
     }
@@ -692,9 +647,9 @@ public final class Utils {
             return emptyList();
         }
 
-        List<String> list = new ArrayList<>();
+        var list = new ArrayList<String>();
 
-        for (String value : values.split(quote(delimiter))) {
+        for (var value : values.split(quote(delimiter))) {
             var trimmedValue = value.trim();
             if (!isEmpty(trimmedValue)) {
                 list.add(trimmedValue);
@@ -715,11 +670,8 @@ public final class Utils {
      * @return the reverse of the given map
      */
     public static <T> Map<T, T> reverse(Map<T, T> source) {
-        Map<T, T> target = new HashMap<>();
-        for (Entry<T, T> entry : source.entrySet()) {
-            target.put(entry.getValue(), entry.getKey());
-        }
-
+        var target = new HashMap<T, T>();
+        source.entrySet().forEach(entry -> target.put(entry.getValue(), entry.getKey()));
         return target;
     }
 
@@ -732,15 +684,8 @@ public final class Utils {
      * @since 1.6
      */
     public static boolean containsByClassName(Collection<?> objects, String className) {
-        Class<?> cls = toClassOrNull(className);
-
-        for (Object object : objects) {
-            if (object.getClass() == cls) {
-                return true;
-            }
-        }
-
-        return false;
+        var cls = toClassOrNull(className);
+        return stream(objects).anyMatch(object -> object.getClass() == cls);
     }
 
     /**
@@ -1161,7 +1106,7 @@ public final class Utils {
         }
 
         try {
-            InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
+            var raw = new ByteArrayInputStream(string.getBytes(UTF_8));
             var deflated = new ByteArrayOutputStream();
             stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(deflated.toByteArray());
@@ -1286,7 +1231,7 @@ public final class Utils {
         if (pathAndQueryString.length > 1) {
             var parameters = pathAndQueryString[1].split(quote("&"));
 
-            for (String parameter : parameters) {
+            for (var parameter : parameters) {
                 var nameAndValue = parameter.split(quote("="));
 
                 if (nameAndValue.length > 0 && parameterName.equals(decodeURL(nameAndValue[0]))) {
@@ -1316,7 +1261,7 @@ public final class Utils {
 
         var builder = new StringBuilder(string.length());
 
-        for (char c : string.toCharArray()) {
+        for (var c : string.toCharArray()) {
             if (c > UNICODE_3_BYTES) {
                 builder.append("\\u").append(Integer.toHexString(c));
             }
@@ -1415,4 +1360,41 @@ public final class Utils {
         }
     }
 
+    // Concurrency ----------------------------------------------------------------------------------------------------
+
+    /**
+     * Atomically execute the given runnable.
+     * @param lock The lock to be used for atomic execution
+     * @param task The runnable to be executed atomically
+     * @since 4.6
+     */
+    public static void executeAtomically(Lock lock, Runnable task) {
+        lock.lock();
+
+        try {
+            task.run();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Atomically execute the given task and return its result.
+     * @param <R> The generic result type.
+     * @param lock The {@link Lock} to be used for atomic execution
+     * @param task The {@link Supplier} to be executed atomically
+     * @return The result of the passed task.
+     * @since 4.6
+     */
+    public static <R> R executeAtomically(Lock lock, Supplier<R> task) {
+        lock.lock();
+
+        try {
+            return task.get();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
 }

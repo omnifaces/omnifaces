@@ -17,10 +17,11 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
-import static org.omnifaces.util.Components.addFacesScriptResource;
-import static org.omnifaces.util.Components.addScriptResource;
-import static org.omnifaces.util.Components.getCurrentForm;
+import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
+import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.ComponentsLocal.getCurrentForm;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
+import static org.omnifaces.util.Faces.getContext;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -115,8 +116,9 @@ public class Highlight extends OnloadScript {
     private void registerScriptsIfNecessary() {
         // This is supposed to be declared via @ResourceDependency, but JSF 3 and Faces 4 use a different script
         // resource name which cannot be resolved statically.
-        addFacesScriptResource(); // Required for faces.ajax.request.
-        addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
+        var context = getContext();
+        addFacesScriptResource(context); // Required for faces.ajax.request.
+        addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -134,7 +136,7 @@ public class Highlight extends OnloadScript {
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        var form = getCurrentForm();
+        var form = getCurrentForm(context);
 
         if (form == null) {
             return;

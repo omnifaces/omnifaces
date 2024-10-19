@@ -14,7 +14,7 @@ package org.omnifaces.component.output;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
-import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.ComponentsLocal.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
@@ -172,7 +172,7 @@ public class Url extends OutputFamily {
     @Override
     public void encodeEnd(FacesContext context) throws IOException {
         var value = getValue();
-        var params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
+        var params = getParams(context, this, isIncludeRequestParams(), isIncludeViewParams());
         var url = value != null ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
 
         if (getVar() != null) {

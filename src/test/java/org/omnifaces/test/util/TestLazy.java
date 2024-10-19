@@ -42,6 +42,7 @@ class TestLazy {
     }
 
     @Test
+    @SuppressWarnings("unused")
     void lazy() {
         var expensive = new Expensive();
         assertNotNull(expensive);

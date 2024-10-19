@@ -21,8 +21,8 @@ import static java.util.stream.Collectors.toMap;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
-import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Components.setAttribute;
+import static org.omnifaces.util.ComponentsLocal.createValueExpression;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -261,7 +261,7 @@ public class ParamProducer {
 
         try {
             setAttribute(component, LABEL_ATTRIBUTE, paramValue.label);
-            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression("#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
+            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression(context, "#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
             return callback.getAsBoolean();
         }
         finally {

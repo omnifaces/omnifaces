@@ -13,13 +13,12 @@
 package org.omnifaces.util.cache;
 
 import static java.util.Objects.requireNonNull;
+import static org.omnifaces.util.Utils.executeAtomically;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.omnifaces.util.Callback.SerializableBiConsumer;
+import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 
 /**
  * Minimal implementation of thread safe LRU cache with support for eviction listener.
@@ -79,27 +78,14 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         this.entries = new LinkedHashMap<>(maximumCapacity);
     }
 
-    // Internal -------------------------------------------------------------------------------------------------------
-
-    private <R> R withLock(Supplier<R> task) {
-        lock.lock();
-
-        try {
-            return task.get();
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
     // Mutation methods -----------------------------------------------------------------------------------------------
 
     @Override
     @SuppressWarnings("unchecked")
     public V get(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> {
-            V value = entries.remove(key);
+        return executeAtomically(lock, () -> {
+            var value = entries.remove(key);
             if (value != null) {
                 entries.put((K) key, value);
                 return value;
@@ -122,15 +108,15 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
         Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
-        V previousValue = withLock(() -> {
-            V existingValue = entries.remove(key);
+        var previousValue = executeAtomically(lock, () -> {
+            var existingValue = entries.remove(key);
 
             while (entries.size() >= maximumCapacity) {
-                K leastRecentlyUsedKey = entries.keySet().iterator().next();
+                var leastRecentlyUsedKey = entries.keySet().iterator().next();
                 evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
             }
 
-            entries.put(key, (onlyIfAbsent && existingValue != null) ? existingValue : value);
+            entries.put(key, onlyIfAbsent && existingValue != null ? existingValue : value);
             return existingValue;
         });
 
@@ -146,21 +132,21 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     @Override
     public V remove(Object key) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
-        return withLock(() -> entries.remove(key));
+        return executeAtomically(lock, () -> entries.remove(key));
     }
 
     @Override
     public boolean remove(Object key, Object value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> value.equals(entries.get(key)) && entries.remove(key) != null);
+        return executeAtomically(lock, () -> value.equals(entries.get(key)) && entries.remove(key) != null);
     }
 
     @Override
     public V replace(K key, V value) {
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> entries.containsKey(key) ? put(key, value, false) : null);
+        return executeAtomically(lock, () -> entries.containsKey(key) ? put(key, value, false) : null);
     }
 
     @Override
@@ -168,12 +154,12 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
         requireNonNull(oldValue, ERROR_NULL_VALUE_DISALLOWED);
         requireNonNull(newValue, ERROR_NULL_VALUE_DISALLOWED);
-        return withLock(() -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
+        return executeAtomically(lock, () -> oldValue.equals(entries.get(key)) && put(key, newValue, false) != null);
     }
 
     @Override
     public void clear() {
-        withLock(() -> { entries.clear(); return null; });
+        executeAtomically(lock, entries::clear);
     }
 
     // Readonly methods -----------------------------------------------------------------------------------------------
@@ -202,57 +188,20 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     @Override
     public Set<K> keySet() {
-        return new ReadOnlyCollection<>(entries::keySet);
+        return copyAtomically(entries::keySet);
     }
 
     @Override
     public Collection<V> values() {
-        return new ReadOnlyCollection<>(entries::values);
+        return copyAtomically(entries::values);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return new ReadOnlyCollection<>(entries::entrySet);
+        return copyAtomically(entries::entrySet);
     }
 
-    // Inner classes --------------------------------------------------------------------------------------------------
-
-    private final class ReadOnlyCollection<E> extends AbstractSet<E> {
-
-        private final Supplier<Collection<E>> collectionSupplier;
-
-        public ReadOnlyCollection(Supplier<Collection<E>> collectionSupplier) {
-            this.collectionSupplier = collectionSupplier;
-        }
-
-        @Override
-        public int size() {
-            return entries.size();
-        }
-
-        @Override
-        public Iterator<E> iterator() {
-            return new ReadOnlyIterator<>(collectionSupplier.get().iterator());
-        }
+    private <E> Set<E> copyAtomically(Supplier<Collection<E>> collectionSupplier) {
+        return executeAtomically(lock, () -> Set.copyOf(collectionSupplier.get()));
     }
-
-    private final class ReadOnlyIterator<E> implements Iterator<E> {
-
-        private final Iterator<E> iterator;
-
-        private ReadOnlyIterator(Iterator<E> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public E next() {
-            return iterator.next();
-        }
-    }
-
 }

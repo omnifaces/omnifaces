@@ -39,6 +39,7 @@ import jakarta.faces.context.FacesContext;
  *
  * @author Bauke Scholtz
  * @since 4.2
+ * @see Messages
  */
 public final class MessagesLocal {
 
@@ -256,10 +257,10 @@ public final class MessagesLocal {
     }
 
     private static boolean clear(Iterator<FacesMessage> iterator, FacesMessage.Severity severity) {
-        boolean atLeastOneCleared = false;
+        var atLeastOneCleared = false;
 
         while (iterator.hasNext()) {
-            FacesMessage facesMessage = iterator.next();
+            var facesMessage = iterator.next();
 
             if (severity == null || severity.equals(facesMessage.getSeverity())) {
                 iterator.remove();

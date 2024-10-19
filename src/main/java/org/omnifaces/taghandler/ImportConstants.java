@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.omnifaces.taghandler.ImportFunctions.getClassLoader;
 import static org.omnifaces.taghandler.ImportFunctions.toClass;
 import static org.omnifaces.util.Facelets.getStringLiteral;
@@ -22,6 +23,7 @@ import static org.omnifaces.util.Utils.isOneOf;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -61,14 +63,23 @@ import org.omnifaces.util.Utils;
  * public enum Baz {
  *     BAZ1, BAZ2;
  * }
+ *
+ * public enum Faz implements Bar {
+ *     FAZ1, FAZ2;
+ * }
  * </pre>
  * <p>The constant field values of the above types can be mapped into the request scope as follows:
  * <pre>
  * &lt;o:importConstants type="com.example.Foo" /&gt;
  * &lt;o:importConstants type="com.example.Bar" /&gt;
  * &lt;o:importConstants type="com.example.Baz" var="Bazzz" /&gt;
+ * &lt;o:importConstants type="com.example.Faz" /&gt;
  * ...
- * #{Foo.FOO1}, #{Foo.FOO2}, #{Bar.BAR1}, #{Bar.BAR2}, #{Bazzz.BAZ1}, #{Bazzz.BAZ2}
+ * #{Foo.FOO1}, #{Foo.FOO2}, #{Bar.BAR1}, #{Bar.BAR2}, #{Bazzz.BAZ1}, #{Bazzz.BAZ2}, #{Faz.FAZ1}, #{Faz.BAR2}
+ * ...
+ * &lt;h:selectOneMenu&gt;
+ *     &lt;f:selectItems value="#{Faz.values()}" /&gt; &lt;!-- FAZ1, FAZ2, BAR1, BAR2 --&gt;
+ * &lt;/h:selectOneMenu&gt;
  * </pre>
  * <p>The map is by default stored in the request scope by the simple name of the type as variable name. You can override
  * this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
@@ -82,6 +93,15 @@ import org.omnifaces.util.Utils;
  * to load the class specified in the <code>type</code> attribute. The class loader of the given object is resolved as
  * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific class when
  * there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+ * <p>
+ * Since version 4.6, when the class specified in the <code>type</code> attribute is an <code>enum</code>, such as
+ * <code>Baz</code> or <code>Faz</code> in the above example, then you can use <code>#{Faz.members()}</code> to
+ * exclusively access enum members rather than all constant field values.
+ * <pre>
+ * &lt;h:selectOneMenu&gt;
+ *     &lt;f:selectItems value="#{Faz.members()}" /&gt; &lt;!-- FAZ1, FAZ2 --&gt;
+ * &lt;/h:selectOneMenu&gt;
+ * </pre>
 
  * <h2>JSF 2.3</h2>
  * <p>
@@ -99,12 +119,13 @@ public class ImportConstants extends TagHandler {
 
     private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
     private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
+    private static final String ERROR_INVALID_TYPE = "Type '%s' is not an enum.";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String varValue;
-    private TagAttribute typeAttribute;
-    private TagAttribute loaderAttribute;
+    private final String varValue;
+    private final TagAttribute typeAttribute;
+    private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -129,20 +150,20 @@ public class ImportConstants extends TagHandler {
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-        String type = typeAttribute.getValue(context);
-        Map<String, Object> constants = CONSTANTS_CACHE.get(type);
+        var type = typeAttribute.getValue(context);
+        var constants = CONSTANTS_CACHE.get(type);
 
         if (constants == null) {
-            ClassLoader loader = getClassLoader(context, loaderAttribute);
+            var loader = getClassLoader(context, loaderAttribute);
             constants = collectConstants(type, loader);
             CONSTANTS_CACHE.put(type, constants);
         }
 
-        String var = varValue;
+        var var = varValue;
 
         if (var == null) {
-            int innerClass = type.lastIndexOf('$');
-            int outerClass = type.lastIndexOf('.');
+            var innerClass = type.lastIndexOf('$');
+            var outerClass = type.lastIndexOf('.');
             var = type.substring(max(innerClass, outerClass) + 1);
         }
 
@@ -157,10 +178,11 @@ public class ImportConstants extends TagHandler {
      * @return Constants of the given type.
      */
     private static Map<String, Object> collectConstants(String type, ClassLoader loader) {
-        Map<String, Object> constants = new LinkedHashMap<>();
+        var constants = new LinkedHashMap<String, Object>();
+        var typeClass = toClass(type, loader);
 
-        for (Class<?> declaredType : getDeclaredTypes(toClass(type, loader))) {
-            for (Field field : declaredType.getDeclaredFields()) {
+        for (var declaredType : getDeclaredTypes(typeClass)) {
+            for (var field : declaredType.getDeclaredFields()) {
                 if (isPublicStaticFinal(field)) {
                     try {
                         constants.putIfAbsent(field.getName(), field.get(null));
@@ -172,28 +194,28 @@ public class ImportConstants extends TagHandler {
             }
         }
 
-        return new ConstantsMap(constants, type);
+        return new ConstantsMap(constants, typeClass);
     }
 
     /**
      * Returns an ordered set of all declared types of given type except for Object.class.
      */
     private static Set<Class<?>> getDeclaredTypes(Class<?> type) {
-        Set<Class<?>> declaredTypes = new LinkedHashSet<>();
+        var declaredTypes = new LinkedHashSet<Class<?>>();
         declaredTypes.add(type);
         fillAllSuperClasses(type, declaredTypes);
-        new LinkedHashSet<>(declaredTypes).stream().forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
+        new LinkedHashSet<>(declaredTypes).forEach(declaredType -> fillAllInterfaces(declaredType, declaredTypes));
         return Collections.unmodifiableSet(declaredTypes);
     }
 
     private static void fillAllSuperClasses(Class<?> type, Set<Class<?>> set) {
-        for (Class<?> sc = type.getSuperclass(); !isOneOf(sc, null, Object.class); sc = sc.getSuperclass()) {
+        for (var sc = type.getSuperclass(); !isOneOf(sc, null, Object.class); sc = sc.getSuperclass()) {
             set.add(sc);
         }
     }
 
     private static void fillAllInterfaces(Class<?> type, Set<Class<?>> set) {
-        for (Class<?> i : type.getInterfaces()) {
+        for (var i : type.getInterfaces()) {
             if (set.add(i)) {
                 fillAllInterfaces(i, set);
             }
@@ -206,7 +228,7 @@ public class ImportConstants extends TagHandler {
      * @return <code>true</code> if the given field is a constant field, otherwise <code>false</code>.
      */
     private static boolean isPublicStaticFinal(Field field) {
-        int modifiers = field.getModifiers();
+        var modifiers = field.getModifiers();
         return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
     }
 
@@ -216,15 +238,19 @@ public class ImportConstants extends TagHandler {
      * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an
      * {@link IllegalArgumentException} in {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
      *
+     * <p>
+     * Since 4.6 this class is public instead of private in order to allow the EL implementation to see the new
+     * {@link #members()} method.
+     *
      * @author Bauke Scholtz
      */
-    private static class ConstantsMap extends MapWrapper<String, Object> {
+    public static class ConstantsMap extends MapWrapper<String, Object> {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
-        private String type;
+        private final Class<?> type;
 
-        public ConstantsMap(Map<String, Object> map, String type) {
+        public ConstantsMap(Map<String, Object> map, Class<?> type) {
             super(Collections.unmodifiableMap(map));
             this.type = type;
         }
@@ -232,10 +258,24 @@ public class ImportConstants extends TagHandler {
         @Override
         public Object get(Object key) {
             if (!containsKey(key)) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type, key));
+                throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type.toString(), type));
             }
 
             return super.get(key);
+        }
+
+        /**
+         * Returns Exclusively enum members in case the type is an enum.
+         * @return Exclusively enum members in case the type is an enum.
+         * @throws IllegalStateException in case the type is not an enum.
+         * @since 4.6
+         */
+        public Collection<Object> members() {
+            if (!type.isEnum()) {
+                throw new IllegalStateException(format(ERROR_INVALID_TYPE, type.toString()));
+            }
+
+            return asList(type.getEnumConstants());
         }
 
         @Override

@@ -14,13 +14,16 @@ package org.omnifaces.cdi.push;
 
 import static jakarta.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static jakarta.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.cdi.PushContext.URI_PREFIX;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
@@ -84,8 +87,8 @@ public class SocketEndpoint extends Endpoint {
 
     /**
      * Remove given web socket session from the {@link SocketSessionManager}. If there is any exception from onError which was
-     * not caused by GOING_AWAY, then log it. Tomcat &lt;= 8.0.30 is known to throw an unnecessary exception when client
-     * abruptly disconnects, see also <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57489">issue 57489</a>.
+     * not caused by {@link CloseCodes#GOING_AWAY} (i.e. "connection reset by peer"), then log it as {@link Level#SEVERE},
+     * else as {@link Level#FINE}. Before OmniFaces 4.6, the {@link CloseCodes#GOING_AWAY} was not logged at all.
      * @param session The closed web socket session.
      * @param reason The close reason.
      */
@@ -93,10 +96,10 @@ public class SocketEndpoint extends Endpoint {
     public void onClose(Session session, CloseReason reason) {
         SocketSessionManager.getInstance().remove(session, reason); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
 
-        Throwable throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
+        var throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 
-        if (throwable != null && reason.getCloseCode() != GOING_AWAY) {
-            logger.log(SEVERE, ERROR_EXCEPTION, throwable);
+        if (throwable != null) {
+            logger.log(reason.getCloseCode() == GOING_AWAY ? FINE : SEVERE, ERROR_EXCEPTION, throwable);
         }
     }
 

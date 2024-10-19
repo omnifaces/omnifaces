@@ -99,6 +99,7 @@ public abstract class OmniFacesIT {
         newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
         var newTab = newTabs.iterator().next();
         browser.switchTo().window(newTab);
+        waitUntil(() -> executeScript("return document.readyState=='complete'"));
         return newTab;
     }
 

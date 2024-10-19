@@ -51,7 +51,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -253,12 +252,8 @@ public final class Servlets {
      * @since 2.6
      */
     public static Map<String, List<String>> getRequestParameterMap(HttpServletRequest request) {
-        Map<String, List<String>> parameterMap = new HashMap<>(request.getParameterMap().size());
-
-        for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            parameterMap.put(entry.getKey(), asList(entry.getValue()));
-        }
-
+        var parameterMap = new HashMap<String, List<String>>(request.getParameterMap().size());
+        request.getParameterMap().entrySet().forEach(entry -> parameterMap.put(entry.getKey(), asList(entry.getValue())));
         return parameterMap;
     }
 
@@ -343,9 +338,9 @@ public final class Servlets {
      */
     public static Map<String, List<String>> toParameterMap(String queryString) {
         var parameters = queryString.split(quote("&"));
-        Map<String, List<String>> parameterMap = new LinkedHashMap<>(parameters.length);
+        var parameterMap = new LinkedHashMap<String, List<String>>(parameters.length);
 
-        for (String parameter : parameters) {
+        for (var parameter : parameters) {
             if (parameter.contains("=")) {
                 var pair = parameter.split(quote("="));
 
@@ -381,14 +376,14 @@ public final class Servlets {
     public static String toQueryString(Map<String, List<String>> parameterMap) {
         var queryString = new StringBuilder();
 
-        for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
+        for (var entry : parameterMap.entrySet()) {
             if (isEmpty(entry.getKey())) {
                 continue;
             }
 
             var name = encodeURL(entry.getKey());
 
-            for (String value : entry.getValue()) {
+            for (var value : entry.getValue()) {
                 if (value == null) {
                     continue;
                 }
@@ -414,7 +409,7 @@ public final class Servlets {
     public static String toQueryString(List<? extends ParamHolder<?>> params) {
         var queryString = new StringBuilder();
 
-        for (ParamHolder<?> param : params) {
+        for (var param : params) {
             if (isEmpty(param.getName())) {
                 continue;
             }
@@ -548,7 +543,7 @@ public final class Servlets {
             return emptyMap();
         }
 
-        Map<String, String> map = new HashMap<>();
+        var map = new HashMap<String, String>();
         var builder = new StringBuilder();
         var quoted = false;
 
@@ -692,7 +687,7 @@ public final class Servlets {
         var cookies = request.getCookies();
 
         if (cookies != null) {
-            for (Cookie cookie : cookies) {
+            for (var cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     return decodeURL(cookie.getValue());
                 }
@@ -720,9 +715,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String value, int maxAge)
-    {
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, int maxAge) {
         addResponseCookie(request, response, name, value, getRequestHostname(request), null, maxAge);
     }
 
@@ -746,9 +739,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String value, String path, int maxAge)
-    {
+    public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, String path, int maxAge) {
         addResponseCookie(request, response, name, value, getRequestHostname(request), path, maxAge);
     }
 
@@ -802,9 +793,7 @@ public final class Servlets {
      * @see HttpServletResponse#addCookie(Cookie)
      * @since 2.0
      */
-    public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response,
-        String name, String path)
-    {
+    public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response, String name, String path) {
         addResponseCookie(request, response, name, null, path, 0);
     }
 
@@ -827,15 +816,19 @@ public final class Servlets {
         var beanManager = Beans.getManager();
 
         if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
-            return BeansLocal.getInstance(beanManager, ServletContext.class);
+            try {
+                return BeansLocal.getInstance(beanManager, ServletContext.class);
+            }
+            catch (Exception ignore) {
+                logger.log(FINEST, "Ignoring thrown exception; will fall back to explicitly searching in application scope.", ignore);
+            }
         }
-        else {
-            // #522 For some reason Weld by default searches for the ServletContext in the request scope.
-            // But this won't work during e.g. startup. So we need to explicitly search in application scope.
-            Bean<ServletContext> bean = BeansLocal.resolve(beanManager, ServletContext.class);
-            var context = beanManager.getContext(ApplicationScoped.class);
-            return context.get(bean, beanManager.createCreationalContext(bean));
-        }
+
+        // #522 For some reason Weld by default searches for the ServletContext in the request scope.
+        // But this won't work during e.g. startup. So we need to explicitly search in application scope.
+        var bean = BeansLocal.resolve(beanManager, ServletContext.class);
+        var context = beanManager.getContext(ApplicationScoped.class);
+        return context.get(bean, beanManager.createCreationalContext(bean));
     }
 
     /**

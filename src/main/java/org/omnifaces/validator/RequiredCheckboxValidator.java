@@ -13,11 +13,9 @@
 package org.omnifaces.validator;
 
 import static java.lang.String.format;
-import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.ComponentsLocal.getLabel;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.Messages.createError;
-
-import java.util.ResourceBundle;
 
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
@@ -85,10 +83,10 @@ public class RequiredCheckboxValidator implements Validator<Boolean> {
         }
 
         if (!Boolean.TRUE.equals(value)) {
-            String requiredMessage = ((UIInput) component).getRequiredMessage();
+            var requiredMessage = ((UIInput) component).getRequiredMessage();
 
             if (requiredMessage == null) {
-                ResourceBundle messageBundle = getMessageBundle(context);
+                var messageBundle = getMessageBundle(context);
 
                 if (messageBundle != null) {
                     requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
@@ -99,7 +97,7 @@ public class RequiredCheckboxValidator implements Validator<Boolean> {
                 requiredMessage = DEFAULT_REQUIRED_MESSAGE;
             }
 
-            throw new ValidatorException(createError(requiredMessage, getLabel(component)));
+            throw new ValidatorException(createError(requiredMessage, getLabel(context, component)));
         }
     }
 

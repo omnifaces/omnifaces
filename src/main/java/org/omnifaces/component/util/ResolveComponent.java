@@ -15,7 +15,7 @@ package org.omnifaces.component.util;
 import static java.lang.String.format;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.name;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.scope;
-import static org.omnifaces.util.Components.findComponentRelatively;
+import static org.omnifaces.util.ComponentsLocal.findComponentRelatively;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Faces.isPostback;
 import static org.omnifaces.util.Faces.setRequestAttribute;
@@ -23,6 +23,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
 import jakarta.faces.event.PreRenderViewEvent;
@@ -32,8 +33,8 @@ import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.taghandler.ComponentExtraHandler;
-import org.omnifaces.util.Callback.SerializableReturning;
 import org.omnifaces.util.Components;
+import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 import org.omnifaces.util.State;
 
 /**
@@ -99,21 +100,21 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     @Override
     public void processEvent(SystemEvent event) {
-        doProcess();
+        doProcess(event.getFacesContext());
     }
 
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event.
-            doProcess();
+            doProcess(event.getFacesContext());
         }
     }
 
-    private void doProcess() {
-        String forValue = getFor();
+    private void doProcess(FacesContext context) {
+        var forValue = getFor();
 
         if (!isEmpty(forValue)) {
-            UIComponent component = findComponentRelatively(this, forValue);
+            var component = findComponentRelatively(context, this, forValue);
 
             if (component == null) {
                 component = findComponent(forValue);
@@ -123,12 +124,12 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
 
-            String scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
+            var scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
 
             if (DEFAULT_SCOPE.equals(scope)) {
                 // Component will be resolved again dynamically when the value expression is evaluated.
                 if (readOnlyValueExpression != null) {
-                    readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+                    readOnlyValueExpression.setCallback(new ComponentClientIdResolver(component.getClientId(context)));
                 }
             }
             else if ("request".equals(scope)) {
@@ -140,7 +141,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
         }
     }
 
-    private static class ComponentClientIdResolver implements SerializableReturning<Object> {
+    private static class ComponentClientIdResolver implements SerializableSupplier<Object> {
 
         private static final long serialVersionUID = 1L;
 
@@ -152,7 +153,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
         }
 
         @Override
-        public Object invoke() {
+        public Object get() {
             if (foundComponent == null) {
                 foundComponent = Components.findComponent(foundComponentId);
             }
