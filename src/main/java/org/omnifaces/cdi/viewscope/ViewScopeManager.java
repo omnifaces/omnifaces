@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static jakarta.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
@@ -27,7 +28,9 @@ import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.isPostback;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,12 +40,14 @@ import jakarta.enterprise.context.spi.Contextual;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.faces.application.ViewExpiredException;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.cache.LruCache;
 
 /**
  * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
@@ -94,6 +99,8 @@ public class ViewScopeManager {
     private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
             + " requires web.xml context parameter 'jakarta.faces.STATE_SAVING_METHOD' being set to 'client'.";
 
+    private static final String ERROR_VIEW_ALREADY_UNLOADED = "View %s was already unloaded.";
+
     // Variables ------------------------------------------------------------------------------------------------------
 
     @Inject
@@ -104,6 +111,8 @@ public class ViewScopeManager {
 
     @Inject
     private ViewScopeStorageInViewState storageInViewState;
+
+    private Map<String, Boolean> recentlyDestroyedViewStates = new LruCache<>(DEFAULT_MAX_ACTIVE_VIEW_SCOPES);
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -158,6 +167,8 @@ public class ViewScopeManager {
                 logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
                 return;
             }
+
+            recentlyDestroyedViewStates.put(getRequestParameter(context, VIEW_STATE_PARAM), true);
         }
         else if (isAjaxRequestWithPartialRendering(context)) {
             context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
@@ -207,6 +218,13 @@ public class ViewScopeManager {
         var beanStorage = storage.getBeanStorage(beanStorageId);
 
         if (beanStorage == null) {
+            var context = getContext();
+
+            if (isPostback(context) && recentlyDestroyedViewStates.containsKey(getRequestParameter(context, VIEW_STATE_PARAM))) {
+                var viewId = context.getViewRoot().getViewId();
+                throw new ViewExpiredException(format(ERROR_VIEW_ALREADY_UNLOADED, viewId), viewId);
+            }
+
             beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
             storage.setBeanStorage(beanStorageId, beanStorage);
         }
