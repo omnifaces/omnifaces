@@ -15,6 +15,7 @@ package org.omnifaces.cdi.viewscope;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
+import static javax.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static org.omnifaces.config.OmniFaces.LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.UNLOAD_SCRIPT_NAME;
@@ -28,7 +29,9 @@ import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.isPostback;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,14 +42,17 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.application.StateManager;
+import javax.faces.application.ViewExpiredException;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.faces.render.ResponseStateManager;
 import javax.inject.Inject;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.util.Hacks;
+import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
@@ -99,6 +105,12 @@ public class ViewScopeManager {
 	private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
 			+ " requires web.xml context parameter 'javax.faces.STATE_SAVING_METHOD' being set to 'client'.";
 
+	private static final String ERROR_VIEW_ALREADY_UNLOADED = "View %s was already unloaded.";
+
+	private Map<String, Boolean> recentlyDestroyedViewStates = new ConcurrentLinkedHashMap.Builder<String, Boolean>()
+			.maximumWeightedCapacity(DEFAULT_MAX_ACTIVE_VIEW_SCOPES)
+			.build();
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	@Inject
@@ -149,6 +161,8 @@ public class ViewScopeManager {
 				logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
 				return;
 			}
+
+			recentlyDestroyedViewStates.put(getRequestParameter(context, VIEW_STATE_PARAM), true);
 		}
 		else if (isAjaxRequestWithPartialRendering(context)) {
 			Hacks.setScriptResourceRendered(context, SCRIPT_ID); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
@@ -197,6 +211,13 @@ public class ViewScopeManager {
 		BeanStorage beanStorage = storage.getBeanStorage(beanStorageId);
 
 		if (beanStorage == null) {
+			FacesContext context = FacesContext.getCurrentInstance();
+
+			if (isPostback(context) && recentlyDestroyedViewStates.containsKey(getRequestParameter(context, VIEW_STATE_PARAM))) {
+				String viewId = context.getViewRoot().getViewId();
+				throw new ViewExpiredException(format(ERROR_VIEW_ALREADY_UNLOADED, viewId), viewId);
+			}
+
 			beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
 			storage.setBeanStorage(beanStorageId, beanStorage);
 		}
