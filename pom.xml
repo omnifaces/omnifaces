@@ -68,19 +68,19 @@
         <maven.source.excludeResources>true</maven.source.excludeResources>
 
         <!-- Test server versions. -->
-        <test.wildfly-mojarra.version>32.0.1.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+        <test.wildfly-mojarra.version>34.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.glassfish-mojarra.version>8.0.0-JDK17-M6</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>10.1.25</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat --> <!-- NOTE: Tomcat 11 is not working with Arquillian. Latest tested: 11.0.0-M22 -->
+        <test.tomcat.version>10.1.31</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat --> <!-- NOTE: Tomcat 11 will only work as per Mojarra 4.0.9/4.1.2 -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
         <test.mojarra.version>4.1.0</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.myfaces.version>4.1.0-RC2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
         <test.weld.version>6.0.0.Beta4</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-        <test.hibernateValidator.version>8.0.1.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <test.hibernateValidator.version>9.0.0.Beta3</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
         <test.tyrus.version>2.2.0</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>14.0.4</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.primefaces.version>14.0.6</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -143,19 +143,19 @@
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
-            <version>11.0.0-M3</version>
+            <version>11.0.0-M4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.11.0</version>
+            <version>5.11.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
-            <version>1.8.0.Final</version>
+            <version>1.8.0.Final</version> <!-- NOTE: 1.8.1 and newer don't work with GlassFish: java.lang.reflect.MalformedParameterizedTypeException: Mismatch of count of formal and actual type arguments in constructor of org.jboss.arquillian.container.spi.Container: 0 formal argument(s) 1 actual argument(s) -->
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -167,7 +167,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.24.0</version>
+            <version>4.25.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -220,7 +220,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.5</version>
+                <version>4.6</version>
                 <configuration>
                     <licenseSets>
                         <licenseSet>
@@ -237,7 +237,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.15.0</version>
+                <version>1.15.1</version>
                 <configuration>
                     <nodeVersion>v18.15.0</nodeVersion>
                     <installDirectory>target</installDirectory>
@@ -382,7 +382,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -417,7 +417,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <javadocVersion>${javase.version}</javadocVersion>
@@ -468,7 +468,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>com.mycila</groupId>
                                         <artifactId>license-maven-plugin</artifactId>
-                                        <versionRange>[4.4,)</versionRange>
+                                        <versionRange>[4.6,)</versionRange>
                                         <goals>
                                             <goal>format</goal>
                                         </goals>
@@ -503,7 +503,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.0</version>
                     <executions>
                         <execution>
                             <phase>process-test-classes</phase>
@@ -524,12 +524,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.1</version>
                     <executions>
                         <execution>
                             <goals>
@@ -567,7 +567,7 @@
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>5.1.0.Beta3</version>
+                    <version>5.1.0.Beta6</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -609,9 +609,9 @@
             <id>glassfish-mojarra</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-                    <version>1.0.2</version>
+                    <groupId>org.omnifaces.arquillian</groupId>
+                    <artifactId>arquillian-glassfish-server-managed</artifactId>
+                    <version>1.6</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -639,9 +639,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
-                            <environmentVariables>
-                                <GLASSFISH_HOME>${project.build.directory}/glassfish8</GLASSFISH_HOME>
-                            </environmentVariables>
+                            <systemPropertyVariables>
+                                <glassfish.home>${project.build.directory}/glassfish8</glassfish.home>
+                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -655,7 +655,7 @@
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
                     <artifactId>arquillian-tomcat-managed-10</artifactId>
-                    <version>1.2.1.Final</version>
+                    <version>1.2.2.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -734,7 +734,7 @@
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
                     <artifactId>arquillian-tomcat-managed-10</artifactId>
-                    <version>1.2.1.Final</version>
+                    <version>1.2.2.Final</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
