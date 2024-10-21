@@ -61,6 +61,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
+    private ConcurrentMap<UUID, Boolean> recentlyDestroyedViewScopes;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -74,6 +75,9 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 			.maximumWeightedCapacity(getMaxActiveViewScopes())
 			.listener(new BeanStorageEvictionListener())
 			.build();
+		recentlyDestroyedViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, Boolean>()
+            .maximumWeightedCapacity(getMaxActiveViewScopes())
+            .build();
 	}
 
 	@Override
@@ -93,6 +97,11 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 		setViewAttribute(getClass().getName(), beanStorageId);
 	}
 
+	@Override
+	public boolean isRecentlyDestroyed(UUID beanStorageId) {
+	    return recentlyDestroyedViewScopes.containsKey(beanStorageId);
+	}
+
 	/**
 	 * Destroys all beans associated with given bean storage identifier.
 	 * @param beanStorageId The bean storage identifier.
@@ -101,6 +110,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 		BeanStorage storage = activeViewScopes.get(beanStorageId);
 
 		if (storage != null) {
+		    recentlyDestroyedViewScopes.put(beanStorageId, true);
 			storage.destroyBeans();
 			activeViewScopes.remove(beanStorageId);
 		}
