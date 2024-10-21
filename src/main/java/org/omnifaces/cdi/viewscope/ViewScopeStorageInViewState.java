@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import javax.enterprise.context.Dependent;
 import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -60,7 +61,7 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
 	}
 
 	@Override
-	public boolean isRecentlyDestroyed(UUID beanStorageId) {
+	public boolean isRecentlyDestroyed(FacesContext context) {
 	    return false;
 	}
 }

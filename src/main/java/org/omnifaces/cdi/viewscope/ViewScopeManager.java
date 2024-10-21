@@ -164,7 +164,7 @@ public class ViewScopeManager {
 			}
 
 			if (beanStorageId != null) {
-				storageInSession.destroyBeans(beanStorageId);
+				storageInSession.destroyBeans(context, beanStorageId);
 			}
 		}
 
@@ -203,7 +203,7 @@ public class ViewScopeManager {
 		if (beanStorage == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			if (isPostback(context) && storage.isRecentlyDestroyed(beanStorageId)) {
+			if (isPostback(context) && storage.isRecentlyDestroyed(context)) {
 				String viewId = context.getViewRoot().getViewId();
 				throw new ViewExpiredException(format(ERROR_VIEW_ALREADY_UNLOADED, viewId), viewId);
 			}

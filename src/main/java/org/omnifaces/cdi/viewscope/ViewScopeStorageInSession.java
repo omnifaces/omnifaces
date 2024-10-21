@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static java.lang.String.format;
+import static javax.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS;
@@ -20,6 +21,7 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NU
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -28,6 +30,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -61,7 +64,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
-    private ConcurrentMap<UUID, Boolean> recentlyDestroyedViewScopes;
+    private ConcurrentMap<String, Boolean> recentlyDestroyedViewStates;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -75,7 +78,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 			.maximumWeightedCapacity(getMaxActiveViewScopes())
 			.listener(new BeanStorageEvictionListener())
 			.build();
-		recentlyDestroyedViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, Boolean>()
+		recentlyDestroyedViewStates = new ConcurrentLinkedHashMap.Builder<String, Boolean>()
             .maximumWeightedCapacity(getMaxActiveViewScopes())
             .build();
 	}
@@ -97,24 +100,24 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 		setViewAttribute(getClass().getName(), beanStorageId);
 	}
 
-	@Override
-	public boolean isRecentlyDestroyed(UUID beanStorageId) {
-	    return recentlyDestroyedViewScopes.containsKey(beanStorageId);
-	}
-
 	/**
 	 * Destroys all beans associated with given bean storage identifier.
 	 * @param beanStorageId The bean storage identifier.
 	 */
-	public void destroyBeans(UUID beanStorageId) {
+	public void destroyBeans(FacesContext context, UUID beanStorageId) {
 		BeanStorage storage = activeViewScopes.get(beanStorageId);
+		recentlyDestroyedViewStates.put(getRequestParameter(context, VIEW_STATE_PARAM), true);
 
 		if (storage != null) {
-		    recentlyDestroyedViewScopes.put(beanStorageId, true);
 			storage.destroyBeans();
 			activeViewScopes.remove(beanStorageId);
 		}
 	}
+
+    @Override
+    public boolean isRecentlyDestroyed(FacesContext context) {
+        return recentlyDestroyedViewStates.containsKey(getRequestParameter(context, VIEW_STATE_PARAM));
+    }
 
 	/**
 	 * This method is invoked during session destroy, in that case destroy all beans in all active view scopes.
