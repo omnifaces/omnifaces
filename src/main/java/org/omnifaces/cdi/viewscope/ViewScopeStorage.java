@@ -14,8 +14,6 @@ package org.omnifaces.cdi.viewscope;
 
 import java.util.UUID;
 
-import javax.faces.context.FacesContext;
-
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 
@@ -50,10 +48,10 @@ public interface ViewScopeStorage {
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage);
 
     /**
-     * Returns {@code true} if bean storage associated with given faces context was recently destroyed.
-     * @param context The involved faces context.
-     * @return {@code true} if bean storage associated with given faces context was recently destroyed.
+     * Returns {@code true} if bean storage identified by given ID was recently destroyed.
+     * @param beanStorageId The bean storage identifier.
+     * @return {@code true} if bean storage identified by given ID was recently destroyed.
      * @since 2.7.27
      */
-    public boolean isRecentlyDestroyed(FacesContext context);
+    public boolean isRecentlyDestroyed(UUID beanStorageId);
 }
