@@ -47,11 +47,4 @@ public interface ViewScopeStorage {
 	 */
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage);
 
-    /**
-     * Returns {@code true} if bean storage identified by given ID was recently destroyed.
-     * @param beanStorageId The bean storage identifier.
-     * @return {@code true} if bean storage identified by given ID was recently destroyed.
-     * @since 4.6
-     */
-    public boolean isRecentlyDestroyed(UUID beanStorageId);
 }

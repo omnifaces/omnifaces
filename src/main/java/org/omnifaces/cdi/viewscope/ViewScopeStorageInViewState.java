@@ -59,8 +59,4 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
 		viewState.put(beanStorageId.toString(), beanStorage);
 	}
 
-	@Override
-	public boolean isRecentlyDestroyed(UUID beanStorageId) {
-	    return false;
-	}
 }
