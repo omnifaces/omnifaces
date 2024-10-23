@@ -390,6 +390,51 @@
                 </executions>
             </plugin>
 
+             <!-- have new xmlns:o="omnifaces" as well -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>rename-ui-file</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/classes/META-INF/omnifaces-ui.taglib.xml" tofile="${project.build.directory}/classes/META-INF/omnifaces-ui.urn.taglib.xml"/>
+                                <!-- Modify the copied file -->
+                                <replace file="${project.build.directory}/classes/META-INF/omnifaces-ui.urn.taglib.xml">
+                                    <replacefilter token="http://omnifaces.org/ui" value="omnifaces.ui"/>
+                                    <replacefilter token="https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_3_0.xsd" value="https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_4_0.xsd"/>
+                                    <replacefilter token="version=&quot;3.0&quot;" value="version=&quot;4.0&quot;"/>
+                                </replace>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>rename-functions-file</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/classes/META-INF/omnifaces-functions.taglib.xml" tofile="${project.build.directory}/classes/META-INF/omnifaces-functions.urn.taglib.xml"/>
+                                <!-- Modify the copied file -->
+                                <replace file="${project.build.directory}/classes/META-INF/omnifaces-functions.urn.taglib.xml">
+                                    <replacefilter token="http://omnifaces.org/functions" value="omnifaces.functions"/>
+                                    <replacefilter token="https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_3_0.xsd" value="https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_4_0.xsd"/>
+                                    <replacefilter token="version=&quot;3.0&quot;" value="version=&quot;4.0&quot;"/>
+                                </replace>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Configure snapshot deployment to Sonatype. -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
