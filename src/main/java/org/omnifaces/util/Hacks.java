@@ -228,8 +228,10 @@ public final class Hacks {
      */
     public static void setComponentResourceUniqueId(FacesContext context, UIComponent resource) {
         var view = context.getViewRoot();
+        Object originalMyFacesValue = null;
 
         if (isMyFacesUsed()) {
+            originalMyFacesValue = view.getAttributes().get(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID);
             view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, TRUE);
         }
 
@@ -238,7 +240,8 @@ public final class Hacks {
         }
         finally {
             if (isMyFacesUsed()) {
-                view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, FALSE);
+                Object restoreValue = originalMyFacesValue != null ? originalMyFacesValue : FALSE;
+                view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, restoreValue);
             }
         }
     }
