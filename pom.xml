@@ -465,10 +465,11 @@
                     <links>
                         <link>https://jakarta.ee/specifications/platform/${jakartaee.version}/apidocs/</link>
                     </links>
+                    <outputDirectory>${project.build.directory}/docs</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <id>generate-apidocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -478,32 +479,9 @@
 
             <!-- Configure the vdldoc generator. -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.6.3</version>
-                <executions>
-                    <execution>
-                        <id>generate-vdldoc</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includePluginDependencies>true</includePluginDependencies>
-                    <mainClass>org.omnifaces.vdldoc.Main</mainClass>
-                    <arguments>
-                        <argument>-d</argument>
-                        <argument>${project.build.directory}/reports/vdldoc</argument>
-                        <argument>-windowtitle</argument>
-                        <argument>OmniFaces ${project.version} VDL Documentation</argument>
-                        <argument>-doctitle</argument>
-                        <argument>OmniFaces ${project.version} VDL Documentation</argument>
-                        <argument>src/main/resources/META-INF/omnifaces.taglib.xml</argument>
-                        <argument>src/main/resources/META-INF/omnifaces-security.taglib.xml</argument>
-                    </arguments>
-                </configuration>
+                <groupId>com.github.matinh.vdldoc</groupId>
+                <artifactId>vdldoc-maven-plugin</artifactId>
+                <version>2.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.omnifaces</groupId>
@@ -511,6 +489,24 @@
                         <version>3.2</version>
                     </dependency>
                 </dependencies>
+                <executions>
+                    <execution>
+                        <id>generate-vdldoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>vdldoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <browserTitle>OmniFaces ${project.version} VDL Documentation</browserTitle>
+                    <documentTitle>OmniFaces ${project.version} VDL Documentation</documentTitle>
+                    <includes>
+                        <include>src/main/resources/META-INF/omnifaces.taglib.xml</include>
+                        <include>src/main/resources/META-INF/omnifaces-security.taglib.xml</include>
+                    </includes>
+                    <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
+                </configuration>
             </plugin>
 
             <!-- Configure snapshot deployment (release deployment is done via 'release' profile). -->
