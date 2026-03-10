@@ -30,7 +30,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Collection of EL functions for string manipulation: <code>o:abbreviate()</code>, <code>o:capitalize()</code>, <code>o:concat()</code>,
  * <code>o:prettyURL()</code>, <code>o:encodeURL()</code>, <code>o:encodeURI()</code>, <code>o:encodeBase64()</code>,
- * <code>o:escapeJS()</code>,  <code>o:stripTags()</code>, <code>o:formatX()</code>, and <code>o:getFlagEmoji()</code>.
+ * <code>o:escapeJS()</code>,  <code>o:stripTags()</code>, <code>o:formatX()</code>, and <code>o:flagEmoji()</code>.
  * <p>
  * Instead of <code>o:formatX()</code>, you can also use <code>&lt;o:outputFormat&gt;</code>.
  *
