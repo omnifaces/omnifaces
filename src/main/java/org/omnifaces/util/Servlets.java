@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -650,13 +651,14 @@ public final class Servlets {
      * Sends a permanent (301) redirect to the given URL.
      * @param response The involved HTTP servlet response.
      * @param url The URL to permanently redirect the current response to.
+     * @throws IllegalArgumentException When given URL is invalid.
      * @see HttpServletResponse#setStatus(int)
      * @see HttpServletResponse#setHeader(String, String)
      * @since 3.6
      */
     public static void redirectPermanent(HttpServletResponse response, String url) {
         response.setStatus(SC_MOVED_PERMANENTLY);
-        response.setHeader("Location", url);
+        response.setHeader("Location", URI.create(url).toString());
         response.setHeader("Connection", "close");
     }
 
@@ -948,6 +950,7 @@ public final class Servlets {
      * @param response The involved HTTP servlet response.
      * @param url The URL to redirect the current response to.
      * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
+     * @throws IllegalArgumentException When given URL is invalid.
      * @throws UncheckedIOException Whenever something fails at I/O level.
      * @since 2.0
      */
@@ -959,7 +962,7 @@ public final class Servlets {
                 setNoCacheHeaders(request, response);
                 response.setContentType("text/xml");
                 response.setCharacterEncoding(UTF_8.name());
-                response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL.replace("&", "&amp;"));
+                response.getWriter().printf(FACES_AJAX_REDIRECT_XML, URI.create(url).toString().replace("&", "&amp;"));
             }
             else {
                 response.sendRedirect(redirectURL);
