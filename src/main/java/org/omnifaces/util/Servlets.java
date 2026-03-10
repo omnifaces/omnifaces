@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -656,7 +657,7 @@ public final class Servlets {
      */
     public static void redirectPermanent(HttpServletResponse response, String url) {
         response.setStatus(SC_MOVED_PERMANENTLY);
-        response.setHeader("Location", url);
+        response.setHeader("Location", URI.create(url).toString());
         response.setHeader("Connection", "close");
     }
 
@@ -936,7 +937,7 @@ public final class Servlets {
                 setNoCacheHeaders(request, response);
                 response.setContentType("text/xml");
                 response.setCharacterEncoding(UTF_8.name());
-                response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL.replace("&", "&amp;"));
+                response.getWriter().printf(FACES_AJAX_REDIRECT_XML, URI.create(redirectURL).toString().replace("&", "&amp;"));
             }
             else {
                 response.sendRedirect(redirectURL);
