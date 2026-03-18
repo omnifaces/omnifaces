@@ -72,7 +72,7 @@
         <test.glassfish-mojarra.version>8.0.0</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
         <test.tomcat.version>11.0.18</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.payara-mojarra.version>7.2026.2</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
-        <test.quarkus.version>3.31.4</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
+        <test.quarkus.version>3.32.3</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
         <test.piranha.version>25.6.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
@@ -1064,7 +1064,7 @@
                 <dependency>
                     <groupId>io.quarkiverse.omnifaces</groupId>
                     <artifactId>quarkus-omnifaces</artifactId>
-                    <version>5.0-M6</version>
+                    <version>5.1.0</version>
                     <scope>test</scope>
                     <exclusions>
                         <exclusion>
