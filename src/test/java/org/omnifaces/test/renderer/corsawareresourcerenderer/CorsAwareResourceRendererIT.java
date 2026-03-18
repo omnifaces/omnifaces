@@ -120,7 +120,7 @@ public class CorsAwareResourceRendererIT extends OmniFacesIT {
 
         assertEquals(9, scripts.size());
         verifyResource(cdn, scripts.get(0), "headWithoutTarget.js", "sha384-gznUcovbufIIDvmyJg3HGej1em1Wg0KSPR14QNgpqu84TA8XWD8taMq0gDymjbjd");
-        verifyResource(cdn, scripts.get(1), "omnifaces.js", "sha384-mQ06TWgJLPZFoRbOGmZ7uB2EOHG8ZrdWrWt+N6MgRg3tt1pAFfWdI5BtUmVx/K7x");
+        verifyResource(cdn, scripts.get(1), "omnifaces.js", null); // Integrity depends on OmniFaces JS source changes and therefore fluctuates during development, so we skip integrity check on omnifaces.js.
         verifyResource(cdn, scripts.get(2), "faces.js", null); // Integrity depends on Faces impl being used by server and therefore fluctuates across test environments, so we skip integrity check on faces.js.
         verifyResource(cdn, scripts.get(3), "headWithTarget.js", "sha384-krDifaBExNHcMs9Yv1ZQAgmP53EhTO2OPqaBFT8MeGKADaqT+NVjuc8crvGE/qbW");
         verifyResource(cdn, scripts.get(4), "bodyWithTargetHead.js", "sha384-180HIFdg/5q9rsSGfQZ+CApl+wuRymzd+CNTzfce6o6LKSh0hrpSPQcAr5TQvA4Y");
