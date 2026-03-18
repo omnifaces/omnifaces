@@ -71,16 +71,16 @@ import org.omnifaces.util.State;
  * <p>
  * The {@link ScriptError} event provides the following information:
  * <ul>
- * <li>{@link ScriptError#pageURL()} — the URL of the page where the error occurred.</li>
- * <li>{@link ScriptError#errorMessage()} — the error message.</li>
- * <li>{@link ScriptError#sourceURL()} — the URL of the script file where the error occurred.</li>
- * <li>{@link ScriptError#lineNumber()} — the line number in the script.</li>
- * <li>{@link ScriptError#columnNumber()} — the column number in the script.</li>
- * <li>{@link ScriptError#errorName()} — the error type (e.g. "TypeError", "ReferenceError").</li>
- * <li>{@link ScriptError#errorStack()} — the full stack trace.</li>
- * <li>{@link ScriptError#remoteAddr()} — the remote address.</li>
- * <li>{@link ScriptError#userAgent()} — the User-Agent header.</li>
- * <li>{@link ScriptError#userPrincipal()} — the authenticated user principal name.</li>
+ * <li>{@link ScriptError#pageURL()}: the URL of the page where the error occurred.</li>
+ * <li>{@link ScriptError#errorMessage()}: the error message.</li>
+ * <li>{@link ScriptError#sourceURL()}: the URL of the script file where the error occurred.</li>
+ * <li>{@link ScriptError#lineNumber()}: the line number in the script.</li>
+ * <li>{@link ScriptError#columnNumber()}: the column number in the script.</li>
+ * <li>{@link ScriptError#errorName()}: the error type (e.g. "TypeError", "ReferenceError").</li>
+ * <li>{@link ScriptError#errorStack()}: the full stack trace.</li>
+ * <li>{@link ScriptError#remoteAddr()}: the remote address.</li>
+ * <li>{@link ScriptError#userAgent()}: the User-Agent header.</li>
+ * <li>{@link ScriptError#userPrincipal()}: the authenticated user principal name.</li>
  * </ul>
  *
  *

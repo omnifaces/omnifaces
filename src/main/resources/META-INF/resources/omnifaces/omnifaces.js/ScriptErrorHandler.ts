@@ -83,7 +83,6 @@ export namespace ScriptErrorHandler {
             const key = params.errorMessage + params.sourceURL + params.lineNumber;
             const now = Date.now();
 
-            // Evict expired entries.
             while (recentErrors.length > 0 && now - recentErrors[0].time > config.errorExpiry) {
                 recentErrors.shift();
             }
@@ -109,7 +108,7 @@ export namespace ScriptErrorHandler {
             navigator.sendBeacon(config.endpointURL, data);
         }
         catch (e) {
-            // Fail silently; don't cause additional errors while reporting errors.
+            // Fail silently. We don't want to cause additional errors while reporting errors.
         }
     }
 
