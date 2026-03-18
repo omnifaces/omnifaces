@@ -1,0 +1,53 @@
+<!--
+
+    Copyright OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+    xmlns:f="jakarta.faces.core"
+    xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:o="omnifaces"
+>
+    <h:head>
+        <o:scriptErrorHandler ignoreSelector=".ignore-errors" />
+    </h:head>
+
+    <h:body>
+        <h:link id="triggerError" value="triggerError" onclick="triggerError(); return false;" />
+        <h:link id="triggerRejection" value="triggerRejection" onclick="triggerRejection(); return false;" />
+
+        <o:form id="poll">
+            <h:commandButton id="pollResult" value="pollResult">
+                <f:ajax render=":errorMessage :errorName :pageURL" />
+            </h:commandButton>
+            <h:commandButton id="reset" value="reset" action="#{scriptErrorHandlerITBean.reset}">
+                <f:ajax render=":errorMessage :errorName :pageURL" />
+            </h:commandButton>
+        </o:form>
+
+        <h:outputText id="errorMessage" value="#{scriptErrorHandlerITBean.lastErrorMessage}" />
+        <h:outputText id="errorName" value="#{scriptErrorHandlerITBean.lastErrorName}" />
+        <h:outputText id="pageURL" value="#{scriptErrorHandlerITBean.lastPageURL}" />
+
+        <script>
+            function triggerError() {
+                nonExistentFunction();
+            }
+
+            function triggerRejection() {
+                Promise.reject(new Error("testRejection"));
+            }
+        </script>
+    </h:body>
+</html>

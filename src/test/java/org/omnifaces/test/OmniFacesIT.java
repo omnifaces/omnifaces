@@ -234,13 +234,25 @@ public abstract class OmniFacesIT {
     }
 
     protected void waitUntilTextContent(String elementId) {
+        waitUntilTextContent(elementId, null);
+    }
+
+    protected void waitUntilTextContent(String elementId, Runnable ajaxPoller) {
         waitUntil(() -> {
             try {
-                return !browser.findElement(By.id(elementId)).getText().isBlank();
+                if (!browser.findElement(By.id(elementId)).getText().isBlank()) {
+                    return true;
+                }
             }
             catch (StaleElementReferenceException ignore) {
-                return false; // Will retry next.
+                // Will retry next.
             }
+
+            if (ajaxPoller != null) {
+                guardAjax(ajaxPoller);
+            }
+
+            return false;
         });
     }
 
