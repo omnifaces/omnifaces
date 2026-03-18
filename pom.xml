@@ -179,7 +179,7 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
-            <version>1.10.0.Final</version>
+            <version>1.8.0.Final</version> <!-- Do not upgrade beyond 1.8.0 until Liberty/Quarkus Arquillian adapters support the Container<T> generics change introduced in 1.8.1. -->
             <scope>test</scope>
         </dependency>
         <dependency>
