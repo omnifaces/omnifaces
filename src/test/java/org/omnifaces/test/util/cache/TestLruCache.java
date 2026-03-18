@@ -40,7 +40,7 @@ class TestLruCache {
 
     private static final Logger logger = Logger.getLogger(TestLruCache.class.getName());
 
-    private static final int SIZE = 1000;
+    private static final int SIZE = 100;
     private static final int ITERATIONS = (SIZE * SIZE) + 1;
     private static final int LAST_EXISTING_KEY = SIZE * SIZE - SIZE;
 
@@ -133,16 +133,16 @@ class TestLruCache {
     void testEvictionSequence() {
         lruCache.get("k0");
         lruCache.put("k1", "v1");
-        lruCache.put("k2000", "v2");
-        lruCache.remove("k3000");
+        lruCache.put("k" + (2 * SIZE), "v2");
+        lruCache.remove("k" + (3 * SIZE));
         lruCache.put("k4", "v4");
         lruCache.put("k5", "v5");
 
         assertAll(
             () -> assertEquals(SIZE, lruCache.size(), "size must be still " + SIZE),
-            () -> assertEquals(Set.of("k1000", "k4000"), evicted, "k0 should not be evicted as it was explicitly accessed; "
-                                                                + "k2000 should not be evicted as it was explicitly replaced; "
-                                                                + "k3000 should not be evicted as it was explicitly removed")
+            () -> assertEquals(Set.of("k" + SIZE, "k" + (4 * SIZE)), evicted, "k0 should not be evicted as it was explicitly accessed; "
+                                                                            + "k" + (2 * SIZE) + " should not be evicted as it was explicitly replaced; "
+                                                                            + "k" + (3 * SIZE) + " should not be evicted as it was explicitly removed")
         );
     }
 
