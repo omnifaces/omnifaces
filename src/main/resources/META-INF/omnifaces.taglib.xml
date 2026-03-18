@@ -568,6 +568,54 @@ input.error, select.error, textarea.error {
     <tag>
         <description>
             <![CDATA[
+                <strong><code>o:scriptErrorHandler</code></strong> catches uncaught JavaScript errors and unhandled promise
+                rejections on the client and sends them to the server, where they are fired as
+                <code>org.omnifaces.cdi.ScriptError</code> CDI events.
+                <p>
+                For detailed usage instructions, see <code>org.omnifaces.component.script.ScriptErrorHandler</code> javadoc.
+            ]]>
+        </description>
+        <tag-name>scriptErrorHandler</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.script.ScriptErrorHandler</component-type>
+        </component>
+        <attribute>
+            <description>
+                <![CDATA[
+                    CSS selector for elements whose presence suppresses error reporting.
+                    When an element matching this selector exists in the document, errors will not be sent to the server.
+                    For example, <code>body.errorPage</code> to suppress reporting on error pages having <code>&lt;h:body styleClass="errorPage"&gt;</code>.
+                ]]>
+            </description>
+            <name>ignoreSelector</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The maximum number of recent errors to keep for deduplication. Defaults to <code>100</code>.
+                ]]>
+            </description>
+            <name>maxRecentErrors</name>
+            <required>false</required>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    The time in milliseconds after which a recent error entry expires for deduplication. Defaults to <code>60000</code> (1 minute).
+                ]]>
+            </description>
+            <name>errorExpiry</name>
+            <required>false</required>
+            <type>int</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            <![CDATA[
                 <p><strong>o:conditionalComment</strong> is an <code>UIComponent</code> which renders a conditional comment. Conditional
                 comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
                 the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:

@@ -32,6 +32,7 @@ import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
+import org.omnifaces.servlet.ScriptErrorServlet;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
@@ -58,6 +59,7 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
+ * <li>Register {@link ScriptErrorServlet} if necessary.
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
@@ -110,6 +112,7 @@ public class ApplicationListener extends DefaultServletContextListener {
             EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
             GraphicResource.registerGraphicImageBeans();
             Socket.registerEndpointIfNecessary(servletContext);
+            ScriptErrorServlet.registerIfNecessary(servletContext);
         }
         catch (Exception | LinkageError e) {
             if (skipDeploymentException) {
