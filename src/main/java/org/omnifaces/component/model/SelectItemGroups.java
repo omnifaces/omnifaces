@@ -29,7 +29,9 @@ import jakarta.faces.component.UISelectItems;
 import jakarta.faces.model.SelectItem;
 import jakarta.faces.model.SelectItemGroup;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ScopedRunner;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -55,7 +57,7 @@ import org.omnifaces.el.ScopedRunner;
  * @author Bauke Scholtz
  * @since 3.0
  */
-@FacesComponent(SelectItemGroups.COMPONENT_TYPE)
+@FacesComponent(value = SelectItemGroups.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SelectItemGroups extends UISelectItems {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -67,6 +69,11 @@ public class SelectItemGroups extends UISelectItems {
 
     private static final String ERROR_EXPRESSION_DISALLOWED =
         "A value expression is disallowed on 'var' attribute of SelectItemGroups.";
+
+    private enum PropertyKeys {
+        VAR, itemLabel, itemValue;
+        @Override public String toString() { return this == VAR ? "var" : name(); }
+    }
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -137,6 +144,73 @@ public class SelectItemGroups extends UISelectItems {
     private static Object getItemValue(Map<String, Object> attributes, Object defaultValue) {
         Object itemValue = attributes.get("itemValue");
         return itemValue != null || attributes.containsKey("itemValue") ? itemValue : defaultValue;
+    }
+
+    // Attribute getters/setters --------------------------------------------------------------------------------------
+
+    /**
+     * Returns the name of the EL variable which exposes the currently iterated select item group.
+     * Defaults to {@code item}.
+     * @return The name of the EL variable.
+     */
+    public String getVar() {
+        return (String) getStateHelper().eval(PropertyKeys.VAR);
+    }
+
+    /**
+     * Sets the name of the EL variable which exposes the currently iterated select item group.
+     * Defaults to {@code item}.
+     * @param var The name of the EL variable.
+     */
+    public void setVar(String var) {
+        getStateHelper().put(PropertyKeys.VAR, var);
+    }
+
+    /**
+     * Returns the label of the select item group.
+     * Defaults to the String representation of {@code itemValue}.
+     * @return The label of the select item group.
+     */
+    public String getItemLabel() {
+        return (String) getStateHelper().eval(PropertyKeys.itemLabel);
+    }
+
+    /**
+     * Sets the label of the select item group.
+     * Defaults to the String representation of {@code itemValue}.
+     * @param itemLabel The label of the select item group.
+     */
+    public void setItemLabel(String itemLabel) {
+        getStateHelper().put(PropertyKeys.itemLabel, itemLabel);
+    }
+
+    /**
+     * Returns the value of the select item group.
+     * This will be exposed to any nested UISelectItem(s) children.
+     * Defaults to the currently iterated select item group.
+     * @return The value of the select item group.
+     */
+    public Object getItemValue() {
+        return getStateHelper().eval(PropertyKeys.itemValue);
+    }
+
+    /**
+     * Sets the value of the select item group.
+     * This will be exposed to any nested UISelectItem(s) children.
+     * Defaults to the currently iterated select item group.
+     * @param itemValue The value of the select item group.
+     */
+    public void setItemValue(Object itemValue) {
+        getStateHelper().put(PropertyKeys.itemValue, itemValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @FacesAttribute(required = true)
+    public void setValue(Object value) {
+        super.setValue(value);
     }
 
 }

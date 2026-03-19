@@ -24,6 +24,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.validator.FacesValidator;
 import jakarta.faces.validator.Validator;
 import jakarta.faces.validator.ValidatorException;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -64,6 +66,7 @@ import jakarta.faces.validator.ValidatorException;
  *
  * @author Bauke Scholtz
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesValidator("omnifaces.RequiredCheckboxValidator")
 public class RequiredCheckboxValidator implements Validator<Boolean> {
 

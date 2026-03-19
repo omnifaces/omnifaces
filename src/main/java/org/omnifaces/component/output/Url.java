@@ -34,6 +34,7 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -115,7 +116,7 @@ import org.omnifaces.util.State;
  * @since 2.4
  * @see OutputFamily
  */
-@FacesComponent(Url.COMPONENT_TYPE)
+@FacesComponent(value = Url.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class Url extends OutputFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -229,7 +230,7 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Returns the target URL.
+     * Returns the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
      * @return The target URL.
      */
     public String getValue() {
@@ -237,7 +238,7 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets the target URL.
+     * Sets the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
      * @param value The target URL.
      */
     public void setValue(String value) {
@@ -245,7 +246,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Returns the view ID to create URL for. Defaults to current view ID.
+     * Returns the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value}
+     * attribute is specified.
      * @return The view ID to create URL for.
      */
     public String getViewId() {
@@ -253,7 +255,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets the view ID to create URL for.
+     * Sets the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value}
+     * attribute is specified.
      * @param viewId The view ID to create URL for.
      */
     public void setViewId(String viewId) {
@@ -269,7 +272,7 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets the domain of the URL.
+     * Sets the domain of the URL. Defaults to current domain.
      * @param domain The domain of the URL.
      */
     public void setDomain(String domain) {
@@ -286,8 +289,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets whether or not the view parameters should be encoded into the URL.
-     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * Sets whether or not the view parameters should be encoded into the URL. Defaults to {@code false}.
+     * This setting is ignored when {@code includeRequestParams} is set to {@code true}.
      * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
      */
     public void setIncludeViewParams(boolean includeViewParams) {
@@ -304,8 +307,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets whether or not the request query string parameters should be encoded into the URL.
-     * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+     * Sets whether or not the request query string parameters should be encoded into the URL. Defaults to
+     * {@code false}. When set to {@code true}, then this will override the {@code includeViewParams} setting.
      * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {

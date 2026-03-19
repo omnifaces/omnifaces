@@ -23,11 +23,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.io.ResettableBuffer;
 import org.omnifaces.io.ResettableBufferedOutputStream;
 import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -47,13 +49,19 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * @see ResettableBufferedWriter
  * @see OutputFamily
  */
-@FacesComponent(ResourceInclude.COMPONENT_TYPE)
+@FacesComponent(value = ResourceInclude.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ResourceInclude extends OutputFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
     /** The component type, which is {@value org.omnifaces.component.output.ResourceInclude#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
+
+    // Private constants ----------------------------------------------------------------------------------------------
+
+    private enum PropertyKeys {
+        path
+    }
 
     // UIComponent overrides ------------------------------------------------------------------------------------------
 
@@ -71,13 +79,34 @@ public class ResourceInclude extends OutputFamily {
         var bufferedResponse = new BufferedHttpServletResponse(response);
 
         try {
-            request.getRequestDispatcher((String) getAttributes().get("path")).include(request, bufferedResponse);
+            request.getRequestDispatcher(getPath()).include(request, bufferedResponse);
         }
         catch (ServletException e) {
             throw new FacesException(e);
         }
 
         context.getResponseWriter().write(bufferedResponse.getBufferAsString());
+    }
+
+    // Attribute getters/setters --------------------------------------------------------------------------------------
+
+    /**
+     * Returns the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to
+     * the current context root.
+     * @return The pathname to the resource.
+     */
+    public String getPath() {
+        return (String) getStateHelper().eval(PropertyKeys.path);
+    }
+
+    /**
+     * Sets the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to
+     * the current context root.
+     * @param path The pathname to the resource.
+     */
+    @FacesAttribute(required = true)
+    public void setPath(String path) {
+        getStateHelper().put(PropertyKeys.path, path);
     }
 
 }

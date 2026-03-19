@@ -20,6 +20,7 @@ import jakarta.faces.convert.Converter;
 
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.facesviews.FacesViewsViewHandler;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * The <code>&lt;o:pathParam&gt;</code> is a component that extends the OmniFaces {@link Param} to support
@@ -61,7 +62,7 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
  * @see FacesViews
  * @see FacesViewsViewHandler#getBookmarkableURL(FacesContext, String, java.util.Map, boolean)
  */
-@FacesComponent(PathParam.COMPONENT_TYPE)
+@FacesComponent(value = PathParam.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class PathParam<T> extends Param<T> {
 
     // Constants

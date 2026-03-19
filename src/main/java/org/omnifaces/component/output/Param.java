@@ -25,6 +25,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -56,7 +57,7 @@ import org.omnifaces.component.ParamHolder;
  * @since 1.4
  * @see ParamHolder
  */
-@FacesComponent(Param.COMPONENT_TYPE)
+@FacesComponent(value = Param.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class Param<T> extends UIParameter implements ParamHolder<T> {
 
     // Public constants -----------------------------------------------------------------------------------------------

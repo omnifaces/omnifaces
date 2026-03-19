@@ -55,6 +55,7 @@ import org.omnifaces.util.cache.DefaultCache;
 import org.omnifaces.util.cache.DefaultCacheProvider;
 import org.omnifaces.util.cache.LruCache;
 import org.omnifaces.util.cache.TimeToLiveCache;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -158,7 +159,7 @@ import org.omnifaces.util.cache.TimeToLiveCache;
  * @see ResettableBufferedWriter
  * @see OutputFamily
  */
-@FacesComponent(Cache.COMPONENT_TYPE)
+@FacesComponent(value = Cache.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class Cache extends OutputFamily {
 
     /** The component type, which is {@value org.omnifaces.component.output.Cache#COMPONENT_TYPE}. */

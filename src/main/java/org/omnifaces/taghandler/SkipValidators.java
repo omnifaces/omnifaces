@@ -39,6 +39,8 @@ import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.validator.ValidateMultipleFields;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -71,6 +73,7 @@ import org.omnifaces.component.validator.ValidateMultipleFields;
  * @author Bauke Scholtz
  * @since 2.3
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SkipValidators extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------

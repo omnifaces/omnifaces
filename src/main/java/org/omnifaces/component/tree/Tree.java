@@ -43,6 +43,7 @@ import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.SortedTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -117,7 +118,7 @@ import org.omnifaces.util.State;
  * @see ListTreeModel
  * @see SortedTreeModel
  */
-@FacesComponent(Tree.COMPONENT_TYPE)
+@FacesComponent(value = Tree.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
 public class Tree extends TreeFamily implements NamingContainer {
 
@@ -504,15 +505,15 @@ public class Tree extends TreeFamily implements NamingContainer {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the tree model.
-     * @return The tree model
+     * Returns the tree model. Only {@link TreeModel} is allowed as value.
+     * @return The tree model.
      */
     public Object getValue() {
         return state.get(PropertyKeys.value);
     }
 
     /**
-     * Sets the tree model.
+     * Sets the tree model. Only {@link TreeModel} is allowed as value.
      * @param value The tree model.
      */
     public void setValue(Object value) {

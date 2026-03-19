@@ -22,6 +22,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.validator.ValidatorException;
 
 import org.omnifaces.validator.MultiFieldValidator;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
  * <p>
@@ -74,7 +76,8 @@ import org.omnifaces.validator.MultiFieldValidator;
  * @see ValidatorFamily
  * @see MultiFieldValidator
  */
-@FacesComponent(ValidateMultiple.COMPONENT_TYPE)
+@FacesComponent(value = ValidateMultiple.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
+@FacesComponentConfig(componentHandler = ValidateMultipleHandler.class)
 public class ValidateMultiple extends ValidateMultipleFields {
 
     // Public constants -----------------------------------------------------------------------------------------------

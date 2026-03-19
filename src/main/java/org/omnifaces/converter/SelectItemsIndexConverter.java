@@ -31,6 +31,8 @@ import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -80,6 +82,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @see SelectItemsUtils
  * @see SelectItemsCollector
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
 public class SelectItemsIndexConverter implements Converter<Object> {
 

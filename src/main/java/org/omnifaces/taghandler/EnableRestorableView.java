@@ -30,6 +30,8 @@ import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.viewhandler.OmniViewHandler;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -74,6 +76,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * @since 1.3
  * @see OmniViewHandler
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class EnableRestorableView extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------

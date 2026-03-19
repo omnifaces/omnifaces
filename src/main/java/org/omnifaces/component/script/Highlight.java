@@ -34,6 +34,7 @@ import jakarta.faces.component.visit.VisitResult;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -78,7 +79,7 @@ import org.omnifaces.util.State;
  * @see OnloadScript
  * @see ScriptFamily
  */
-@FacesComponent(Highlight.COMPONENT_TYPE)
+@FacesComponent(value = Highlight.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ResourceDependency(library=FACES_SCRIPT_LIBRARY_NAME, name=FACES_SCRIPT_RESOURCE_NAME, target="head") // Required for faces.ajax.request.
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Highlight.ts.
 public class Highlight extends OnloadScript {
@@ -165,7 +166,7 @@ public class Highlight extends OnloadScript {
     }
 
     /**
-     * Sets the error style class which is to be applied on invalid inputs.
+     * Sets the error style class which is to be applied on invalid inputs. Defaults to {@code "error"}.
      * @param styleClass The error style class which is to be applied on invalid inputs.
      */
     public void setStyleClass(String styleClass) {
@@ -181,7 +182,7 @@ public class Highlight extends OnloadScript {
     }
 
     /**
-     * Sets whether the first error element should gain focus.
+     * Sets whether the first error element should gain focus. Defaults to {@code true}.
      * @param focus Whether the first error element should gain focus.
      */
     public void setFocus(boolean focus) {

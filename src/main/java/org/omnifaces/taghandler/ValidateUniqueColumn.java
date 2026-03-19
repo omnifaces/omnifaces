@@ -36,6 +36,10 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
+
 /**
  * <p>
  * The <code>&lt;o:validateUniqueColumn&gt;</code> validates if the given {@link UIInput} component in an {@link UIData}
@@ -73,6 +77,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * @author Bauke Scholtz
  * @since 1.3
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ValidateUniqueColumn extends TagHandler implements ValueChangeListener {
 
     // Private constants ----------------------------------------------------------------------------------------------
@@ -87,7 +92,10 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(description = "The validator message to be shown on failure. Any \"{0}\" placeholder in the message will be substituted with the label of the input component. Any \"{1}\" placeholder will be substituted with the 1-based row index of the data model.")
     private ValueExpression message;
+
+    @FacesAttribute(description = "Whether the validation should be disabled or not. Defaults to false.")
     private ValueExpression disabled;
 
     // Constructors ---------------------------------------------------------------------------------------------------

@@ -36,6 +36,8 @@ import org.omnifaces.model.IterableDataModel;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.Utils;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
@@ -58,6 +60,7 @@ import org.omnifaces.util.Utils;
  * @see IterableDataModel
  * @see Json
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Converters {
 
     // Constants ------------------------------------------------------------------------------------------------------

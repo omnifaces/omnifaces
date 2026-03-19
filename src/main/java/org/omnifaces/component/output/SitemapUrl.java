@@ -38,6 +38,7 @@ import jakarta.faces.context.FacesContext;
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -103,7 +104,7 @@ import org.omnifaces.util.State;
  * @see OutputFamily
  * @see ViewResourceHandler
  */
-@FacesComponent(SitemapUrl.COMPONENT_TYPE)
+@FacesComponent(value = SitemapUrl.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SitemapUrl extends OutputFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------

@@ -24,7 +24,6 @@ import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;

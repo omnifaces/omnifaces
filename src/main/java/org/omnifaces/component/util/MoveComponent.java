@@ -40,6 +40,8 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -64,7 +66,7 @@ import org.omnifaces.util.State;
  * @author Arjan Tijms
  * @see UtilFamily
  */
-@FacesComponent(MoveComponent.COMPONENT_TYPE)
+@FacesComponent(value = MoveComponent.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class MoveComponent extends UtilFamily implements SystemEventListener, ClientBehaviorHolder {
 
     /** The component type, which is {@value org.omnifaces.component.util.MoveComponent#COMPONENT_TYPE}. */
@@ -294,6 +296,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
        * Sets ID of the target component for which the component moving will be done.
        * @param forValue ID of the target component for which the component moving will be done.
        */
+    @FacesAttribute(required = true)
     public void setFor(String forValue) {
         state.put("for", forValue);
     }

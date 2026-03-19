@@ -41,7 +41,10 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Faces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -144,6 +147,7 @@ import org.omnifaces.util.Faces;
  * @author Bauke Scholtz
  * @since 2.0
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ViewParamValidationFailed extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -164,8 +168,13 @@ public class ViewParamValidationFailed extends TagHandler {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(description = "The URL to send redirect to on validation failure. This attribute is required when the sendError attribute is absent.")
     private ValueExpression sendRedirect;
+
+    @FacesAttribute(description = "The HTTP status to send error with on validation failure. This attribute cannot be specified when the sendRedirect is already specified.")
     private ValueExpression sendError;
+
+    @FacesAttribute(description = "The message to send along with the redirect or error. If this attribute is not specified, then by default the validation error message will be used.")
     private ValueExpression message;
 
     // Constructors ---------------------------------------------------------------------------------------------------

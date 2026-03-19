@@ -27,6 +27,7 @@ import jakarta.faces.event.ActionEvent;
 import jakarta.faces.event.FacesEvent;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -75,7 +76,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @since 2.2
  */
-@FacesComponent(ViewAction.COMPONENT_TYPE)
+@FacesComponent(value = ViewAction.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ViewAction extends UIViewAction {
 
     // Constants ------------------------------------------------------------------------------------------------------

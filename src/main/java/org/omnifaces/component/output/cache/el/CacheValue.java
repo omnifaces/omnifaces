@@ -22,6 +22,9 @@ import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.output.Cache;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * CacheValue is a replacement for <code>ui:param</code> and <code>c:set</code> that only evaluates a value expression once
@@ -33,9 +36,13 @@ import org.omnifaces.component.output.Cache;
  * @author Arjan Tijms
  *
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class CacheValue extends TagHandler {
 
+    @FacesAttribute(required = true, description = "Name under which the value expression will be made available to EL, scoped to the Facelet in which this tag occurs.")
     private final TagAttribute name;
+
+    @FacesAttribute(required = true, description = "The value expression for which its value will be cached on demand and made available as a new value expression.")
     private final TagAttribute value;
 
     /**

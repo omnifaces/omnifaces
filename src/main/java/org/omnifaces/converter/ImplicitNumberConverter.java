@@ -25,6 +25,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.convert.NumberConverter;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTag;
+
 /**
  * <p>
  * This converter won't output the percent or currency symbols, that's up to the UI. This converter will implicitly
@@ -56,10 +60,20 @@ import jakarta.faces.convert.NumberConverter;
  * @author Bauke Scholtz
  * @since 3.0
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ImplicitNumberConverter")
 public class ImplicitNumberConverter extends NumberConverter {
 
     private static final Pattern PATTERN_NUMBER = Pattern.compile("[\\d,.]+");
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @FacesAttribute(required = true)
+    public void setType(String type) {
+        super.setType(type);
+    }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object modelValue) {

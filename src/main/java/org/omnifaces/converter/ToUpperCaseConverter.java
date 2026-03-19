@@ -19,6 +19,8 @@ import java.util.Locale;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.FacesConverter;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -47,6 +49,7 @@ import jakarta.faces.convert.FacesConverter;
  * @see TrimConverter
  * @since 2.6
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ToUpperCaseConverter")
 public class ToUpperCaseConverter extends TrimConverter {
 

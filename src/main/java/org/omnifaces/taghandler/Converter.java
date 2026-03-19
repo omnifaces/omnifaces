@@ -32,9 +32,12 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagHandlerDelegate;
 
 import org.omnifaces.cdi.converter.ConverterManager;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -71,7 +74,19 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * @author Bauke Scholtz
  * @see DeferredTagHandlerHelper
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE, converterId = "omnifaces.Converter")
 public class Converter extends ConverterHandler implements DeferredTagHandler {
+
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    @FacesAttribute(description = "Converter identifier of the Converter to be created and registered.")
+    private final TagAttribute converterId;
+
+    @FacesAttribute(description = "A ValueExpression that evaluates to an object that implements the jakarta.faces.convert.Converter interface.")
+    private final TagAttribute binding;
+
+    @FacesAttribute(name = "for", description = "If present, this attribute refers to the value of one of the exposed attached objects within the composite component inside of which this tag is nested.")
+    private final TagAttribute forValue;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -81,6 +96,9 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
      */
     public Converter(ConverterConfig config) {
         super(config);
+        converterId = getAttribute("converterId");
+        binding = getAttribute("binding");
+        forValue = getAttribute("for");
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

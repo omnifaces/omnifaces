@@ -39,6 +39,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.cdi.GraphicImageBean;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.resourcehandler.DefaultResourceHandler;
@@ -203,7 +204,7 @@ import org.omnifaces.util.State;
  * @see ExpressionInspector
  * @see MethodReference
  */
-@FacesComponent(GraphicImage.COMPONENT_TYPE)
+@FacesComponent(value = GraphicImage.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically GraphicImage.ts.
 public class GraphicImage extends HtmlGraphicImage {
 
@@ -219,6 +220,11 @@ public class GraphicImage extends HtmlGraphicImage {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
+        name,
+        library,
+        type,
+        fragment,
+        lastModified,
         dataURI,
         lazy;
     }
@@ -270,7 +276,7 @@ public class GraphicImage extends HtmlGraphicImage {
      * @throws IOException When something fails at I/O level.
      */
     protected String getSrc(FacesContext context) throws IOException {
-        var name = (String) getAttributes().get("name");
+        var name = getName();
         boolean dataURI = isDataURI();
 
         Resource resource;
@@ -294,7 +300,7 @@ public class GraphicImage extends HtmlGraphicImage {
         }
 
         String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
-        var fragment = (String) getAttributes().get("fragment");
+        var fragment = getFragment();
 
         if (dataURI || isEmpty(fragment)) {
             return url;
@@ -304,7 +310,7 @@ public class GraphicImage extends HtmlGraphicImage {
     }
 
     private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
-        var library = (String) getAttributes().get("library");
+        var library = getLibrary();
         Resource resource = createResource(context, library, name);
 
         if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
@@ -315,13 +321,13 @@ public class GraphicImage extends HtmlGraphicImage {
     }
 
     private Resource createGraphicResourceByValue(FacesContext context, ValueExpression value, boolean dataURI) {
-        var type = (String) getAttributes().get("type");
+        var type = getType();
 
         if (dataURI) {
             return new GraphicResource(value.getValue(context.getELContext()), type);
         }
         else {
-            return GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+            return GraphicResource.create(context, value, type, getLastModified());
         }
     }
 
@@ -334,6 +340,100 @@ public class GraphicImage extends HtmlGraphicImage {
     @Override
     public String getAlt() {
         return coalesce(super.getAlt(), "");
+    }
+
+    /**
+     * Returns the resource name of the resource. Works the same way as on {@code <h:graphicImage>}.
+     * When this attribute is specified, 'value', 'type' and 'lastModified' attributes are ignored.
+     * @return The resource name.
+     */
+    public String getName() {
+        return state.get(PropertyKeys.name);
+    }
+
+    /**
+     * Sets the resource name of the resource. Works the same way as on {@code <h:graphicImage>}.
+     * When this attribute is specified, 'value', 'type' and 'lastModified' attributes are ignored.
+     * @param name The resource name.
+     */
+    public void setName(String name) {
+        state.put(PropertyKeys.name, name);
+    }
+
+    /**
+     * Returns the resource library name of the resource. Works the same way as on {@code <h:graphicImage>}.
+     * This attribute is only used when 'name' attribute is specified.
+     * @return The resource library name.
+     */
+    public String getLibrary() {
+        return state.get(PropertyKeys.library);
+    }
+
+    /**
+     * Sets the resource library name of the resource. Works the same way as on {@code <h:graphicImage>}.
+     * This attribute is only used when 'name' attribute is specified.
+     * @param library The resource library name.
+     */
+    public void setLibrary(String library) {
+        state.put(PropertyKeys.library, library);
+    }
+
+    /**
+     * Returns the image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp",
+     * "tiff", etc. This attribute is ignored when 'name' attribute is specified.
+     * @return The image type.
+     */
+    public String getType() {
+        return state.get(PropertyKeys.type);
+    }
+
+    /**
+     * Sets the image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp",
+     * "tiff", etc. This attribute is ignored when 'name' attribute is specified.
+     * @param type The image type.
+     */
+    public void setType(String type) {
+        state.put(PropertyKeys.type, type);
+    }
+
+    /**
+     * Returns the URL fragment identifier, which will be appended to generated resource URL. This is particularly
+     * useful with SVG images with view modes. The value does not necessarily need to start with '#', this will be
+     * checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
+     * @return The URL fragment identifier.
+     */
+    public String getFragment() {
+        return state.get(PropertyKeys.fragment);
+    }
+
+    /**
+     * Sets the URL fragment identifier, which will be appended to generated resource URL. This is particularly
+     * useful with SVG images with view modes. The value does not necessarily need to start with '#', this will be
+     * checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
+     * @param fragment The URL fragment identifier.
+     */
+    public void setFragment(String fragment) {
+        state.put(PropertyKeys.fragment, fragment);
+    }
+
+    /**
+     * Returns the "last modified" timestamp, can be either a {@link Long}, or {@link Date}, or {@link String} which
+     * is parseable as {@link Long}. This attribute is ignored when 'name' attribute is specified or when 'dataURI'
+     * attribute is set to 'true'.
+     * @return The "last modified" timestamp.
+     */
+    public Object getLastModified() {
+        return state.get(PropertyKeys.lastModified);
+    }
+
+    /**
+     * Sets the "last modified" timestamp, can be either a {@link Long}, or {@link Date}, or {@link String} which
+     * is parseable as {@link Long}. This attribute is ignored when 'name' attribute is specified or when 'dataURI'
+     * attribute is set to 'true'.
+     * @param lastModified The "last modified" timestamp.
+     */
+    public void setLastModified(Object lastModified) {
+        state.put(PropertyKeys.lastModified, lastModified);
     }
 
     /**

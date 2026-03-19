@@ -21,6 +21,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -60,7 +62,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @see OutputFamily
  */
-@FacesComponent(ConditionalComment.COMPONENT_TYPE)
+@FacesComponent(value = ConditionalComment.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ConditionalComment extends OutputFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -110,17 +112,20 @@ public class ConditionalComment extends OutputFamily {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the if condition.
-     * @return The if condition.
+     * Returns the {@code if} condition of the conditional comment. This is exactly the value you would use in
+     * {@code <!--[if ...]>}.
+     * @return The {@code if} condition.
      */
     public String getIf() {
         return state.get(PropertyKeys.IF);
     }
 
     /**
-     * Sets the if condition.
-     * @param condition The if condition.
+     * Sets the {@code if} condition of the conditional comment. This is exactly the value you would use in
+     * {@code <!--[if ...]>}.
+     * @param condition The {@code if} condition.
      */
+    @FacesAttribute(required = true)
     public void setIf(String condition) {
         state.put(PropertyKeys.IF, condition);
     }

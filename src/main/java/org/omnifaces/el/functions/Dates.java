@@ -42,6 +42,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
@@ -56,6 +58,7 @@ import org.omnifaces.util.Faces;
  *
  * @author Bauke Scholtz
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Dates {
 
     // Constants ------------------------------------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlOutputLabel;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -37,7 +38,7 @@ import jakarta.faces.event.PostRestoreStateEvent;
  *
  * @author Arjan Tijms
  */
-@FacesComponent(OutputLabel.COMPONENT_TYPE)
+@FacesComponent(value = OutputLabel.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class OutputLabel extends HtmlOutputLabel {
 
     /** The component type, which is {@value org.omnifaces.component.output.OutputLabel#COMPONENT_TYPE}. */

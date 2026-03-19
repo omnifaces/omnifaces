@@ -34,10 +34,13 @@ import jakarta.faces.view.facelets.ValidatorConfig;
 import jakarta.faces.view.facelets.ValidatorHandler;
 
 import org.omnifaces.cdi.validator.ValidatorManager;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
 import org.omnifaces.util.Messages;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -82,7 +85,25 @@ import org.omnifaces.util.Messages;
  * @author Bauke Scholtz
  * @see DeferredTagHandlerHelper
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE, validatorId = "omnifaces.Validator")
 public class Validator extends ValidatorHandler implements DeferredTagHandler {
+
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    @FacesAttribute(description = "Validator identifier of the Validator to be created and registered.")
+    private final TagAttribute validatorId;
+
+    @FacesAttribute(description = "A ValueExpression that evaluates to an object that implements the jakarta.faces.validator.Validator interface.")
+    private final TagAttribute binding;
+
+    @FacesAttribute(description = "A boolean value enabling request based determination of whether or not this validator is enabled on the enclosing component.")
+    private final TagAttribute disabled;
+
+    @FacesAttribute(name = "for", description = "If present, this attribute refers to the value of one of the exposed attached objects within the composite component inside of which this tag is nested.")
+    private final TagAttribute forValue;
+
+    @FacesAttribute(description = "The validator message to be shown on failure. Any \"{0}\" placeholder in the message will be substituted with the label of the referenced input component. Note that this attribute is ignored when the parent component has already validatorMessage specified.")
+    private final TagAttribute message;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -92,6 +113,11 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
      */
     public Validator(ValidatorConfig config) {
         super(config);
+        validatorId = getAttribute("validatorId");
+        binding = getAttribute("binding");
+        disabled = getAttribute("disabled");
+        forValue = getAttribute("for");
+        message = getAttribute("message");
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

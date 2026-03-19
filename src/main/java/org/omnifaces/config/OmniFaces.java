@@ -25,6 +25,7 @@ import jakarta.servlet.ServletContext;
 import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.ApplicationProcessor;
+import org.omnifaces.vdl.FaceletTagLibrary;
 
 
 /**
@@ -33,9 +34,13 @@ import org.omnifaces.ApplicationProcessor;
  * @author Bauke Scholtz
  * @since 2.5
  */
+@FaceletTagLibrary(id = OmniFaces.OMNIFACES_LIBRARY_NAME, namespace = OmniFaces.OMNIFACES_NAMESPACE, shortName = "o", description = "OmniFaces UI components and EL functions.")
 public final class OmniFaces {
 
     // Public constants -----------------------------------------------------------------------------------------------
+
+    /** Returns the "omnifaces" taglib namespace. */
+    public static final String OMNIFACES_NAMESPACE = "omnifaces";
 
     /** Returns the "omnifaces" resource library name. */
     public static final String OMNIFACES_LIBRARY_NAME = "omnifaces";

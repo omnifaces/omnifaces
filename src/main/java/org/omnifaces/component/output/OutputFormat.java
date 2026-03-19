@@ -22,6 +22,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -52,7 +53,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @since 1.2
  */
-@FacesComponent(OutputFormat.COMPONENT_TYPE)
+@FacesComponent(value = OutputFormat.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class OutputFormat extends HtmlOutputFormat {
 
     // Public constants -----------------------------------------------------------------------------------------------

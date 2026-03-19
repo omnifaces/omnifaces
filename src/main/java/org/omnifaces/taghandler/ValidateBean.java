@@ -85,6 +85,7 @@ import jakarta.faces.view.facelets.TagHandler;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Reflection.PropertyPath;
 import org.omnifaces.util.copier.CloneCopier;
@@ -93,6 +94,8 @@ import org.omnifaces.util.copier.CopyCtorCopier;
 import org.omnifaces.util.copier.MultiStrategyCopier;
 import org.omnifaces.util.copier.NewInstanceCopier;
 import org.omnifaces.util.copier.SerializationCopier;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -291,6 +294,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * @author Andre Wachsmuth
  * @see BeanValidationEventListener
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ValidateBean extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -322,12 +326,25 @@ public class ValidateBean extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(description = "If specified, then only the given bean will be validated at class level. If unspecified, then only the bean properties bound to the in the current request processed/executed input fields will be validated \"as usual\".")
     private ValueExpression value;
+
+    @FacesAttribute(description = "A boolean value enabling page level determination of whether or not this validator is enabled.")
     private boolean disabled;
+
+    @FacesAttribute(description = "Set the class level validation method, which can be either 'validateCopy' or 'validateActual'. Defaults to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified.")
     private ValidateMethod method;
-    private String groups;
+
+    @FacesAttribute(description = "A comma-separated list of validation groups. A validation group is a fully-qualified class name.")
+    private String validationGroups;
+
+    @FacesAttribute(description = "Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'.")
     private String copier;
+
+    @FacesAttribute(description = "The identifier for which this validator should show the message. Defaults to \"@form\" which is the parent UIForm. Other available values are \"@all\", \"@invalid\", \"@global\" and \"@violating\". Any other space separated value will be treated as client ID of UI input component.")
     private String showMessageFor;
+
+    @FacesAttribute(description = "The faces message format. Any \"{0}\" placeholder will be substituted with the error message and any \"{1}\" placeholder will be substituted with the labels of all validated fields.")
     private String messageFormat;
 
     // Constructors ---------------------------------------------------------------------------------------------------
@@ -364,7 +381,7 @@ public class ValidateBean extends TagHandler {
         value = getValueExpression(context, getAttribute(VALUE_ATTRIBUTE), Object.class);
         disabled = getBoolean(context, getAttribute("disabled"));
         method = ValidateMethod.of(getString(context, getAttribute("method")));
-        groups = getString(context, getAttribute("validationGroups"));
+        validationGroups = getString(context, getAttribute("validationGroups"));
         copier = getString(context, getAttribute("copier"));
         showMessageFor = coalesce(getString(context, getAttribute("showMessageFor")), DEFAULT_SHOWMESSAGEFOR);
         messageFormat = getString(context, getAttribute("messageFormat"));
@@ -495,7 +512,7 @@ public class ValidateBean extends TagHandler {
      */
     private void validateForm() {
         var validateForm = new ValidateBeanCallback() { @Override public void invoke() {
-            var listener = new BeanValidationEventListener(groups, disabled);
+            var listener = new BeanValidationEventListener(validationGroups, disabled);
             subscribeToViewEvent(PreValidateEvent.class, listener);
             subscribeToViewEvent(PostValidateEvent.class, listener);
         }};
@@ -507,7 +524,7 @@ public class ValidateBean extends TagHandler {
     private void validate(FacesContext context, UIForm form, Object actualBean, Object validableBean, Set<String> clientIds, boolean renderResponseOnFail) {
         var groupClasses = new ArrayList<Class>();
 
-        for (var group : csvToList(groups)) {
+        for (var group : csvToList(validationGroups)) {
             groupClasses.add(toClass(group));
         }
 

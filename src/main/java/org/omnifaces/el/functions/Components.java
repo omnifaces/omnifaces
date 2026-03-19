@@ -22,6 +22,8 @@ import jakarta.faces.component.UIComponent;
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.resourcehandler.GraphicResource;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * Collection of EL functions for working with components.
@@ -29,6 +31,7 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * @since 2.0
  * @author Arjan Tijms
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Components {
 
     // Constructors ---------------------------------------------------------------------------------------------------

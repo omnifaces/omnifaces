@@ -20,6 +20,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.model.SelectItem;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -59,6 +62,7 @@ import jakarta.faces.model.SelectItem;
  * @since 1.5
  * @author Arjan Tijms
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ListConverter")
 public class ListConverter implements Converter<Object> {
 
@@ -89,6 +93,7 @@ public class ListConverter implements Converter<Object> {
      * Sets the list of available items.
      * @param list The list of available items.
      */
+    @FacesAttribute(required = true)
     public void setList(List<?> list) {
         this.list = list;
     }

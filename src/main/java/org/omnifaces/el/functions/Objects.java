@@ -13,12 +13,15 @@
 package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Reflection.toClass;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * Collection of EL functions for objects.
  *
  * @author Bauke Scholtz
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Objects {
 
     // Constructors ---------------------------------------------------------------------------------------------------

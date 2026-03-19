@@ -24,6 +24,9 @@ import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
 import org.omnifaces.util.FacesLocal;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -49,6 +52,7 @@ import org.omnifaces.util.FacesLocal;
  * @author Bauke Scholtz
  * @since 5.1
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.CompositeConverter")
 public class CompositeConverter implements Converter<Object> {
 
@@ -104,6 +108,7 @@ public class CompositeConverter implements Converter<Object> {
      * Sets the comma-separated string of converter IDs.
      * @param converterIds The comma-separated string of converter IDs.
      */
+    @FacesAttribute(required = true)
     public void setConverterIds(String converterIds) {
         this.converterIds = converterIds;
     }

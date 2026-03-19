@@ -34,6 +34,8 @@ import jakarta.faces.convert.FacesConverter;
 
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.util.Faces;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTag;
 
 /**
  * <p>
@@ -76,6 +78,7 @@ import org.omnifaces.util.Faces;
  * @see TrimConverter
  * @since 2.6
  */
+@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ToCollectionConverter")
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ToCollectionConverter implements Converter<Collection> {

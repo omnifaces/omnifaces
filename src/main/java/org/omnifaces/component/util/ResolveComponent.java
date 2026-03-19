@@ -36,6 +36,9 @@ import org.omnifaces.taghandler.ComponentExtraHandler;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
  * <p>
@@ -48,7 +51,8 @@ import org.omnifaces.util.State;
  * @see ComponentExtraHandler
  * @see UtilFamily
  */
-@FacesComponent(ResolveComponent.COMPONENT_TYPE)
+@FacesComponent(value = ResolveComponent.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
+@FacesComponentConfig(componentHandler = ComponentExtraHandler.class)
 public class ResolveComponent extends UtilFamily implements FaceletContextConsumer, SystemEventListener {
 
     /** The component type, which is {@value org.omnifaces.component.util.ResolveComponent#COMPONENT_TYPE}. */
@@ -176,6 +180,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
      * or to the request.
      * @param nameValue Name under which the component will be made available to EL.
      */
+    @FacesAttribute(required = true)
     public void setName(String nameValue) {
         state.put(name, nameValue);
     }
@@ -192,6 +197,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
      * Sets ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      * @param forValue ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      */
+    @FacesAttribute(required = true)
     public void setFor(String forValue) {
         state.put("for", forValue);
     }

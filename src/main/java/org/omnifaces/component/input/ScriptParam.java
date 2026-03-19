@@ -27,6 +27,8 @@ import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.PostScriptParam;
 import org.omnifaces.util.Faces;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -133,7 +135,7 @@ import org.omnifaces.util.Faces;
  * @see PostScriptParam
  * @see Faces#getScriptParameters()
  */
-@FacesComponent(ScriptParam.COMPONENT_TYPE)
+@FacesComponent(value = ScriptParam.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ScriptParam extends OnloadParam {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -208,6 +210,7 @@ public class ScriptParam extends OnloadParam {
      * Sets the script to be evaluated.
      * @param script The script to be evaluated.
      */
+    @FacesAttribute(required = true)
     public void setScript(String script) {
         state.put(PropertyKeys.SCRIPT, script);
     }

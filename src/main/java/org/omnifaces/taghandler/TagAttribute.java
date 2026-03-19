@@ -21,7 +21,10 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.DelegatingVariableMapper;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -68,12 +71,16 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * @author Arjan Tijms.
  * @since 2.1
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TagAttribute extends TagHandler {
 
     private static final String ID_ATTRIBUTE = "id";
     private static final String ID_PREFIX = "j_ido";
 
+    @FacesAttribute(required = true, description = "The declared attribute name.")
     private final String name;
+
+    @FacesAttribute(name = "default", description = "The default value to be used when actual value is null.")
     private final jakarta.faces.view.facelets.TagAttribute defaultValue;
 
     /**
