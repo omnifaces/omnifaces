@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.Utils.escapeJS;
 
 import java.io.IOException;
 
@@ -28,6 +29,7 @@ import jakarta.faces.event.PostAddToViewEvent;
 
 import org.omnifaces.cdi.ScriptError;
 import org.omnifaces.servlet.ScriptErrorServlet;
+import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
 
 /**
@@ -115,6 +117,10 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     private static final String SCRIPT_INIT = "OmniFaces.ScriptErrorHandler.init('%s',%s,%s,%s);";
 
+    private static final String ERROR_SERVLET_NOT_REGISTERED =
+        "ScriptErrorHandler requires a CDI observer for ScriptError, but none was found."
+        + " Register a bean with a @Observes ScriptError method. See also the javadoc of <o:scriptErrorHandler>.";
+
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
         ignoreSelector, maxRecentErrors, errorExpiry;
@@ -122,16 +128,21 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
+    private static boolean servletRegistered;
+
     private final State state = new State(getStateHelper());
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
      * Move this component to head, so that error handlers are registered as early as possible.
+     * @throws IllegalArgumentException When the {@link ScriptErrorServlet} is not registered because no CDI observer
+     * for {@link ScriptError} was found.
      */
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostAddToViewEvent) {
+            validateServletRegistered();
             event.getFacesContext().getViewRoot().addComponentResource(event.getFacesContext(), this, "head");
         }
     }
@@ -148,7 +159,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
         var script = format(SCRIPT_INIT,
             endpointURL,
-            ignoreSelector != null ? "'" + ignoreSelector.replace("\\", "\\\\").replace("'", "\\'") + "'" : "null",
+            ignoreSelector != null ? "'" + escapeJS(ignoreSelector, true) + "'" : "null",
             maxRecentErrors,
             errorExpiry);
 
@@ -205,6 +216,18 @@ public class ScriptErrorHandler extends ScriptFamily {
      */
     public void setErrorExpiry(int errorExpiry) {
         state.put(PropertyKeys.errorExpiry, errorExpiry);
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    private static void validateServletRegistered() {
+        if (!servletRegistered) {
+            if (!Servlets.getContext().getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
+                throw new IllegalArgumentException(ERROR_SERVLET_NOT_REGISTERED);
+            }
+
+            servletRegistered = true;
+        }
     }
 
 }

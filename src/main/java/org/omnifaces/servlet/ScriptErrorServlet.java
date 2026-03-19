@@ -44,11 +44,16 @@ public class ScriptErrorServlet extends HttpServlet {
     public static final String URI = "/omnifaces.scripterror";
 
     /**
-     * Register the script error handler servlet if it has not already been registered.
+     * Register the script error handler servlet if it has not already been registered and there is at least one CDI
+     * observer for {@link ScriptError}.
      * @param servletContext The involved servlet context.
      */
     public static void registerIfNecessary(ServletContext servletContext) {
         if (servletContext.getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
+            return;
+        }
+
+        if (Beans.getManager().resolveObserverMethods(new ScriptError(null, null, null, null, null, null, null, null, null, null)).isEmpty()) {
             return;
         }
 
