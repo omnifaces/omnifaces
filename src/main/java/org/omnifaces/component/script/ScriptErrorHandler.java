@@ -40,9 +40,12 @@ import org.omnifaces.util.State;
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
  * <p>
- * Just add the component somewhere in the Faces view, typically in the master template.
+ * Just put the component in the <code>&lt;h:head&gt;</code> of the master template. It will automatically move itself to
+ * <code>head</code> even when placed elsewhere, but placing it in <code>&lt;h:head&gt;</code> makes the intent explicit.
  * <pre>
- * &lt;o:scriptErrorHandler /&gt;
+ * &lt;h:head&gt;
+ *     &lt;o:scriptErrorHandler /&gt;
+ * &lt;/h:head&gt;
  * </pre>
  * <p>
  * This will register <code>window.onerror</code> and <code>unhandledrejection</code> event listeners which report

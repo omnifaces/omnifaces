@@ -570,7 +570,9 @@ input.error, select.error, textarea.error {
             <![CDATA[
                 <strong><code>o:scriptErrorHandler</code></strong> catches uncaught JavaScript errors and unhandled promise
                 rejections on the client and sends them to the server, where they are fired as
-                <code>org.omnifaces.cdi.ScriptError</code> CDI events.
+                <code>org.omnifaces.cdi.ScriptError</code> CDI events. Put this in the <code>&lt;h:head&gt;</code>
+                of the master template. It will automatically move itself to <code>head</code> even when placed
+                elsewhere, but placing it in <code>&lt;h:head&gt;</code> makes the intent explicit.
                 <p>
                 For detailed usage instructions, see <code>org.omnifaces.component.script.ScriptErrorHandler</code> javadoc.
             ]]>
