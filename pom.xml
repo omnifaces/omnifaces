@@ -546,7 +546,7 @@
                     </excludes>
                     <includes>
                         <include>target/classes/META-INF/omnifaces.taglib.xml</include>
-                        <include>src/main/resources/META-INF/omnifaces-security.taglib.xml</include>
+                        <include>target/classes/META-INF/omnifaces-security.taglib.xml</include>
                     </includes>
                     <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
                 </configuration>

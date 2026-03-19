@@ -34,13 +34,17 @@ import org.omnifaces.vdl.FaceletTagLibrary;
  * @author Bauke Scholtz
  * @since 2.5
  */
-@FaceletTagLibrary(id = OmniFaces.OMNIFACES_LIBRARY_NAME, namespace = OmniFaces.OMNIFACES_NAMESPACE, shortName = "o", description = "OmniFaces UI components and EL functions.")
+@FaceletTagLibrary(id = "omnifaces", namespace = OmniFaces.OMNIFACES_NAMESPACE, shortName = "o", description = "OmniFaces UI components and EL functions.")
+@FaceletTagLibrary(id = "omnifaces-security", namespace = OmniFaces.OMNIFACES_SECURITY_NAMESPACE, shortName = "sec", description = "OmniFaces Security tag library for jakarta.security.enterprise.SecurityContext authentication and authorization.")
 public final class OmniFaces {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
     /** Returns the "omnifaces" taglib namespace. */
     public static final String OMNIFACES_NAMESPACE = "omnifaces";
+
+    /** Returns the "omnifaces.security" taglib namespace. */
+    public static final String OMNIFACES_SECURITY_NAMESPACE = "omnifaces.security";
 
     /** Returns the "omnifaces" resource library name. */
     public static final String OMNIFACES_LIBRARY_NAME = "omnifaces";
