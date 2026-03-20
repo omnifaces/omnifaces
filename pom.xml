@@ -279,13 +279,13 @@
                 </executions>
             </plugin>
 
-            <!-- Configure the TypeScript compiler and packer for omnifaces.js. -->
+            <!-- Configure the TypeScript compiler/packer for omnifaces.js, and run JavaScript unit tests via Jest. -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.15.1</version>
                 <configuration>
-                    <nodeVersion>v18.15.0</nodeVersion>
+                    <nodeVersion>v22.22.0</nodeVersion>
                     <installDirectory>target</installDirectory>
                 </configuration>
                 <executions>
@@ -311,6 +311,28 @@
                         </goals>
                         <configuration>
                             <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm install test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/src/test/ts</workingDirectory>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/src/test/ts</workingDirectory>
+                            <arguments>test</arguments>
                         </configuration>
                     </execution>
                 </executions>
