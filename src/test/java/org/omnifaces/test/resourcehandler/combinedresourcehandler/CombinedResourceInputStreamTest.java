@@ -141,6 +141,24 @@ class CombinedResourceInputStreamTest {
     }
 
     @Test
+    void testUseStrictMinifiedWithCodeOnSameLine() throws IOException {
+        assertCombinedOutput(
+            "\"use strict\";var a = 1;\n",
+            "var b = 2;\n",
+            "var a = 1;\n\r\nvar b = 2;\n\r\n"
+        );
+    }
+
+    @Test
+    void testUseStrictMinifiedWithoutTrailingNewline() throws IOException {
+        assertCombinedOutput(
+            "\"use strict\";var a = 1;",
+            "var b = 2;\n",
+            "var a = 1;\r\nvar b = 2;\n\r\n"
+        );
+    }
+
+    @Test
     void testBulkReadDuringPreamble() throws IOException {
         when(resource1.getInputStream()).thenReturn(toResourceStream("\"use strict\";\nvar a = 1;\n"));
         when(resource2.getInputStream()).thenReturn(toResourceStream("var b = 2;\n"));
