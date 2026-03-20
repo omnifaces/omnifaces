@@ -55,6 +55,7 @@ import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.ViewScoped;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.FacesLocal;
@@ -282,13 +283,15 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     /** The resource name <code>sw.js</code>. */
     public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
 
+    private static final Pattern PATTERN_V_PARAM_FIRST = Pattern.compile("\\?v=[^&#]*&");
+    private static final Pattern PATTERN_V_PARAM_NEXT = Pattern.compile("[?&]v=[^&#]*");
+
     private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
 
-    private final Bean<WebAppManifest> manifestBean;
+    private record CachedContents(byte[] manifestContents, byte[] serviceWorkerContents, long lastModified) {}
 
-    private byte[] manifestContents;
-    private byte[] serviceWorkerContents;
-    private long lastModified;
+    private final Bean<WebAppManifest> manifestBean;
+    private volatile CachedContents cachedContents;
 
     /**
      * Creates a new instance of this web app manifest resource handler which wraps the given resource handler.
@@ -314,10 +317,13 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
 
         var context = Faces.getContext();
-        var manifest = loadWebAppManifest(context);
+        var existingManifest = Beans.getInstance(manifestBean, false);
+        var manifest = existingManifest != null ? existingManifest : Beans.getInstance(manifestBean, true);
+        var resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
+        var contents = resourceContentsRequest ? computeContents(manifest, existingManifest == null) : null;
 
         if (manifestResourceRequest) {
-            if (manifest != null) {
+            if (!resourceContentsRequest) {
                 if (!manifest.getCacheableViewIds().isEmpty()) {
                     addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
                     addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
@@ -328,61 +334,62 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 }
             }
 
-            return createManifestResource(resourceName);
+            return createManifestResource(resourceName, contents);
         }
         else {
-            return createServiceWorkerResource();
+            return createServiceWorkerResource(contents);
         }
     }
 
-	private WebAppManifest loadWebAppManifest(FacesContext context) {
-		var manifest = Beans.getInstance(manifestBean, false);
+    private CachedContents computeContents(WebAppManifest manifest, boolean newInstance) {
+        var cached = cachedContents;
 
-        if (manifest == null) {
-            manifest = Beans.getInstance(manifestBean, true);
-            lastModified = 0;
+        if (cached == null || newInstance) {
+            cached = new CachedContents(
+                Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8),
+                getServiceWorkerContents(manifest).getBytes(UTF_8),
+                System.currentTimeMillis()
+            );
+            cachedContents = cached;
         }
 
-        var resourceContentsRequest = context.getApplication().getResourceHandler().isResourceRequest(context);
+        return cached;
+    }
 
-        if (resourceContentsRequest && lastModified == 0) {
-            manifestContents = Json.encode(manifest, PWAResourceHandler::camelCaseToSnakeCase).getBytes(UTF_8);
-            serviceWorkerContents = getServiceWorkerContents(manifest).getBytes(UTF_8);
-            lastModified = System.currentTimeMillis();
-        }
-
-        return resourceContentsRequest ? null : manifest;
-	}
-
-    private DynamicResource createManifestResource(String resourceName) {
-        return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, "application/json") {
+    private DynamicResource createManifestResource(String resourceName, CachedContents contents) {
+        return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, MANIFEST_CONTENT_TYPE) {
             @Override
             public InputStream getInputStream() throws IOException {
-                return new ByteArrayInputStream(manifestContents);
+                return new ByteArrayInputStream(contents.manifestContents);
             }
 
             @Override
             public long getLastModified() {
-                return lastModified;
-            }
+                if (contents != null) {
+                    return contents.lastModified;
+                }
 
-            @Override
-            public String getContentType() {
-                return MANIFEST_CONTENT_TYPE;
+                var cached = cachedContents;
+                return cached != null ? cached.lastModified : 0;
             }
         };
     }
 
-    private DynamicResource createServiceWorkerResource() {
+    private DynamicResource createServiceWorkerResource(CachedContents contents) {
         return new DynamicResource(SERVICEWORKER_RESOURCE_NAME, OMNIFACES_LIBRARY_NAME, "application/javascript") {
             @Override
             public InputStream getInputStream() throws IOException {
-                return new ByteArrayInputStream(serviceWorkerContents);
+                return new ByteArrayInputStream(contents.serviceWorkerContents);
             }
 
             @Override
             public long getLastModified() {
-                return lastModified;
+                if (contents != null) {
+                    return contents.lastModified;
+                }
+
+                var cached = cachedContents;
+                return cached != null ? cached.lastModified : 0;
             }
 
             @Override
@@ -411,8 +418,10 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
         else {
             try (var scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8)) {
+                var cacheableResources = getCacheableResources(manifest);
                 return scanner.useDelimiter("\\A").next()
-                    .replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
+                    .replace("$cacheVersion", OmniFaces.getVersion() + "." + Integer.toHexString(cacheableResources.hashCode()))
+                    .replace("$cacheableResources", Json.encode(cacheableResources))
                     .replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
             }
         }
@@ -430,14 +439,14 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
 
         for (var viewId : viewIds) {
-    		var viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
+            var viewDeclarationLanguage = viewHandler.getViewDeclarationLanguage(context, viewId);
 
-    		if (viewDeclarationLanguage.viewExists(context, viewId)) {
-    			collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
-    		}
-    		else {
-    			logger.warning(() -> format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
-    		}
+            if (viewDeclarationLanguage.viewExists(context, viewId)) {
+                collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
+            }
+            else {
+                logger.warning(() -> format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
+            }
         }
 
         cacheableResources.add(getResourceUrl(context, FACES_SCRIPT_LIBRARY_NAME, FACES_SCRIPT_RESOURCE_NAME));
@@ -445,32 +454,32 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         return cacheableResources;
     }
 
-	private static void collectCacheableResources(FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage, Collection<String> cacheableResources) {
-		cacheableResources.add(viewHandler.getActionURL(context, viewId));
-		var view = viewHandler.createView(context, viewId);
+    private static void collectCacheableResources(FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage, Collection<String> cacheableResources) {
+        cacheableResources.add(viewHandler.getActionURL(context, viewId));
+        var view = viewHandler.createView(context, viewId);
 
-		try {
-		    context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
-		    viewDeclarationLanguage.buildView(context, view);
-		    context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
-		}
-		catch (Exception e) {
-		    throw new FacesException("Cannot build the view " + viewId, e);
-		}
+        try {
+            context.setViewRoot(view); // YES, this is safe to do so during a ResourceHandler#isResourceRequest(), but it's otherwise dirty!
+            viewDeclarationLanguage.buildView(context, view);
+            context.getApplication().publishEvent(context, PreRenderViewEvent.class, view);
+        }
+        catch (Exception e) {
+            throw new FacesException("Cannot build the view " + viewId, e);
+        }
 
-		forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
-		    if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
-		        cacheableResources.add(((UIGraphic) component).getValue().toString());
-		    }
-		    else if (component.getAttributes().get("name") != null) {
-		        var url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
+        forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
+            if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
+                cacheableResources.add(((UIGraphic) component).getValue().toString());
+            }
+            else if (component.getAttributes().get("name") != null) {
+                var url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
 
-		        if (url != null) {
-		            cacheableResources.add(url);
-		        }
-		    }
-		});
-	}
+                if (url != null) {
+                    cacheableResources.add(url);
+                }
+            }
+        });
+    }
 
     private static String getOfflineResource(WebAppManifest manifest) {
         if (manifest.getOfflineViewId() != null) {
@@ -498,7 +507,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
+        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll(""); // Strips the v= parameter indicating the cache bust version.
     }
 
     /**

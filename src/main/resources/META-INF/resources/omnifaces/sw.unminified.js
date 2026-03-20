@@ -13,6 +13,7 @@
 /**
  * Service worker template. Following variables must be substituted:
  * <ul>
+ * <li><code>$cacheVersion</code> - hex hash of cacheable resources, used as cache version.</li>
  * <li><code>$cacheableResources</code> - JS array representing URLs of cacheable resources.</li>
  * <li><code>$offlineResource</code> - JS string representing URL of offline resource.</li>
  * </ul>
@@ -22,7 +23,7 @@
  * @see PWAResourceHandler
  * @see <a href="https://css-tricks.com/serviceworker-for-offline/">https://css-tricks.com/serviceworker-for-offline/</a>
  */
-const cacheName = "omnifaces.5.0"; // Should be bumped every time this sw.unminified.js logic is changed.
+const cacheName = "omnifaces.$cacheVersion";
 const cacheableResources = $cacheableResources;
 const offlineResource = $offlineResource;
 
@@ -96,16 +97,20 @@ self.addEventListener("fetch", function(event) {
 
                         return cached;
                     }
-                    else { // Invalidate cache and let browser handle the error.
-                        caches.open(cacheName).then(cache => cache.delete(url));
+                    else { // Let browser handle the error; don't evict cache as this may be a transient network issue.
                         throw error;
                     }
                 }
             }));
         }
     }
-    else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with Faces because its POST requests are by default postback.
-        fetch(url + (url.includes("?") ? "&" : "?") + "omnifaces.event=sw.js").then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
+    else if (method == "POST") { // Do not cache! Merely fire online/offline events. This works with Faces because its POST requests are by default postback.
+        if (navigator.onLine) {
+            sendOnlineEvent();
+        }
+        else {
+            sendOfflineEvent(new Error("The network connection has been lost."));
+        }
     }
 });
 
