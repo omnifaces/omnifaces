@@ -22,8 +22,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.Faces;
 import org.omnifaces.vdl.FacesFunctions;
 
 /**

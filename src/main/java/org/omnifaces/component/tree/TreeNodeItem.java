@@ -27,8 +27,8 @@ import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PhaseId;
 
-import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.model.tree.TreeModel;
 
 /**
  * <p>

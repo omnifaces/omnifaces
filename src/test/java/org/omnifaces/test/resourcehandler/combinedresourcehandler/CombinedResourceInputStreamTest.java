@@ -23,14 +23,14 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import jakarta.faces.application.Resource;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.resourcehandler.CombinedResourceInputStream;
 import org.omnifaces.util.Faces;
-
-import jakarta.faces.application.Resource;
 
 @ExtendWith(MockitoExtension.class)
 class CombinedResourceInputStreamTest {

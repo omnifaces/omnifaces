@@ -26,8 +26,8 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.PostScriptParam;
-import org.omnifaces.util.Faces;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.Faces;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**
@@ -151,8 +151,8 @@ public class ScriptParam extends OnloadParam {
     private static final String SCRIPT_INIT = "OmniFaces.ScriptParam.run('%s', %s)";
 
     private enum PropertyKeys {
-        SCRIPT;
-        @Override public String toString() { return name().toLowerCase(); }
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        script;
     }
 
     // Init -----------------------------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ public class ScriptParam extends OnloadParam {
      * @return The script to be evaluated.
      */
     public String getScript() {
-        return state.get(PropertyKeys.SCRIPT);
+        return state.get(PropertyKeys.script);
     }
 
     /**
@@ -212,7 +212,7 @@ public class ScriptParam extends OnloadParam {
      */
     @FacesAttribute(required = true)
     public void setScript(String script) {
-        state.put(PropertyKeys.SCRIPT, script);
+        state.put(PropertyKeys.script, script);
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------

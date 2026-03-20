@@ -23,9 +23,9 @@ import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**

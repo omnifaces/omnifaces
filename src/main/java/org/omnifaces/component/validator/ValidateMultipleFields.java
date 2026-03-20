@@ -38,10 +38,10 @@ import jakarta.faces.component.UISelectBoolean;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.OmniFaces;
-import org.omnifaces.vdl.FacesAttribute;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * Base class which is to be shared between all multi field validators. The implementors have to call the super

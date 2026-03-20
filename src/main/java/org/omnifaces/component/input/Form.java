@@ -31,9 +31,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.FacesContextWrapper;
 
 import org.omnifaces.component.ActionURLDecorator;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -124,7 +124,7 @@ public class Form extends HtmlForm {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
     enum PropertyKeys {
-
+        // Cannot be uppercased. They have to exactly match the attribute names.
         useRequestURI,
         includeRequestParams,
         partialSubmit,

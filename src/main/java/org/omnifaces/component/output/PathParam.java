@@ -18,9 +18,9 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.facesviews.FacesViewsViewHandler;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * The <code>&lt;o:pathParam&gt;</code> is a component that extends the OmniFaces {@link Param} to support

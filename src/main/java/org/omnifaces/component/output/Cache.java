@@ -39,6 +39,7 @@ import jakarta.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.el.CacheValue;
 import org.omnifaces.component.output.cache.el.CachingValueExpression;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 import org.omnifaces.io.ResettableBuffer;
 import org.omnifaces.io.ResettableBufferedOutputStream;
@@ -55,7 +56,6 @@ import org.omnifaces.util.cache.DefaultCache;
 import org.omnifaces.util.cache.DefaultCacheProvider;
 import org.omnifaces.util.cache.LruCache;
 import org.omnifaces.util.cache.TimeToLiveCache;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -181,6 +181,7 @@ public class Cache extends OutputFamily {
     private final State state = new State(getStateHelper());
 
     enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         key, scope, time, useBuffer, reset, disabled
     }
 

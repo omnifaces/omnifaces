@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.Faces;
 import org.omnifaces.vdl.FacesFunctions;
 
 /**

@@ -19,8 +19,8 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlInputHidden;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -78,6 +78,7 @@ public class InputHidden extends HtmlInputHidden {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.input.InputHidden";
 
     enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         readonly
     }
 

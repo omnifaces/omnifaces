@@ -17,10 +17,10 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.html.HtmlMessages;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.renderer.MessagesRenderer;
 import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
@@ -132,7 +132,8 @@ public class OmniMessages extends HtmlMessages {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        var, message, escape;
+        VAR, message, escape;
+        @Override public String toString() { return this == VAR ? name().toLowerCase() : name(); }
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -158,7 +159,7 @@ public class OmniMessages extends HtmlMessages {
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
-        if (PropertyKeys.var.toString().equals(name)) {
+        if (PropertyKeys.VAR.toString().equals(name)) {
             throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
         }
 
@@ -173,7 +174,7 @@ public class OmniMessages extends HtmlMessages {
      * @return The name of the request attribute which exposes the current faces message.
      */
     public String getVar() {
-        return state.get(PropertyKeys.var);
+        return state.get(PropertyKeys.VAR);
     }
 
     /**
@@ -182,7 +183,7 @@ public class OmniMessages extends HtmlMessages {
      * @param varName The name of the request attribute which exposes the current faces message.
      */
     public void setVar(String varName) {
-        state.put(PropertyKeys.var, varName);
+        state.put(PropertyKeys.VAR, varName);
     }
 
     /**

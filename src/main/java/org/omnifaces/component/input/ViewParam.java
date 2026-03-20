@@ -26,9 +26,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PostValidateEvent;
 import jakarta.faces.event.PreValidateEvent;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.MapWrapper;
 import org.omnifaces.util.Utils;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**

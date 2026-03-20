@@ -39,8 +39,8 @@ import jakarta.faces.event.PreRenderViewEvent;
 import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.State;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**

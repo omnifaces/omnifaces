@@ -22,8 +22,8 @@ import jakarta.faces.component.html.HtmlOutcomeTargetLink;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.ActionURLDecorator;
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -57,6 +57,7 @@ public class Link extends HtmlOutcomeTargetLink {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Link";
 
     enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         includeRequestParams,
         fragment
     }

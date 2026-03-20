@@ -29,9 +29,9 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
-import org.omnifaces.viewhandler.OmniViewHandler;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesTagHandler;
+import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>

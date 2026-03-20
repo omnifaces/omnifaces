@@ -31,12 +31,12 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 import jakarta.faces.view.facelets.FaceletContext;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.taghandler.ComponentExtraHandler;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
 import org.omnifaces.vdl.FacesComponentConfig;
 
@@ -72,6 +72,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     private final State state = new State(getStateHelper());
 
     enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         name, scope, /* for */
     }
 

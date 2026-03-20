@@ -33,8 +33,8 @@ import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -134,12 +134,13 @@ public class Url extends OutputFamily {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        var,
+        VAR,
         value,
         viewId,
         domain,
         includeViewParams,
         includeRequestParams;
+        @Override public String toString() { return this == VAR ? "var" : name(); }
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -155,7 +156,7 @@ public class Url extends OutputFamily {
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
-        if (PropertyKeys.var.toString().equals(name)) {
+        if (PropertyKeys.VAR.toString().equals(name)) {
             throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
         }
 
@@ -218,7 +219,7 @@ public class Url extends OutputFamily {
      * @return The variable name which exposes the URL into the request scope.
      */
     public String getVar() {
-        return state.get(PropertyKeys.var);
+        return state.get(PropertyKeys.VAR);
     }
 
     /**
@@ -226,7 +227,7 @@ public class Url extends OutputFamily {
      * @param varName The variable name which exposes the URL into the request scope.
      */
     public void setVar(String varName) {
-        state.put(PropertyKeys.var, varName);
+        state.put(PropertyKeys.VAR, varName);
     }
 
     /**

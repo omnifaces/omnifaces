@@ -16,6 +16,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.stream.IntStream;
+
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesFunctions;
 

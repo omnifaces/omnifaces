@@ -43,8 +43,8 @@ public abstract class OnloadParam extends UIViewParameter {
     // Private constants ----------------------------------------------------------------------------------------------
 
     private enum PropertyKeys {
-        RENDER;
-        @Override public String toString() { return name().toLowerCase(); }
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        render;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public abstract class OnloadParam extends UIViewParameter {
      * @return A space separated string of client IDs to update on ajax response.
      */
     public String getRender() {
-        return state.get(PropertyKeys.RENDER, "@none");
+        return state.get(PropertyKeys.render, "@none");
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class OnloadParam extends UIViewParameter {
      * @param render A space separated string of client IDs to update on ajax response.
      */
     public void setRender(String render) {
-        state.put(PropertyKeys.RENDER, render);
+        state.put(PropertyKeys.render, render);
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------

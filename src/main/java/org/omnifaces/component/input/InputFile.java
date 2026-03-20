@@ -52,11 +52,11 @@ import jakarta.faces.component.html.HtmlInputFile;
 import jakarta.faces.context.FacesContext;
 import jakarta.servlet.http.Part;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
 import org.omnifaces.util.Utils;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>

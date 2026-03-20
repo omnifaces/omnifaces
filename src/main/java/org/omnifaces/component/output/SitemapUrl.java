@@ -36,9 +36,9 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>

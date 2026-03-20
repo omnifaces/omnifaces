@@ -60,6 +60,7 @@ public class ResourceInclude extends OutputFamily {
     // Private constants ----------------------------------------------------------------------------------------------
 
     private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         path
     }
 

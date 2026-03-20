@@ -21,8 +21,8 @@ import jakarta.faces.component.UIComponent;
 
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.component.output.GraphicImage;
-import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.vdl.FacesFunctions;
 
 /**

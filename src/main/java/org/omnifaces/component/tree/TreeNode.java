@@ -21,9 +21,9 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PhaseId;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>

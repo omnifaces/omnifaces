@@ -26,8 +26,8 @@ import jakarta.faces.context.FacesContextWrapper;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.event.FacesEvent;
 
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -85,6 +85,7 @@ public class ViewAction extends UIViewAction {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewAction";
 
     enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         message
     }
 

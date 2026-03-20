@@ -25,9 +25,9 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>

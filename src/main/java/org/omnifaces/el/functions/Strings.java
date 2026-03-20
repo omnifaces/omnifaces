@@ -23,9 +23,9 @@ import java.text.Normalizer.Form;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesFunctions;
 
 /**

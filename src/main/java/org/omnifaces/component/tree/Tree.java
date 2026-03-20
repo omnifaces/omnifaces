@@ -37,13 +37,13 @@ import jakarta.faces.event.PostValidateEvent;
 import jakarta.faces.event.PreValidateEvent;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.event.FacesEventWrapper;
 import org.omnifaces.model.tree.AbstractTreeModel;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.SortedTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>

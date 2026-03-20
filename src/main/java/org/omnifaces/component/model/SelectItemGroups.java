@@ -71,8 +71,9 @@ public class SelectItemGroups extends UISelectItems {
         "A value expression is disallowed on 'var' attribute of SelectItemGroups.";
 
     private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         VAR, itemLabel, itemValue;
-        @Override public String toString() { return this == VAR ? "var" : name(); }
+        @Override public String toString() { return this == VAR ? name().toLowerCase() : name(); }
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -84,7 +85,7 @@ public class SelectItemGroups extends UISelectItems {
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
-        if ("var".equals(name)) {
+        if (PropertyKeys.VAR.toString().equals(name)) {
             throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
         }
 
