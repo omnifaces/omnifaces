@@ -23,7 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.omnifaces.el.functions.Strings;
 
-class TestStrings {
+class StringsTest {
 
     @Test
     void testPrettyURL() {

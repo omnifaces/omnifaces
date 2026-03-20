@@ -26,7 +26,7 @@ import org.omnifaces.util.Lazy;
  *
  * @author Lenny Primak
  */
-class TestLazy {
+class LazyTest {
 
     private final AtomicInteger numCreations = new AtomicInteger();
 

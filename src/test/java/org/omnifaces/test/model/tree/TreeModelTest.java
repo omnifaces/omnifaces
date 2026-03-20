@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 
-class TestTreeModel {
+class TreeModelTest {
 
     @Test
     void testTree() {

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.copier.CloneCopier;
 
-class TestCloneCopier {
+class CloneCopierTest {
 
     @Test
     void testDoesNotImplementCloneable() {

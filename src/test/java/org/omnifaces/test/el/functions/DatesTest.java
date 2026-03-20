@@ -39,7 +39,7 @@ import org.omnifaces.cdi.config.DateProducer;
 import org.omnifaces.el.functions.Dates;
 import org.omnifaces.util.Utils;
 
-class TestDates {
+class DatesTest {
 
     private static final ZonedDateTime MY_BIRTH_DATE = ZonedDateTime.of(1978, 3, 26, 12, 35, 0, 0, UTC);
     private static final ZoneId ZP2 = ZoneOffset.ofHours(2);

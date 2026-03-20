@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.servlet.CompressedHttpServletResponse.Algorithm;
 
-class TestCompressedHttpServletResponse {
+class CompressedHttpServletResponseTest {
 
     @Test
     void testCreateOutputStreamRethrowsIOExceptionFromGetOutputStream() throws Exception {

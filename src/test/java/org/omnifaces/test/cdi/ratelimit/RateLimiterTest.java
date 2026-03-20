@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.omnifaces.cdi.ratelimit.RateLimitExceededException;
 import org.omnifaces.cdi.ratelimit.RateLimiter;
 
-class TestRateLimiter {
+class RateLimiterTest {
 
     private static final String FIRST_IP = "192.0.2.1";
     private static final String SECOND_IP = "192.0.2.2";

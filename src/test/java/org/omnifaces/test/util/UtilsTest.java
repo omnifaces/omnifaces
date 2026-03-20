@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Utils;
 
-class TestUtils {
+class UtilsTest {
 
     private static final String[] URL_SAFE_SERIALIZATION_EXAMPLES = {
         "omnifaces:omnifaces.js", // This example normally generates 1-padded base64 encoded string

@@ -36,9 +36,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.cache.LruCache;
 
-class TestLruCache {
+class LruCacheTest {
 
-    private static final Logger logger = Logger.getLogger(TestLruCache.class.getName());
+    private static final Logger logger = Logger.getLogger(LruCacheTest.class.getName());
 
     private static final int SIZE = 100;
     private static final int ITERATIONS = (SIZE * SIZE) + 1;
