@@ -151,7 +151,7 @@ final class DeferredTagHandlerHelper {
      * @param type The type of the value expression.
      * @return The given attribute as a {@link ValueExpression}.
      */
-    static <T> ValueExpression getValueExpression
+    private static <T> ValueExpression getValueExpression
         (FaceletContext context, DeferredTagHandler tag, String name, Class<T> type)
     {
         var attribute = tag.getTagAttribute(name);

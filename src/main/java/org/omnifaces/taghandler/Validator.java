@@ -13,8 +13,8 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
-import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
 import static org.omnifaces.util.ComponentsLocal.getLabel;
+import static org.omnifaces.util.Facelets.getValueExpression;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -148,13 +148,13 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
             return;
         }
 
-        var binding = getValueExpression(context, this, "binding", Object.class);
-        var id = getValueExpression(context, this, "validatorId", String.class);
-        var disabled = getValueExpression(context, this, "disabled", Boolean.class);
-        var message = getValueExpression(context, this, "message", String.class);
-        var validator = createInstance(context.getFacesContext(), context, binding, id);
+        var bindingExpression = getValueExpression(context, binding, Object.class);
+        var id = getValueExpression(context, validatorId, String.class);
+        var disabledExpression = getValueExpression(context, disabled, Boolean.class);
+        var messageExpression = getValueExpression(context, message, String.class);
+        var validator = createInstance(context.getFacesContext(), context, bindingExpression, id);
         var attributes = collectDeferredAttributes(context, this, validator);
-        editableValueHolder.addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
+        editableValueHolder.addValidator(new DeferredValidator(validator, bindingExpression, id, disabledExpression, messageExpression, attributes));
     }
 
     @Override

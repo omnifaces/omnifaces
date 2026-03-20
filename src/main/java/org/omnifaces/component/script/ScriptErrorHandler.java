@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.Utils.escapeJS;
 
 import java.io.IOException;
@@ -28,10 +29,9 @@ import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
 
 import org.omnifaces.cdi.ScriptError;
-import org.omnifaces.servlet.ScriptErrorServlet;
-import org.omnifaces.util.Servlets;
-import org.omnifaces.util.State;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.servlet.ScriptErrorServlet;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -143,8 +143,9 @@ public class ScriptErrorHandler extends ScriptFamily {
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostAddToViewEvent) {
-            validateServletRegistered();
-            event.getFacesContext().getViewRoot().addComponentResource(event.getFacesContext(), this, "head");
+            var context = event.getFacesContext();
+            validateServletRegistered(context);
+            context.getViewRoot().addComponentResource(context, this, "head");
         }
     }
 
@@ -224,9 +225,9 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    private static void validateServletRegistered() {
+    private static void validateServletRegistered(FacesContext context) {
         if (!servletRegistered) {
-            if (!Servlets.getContext().getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
+            if (!getServletContext(context).getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
                 throw new IllegalArgumentException(ERROR_SERVLET_NOT_REGISTERED);
             }
 

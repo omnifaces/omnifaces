@@ -160,10 +160,10 @@ public class SelectItemGroups extends UISelectItems {
     /**
      * Sets the name of the EL variable which exposes the currently iterated select item group.
      * Defaults to {@code item}.
-     * @param var The name of the EL variable.
+     * @param varName The name of the EL variable.
      */
-    public void setVar(String var) {
-        getStateHelper().put(PropertyKeys.VAR, var);
+    public void setVar(String varName) {
+        getStateHelper().put(PropertyKeys.VAR, varName);
     }
 
     /**

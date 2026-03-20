@@ -13,15 +13,14 @@
 package org.omnifaces.component.stylesheet;
 
 import jakarta.faces.component.FacesComponent;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AbortProcessingException;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.renderer.CriticalStylesheetRenderer;
 import org.omnifaces.util.State;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**
@@ -30,7 +29,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * which renders a <code>&lt;link rel="preload" as="style"&gt;</code> instead of <code>&lt;link rel="stylesheet"&gt;</code>
  * and automatically changes the <code>rel="preload"</code> to <code>rel="stylesheet"</code> during window load event.
  * Additionally, it will automatically be moved to the very top of the head.
- * 
+ *
  * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputStylesheet&gt;</code>, with a <code>library</code> and <code>name</code>.
@@ -86,8 +85,8 @@ public class CriticalStylesheet extends StylesheetFamily {
     @Override
     public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
         if (event instanceof PostAddToViewEvent) {
-            FacesContext context = event.getFacesContext();
-            context.getViewRoot().addComponentResource(context, event.getComponent(), "head");
+            var context = event.getFacesContext();
+            context.getViewRoot().addComponentResource(context, this, "head");
         }
     }
 
