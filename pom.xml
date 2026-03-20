@@ -453,6 +453,7 @@
                 <version>3.4.2</version>
                 <configuration>
                     <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -529,6 +530,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${maven.javadoc.skip}</skip>
                     <browserTitle>OmniFaces ${project.version} VDL Documentation</browserTitle>
                     <documentTitle>OmniFaces ${project.version} VDL Documentation</documentTitle>
                     <excludes>
