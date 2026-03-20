@@ -19,8 +19,9 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
+
 import org.omnifaces.config.OmniFaces;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -56,8 +57,8 @@ import org.omnifaces.vdl.FacesTag;
  * @author Bauke Scholtz
  * @since 2.6
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.TrimConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TrimConverter implements Converter<String> {
 
     @Override

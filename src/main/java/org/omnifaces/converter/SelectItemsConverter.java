@@ -17,10 +17,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
-import org.omnifaces.config.OmniFaces;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -97,8 +97,8 @@ import org.omnifaces.vdl.FacesTag;
  * @see SelectItemsUtils
  * @see SelectItemsCollector
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.SelectItemsConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SelectItemsConverter implements Converter<Object> {
 
     @Override

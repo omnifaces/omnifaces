@@ -29,10 +29,10 @@ import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.event.PhaseId;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
-import org.omnifaces.config.OmniFaces;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -82,8 +82,8 @@ import org.omnifaces.vdl.FacesTag;
  * @see SelectItemsUtils
  * @see SelectItemsCollector
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SelectItemsIndexConverter implements Converter<Object> {
 
     // Constants ------------------------------------------------------------------------------------------------------

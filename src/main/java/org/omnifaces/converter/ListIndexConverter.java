@@ -22,9 +22,10 @@ import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.model.SelectItem;
+
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -59,8 +60,8 @@ import org.omnifaces.vdl.FacesTag;
  *
  * @author Arjan Tijms
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ListIndexConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ListIndexConverter implements Converter<Object> {
 
     private static final String ERROR_LIST_INDEX =
@@ -79,7 +80,7 @@ public class ListIndexConverter implements Converter<Object> {
         int index;
 
         try {
-            index = Integer.valueOf(value);
+            index = Integer.parseInt(value);
         }
         catch (NumberFormatException e) {
             throw new ConverterException(

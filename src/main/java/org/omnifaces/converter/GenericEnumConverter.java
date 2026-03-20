@@ -35,8 +35,9 @@ import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.EnumConverter;
 import jakarta.faces.convert.FacesConverter;
+
 import org.omnifaces.config.OmniFaces;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -113,8 +114,8 @@ import org.omnifaces.vdl.FacesTag;
  * @author Bauke Scholtz
  * @since 1.2
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter(value = "omnifaces.GenericEnumConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class GenericEnumConverter implements Converter<Enum> {
 

@@ -27,7 +27,7 @@ import jakarta.faces.convert.NumberConverter;
 
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.vdl.FacesAttribute;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -60,8 +60,8 @@ import org.omnifaces.vdl.FacesTag;
  * @author Bauke Scholtz
  * @since 3.0
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.ImplicitNumberConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ImplicitNumberConverter extends NumberConverter {
 
     private static final Pattern PATTERN_NUMBER = Pattern.compile("[\\d,.]+");

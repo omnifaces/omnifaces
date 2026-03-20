@@ -23,10 +23,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
-import org.omnifaces.util.FacesLocal;
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.vdl.FacesAttribute;
-import org.omnifaces.vdl.FacesTag;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -52,8 +52,8 @@ import org.omnifaces.vdl.FacesTag;
  * @author Bauke Scholtz
  * @since 5.1
  */
-@FacesTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @FacesConverter("omnifaces.CompositeConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class CompositeConverter implements Converter<Object> {
 
     private String converterIds;
