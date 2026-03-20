@@ -16,6 +16,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.stream.IntStream;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
@@ -24,6 +26,7 @@ import java.util.stream.IntStream;
  *
  * @author Bauke Scholtz
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Arrays {
 
     // Constants ------------------------------------------------------------------------------------------------------

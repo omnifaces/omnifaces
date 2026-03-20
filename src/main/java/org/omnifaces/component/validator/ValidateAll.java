@@ -21,6 +21,7 @@ import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.validator.MultiFieldValidator;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -40,7 +41,7 @@ import org.omnifaces.validator.MultiFieldValidator;
  * @see ValidatorFamily
  * @see MultiFieldValidator
  */
-@FacesComponent(ValidateAll.COMPONENT_TYPE)
+@FacesComponent(value = ValidateAll.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ValidateAll extends ValidateMultipleFields {
 
     // Public constants -----------------------------------------------------------------------------------------------

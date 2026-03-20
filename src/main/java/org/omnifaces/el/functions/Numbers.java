@@ -23,6 +23,8 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
@@ -33,6 +35,7 @@ import org.omnifaces.util.Faces;
  * @author Bauke Scholtz
  * @since 1.2
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Numbers {
 
     // Constants ------------------------------------------------------------------------------------------------------

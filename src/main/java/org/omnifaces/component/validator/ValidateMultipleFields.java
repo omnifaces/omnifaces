@@ -38,6 +38,7 @@ import jakarta.faces.component.UISelectBoolean;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
@@ -399,17 +400,18 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the client identifiers of components which are to be validated.
-     * @return The client identifiers of components which are to be validated.
+     * Returns the space separated collection of client IDs of UI input components to be validated.
+     * @return The space separated collection of client IDs of UI input components to be validated.
      */
     public String getComponents() {
         return state.get(PropertyKeys.components, "");
     }
 
     /**
-     * Sets the client identifiers of components which are to be validated.
-     * @param components The client identifiers of components which are to be validated.
+     * Sets the space separated collection of client IDs of UI input components to be validated.
+     * @param components The space separated collection of client IDs of UI input components to be validated.
      */
+    @FacesAttribute(required = true)
     public void setComponents(String components) {
         state.put(PropertyKeys.components, components);
     }
@@ -435,32 +437,38 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     }
 
     /**
-     * Returns the validation message to be shown.
-     * @return The validation message to be shown.
+     * Returns the validation message to be shown on failure. Any "{0}" placeholder in the message will be substituted
+     * with a comma separated collection of labels of the input fields.
+     * @return The validation message to be shown on failure.
      */
     public String getMessage() {
         return state.get(PropertyKeys.message, defaultMessage);
     }
 
     /**
-     * Sets the validation message to be shown.
-     * @param message The validation message to be shown.
+     * Sets the validation message to be shown on failure. Any "{0}" placeholder in the message will be substituted
+     * with a comma separated collection of labels of the input fields.
+     * @param message The validation message to be shown on failure.
      */
     public void setMessage(String message) {
         state.put(PropertyKeys.message, message);
     }
 
     /**
-     * Returns the client identifiers to show the validation message for.
-     * @return The client identifiers to show the validation message for.
+     * Returns the identifier for which this validator should show the message. Defaults to {@code "@this"} which is the
+     * validator component itself. Other available values are {@code "@all"}, {@code "@invalid"}, {@code "@global"} and
+     * {@code "@violating"}. Any other space separated value will be treated as client ID of UI input component.
+     * @return The identifier for which this validator should show the message.
      */
     public String getShowMessageFor() {
         return state.get(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
     }
 
     /**
-     * Sets the client identifiers to show the validation message for.
-     * @param showMessageFor The client identifiers to show the validation message for.
+     * Sets the identifier for which this validator should show the message. Defaults to {@code "@this"} which is the
+     * validator component itself. Other available values are {@code "@all"}, {@code "@invalid"}, {@code "@global"} and
+     * {@code "@violating"}. Any other space separated value will be treated as client ID of UI input component.
+     * @param showMessageFor The identifier for which this validator should show the message.
      */
     public void setShowMessageFor(String showMessageFor) {
         state.put(PropertyKeys.showMessageFor, showMessageFor);

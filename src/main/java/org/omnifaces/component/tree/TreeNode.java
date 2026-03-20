@@ -23,6 +23,7 @@ import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -38,7 +39,7 @@ import org.omnifaces.util.State;
  * @see Tree
  * @see TreeNodeItem
  */
-@FacesComponent(TreeNode.COMPONENT_TYPE)
+@FacesComponent(value = TreeNode.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TreeNode extends TreeFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -88,16 +89,16 @@ public class TreeNode extends TreeFamily {
     // Getters/setters ------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the level for which this node should render the items.
-     * @return The level for which this node should render the items.
+     * Returns the tree node level to render the node children for. The root level is {@code 0}.
+     * @return The tree node level.
      */
     public Integer getLevel() {
         return state.get(PropertyKeys.level);
     }
 
     /**
-     * Sets the level for which this node should render the items.
-     * @param level The level for which this node should render the items.
+     * Sets the tree node level to render the node children for. The root level is {@code 0}.
+     * @param level The tree node level.
      */
     public void setLevel(Integer level) {
         state.put(PropertyKeys.level, level);

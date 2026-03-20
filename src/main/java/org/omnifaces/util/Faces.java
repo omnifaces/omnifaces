@@ -78,6 +78,7 @@ import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
 import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
@@ -85,6 +86,7 @@ import org.omnifaces.filter.MutableRequestFilter;
 import org.omnifaces.filter.MutableRequestFilter.MutableRequest;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.util.FunctionalInterfaces.ThrowingConsumer;
+import org.omnifaces.vdl.FacesFunction;
 
 /**
  * <p>
@@ -1584,6 +1586,7 @@ public final class Faces {
      * @see HttpServletRequest#getRequestURI()
      * @see HttpServletRequest#getContextPath()
      */
+    @FacesFunction(namespace = OmniFaces.OMNIFACES_NAMESPACE)
     public static String getRequestBaseURL() {
         return FacesLocal.getRequestBaseURL(getContext());
     }
@@ -1598,6 +1601,7 @@ public final class Faces {
      * @see HttpServletRequest#getRequestURI()
      * @since 1.1
      */
+    @FacesFunction(namespace = OmniFaces.OMNIFACES_NAMESPACE)
     public static String getRequestDomainURL() {
         return FacesLocal.getRequestDomainURL(getContext());
     }
@@ -1669,6 +1673,7 @@ public final class Faces {
      * @see HttpServletRequest#getQueryString()
      * @since 1.5
      */
+    @FacesFunction(namespace = OmniFaces.OMNIFACES_NAMESPACE)
     public static String getRequestURLWithQueryString() {
         return FacesLocal.getRequestURLWithQueryString(getContext());
     }
@@ -1699,6 +1704,7 @@ public final class Faces {
      * @see HttpServletRequest#getRemoteAddr()
      * @since 1.2
      */
+    @FacesFunction(namespace = OmniFaces.OMNIFACES_NAMESPACE)
     public static String getRemoteAddr() {
         return FacesLocal.getRemoteAddr(getContext());
     }

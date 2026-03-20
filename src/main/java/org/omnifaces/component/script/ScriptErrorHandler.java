@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.Utils.escapeJS;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
 
 import org.omnifaces.cdi.ScriptError;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.servlet.ScriptErrorServlet;
-import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
 
 /**
@@ -100,7 +101,7 @@ import org.omnifaces.util.State;
  * @see ScriptErrorServlet
  * @since 5.2
  */
-@FacesComponent(ScriptErrorHandler.COMPONENT_TYPE)
+@FacesComponent(value = ScriptErrorHandler.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ListenerFor(systemEventClass = PostAddToViewEvent.class)
 @ResourceDependency(library = OMNIFACES_LIBRARY_NAME, name = OMNIFACES_SCRIPT_NAME, target = "head")
 public class ScriptErrorHandler extends ScriptFamily {
@@ -142,8 +143,9 @@ public class ScriptErrorHandler extends ScriptFamily {
     @Override
     public void processEvent(ComponentSystemEvent event) {
         if (event instanceof PostAddToViewEvent) {
-            validateServletRegistered();
-            event.getFacesContext().getViewRoot().addComponentResource(event.getFacesContext(), this, "head");
+            var context = event.getFacesContext();
+            validateServletRegistered(context);
+            context.getViewRoot().addComponentResource(context, this, "head");
         }
     }
 
@@ -180,6 +182,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Sets the CSS selector for elements whose presence suppresses error reporting.
+     * When an element matching this selector exists in the document, errors will not be sent to the server.
      * @param ignoreSelector The CSS selector.
      */
     public void setIgnoreSelector(String ignoreSelector) {
@@ -196,6 +199,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Sets the maximum number of recent errors to keep for deduplication.
+     * Defaults to {@value #DEFAULT_MAX_RECENT_ERRORS}.
      * @param maxRecentErrors The maximum number of recent errors.
      */
     public void setMaxRecentErrors(int maxRecentErrors) {
@@ -211,7 +215,8 @@ public class ScriptErrorHandler extends ScriptFamily {
     }
 
     /**
-     * Sets the time in milliseconds after which a recent error entry expires.
+     * Sets the time in milliseconds after which a recent error entry expires for deduplication.
+     * Defaults to {@value #DEFAULT_ERROR_EXPIRY} (1 minute).
      * @param errorExpiry The error expiry time in milliseconds.
      */
     public void setErrorExpiry(int errorExpiry) {
@@ -220,9 +225,9 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    private static void validateServletRegistered() {
+    private static void validateServletRegistered(FacesContext context) {
         if (!servletRegistered) {
-            if (!Servlets.getContext().getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
+            if (!getServletContext(context).getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
                 throw new IllegalArgumentException(ERROR_SERVLET_NOT_REGISTERED);
             }
 

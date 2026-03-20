@@ -34,6 +34,7 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 
 import org.omnifaces.util.Ajax;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ import org.omnifaces.util.Ajax;
  * @author Bauke Scholtz
  * @see ScriptFamily
  */
-@FacesComponent(OnloadScript.COMPONENT_TYPE)
+@FacesComponent(value = OnloadScript.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class OnloadScript extends ScriptFamily implements SystemEventListener {

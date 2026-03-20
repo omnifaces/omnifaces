@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
@@ -36,6 +38,7 @@ import org.omnifaces.util.Utils;
  *
  * @author Bauke Scholtz
  */
+@FacesFunctions(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public final class Strings {
 
     // Constants ------------------------------------------------------------------------------------------------------

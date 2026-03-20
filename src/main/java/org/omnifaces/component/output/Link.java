@@ -23,6 +23,7 @@ import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.ActionURLDecorator;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -47,7 +48,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @see ActionURLDecorator
  */
-@FacesComponent(Link.COMPONENT_TYPE)
+@FacesComponent(value = Link.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class Link extends HtmlOutcomeTargetLink {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -56,7 +57,8 @@ public class Link extends HtmlOutcomeTargetLink {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Link";
 
     enum PropertyKeys {
-        includeRequestParams
+        includeRequestParams,
+        fragment
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -73,18 +75,38 @@ public class Link extends HtmlOutcomeTargetLink {
     // Getters/setters ------------------------------------------------------------------------------------------------
 
     /**
-     * Returns whether or not the request parameters should be encoded into the form's action URL.
-     * @return Whether or not the request parameters should be encoded into the form's action URL.
+     * Returns whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
+     * @return Whether or not the request parameters should be encoded into the target URL.
      */
     public boolean isIncludeRequestParams() {
         return state.get(includeRequestParams, FALSE);
     }
 
     /**
-     * Set whether or not the request parameters should be encoded into the form's action URL.
-     * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
+     * Sets whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
+     * @param includeRequestParams Whether or not the request parameters should be encoded into the target URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {
         state.put(PropertyKeys.includeRequestParams, includeRequestParams);
+    }
+
+    /**
+     * Returns the identifier of the page fragment which should be brought into focus when the target page is
+     * rendered. The value of this attribute is appended to the end of target URL following a hash (#) mark. This
+     * notation is part of the standard URL syntax.
+     * @return The page fragment identifier.
+     */
+    public String getFragment() {
+        return state.get(PropertyKeys.fragment);
+    }
+
+    /**
+     * Sets the identifier of the page fragment which should be brought into focus when the target page is
+     * rendered. The value of this attribute is appended to the end of target URL following a hash (#) mark. This
+     * notation is part of the standard URL syntax.
+     * @param fragment The page fragment identifier.
+     */
+    public void setFragment(String fragment) {
+        state.put(PropertyKeys.fragment, fragment);
     }
 }

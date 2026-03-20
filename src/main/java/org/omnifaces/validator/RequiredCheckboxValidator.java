@@ -25,6 +25,9 @@ import jakarta.faces.validator.FacesValidator;
 import jakarta.faces.validator.Validator;
 import jakarta.faces.validator.ValidatorException;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesValidatorTag;
+
 /**
  * <p>
  * The <code>omnifaces.RequiredCheckboxValidator</code> is intented to solve a peculiar problem with
@@ -65,6 +68,7 @@ import jakarta.faces.validator.ValidatorException;
  * @author Bauke Scholtz
  */
 @FacesValidator("omnifaces.RequiredCheckboxValidator")
+@FacesValidatorTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class RequiredCheckboxValidator implements Validator<Boolean> {
 
     // Constants ------------------------------------------------------------------------------------------------------

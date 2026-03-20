@@ -22,7 +22,10 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -37,9 +40,13 @@ import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
  *
  * @author Arjan Tijms
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class MethodParam extends TagHandler {
 
+    @FacesAttribute(required = true, description = "Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.")
     private final TagAttribute name;
+
+    @FacesAttribute(required = true, description = "The method expression to be cached and made available as a new value expression.")
     private final TagAttribute value;
 
     /**

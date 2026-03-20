@@ -33,6 +33,7 @@ import jakarta.faces.context.FacesContextWrapper;
 import org.omnifaces.component.ActionURLDecorator;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -113,7 +114,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @see ActionURLDecorator
  */
-@FacesComponent(Form.COMPONENT_TYPE)
+@FacesComponent(value = Form.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Form.ts.
 public class Form extends HtmlForm {
 
@@ -177,7 +178,8 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Set whether or not the request parameters should be encoded into the form's action URL.
+     * Sets whether or not the request parameters should be encoded into the form's action URL. Defaults to
+     * {@code false}.
      * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
      * @since 1.5
      */
@@ -196,8 +198,8 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Set whether the request URI should be used as form's action URL.
-     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * Sets whether the request URI should be used as form's action URL. Defaults to {@code true}.
+     * This setting is ignored when {@code includeRequestParams} is set to {@code true}.
      * @param useRequestURI Whether the request URI should be used as form's action URL.
      * @since 1.6
      */
@@ -215,7 +217,7 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Set whether the form should ignore validation fail.
+     * Sets whether the form should ignore validation fail (and thus proceed to update model/invoke action).
      * @param ignoreValidationFailed Whether the form should ignore validation fail.
      * @since 2.1
      */
@@ -233,7 +235,8 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Set whether to send only the form data which actually need to be processed as opposed to the entire form.
+     * Sets whether to send only the form data which actually need to be processed as opposed to the entire form.
+     * Defaults to {@code true}.
      * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
      * @since 3.0
      */

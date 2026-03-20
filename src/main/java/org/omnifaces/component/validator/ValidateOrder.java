@@ -27,6 +27,7 @@ import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -56,7 +57,7 @@ import org.omnifaces.validator.MultiFieldValidator;
  * @see ValidatorFamily
  * @see MultiFieldValidator
  */
-@FacesComponent(ValidateOrder.COMPONENT_TYPE)
+@FacesComponent(value = ValidateOrder.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // We don't care about the actual Comparable type.
 public class ValidateOrder extends ValidateMultipleFields {
 

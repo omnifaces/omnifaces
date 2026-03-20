@@ -13,13 +13,15 @@
 package org.omnifaces.component.stylesheet;
 
 import jakarta.faces.component.FacesComponent;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.AbortProcessingException;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.renderer.CriticalStylesheetRenderer;
+import org.omnifaces.util.State;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -27,7 +29,7 @@ import org.omnifaces.renderer.CriticalStylesheetRenderer;
  * which renders a <code>&lt;link rel="preload" as="style"&gt;</code> instead of <code>&lt;link rel="stylesheet"&gt;</code>
  * and automatically changes the <code>rel="preload"</code> to <code>rel="stylesheet"</code> during window load event.
  * Additionally, it will automatically be moved to the very top of the head.
- * 
+ *
  * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputStylesheet&gt;</code>, with a <code>library</code> and <code>name</code>.
@@ -46,7 +48,7 @@ import org.omnifaces.renderer.CriticalStylesheetRenderer;
  * @see StylesheetFamily
  * @see CriticalStylesheetRenderer
  */
-@FacesComponent(CriticalStylesheet.COMPONENT_TYPE)
+@FacesComponent(value = CriticalStylesheet.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 public class CriticalStylesheet extends StylesheetFamily {
 
@@ -54,6 +56,16 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /** The component type, which is {@value org.omnifaces.component.stylesheet.CriticalStylesheet#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.stylesheet.CriticalStylesheet";
+
+    enum PropertyKeys {
+        library,
+        name,
+        media
+    }
+
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    private final State state = new State(getStateHelper());
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -73,9 +85,60 @@ public class CriticalStylesheet extends StylesheetFamily {
     @Override
     public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
         if (event instanceof PostAddToViewEvent) {
-            FacesContext context = event.getFacesContext();
-            context.getViewRoot().addComponentResource(context, event.getComponent(), "head");
+            var context = event.getFacesContext();
+            context.getViewRoot().addComponentResource(context, this, "head");
         }
+    }
+
+    // Attribute getters/setters --------------------------------------------------------------------------------------
+
+    /**
+     * Returns the "library name" part of the resource identifier.
+     * @return The library name.
+     */
+    public String getLibrary() {
+        return state.get(PropertyKeys.library);
+    }
+
+    /**
+     * Sets the "library name" part of the resource identifier.
+     * @param library The library name.
+     */
+    public void setLibrary(String library) {
+        state.put(PropertyKeys.library, library);
+    }
+
+    /**
+     * Returns the "resource name" part of the resource identifier.
+     * @return The resource name.
+     */
+    public String getName() {
+        return state.get(PropertyKeys.name);
+    }
+
+    /**
+     * Sets the "resource name" part of the resource identifier.
+     * @param name The resource name.
+     */
+    @FacesAttribute(required = true)
+    public void setName(String name) {
+        state.put(PropertyKeys.name, name);
+    }
+
+    /**
+     * Returns the media that the stylesheet applies to.
+     * @return The media type.
+     */
+    public String getMedia() {
+        return state.get(PropertyKeys.media);
+    }
+
+    /**
+     * Sets the media that the stylesheet applies to.
+     * @param media The media type.
+     */
+    public void setMedia(String media) {
+        state.put(PropertyKeys.media, media);
     }
 
 }

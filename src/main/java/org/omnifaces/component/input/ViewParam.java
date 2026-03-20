@@ -28,6 +28,8 @@ import jakarta.faces.event.PreValidateEvent;
 
 import org.omnifaces.util.MapWrapper;
 import org.omnifaces.util.Utils;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -85,7 +87,7 @@ import org.omnifaces.util.Utils;
  * @author Arjan Tijms
  * @author Bauke Scholtz
  */
-@FacesComponent(ViewParam.COMPONENT_TYPE)
+@FacesComponent(value = ViewParam.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ViewParam extends UIViewParameter {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -181,6 +183,15 @@ public class ViewParam extends UIViewParameter {
      */
     public void setDefault(String defaultValue) {
         getStateHelper().put("default", defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @FacesAttribute(required = true)
+    @Override
+    public void setName(String name) {
+        super.setName(name);
     }
 
     @Override

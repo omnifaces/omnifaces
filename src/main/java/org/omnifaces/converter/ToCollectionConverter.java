@@ -32,8 +32,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.util.Faces;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -77,6 +79,7 @@ import org.omnifaces.util.Faces;
  * @since 2.6
  */
 @FacesConverter("omnifaces.ToCollectionConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ToCollectionConverter implements Converter<Collection> {
 

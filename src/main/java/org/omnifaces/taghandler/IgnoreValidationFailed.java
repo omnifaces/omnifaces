@@ -28,6 +28,8 @@ import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.input.Form;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -57,6 +59,7 @@ import org.omnifaces.component.input.Form;
  * @author Bauke Scholtz
  * @see Form
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class IgnoreValidationFailed extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------

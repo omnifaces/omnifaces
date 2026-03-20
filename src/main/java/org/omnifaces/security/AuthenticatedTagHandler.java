@@ -19,6 +19,9 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.security.enterprise.SecurityContext;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesTagHandler;
+
 /**
  * <p>
  * The <code>&lt;sec:isAuthenticated&gt;</code> tag conditionally renders its content only when the user is
@@ -124,6 +127,7 @@ import jakarta.security.enterprise.SecurityContext;
  * @author Bauke Scholtz
  * @since 5.0
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_SECURITY_NAMESPACE, tagName = "isAuthenticated")
 public class AuthenticatedTagHandler extends BaseSecurityTagHandler {
 
     /**

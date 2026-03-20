@@ -56,6 +56,7 @@ import org.omnifaces.util.Components;
 import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
 import org.omnifaces.util.Utils;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -254,7 +255,7 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  * @since 2.5
  */
-@FacesComponent(InputFile.COMPONENT_TYPE)
+@FacesComponent(value = InputFile.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ResourceDependency(library=FACES_SCRIPT_LIBRARY_NAME, name=FACES_SCRIPT_RESOURCE_NAME, target="head") // Required for faces.ajax.request.
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically InputFile.ts.
 public class InputFile extends HtmlInputFile {

@@ -20,6 +20,7 @@ import jakarta.faces.component.html.HtmlInputHidden;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -68,7 +69,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @since 3.7
  */
-@FacesComponent(InputHidden.COMPONENT_TYPE)
+@FacesComponent(value = InputHidden.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class InputHidden extends HtmlInputHidden {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -124,9 +125,9 @@ public class InputHidden extends HtmlInputHidden {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns whether this component is readonly. Defaults to <code>false</code>. Note that even when this component is
-     * readonly, all associated validators will be invoked based on the model value, not on the submitted value. Also
-     * the setter won't be invoked.
+     * Returns whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the
+     * submitted value will be ignored and the model value will be used as submitted value. All associated validators
+     * will still be invoked based on the model value, not on the submitted value. Also the setter won't be invoked.
      * @return Whether this component is readonly.
      * @since 4.1
      */
@@ -135,7 +136,9 @@ public class InputHidden extends HtmlInputHidden {
     }
 
     /**
-     * Set whether this component is readonly.
+     * Sets whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the
+     * submitted value will be ignored and the model value will be used as submitted value. All associated validators
+     * will still be invoked based on the model value, not on the submitted value. Also the setter won't be invoked.
      * @param readonly Whether this component is readonly.
      * @since 4.1
      */

@@ -20,6 +20,9 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.FacesConverter;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesConverterTag;
+
 /**
  * <p>
  * The <code>omnifaces.ToUpperCaseConverter</code> is intented to convert submitted {@link String} values to upper case
@@ -48,6 +51,7 @@ import jakarta.faces.convert.FacesConverter;
  * @since 2.6
  */
 @FacesConverter("omnifaces.ToUpperCaseConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ToUpperCaseConverter extends TrimConverter {
 
     @Override

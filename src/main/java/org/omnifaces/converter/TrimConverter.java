@@ -20,6 +20,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesConverterTag;
+
 /**
  * <p>
  * The <code>omnifaces.TrimConverter</code> is intented to trim any whitespace from submitted {@link String} values.
@@ -55,6 +58,7 @@ import jakarta.faces.convert.FacesConverter;
  * @since 2.6
  */
 @FacesConverter("omnifaces.TrimConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TrimConverter implements Converter<String> {
 
     @Override

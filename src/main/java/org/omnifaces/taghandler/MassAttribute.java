@@ -29,6 +29,10 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
+
 /**
  * <p>
  * The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
@@ -83,6 +87,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * @author Bauke Scholtz
  * @since 1.8
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class MassAttribute extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -96,8 +101,13 @@ public class MassAttribute extends TagHandler {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(required = true, description = "The name of the attribute to be set on all nested components. This cannot be set to id or binding as those are already evaluated during view build time and they shouldn't be shared among components anyway.")
     private final String name;
+
+    @FacesAttribute(required = true, description = "The value of the attribute to be set on all nested components. This will be evaluated on a per-component basis. In other words, #{component} can be used here to refer the \"current\" component.")
     private final TagAttribute value;
+
+    @FacesAttribute(name = "target", description = "The FQN of the specific UIComponent (super)class for which the attribute should be set. This value can be a comma separated string of FQNs.")
     private Class<UIComponent>[] targetClasses;
 
     // Constructors ---------------------------------------------------------------------------------------------------

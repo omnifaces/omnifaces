@@ -12,8 +12,6 @@
  */
 package org.omnifaces.component.input;
 
-import static java.lang.Boolean.parseBoolean;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +20,7 @@ import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -42,28 +41,27 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
  * @since 1.1
  * @author Arjan Tijms
  */
-@FacesComponent(ComponentIdParam.COMPONENT_TYPE)
+@FacesComponent(value = ComponentIdParam.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ComponentIdParam extends ViewParam {
 
     /** The component type, which is {@value org.omnifaces.component.input.ComponentIdParam#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ComponentIdParam";
 
     private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
         componentIdName, clientIdName, renderChildren
     }
 
     @Override
     public void decode(FacesContext context) {
-
-        List<String> componentIds = getRequestValues(context, PropertyKeys.componentIdName);
-        List<String> clientIds = getRequestValues(context, PropertyKeys.clientIdName);
-        boolean renderChildren = getBooleanAttribute(PropertyKeys.renderChildren);
+        List<String> componentIds = getRequestValues(context, getComponentIdName());
+        List<String> clientIds = getRequestValues(context, getClientIdName());
 
         // Installs a PhaseListener on the view root that will replace the response writer before
         // and after rendering with one that only renders when the current component has one of the Ids
         // that we receive from the request here.
         if (!componentIds.isEmpty() || !clientIds.isEmpty()) {
-            context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, renderChildren));
+            context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, isRenderChildren()));
         }
     }
 
@@ -77,36 +75,83 @@ public class ComponentIdParam extends ViewParam {
         // NOOP. This component doesn't have a model value anyway.
     }
 
+    // Attribute getters/setters --------------------------------------------------------------------------------------
+
     /**
-     * Gets the list of request values for the request parameter names identified by the value of the given property key.
-     *
-     * @param context
-     *            FacesContext for the request we are processing
-     * @param propertyKey
-     *            property that holds the request parameter name for which values are returned.
-     * @return All values in the request corresponding to the given parameter name
+     * Returns the name of the request parameters from which the values are retrieved on an initial request that
+     * represent component ids of those components from which the markup should appear in the response (i.e. which
+     * should be rendered).
+     * @return The component id parameter name.
      */
-    private List<String> getRequestValues(FacesContext context, PropertyKeys propertyKey) {
-        String componentIdName = (String) getAttributes().get(propertyKey.name());
-        if (componentIdName != null) {
-            String[] values = context.getExternalContext().getRequestParameterValuesMap().get(componentIdName);
+    public String getComponentIdName() {
+        return (String) getStateHelper().eval(PropertyKeys.componentIdName);
+    }
+
+    /**
+     * Sets the name of the request parameters from which the values are retrieved on an initial request that
+     * represent component ids of those components from which the markup should appear in the response (i.e. which
+     * should be rendered).
+     * @param componentIdName The component id parameter name.
+     */
+    public void setComponentIdName(String componentIdName) {
+        getStateHelper().put(PropertyKeys.componentIdName, componentIdName);
+    }
+
+    /**
+     * Returns the name of the request parameters from which the values are retrieved on an initial request that
+     * represent client ids of those components from which the markup should appear in the response (i.e. which
+     * should be rendered).
+     * @return The client id parameter name.
+     */
+    public String getClientIdName() {
+        return (String) getStateHelper().eval(PropertyKeys.clientIdName);
+    }
+
+    /**
+     * Sets the name of the request parameters from which the values are retrieved on an initial request that
+     * represent client ids of those components from which the markup should appear in the response (i.e. which
+     * should be rendered).
+     * @param clientIdName The client id parameter name.
+     */
+    public void setClientIdName(String clientIdName) {
+        getStateHelper().put(PropertyKeys.clientIdName, clientIdName);
+    }
+
+    /**
+     * Returns whether children of the components identified by clientIdName or componentIdName are rendered in
+     * addition to the component itself. Defaults to {@code true}.
+     * @return Whether children should be rendered.
+     */
+    public boolean isRenderChildren() {
+        return (boolean) getStateHelper().eval(PropertyKeys.renderChildren, true);
+    }
+
+    /**
+     * Sets whether children of the components identified by clientIdName or componentIdName are rendered in
+     * addition to the component itself. Defaults to {@code true}.
+     * @param renderChildren Whether children should be rendered.
+     */
+    public void setRenderChildren(boolean renderChildren) {
+        getStateHelper().put(PropertyKeys.renderChildren, renderChildren);
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Gets the list of request values for the given request parameter name.
+     * @param context FacesContext for the request we are processing.
+     * @param paramName The request parameter name for which values are returned.
+     * @return All values in the request corresponding to the given parameter name.
+     */
+    private static List<String> getRequestValues(FacesContext context, String paramName) {
+        if (paramName != null) {
+            String[] values = context.getExternalContext().getRequestParameterValuesMap().get(paramName);
             if (values != null) {
                 return Arrays.asList(values);
             }
         }
 
         return Collections.emptyList();
-    }
-
-    /**
-     * Gets the boolean value for the given property key. Defaults to true if no value is defined.
-     *
-     * @param propertyKey
-     * @return false if the boolean attribute is present and not equal to "true", true otherwise.
-     */
-    private boolean getBooleanAttribute(PropertyKeys propertyKey) {
-        String attribute = (String) getAttributes().get(propertyKey.name());
-        return attribute == null || parseBoolean(attribute);
     }
 
 }

@@ -20,6 +20,8 @@ import jakarta.faces.component.html.HtmlMessages;
 import org.omnifaces.renderer.MessagesRenderer;
 import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
  * <p>
@@ -114,7 +116,8 @@ import org.omnifaces.util.State;
  * @since 1.5
  * @see MessagesRenderer
  */
-@FacesComponent(OmniMessages.COMPONENT_TYPE)
+@FacesComponent(value = OmniMessages.COMPONENT_TYPE, tagName = "messages", namespace = OmniFaces.OMNIFACES_NAMESPACE)
+@FacesComponentConfig(rendererType = "org.omnifaces.Messages")
 public class OmniMessages extends HtmlMessages {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -165,7 +168,8 @@ public class OmniMessages extends HtmlMessages {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the name of the request attribute which exposes the current faces message.
+     * Returns the name of the request attribute which exposes the current faces message in the request scope.
+     * This will trigger rendering of markup per faces message instead of per component.
      * @return The name of the request attribute which exposes the current faces message.
      */
     public String getVar() {
@@ -173,7 +177,8 @@ public class OmniMessages extends HtmlMessages {
     }
 
     /**
-     * Sets the name of the request attribute which exposes the current faces message.
+     * Sets the name of the request attribute which exposes the current faces message in the request scope.
+     * This will trigger rendering of markup per faces message instead of per component.
      * @param varName The name of the request attribute which exposes the current faces message.
      */
     public void setVar(String varName) {
@@ -207,7 +212,7 @@ public class OmniMessages extends HtmlMessages {
     }
 
     /**
-     * Sets whether the message detail and summary should be HTML-escaped.
+     * Sets whether the message detail and summary should be HTML-escaped. Defaults to {@code true}.
      * @param escape Whether the message detail and summary should be HTML-escaped.
      */
     public void setEscape(boolean escape) {

@@ -25,6 +25,10 @@ import jakarta.faces.view.facelets.TagAttributeException;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.security.enterprise.SecurityContext;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
+
 /**
  * <p>
  * The <code>&lt;sec:authorize&gt;</code> tag conditionally renders its content based on role-based access control
@@ -107,11 +111,19 @@ import jakarta.security.enterprise.SecurityContext;
  * @author Bauke Scholtz
  * @since 5.0
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_SECURITY_NAMESPACE, tagName = "authorize")
 public class AuthorizeTagHandler extends BaseSecurityTagHandler {
 
+    @FacesAttribute(description = "Allows content to be rendered if the user has the role specified here. Mutually exclusive with anyRole and allRoles.")
     private final TagAttribute role;
+
+    @FacesAttribute(description = "Allows content to be rendered if the user has any of the comma-separated roles added here. Mutually exclusive with role and allRoles.")
     private final TagAttribute anyRole;
+
+    @FacesAttribute(description = "Allows content to be rendered if the user has all of the comma-separated roles added here. Mutually exclusive with role and anyRole.")
     private final TagAttribute allRoles;
+
+    @FacesAttribute(name = "var", description = "Name for a boolean EL variable containing the authorization result. Always set regardless of whether content is rendered.")
     private final TagAttribute varAttribute;
 
     /**

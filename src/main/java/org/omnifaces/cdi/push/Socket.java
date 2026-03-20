@@ -56,6 +56,8 @@ import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -733,7 +735,7 @@ import org.omnifaces.util.State;
  * @see SocketPushContextProducer
  * @since 2.3
  */
-@FacesComponent(Socket.COMPONENT_TYPE)
+@FacesComponent(value = Socket.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Socket.ts.
 public class Socket extends ScriptFamily implements ClientBehaviorHolder {
@@ -941,6 +943,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
      * All open websockets on the same channel will receive the same push message from the server.
      * @param channel The name of the web socket channel.
      */
+    @FacesAttribute(required = true)
     public void setChannel(String channel) {
         state.put(PropertyKeys.channel, channel);
     }
@@ -1017,6 +1020,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
      * The function will be invoked with three arguments: the push message, the channel name and the raw MessageEvent itself.
      * @param onmessage The JavaScript event handler function that is invoked when a push message is received from the server.
      */
+    @FacesAttribute(required = true)
     public void setOnmessage(String onmessage) {
         state.put(PropertyKeys.onmessage, onmessage);
     }

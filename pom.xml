@@ -135,6 +135,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Compile-only: VDL taglib.xml generator. -->
+        <dependency>
+            <groupId>org.omnifaces</groupId>
+            <artifactId>vdlgen</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Optional Jakarta EE 11 dependencies. -->
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -308,37 +316,6 @@
                 </executions>
             </plugin>
 
-            <!-- Configure the *.old.taglib.xml generators. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xml-maven-plugin</artifactId>
-                <version>1.1.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-old-taglib-files</id>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <transformationSets>
-                        <transformationSet>
-                            <dir>src/main/resources/META-INF</dir>
-                            <includes><include>omnifaces.taglib.xml</include></includes>
-                            <stylesheet>src/main/generate-omnifaces-ui.old.taglib.xsl</stylesheet>
-                            <outputDir>${project.build.directory}/generated-resources/xslt/omnifaces-ui</outputDir>
-                        </transformationSet>
-                        <transformationSet>
-                            <dir>src/main/resources/META-INF</dir>
-                            <includes><include>omnifaces.taglib.xml</include></includes>
-                            <stylesheet>src/main/generate-omnifaces-functions.old.taglib.xsl</stylesheet>
-                            <outputDir>${project.build.directory}/generated-resources/xslt/omnifaces-functions</outputDir>
-                        </transformationSet>
-                    </transformationSets>
-                </configuration>
-            </plugin>
-
             <!-- Configure the JavaScript minifier. -->
             <plugin>
                 <groupId>com.github.blutorange</groupId>
@@ -388,7 +365,60 @@
                 </executions>
             </plugin>
 
-            <!-- Rename these *.old.taglib.xml files and put them back in the right place. -->
+            <!-- Configure the annotation processor for taglib.xml generation. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.omnifaces</groupId>
+                            <artifactId>vdlgen</artifactId>
+                            <version>1.0</version>
+                        </path>
+                        <path>
+                            <groupId>org.glassfish</groupId>
+                            <artifactId>jakarta.faces</artifactId> <!-- needed for inherited taglib.xml attributes -->
+                            <version>${test.mojarra.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Transform the generated taglib.xml into *.old.taglib.xml files. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-old-taglib-files</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>${project.build.outputDirectory}/META-INF</dir>
+                            <includes><include>omnifaces.taglib.xml</include></includes>
+                            <stylesheet>src/main/generate-omnifaces-ui.old.taglib.xsl</stylesheet>
+                            <outputDir>${project.build.directory}/generated-resources/xslt/omnifaces-ui</outputDir>
+                        </transformationSet>
+                        <transformationSet>
+                            <dir>${project.build.outputDirectory}/META-INF</dir>
+                            <includes><include>omnifaces.taglib.xml</include></includes>
+                            <stylesheet>src/main/generate-omnifaces-functions.old.taglib.xsl</stylesheet>
+                            <outputDir>${project.build.directory}/generated-resources/xslt/omnifaces-functions</outputDir>
+                        </transformationSet>
+                    </transformationSets>
+                </configuration>
+            </plugin>
+
+            <!-- Rename the *.old.taglib.xml files and put them back in the right place. -->
             <plugin>
                 <groupId>com.coderplus.maven.plugins</groupId>
                 <artifactId>copy-rename-maven-plugin</artifactId>
@@ -396,7 +426,7 @@
                 <executions>
                     <execution>
                         <id>rename-old-taglib-files</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -501,9 +531,12 @@
                 <configuration>
                     <browserTitle>OmniFaces ${project.version} VDL Documentation</browserTitle>
                     <documentTitle>OmniFaces ${project.version} VDL Documentation</documentTitle>
+                    <excludes>
+                        <exclude>none</exclude>
+                    </excludes>
                     <includes>
-                        <include>src/main/resources/META-INF/omnifaces.taglib.xml</include>
-                        <include>src/main/resources/META-INF/omnifaces-security.taglib.xml</include>
+                        <include>target/classes/META-INF/omnifaces.taglib.xml</include>
+                        <include>target/classes/META-INF/omnifaces-security.taglib.xml</include>
                     </includes>
                     <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
                 </configuration>
@@ -1135,6 +1168,7 @@
                         <version>0.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
+                            <deploymentName>${project.artifactId}-${project.version}</deploymentName>
                             <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>

@@ -23,6 +23,7 @@ import jakarta.faces.component.visit.VisitCallback;
 import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PhaseId;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -34,7 +35,7 @@ import jakarta.faces.event.PhaseId;
  * @author Bauke Scholtz
  * @see TreeNodeItem
  */
-@FacesComponent(TreeInsertChildren.COMPONENT_TYPE)
+@FacesComponent(value = TreeInsertChildren.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TreeInsertChildren extends TreeFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------

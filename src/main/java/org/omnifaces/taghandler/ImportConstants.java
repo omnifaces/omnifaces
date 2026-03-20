@@ -37,8 +37,11 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.MapWrapper;
 import org.omnifaces.util.Utils;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -111,6 +114,7 @@ import org.omnifaces.util.Utils;
  *
  * @author Bauke Scholtz
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ImportConstants extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -123,8 +127,13 @@ public class ImportConstants extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(name = "var", description = "The name of the request attribute which exposes the mapping of the constants in the request scope.")
     private final String varValue;
+
+    @FacesAttribute(name = "type", required = true, description = "The fully qualified name of the class/interface/enum to import the constant field values for.")
     private final TagAttribute typeAttribute;
+
+    @FacesAttribute(name = "loader", description = "The object to be used as source of the class loader to load the class specified in the type attribute. Can be an instance of ClassLoader, Class or any object.")
     private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------

@@ -33,10 +33,13 @@ import jakarta.faces.view.facelets.TagAttributeException;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.MapWrapper;
 import org.omnifaces.util.Utils;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -60,12 +63,18 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  * @since 4.3
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class LoadBundle extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
+    @FacesAttribute(name = "var", required = true, description = "The name of the request attribute which exposes the loaded resource bundle in the request scope.")
     private final String varValue;
+
+    @FacesAttribute(name = "basename", required = true, description = "Base name of the resource bundle to be loaded.")
     private final TagAttribute basenameAttribute;
+
+    @FacesAttribute(name = "loader", description = "The object to be used as source of the class loader to load the resource bundle specified in basename attribute. Can be an instance of ClassLoader, Class or any object.")
     private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------

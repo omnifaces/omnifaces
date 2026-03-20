@@ -23,7 +23,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.FacesLocal;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
@@ -50,6 +53,7 @@ import org.omnifaces.util.FacesLocal;
  * @since 5.1
  */
 @FacesConverter("omnifaces.CompositeConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class CompositeConverter implements Converter<Object> {
 
     private String converterIds;
@@ -104,6 +108,7 @@ public class CompositeConverter implements Converter<Object> {
      * Sets the comma-separated string of converter IDs.
      * @param converterIds The comma-separated string of converter IDs.
      */
+    @FacesAttribute(required = true)
     public void setConverterIds(String converterIds) {
         this.converterIds = converterIds;
     }

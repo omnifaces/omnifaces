@@ -23,6 +23,10 @@ import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.model.SelectItem;
 
+import org.omnifaces.config.OmniFaces;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesConverterTag;
+
 /**
  * <p>
  * The <code>omnifaces.ListIndexConverter</code> is a variant of the {@link ListConverter} which automatically converts
@@ -57,6 +61,7 @@ import jakarta.faces.model.SelectItem;
  * @author Arjan Tijms
  */
 @FacesConverter("omnifaces.ListIndexConverter")
+@FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ListIndexConverter implements Converter<Object> {
 
     private static final String ERROR_LIST_INDEX =
@@ -75,7 +80,7 @@ public class ListIndexConverter implements Converter<Object> {
         int index;
 
         try {
-            index = Integer.valueOf(value);
+            index = Integer.parseInt(value);
         }
         catch (NumberFormatException e) {
             throw new ConverterException(
@@ -108,6 +113,7 @@ public class ListIndexConverter implements Converter<Object> {
      * Sets the list of available items.
      * @param list The list of available items.
      */
+    @FacesAttribute(required = true)
     public void setList(List<?> list) {
         this.list = list;
     }

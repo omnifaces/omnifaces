@@ -28,6 +28,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
+import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
@@ -43,7 +44,7 @@ import org.omnifaces.model.tree.TreeModel;
  * @see TreeNode
  * @see TreeInsertChildren
  */
-@FacesComponent(TreeNodeItem.COMPONENT_TYPE)
+@FacesComponent(value = TreeNodeItem.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class TreeNodeItem extends TreeFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------

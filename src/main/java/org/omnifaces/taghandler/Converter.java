@@ -13,7 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
-import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
+import static org.omnifaces.util.Facelets.getValueExpression;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,9 +32,12 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagHandlerDelegate;
 
 import org.omnifaces.cdi.converter.ConverterManager;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
+import org.omnifaces.vdl.FacesAttribute;
+import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
@@ -71,7 +74,19 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * @author Bauke Scholtz
  * @see DeferredTagHandlerHelper
  */
+@FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE, converterId = "omnifaces.Converter")
 public class Converter extends ConverterHandler implements DeferredTagHandler {
+
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    @FacesAttribute(description = "Converter identifier of the Converter to be created and registered.")
+    private final TagAttribute converterId;
+
+    @FacesAttribute(description = "A ValueExpression that evaluates to an object that implements the jakarta.faces.convert.Converter interface.")
+    private final TagAttribute binding;
+
+    @FacesAttribute(name = "for", description = "If present, this attribute refers to the value of one of the exposed attached objects within the composite component inside of which this tag is nested.")
+    private final TagAttribute forValue;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -81,6 +96,9 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
      */
     public Converter(ConverterConfig config) {
         super(config);
+        converterId = getAttribute("converterId");
+        binding = getAttribute("binding");
+        forValue = getAttribute("for");
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -110,11 +128,11 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
             return;
         }
 
-        ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
-        ValueExpression id = getValueExpression(context, this, "converterId", String.class);
-        jakarta.faces.convert.Converter<Object> converter = createInstance(context.getFacesContext(), context, binding, id);
-        DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
-        ((ValueHolder) parent).setConverter(new DeferredConverter(converter, binding, id, attributes));
+        var bindingExpression = getValueExpression(context, binding, Object.class);
+        var id = getValueExpression(context, converterId, String.class);
+        var converter = createInstance(context.getFacesContext(), context, bindingExpression, id);
+        var attributes = collectDeferredAttributes(context, this, converter);
+        ((ValueHolder) parent).setConverter(new DeferredConverter(converter, bindingExpression, id, attributes));
     }
 
     @Override

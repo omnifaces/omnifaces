@@ -26,8 +26,10 @@ import java.util.Objects;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.event.HashChangeEvent;
 import org.omnifaces.util.Faces;
+import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -117,7 +119,7 @@ import org.omnifaces.util.Faces;
  * @see Faces#getHashParameterMap()
  * @see Faces#getHashQueryString()
  */
-@FacesComponent(HashParam.COMPONENT_TYPE)
+@FacesComponent(value = HashParam.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class HashParam extends OnloadParam {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -196,6 +198,15 @@ public class HashParam extends OnloadParam {
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @FacesAttribute(required = true)
+    public void setName(String name) {
+        super.setName(name);
+    }
 
     /**
      * Returns the default value in case the actual hash parameter is <code>null</code> or empty.
