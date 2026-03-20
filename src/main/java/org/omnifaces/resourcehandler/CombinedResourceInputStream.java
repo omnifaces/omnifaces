@@ -12,10 +12,14 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -49,6 +53,10 @@ public final class CombinedResourceInputStream extends InputStream {
     private List<InputStream> streams;
     private Iterator<InputStream> streamIterator;
     private InputStream currentStream;
+    private final boolean script;
+    private boolean preamble;
+    private byte[] pendingOutput;
+    private int pendingOutputOffset;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -56,9 +64,14 @@ public final class CombinedResourceInputStream extends InputStream {
      * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the
      * {@link InputStream} will be obtained and hold in an iterable collection.
      * @param resources The resources to be read.
+     * @param contentType The content type of the combined resource; must not be <code>null</code>. When this is a
+     * JavaScript type (ending in <code>/javascript</code>), <code>"use strict"</code> directives will be stripped from
+     * the preamble of each resource to prevent them from ending up in the middle of the combined output.
+     * @throws NullPointerException When content type is <code>null</code>.
      * @throws IOException If something fails at I/O level.
      */
-    public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
+    public CombinedResourceInputStream(Set<Resource> resources, String contentType) throws IOException {
+        script = requireNonNull(contentType, "contentType").endsWith("/javascript");
         streams = new ArrayList<>();
         String domainURL = getRequestDomainURL();
 
@@ -78,10 +91,7 @@ public final class CombinedResourceInputStream extends InputStream {
         }
 
         streamIterator = streams.iterator();
-
-        if (streamIterator.hasNext()) {
-            currentStream = streamIterator.next();
-        }
+        advanceStream();
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -92,14 +102,33 @@ public final class CombinedResourceInputStream extends InputStream {
      */
     @Override
     public int read() throws IOException {
+        if (pendingOutput != null && pendingOutputOffset < pendingOutput.length) {
+            return pendingOutput[pendingOutputOffset++] & 0xFF;
+        }
+
+        pendingOutput = null;
+
+        if (preamble) {
+            int preambleRead = readPreamble();
+
+            if (preambleRead != -1) {
+                return preambleRead;
+            }
+        }
+
         int read;
 
         while ((read = currentStream.read()) == -1) {
-            if (streamIterator.hasNext()) {
-                currentStream = streamIterator.next();
-            }
-            else {
+            if (!advanceStream()) {
                 break;
+            }
+
+            if (preamble) {
+                int preambleRead = readPreamble();
+
+                if (preambleRead != -1) {
+                    return preambleRead;
+                }
             }
         }
 
@@ -112,14 +141,39 @@ public final class CombinedResourceInputStream extends InputStream {
      */
     @Override
     public int read(byte[] b, int offset, int length) throws IOException {
+        if (preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length)) {
+            // Delegate to single-byte read during preamble scanning (only a handful of bytes).
+            int singleByte = read();
+
+            if (singleByte == -1) {
+                return -1;
+            }
+
+            b[offset] = (byte) singleByte;
+            int count = 1;
+
+            while (count < length && (preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length))) {
+                singleByte = read();
+
+                if (singleByte == -1) {
+                    break;
+                }
+
+                b[offset + count++] = (byte) singleByte;
+            }
+
+            return count;
+        }
+
         int read;
 
         while ((read = currentStream.read(b, offset, length)) == -1) {
-            if (streamIterator.hasNext()) {
-                currentStream = streamIterator.next();
-            }
-            else {
+            if (!advanceStream()) {
                 break;
+            }
+
+            if (preamble) {
+                return read(b, offset, length);
             }
         }
 
@@ -145,6 +199,82 @@ public final class CombinedResourceInputStream extends InputStream {
 
         if (caught != null) {
             throw caught;
+        }
+    }
+
+    /**
+     * Advances to the next stream in the iterator. When advancing to a JS resource stream (not a CRLF separator),
+     * enables preamble scanning mode for <code>"use strict"</code> directive stripping.
+     * @return <code>true</code> if there was a next stream to advance to, <code>false</code> otherwise.
+     */
+    private boolean advanceStream() {
+        if (!streamIterator.hasNext()) {
+            return false;
+        }
+
+        currentStream = streamIterator.next();
+
+        if (script && !(currentStream instanceof ByteArrayInputStream)) {
+            currentStream = new BufferedInputStream(currentStream);
+            preamble = true;
+        }
+
+        return true;
+    }
+
+    /**
+     * Scans the preamble of a JS resource stream for a <code>"use strict"</code> directive and strips it if found.
+     * Non-quote bytes (whitespace, comment characters) pass through directly. When a quote is found, the content up to
+     * the matching close quote is buffered and checked. If it's <code>"use strict"</code>, the directive and the rest
+     * of the line are consumed. Otherwise, the buffered content is queued as pending output.
+     * @return The next byte to output, or <code>-1</code> if the stream is exhausted.
+     * @throws IOException If something fails at I/O level.
+     */
+    private int readPreamble() throws IOException {
+        while (true) {
+            int b = currentStream.read();
+
+            if (b == -1) {
+                preamble = false;
+                return -1;
+            }
+
+            if (b != '\'' && b != '"') {
+                return b;
+            }
+
+            var buf = new ByteArrayOutputStream();
+            int c;
+
+            while ((c = currentStream.read()) != -1 && c != b) {
+                buf.write(c);
+            }
+
+            preamble = false;
+
+            if ("use strict".equals(buf.toString(UTF_8))) {
+                int next;
+
+                while ((next = currentStream.read()) != -1) {
+                    if (next == '\n') {
+                        break;
+                    }
+                }
+
+                return currentStream.read();
+            }
+
+            byte[] content = buf.toByteArray();
+            pendingOutput = new byte[content.length + (c == -1 ? 1 : 2)];
+            pendingOutput[0] = (byte) b;
+            System.arraycopy(content, 0, pendingOutput, 1, content.length);
+
+            if (c != -1) {
+                pendingOutput[content.length + 1] = (byte) c;
+            }
+
+            pendingOutputOffset = 0;
+            return pendingOutput[pendingOutputOffset++] & 0xFF;
         }
     }
 
