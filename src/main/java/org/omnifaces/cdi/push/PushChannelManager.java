@@ -104,7 +104,7 @@ abstract class PushChannelManager implements Serializable {
      * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
      */
     protected String register(String channel, String scope, Serializable user) {
-        return switch (Scope.of(scope, user, getComponentName())) {
+        return switch (Scope.of(scope, user, getClass().getSimpleName())) {
             case APPLICATION -> register(null, channel, getApplicationScope(), sessionScopedChannels, getViewScopedChannels(false));
             case SESSION -> register(user, channel, sessionScopedChannels, getApplicationScope(), getViewScopedChannels(false));
             case VIEW -> register(user, channel, getViewScopedChannels(true), getApplicationScope(), sessionScopedChannels);
@@ -116,7 +116,7 @@ abstract class PushChannelManager implements Serializable {
         if (!targetScope.containsKey(channel)) {
             for (var otherScope : otherScopes) {
                 if (otherScope.containsKey(channel)) {
-                    throw new IllegalArgumentException(format(ERROR_DUPLICATE_CHANNEL, getComponentName(), channel));
+                    throw new IllegalArgumentException(format(ERROR_DUPLICATE_CHANNEL, getClass().getSimpleName(), channel));
                 }
             }
 
@@ -176,12 +176,6 @@ abstract class PushChannelManager implements Serializable {
      * @throws IllegalStateException When the Faces view scope is not available while {@code create} is {@code true}.
      */
     protected abstract Map<String, String> getViewScopedChannels(boolean create);
-
-    /**
-     * Returns the component name for error messages (e.g. "o:socket" or "o:sse").
-     * @return The component name.
-     */
-    protected abstract String getComponentName();
 
     // Internal -------------------------------------------------------------------------------------------------------
 

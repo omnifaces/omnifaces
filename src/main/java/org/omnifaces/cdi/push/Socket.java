@@ -743,7 +743,7 @@ public class Socket extends PushComponent {
         "o:socket endpoint is not enabled."
             + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
-    private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init('%s','%s',%s,%s,%s);});";
+    private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(false,'%s','%s',%s,%s,%s);});";
 
     // Actions --------------------------------------------------------------------------------------------------------
 

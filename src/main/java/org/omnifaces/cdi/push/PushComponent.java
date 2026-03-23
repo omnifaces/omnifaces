@@ -271,8 +271,7 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
     }
 
     /**
-     * Returns the JavaScript event handler function that is invoked when a connection error has occurred and the
-     * connection will attempt to reconnect.
+     * Returns the JavaScript event handler function that is invoked when a connection error has occurred.
      * @return The JavaScript event handler function that is invoked when a connection error has occurred.
      */
     public String getOnerror() {
@@ -280,8 +279,7 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
     }
 
     /**
-     * Sets the JavaScript event handler function that is invoked when a connection error has occurred and the
-     * connection will attempt to reconnect.
+     * Sets the JavaScript event handler function that is invoked when a connection error has occurred.
      * @param onerror The JavaScript event handler function that is invoked when a connection error has occurred.
      */
     public void setOnerror(String onerror) {
@@ -289,8 +287,7 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
     }
 
     /**
-     * Returns the JavaScript event handler function that is invoked when the push connection is closed and will not
-     * anymore attempt to reconnect.
+     * Returns the JavaScript event handler function that is invoked when the push connection is closed.
      * @return The JavaScript event handler function that is invoked when the push connection is closed.
      */
     public String getOnclose() {
@@ -298,8 +295,7 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
     }
 
     /**
-     * Sets the JavaScript event handler function that is invoked when the push connection is closed and will not
-     * anymore attempt to reconnect.
+     * Sets the JavaScript event handler function that is invoked when the push connection is closed.
      * @param onclose The JavaScript event handler function that is invoked when the push connection is closed.
      */
     public void setOnclose(String onclose) {

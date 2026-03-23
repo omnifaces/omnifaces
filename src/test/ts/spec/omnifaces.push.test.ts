@@ -30,24 +30,24 @@ describe("OmniFaces.Push.init", () => {
     afterEach(() => uninstallMockWebSocket());
 
     test("creates socket for new channel", () => {
-        push().init("", "testChannel?token=abc", null, null, null, null, {}, false);
+        push().init(false, "", "testChannel?token=abc", null, null, null, null, {}, false);
         expect(() => push().open("testChannel")).not.toThrow();
     });
 
     test("does not create duplicate socket for same channel", () => {
-        push().init("", "dupChannel?t=1", null, null, null, null, {}, false);
-        push().init("", "dupChannel?t=2", null, null, null, null, {}, false);
+        push().init(false, "", "dupChannel?t=1", null, null, null, null, {}, false);
+        push().init(false, "", "dupChannel?t=2", null, null, null, null, {}, false);
         push().open("dupChannel");
         expect(getWSInstances().length).toBe(1);
     });
 
     test("autoconnect=true opens socket immediately", () => {
-        push().init("", "autoChannel", null, null, null, null, {}, true);
+        push().init(false, "", "autoChannel", null, null, null, null, {}, true);
         expect(getWSInstances().length).toBe(1);
     });
 
     test("autoconnect=false does not open socket", () => {
-        push().init("", "noAutoChannel", null, null, null, null, {}, false);
+        push().init(false, "", "noAutoChannel", null, null, null, null, {}, false);
         expect(getWSInstances().length).toBe(0);
     });
 
@@ -56,7 +56,7 @@ describe("OmniFaces.Push.init", () => {
         delete (window as unknown as Record<string, unknown>).WebSocket;
 
         const closeCalls: unknown[][] = [];
-        push().init("", "noWsChannel", null, null, null,
+        push().init(false, "", "noWsChannel", null, null, null,
             (code: number, channel: string) => closeCalls.push([code, channel]),
             {}, false);
 
@@ -76,28 +76,28 @@ describe("OmniFaces.Push.init: host URL resolution", () => {
     afterEach(() => uninstallMockWebSocket());
 
     test("empty host defaults to window.location.host", () => {
-        push().init("", "hostTest1", null, null, null, null, {}, true);
+        push().init(false, "", "hostTest1", null, null, null, null, {}, true);
         expect(lastWS().url).toContain(window.location.host);
         expect(lastWS().url).toContain("/omnifaces.socket/");
     });
 
     test("host starting with / prepends window.location.host", () => {
-        push().init("/myapp", "hostTest2", null, null, null, null, {}, true);
+        push().init(false, "/myapp", "hostTest2", null, null, null, null, {}, true);
         expect(lastWS().url).toContain(window.location.host + "/myapp");
     });
 
     test("host starting with : prepends window.location.hostname", () => {
-        push().init(":8443/myapp", "hostTest3", null, null, null, null, {}, true);
+        push().init(false, ":8443/myapp", "hostTest3", null, null, null, null, {}, true);
         expect(lastWS().url).toContain(window.location.hostname + ":8443/myapp");
     });
 
     test("full host is used as-is", () => {
-        push().init("example.com:8080/ctx", "hostTest4", null, null, null, null, {}, true);
+        push().init(false, "example.com:8080/ctx", "hostTest4", null, null, null, null, {}, true);
         expect(lastWS().url).toContain("example.com:8080/ctx/omnifaces.socket/");
     });
 
     test("URL includes channel URI", () => {
-        push().init("", "myChannel?token=xyz", null, null, null, null, {}, true);
+        push().init(false, "", "myChannel?token=xyz", null, null, null, null, {}, true);
         expect(lastWS().url).toContain("myChannel?token=xyz");
     });
 });
@@ -114,13 +114,13 @@ describe("OmniFaces.Push.open", () => {
     });
 
     test("creates WebSocket on open", () => {
-        push().init("", "openTest", null, null, null, null, {}, false);
+        push().init(false, "", "openTest", null, null, null, null, {}, false);
         push().open("openTest");
         expect(getWSInstances().length).toBe(1);
     });
 
     test("does not create second WebSocket if already open", () => {
-        push().init("", "openTest2", null, null, null, null, {}, false);
+        push().init(false, "", "openTest2", null, null, null, null, {}, false);
         push().open("openTest2");
         lastWS().simulateOpen();
         push().open("openTest2");
@@ -140,7 +140,7 @@ describe("OmniFaces.Push.close", () => {
     });
 
     test("closes an open socket", () => {
-        push().init("", "closeTest", null, null, null, null, {}, false);
+        push().init(false, "", "closeTest", null, null, null, null, {}, false);
         push().open("closeTest");
         lastWS().simulateOpen();
         expect(() => push().close("closeTest")).not.toThrow();
@@ -148,7 +148,7 @@ describe("OmniFaces.Push.close", () => {
     });
 
     test("close before open does not throw", () => {
-        push().init("", "closeTest2", null, null, null, null, {}, false);
+        push().init(false, "", "closeTest2", null, null, null, null, {}, false);
         expect(() => push().close("closeTest2")).not.toThrow();
     });
 });
@@ -162,7 +162,7 @@ describe("OmniFaces.Push: onopen callback", () => {
 
     test("onopen is called with channel on first connect", () => {
         const calls: unknown[] = [];
-        push().init("", "onOpenCh", (ch: string) => calls.push(ch), null, null, null, {}, false);
+        push().init(false, "", "onOpenCh", (ch: string) => calls.push(ch), null, null, null, {}, false);
         push().open("onOpenCh");
         lastWS().simulateOpen();
         expect(calls).toEqual(["onOpenCh"]);
@@ -170,7 +170,7 @@ describe("OmniFaces.Push: onopen callback", () => {
 
     test("onopen is NOT called on reconnect", () => {
         const calls: unknown[] = [];
-        push().init("", "onOpenReconn", (ch: string) => calls.push(ch), null, null, null, {}, false);
+        push().init(false, "", "onOpenReconn", (ch: string) => calls.push(ch), null, null, null, {}, false);
         push().open("onOpenReconn");
         lastWS().simulateOpen();
         expect(calls.length).toBe(1);
@@ -182,7 +182,7 @@ describe("OmniFaces.Push: onopen callback", () => {
 
     test("onopen resolves string function name from window", () => {
         (window as any).__testPushOnOpen = jest.fn();
-        push().init("", "onOpenStr", "__testPushOnOpen", null, null, null, {}, false);
+        push().init(false, "", "onOpenStr", "__testPushOnOpen", null, null, null, {}, false);
         push().open("onOpenStr");
         lastWS().simulateOpen();
         expect((window as any).__testPushOnOpen).toHaveBeenCalledWith("onOpenStr");
@@ -190,7 +190,7 @@ describe("OmniFaces.Push: onopen callback", () => {
     });
 
     test("onopen with null does not throw", () => {
-        push().init("", "onOpenNull", null, null, null, null, {}, false);
+        push().init(false, "", "onOpenNull", null, null, null, null, {}, false);
         push().open("onOpenNull");
         expect(() => lastWS().simulateOpen()).not.toThrow();
     });
@@ -205,7 +205,7 @@ describe("OmniFaces.Push: onmessage callback", () => {
 
     test("onmessage receives parsed data, channel and raw event", () => {
         const calls: unknown[][] = [];
-        push().init("", "msgCh1",
+        push().init(false, "", "msgCh1",
             null, (message: unknown, channel: string, event: unknown) => calls.push([message, channel, event]),
             null, null, {}, false);
         push().open("msgCh1");
@@ -220,7 +220,7 @@ describe("OmniFaces.Push: onmessage callback", () => {
 
     test("onmessage receives object data", () => {
         const calls: unknown[] = [];
-        push().init("", "msgCh2",
+        push().init(false, "", "msgCh2",
             null, (message: unknown) => calls.push(message),
             null, null, {}, false);
         push().open("msgCh2");
@@ -230,7 +230,7 @@ describe("OmniFaces.Push: onmessage callback", () => {
     });
 
     test("onmessage with null does not throw", () => {
-        push().init("", "msgCh3", null, null, null, null, {}, false);
+        push().init(false, "", "msgCh3", null, null, null, null, {}, false);
         push().open("msgCh3");
         lastWS().simulateOpen();
         expect(() => lastWS().simulateMessage("test")).not.toThrow();
@@ -249,7 +249,7 @@ describe("OmniFaces.Push: behaviors", () => {
         const behaviors = {
             update: [() => called.push("update1"), () => called.push("update2")],
         };
-        push().init("", "behCh1", null, null, null, null, behaviors, false);
+        push().init(false, "", "behCh1", null, null, null, null, behaviors, false);
         push().open("behCh1");
         lastWS().simulateOpen();
         lastWS().simulateMessage("update");
@@ -261,7 +261,7 @@ describe("OmniFaces.Push: behaviors", () => {
         const behaviors = {
             update: [() => called.push("update")],
         };
-        push().init("", "behCh2", null, null, null, null, behaviors, false);
+        push().init(false, "", "behCh2", null, null, null, null, behaviors, false);
         push().open("behCh2");
         lastWS().simulateOpen();
         lastWS().simulateMessage("delete");
@@ -269,7 +269,7 @@ describe("OmniFaces.Push: behaviors", () => {
     });
 
     test("empty behaviors object does not cause errors", () => {
-        push().init("", "behCh3", null, null, null, null, {}, false);
+        push().init(false, "", "behCh3", null, null, null, null, {}, false);
         push().open("behCh3");
         lastWS().simulateOpen();
         expect(() => lastWS().simulateMessage("anything")).not.toThrow();
@@ -291,7 +291,7 @@ describe("OmniFaces.Push: onerror callback", () => {
 
     test("onerror is called on unexpected close with reconnect pending", () => {
         const errors: unknown[][] = [];
-        push().init("", "errCh1",
+        push().init(false, "", "errCh1",
             null, null,
             (code: number, channel: string, event: unknown) => errors.push([code, channel, event]),
             null, {}, false);
@@ -305,7 +305,7 @@ describe("OmniFaces.Push: onerror callback", () => {
     });
 
     test("reconnect creates new WebSocket after interval", () => {
-        push().init("", "errCh2", null, null, null, null, {}, false);
+        push().init(false, "", "errCh2", null, null, null, null, {}, false);
         push().open("errCh2");
         lastWS().simulateOpen();
         expect(getWSInstances().length).toBe(1);
@@ -325,7 +325,7 @@ describe("OmniFaces.Push: onclose callback", () => {
 
     test("onclose is called when server sends Expired reason", () => {
         const closes: unknown[][] = [];
-        push().init("", "clExpired",
+        push().init(false, "", "clExpired",
             null, null, null,
             (code: number, channel: string, event: unknown) => closes.push([code, channel, event]),
             {}, false);
@@ -340,7 +340,7 @@ describe("OmniFaces.Push: onclose callback", () => {
 
     test("onclose is called when server sends Unknown channel (code 1008)", () => {
         const closes: unknown[][] = [];
-        push().init("", "clUnknown",
+        push().init(false, "", "clUnknown",
             null, null, null,
             (code: number, channel: string) => closes.push([code, channel]),
             {}, false);
@@ -355,7 +355,7 @@ describe("OmniFaces.Push: onclose callback", () => {
     test("code 1000 without Expired reason triggers reconnect, not onclose", () => {
         const closes: unknown[][] = [];
         const errors: unknown[][] = [];
-        push().init("", "clNoExpired",
+        push().init(false, "", "clNoExpired",
             null, null,
             (code: number, channel: string) => errors.push([code, channel]),
             (code: number, channel: string) => closes.push([code, channel]),
@@ -383,7 +383,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
     });
 
     test("reconnect interval increases cumulatively (500ms * attempt)", () => {
-        push().init("", "rcInterval", null, null, null, null, {}, false);
+        push().init(false, "", "rcInterval", null, null, null, null, {}, false);
         push().open("rcInterval");
         lastWS().simulateOpen();
 
@@ -402,7 +402,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
 
     test("stops reconnecting after 25 attempts and calls onclose", () => {
         const closes: unknown[][] = [];
-        push().init("", "rcMax",
+        push().init(false, "", "rcMax",
             null, null, null,
             (code: number, channel: string) => closes.push([code, channel]),
             {}, false);
@@ -420,7 +420,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
     });
 
     test("successful reconnect resets attempt counter", () => {
-        push().init("", "rcReset", null, null, null, null, {}, false);
+        push().init(false, "", "rcReset", null, null, null, null, {}, false);
         push().open("rcReset");
         lastWS().simulateOpen();
 
@@ -436,7 +436,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
     });
 
     test("explicit close prevents reconnect", () => {
-        push().init("", "rcExplicit", null, null, null, null, {}, false);
+        push().init(false, "", "rcExplicit", null, null, null, null, {}, false);
         push().open("rcExplicit");
         lastWS().simulateOpen();
 
@@ -454,13 +454,13 @@ describe("OmniFaces.Push: function resolution", () => {
     afterEach(() => uninstallMockWebSocket());
 
     test("nonexistent string callback resolves to noop (no error)", () => {
-        push().init("", "resNoop", "nonExistentGlobalFn", null, null, null, {}, false);
+        push().init(false, "", "resNoop", "nonExistentGlobalFn", null, null, null, {}, false);
         push().open("resNoop");
         expect(() => lastWS().simulateOpen()).not.toThrow();
     });
 
     test("undefined callback resolves to noop (no error)", () => {
-        push().init("", "resUndef", undefined, undefined, undefined, undefined, {}, false);
+        push().init(false, "", "resUndef", undefined, undefined, undefined, undefined, {}, false);
         push().open("resUndef");
         lastWS().simulateOpen();
         expect(() => lastWS().simulateMessage("test")).not.toThrow();

@@ -24,6 +24,7 @@ import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
 
 import org.omnifaces.cdi.push.Socket;
+import org.omnifaces.cdi.push.Sse;
 
 /**
  * <p>
@@ -34,10 +35,12 @@ import org.omnifaces.cdi.push.Socket;
  * private PushContext channelName;
  * </pre>
  * <p>
- * For detailed usage instructions, see {@link Socket} javadoc.
+ * For detailed usage instructions, see {@link Socket} and {@link Sse} javadocs.
  *
  * @author Bauke Scholtz
+ * @see PushContext
  * @see Socket
+ * @see Sse
  * @since 2.3
  */
 @Qualifier
@@ -52,4 +55,11 @@ public @interface Push {
      */
     @Nonbinding String channel() default "";
 
+    /**
+     * (Optional) Whether to use SSE instead of Web Socket. Defaults to {@code false}.
+     *
+     * @return Whether to use SSE instead of Web Socket.
+     * @since 5.2
+     */
+    @Nonbinding boolean sse() default false;
 }

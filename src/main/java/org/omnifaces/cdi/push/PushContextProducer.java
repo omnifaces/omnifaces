@@ -28,6 +28,7 @@ import org.omnifaces.cdi.PushContext;
  *
  * @author Bauke Scholtz
  * @see Push
+ * @see PushContext
  * @since 5.2
  */
 @Dependent
@@ -48,6 +49,15 @@ class PushContextProducer {
     @Inject
     private SocketUserManager socketUsers;
 
+    @Inject
+    private SseChannelManager sseChannels;
+
+    @Inject
+    private SseSessionManager sseSessions;
+
+    @Inject
+    private SseUserManager sseUsers;
+
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
@@ -60,7 +70,13 @@ class PushContextProducer {
     public PushContext produce(InjectionPoint injectionPoint) {
         Push push = getQualifier(injectionPoint, Push.class);
         String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
-        return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+
+        if (push.sse()) {
+            return new SsePushContext(channel, sseChannels, sseSessions, sseUsers);
+        }
+        else {
+            return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+        }
     }
 
 }

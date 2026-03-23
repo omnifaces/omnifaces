@@ -40,6 +40,7 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see Push
+ * @see Socket
  * @since 2.3
  */
 public class SocketPushContext implements PushContext {

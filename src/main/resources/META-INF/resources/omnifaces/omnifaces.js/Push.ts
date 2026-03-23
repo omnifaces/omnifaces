@@ -14,10 +14,12 @@
 import { Util } from "./Util";
 
 /**
- * Manage web socket push channels. This script is used by <code>&lt;o:socket&gt;</code>.
- * 
+ * Manage push channels via Web Socket or SSE (Server-Sent Events).
+ * This script is used by <code>&lt;o:socket&gt;</code> and <code>&lt;o:sse&gt;</code>.
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.cdi.push.Socket
+ * @see org.omnifaces.cdi.push.Sse
  * @since 2.3
  */
 export namespace Push {
@@ -26,6 +28,7 @@ export namespace Push {
 
     const WS_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
     const WS_URI_PREFIX = "/omnifaces.socket";
+    const SSE_URI_PREFIX = "/omnifaces.sse";
     const RECONNECT_INTERVAL = 500;
     const MAX_RECONNECT_ATTEMPTS = 25;
     const REASON_EXPIRED = "Expired";
@@ -60,16 +63,19 @@ export namespace Push {
         // Constructor ------------------------------------------------------------------------------------------------
 
         /**
-         * Creates a reconnecting web socket. When the web socket successfully connects on first attempt, then it will
-         * automatically reconnect on timeout with cumulative intervals of 500ms with a maximum of 25 attempts (~3 minutes).
-         * The <code>onclose</code> function will be called with the error code of the last attempt.
+         * Creates a reconnecting web socket connection. When the web socket successfully connects on first attempt,
+         * then it will automatically reconnect on timeout with cumulative intervals of 500ms with a maximum of 25
+         * attempts (~3 minutes). The <code>onclose</code> function will be called with the error code of the last
+         * attempt.
          * @constructor
-         * @param url The URL of the web socket 
-         * @param channel The name of the web socket channel.
+         * @param url The URL of the web socket.
+         * @param channel The name of the push channel.
          * @param onopen The function to be invoked when the web socket is opened.
          * @param onmessage The function to be invoked when a message is received.
-         * @param onerror The funtypction to be invoked when a connection error has occurred and the web socket will attempt to reconnect.
-         * @param onclose The function to be invoked when the web socket is closed and will not anymore attempt to reconnect.
+         * @param onerror The function to be invoked when a connection error has occurred and the web socket will
+         * attempt to reconnect.
+         * @param onclose The function to be invoked when the web socket is closed and will not anymore attempt to
+         * reconnect.
          * @param behaviors Client behavior functions to be invoked when specific message is received.
          */
         constructor(url: string, channel: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>) {
@@ -139,52 +145,133 @@ export namespace Push {
         }
     }
 
+    class SseConnection implements Connection {
+
+        readonly url: string;
+        readonly channel: string;
+        readonly onopen: Function;
+        readonly onmessage: Function;
+        readonly onerror: Function;
+        readonly onclose: Function;
+        readonly behaviors: Record<string, Function[]>;
+
+        eventSource: EventSource;
+
+        // Constructor ------------------------------------------------------------------------------------------------
+
+        /**
+         * Creates an SSE connection. The browser's <code>EventSource</code> API handles reconnect natively.
+         * The <code>onclose</code> function will be called when the server explicitly closes the connection or when
+         * <code>close()</code> is called.
+         * @constructor
+         * @param url The URL of the SSE endpoint.
+         * @param channel The name of the push channel.
+         * @param onopen The function to be invoked when the SSE connection is opened.
+         * @param onmessage The function to be invoked when a message is received.
+         * @param onerror The function to be invoked when a connection error has occurred.
+         * @param onclose The function to be invoked when the SSE connection is closed.
+         * @param behaviors Client behavior functions to be invoked when specific message is received.
+         */
+        constructor(url: string, channel: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>) {
+            this.url = url;
+            this.channel = channel;
+            this.onopen = onopen;
+            this.onmessage = onmessage;
+            this.onerror = onerror;
+            this.onclose = onclose;
+            this.behaviors = behaviors;
+        }
+
+        // Public functions -------------------------------------------------------------------------------------------
+
+        /**
+         * Opens the SSE connection.
+         */
+        open() {
+            if (this.eventSource) {
+                return;
+            }
+
+            this.eventSource = new EventSource(this.url);
+
+            this.eventSource.onopen = () => {
+                this.onopen(this.channel);
+            };
+
+            this.eventSource.onmessage = (event: MessageEvent) => {
+                const message = JSON.parse(event.data);
+                this.onmessage(message, this.channel, event);
+                this.behaviors[message]?.forEach(behavior => behavior());
+            };
+
+            this.eventSource.onerror = (event: Event) => {
+                if (this.eventSource?.readyState == EventSource.CLOSED) {
+                    this.onclose(this.channel);
+                    this.eventSource = null;
+                }
+                else {
+                    this.onerror(this.channel, event);
+                }
+            };
+        }
+
+        /**
+         * Closes the SSE connection.
+         */
+        close() {
+            if (this.eventSource) {
+                const es = this.eventSource;
+                this.eventSource = null;
+                es.close();
+                this.onclose(this.channel);
+            }
+        }
+    }
+
     // Public static functions ----------------------------------------------------------------------------------------
 
     /**
-     * Initialize a web socket on the given channel. When connected, it will stay open and reconnect as long as channel
-     * is valid and <code>OmniFaces.Push.close()</code> hasn't explicitly been called on the same channel.
-     * @param host The host of the web socket in either the format <code>example.com:8080/context</code>, or
-     * <code>:8080/context</code>, or <code>/context</code>.
-     * If the value is falsey, then it will default to <code>window.location.host</code>.
-     * If the value starts with <code>:</code>, then <code>window.location.hostname</code> will be prepended.
-     * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
-     * @param uri The uri of the web socket representing the channel name and identifier, separated by a 
-     * question mark. All open websockets on the same uri will receive the same push notification from the server.
-     * @param onopen The JavaScript event handler function that is invoked when the web socket is opened.
-     * The function will be invoked with one argument: the channel name.
+     * Initialize a push channel using either Web Socket or SSE transport. When connected, it will stay open and
+     * reconnect as long as channel is valid and <code>OmniFaces.Push.close()</code> hasn't explicitly been called
+     * on the same channel.
+     * @param sse Whether to use SSE instead of Web Socket.
+     * @param host The host of the push connection. For Web Socket this is in either the format
+     * <code>example.com:8080/context</code>, or <code>:8080/context</code>, or <code>/context</code>.
+     * For SSE this is the context path (e.g. <code>/context</code>).
+     * @param uri The uri representing the channel name and identifier, separated by a question mark.
+     * All open connections on the same uri will receive the same push notification from the server.
+     * @param onopen The JavaScript event handler function that is invoked when the connection is opened.
      * @param onmessage The JavaScript event handler function that is invoked when a message is received from
-     * the server. The function will be invoked with three arguments: the push message, the channel name and the raw
-     * <code>MessageEvent</code> itself.
-     * @param onerror The JavaScript event handler function that is invoked when a connection error has
-     * occurred and the web socket will attempt to reconnect. The function will be invoked with three arguments: the
-     * error reason code, the channel name and the raw <code>CloseEvent</code> itself. Note that this will not be
-     * invoked on final close of the web socket, even when the final close is caused by an error. See also
-     * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
-     * for an elaborate list of all close codes.
-     * @param onclose The function to be invoked when the web socket is closed and will not anymore attempt
-     * to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
-     * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
-     * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
-     * when the code is not 1000 or 1008). See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
-     * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
+     * the server.
+     * @param onerror The JavaScript event handler function that is invoked when a connection error has occurred.
+     * @param onclose The function to be invoked when the connection is closed.
      * @param behaviors Client behavior functions to be invoked when specific message is received.
-     * @param autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
+     * @param autoconnect Whether or not to immediately open the connection. Defaults to <code>true</code>.
      */
-    export function init(host: string, uri: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>, autoconnect: boolean) {
+    export function init(sse: boolean, host: string, uri: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>, autoconnect?: boolean) {
         onclose = Util.resolveFunction(onclose);
         const channel = uri.split(/\?/)[0];
 
-        if (!window.WebSocket) {
+        if (!sse && !window.WebSocket) {
             onclose(-1, channel);
             return;
         }
 
         if (!connections[channel]) {
-            connections[channel] = new SocketConnection(getSocketBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), Util.resolveFunction(onerror), onclose, behaviors);
+            const resolvedOnopen = Util.resolveFunction(onopen);
+            const resolvedOnmessage = Util.resolveFunction(onmessage);
+            const resolvedOnerror = Util.resolveFunction(onerror);
+
+            if (sse) {
+                const url = host + SSE_URI_PREFIX + "/" + channel + "?" + uri.split(/\?/)[1];
+                connections[channel] = new SseConnection(url, channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+            }
+            else {
+                connections[channel] = new SocketConnection(getSocketBaseURL(host) + uri, channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+            }
         }
 
-        if (autoconnect) {
+        if (autoconnect !== false) {
             open(channel);
         }
     }
