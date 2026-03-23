@@ -607,7 +607,7 @@ public class Sse extends PushComponent {
     // Public constants -----------------------------------------------------------------------------------------------
 
     /** The component type, which is {@value org.omnifaces.cdi.push.Sse#COMPONENT_TYPE}. */
-    public static final String COMPONENT_TYPE = "org.omnifaces.cdi.sse.SseComponent";
+    public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.SseComponent";
 
     // Private constants ----------------------------------------------------------------------------------------------
 
