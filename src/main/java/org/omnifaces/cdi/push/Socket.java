@@ -68,17 +68,17 @@ import org.omnifaces.vdl.FacesAttribute;
  *
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
- * First enable the web socket endpoint by below boolean context parameter in <code>web.xml</code>:
+ * Since OmniFaces 5.2, the web socket endpoint is automatically registered when <code>&#64;Inject &#64;Push PushContext</code>
+ * is used anywhere in the application. No additional configuration is needed.
+ * <p>
+ * Alternatively, if you want to explicitly enable the endpoint without using <code>&#64;Push</code> injection, you can
+ * set the below boolean context parameter in <code>web.xml</code>:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_ENABLED&lt;/param-name&gt;
  *     &lt;param-value&gt;true&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
- * <p>
- * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
- * possible across all containers (yet).
- * See also <a href="https://github.com/jakartaee/websocket/issues/211">WS spec issue 211</a>.
  *
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
@@ -745,7 +745,8 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
     /** The component type, which is {@value org.omnifaces.cdi.push.Socket#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.Socket";
 
-    /** The boolean context parameter name to register web socket endpoint during startup. */
+    /** The boolean context parameter name to explicitly register web socket endpoint during startup.
+     * Since 5.2, this is no longer necessary when <code>&#64;Inject &#64;Push PushContext</code> is used. */
     public static final String PARAM_SOCKET_ENDPOINT_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ENABLED";
 
     // Private constants ----------------------------------------------------------------------------------------------
@@ -762,7 +763,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
             + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.";
     private static final String ERROR_ENDPOINT_NOT_ENABLED =
         "o:socket endpoint is not enabled."
-            + " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
+            + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
     private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init('%s','%s',%s,%s,%s);});";
 
@@ -1096,11 +1097,12 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Register web socket endpoint if necessary, i.e. when it's enabled via context param and not already installed.
+     * Register web socket endpoint if necessary, i.e. when it's enabled via context param or when
+     * <code>&#64;Inject &#64;Push PushContext</code> is detected, and not already installed.
      * @param context The involved servlet context.
      */
     public static void registerEndpointIfNecessary(ServletContext context) {
-        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
+        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED)) && !SocketExtension.isPushContextInjected()) {
             return;
         }
 
