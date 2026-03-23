@@ -27,10 +27,12 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.ListenerFor;
 import jakarta.faces.event.PostAddToViewEvent;
+import jakarta.servlet.ServletContext;
 
 import org.omnifaces.cdi.ScriptError;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.servlet.ScriptErrorServlet;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.State;
 
 /**
@@ -232,6 +234,27 @@ public class ScriptErrorHandler extends ScriptFamily {
             }
 
             servletRegistered = true;
+        }
+    }
+
+    /**
+     * Register the script error handler servlet if it has not already been registered and there is at least one CDI
+     * observer for {@link ScriptError}.
+     * @param servletContext The involved servlet context.
+     */
+    public static void registerServletIfNecessary(ServletContext servletContext) {
+        if (servletContext.getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
+            return;
+        }
+
+        if (Beans.getManager().resolveObserverMethods(new ScriptError(null, null, null, null, null, null, null, null, null, null)).isEmpty()) {
+            return;
+        }
+
+        var registration = servletContext.addServlet(ScriptErrorServlet.class.getName(), ScriptErrorServlet.class);
+
+        if (registration != null) {
+            registration.addMapping(ScriptErrorServlet.URI);
         }
     }
 

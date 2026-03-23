@@ -16,7 +16,6 @@ import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 
 import java.io.IOException;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,27 +41,6 @@ public class ScriptErrorServlet extends HttpServlet {
 
     /** The URI of the script error handler servlet. */
     public static final String URI = "/omnifaces.scripterror";
-
-    /**
-     * Register the script error handler servlet if it has not already been registered and there is at least one CDI
-     * observer for {@link ScriptError}.
-     * @param servletContext The involved servlet context.
-     */
-    public static void registerIfNecessary(ServletContext servletContext) {
-        if (servletContext.getServletRegistrations().containsKey(ScriptErrorServlet.class.getName())) {
-            return;
-        }
-
-        if (Beans.getManager().resolveObserverMethods(new ScriptError(null, null, null, null, null, null, null, null, null, null)).isEmpty()) {
-            return;
-        }
-
-        var registration = servletContext.addServlet(ScriptErrorServlet.class.getName(), ScriptErrorServlet.class);
-
-        if (registration != null) {
-            registration.addMapping(URI);
-        }
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

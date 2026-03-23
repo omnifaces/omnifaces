@@ -34,6 +34,7 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.cdi.push.Sse;
 import org.omnifaces.component.output.Cache;
+import org.omnifaces.component.script.ScriptErrorHandler;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
@@ -41,7 +42,6 @@ import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
-import org.omnifaces.servlet.ScriptErrorServlet;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Servlets;
 import org.omnifaces.util.cache.CacheInitializer;
@@ -60,7 +60,8 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
- * <li>Register {@link ScriptErrorServlet} if necessary.
+ * <li>Register {@link Sse} servlet if necessary.
+ * <li>Register {@link ScriptErrorHandler} servlet if necessary.
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
@@ -114,7 +115,7 @@ public class ApplicationListener extends DefaultServletContextListener {
             GraphicResource.registerGraphicImageBeans();
             Socket.registerEndpointIfNecessary(servletContext);
             Sse.registerServletIfNecessary(servletContext);
-            ScriptErrorServlet.registerIfNecessary(servletContext);
+            ScriptErrorHandler.registerServletIfNecessary(servletContext);
         }
         catch (Exception | LinkageError e) {
             if (skipDeploymentException) {
