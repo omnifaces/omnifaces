@@ -15,38 +15,31 @@ package org.omnifaces.cdi.push;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
-import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Pattern;
 
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.component.script.ScriptFamily;
-import org.omnifaces.util.State;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
  * Base class for push components ({@link Socket} and {@link Sse}) that share common attributes, validation, client
- * behavior handling and property accessors for channel, scope, user, onopen, onmessage, onerror and onclose.
+ * behavior handling and property accessors for scope, onopen, onmessage, onerror and onclose.
  *
  * @author Bauke Scholtz
  * @see Socket
  * @see Sse
  * @since 5.2
  */
-abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolder {
+abstract class PushComponent extends ChannelComponent implements ClientBehaviorHolder {
 
     // Constants ------------------------------------------------------------------------------------------------------
-
-    static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
 
     private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
@@ -59,38 +52,22 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        channel, scope, user, onopen, onmessage, onerror, onclose;
+        scope, onopen, onmessage, onerror, onclose;
     }
-
-    // Variables ------------------------------------------------------------------------------------------------------
-
-    final State state = new State(getStateHelper());
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * An override which checks if this isn't been invoked on <code>channel</code> or <code>scope</code> attribute, and
-     * if the <code>user</code> attribute is <code>Serializable</code>.
+     * An override which additionally checks if this isn't been invoked on <code>scope</code> attribute.
      * Finally it delegates to the super method.
      * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> or
      * <code>scope</code> attribute, or when the <code>user</code> attribute is not <code>Serializable</code>.
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
-        if (PropertyKeys.channel.toString().equals(name) || PropertyKeys.scope.toString().equals(name)) {
+        if (PropertyKeys.scope.toString().equals(name)) {
             throw new IllegalArgumentException(
-                getClass().getSimpleName() + " 'channel' and 'scope' attributes may not contain an EL expression.");
-        }
-
-        if (PropertyKeys.user.toString().equals(name)) {
-            var user = binding.getValue(getFacesContext().getELContext());
-
-            if (user != null && !(user instanceof Serializable)) {
-                throw new IllegalArgumentException(format(
-                        getClass().getSimpleName() + " 'user' attribute '%s' does not represent a valid user identifier."
-                        + " It must implement Serializable and preferably have low memory footprint."
-                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.", user));
-            }
+                getComponentName() + " 'scope' attribute may not contain an EL expression.");
         }
 
         super.setValueExpression(name, binding);
@@ -157,39 +134,7 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
         return scripts.append("}").toString();
     }
 
-    /**
-     * Validate the channel name.
-     * @param channel The channel name to validate.
-     * @throws IllegalArgumentException When the channel name is invalid.
-     */
-    void validateChannel(String channel) {
-        if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-            throw new IllegalArgumentException(format(
-                getClass().getSimpleName() + " 'channel' attribute '%s' does not represent a valid channel name."
-                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.", channel));
-        }
-    }
-
     // Attribute getters/setters --------------------------------------------------------------------------------------
-
-    /**
-     * Returns the name of the push channel.
-     * @return The name of the push channel.
-     */
-    public String getChannel() {
-        return state.get(PropertyKeys.channel);
-    }
-
-    /**
-     * Sets the name of the push channel.
-     * It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods.
-     * All open connections on the same channel will receive the same push message from the server.
-     * @param channel The name of the push channel.
-     */
-    @FacesAttribute(required = true)
-    public void setChannel(String channel) {
-        state.put(PropertyKeys.channel, channel);
-    }
 
     /**
      * Returns the scope of the push channel.
@@ -212,25 +157,6 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
      */
     public void setScope(String scope) {
         state.put(PropertyKeys.scope, scope);
-    }
-
-    /**
-     * Returns the user identifier of the push channel.
-     * @return The user identifier of the push channel.
-     */
-    public Serializable getUser() {
-        return state.get(PropertyKeys.user);
-    }
-
-    /**
-     * Sets the user identifier of the push channel, so that user-targeted push messages can be sent.
-     * All open connections on the same channel and user will receive the same push message from the server.
-     * It must implement <code>Serializable</code> and preferably have low memory footprint.
-     * Suggestion: use <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
-     * @param user The user identifier of the push channel.
-     */
-    public void setUser(Serializable user) {
-        state.put(PropertyKeys.user, user);
     }
 
     /**

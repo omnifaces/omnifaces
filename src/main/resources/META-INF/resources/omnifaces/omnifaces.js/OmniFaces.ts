@@ -34,6 +34,7 @@ export { ScriptParam } from "./ScriptParam";
 export { ServiceWorker } from "./ServiceWorker";
 export { GraphicImage } from "./GraphicImage";
 export { ScriptErrorHandler } from "./ScriptErrorHandler";
+export { Notification } from "./Notification";
 
 /**
  * Declare optional global vars for the OmniFaces namespace which is needed by some modules; tsc needs this info.

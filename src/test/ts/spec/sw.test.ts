@@ -88,7 +88,7 @@ function loadServiceWorker(
         listeners,
         { location: { origin: "http://localhost" } },
         { open: cacheOpen, keys: cacheKeys, match: cachesMatch, delete: cacheDelete },
-        { matchAll: clientsMatchAll },
+        { matchAll: clientsMatchAll, openWindow: jest.fn().mockResolvedValue(null) },
         navigatorMock,
         fetchMock
     );
@@ -351,5 +351,92 @@ describe("sw.js: fetch handler behavior", () => {
 
         const result = await event.respondWith.mock.calls[0][0];
         expect(result).toBe(cachedResponse);
+    });
+});
+
+describe("sw.js: notificationclick event", () => {
+
+    test("registers notificationclick event listener", () => {
+        const env = loadServiceWorker();
+        expect(env.listeners["notificationclick"]).toBeDefined();
+    });
+
+    test("closes notification and relays to clients", async () => {
+        const mockClient = { postMessage: jest.fn() };
+        const env = loadServiceWorker();
+        env.clientsMatchAll.mockResolvedValue([mockClient]);
+
+        const closeMock = jest.fn();
+        env.listeners["notificationclick"]({
+            notification: { tag: "test.info", data: null, close: closeMock },
+            action: "reply",
+            waitUntil: jest.fn(),
+        });
+
+        expect(closeMock).toHaveBeenCalled();
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(env.clientsMatchAll).toHaveBeenCalledWith(expect.objectContaining({ includeUncontrolled: true }));
+        expect(mockClient.postMessage).toHaveBeenCalledWith({
+            type: "omnifaces.event",
+            name: "omnifaces.notificationclick",
+            detail: { tag: "test.info", data: null },
+        });
+    });
+
+    test("opens window when notification data has url", async () => {
+        const env = loadServiceWorker();
+        env.clientsMatchAll.mockResolvedValue([]);
+
+        const waitUntilMock = jest.fn();
+        env.listeners["notificationclick"]({
+            notification: { tag: "url", data: { url: "https://omnifaces.org" }, close: jest.fn() },
+            action: "",
+            waitUntil: waitUntilMock,
+        });
+
+        expect(waitUntilMock).toHaveBeenCalled();
+    });
+
+    test("does not open window when notification has no data url", () => {
+        const env = loadServiceWorker();
+        env.clientsMatchAll.mockResolvedValue([]);
+
+        const waitUntilMock = jest.fn();
+        env.listeners["notificationclick"]({
+            notification: { tag: "test", data: null, close: jest.fn() },
+            action: "",
+            waitUntil: waitUntilMock,
+        });
+
+        expect(waitUntilMock).not.toHaveBeenCalled();
+    });
+});
+
+describe("sw.js: notificationclose event", () => {
+
+    test("registers notificationclose event listener", () => {
+        const env = loadServiceWorker();
+        expect(env.listeners["notificationclose"]).toBeDefined();
+    });
+
+    test("relays close event to clients", async () => {
+        const mockClient = { postMessage: jest.fn() };
+        const env = loadServiceWorker();
+        env.clientsMatchAll.mockResolvedValue([mockClient]);
+
+        env.listeners["notificationclose"]({
+            notification: { tag: "test.warn", data: { key: "value" } },
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(env.clientsMatchAll).toHaveBeenCalledWith(expect.objectContaining({ includeUncontrolled: true }));
+        expect(mockClient.postMessage).toHaveBeenCalledWith({
+            type: "omnifaces.event",
+            name: "omnifaces.notificationclose",
+            detail: { tag: "test.warn", data: { key: "value" } },
+        });
     });
 });

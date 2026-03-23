@@ -271,6 +271,7 @@
                                     <header>license.txt</header>
                                     <excludes>
                                        <exclude>*.*</exclude> <!-- excludes files in root folder -->
+                                       <exclude>**/.*</exclude> <!-- excludes dotfiles -->
                                     </excludes>
                                 </licenseSet>
                             </licenseSets>
@@ -320,6 +321,7 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
+                            <skip>${maven.test.skip}</skip>
                             <workingDirectory>${project.basedir}/src/test/ts</workingDirectory>
                             <arguments>install</arguments>
                         </configuration>
@@ -331,6 +333,7 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
+                            <skip>${maven.test.skip}</skip>
                             <workingDirectory>${project.basedir}/src/test/ts</workingDirectory>
                             <arguments>test</arguments>
                         </configuration>

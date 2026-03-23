@@ -37,6 +37,7 @@ describe("OmniFaces namespace", () => {
         HashParam: "object",
         ScriptParam: "object",
         ServiceWorker: "object",
+        Notification: "object",
         GraphicImage: "object",
         ScriptErrorHandler: "object",
     };

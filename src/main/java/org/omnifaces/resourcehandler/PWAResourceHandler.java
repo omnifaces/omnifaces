@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 import static java.lang.String.format;
@@ -28,6 +29,8 @@ import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getViewAttribute;
+import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -328,6 +331,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                     addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
                     addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
                     addScript(context, format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+                    setViewAttribute(context, PWAResourceHandler.class.getName(), true);
                 }
                 else {
                     logger.warning(() -> format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
@@ -508,6 +512,16 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
 
         return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll(""); // Strips the v= parameter indicating the cache bust version.
+    }
+
+    /**
+     * Returns {@code true} if the {@link PWAResourceHandler} is active.
+     * @param context The involved faces context.
+     * @return {@code true} if the {@link PWAResourceHandler} is active.
+     * @since 5.2
+     */
+    public static boolean isActive(FacesContext context) {
+        return TRUE.equals(getViewAttribute(context, PWAResourceHandler.class.getName()));
     }
 
     /**

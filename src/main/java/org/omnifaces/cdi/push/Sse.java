@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import jakarta.enterprise.event.Observes;
 import jakarta.faces.FacesException;
@@ -612,10 +610,10 @@ public class Sse extends PushComponent {
     // Private constants ----------------------------------------------------------------------------------------------
 
     private static final String ERROR_SERVLET_NOT_REGISTERED =
-        "o:sse servlet is not registered."
-            + " Perhaps there is no @Push(sse=true) qualified injection point in any CDI managed bean?";
+        "SSE servlet is not registered."
+            + " Make sure there is at least one CDI managed bean with @Push(sse=true) qualified injection point.";
 
-    private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(true,'%s','%s',%s,%s);});";
+    static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(true,'%s','%s',%s,%s);});";
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -632,21 +630,10 @@ public class Sse extends PushComponent {
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        if (!context.getExternalContext().getApplicationMap().containsKey(Sse.class.getName())) {
-            throw new IllegalStateException(ERROR_SERVLET_NOT_REGISTERED);
-        }
-
-        var channel = getChannel();
-        validateChannel(channel);
-
-        var previousUser = getUsers(context).put(channel, getUser());
-
-        if (previousUser != null && !Objects.equals(previousUser, getUser())) {
-            SseChannelManager.getInstance().switchUser(channel, getScope(), previousUser, getUser());
-        }
+        checkServletRegistered(context);
 
         var contextPath = getRequestContextPath(context);
-        var channelId = SseChannelManager.getInstance().register(channel, getScope(), getUser());
+        var channelId = registerChannel(context, this, getScope());
         var functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
         var behaviors = getBehaviorScripts();
 
@@ -657,10 +644,36 @@ public class Sse extends PushComponent {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Helper to remember which SSE channels and their users are initialized on the view.
+     * Check if the SSE servlet is registered.
+     * @param context The involved faces context.
+     * @throws IllegalStateException When the SSE servlet is not registered.
      */
-    private static Map<String, Serializable> getUsers(FacesContext context) {
-        return getViewAttribute(context, Sse.class.getName(), () -> new HashMap<>(ESTIMATED_TOTAL_CHANNELS, 1));
+    static void checkServletRegistered(FacesContext context) {
+        if (!context.getExternalContext().getApplicationMap().containsKey(Sse.class.getName())) {
+            throw new IllegalStateException(ERROR_SERVLET_NOT_REGISTERED);
+        }
+    }
+
+    /**
+     * Validate the channel, handle user switching, and register the channel in {@link SseChannelManager}.
+     * @param context The involved faces context.
+     * @param component The channel component.
+     * @param scope The channel scope.
+     * @return The registered channel identifier for use in the SSE connection URI.
+     * @throws IllegalArgumentException When the channel name is invalid.
+     */
+    static String registerChannel(FacesContext context, ChannelComponent component, String scope) {
+        var channel = component.getChannel();
+        component.validateChannel(context, channel);
+
+        var registeredUsers = getViewAttribute(context, Sse.class.getName(), () -> new HashMap<>(ESTIMATED_TOTAL_CHANNELS, 1));
+        var previousUser = (Serializable) registeredUsers.put(channel, component.getUser());
+
+        if (previousUser != null && !previousUser.equals(component.getUser())) {
+            SseChannelManager.getInstance().switchUser(channel, scope, previousUser, component.getUser());
+        }
+
+        return SseChannelManager.getInstance().register(channel, scope, component.getUser());
     }
 
     /**

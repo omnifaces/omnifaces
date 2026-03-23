@@ -115,6 +115,42 @@ self.addEventListener("fetch", function(event) {
 });
 
 /**
+ * Handle notification click events; relay to client pages.
+ */
+self.addEventListener("notificationclick", function(event) {
+    event.notification.close();
+
+    self.clients.matchAll({ includeUncontrolled: true, type: "window" }).then(clients => {
+        clients.forEach(client => {
+            client.postMessage({
+                type: "omnifaces.event",
+                name: "omnifaces.notificationclick",
+                detail: { tag: event.notification.tag, data: event.notification.data }
+            });
+        });
+    });
+
+    if (event.notification.data && event.notification.data.url) {
+        event.waitUntil(self.clients.openWindow(event.notification.data.url));
+    }
+});
+
+/**
+ * Handle notification close events; relay to client pages.
+ */
+self.addEventListener("notificationclose", function(event) {
+    self.clients.matchAll({ includeUncontrolled: true, type: "window" }).then(clients => {
+        clients.forEach(client => {
+            client.postMessage({
+                type: "omnifaces.event",
+                name: "omnifaces.notificationclose",
+                detail: { tag: event.notification.tag, data: event.notification.data }
+            });
+        });
+    });
+});
+
+/**
  * Prune old caches.
  */
 self.addEventListener("activate", function(event) {

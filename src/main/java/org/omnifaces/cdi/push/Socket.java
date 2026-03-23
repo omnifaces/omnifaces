@@ -755,7 +755,7 @@ public class Socket extends PushComponent {
 
         if (SocketFacesListener.register(context, this)) {
             var channel = getChannel();
-            validateChannel(channel);
+            validateChannel(context, channel);
 
             var port = getPort();
             var host = (port != null ? ":" + port : "") + getRequestContextPath(context);
