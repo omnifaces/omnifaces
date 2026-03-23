@@ -452,7 +452,7 @@ import org.omnifaces.util.Json;
  * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
  * want to add the URL of the push handshake request URL to the set of restricted URLs.
  * <p>
- * The push handshake request URL is composed of the URI prefix <strong><code>/omnifaces.push/</code></strong>, followed
+ * The push handshake request URL is composed of the URI prefix <strong><code>/omnifaces.socket/</code></strong>, followed
  * by channel name. So, in case of for example container managed security which has already restricted an example page
  * <code>/user/foo.xhtml</code> to logged-in users with the example role <code>USER</code> on the example URL pattern
  * <code>/user/*</code> in <code>web.xml</code> like below,
@@ -469,13 +469,13 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * .. and the page <code>/user/foo.xhtml</code> in turn contains a <code>&lt;o:socket channel="foo"&gt;</code>, then you
- * need to add a restriction on push handshake request URL pattern of <code>/omnifaces.push/foo</code> like below.
+ * need to add a restriction on push handshake request URL pattern of <code>/omnifaces.socket/foo</code> like below.
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
  *         &lt;web-resource-name&gt;Restrict access to role USER.&lt;/web-resource-name&gt;
  *         &lt;url-pattern&gt;/user/*&lt;/url-pattern&gt;
- *         &lt;url-pattern&gt;/omnifaces.push/foo&lt;/url-pattern&gt;
+ *         &lt;url-pattern&gt;/omnifaces.socket/foo&lt;/url-pattern&gt;
  *     &lt;/web-resource-collection&gt;
  *     &lt;auth-constraint&gt;
  *         &lt;role-name&gt;USER&lt;/role-name&gt;
@@ -494,9 +494,9 @@ import org.omnifaces.util.Json;
  * reachable from server end even when the session or view associated with the page in client side is expired.
  *
  *
- * <h2 id="ejb"><a href="#ejb">EJB design hints</a></h2>
+ * <h2 id="business-service"><a href="#business-service">Business service design hints</a></h2>
  * <p>
- * In case you'd like to trigger a push from EAR/EJB side to an application scoped push socket, then you could make use
+ * In case you'd like to trigger a push from business service side to an application scoped push socket, then you could make use
  * of CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code>
  * below taking whatever you'd like to pass as push message.
  * <pre>
@@ -525,8 +525,8 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Note that OmniFaces own {@link Beans#fireEvent(Object, java.lang.annotation.Annotation...)} utility method is
- * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like Faces and OmniFaces in EAR/EJB
- * (back end) side.
+ * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like Faces and OmniFaces in business
+ * service (back end) side.
  * <p>
  * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and
  * delegate to {@link PushContext} as below.
@@ -545,7 +545,7 @@ import org.omnifaces.util.Json;
  * HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be
  * application scoped. The {@link FacesContext} will also be unavailable in the above event listener method.
  * <p>
- * In case the trigger in EAR/EJB side is an asynchronous service method which is in turn initiated in WAR side, then
+ * In case the trigger in business service side is an asynchronous service method which is in turn initiated in WAR side, then
  * you could make use of callbacks from WAR side. Let the business service method take a callback instance as argument,
  * e.g. the <code>java.util.function.Consumer</code> functional interface.
  * <pre>
@@ -572,31 +572,6 @@ import org.omnifaces.util.Json;
  * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push
  * socket, and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
  * (<code>final</code>) argument.
- * <p>
- * In case you're not on Java 8 yet, then you can make use of {@link Runnable} as callback instance instead of the
- * above <code>Consumer</code> functional interface example.
- * <pre>
- * &#64;Asynchronous
- * public void someAsyncServiceMethod(Entity entity, Runnable callback) {
- *     // ... (some long process)
- *     entity.setSomeProperty(someProperty);
- *     callback.run();
- * }
- * </pre>
- * <p>
- * Which is invoked in WAR as below.
- * <pre>
- * public void someAction() {
- *     someService.someAsyncServiceMethod(entity, new Runnable() {
- *         public void run() {
- *             someChannel.send(entity.getSomeProperty());
- *         }
- *     });
- * }
- * </pre>
- * <p>
- * Note that OmniFaces own {@link FunctionalInterface} interfaces are insuitable as it is not allowed to use WAR (front end)
- * frameworks and libraries like Faces and OmniFaces in EAR/EJB (back end) side.
  *
  *
  * <h2 id="cluster"><a href="#cluster">Cluster design hints</a></h2>
@@ -606,10 +581,9 @@ import org.omnifaces.util.Json;
  * to activate and configure a JMS topic in the server configuration, trigger the push event via JMS instead of CDI,
  * and use a JMS listener (a message driven bean, MDB) to delegate the push event to CDI.</p>
  * <p>
- * Below is an example extending on the above given EJB example.
+ * Below is an example extending on the above given business service example.
  * <pre>
- * &#64;Singleton
- * &#64;TransactionAttribute(NOT_SUPPORTED)
+ * &#64;ApplicationScoped
  * public class PushManager {
  *
  *     &#64;Resource(lookup = "java:/jms/topic/push")
@@ -652,7 +626,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Then, in your EJB, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
+ * Then, in your business service, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
  * <pre>
  * &#64;Inject
  * private BeanManager beanManager;
