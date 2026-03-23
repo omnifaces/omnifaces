@@ -719,6 +719,11 @@ public class Socket extends PushComponent {
 
     private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(false,'%s','%s',%s,%s,%s);});";
 
+    private enum PropertyKeys {
+        // Cannot be uppercased. They have to exactly match the attribute names.
+        port, connected;
+    }
+
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**

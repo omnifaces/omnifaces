@@ -57,9 +57,9 @@ abstract class PushComponent extends ScriptFamily implements ClientBehaviorHolde
         }
     });
 
-    enum PropertyKeys {
+    private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        port, channel, scope, user, onopen, onmessage, onerror, onclose, connected;
+        channel, scope, user, onopen, onmessage, onerror, onclose;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
