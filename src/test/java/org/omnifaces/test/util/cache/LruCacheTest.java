@@ -25,12 +25,10 @@ import static org.omnifaces.test.Concurrency.testThreadSafety;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,11 +36,8 @@ import org.omnifaces.util.cache.LruCache;
 
 class LruCacheTest {
 
-    private static final Logger logger = Logger.getLogger(LruCacheTest.class.getName());
-
     private static final int SIZE = 100;
     private static final int ITERATIONS = (SIZE * SIZE) + 1;
-    private static final int LAST_EXISTING_KEY = SIZE * SIZE - SIZE;
 
     private Map<String, String> lruCache;
     private Set<String> evicted;
@@ -58,15 +53,13 @@ class LruCacheTest {
     void testPutThreadSafety() {
         testThreadSafety(i -> lruCache.put("k" + i, "v" + i), ITERATIONS);
 
-        if (evicted.size() == ITERATIONS - SIZE + 1) {
-            // Very sometimes the last existing key is evicted while put by another thread, just inevitable nature of the test using overlapping keys, we'll want to remove the known key from the eviction set.
-            var keyOfLastIteration = "k" + LAST_EXISTING_KEY;
-            List<String> leftIntersecting = evicted.stream().filter(lruCache::containsKey).toList();
-            List<String> rightIntersecting = lruCache.keySet().stream().filter(evicted::contains).toList();
+        if (evicted.size() > ITERATIONS - SIZE) {
+            // Very sometimes a setup key is evicted while being re-put by another thread, just inevitable nature of the test using overlapping keys.
+            // Remove any such keys from the eviction set, but only if they are indeed setup keys (multiples of SIZE).
+            var reAddedAfterEviction = evicted.stream().filter(lruCache::containsKey).toList();
 
-            if (leftIntersecting.size() == 1 && leftIntersecting.contains(keyOfLastIteration) && leftIntersecting.equals(rightIntersecting)) { // Just to ensure it's indeed that one.
-                logger.warning("Last existing key evicted while put by another thread: " + keyOfLastIteration);
-                evicted.remove(keyOfLastIteration);
+            if (!reAddedAfterEviction.isEmpty() && reAddedAfterEviction.stream().allMatch(k -> Integer.parseInt(k.substring(1)) % SIZE == 0)) {
+                reAddedAfterEviction.forEach(evicted::remove);
             }
         }
 
