@@ -12,32 +12,23 @@
  */
 package org.omnifaces.cdi.push;
 
-import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
-import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
-import static jakarta.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Pattern;
 
-import jakarta.el.ValueExpression;
 import jakarta.enterprise.event.Observes;
 import jakarta.faces.FacesException;
 import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
-import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.event.ListenerFor;
@@ -52,12 +43,9 @@ import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.cdi.push.SocketEvent.Switched;
-import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Json;
-import org.omnifaces.util.State;
-import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
@@ -731,14 +719,14 @@ import org.omnifaces.vdl.FacesAttribute;
  * @see SocketEvent
  * @see Push
  * @see PushContext
+ * @see PushExtension
  * @see SocketPushContext
- * @see SocketPushContextProducer
  * @since 2.3
  */
 @FacesComponent(value = Socket.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Socket.ts.
-public class Socket extends ScriptFamily implements ClientBehaviorHolder {
+public class Socket extends PushComponent {
 
     // Public constants -----------------------------------------------------------------------------------------------
 
@@ -751,39 +739,11 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
-
-    private static final String ERROR_EXPRESSION_DISALLOWED =
-        "o:socket 'channel' and 'scope' attributes may not contain an EL expression.";
-    private static final String ERROR_INVALID_USER =
-        "o:socket 'user' attribute '%s' does not represent a valid user identifier. It must implement Serializable and"
-            + " preferably have low memory footprint. Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.";
-    private static final String ERROR_INVALID_CHANNEL =
-        "o:socket 'channel' attribute '%s' does not represent a valid channel name."
-            + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.";
     private static final String ERROR_ENDPOINT_NOT_ENABLED =
         "o:socket endpoint is not enabled."
             + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
     private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init('%s','%s',%s,%s,%s);});";
-
-    private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public boolean contains(Object object) {
-            return true;
-        }
-    });
-
-    private enum PropertyKeys {
-        // Cannot be uppercased. They have to exactly match the attribute names.
-        port, channel, scope, user, onopen, onmessage, onerror, onclose, connected;
-    }
-
-    // Variables ------------------------------------------------------------------------------------------------------
-
-    private final State state = new State(getStateHelper());
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -795,38 +755,6 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
         if (event instanceof PostAddToViewEvent) {
             SocketFacesListener.subscribeIfNecessary();
         }
-    }
-
-    /**
-     * An override which checks if this isn't been invoked on <code>channel</code> or <code>scope</code> attribute, and
-     * if the <code>user</code> attribute is <code>Serializable</code>.
-     * Finally it delegates to the super method.
-     * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> or
-     * <code>scope</code> attribute, or when the <code>user</code> attribute is not <code>Serializable</code>.
-     */
-    @Override
-    public void setValueExpression(String name, ValueExpression binding) {
-        if (PropertyKeys.channel.toString().equals(name) || PropertyKeys.scope.toString().equals(name)) {
-            throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
-        }
-
-        if (PropertyKeys.user.toString().equals(name)) {
-            var user = binding.getValue(getFacesContext().getELContext());
-
-            if (user != null && !(user instanceof Serializable)) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_USER, user));
-            }
-        }
-
-        super.setValueExpression(name, binding);
-    }
-
-    /**
-     * Accept all event names.
-     */
-    @Override
-    public Collection<String> getEventNames() {
-        return CONTAINS_EVERYTHING;
     }
 
     /**
@@ -848,10 +776,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
         if (SocketFacesListener.register(context, this)) {
             var channel = getChannel();
-
-            if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_CHANNEL, channel));
-            }
+            validateChannel(channel);
 
             var port = getPort();
             var host = (port != null ? ":" + port : "") + getRequestContextPath(context);
@@ -865,53 +790,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
         }
     }
 
-    private String getBehaviorScripts() {
-        var clientBehaviorsByEvent = getClientBehaviors();
-
-        if (clientBehaviorsByEvent.isEmpty()) {
-            return "{}";
-        }
-
-        var clientId = getClientId(getFacesContext());
-        var scripts = new StringBuilder("{");
-
-        for (var entry : clientBehaviorsByEvent.entrySet()) {
-            var event = entry.getKey();
-            var clientBehaviors = entry.getValue();
-            scripts.append(scripts.length() > 1 ? "," : "").append(event).append(":[");
-
-            for (var i = 0; i < clientBehaviors.size(); i++) {
-                scripts.append(i > 0 ? "," : "").append("function(event){");
-                scripts.append(clientBehaviors.get(i).getScript(createClientBehaviorContext(getFacesContext(), this, event, clientId, null)));
-                scripts.append("}");
-            }
-
-            scripts.append("]");
-        }
-
-        return scripts.append("}").toString();
-    }
-
-    @Override
-    public void decode(FacesContext context) {
-        var clientBehaviors = getClientBehaviors();
-
-        if (clientBehaviors.isEmpty() || !getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME))) {
-            return;
-        }
-
-        var behaviors = clientBehaviors.get(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME));
-
-        if (behaviors == null) {
-            return;
-        }
-
-        for (var behavior : behaviors) {
-            behavior.decode(context, this);
-        }
-    }
-
-    // Attribute getters/setters --------------------------------------------------------------------------------------
+    // Socket-specific attribute getters/setters ----------------------------------------------------------------------
 
     /**
      * Returns the port number of the web socket host.
@@ -928,150 +807,6 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
      */
     public void setPort(Integer port) {
         state.put(PropertyKeys.port, port);
-    }
-
-    /**
-     * Returns the name of the web socket channel.
-     * @return The name of the web socket channel.
-     */
-    public String getChannel() {
-        return state.get(PropertyKeys.channel);
-    }
-
-    /**
-     * Sets the name of the web socket channel.
-     * It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods.
-     * All open websockets on the same channel will receive the same push message from the server.
-     * @param channel The name of the web socket channel.
-     */
-    @FacesAttribute(required = true)
-    public void setChannel(String channel) {
-        state.put(PropertyKeys.channel, channel);
-    }
-
-    /**
-     * Returns the scope of the web socket channel.
-     * @return The scope of the web socket channel.
-     */
-    public String getScope() {
-        return state.get(PropertyKeys.scope);
-    }
-
-    /**
-     * Sets the scope of the web socket channel.
-     * It may not be an EL expression and allowed values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. When the value is <code>application</code>, then all channels with the same
-     * name throughout the application will receive the same push message. When the value is <code>session</code>, then
-     * only the channels with the same name in the current user session will receive the same push message. When the
-     * value is <code>view</code>, then only the channel in the current view will receive the push message. The default
-     * scope is <code>application</code>. When the <code>user</code> attribute is specified, then the default scope is
-     * <code>session</code>.
-     * @param scope The scope of the web socket channel.
-     */
-    public void setScope(String scope) {
-        state.put(PropertyKeys.scope, scope);
-    }
-
-    /**
-     * Returns the user identifier of the web socket channel.
-     * @return The user identifier of the web socket channel.
-     */
-    public Serializable getUser() {
-        return state.get(PropertyKeys.user);
-    }
-
-    /**
-     * Sets the user identifier of the web socket channel, so that user-targeted push messages can be sent.
-     * All open websockets on the same channel and user will receive the same push message from the server.
-     * It must implement <code>Serializable</code> and preferably have low memory footprint.
-     * Suggestion: use <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
-     * @param user The user identifier of the web socket channel.
-     */
-    public void setUser(Serializable user) {
-        state.put(PropertyKeys.user, user);
-    }
-
-    /**
-     * Returns the JavaScript event handler function that is invoked when the web socket is opened.
-     * @return The JavaScript event handler function that is invoked when the web socket is opened.
-     */
-    public String getOnopen() {
-        return state.get(PropertyKeys.onopen);
-    }
-
-    /**
-     * Sets the JavaScript event handler function that is invoked when the web socket is opened.
-     * The function will be invoked with one argument: the channel name.
-     * @param onopen The JavaScript event handler function that is invoked when the web socket is opened.
-     */
-    public void setOnopen(String onopen) {
-        state.put(PropertyKeys.onopen, onopen);
-    }
-
-    /**
-     * Returns the JavaScript event handler function that is invoked when a push message is received from the server.
-     * @return The JavaScript event handler function that is invoked when a push message is received from the server.
-     */
-    public String getOnmessage() {
-        return state.get(PropertyKeys.onmessage);
-    }
-
-    /**
-     * Sets the JavaScript event handler function that is invoked when a push message is received from the server.
-     * The function will be invoked with three arguments: the push message, the channel name and the raw MessageEvent itself.
-     * @param onmessage The JavaScript event handler function that is invoked when a push message is received from the server.
-     */
-    @FacesAttribute(required = true)
-    public void setOnmessage(String onmessage) {
-        state.put(PropertyKeys.onmessage, onmessage);
-    }
-
-    /**
-     * Returns the JavaScript event handler function that is invoked when a connection error has occurred and the web
-     * socket will attempt to reconnect.
-     * @return The JavaScript event handler function that is invoked when a connection error has occurred and the web
-     * socket will attempt to reconnect.
-     * @since 3.4
-     */
-    public String getOnerror() {
-        return state.get(PropertyKeys.onerror);
-    }
-
-    /**
-     * Sets the JavaScript event handler function that is invoked when a connection error has occurred and the web
-     * socket will attempt to reconnect. The function will be invoked with three arguments: the error reason code, the
-     * channel name and the raw <code>CloseEvent</code> itself. Note that this will not be invoked on final close of the
-     * web socket, even when the final close is caused by an error. See also
-     * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
-     * for an elaborate list of all close codes.
-     * @param onerror The JavaScript event handler function that is invoked when a reconnection error has occurred.
-     * @since 3.4
-     */
-    public void setOnerror(String onerror) {
-        state.put(PropertyKeys.onerror, onerror);
-    }
-
-    /**
-     * Returns the JavaScript event handler function that is invoked when the web socket is closed and will not anymore
-     * attempt to reconnect.
-     * @return The JavaScript event handler function that is invoked when the web socket is closed and will not anymore
-     * attempt to reconnect.
-     */
-    public String getOnclose() {
-        return state.get(PropertyKeys.onclose);
-    }
-
-    /**
-     * Sets the JavaScript event handler function that is invoked when the web socket is closed and will not anymore
-     * attempt to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
-     * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
-     * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
-     * when the code is not 1000 or 1008). See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455
-     * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
-     * @param onclose The JavaScript event handler function that is invoked when the web socket is closed.
-     */
-    public void setOnclose(String onclose) {
-        state.put(PropertyKeys.onclose, onclose);
     }
 
     /**
@@ -1102,7 +837,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
      * @param context The involved servlet context.
      */
     public static void registerEndpointIfNecessary(ServletContext context) {
-        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED)) && !SocketExtension.isPushContextInjected()) {
+        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED)) && !PushExtension.isSocketActivated()) {
             return;
         }
 

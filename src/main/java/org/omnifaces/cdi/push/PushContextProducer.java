@@ -24,14 +24,14 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * This producer prepares the {@link SocketPushContext} instance for injection by <code>&#64;</code>{@link Push}.
+ * This producer prepares the {@link PushContext} instance for injection by <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push
- * @since 2.3
+ * @since 5.2
  */
 @Dependent
-public class SocketPushContextProducer {
+class PushContextProducer {
 
     // Variables ------------------------------------------------------------------------------------------------------
 

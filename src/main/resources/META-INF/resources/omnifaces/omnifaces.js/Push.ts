@@ -24,8 +24,8 @@ export namespace Push {
 
     // "Constant" fields ----------------------------------------------------------------------------------------------
 
-    const URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
-    const URI_PREFIX = "/omnifaces.push";
+    const WS_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
+    const WS_URI_PREFIX = "/omnifaces.socket";
     const RECONNECT_INTERVAL = 500;
     const MAX_RECONNECT_ATTEMPTS = 25;
     const REASON_EXPIRED = "Expired";
@@ -33,13 +33,18 @@ export namespace Push {
 
     // Private static fields ------------------------------------------------------------------------------------------
 
-    const sockets: Record<string, Socket> = {};
+    const connections: Record<string, Connection> = {};
+
+    // Private interfaces ---------------------------------------------------------------------------------------------
+
+    interface Connection {
+        open(): void;
+        close(): void;
+    }
 
     // Private static classes -----------------------------------------------------------------------------------------
 
-    class Socket {
-
-        // Private fields ---------------------------------------------------------------------------------------------
+    class SocketConnection implements Connection {
 
         readonly url: string;
         readonly channel: string;
@@ -175,8 +180,8 @@ export namespace Push {
             return;
         }
 
-        if (!sockets[channel]) {
-            sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), Util.resolveFunction(onerror), onclose, behaviors);
+        if (!connections[channel]) {
+            connections[channel] = new SocketConnection(getSocketBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), Util.resolveFunction(onerror), onclose, behaviors);
         }
 
         if (autoconnect) {
@@ -185,21 +190,21 @@ export namespace Push {
     }
 
     /**
-     * Open the web socket on the given channel.
-     * @param channel The name of the web socket channel.
+     * Open the push connection on the given channel.
+     * @param channel The name of the push channel.
      * @throws {Error} When channel is unknown.
      */
     export function open(channel: string) {
-        getSocket(channel).open();
+        getConnection(channel).open();
     }
 
     /**
-     * Close the web socket on the given channel.
-     * @param channel The name of the web socket channel.
+     * Close the push connection on the given channel.
+     * @param channel The name of the push channel.
      * @throws {Error} When channel is unknown.
      */
     export function close(channel: string) {
-        getSocket(channel).close();
+        getConnection(channel).close();
     }
 
     // Private static functions ---------------------------------------------------------------------------------------
@@ -213,25 +218,25 @@ export namespace Push {
      * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
      * @return Base URL
      */
-    function getBaseURL(host: string): string {
+    function getSocketBaseURL(host: string): string {
         host = host ?? "";
         const base = (!host || host.startsWith("/")) ? window.location.host
                 : (host.startsWith(":")) ? window.location.hostname
                 : "";
-        return `${URL_PROTOCOL}${base}${host}${URI_PREFIX}/`;
+        return `${WS_PROTOCOL}${base}${host}${WS_URI_PREFIX}/`;
     }
 
     /**
-     * Get socket associated with given channel.
-     * @param channel The name of the web socket channel.
-     * @return Socket associated with given channel.
+     * Get connection associated with given channel.
+     * @param channel The name of the channel.
+     * @return Connection associated with given channel.
      * @throws {Error} When channel is unknown. You may need to initialize it first via <code>init()</code> function.
      */
-    function getSocket(channel: string): Socket {
-        const socket = sockets[channel];
+    function getConnection(channel: string): Connection {
+        const connection = connections[channel];
 
-        if (socket) {
-            return socket;
+        if (connection) {
+            return connection;
         }
         else {
             throw new Error(`Unknown channel: ${channel}`);

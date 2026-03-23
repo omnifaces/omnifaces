@@ -78,7 +78,7 @@ describe("OmniFaces.Push.init: host URL resolution", () => {
     test("empty host defaults to window.location.host", () => {
         push().init("", "hostTest1", null, null, null, null, {}, true);
         expect(lastWS().url).toContain(window.location.host);
-        expect(lastWS().url).toContain("/omnifaces.push/");
+        expect(lastWS().url).toContain("/omnifaces.socket/");
     });
 
     test("host starting with / prepends window.location.host", () => {
@@ -93,7 +93,7 @@ describe("OmniFaces.Push.init: host URL resolution", () => {
 
     test("full host is used as-is", () => {
         push().init("example.com:8080/ctx", "hostTest4", null, null, null, null, {}, true);
-        expect(lastWS().url).toContain("example.com:8080/ctx/omnifaces.push/");
+        expect(lastWS().url).toContain("example.com:8080/ctx/omnifaces.socket/");
     });
 
     test("URL includes channel URI", () => {

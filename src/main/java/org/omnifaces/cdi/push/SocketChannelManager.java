@@ -12,8 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
 
@@ -21,10 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.annotation.PreDestroy;
@@ -45,63 +40,19 @@ import org.omnifaces.util.Beans;
  * @since 2.3
  */
 @SessionScoped
-public class SocketChannelManager implements Serializable {
+public class SocketChannelManager extends PushChannelManager {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_INVALID_SCOPE =
-        "o:socket 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
-            + " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
-            + " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
-    private static final String ERROR_DUPLICATE_CHANNEL =
-        "o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
-            + " different channel (or shutdown all browsers and restart the server if you were just testing).";
     private static final String ERROR_VIEW_SCOPE_UNAVAILABLE =
         "o:socket view scope is unavailable."
             + " Perhaps you need to explicitly register the SocketChannelManager.ViewScope as a CDI managed bean?";
 
-    /** A good developer will unlikely declare multiple application scoped push channels in same application (a global JS listener is more efficient). */
-    private static final int ESTIMATED_CHANNELS_PER_APPLICATION = 1;
-
-    /** A good developer will unlikely declare multiple session scoped push channels in same session (a global JS listener is more efficient). */
-    private static final int ESTIMATED_CHANNELS_PER_SESSION = 1;
-
-    /** A good developer will unlikely declare multiple view scoped channels in same view (a global JS listener is more efficient). */
-    private static final int ESTIMATED_CHANNELS_PER_VIEW = 1;
-
-    /** A good developer will unlikely allow the session to have more than one user (bad security practice, but technically not impossible). */
-    private static final int ESTIMATED_USERS_PER_SESSION = 1;
-
-    /** A good developer will unlikely declare more than three push channels in same application (one for each scope with each a global JS listener). */
-    static final int ESTIMATED_TOTAL_CHANNELS = ESTIMATED_CHANNELS_PER_APPLICATION + ESTIMATED_CHANNELS_PER_SESSION + ESTIMATED_CHANNELS_PER_VIEW;
-
-    static final Map<String, String> EMPTY_SCOPE = emptyMap();
-
-    private enum Scope {
-        APPLICATION, SESSION, VIEW;
-
-        static Scope of(String value, Serializable user) {
-            if (value == null) {
-                return user == null ? APPLICATION : SESSION;
-            }
-
-            for (var scope : values()) {
-                if (scope.name().equalsIgnoreCase(value) && (user == null || scope != APPLICATION)) {
-                    return scope;
-                }
-            }
-
-            throw new IllegalArgumentException(format(ERROR_INVALID_SCOPE, value));
-        }
-    }
-
     // Properties -----------------------------------------------------------------------------------------------------
 
     private static final ConcurrentHashMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION, 1);
-    private final ConcurrentHashMap<String, String> sessionScopedChannels = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION, 1);
-    private final ConcurrentHashMap<Serializable, String> sessionUsers = new ConcurrentHashMap<>(ESTIMATED_USERS_PER_SESSION, 1);
 
     @Inject
     private SocketSessionManager socketSessions;
@@ -110,51 +61,6 @@ public class SocketChannelManager implements Serializable {
     private SocketUserManager socketUsers;
 
     // Actions --------------------------------------------------------------------------------------------------------
-
-    /**
-     * Register given channel on given scope and returns the web socket channel identifier.
-     * @param channel The web socket channel.
-     * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
-     * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
-     * @return The web socket channel identifier. This can be used as web socket URI.
-     * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
-     */
-    protected String register(String channel, String scope, Serializable user) {
-        return switch (Scope.of(scope, user)) {
-            case APPLICATION -> register(null, channel, APPLICATION_SCOPE, sessionScopedChannels, getViewScopedChannels(false));
-            case SESSION -> register(user, channel, sessionScopedChannels, APPLICATION_SCOPE, getViewScopedChannels(false));
-            case VIEW -> register(user, channel, getViewScopedChannels(true), APPLICATION_SCOPE, sessionScopedChannels);
-            default -> throw new UnsupportedOperationException();
-        };
-    }
-
-    @SafeVarargs
-    private String register(Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
-        if (!targetScope.containsKey(channel)) {
-            for (var otherScope : otherScopes) {
-                if (otherScope.containsKey(channel)) {
-                    throw new IllegalArgumentException(format(ERROR_DUPLICATE_CHANNEL, channel));
-                }
-            }
-
-            ((ConcurrentHashMap<String, String>) targetScope).putIfAbsent(channel, channel + "?" + UUID.randomUUID());
-        }
-
-        var channelId = targetScope.get(channel);
-
-        if (user != null) {
-            if (!sessionUsers.containsKey(user) && sessionUsers.putIfAbsent(user, UUID.randomUUID().toString()) == null) {
-                socketUsers.register(user, sessionUsers.get(user));
-            }
-
-            socketUsers.addChannelId(sessionUsers.get(user), channel, channelId);
-        }
-
-        socketSessions.register(channelId);
-        return channelId;
-    }
 
     /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
@@ -168,7 +74,7 @@ public class SocketChannelManager implements Serializable {
      */
     protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
         if (oldUser != null) {
-            var userId = sessionUsers.remove(oldUser);
+            var userId = getSessionUsers().remove(oldUser);
 
             if (userId != null) {
                 socketUsers.deregister(oldUser, userId);
@@ -184,12 +90,46 @@ public class SocketChannelManager implements Serializable {
      * any open web sockets associated with it to avoid stale websockets. If any, also deregister session users.
      */
     @PreDestroy
+    @Override
     protected void deregisterSessionScope() {
-        for (var sessionUser : sessionUsers.entrySet()) {
-            socketUsers.deregister(sessionUser.getKey(), sessionUser.getValue());
-        }
+        super.deregisterSessionScope();
+    }
 
-        socketSessions.deregister(sessionScopedChannels.values());
+    // Template methods -----------------------------------------------------------------------------------------------
+
+    @Override
+    protected ConcurrentHashMap<String, String> getApplicationScope() {
+        return APPLICATION_SCOPE;
+    }
+
+    @Override
+    protected PushSessionManager<?> getPushSessions() {
+        return socketSessions;
+    }
+
+    @Override
+    protected PushUserManager getPushUsers() {
+        return socketUsers;
+    }
+
+    @Override
+    protected Map<String, String> getViewScopedChannels(boolean create) {
+        var bean = Beans.getInstance(ViewScope.class, create);
+
+        if (bean != null) {
+            return bean.getChannels();
+        }
+        else if (!create) {
+            return EMPTY_SCOPE;
+        }
+        else {
+            throw new IllegalStateException(ERROR_VIEW_SCOPE_UNAVAILABLE);
+        }
+    }
+
+    @Override
+    protected String getComponentName() {
+        return "o:socket";
     }
 
     // Nested classes -------------------------------------------------------------------------------------------------
@@ -233,39 +173,6 @@ public class SocketChannelManager implements Serializable {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
-     * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of
-     * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
-     * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
-     * @return Session scope channel IDs.
-     */
-    protected Map<String, String> getSessionScopedChannels() {
-        return sessionScopedChannels;
-    }
-
-    /**
-     * For internal usage only. This makes it possible to reference view scope channel IDs during injection time of
-     * {@link SocketPushContext} (the Faces view scope is not necessarily active during push send time).
-     * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
-     * @param create Whether or not to auto-create the entry in Faces view scope.
-     * @return View scope channel IDs.
-     * @throws IllegalStateException Since OmniFaces 4.6 when the Faces view scope is not available while {@code create}
-     * is {@code true}.
-     */
-    protected Map<String, String> getViewScopedChannels(boolean create) {
-        var bean = Beans.getInstance(ViewScope.class, create);
-
-        if (bean != null) {
-            return bean.getChannels();
-        }
-        else if (!create) {
-            return EMPTY_SCOPE;
-        }
-        else {
-            throw new IllegalStateException(ERROR_VIEW_SCOPE_UNAVAILABLE);
-        }
-    }
-
-    /**
      * Internal usage only. Awkward workaround for it being unavailable via @Inject in Faces components and listeners.
      */
     static SocketChannelManager getInstance() {
@@ -277,54 +184,19 @@ public class SocketChannelManager implements Serializable {
      * send time in {@link SocketPushContext}.
      */
     static String getChannelId(String channel, Map<String, String> sessionScope, Map<String, String> viewScope) {
-        var channelId = viewScope.get(channel);
-
-        if (channelId == null) {
-            channelId = sessionScope.get(channel);
-
-            if (channelId == null) {
-                channelId = APPLICATION_SCOPE.get(channel);
-            }
-        }
-
-        return channelId;
+        return PushChannelManager.getChannelId(channel, APPLICATION_SCOPE, sessionScope, viewScope);
     }
 
     // Serialization --------------------------------------------------------------------------------------------------
 
     private void writeObject(ObjectOutputStream output) throws IOException {
         output.defaultWriteObject();
-
-        // All of below is just in case server restarts with session persistence or failovers/synchronizes to another server.
-        output.writeObject(APPLICATION_SCOPE);
-        var sessionUserChannels = new HashMap<String, ConcurrentHashMap<String, Set<String>>>(sessionUsers.size(), 1);
-
-        for (var userId : sessionUsers.values()) {
-            sessionUserChannels.put(userId, socketUsers.getUserChannels().get(userId));
-        }
-
-        output.writeObject(sessionUserChannels);
+        serializeState(output);
     }
 
-    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
         input.defaultReadObject();
-
-        // Below is just in case server restarts with session persistence or failovers/synchronizes from another server.
-        APPLICATION_SCOPE.putAll((Map<String, String>) input.readObject());
-        var sessionUserChannels = (Map<String, ConcurrentHashMap<String, Set<String>>>) input.readObject();
-
-        for (var sessionUser : sessionUsers.entrySet()) {
-            var userId = sessionUser.getValue();
-            socketUsers.register(sessionUser.getKey(), userId);
-            socketUsers.getUserChannels().put(userId, sessionUserChannels.get(userId));
-        }
-
-        // Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
-        // is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
-        // And, for application scope IDs we make sure they're re-registered after server restart/failover.
-        socketSessions.register(sessionScopedChannels.values());
-        socketSessions.register(APPLICATION_SCOPE.values());
+        deserializeState(input);
     }
 
 }

@@ -16,7 +16,7 @@ import static jakarta.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static jakarta.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
-import static org.omnifaces.cdi.PushContext.URI_PREFIX;
+import static org.omnifaces.cdi.PushContext.SOCKET_URI_PREFIX;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -44,7 +44,7 @@ public class SocketEndpoint extends Endpoint {
     static final String PARAM_CHANNEL = "channel";
 
     /** The context-relative URI template where the web socket endpoint should listen on. */
-    public static final String URI_TEMPLATE = URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
+    public static final String URI_TEMPLATE = SOCKET_URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
 
     private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
     private static final CloseReason REASON_UNKNOWN_CHANNEL = new CloseReason(VIOLATED_POLICY, "Unknown channel");

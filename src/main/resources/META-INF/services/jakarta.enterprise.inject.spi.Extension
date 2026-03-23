@@ -1,4 +1,4 @@
 org.omnifaces.cdi.viewscope.ViewScopeExtension
 org.omnifaces.cdi.eager.EagerExtension
 org.omnifaces.cdi.param.ParamExtension
-org.omnifaces.cdi.push.SocketExtension
+org.omnifaces.cdi.push.PushExtension

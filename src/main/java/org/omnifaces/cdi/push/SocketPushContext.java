@@ -13,7 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.singleton;
-import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
+import static org.omnifaces.cdi.push.PushChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Beans.isActive;
