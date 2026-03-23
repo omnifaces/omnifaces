@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 
+import org.omnifaces.cdi.push.SseEvent.Switched;
 import org.omnifaces.util.Beans;
 
 /**
@@ -60,6 +62,33 @@ public class SseChannelManager extends PushChannelManager {
 
     // Actions --------------------------------------------------------------------------------------------------------
 
+    /**
+     * Switch the user on the given channel on the given scope from the given old user to the given new user.
+     * @param channel The SSE channel.
+     * @param scope The SSE scope. Supported values are <code>application</code>, <code>session</code> and
+     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
+     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope
+     * may not be <code>application</code>.
+     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope
+     * may not be <code>application</code>.
+     */
+    protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
+        if (oldUser != null) {
+            var userId = getSessionUsers().remove(oldUser);
+
+            if (userId != null) {
+                sseUsers.deregister(oldUser, userId);
+            }
+        }
+
+        register(channel, scope, newUser);
+        fireEvent(new SseEvent(channel, newUser, oldUser), Switched.LITERAL);
+    }
+
+    /**
+     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close
+     * any open SSE connections associated with it to avoid stale connections. If any, also deregister session users.
+     */
     @PreDestroy
     @Override
     protected void deregisterSessionScope() {

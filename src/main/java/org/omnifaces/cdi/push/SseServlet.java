@@ -71,7 +71,7 @@ public class SseServlet extends HttpServlet {
 		var asyncContext = request.startAsync();
 		asyncContext.setTimeout(0);
 
-		if (!sseSessions.add(channelId, asyncContext)) {
+		if (!sseSessions.add(channelId, channel, asyncContext)) {
 			asyncContext.complete();
 			return;
 		}

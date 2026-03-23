@@ -16,12 +16,20 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Level.FINEST;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.inject.Inject;
 import jakarta.servlet.AsyncContext;
+
+import org.omnifaces.cdi.push.SseEvent.Closed;
+import org.omnifaces.cdi.push.SseEvent.Opened;
+import org.omnifaces.util.Beans;
 
 /**
  * <p>
@@ -41,17 +49,38 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
     private static final byte[] SSE_DATA_PREFIX = "data: ".getBytes(UTF_8);
     private static final byte[] SSE_DATA_SUFFIX = "\n\n".getBytes(UTF_8);
 
+    // Properties -----------------------------------------------------------------------------------------------------
+
+    @Inject
+    private SseUserManager sseUsers;
+
+    private final ConcurrentHashMap<AsyncContext, String> channels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<AsyncContext, Serializable> users = new ConcurrentHashMap<>();
+
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
      * On open, add given async context to the mapping associated with given channel identifier and return
      * <code>true</code> if it's accepted (i.e. the channel identifier is known), otherwise <code>false</code>.
      * @param channelId The channel identifier.
+     * @param channel The channel name.
      * @param asyncContext The opened async context.
      * @return <code>true</code> if given async context is accepted, otherwise <code>false</code>.
      */
-    protected boolean add(String channelId, AsyncContext asyncContext) {
-        return addSession(channelId, asyncContext);
+    protected boolean add(String channelId, String channel, AsyncContext asyncContext) {
+        if (addSession(channelId, asyncContext)) {
+            channels.put(asyncContext, channel);
+            var user = sseUsers.getUser(channel, channelId);
+
+            if (user != null) {
+                users.put(asyncContext, user);
+            }
+
+            fireEvent(asyncContext, Opened.LITERAL);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -60,7 +89,11 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
      * @param asyncContext The async context to remove.
      */
     protected void remove(String channelId, AsyncContext asyncContext) {
-        removeSession(channelId, asyncContext);
+        if (removeSession(channelId, asyncContext)) {
+            fireEvent(asyncContext, Closed.LITERAL);
+            channels.remove(asyncContext);
+            users.remove(asyncContext);
+        }
     }
 
     // Template methods -----------------------------------------------------------------------------------------------
@@ -94,6 +127,18 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
         catch (IllegalStateException ignore) {
             logger.log(FINEST, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
         }
+        finally {
+            channels.remove(asyncContext);
+            users.remove(asyncContext);
+        }
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    private void fireEvent(AsyncContext asyncContext, AnnotationLiteral<?> qualifier) {
+        var channel = channels.get(asyncContext);
+        var user = users.get(asyncContext);
+        Beans.fireEvent(new SseEvent(channel, user, null), qualifier);
     }
 
 }
