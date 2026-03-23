@@ -19,24 +19,32 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import jakarta.websocket.RemoteEndpoint.Async;
-
 import org.omnifaces.cdi.push.Socket;
+import org.omnifaces.cdi.push.Sse;
 import org.omnifaces.util.Json;
 
 /**
  * <p>
- * CDI interface to send a message object to the push socket channel as identified by <code>&#64;</code>{@link Push}.
+ * CDI interface to send a message object to the push channel as identified by <code>&#64;</code>{@link Push}.
  * This can be injected via <code>&#64;</code>{@link Push} in any container managed artifact in WAR (not in EAR/EJB!).
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext channelName;
  * </pre>
  * <p>
- * For detailed usage instructions, see {@link Socket} javadoc.
+ * By default this uses Web Socket as transport. To use Server-Sent Events (SSE) instead, set {@link Push#sse()} to
+ * {@code true}:
+ * <pre>
+ * &#64;Inject &#64;Push(sse=true)
+ * private PushContext channelName;
+ * </pre>
+ * <p>
+ * For detailed usage instructions, see {@link Socket} and {@link Sse} javadocs.
  *
  * @author Bauke Scholtz
+ * @see Push
  * @see Socket
+ * @see Sse
  * @since 2.3
  */
 public interface PushContext extends Serializable {
@@ -44,56 +52,60 @@ public interface PushContext extends Serializable {
     // Constants ------------------------------------------------------------------------------------------------------
 
     /** The context-relative web socket URI prefix where the endpoint should listen on. */
-    String URI_PREFIX = "/omnifaces.push";
+    String SOCKET_URI_PREFIX = "/omnifaces.socket";
+
+    /** The context-relative server sent events URI prefix where the async servlet should listen on. */
+    String SSE_URI_PREFIX = "/omnifaces.sse";
+
+    /** The context-relative web socket URI prefix where the endpoint should listen on.
+     * @deprecated Use SOCKET_URI_PREFIX instead. */
+    @Deprecated(since = "5.2", forRemoval = true)
+    String URI_PREFIX = SOCKET_URI_PREFIX;
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}.
+     * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}.
      * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
-     * declared in <code>&lt;o:socket onmessage&gt;</code>.
+     * declared in <code>&lt;o:socket onmessage&gt;</code> or <code>&lt;o:sse onmessage&gt;</code>.
      * @param message The push message object.
-     * @return The results of the send operation. If it returns an empty set, then there was no open web socket session
-     * associated with given socket channel. The returned futures will return <code>null</code> on {@link Future#get()}
-     * if the message was successfully delivered and otherwise throw {@link ExecutionException}.
+     * @return The results of the send operation. If it returns an empty set, then there was no open session associated
+     * with given push channel. The returned futures will return <code>null</code> on {@link Future#get()} if the
+     * message was successfully delivered and otherwise throw {@link ExecutionException}.
      * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
      * @see Json#encode(Object)
-     * @see Async#sendText(String)
      */
     Set<Future<Void>> send(Object message);
 
     /**
-     * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}, targeted
-     * to the given user as identified by <code>&lt;o:socket user&gt;</code>.
+     * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}, targeted to the
+     * given user as identified by <code>&lt;o:socket user&gt;</code> or <code>&lt;o:sse user&gt;</code>.
      * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
-     * declared in <code>&lt;o:socket onmessage&gt;</code>.
+     * declared in <code>&lt;o:socket onmessage&gt;</code> or <code>&lt;o:sse onmessage&gt;</code>.
      * @param <S> The generic type of the user identifier.
      * @param message The push message object.
      * @param user The user to which the push message object must be delivered to.
-     * @return The results of the send operation. If it returns an empty set, then there was no open web socket session
-     * associated with given socket channel and user. The returned futures will return <code>null</code> on
-     * {@link Future#get()} if the message was successfully delivered and otherwise throw {@link ExecutionException}.
+     * @return The results of the send operation. If it returns an empty set, then there was no open session associated
+     * with given push channel and user. The returned futures will return <code>null</code> on {@link Future#get()} if
+     * the message was successfully delivered and otherwise throw {@link ExecutionException}.
      * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
      * @see Json#encode(Object)
-     * @see Async#sendText(String)
      */
     <S extends Serializable> Set<Future<Void>> send(Object message, S user);
 
     /**
-     * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}, targeted
-     * to the given users as identified by <code>&lt;o:socket user&gt;</code>.
+     * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}, targeted to the
+     * given users as identified by <code>&lt;o:socket user&gt;</code> or <code>&lt;o:sse user&gt;</code>.
      * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
-     * declared in <code>&lt;o:socket onmessage&gt;</code>.
+     * declared in <code>&lt;o:socket onmessage&gt;</code> or <code>&lt;o:sse onmessage&gt;</code>.
      * @param <S> The generic type of the user identifier.
      * @param message The push message object.
      * @param users The users to which the push message object must be delivered to.
      * @return The results of the send operation grouped by user. If it contains an empty set, then there was no open
-     * web socket session associated with given socket channel and user. The returned futures will return
-     * <code>null</code> on {@link Future#get()} if the message was successfully delivered and otherwise throw
-     * {@link ExecutionException}.
+     * session associated with given push channel and user. The returned futures will return <code>null</code> on
+     * {@link Future#get()} if the message was successfully delivered and otherwise throw {@link ExecutionException}.
      * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
      * @see Json#encode(Object)
-     * @see Async#sendText(String)
      */
     <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users);
 

@@ -333,9 +333,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             return; // FacesExceptionFilter is already explicitly registered.
         }
 
-        servletContext
-            .addFilter(FacesExceptionFilter.class.getName(), FacesExceptionFilter.class)
-            .addMappingForUrlPatterns(EnumSet.of(REQUEST), false, "/*");
+        var filter = servletContext.addFilter(FacesExceptionFilter.class.getName(), FacesExceptionFilter.class);
+        filter.setAsyncSupported(true);
+        filter.addMappingForUrlPatterns(EnumSet.of(REQUEST), false, "/*");
         logger.log(INFO, FACES_EXCEPTION_FILTER_AUTO_INSTALLED);
     }
 

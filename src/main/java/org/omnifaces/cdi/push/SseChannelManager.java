@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
@@ -27,68 +26,40 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 
-import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This web socket channel manager holds all application and session scoped web socket channel identifiers registered by
- * <code>&lt;o:socket&gt;</code>.
+ * This SSE channel manager holds all application and session scoped SSE channel identifiers registered by
+ * <code>&lt;o:sse&gt;</code>.
  *
  * @author Bauke Scholtz
- * @see Socket
- * @since 2.3
+ * @see Sse
+ * @since 5.2
  */
 @SessionScoped
-public class SocketChannelManager extends PushChannelManager {
+public class SseChannelManager extends PushChannelManager {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final long serialVersionUID = 1L;
 
     private static final String ERROR_VIEW_SCOPE_UNAVAILABLE =
-        "o:socket view scope is unavailable."
-            + " Perhaps you need to explicitly register the SocketChannelManager.ViewScope as a CDI managed bean?";
+        "o:sse view scope is unavailable."
+            + " Perhaps you need to explicitly register the SseChannelManager.ViewScope as a CDI managed bean?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
     private static final ConcurrentHashMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION, 1);
 
     @Inject
-    private SocketSessionManager socketSessions;
+    private SseSessionManager sseSessions;
 
     @Inject
-    private SocketUserManager socketUsers;
+    private SseUserManager sseUsers;
 
     // Actions --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Switch the user on the given channel on the given scope from the given old user to the given new user.
-     * @param channel The web socket channel.
-     * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
-     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
-     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
-     */
-    protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
-        if (oldUser != null) {
-            var userId = getSessionUsers().remove(oldUser);
-
-            if (userId != null) {
-                socketUsers.deregister(oldUser, userId);
-            }
-        }
-
-        register(channel, scope, newUser);
-        fireEvent(new SocketEvent(channel, newUser, oldUser, null), Switched.LITERAL);
-    }
-
-    /**
-     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close
-     * any open web sockets associated with it to avoid stale websockets. If any, also deregister session users.
-     */
     @PreDestroy
     @Override
     protected void deregisterSessionScope() {
@@ -104,12 +75,12 @@ public class SocketChannelManager extends PushChannelManager {
 
     @Override
     protected PushSessionManager<?> getPushSessions() {
-        return socketSessions;
+        return sseSessions;
     }
 
     @Override
     protected PushUserManager getPushUsers() {
-        return socketUsers;
+        return sseUsers;
     }
 
     @Override
@@ -130,14 +101,14 @@ public class SocketChannelManager extends PushChannelManager {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * This helps the web socket channel manager to hold view scoped web socket channel identifiers registered by
-     * <code>&lt;o:socket&gt;</code>.
+     * This helps the SSE channel manager to hold view scoped SSE channel identifiers registered by
+     * <code>&lt;o:sse&gt;</code>.
      * <p>
-     * Since OmniFaces 4.6 this class is {@code public} instead of {@code protected} so it can be externally registered
-     * into environment-specific CDI bean management facility.
+     * Since this class is {@code public} it can be externally registered into environment-specific CDI bean
+     * management facility.
      * @author Bauke Scholtz
-     * @see SocketChannelManager
-     * @since 2.3
+     * @see SseChannelManager
+     * @since 5.2
      */
     @ViewScoped
     public static class ViewScope implements Serializable {
@@ -155,12 +126,12 @@ public class SocketChannelManager extends PushChannelManager {
         }
 
         /**
-         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly close
-         * any open web sockets associated with it to avoid stale websockets.
+         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly
+         * complete any open SSE connections associated with it to avoid stale connections.
          */
         @PreDestroy
         protected void deregisterViewScope() {
-            SocketSessionManager.getInstance().deregister(channels.values());
+            getReference(SseSessionManager.class).deregister(channels.values());
         }
 
     }
@@ -168,15 +139,15 @@ public class SocketChannelManager extends PushChannelManager {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
-     * Internal usage only. Awkward workaround for it being unavailable via @Inject in Faces components and listeners.
+     * Internal usage only. Workaround for it being unavailable via {@code @Inject} in Faces components.
      */
-    static SocketChannelManager getInstance() {
-        return getReference(SocketChannelManager.class);
+    static SseChannelManager getInstance() {
+        return getReference(SseChannelManager.class);
     }
 
     /**
      * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push
-     * send time in {@link SocketPushContext}.
+     * send time in {@link SsePushContext}.
      */
     static String getChannelId(String channel, Map<String, String> sessionScope, Map<String, String> viewScope) {
         return PushChannelManager.getChannelId(channel, APPLICATION_SCOPE, sessionScope, viewScope);

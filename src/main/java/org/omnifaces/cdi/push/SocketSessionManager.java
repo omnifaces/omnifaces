@@ -14,22 +14,14 @@ package org.omnifaces.cdi.push;
 
 import static jakarta.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -53,7 +45,7 @@ import org.omnifaces.util.Hacks;
  * @since 2.3
  */
 @ApplicationScoped
-public class SocketSessionManager {
+public class SocketSessionManager extends PushSessionManager<Session> {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
@@ -75,28 +67,10 @@ public class SocketSessionManager {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private final ConcurrentHashMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
-
     @Inject
     private SocketUserManager socketUsers;
 
     // Actions --------------------------------------------------------------------------------------------------------
-
-    /**
-     * Register given channel identifier.
-     * @param channelId The channel identifier to register.
-     */
-    protected void register(String channelId) {
-        socketSessions.computeIfAbsent(channelId, $ -> new ConcurrentLinkedQueue<>());
-    }
-
-    /**
-     * Register given channel identifiers.
-     * @param channelIds The channel identifiers to register.
-     */
-    protected void register(Iterable<String> channelIds) {
-        channelIds.forEach(this::register);
-    }
 
     /**
      * On open, add given web socket session to the mapping associated with its channel identifier and returns
@@ -107,9 +81,8 @@ public class SocketSessionManager {
      */
     protected boolean add(Session session) {
         var channelId = getChannelId(session);
-        var sessions = socketSessions.get(channelId);
 
-        if (sessions != null && sessions.add(session)) {
+        if (addSession(channelId, session)) {
             var user = socketUsers.getUser(getChannel(session), channelId);
 
             if (user != null) {
@@ -124,112 +97,30 @@ public class SocketSessionManager {
     }
 
     /**
-     * Send the given message to all open web socket sessions associated with given web socket channel identifier.
-     * @param channelId The web socket channel identifier.
-     * @param message The push message string.
-     * @return The results of the send operation. If it returns an empty set, then there was no open session associated
-     * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
-     * message was successfully delivered and otherwise throw {@link ExecutionException}.
-     */
-    protected Set<Future<Void>> send(String channelId, String message) {
-        var sessions = channelId != null ? socketSessions.get(channelId) : null;
-
-        if (sessions != null) {
-            return sessions.stream()
-                    .filter(Session::isOpen)
-                    .map(session -> send(session, message, true))
-                    .filter(Objects::nonNull)
-                    .collect(toUnmodifiableSet());
-        }
-
-        return emptySet();
-    }
-
-    private Future<Void> send(Session session, String text, boolean retrySendTomcatWebSocket) {
-        try {
-            return session.getAsyncRemote().sendText(text);
-        }
-        catch (IllegalStateException e) {
-            if (Hacks.isTomcatWebSocketBombed(session, e)) {
-                if (retrySendTomcatWebSocket) {
-                    return CompletableFuture.supplyAsync(() -> retrySendTomcatWebSocket(session, text));
-                }
-                else {
-                    return null;
-                }
-            }
-            else {
-                throw e;
-            }
-        }
-    }
-
-    private Void retrySendTomcatWebSocket(Session session, String text) {
-        var retries = 0;
-        Exception cause = null;
-
-        try {
-            while (++retries < TOMCAT_WEB_SOCKET_MAX_RETRIES) {
-                Thread.sleep(TOMCAT_WEB_SOCKET_RETRY_TIMEOUT);
-
-                if (!session.isOpen()) {
-                    throw new IllegalStateException("Too bad, session is now closed");
-                }
-
-                var result = send(session, text, false);
-
-                if (result != null) {
-                    if (logger.isLoggable(WARNING)) {
-                        logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
-                    }
-
-                    return result.get();
-                }
-            }
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            cause = e;
-        }
-        catch (Exception e) {
-            cause = e;
-        }
-
-        throw new UnsupportedOperationException(format(ERROR_TOMCAT_WEB_SOCKET_BOMBED, retries), cause);
-    }
-
-    /**
      * On close, remove given web socket session from the mapping.
      * @param session The closed web socket session.
      * @param reason The close reason.
      */
     protected void remove(Session session, CloseReason reason) {
-        var sessions = socketSessions.get(getChannelId(session));
-
-        if (sessions != null && sessions.remove(session)) {
+        if (removeSession(getChannelId(session), session)) {
             fireEvent(session, reason, Closed.LITERAL);
         }
     }
 
-    /**
-     * Deregister given channel identifiers and explicitly close all open web socket sessions associated with it.
-     * @param channelIds The channel identifiers to deregister.
-     */
-    protected void deregister(Iterable<String> channelIds) {
-        for (var channelId : channelIds) {
-            var sessions = socketSessions.remove(channelId);
+    // Template methods -----------------------------------------------------------------------------------------------
 
-            if (sessions != null) {
-                sessions.forEach(SocketSessionManager::close);
-            }
-        }
+    @Override
+    protected Future<Void> sendToSession(Session session, String message) {
+        return sendToSession(session, message, true);
     }
 
-    /**
-     * Close given web socket session.
-     * @param session The web socket session to close.
-     */
-    private static void close(Session session) {
+    @Override
+    protected boolean isOpen(Session session) {
+        return session.isOpen();
+    }
+
+    @Override
+    protected void closeSession(Session session) {
         if (session.isOpen()) {
             try {
                 session.close(REASON_EXPIRED);
@@ -263,6 +154,59 @@ public class SocketSessionManager {
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
+
+    private Future<Void> sendToSession(Session session, String text, boolean retrySendTomcatWebSocket) {
+        try {
+            return session.getAsyncRemote().sendText(text);
+        }
+        catch (IllegalStateException e) {
+            if (Hacks.isTomcatWebSocketBombed(session, e)) {
+                if (retrySendTomcatWebSocket) {
+                    return CompletableFuture.supplyAsync(() -> retrySendTomcatWebSocket(session, text));
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                throw e;
+            }
+        }
+    }
+
+    private Void retrySendTomcatWebSocket(Session session, String text) {
+        var retries = 0;
+        Exception cause = null;
+
+        try {
+            while (++retries < TOMCAT_WEB_SOCKET_MAX_RETRIES) {
+                Thread.sleep(TOMCAT_WEB_SOCKET_RETRY_TIMEOUT);
+
+                if (!session.isOpen()) {
+                    throw new IllegalStateException("Too bad, session is now closed");
+                }
+
+                var result = sendToSession(session, text, false);
+
+                if (result != null) {
+                    if (logger.isLoggable(WARNING)) {
+                        logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+                    }
+
+                    return result.get();
+                }
+            }
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            cause = e;
+        }
+        catch (Exception e) {
+            cause = e;
+        }
+
+        throw new UnsupportedOperationException(format(ERROR_TOMCAT_WEB_SOCKET_BOMBED, retries), cause);
+    }
 
     private static String getChannel(Session session) {
         return session.getPathParameters().get(PARAM_CHANNEL);

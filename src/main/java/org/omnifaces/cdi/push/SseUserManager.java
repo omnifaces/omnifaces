@@ -16,14 +16,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * <p>
- * This web socket user manager holds all web socket users registered by <code>&lt;o:socket&gt;</code>.
+ * This SSE user manager holds all SSE users registered by <code>&lt;o:sse&gt;</code>.
  *
  * @author Bauke Scholtz
- * @see Socket
- * @since 2.3
+ * @see Sse
+ * @since 5.2
  */
 @ApplicationScoped
-public class SocketUserManager extends PushUserManager {
+public class SseUserManager extends PushUserManager {
 
     // All logic is inherited from PushUserManager.
 

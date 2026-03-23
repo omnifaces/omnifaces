@@ -24,14 +24,15 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * This producer prepares the {@link SocketPushContext} instance for injection by <code>&#64;</code>{@link Push}.
+ * This producer prepares the {@link PushContext} instance for injection by <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push
- * @since 2.3
+ * @see PushContext
+ * @since 5.2
  */
 @Dependent
-public class SocketPushContextProducer {
+class PushContextProducer {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -48,6 +49,15 @@ public class SocketPushContextProducer {
     @Inject
     private SocketUserManager socketUsers;
 
+    @Inject
+    private SseChannelManager sseChannels;
+
+    @Inject
+    private SseSessionManager sseSessions;
+
+    @Inject
+    private SseUserManager sseUsers;
+
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
@@ -60,7 +70,13 @@ public class SocketPushContextProducer {
     public PushContext produce(InjectionPoint injectionPoint) {
         Push push = getQualifier(injectionPoint, Push.class);
         String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
-        return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+
+        if (push.sse()) {
+            return new SsePushContext(channel, sseChannels, sseSessions, sseUsers);
+        }
+        else {
+            return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+        }
     }
 
 }

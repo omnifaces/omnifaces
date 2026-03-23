@@ -14,7 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static java.lang.String.format;
-import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
+import static org.omnifaces.cdi.push.PushChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.ComponentsLocal.addScript;
 import static org.omnifaces.util.ComponentsLocal.forEachComponent;
 import static org.omnifaces.util.Faces.getViewRoot;
