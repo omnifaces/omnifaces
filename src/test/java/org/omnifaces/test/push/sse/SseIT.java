@@ -13,11 +13,13 @@
 package org.omnifaces.test.push.sse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -29,11 +31,11 @@ public class SseIT extends OmniFacesIT {
     @FindBy(id="clientOpenedMessages")
     private WebElement clientOpenedMessages;
 
-    @FindBy(id="applicationScopedEventMessage")
-    private WebElement applicationScopedEventMessage;
+    @FindBy(id="applicationScopedServerEventMessage")
+    private WebElement applicationScopedServerEventMessage;
 
-    @FindBy(id="push:applicationScopedEvent")
-    private WebElement pushApplicationScopedEvent;
+    @FindBy(id="push:applicationScopedServerEvent")
+    private WebElement pushApplicationScopedServerEvent;
 
     @FindBy(id="sessionScopedUserTargetedMessage")
     private WebElement sessionScopedUserTargetedMessage;
@@ -53,6 +55,9 @@ public class SseIT extends OmniFacesIT {
     @FindBy(id="closeAllSse")
     private WebElement closeAllSse;
 
+    @FindBy(id="poll:pollClosedChannels")
+    private WebElement pollClosedChannels;
+
     @Deployment(testable=false)
     public static WebArchive createDeployment() {
         return createWebArchive(SseIT.class);
@@ -62,11 +67,11 @@ public class SseIT extends OmniFacesIT {
     void test() {
         testOnopen();
 
-        assertEquals(pushApplicationScopedEvent(), "1," + applicationScopedEventMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
         assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
         assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-        assertEquals(pushApplicationScopedEvent(), "1," + applicationScopedEventMessage.getText());
+        assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
         assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
         assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
@@ -80,21 +85,35 @@ public class SseIT extends OmniFacesIT {
     }
 
     private void testOnopen() {
-        waitUntilTextContains(clientOpenedMessages, "|applicationScopedEvent|");
+        waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
         waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
+
+        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:applicationScopedServerEvent|");
+        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
+        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
     }
 
     private void testOnclose() {
         closeAllSse.click();
         waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
+
+        pollUntilClosedEventsReceived();
+
+        var closedChannels = browser.findElement(By.id("serverClosedMessages")).getText();
+        assertTrue(closedChannels.contains("sessionScopedUserTargeted"));
+        assertTrue(closedChannels.contains("viewScopedAjaxAware"));
     }
 
-    private String pushApplicationScopedEvent() {
-        guardAjax(pushApplicationScopedEvent::click);
+    private void pollUntilClosedEventsReceived() {
+        waitUntilTextContent("serverClosedMessages", pollClosedChannels::click);
+    }
+
+    private String pushApplicationScopedServerEvent() {
+        guardAjax(pushApplicationScopedServerEvent::click);
         String message = messages.getText();
-        waitUntilTextContent(applicationScopedEventMessage);
+        waitUntilTextContent(applicationScopedServerEventMessage);
         return message;
     }
 

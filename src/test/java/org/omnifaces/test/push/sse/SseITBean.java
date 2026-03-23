@@ -33,7 +33,7 @@ public class SseITBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject @Push(sse=true)
-    private PushContext applicationScopedEvent;
+    private PushContext applicationScopedServerEvent;
 
     @Inject @Push(sse=true)
     private PushContext sessionScopedUserTargeted;
@@ -41,11 +41,14 @@ public class SseITBean implements Serializable {
     @Inject @Push(sse=true)
     private PushContext viewScopedAjaxAware;
 
+    @Inject
+    private SseITObserver observer;
+
     private String ajaxAwareMessage;
 
-    public void pushApplicationScopedEvent() {
+    public void pushApplicationScopedServerEvent() {
         String timestamp = String.valueOf(nanoTime());
-        Set<Future<Void>> sent = applicationScopedEvent.send(timestamp);
+        Set<Future<Void>> sent = applicationScopedServerEvent.send(timestamp);
         addGlobalInfo("{0},{1}", sent.size(), timestamp);
     }
 
@@ -61,8 +64,17 @@ public class SseITBean implements Serializable {
         addGlobalInfo("{0},{1}", sent.size(), ajaxAwareMessage);
     }
 
+    public void pollClosedChannels() {
+        sessionScopedUserTargeted.send("ping", "42");
+        viewScopedAjaxAware.send("ping");
+    }
+
     public String getAjaxAwareMessage() {
         return ajaxAwareMessage;
+    }
+
+    public String getClosedChannels() {
+        return observer.getClosedChannels();
     }
 
 }

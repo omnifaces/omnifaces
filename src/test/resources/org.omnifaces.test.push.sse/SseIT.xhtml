@@ -23,7 +23,7 @@
         <script>
             function clearMessages(data) {
                 if (data.status == "begin") {
-                    document.getElementById("applicationScopedEventMessage").innerHTML = "";
+                    document.getElementById("applicationScopedServerEventMessage").innerHTML = "";
                     document.getElementById("sessionScopedUserTargetedMessage").innerHTML = "";
                     document.getElementById("viewScopedAjaxAwareMessage").innerHTML = "";
                 }
@@ -31,6 +31,15 @@
 
             function clientOpened(channel) {
                 document.getElementById("clientOpenedMessages").innerHTML += "|" + channel + "|";
+            }
+
+            function showServerEvent(message, channel) {
+                if (message.indexOf(":") != -1) {
+                    document.getElementById("applicationScopedServerEventMessage").innerHTML += "|" + message + "|";
+                }
+                else {
+                    showMessage(message, channel);
+                }
             }
 
             function showMessage(message, channel) {
@@ -53,22 +62,29 @@
         <h:link id="newtab" value="newtab" target="_blank" />
 
         <div id="clientOpenedMessages" />
-        <div id="applicationScopedEventMessage" />
+        <div id="applicationScopedServerEventMessage" />
         <div id="sessionScopedUserTargetedMessage" />
         <h:outputText id="viewScopedAjaxAwareMessage" value="#{sseITBean.ajaxAwareMessage}" />
         <div id="clientClosedMessages" />
 
         <o:form id="push">
             <f:ajax onevent="clearMessages" render=":messages">
-                <h:commandButton id="applicationScopedEvent" value="applicationScopedEvent" action="#{sseITBean.pushApplicationScopedEvent}" />
+                <h:commandButton id="applicationScopedServerEvent" value="applicationScopedServerEvent" action="#{sseITBean.pushApplicationScopedServerEvent}" />
                 <h:commandButton id="sessionScopedUserTargeted" value="sessionScopedUserTargeted" action="#{sseITBean.pushSessionScopedUserTargeted('42')}" />
                 <h:commandButton id="viewScopedAjaxAware" value="viewScopedAjaxAware" action="#{sseITBean.pushViewScopedAjaxAware}" />
             </f:ajax>
         </o:form>
 
         <h:link id="closeAllSse" value="closeAllSse" onclick="closeAllSse();return false;" />
+        <h:outputText id="serverClosedMessages" value="#{sseITBean.closedChannels}" />
 
-        <o:sse channel="applicationScopedEvent" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+        <o:form id="poll">
+            <h:commandButton id="pollClosedChannels" value="pollClosedChannels" action="#{sseITBean.pollClosedChannels}">
+                <f:ajax render=":serverClosedMessages" />
+            </h:commandButton>
+        </o:form>
+
+        <o:sse channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
         <o:sse channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
 
         <o:form>
