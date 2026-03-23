@@ -492,7 +492,6 @@ public abstract class OmniFacesIT {
         withFacesViewsLowercasedRequestURI,
         withMultiViews,
         withThreeViewsInSession,
-        withSocket,
         withClientStateSaving,
         withCDNResources,
         withInterpretEmptyStringSubmittedValuesAsNull,

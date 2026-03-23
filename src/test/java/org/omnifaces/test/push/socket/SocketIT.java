@@ -13,7 +13,6 @@
 package org.omnifaces.test.push.socket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.omnifaces.test.OmniFacesIT.WebXml.withSocket;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -61,9 +60,7 @@ public class SocketIT extends OmniFacesIT {
 
     @Deployment(testable=false)
     public static WebArchive createDeployment() {
-        return buildWebArchive(SocketIT.class)
-                .withWebXml(withSocket)
-                .createDeployment();
+        return createWebArchive(SocketIT.class);
     }
 
     @Test

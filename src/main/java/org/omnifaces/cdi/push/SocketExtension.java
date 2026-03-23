@@ -31,25 +31,25 @@ import org.omnifaces.cdi.PushContext;
  */
 public class SocketExtension implements Extension {
 
-	private static volatile boolean pushContextInjected;
+    private static volatile boolean pushContextInjected;
 
-	/**
-	 * Collect injection points of type {@link PushContext} qualified with {@link Push}.
-	 * @param <T> The generic bean type.
-	 * @param event The process injection point event.
-	 */
-	public <T> void collect(@Observes ProcessInjectionPoint<T, PushContext> event) {
-		if (event.getInjectionPoint().getQualifiers().stream().anyMatch(q -> q.annotationType() == Push.class)) {
-			pushContextInjected = true;
-		}
-	}
+    /**
+     * Collect injection points of type {@link PushContext} qualified with {@link Push}.
+     * @param <T> The generic bean type.
+     * @param event The process injection point event.
+     */
+    public <T> void collect(@Observes ProcessInjectionPoint<T, PushContext> event) {
+        if (event.getInjectionPoint().getQualifiers().stream().anyMatch(q -> q.annotationType() == Push.class)) {
+            pushContextInjected = true;
+        }
+    }
 
-	/**
-	 * Returns whether a <code>&#64;Push PushContext</code> injection point was detected during bean discovery.
-	 * @return Whether a <code>&#64;Push PushContext</code> injection point was detected during bean discovery.
-	 */
-	static boolean isPushContextInjected() {
-		return pushContextInjected;
-	}
+    /**
+     * Returns whether a <code>&#64;Push PushContext</code> injection point was detected during bean discovery.
+     * @return Whether a <code>&#64;Push PushContext</code> injection point was detected during bean discovery.
+     */
+    static boolean isPushContextInjected() {
+        return pushContextInjected;
+    }
 
 }
