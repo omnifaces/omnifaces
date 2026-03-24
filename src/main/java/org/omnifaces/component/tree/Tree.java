@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.tree;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.ComponentsLocal.validateHasChild;
 import static org.omnifaces.util.ComponentsLocal.validateHasNoParent;
 import static org.omnifaces.util.ComponentsLocal.validateHasOnlyChildren;
@@ -400,7 +399,7 @@ public class Tree extends TreeFamily implements NamingContainer {
                 var node = (TreeNode) child;
 
                 if (nodes.put(node.getLevel(), node) != null) {
-                    throw new IllegalStateException(format(ERROR_DUPLICATE_NODE, node.getLevel()));
+                    throw new IllegalStateException(ERROR_DUPLICATE_NODE.formatted(node.getLevel()));
                 }
             }
         }
@@ -425,7 +424,7 @@ public class Tree extends TreeFamily implements NamingContainer {
                 currentModel = treeModel;
             }
             else {
-                throw new IllegalArgumentException(format(ERROR_INVALID_MODEL, value.getClass().getName()));
+                throw new IllegalArgumentException(ERROR_INVALID_MODEL.formatted(value.getClass().getName()));
             }
         }
 

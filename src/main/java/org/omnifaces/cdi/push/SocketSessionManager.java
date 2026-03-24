@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static jakarta.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
-import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
@@ -190,7 +189,7 @@ public class SocketSessionManager extends PushSessionManager<Session> {
 
                 if (result != null) {
                     if (logger.isLoggable(WARNING)) {
-                        logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+                        logger.log(WARNING, WARNING_TOMCAT_WEB_SOCKET_BOMBED.formatted(retries));
                     }
 
                     return result.get();
@@ -205,7 +204,7 @@ public class SocketSessionManager extends PushSessionManager<Session> {
             cause = e;
         }
 
-        throw new UnsupportedOperationException(format(ERROR_TOMCAT_WEB_SOCKET_BOMBED, retries), cause);
+        throw new UnsupportedOperationException(ERROR_TOMCAT_WEB_SOCKET_BOMBED.formatted(retries), cause);
     }
 
     private static String getChannel(Session session) {

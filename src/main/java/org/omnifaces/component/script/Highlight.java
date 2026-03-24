@@ -15,7 +15,6 @@ package org.omnifaces.component.script;
 import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_LIBRARY_NAME;
 import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.ComponentsLocal.getCurrentForm;
@@ -141,7 +140,7 @@ public class Highlight extends OnloadScript {
         });
 
         if (!clientIds.isEmpty()) {
-            context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
+            context.getResponseWriter().write(SCRIPT.formatted(clientIds, getStyleClass(), isFocus()));
         }
     }
 

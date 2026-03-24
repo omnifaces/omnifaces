@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isAnyEmpty;
@@ -200,7 +199,7 @@ public class EagerBeansRepository {
                 getByViewId(viewId).add(bean);
             }
 
-            logger.severe(() -> format(MISSING_VIEW_ID, bean.getBeanClass().getName()));
+            logger.severe(() -> MISSING_VIEW_ID.formatted(bean.getBeanClass().getName()));
         }
 
         void addByRequestURIOrViewId(Bean<?> bean, String requestURI, String viewId) {
@@ -211,7 +210,7 @@ public class EagerBeansRepository {
                 getByViewId(viewId).add(bean);
             }
 
-            logger.severe(() -> format(MISSING_REQUEST_URI_OR_VIEW_ID, bean.getBeanClass().getName()));
+            logger.severe(() -> MISSING_REQUEST_URI_OR_VIEW_ID.formatted(bean.getBeanClass().getName()));
         }
 
         private List<Bean<?>> getByViewId(String viewId) {

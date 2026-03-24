@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
@@ -117,11 +116,11 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
             for (var viewResource : splitAndTrim(viewResourcesParam, ",").toList()) {
                 if (!viewResource.startsWith("/")) {
-                    throw new IllegalArgumentException(format(ERROR_MISSING_FORWARD_SLASH, viewResource));
+                    throw new IllegalArgumentException(ERROR_MISSING_FORWARD_SLASH.formatted(viewResource));
                 }
 
                 if (servletContext.getResource(viewResource) == null) {
-                    throw new IllegalArgumentException(format(ERROR_UNKNOWN_VIEW_RESOURCE, viewResource));
+                    throw new IllegalArgumentException(ERROR_UNKNOWN_VIEW_RESOURCE.formatted(viewResource));
                 }
 
                 VIEW_RESOURCES.add(viewResource);

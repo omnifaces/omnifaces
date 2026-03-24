@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
@@ -72,7 +71,7 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
                 }
             }
             catch (Exception e) {
-                logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
+                logger.log(WARNING, POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE.formatted(uri), e);
             }
         }
     }

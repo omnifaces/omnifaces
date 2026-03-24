@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.script;
 
-import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
@@ -161,8 +160,7 @@ public class ScriptErrorHandler extends ScriptFamily {
         var maxRecentErrors = getMaxRecentErrors();
         var errorExpiry = getErrorExpiry();
 
-        var script = format(SCRIPT_INIT,
-            endpointURL,
+        var script = SCRIPT_INIT.formatted(endpointURL,
             ignoreSelector != null ? "'" + escapeJS(ignoreSelector, true) + "'" : "null",
             maxRecentErrors,
             errorExpiry);

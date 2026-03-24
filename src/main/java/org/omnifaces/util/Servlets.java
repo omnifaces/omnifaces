@@ -19,7 +19,6 @@ import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static jakarta.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
 import static jakarta.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static jakarta.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -644,7 +643,7 @@ public final class Servlets {
      * @since 2.6
      */
     public static String formatContentDispositionHeader(String filename, boolean attachment) {
-        return format(CONTENT_DISPOSITION_HEADER, attachment ? "attachment" : "inline", encodeURI(filename));
+        return CONTENT_DISPOSITION_HEADER.formatted(attachment ? "attachment" : "inline", encodeURI(filename));
     }
 
     /**
@@ -941,7 +940,7 @@ public final class Servlets {
      * Servlets.facesRedirect(request, response, "some.xhtml");
      * </pre>
      * <p>
-     * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
+     * You can use {@link String#String.formatted(Object...)} placeholder <code>%s</code> in the redirect URL to represent
      * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
      * <pre>
      * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&amp;bar=%s", foo, bar);
@@ -1010,7 +1009,7 @@ public final class Servlets {
             encodedParams[i] = paramValue instanceof String string ? encodeURL(string) : paramValue;
         }
 
-        return format(redirectURL, encodedParams);
+        return redirectURL.formatted(encodedParams);
     }
 
     /**

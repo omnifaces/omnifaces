@@ -13,7 +13,6 @@
 package org.omnifaces.util;
 
 import static jakarta.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.joining;
 import static org.omnifaces.util.Beans.unwrapIfNecessary;
@@ -81,13 +80,11 @@ public final class Validators {
     private static final String ERROR_ACCESS_KEY = "Cannot access '%s' of '%s' by key '%s'.";
     private static final String ERROR_ACCESS_INDEX = "Cannot access '%s' of '%s' by index '%s'.";
 
-
     // Constructors ---------------------------------------------------------------------------------------------------
 
     private Validators() {
         // Hide constructor.
     }
-
 
     // Utils ----------------------------------------------------------------------------------------------------------
 
@@ -198,7 +195,7 @@ public final class Validators {
         }
         catch (Exception e) {
             var propertyPath = getPropertyNodes(violation).stream().map(Node::toString).collect(joining("."));
-            logger.log(WARNING, format(ERROR_RESOLVE_BASE, propertyPath, bean == null ? "null" : bean.getClass()), e);
+            logger.log(WARNING, ERROR_RESOLVE_BASE.formatted(propertyPath, bean == null ? "null" : bean.getClass()), e);
 
             if (violation.getLeafBean() != null) {
                 add.accept(violation.getLeafBean(), resolveViolatedProperty(violation)); // Fall back.
@@ -278,7 +275,7 @@ public final class Validators {
             return value;
         }
         else {
-            throw new UnsupportedOperationException(format(ERROR_RESOLVE_BASE, node, base.getClass()));
+            throw new UnsupportedOperationException(ERROR_RESOLVE_BASE.formatted(node, base.getClass()));
         }
     }
 
@@ -293,7 +290,7 @@ public final class Validators {
             return Array.get(base, index);
         }
 
-        throw new UnsupportedOperationException(format(ERROR_ACCESS_INDEX, node, base.getClass(), index));
+        throw new UnsupportedOperationException(ERROR_ACCESS_INDEX.formatted(node, base.getClass(), index));
     }
 
     private static Object accessKey(Object base, Node node) {
@@ -303,7 +300,7 @@ public final class Validators {
             return ((Map<?, ?>) base).get(key);
         }
 
-        throw new UnsupportedOperationException(format(ERROR_ACCESS_KEY, node, base.getClass(), key));
+        throw new UnsupportedOperationException(ERROR_ACCESS_KEY.formatted(node, base.getClass(), key));
     }
 
     private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {

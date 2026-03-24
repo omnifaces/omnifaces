@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -163,7 +162,7 @@ public class GraphicResource extends DynamicResource {
             setLastModified(Long.parseLong(lastModified.toString()));
         }
         else if (lastModified != null) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_LASTMODIFIED, lastModified));
+            throw new IllegalArgumentException(ERROR_INVALID_LASTMODIFIED.formatted(lastModified));
         }
     }
 
@@ -186,7 +185,7 @@ public class GraphicResource extends DynamicResource {
         var beanMethod = methodReference.getMethod();
 
         if (beanMethod == null) {
-            throw new IllegalArgumentException(format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
+            throw new IllegalArgumentException(ERROR_UNKNOWN_METHOD.formatted(value.getExpressionString()));
         }
 
         Class<?> beanClass = methodReference.getBase().getClass();
@@ -194,11 +193,11 @@ public class GraphicResource extends DynamicResource {
 
         if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
             if (!isOneAnnotationPresent(beanClass, REQUIRED_ANNOTATION_TYPES)) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_SCOPE, beanClass));
+                throw new IllegalArgumentException(ERROR_INVALID_SCOPE.formatted(beanClass));
             }
 
             if (!isOneOf(beanMethod.getReturnType(), REQUIRED_RETURN_TYPES)) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, beanMethod.getReturnType()));
+                throw new IllegalArgumentException(ERROR_INVALID_RETURNTYPE.formatted(beanMethod.getReturnType()));
             }
 
             ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), beanMethod));
@@ -305,7 +304,7 @@ public class GraphicResource extends DynamicResource {
             }
 
             if (!registered) {
-                throw new IllegalArgumentException(format(ERROR_MISSING_METHOD, beanClass.getName()));
+                throw new IllegalArgumentException(ERROR_MISSING_METHOD.formatted(beanClass.getName()));
             }
         }
     }
@@ -329,7 +328,7 @@ public class GraphicResource extends DynamicResource {
         var contentType = getExternalContext().getMimeType(resourceName);
 
         if (contentType == null) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, resourceName.split("\\.", 2)[1]));
+            throw new IllegalArgumentException(ERROR_INVALID_TYPE.formatted(resourceName.split("\\.", 2)[1]));
         }
 
         return contentType;
@@ -367,7 +366,7 @@ public class GraphicResource extends DynamicResource {
             bytes = byteArray;
         }
         else {
-            throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, content));
+            throw new IllegalArgumentException(ERROR_INVALID_RETURNTYPE.formatted(content));
         }
 
         return Base64.getEncoder().encodeToString(bytes);
@@ -415,7 +414,7 @@ public class GraphicResource extends DynamicResource {
 
     private static void validateParamLength(Object[] params, Class<?>[] types) {
         if (params.length != types.length) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
+            throw new IllegalArgumentException(ERROR_INVALID_PARAMS.formatted(Arrays.toString(params)));
         }
     }
 

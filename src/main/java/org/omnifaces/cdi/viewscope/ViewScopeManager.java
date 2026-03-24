@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -187,7 +186,7 @@ public class ViewScopeManager {
                 var viewRoot = context.getViewRoot();
 
                 if (viewRoot.isTransient()) {
-                    logger.warning(() -> format(WARNING_UNSUPPORTED_STATE_SAVING, beanClass.getName(), viewRoot.getViewId()));
+                    logger.warning(() -> WARNING_UNSUPPORTED_STATE_SAVING.formatted(beanClass.getName(), viewRoot.getViewId()));
                 }
                 else {
                     registerUnloadScript(context, beanStorageId);
@@ -200,7 +199,7 @@ public class ViewScopeManager {
         if (beanStorage == null) {
             if (storage instanceof ViewScopeStorageInSession && isPostback(context) && storageInSession.isRecentlyUnloaded(context)) {
                 var viewId = context.getViewRoot().getViewId();
-                throw new ViewExpiredException(format(ERROR_VIEW_ALREADY_UNLOADED, viewId), viewId);
+                throw new ViewExpiredException(ERROR_VIEW_ALREADY_UNLOADED.formatted(viewId), viewId);
             }
 
             beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
@@ -212,7 +211,7 @@ public class ViewScopeManager {
 
     private static void checkStateSavingMethod(FacesContext context, Class<?> beanClass) {
         if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
-            throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
+            throw new IllegalStateException(ERROR_INVALID_STATE_SAVING.formatted(beanClass.getName()));
         }
     }
 
@@ -223,7 +222,7 @@ public class ViewScopeManager {
         addFormIfNecessary(context); // Required to get view state ID.
         addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
         addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-        addScript(context, format(SCRIPT_INIT, beanStorageId));
+        addScript(context, SCRIPT_INIT.formatted(beanStorageId));
     }
 
     /**

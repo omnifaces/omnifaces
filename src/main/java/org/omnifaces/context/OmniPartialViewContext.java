@@ -13,7 +13,6 @@
 package org.omnifaces.context;
 
 import static jakarta.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
-import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
@@ -333,7 +332,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
             else {
                 if (context.arguments != null) {
                     startEval();
-                    write(format(AJAX_DATA, Json.encode(context.arguments)));
+                    write(AJAX_DATA.formatted(Json.encode(context.arguments)));
                     endEval();
                 }
 

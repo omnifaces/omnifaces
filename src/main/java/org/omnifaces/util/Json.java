@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
 
 import java.beans.BeanInfo;
@@ -204,7 +203,7 @@ public final class Json {
             }
             catch (Exception e) {
                 throw new IllegalArgumentException(
-                    format(ERROR_INVALID_GETTER, component.getName(), instance.getClass()), e);
+                    ERROR_INVALID_GETTER.formatted(component.getName(), instance.getClass()), e);
             }
 
             if (value != null) {
@@ -232,7 +231,7 @@ public final class Json {
         }
         catch (IntrospectionException e) {
             throw new IllegalArgumentException(
-                format(ERROR_INVALID_BEAN, bean.getClass()), e);
+                ERROR_INVALID_BEAN.formatted(bean.getClass()), e);
         }
 
         builder.append('{');
@@ -250,7 +249,7 @@ public final class Json {
             }
             catch (Exception e) {
                 throw new IllegalArgumentException(
-                    format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
+                    ERROR_INVALID_GETTER.formatted(property.getName(), bean.getClass()), e);
             }
 
             if (value != null) {

@@ -15,7 +15,6 @@ package org.omnifaces.component.output;
 import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static org.omnifaces.component.output.Cache.PropertyKeys.disabled;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
 import static org.omnifaces.component.output.Cache.PropertyKeys.reset;
@@ -172,10 +171,7 @@ public class Cache extends OutputFamily {
     private static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
     private static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
 
-    private static final String ERROR_NO_BUFFERED_RESPONSE = format(
-        "No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
-        CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
-    );
+    private static final String ERROR_NO_BUFFERED_RESPONSE = "No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.".formatted(CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class);
     private static final Class<? extends SystemEvent> PRE_RENDER = PreRenderViewEvent.class;
 
     private final State state = new State(getStateHelper());
@@ -356,11 +352,11 @@ public class Cache extends OutputFamily {
     }
 
     private String getStartContentMarker() {
-        return format(START_CONTENT_MARKER, getClientId());
+        return START_CONTENT_MARKER.formatted(getClientId());
     }
 
     private String getEndContentMarker() {
-        return format(END_CONTENT_MARKER, getClientId());
+        return END_CONTENT_MARKER.formatted(getClientId());
     }
 
     private String getContentFromBuffer(String buffer) {
@@ -380,7 +376,6 @@ public class Cache extends OutputFamily {
 
         return null;
     }
-
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
 

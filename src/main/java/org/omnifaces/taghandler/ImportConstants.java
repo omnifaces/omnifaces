@@ -13,7 +13,6 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.omnifaces.taghandler.ImportFunctions.getClassLoader;
 import static org.omnifaces.taghandler.ImportFunctions.toClass;
@@ -197,7 +196,7 @@ public class ImportConstants extends TagHandler {
                         constants.putIfAbsent(field.getName(), field.get(null));
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
+                        throw new IllegalArgumentException(ERROR_FIELD_ACCESS.formatted(type, field.getName()), e);
                     }
                 }
             }
@@ -267,7 +266,7 @@ public class ImportConstants extends TagHandler {
         @Override
         public Object get(Object key) {
             if (!containsKey(key)) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type.toString(), type));
+                throw new IllegalArgumentException(ERROR_INVALID_CONSTANT.formatted(type.toString(), type));
             }
 
             return super.get(key);
@@ -281,7 +280,7 @@ public class ImportConstants extends TagHandler {
          */
         public Collection<Object> members() {
             if (!type.isEnum()) {
-                throw new IllegalStateException(format(ERROR_INVALID_TYPE, type.toString()));
+                throw new IllegalStateException(ERROR_INVALID_TYPE.formatted(type.toString()));
             }
 
             return asList(type.getEnumConstants());

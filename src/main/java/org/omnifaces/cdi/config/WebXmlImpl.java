@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.config;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
@@ -150,7 +149,7 @@ class WebXmlImpl implements WebXml {
     @Override
     public boolean isAccessAllowed(String url, String role) {
         if (url.charAt(0) != '/') {
-            throw new IllegalArgumentException(format(ERROR_URL_MUST_START_WITH_SLASH, url));
+            throw new IllegalArgumentException(ERROR_URL_MUST_START_WITH_SLASH.formatted(url));
         }
 
         String uri = url;

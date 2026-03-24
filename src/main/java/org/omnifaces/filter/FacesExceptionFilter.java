@@ -12,7 +12,6 @@
  */
 package org.omnifaces.filter;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.exceptionhandler.FullAjaxExceptionHandler.EXCEPTION_UUID;
@@ -177,7 +176,7 @@ public class FacesExceptionFilter extends HttpFilter {
         (HttpServletRequest request, Throwable exception, String location, String message, Object... parameters)
     {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-            logger.log(SEVERE, format("[%s][%s] %s", request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), format(message, parameters)), exception);
+            logger.log(SEVERE, "[%s][%s] %s".formatted(request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), message.formatted(parameters)), exception);
         }
     }
 

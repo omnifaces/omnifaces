@@ -13,7 +13,6 @@
 package org.omnifaces.resourcehandler;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static org.omnifaces.renderer.CorsAwareResourceRenderer.getCrossorigin;
 import static org.omnifaces.renderer.CorsAwareResourceRenderer.getIntegrityIfNecessary;
 import static org.omnifaces.util.Components.isRendered;
@@ -419,7 +418,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
                 }
             }
 
-            throw new IllegalArgumentException(format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
+            throw new IllegalArgumentException(ERROR_INVALID_CACHE_TTL_PARAM.formatted(cacheTTLParam));
         }
         else {
             return null;

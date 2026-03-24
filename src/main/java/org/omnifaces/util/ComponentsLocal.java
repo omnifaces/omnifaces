@@ -25,7 +25,6 @@ import static jakarta.faces.component.visit.VisitContext.createVisitContext;
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -713,7 +712,7 @@ public final class ComponentsLocal {
         var form = component instanceof UIForm found ? found : getClosestParent(component, UIForm.class);
 
         if (form == null) {
-            throw new IllegalArgumentException(format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
+            throw new IllegalArgumentException(ERROR_MISSING_PARENT.formatted(component.getClass(), UIForm.class));
         }
 
         resetInputs(context, form);
@@ -849,7 +848,7 @@ public final class ComponentsLocal {
 
             if (!(component instanceof UIInput input)) {
                 var type = component == null ? "null" : component.getClass().getName();
-                throw new IllegalArgumentException(format(ERROR_ILLEGAL_UIINPUT, relativeClientId, type));
+                throw new IllegalArgumentException(ERROR_ILLEGAL_UIINPUT.formatted(relativeClientId, type));
             }
 
             var fullClientId = input.getClientId();
@@ -870,7 +869,6 @@ public final class ComponentsLocal {
         context.validationFailed();
         return fullClientIds;
     }
-
 
     // Expressions ----------------------------------------------------------------------------------------------------
 
@@ -956,7 +954,7 @@ public final class ComponentsLocal {
         }
 
         if (getClosestParent(component, parentType) == null) {
-            throw new IllegalStateException(format(ERROR_MISSING_PARENT, component.getClass().getSimpleName(), parentType));
+            throw new IllegalStateException(ERROR_MISSING_PARENT.formatted(component.getClass().getSimpleName(), parentType));
         }
     }
 
@@ -969,7 +967,7 @@ public final class ComponentsLocal {
         }
 
         if (!parentType.isInstance(component.getParent())) {
-            throw new IllegalStateException(format(ERROR_MISSING_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
+            throw new IllegalStateException(ERROR_MISSING_DIRECT_PARENT.formatted(component.getClass().getSimpleName(), parentType));
         }
     }
 
@@ -982,7 +980,7 @@ public final class ComponentsLocal {
         }
 
         if (getClosestParent(component, parentType) != null) {
-            throw new IllegalStateException(format(ERROR_ILLEGAL_PARENT, component.getClass().getSimpleName(), parentType));
+            throw new IllegalStateException(ERROR_ILLEGAL_PARENT.formatted(component.getClass().getSimpleName(), parentType));
         }
     }
 
@@ -995,7 +993,7 @@ public final class ComponentsLocal {
         }
 
         if (findComponentsInChildren(component, childType).isEmpty()) {
-            throw new IllegalStateException(format(ERROR_MISSING_CHILD, component.getClass().getSimpleName(), childType));
+            throw new IllegalStateException(ERROR_MISSING_CHILD.formatted(component.getClass().getSimpleName(), childType));
         }
     }
 
@@ -1020,8 +1018,7 @@ public final class ComponentsLocal {
         }
 
         if (!childClassNames.isEmpty()) {
-            throw new IllegalStateException(format(
-                    ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
+            throw new IllegalStateException(ERROR_ILLEGAL_CHILDREN.formatted(component.getClass().getSimpleName(), childType, childClassNames));
         }
     }
 
@@ -1044,8 +1041,7 @@ public final class ComponentsLocal {
                 childClassNames.append(child.getClass().getName());
             }
 
-            throw new IllegalStateException(format(
-                    ERROR_CHILDREN_DISALLOWED, component.getClass().getSimpleName(), childClassNames));
+            throw new IllegalStateException(ERROR_CHILDREN_DISALLOWED.formatted(component.getClass().getSimpleName(), childClassNames));
         }
     }
 

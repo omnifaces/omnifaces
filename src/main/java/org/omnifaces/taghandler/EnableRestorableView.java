@@ -13,7 +13,6 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
@@ -107,7 +106,7 @@ public class EnableRestorableView extends TagHandler {
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
         if (!(parent instanceof UIViewRoot)) {
             throw new IllegalStateException(
-                format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
+                ERROR_INVALID_PARENT.formatted(parent != null ? parent.getClass().getName() : null));
         }
 
         if (!ComponentHandler.isNew(parent)) {

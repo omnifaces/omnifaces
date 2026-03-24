@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util.selectitems;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public final class SelectItemsCollector {
         }
         else {
             // A value binding was specified, but of a type we don't support.
-            throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
+            throw new IllegalArgumentException(ERROR_UNKNOWN_SELECT_TYPE.formatted(value.getClass().toString()));
         }
     }
 
@@ -112,7 +111,7 @@ public final class SelectItemsCollector {
         }
         else {
             // A value binding was specified, but of a type we don't support.
-            throw new IllegalArgumentException(format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
+            throw new IllegalArgumentException(ERROR_UNKNOWN_SELECT_TYPE.formatted(value.getClass().toString()));
         }
     }
 

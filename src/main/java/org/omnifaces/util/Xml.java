@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
 
@@ -111,7 +110,7 @@ public final class Xml {
             factory.setAttribute(name, "");
         }
         catch (IllegalArgumentException e) {
-            logger.log(FINE, format("Cannot unset attribute '%s'; falling back to default.", name), e);
+            logger.log(FINE, "Cannot unset attribute '%s'; falling back to default.".formatted(name), e);
         }
     }
 

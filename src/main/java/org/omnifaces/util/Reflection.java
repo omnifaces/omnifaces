@@ -15,7 +15,6 @@ package org.omnifaces.util;
 import static java.beans.Introspector.decapitalize;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.Character.isUpperCase;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
@@ -86,7 +85,6 @@ public final class Reflection {
     private static final String ERROR_ACCESS_FIELD = "Cannot access field '%s' of class '%s'.";
     private static final String ERROR_MODIFY_FIELD = "Cannot modify field '%s' of class '%s' with value %s.";
     private static final String ERROR_INVOKE_METHOD = "Cannot invoke method '%s' of class '%s' with arguments %s.";
-
 
     // Nested classes -------------------------------------------------------------------------------------------------
 
@@ -209,7 +207,6 @@ public final class Reflection {
     private Reflection() {
         // Hide constructor.
     }
-
 
     // Beans ----------------------------------------------------------------------------------------------------------
 
@@ -691,7 +688,6 @@ public final class Reflection {
         return methods;
     }
 
-
     // Classes --------------------------------------------------------------------------------------------------------
 
     /**
@@ -735,7 +731,7 @@ public final class Reflection {
                 // Just continue to IllegalStateException on original ClassNotFoundException.
             }
 
-            throw new IllegalStateException(format(ERROR_LOAD_CLASS, className), e);
+            throw new IllegalStateException(ERROR_LOAD_CLASS.formatted(className), e);
         }
     }
 
@@ -802,10 +798,9 @@ public final class Reflection {
             return clazz.getDeclaredConstructor().newInstance();
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_CREATE_INSTANCE, clazz), e);
+            throw new IllegalStateException(ERROR_CREATE_INSTANCE.formatted(clazz), e);
         }
     }
-
 
     // Fields ---------------------------------------------------------------------------------------------------------
 
@@ -827,7 +822,7 @@ public final class Reflection {
             return (T) field.get(instance);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
+            throw new IllegalStateException(ERROR_ACCESS_FIELD.formatted(fieldName, instance.getClass()), e);
         }
     }
 
@@ -879,7 +874,7 @@ public final class Reflection {
             return null;
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldType, instance.getClass()), e);
+            throw new IllegalStateException(ERROR_ACCESS_FIELD.formatted(fieldType, instance.getClass()), e);
         }
     }
 
@@ -899,7 +894,7 @@ public final class Reflection {
             return modifyField(instance, instance.getClass().getDeclaredField(fieldName), value);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_MODIFY_FIELD, fieldName, instance != null ? instance.getClass() : null, value), e);
+            throw new IllegalStateException(ERROR_MODIFY_FIELD.formatted(fieldName, instance != null ? instance.getClass() : null, value), e);
         }
     }
 
@@ -923,7 +918,7 @@ public final class Reflection {
             return (T) oldValue;
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_MODIFY_FIELD, field != null ? field.getName() : null, instance != null ? instance.getClass() : null, value), e);
+            throw new IllegalStateException(ERROR_MODIFY_FIELD.formatted(field != null ? field.getName() : null, instance != null ? instance.getClass() : null, value), e);
         }
     }
 
@@ -953,7 +948,7 @@ public final class Reflection {
             return invokeMethod(instance, method, parameters);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_INVOKE_METHOD, methodName, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+            throw new IllegalStateException(ERROR_INVOKE_METHOD.formatted(methodName, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
         }
     }
 
@@ -975,7 +970,7 @@ public final class Reflection {
             return (T) method.invoke(instance, parameters);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_INVOKE_METHOD, method != null ? method.getName() : null, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+            throw new IllegalStateException(ERROR_INVOKE_METHOD.formatted(method != null ? method.getName() : null, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
         }
     }
 
@@ -993,7 +988,7 @@ public final class Reflection {
             }
             catch (Exception e) {
                 throw new IllegalStateException(
-                    format(ERROR_INVOKE_METHOD, method.getName(), instance.getClass(), "[]"), e);
+                    ERROR_INVOKE_METHOD.formatted(method.getName(), instance.getClass(), "[]"), e);
             }
         }
     }
@@ -1025,7 +1020,7 @@ public final class Reflection {
             return (T) method.invoke(null, parameters);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_INVOKE_METHOD, methodName, type, Arrays.toString(parameters)), e);
+            throw new IllegalStateException(ERROR_INVOKE_METHOD.formatted(methodName, type, Arrays.toString(parameters)), e);
         }
     }
 

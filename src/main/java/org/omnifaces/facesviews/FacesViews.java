@@ -15,7 +15,6 @@ package org.omnifaces.facesviews;
 import static jakarta.servlet.DispatcherType.FORWARD;
 import static jakarta.servlet.DispatcherType.REQUEST;
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.ENGLISH;
@@ -163,7 +162,6 @@ import org.omnifaces.util.Servlets;
  */
 public final class FacesViews {
 
-
     // Defaults -------------------------------------------------------------------------------------------------------
 
     /**
@@ -171,7 +169,6 @@ public final class FacesViews {
      * This directory is scanned by convention so that no explicit configuration is needed.
      */
     public static final String WEB_INF_VIEWS = "/WEB-INF/faces-views/";
-
 
     // Context parameter names ----------------------------------------------------------------------------------------
 
@@ -223,7 +220,6 @@ public final class FacesViews {
      */
     public static final String FACES_VIEWS_LOWERCASED_REQUEST_URI_PARAM_NAME = "org.omnifaces.FACES_VIEWS_LOWERCASED_REQUEST_URI";
 
-
     // Request attributes ---------------------------------------------------------------------------------------------
 
     /**
@@ -235,7 +231,6 @@ public final class FacesViews {
      * The name of the request attribute under which the original request path info is stored.
      */
     public static final String FACES_VIEWS_ORIGINAL_PATH_INFO = "org.omnifaces.facesviews.original.path_info";
-
 
     // Constants ------------------------------------------------------------------------------------------------------
 
@@ -262,7 +257,6 @@ public final class FacesViews {
     private FacesViews() {
         //
     }
-
 
     // Initialization -------------------------------------------------------------------------------------------------
 
@@ -362,7 +356,6 @@ public final class FacesViews {
             application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
         }
     }
-
 
     // Scanning -------------------------------------------------------------------------------------------------------
 
@@ -660,7 +653,6 @@ public final class FacesViews {
         return isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
     }
 
-
     // Helpers for FacesViewsForwardingFilter -------------------------------------------------------------------------
 
     static ExtensionAction getExtensionAction(ServletContext servletContext) {
@@ -708,7 +700,6 @@ public final class FacesViews {
         return getMultiViewsWelcomeFile(servletContext);
     }
 
-
     // Helpers for FacesViewsViewHandler ------------------------------------------------------------------------------
 
     static boolean isScannedViewsAlwaysExtensionless(ServletContext servletContext) {
@@ -739,14 +730,12 @@ public final class FacesViews {
         return extensions;
     }
 
-
     // Helpers for FacesViewsResourceHandler --------------------------------------------------------------------------
 
     static String getMappedPath(String path) {
         Map<String, String> mappedResources = getMappedResources(getServletContext());
         return (mappedResources != null && mappedResources.containsKey(path)) ? mappedResources.get(path) : path;
     }
-
 
     // Internal helpers -----------------------------------------------------------------------------------------------
 
@@ -761,7 +750,7 @@ public final class FacesViews {
             return Enum.valueOf(type, value.toUpperCase(US));
         }
         catch (Exception e) {
-            throw new IllegalArgumentException(format("Value '%s' is not valid for context parameter '%s'", value, name), e);
+            throw new IllegalArgumentException("Value '%s' is not valid for context parameter '%s'".formatted(value, name), e);
         }
     }
 
@@ -800,7 +789,6 @@ public final class FacesViews {
     static String getFacesServletName(ServletContext servletContext) {
         return getApplicationAttribute(servletContext, FACES_SERVLET_NAME);
     }
-
 
     // Utility --------------------------------------------------------------------------------------------------------
 

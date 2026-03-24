@@ -12,7 +12,6 @@
  */
 package org.omnifaces.viewhandler;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.isServiceWorkerRequest;
@@ -263,7 +262,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
                 if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
                     throw new IllegalStateException(
-                        format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(context), nestedParent.getClientId(context)));
+                        ERROR_NESTED_FORM_ENCOUNTERED.formatted(form.getClientId(context), nestedParent.getClientId(context)));
                 }
             }
 

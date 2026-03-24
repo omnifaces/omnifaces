@@ -14,7 +14,6 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -764,7 +763,7 @@ public class Socket extends PushComponent {
             var behaviors = getBehaviorScripts();
             var connected = isConnected();
 
-            var script = format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
+            var script = SCRIPT_INIT.formatted(host, channelId, functions, behaviors, connected);
             context.getResponseWriter().write(script);
         }
     }

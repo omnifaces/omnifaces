@@ -16,7 +16,6 @@ import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_LIBRARY_NAM
 import static jakarta.faces.application.ResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static java.lang.Boolean.FALSE;
-import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
@@ -396,7 +395,7 @@ public class InputFile extends HtmlInputFile {
 
         if (maxsize != null) {
             validateHierarchy(context);
-            setOnchange(format(SCRIPT_ONCHANGE, getMessageComponentClientId(context), maxsize, coalesce(getOnchange(), "")));
+            setOnchange(SCRIPT_ONCHANGE.formatted(getMessageComponentClientId(context), maxsize, coalesce(getOnchange(), "")));
         }
 
         super.encodeEnd(context);

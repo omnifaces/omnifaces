@@ -12,8 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
-
 import jakarta.el.ValueExpression;
 import jakarta.enterprise.inject.Typed;
 import jakarta.faces.view.facelets.FaceletContext;
@@ -61,7 +59,7 @@ public final class Facelets {
                 return tagAttribute.getValue();
             }
             else {
-                throw new IllegalArgumentException(format(ERROR_EL_DISALLOWED,  name));
+                throw new IllegalArgumentException(ERROR_EL_DISALLOWED.formatted(name));
             }
         }
 

@@ -18,7 +18,6 @@ import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
 import static jakarta.servlet.RequestDispatcher.ERROR_MESSAGE;
 import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
-import static java.lang.String.format;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.util.Exceptions.unwrap;
@@ -391,7 +390,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
                 }
                 catch (ClassNotFoundException e) {
                     throw new IllegalArgumentException(
-                        format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
+                        ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS.formatted(paramName, typeParam), e);
                 }
             });
         }
@@ -548,7 +547,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
      */
     protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-            logger.log(SEVERE, format("[%s][%s] %s", getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), format(message, parameters)), exception);
+            logger.log(SEVERE, "[%s][%s] %s".formatted(getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), message.formatted(parameters)), exception);
         }
     }
 

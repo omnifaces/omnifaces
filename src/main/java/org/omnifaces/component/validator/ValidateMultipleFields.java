@@ -14,7 +14,6 @@ package org.omnifaces.component.validator;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Components.getValue;
@@ -252,8 +251,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         var components = getComponents();
 
         if (components.isEmpty()) {
-            throw new IllegalArgumentException(format(
-                ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
+            throw new IllegalArgumentException(ERROR_MISSING_COMPONENTS.formatted(getClass().getSimpleName()));
         }
 
         var namingContainerParent = getNamingContainer();
@@ -336,12 +334,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         var found = parent.findComponent(clientId);
 
         if (found == null) {
-            throw new IllegalArgumentException(format(
-                ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+            throw new IllegalArgumentException(ERROR_UNKNOWN_COMPONENT.formatted(getClass().getSimpleName(), property, clientId));
         }
         else if (!(found instanceof UIInput)) {
-            throw new IllegalArgumentException(format(
-                ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+            throw new IllegalArgumentException(ERROR_INVALID_COMPONENT.formatted(getClass().getSimpleName(), property, clientId, found.getClass().getName()));
         }
 
         return (UIInput) found;
@@ -351,15 +347,13 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         var found = parent.findComponent(clientId);
 
         if (found == null) {
-            throw new IllegalArgumentException(format(
-                ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+            throw new IllegalArgumentException(ERROR_UNKNOWN_COMPONENT.formatted(getClass().getSimpleName(), property, clientId));
         }
         else if (!(found instanceof UIInput)) {
             List<UIInput> inputs = findComponentsInChildren(found, UIInput.class);
 
             if (inputs.isEmpty()) {
-                throw new IllegalArgumentException(format(
-                    ERROR_INVALID_COMPONENTS, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+                throw new IllegalArgumentException(ERROR_INVALID_COMPONENTS.formatted(getClass().getSimpleName(), property, clientId, found.getClass().getName()));
             }
 
             return inputs;

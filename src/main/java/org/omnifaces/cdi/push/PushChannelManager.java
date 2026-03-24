@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
 import java.io.IOException;
@@ -82,7 +81,7 @@ abstract class PushChannelManager implements Serializable {
                 }
             }
 
-            throw new IllegalArgumentException(format(ERROR_INVALID_SCOPE, componentName, value));
+            throw new IllegalArgumentException(ERROR_INVALID_SCOPE.formatted(componentName, value));
         }
     }
 
@@ -116,7 +115,7 @@ abstract class PushChannelManager implements Serializable {
         if (!targetScope.containsKey(channel)) {
             for (var otherScope : otherScopes) {
                 if (otherScope.containsKey(channel)) {
-                    throw new IllegalArgumentException(format(ERROR_DUPLICATE_CHANNEL, getClass().getSimpleName(), channel));
+                    throw new IllegalArgumentException(ERROR_DUPLICATE_CHANNEL.formatted(getClass().getSimpleName(), channel));
                 }
             }
 

@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.util;
 
-import static java.lang.String.format;
 import static org.omnifaces.component.util.MoveComponent.Destination.ADD_LAST;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorDefaultEvent;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorEvents;
@@ -185,7 +184,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             }
 
             if (component == null) {
-                throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
+                throw new IllegalArgumentException(ERROR_COMPONENT_NOT_FOUND.formatted(forValue, getId()));
             }
 
             var children = getChildrenInNewList();

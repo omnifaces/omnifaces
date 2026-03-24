@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.util;
 
-import static java.lang.String.format;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.name;
 import static org.omnifaces.component.util.ResolveComponent.PropertyKeys.scope;
 import static org.omnifaces.util.ComponentsLocal.findComponentRelatively;
@@ -126,7 +125,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
             }
 
             if (component == null) {
-                throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
+                throw new IllegalArgumentException(ERROR_COMPONENT_NOT_FOUND.formatted(forValue, getId()));
             }
 
             var scope = getScope();
@@ -141,7 +140,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
                 setRequestAttribute(getName(), component);
             }
             else {
-                throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
+                throw new IllegalArgumentException(ERROR_ILLEGAL_SCOPE.formatted(scope));
             }
         }
     }

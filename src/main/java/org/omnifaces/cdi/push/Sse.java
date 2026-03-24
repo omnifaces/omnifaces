@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static org.omnifaces.cdi.PushContext.SSE_URI_PREFIX;
 import static org.omnifaces.cdi.push.PushChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -686,7 +685,7 @@ public class Sse extends PushComponent {
         var functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
         var behaviors = getBehaviorScripts();
 
-        var script = format(SCRIPT_INIT, contextPath, channelId, functions, behaviors);
+        var script = SCRIPT_INIT.formatted(contextPath, channelId, functions, behaviors);
         context.getResponseWriter().write(script);
     }
 

@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.output;
 
-import static java.lang.String.format;
 import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
@@ -297,7 +296,7 @@ public class SitemapUrl extends OutputFamily {
 
         if (priority != null) {
             if (priority.compareTo(BigDecimal.ZERO) < 0 || priority.compareTo(BigDecimal.ONE) > 0) {
-                throw new IllegalArgumentException(format(ERROR_INVALID_PRIORITY, priority));
+                throw new IllegalArgumentException(ERROR_INVALID_PRIORITY.formatted(priority));
             }
 
             var writer = context.getResponseWriter();

@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.FacesLocal.createResource;
 
@@ -164,7 +163,7 @@ public class ResourceIdentifier {
             }
         }
         catch (Exception e) {
-            logger.log(WARNING, format(WARNING_CANNOT_COMPUTE_INTEGRITY, id), e);
+            logger.log(WARNING, WARNING_CANNOT_COMPUTE_INTEGRITY.formatted(id), e);
             return "";
         }
     }

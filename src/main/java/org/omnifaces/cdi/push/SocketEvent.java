@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -79,7 +78,7 @@ public final class SocketEvent extends PushEvent {
 
     @Override
     public String toString() {
-        return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", getChannel(), getUser(), getCloseCode());
+        return "SocketEvent[channel=%s, user=%s, closeCode=%s]".formatted(getChannel(), getUser(), getCloseCode());
     }
 
     /**

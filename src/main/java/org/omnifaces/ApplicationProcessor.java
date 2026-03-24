@@ -12,7 +12,6 @@
  */
 package org.omnifaces;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.ApplicationInitializer.WARNING_OMNIFACES_INITIALIZATION_FAIL;
@@ -79,7 +78,7 @@ public class ApplicationProcessor implements SystemEventListener {
         }
         catch (Exception | LinkageError e) {
             if (OmniFaces.skipDeploymentException(servletContext)) {
-                logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
+                logger.log(WARNING, WARNING_OMNIFACES_INITIALIZATION_FAIL.formatted(e));
             }
             else {
                 throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
@@ -92,7 +91,7 @@ public class ApplicationProcessor implements SystemEventListener {
 
         for (var resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
             if (!allResourceHandlers.add(resourceHandler)) {
-                throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler));
+                throw new IllegalStateException(ERROR_DUPLICATE_RESOURCE_HANDLER.formatted(resourceHandler));
             }
         }
     }

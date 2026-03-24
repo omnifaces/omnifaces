@@ -15,7 +15,6 @@ package org.omnifaces.util;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -190,7 +189,7 @@ public final class Hacks {
                         break;
                     }
                     catch (NumberFormatException e) {
-                        throw new IllegalArgumentException(format(ERROR_MAX_AGE, name, value), e);
+                        throw new IllegalArgumentException(ERROR_MAX_AGE.formatted(name, value), e);
                     }
                 }
             }
@@ -370,7 +369,6 @@ public final class Hacks {
         return metadataFacet;
     }
 
-
     // EL related -----------------------------------------------------------------------------------------------------
 
     /**
@@ -387,7 +385,6 @@ public final class Hacks {
             return accessField(mapper, VariableMapper.class);
         }
     }
-
 
     // PrimeFaces related ---------------------------------------------------------------------------------------------
 

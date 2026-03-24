@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
@@ -248,8 +247,8 @@ public class Notification extends ChannelComponent {
         var channelId = Sse.registerChannel(context, this, SCOPE_SESSION);
         var writer = context.getResponseWriter();
 
-        writer.write(format(Sse.SCRIPT_INIT, contextPath, channelId, SSE_FUNCTIONS, SSE_BEHAVIORS));
-        writer.write(format(SCRIPT_INIT, buildInitOptionsJson(getClientId(context))));
+        writer.write(Sse.SCRIPT_INIT.formatted(contextPath, channelId, SSE_FUNCTIONS, SSE_BEHAVIORS));
+        writer.write(SCRIPT_INIT.formatted(buildInitOptionsJson(getClientId(context))));
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------

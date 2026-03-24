@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.validator;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
@@ -150,7 +149,7 @@ public class ValidateOrder extends ValidateMultipleFields {
             Type.valueOf(type.toUpperCase());
         }
         catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, type), e);
+            throw new IllegalArgumentException(ERROR_INVALID_TYPE.formatted(type), e);
         }
 
         state.put(PropertyKeys.type, type);

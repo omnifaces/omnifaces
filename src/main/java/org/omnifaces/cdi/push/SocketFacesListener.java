@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
-import static java.lang.String.format;
 import static org.omnifaces.cdi.push.PushChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.ComponentsLocal.addScript;
 import static org.omnifaces.util.ComponentsLocal.forEachComponent;
@@ -89,7 +88,7 @@ public class SocketFacesListener implements SystemEventListener {
             boolean previouslyConnected = sockets.get(socket.getChannel()).setValue(connected);
 
             if (connected != previouslyConnected) {
-                addScript(context, format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel()));
+                addScript(context, connected ? SCRIPT_OPEN : SCRIPT_CLOSE.formatted(socket.getChannel()));
             }
         });
     }

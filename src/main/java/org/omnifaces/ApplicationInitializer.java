@@ -12,7 +12,6 @@
  */
 package org.omnifaces;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 
 import java.util.Set;
@@ -67,7 +66,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
         }
         catch (Exception | LinkageError e) {
             if (OmniFaces.skipDeploymentException(servletContext)) {
-                logger.log(WARNING, format(WARNING_OMNIFACES_INITIALIZATION_FAIL, e));
+                logger.log(WARNING, WARNING_OMNIFACES_INITIALIZATION_FAIL.formatted(e));
             }
             else {
                 throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);

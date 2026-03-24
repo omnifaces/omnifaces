@@ -13,7 +13,6 @@
 package org.omnifaces.el.functions;
 
 import static jakarta.faces.component.UIComponent.getCurrentComponent;
-import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -163,7 +162,7 @@ public final class Converters {
         }
 
         if (!array.getClass().isArray()) {
-            throw new IllegalArgumentException(format(ERROR_NOT_AN_ARRAY, array.getClass()));
+            throw new IllegalArgumentException(ERROR_NOT_AN_ARRAY.formatted(array.getClass()));
         }
 
         var builder = new StringBuilder();
@@ -258,11 +257,11 @@ public final class Converters {
         }
 
         if (!array.getClass().isArray()) {
-            throw new IllegalArgumentException(format(ERROR_NOT_AN_ARRAY, array.getClass()));
+            throw new IllegalArgumentException(ERROR_NOT_AN_ARRAY.formatted(array.getClass()));
         }
 
         if (fragmentSize < 1) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
+            throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE.formatted(fragmentSize));
         }
 
         var sourceSize = Array.getLength(array);
@@ -293,7 +292,7 @@ public final class Converters {
         }
 
         if (fragmentSize < 1) {
-            throw new IllegalArgumentException(format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
+            throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE.formatted(fragmentSize));
         }
 
         var sourceSize = list.size();

@@ -12,7 +12,6 @@
  */
 package org.omnifaces.converter;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.omnifaces.el.ExpressionInspector.getMethodReference;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
@@ -135,7 +134,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 
         Class<Enum> enumType = modelValue.getDeclaringClass();
         setAttribute(component, ATTRIBUTE_ENUM_TYPE, enumType);
-        setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
+        setViewAttribute(ATTRIBUTE_ENUM_TYPE.formatted(component.getClientId(context)), enumType);
         return modelValue.name();
     }
 
@@ -147,7 +146,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 
         Class<Enum> enumType = coalesce(
             getAttribute(component, ATTRIBUTE_ENUM_TYPE),
-            getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)))
+            getViewAttribute(ATTRIBUTE_ENUM_TYPE.formatted(component.getClientId(context)))
         );
 
         if (enumType == null) {

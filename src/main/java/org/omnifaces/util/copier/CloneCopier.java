@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util.copier;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
@@ -42,20 +41,20 @@ public class CloneCopier implements Copier {
     public Object copy(Object object) {
 
         if (!(object instanceof Cloneable)) {
-            throw new IllegalStateException(format(ERROR_MISSING_INTERFACE, object.getClass()));
+            throw new IllegalStateException(ERROR_MISSING_INTERFACE.formatted(object.getClass()));
         }
 
         Method method = findMethod(object, "clone");
 
         if (!method.canAccess(object)) {
-            throw new IllegalStateException(format(ERROR_INACCESSIBLE_METHOD, object.getClass()));
+            throw new IllegalStateException(ERROR_INACCESSIBLE_METHOD.formatted(object.getClass()));
         }
 
         try {
             return method.invoke(object);
         }
         catch (Exception e) {
-            throw new IllegalStateException(format(ERROR_UNINVOKABLE_METHOD, object.getClass()));
+            throw new IllegalStateException(ERROR_UNINVOKABLE_METHOD.formatted(object.getClass()));
         }
     }
 

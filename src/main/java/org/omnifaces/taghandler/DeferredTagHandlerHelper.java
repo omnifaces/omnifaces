@@ -12,7 +12,6 @@
  */
 package org.omnifaces.taghandler;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getFaceletContext;
 import static org.omnifaces.util.Reflection.invokeMethod;
 
@@ -90,7 +89,7 @@ final class DeferredTagHandlerHelper {
             }
             catch (FacesException e) {
                 throw new IllegalArgumentException(
-                    format(ERROR_INVALID_ID, name, id), e);
+                    ERROR_INVALID_ID.formatted(name, id), e);
             }
 
             if (binding != null) {
@@ -99,7 +98,7 @@ final class DeferredTagHandlerHelper {
         }
         else if (instance == null) {
             throw new IllegalArgumentException(
-                format(ERROR_MISSING_ID, name));
+                ERROR_MISSING_ID.formatted(name));
         }
 
         return instance;

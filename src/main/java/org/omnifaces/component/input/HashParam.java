@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.input;
 
-import static java.lang.String.format;
 import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.ComponentsLocal.convertToString;
 import static org.omnifaces.util.FacesLocal.getHashParameters;
@@ -144,13 +143,12 @@ public class HashParam extends OnloadParam {
 
     @Override
     protected String getInitScript(FacesContext context) {
-        return format(SCRIPT_INIT, getClientId(context));
+        return SCRIPT_INIT.formatted(getClientId(context));
     }
-
 
     @Override
     protected String getUpdateScript(FacesContext context) {
-        return format(SCRIPT_UPDATE, getName(), getRenderedValue(context));
+        return SCRIPT_UPDATE.formatted(getName(), getRenderedValue(context));
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

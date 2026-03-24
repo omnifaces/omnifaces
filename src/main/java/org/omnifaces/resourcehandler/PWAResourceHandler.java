@@ -15,7 +15,6 @@ package org.omnifaces.resourcehandler;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -330,11 +329,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 if (!manifest.getCacheableViewIds().isEmpty()) {
                     addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
                     addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-                    addScript(context, format(SCRIPT_INIT, getServiceWorkerUrl(context), getServiceWorkerScope(context)));
+                    addScript(context, SCRIPT_INIT.formatted(getServiceWorkerUrl(context), getServiceWorkerScope(context)));
                     setViewAttribute(context, PWAResourceHandler.class.getName(), true);
                 }
                 else {
-                    logger.warning(() -> format(WARNING_NO_CACHEABLE_VIEW_IDS, manifest.getClass().getName()));
+                    logger.warning(() -> WARNING_NO_CACHEABLE_VIEW_IDS.formatted(manifest.getClass().getName()));
                 }
             }
 
@@ -449,7 +448,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
             }
             else {
-                logger.warning(() -> format(viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID, viewId, manifest.getClass().getName()));
+                logger.warning(() -> viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID.formatted(viewId, manifest.getClass().getName()));
             }
         }
 

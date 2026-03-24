@@ -12,7 +12,6 @@
  */
 package org.omnifaces.filter;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.servlet.CompressedHttpServletResponse.Algorithm.BROTLI;
 import static org.omnifaces.util.Utils.splitAndTrim;
@@ -193,13 +192,13 @@ public class CompressedResponseFilter extends HttpFilter {
                 algorithm = Algorithm.valueOf(algorithmParam.toUpperCase());
             }
             catch (IllegalArgumentException e) {
-                throw new ServletException(format(ERROR_ALGORITHM, algorithmParam), e);
+                throw new ServletException(ERROR_ALGORITHM.formatted(algorithmParam), e);
             }
         }
 
         if (algorithm == null || algorithm == BROTLI) {
             if (Algorithm.BROTLI.isAvailable()) {
-                logger.info(() -> format(LOG_BROTLI_AVAILABLE, Algorithm.BROTLI.getOutputStreamClass()));
+                logger.info(() -> LOG_BROTLI_AVAILABLE.formatted(Algorithm.BROTLI.getOutputStreamClass()));
             }
             else if (algorithm == null) {
                 logger.info(LOG_BROTLI_UNAVAILABLE);
@@ -213,7 +212,7 @@ public class CompressedResponseFilter extends HttpFilter {
 
         if (thresholdParam != null) {
             if (!thresholdParam.matches("[0-9]{1,4}")) {
-                throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
+                throw new ServletException(ERROR_THRESHOLD.formatted(thresholdParam));
             }
             else {
                 threshold = Integer.parseInt(thresholdParam);

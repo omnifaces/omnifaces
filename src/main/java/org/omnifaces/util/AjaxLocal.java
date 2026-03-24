@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.ComponentsLocal.getCurrentComponent;
 import static org.omnifaces.util.ComponentsLocal.getCurrentForm;
@@ -143,7 +142,7 @@ public final class AjaxLocal {
                         continue;
                     }
 
-                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, index, separator, cell.getId()));
+                    renderIds.add("%s%c%s%c%d%c%s".formatted(parentId, separator, tableId, separator, index, separator, cell.getId()));
                 }
             }
             else if (column instanceof UIData columns) { // <p:columns>.
@@ -162,7 +161,7 @@ public final class AjaxLocal {
             }
 
             for (var columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-                renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
+                renderIds.add("%s%c%d%c%s%c%d%c%s".formatted(tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
             }
         }
     }
@@ -200,7 +199,7 @@ public final class AjaxLocal {
                 var cellId = cell.getId();
 
                 for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-                    renderIds.add(format("%s%c%s%c%d%c%s", parentId, separator, tableId, separator, rowIndex, separator, cellId));
+                    renderIds.add("%s%c%s%c%d%c%s".formatted(parentId, separator, tableId, separator, rowIndex, separator, cellId));
                 }
             }
         }
@@ -263,7 +262,7 @@ public final class AjaxLocal {
      */
     public static void data(FacesContext context, Object... namesValues) {
         if (namesValues.length % 2 != 0) {
-            throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
+            throw new IllegalArgumentException(ERROR_ARGUMENTS_LENGTH.formatted(namesValues.length));
         }
 
         var omniContext = OmniPartialViewContext.getCurrentInstance(context);
@@ -271,7 +270,7 @@ public final class AjaxLocal {
         for (var i = 0; i < namesValues.length; i+= 2) {
             if (!(namesValues[i] instanceof String)) {
                 var type = namesValues[i] != null ? namesValues[i].getClass().getName() : "null";
-                throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
+                throw new IllegalArgumentException(ERROR_ARGUMENT_TYPE.formatted(type, namesValues[i]));
             }
 
             omniContext.addArgument((String) namesValues[i], namesValues[i + 1]);

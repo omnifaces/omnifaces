@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.input;
 
-import static java.lang.String.format;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -167,7 +166,7 @@ public class ScriptParam extends OnloadParam {
 
         scripts.append("}");
 
-        return format(SCRIPT_INIT, getClientId(), scripts);
+        return SCRIPT_INIT.formatted(getClientId(), scripts);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

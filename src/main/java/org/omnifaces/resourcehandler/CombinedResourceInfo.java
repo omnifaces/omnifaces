@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.resourcehandler.CombinedResourceHandler.LIBRARY_NAME;
 import static org.omnifaces.util.FacesLocal.createResource;
@@ -186,7 +185,7 @@ public final class CombinedResourceInfo {
             var resource = createResource(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName());
 
             if (resource == null) {
-                logger.warning(() -> format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
+                logger.warning(() -> LOG_RESOURCE_NOT_FOUND.formatted(resourceIdentifier, id));
                 resources.clear();
                 return;
             }
@@ -237,7 +236,7 @@ public final class CombinedResourceInfo {
      */
     @Override
     public String toString() {
-        return format("CombinedResourceInfo[%s,%s]", id, resourceIdentifiers);
+        return "CombinedResourceInfo[%s,%s]".formatted(id, resourceIdentifiers);
     }
 
     // Getters --------------------------------------------------------------------------------------------------------

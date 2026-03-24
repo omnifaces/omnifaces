@@ -12,8 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -99,7 +97,7 @@ public abstract class PushEvent implements Serializable {
 
     @Override
     public String toString() {
-        return format("%s[channel=%s, user=%s]", getClass().getSimpleName(), channel, user);
+        return "%s[channel=%s, user=%s]".formatted(getClass().getSimpleName(), channel, user);
     }
 
 }
