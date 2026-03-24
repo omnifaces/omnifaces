@@ -55,6 +55,9 @@ public class SseIT extends OmniFacesIT {
     @FindBy(id="closeAllSse")
     private WebElement closeAllSse;
 
+    @FindBy(id="poll:pollOpenedChannels")
+    private WebElement pollOpenedChannels;
+
     @FindBy(id="poll:pollClosedChannels")
     private WebElement pollClosedChannels;
 
@@ -89,9 +92,12 @@ public class SseIT extends OmniFacesIT {
         waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
 
-        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:applicationScopedServerEvent|");
-        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
-        waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
+        pollUntilOpenedEventsReceived();
+
+        var openedChannels = browser.findElement(By.id("serverOpenedMessages")).getText();
+        assertTrue(openedChannels.contains("applicationScopedServerEvent"));
+        assertTrue(openedChannels.contains("sessionScopedUserTargeted"));
+        assertTrue(openedChannels.contains("viewScopedAjaxAware"));
     }
 
     private void testOnclose() {
@@ -104,6 +110,10 @@ public class SseIT extends OmniFacesIT {
         var closedChannels = browser.findElement(By.id("serverClosedMessages")).getText();
         assertTrue(closedChannels.contains("sessionScopedUserTargeted"));
         assertTrue(closedChannels.contains("viewScopedAjaxAware"));
+    }
+
+    private void pollUntilOpenedEventsReceived() {
+        waitUntilTextContent("serverOpenedMessages", pollOpenedChannels::click);
     }
 
     private void pollUntilClosedEventsReceived() {

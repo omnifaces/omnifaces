@@ -66,13 +66,19 @@ public class SseITBean implements Serializable {
         addGlobalInfo("{0},{1}", sent.size(), ajaxAwareMessage);
     }
 
+    private static final String PADDING = "x".repeat(65536);
+
     public void pollClosedChannels() {
-        sessionScopedUserTargeted.send("ping", "42");
-        viewScopedAjaxAware.send("ping");
+        sessionScopedUserTargeted.send(PADDING, "42");
+        viewScopedAjaxAware.send(PADDING);
     }
 
     public String getAjaxAwareMessage() {
         return ajaxAwareMessage;
+    }
+
+    public String getOpenedChannels() {
+        return observer.getOpenedChannels();
     }
 
     public String getClosedChannels() {

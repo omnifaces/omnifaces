@@ -75,10 +75,14 @@
             </f:ajax>
         </o:form>
 
-        <h:link id="closeAllSse" value="closeAllSse" onclick="closeAllSse();return false;" />
+        <h:outputText id="serverOpenedMessages" value="#{sseITBean.openedChannels}" />
+        <h:button id="closeAllSse" value="closeAllSse" onclick="closeAllSse();return false;" />
         <h:outputText id="serverClosedMessages" value="#{sseITBean.closedChannels}" />
 
         <o:form id="poll">
+            <h:commandButton id="pollOpenedChannels" value="pollOpenedChannels">
+                <f:ajax render=":serverOpenedMessages" />
+            </h:commandButton>
             <h:commandButton id="pollClosedChannels" value="pollClosedChannels" action="#{sseITBean.pollClosedChannels}">
                 <f:ajax render=":serverClosedMessages" />
             </h:commandButton>

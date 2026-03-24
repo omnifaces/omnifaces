@@ -30,20 +30,26 @@ public class SseITObserver {
     @Inject @Push(type=SSE)
     private PushContext applicationScopedServerEvent;
 
-    private volatile String closedChannels = "";
+    private final StringBuffer openedChannels = new StringBuffer();
+    private final StringBuffer closedChannels = new StringBuffer();
 
     public void onopen(@Observes @Opened SseEvent event) {
         String channel = event.getChannel();
+        openedChannels.append("|").append(channel).append("|");
         applicationScopedServerEvent.send("opened:" + channel);
     }
 
     public void onclose(@Observes @Closed SseEvent event) {
         String channel = event.getChannel();
-        closedChannels += "|" + channel + "|";
+        closedChannels.append("|").append(channel).append("|");
         applicationScopedServerEvent.send("closed:" + channel);
     }
 
+    public String getOpenedChannels() {
+        return openedChannels.toString();
+    }
+
     public String getClosedChannels() {
-        return closedChannels;
+        return closedChannels.toString();
     }
 }

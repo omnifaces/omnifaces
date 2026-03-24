@@ -55,8 +55,8 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
     @Inject
     private SseUserManager sseUsers;
 
-    private final ConcurrentHashMap<AsyncContext, String> channels = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<AsyncContext, Serializable> users = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<AsyncContext, String> channelIds = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Serializable> users = new ConcurrentHashMap<>();
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -70,14 +70,14 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
      */
     protected boolean add(String channelId, String channel, AsyncContext asyncContext) {
         if (addSession(channelId, asyncContext)) {
-            channels.put(asyncContext, channel);
+            channelIds.put(asyncContext, channelId);
             var user = sseUsers.getUser(channel, channelId);
 
             if (user != null) {
-                users.put(asyncContext, user);
+                users.put(channelId, user);
             }
 
-            fireEvent(asyncContext, Opened.LITERAL);
+            fireEvent(channelId, Opened.LITERAL);
             return true;
         }
 
@@ -91,10 +91,11 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
      */
     protected void remove(String channelId, AsyncContext asyncContext) {
         if (removeSession(channelId, asyncContext)) {
-            fireEvent(asyncContext, Closed.LITERAL);
-            channels.remove(asyncContext);
-            users.remove(asyncContext);
+            fireEvent(channelId, Closed.LITERAL);
         }
+
+        channelIds.remove(asyncContext);
+        users.remove(channelId);
     }
 
     // Template methods -----------------------------------------------------------------------------------------------
@@ -115,7 +116,11 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
         }
         catch (IOException e) {
             logger.log(FINEST, "Ignoring thrown exception; the SSE connection is apparently closed.", e);
+
+            // Call remove() directly rather than relying on AsyncListener.onComplete() after closeSession(),
+            // because some containers (e.g. Liberty and GlassFish) don't fire onComplete when the connection is already broken.
             closeSession(asyncContext);
+            remove(channelIds.get(asyncContext), asyncContext);
             return null;
         }
     }
@@ -129,23 +134,24 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
                 output.write(SSE_CLOSE_EVENT);
                 output.flush();
             }
+        }
+        catch (IOException | IllegalStateException e) {
+            logger.log(FINEST, "Ignoring thrown exception; the SSE connection is apparently already closed.", e);
+        }
 
+        try {
             asyncContext.complete();
         }
-        catch (IOException | IllegalStateException ignore) {
-            logger.log(FINEST, "Ignoring thrown exception; the SSE connection is apparently already closed.", ignore);
-        }
-        finally {
-            channels.remove(asyncContext);
-            users.remove(asyncContext);
+        catch (IllegalStateException e) {
+            logger.log(FINEST, "Ignoring thrown exception; the async context is apparently already complete.", e);
         }
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    private void fireEvent(AsyncContext asyncContext, AnnotationLiteral<?> qualifier) {
-        var channel = channels.get(asyncContext);
-        var user = users.get(asyncContext);
+    private void fireEvent(String channelId, AnnotationLiteral<?> qualifier) {
+        var channel = channelId.split("\\?")[0];
+        var user = users.get(channelId);
         Beans.fireEvent(new SseEvent(channel, user, null), qualifier);
     }
 
