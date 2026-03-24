@@ -21,6 +21,11 @@
 >
     <distributable/>
 
+    <context-param>
+        <param-name>Temporary Quarkus-MyFaces patch as it throws NPE when web.xml has no context params; remove when quarkus-myfaces is upgraded to use MyFaces 4.1.3</param-name>
+        <param-value>See also https://issues.apache.org/jira/browse/MYFACES-4735</param-value>
+    </context-param>
+
     <servlet>
         <servlet-name>facesServlet</servlet-name>
         <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
