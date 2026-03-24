@@ -117,10 +117,16 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
         catch (IOException e) {
             logger.log(FINEST, "Ignoring thrown exception; the SSE connection is apparently closed.", e);
 
+            closeSession(asyncContext);
+
             // Call remove() directly rather than relying on AsyncListener.onComplete() after closeSession(),
             // because some containers (e.g. Liberty and GlassFish) don't fire onComplete when the connection is already broken.
-            closeSession(asyncContext);
-            remove(channelIds.get(asyncContext), asyncContext);
+            var channelId = channelIds.get(asyncContext);
+
+            if (channelId != null) {
+                remove(channelId, asyncContext);
+            }
+
             return null;
         }
     }

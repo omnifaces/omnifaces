@@ -59,7 +59,9 @@
 
     <h:body>
         <h:messages id="messages" />
-        <h:link id="newtab" value="newtab" target="_blank" />
+        <h:link id="newtab" value="newtab" target="_blank">
+            <f:param name="newtab" value="true" />
+        </h:link>
 
         <div id="clientOpenedMessages" />
         <div id="applicationScopedServerEventMessage" />
@@ -88,7 +90,7 @@
             </h:commandButton>
         </o:form>
 
-        <o:sse channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
+        <o:sse channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" rendered="#{not param.newtab}" />
         <o:sse channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
 
         <o:form>

@@ -13,8 +13,10 @@
 package org.omnifaces.cdi.push;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.logging.Level.FINEST;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
@@ -46,6 +48,7 @@ public class SseServlet extends HttpServlet {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
+    private static final Logger logger = Logger.getLogger(SseServlet.class.getName());
     private static final long serialVersionUID = 1L;
     private static final byte[] SSE_NOT_FOUND_EVENT = "event: close\ndata: 404\n\n".getBytes(UTF_8);
 
@@ -76,24 +79,33 @@ public class SseServlet extends HttpServlet {
         asyncContext.addListener(new AsyncListener() {
 
             @Override
-            public void onComplete(AsyncEvent event) {
-                sseSessions.remove(channelId, asyncContext);
+            public void onStartAsync(AsyncEvent event) {
+                // NOOP.
             }
 
             @Override
-            public void onTimeout(AsyncEvent event) {
-                sseSessions.remove(channelId, asyncContext);
-                asyncContext.complete();
+            public void onComplete(AsyncEvent event) {
+                removeSseSession();
             }
 
             @Override
             public void onError(AsyncEvent event) {
-                sseSessions.remove(channelId, asyncContext);
+                removeSseSession();
             }
 
             @Override
-            public void onStartAsync(AsyncEvent event) {
-                // NOOP.
+            public void onTimeout(AsyncEvent event) {
+                removeSseSession();
+                asyncContext.complete();
+            }
+
+            private void removeSseSession() {
+                try {
+                    sseSessions.remove(channelId, asyncContext);
+                }
+                catch (IllegalStateException e) {
+                    logger.log(FINEST, "Ignoring thrown exception; can happen when the CDI context is no longer active.", e);
+                }
             }
         });
     }

@@ -30,6 +30,9 @@ public class SseIT extends OmniFacesIT {
     @FindBy(id="messages")
     private WebElement messages;
 
+    @FindBy(id="newtab")
+    private WebElement newtab;
+
     @FindBy(id="clientOpenedMessages")
     private WebElement clientOpenedMessages;
 
@@ -70,7 +73,7 @@ public class SseIT extends OmniFacesIT {
 
     @Test
     void test() {
-        testOnopen();
+        testOnopen(false);
 
         assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
         assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
@@ -80,29 +83,44 @@ public class SseIT extends OmniFacesIT {
         assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
         assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
-        // Multi-tab testing is not possible with SSE over HTTP/1.1 because browsers limit concurrent connections to
-        // 6 per origin. With 3 SSE channels on tab 1 and 3 on tab 2, all 6 slots are taken and AJAX requests get
-        // queued indefinitely. This is a well-known SSE limitation that doesn't apply to WebSocket (which upgrades
-        // the protocol). Multi-tab scoping is already tested by SocketIT. With HTTP/2 this limit doesn't apply
-        // because SSE streams are multiplexed over a single TCP connection.
+        String firstTab = browser.getWindowHandle();
+        openNewTab(newtab);
+        testOnopen(true); // NOTE: application scoped push is disabled in new tab because currently used Chrome browser limits concurrent HTTP 1.1 connections to 6 (so we cannot use 3 SSE channels in second tab and expect ajax to continue working).
 
-        testOnclose();
+        assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+
+        assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
+        assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
+
+        // Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT, so
+        // application, session and user sockets can't be tested more extensively. If possible somehow, it's expected
+        // that numbers should equal respectively 3, 2, 1 on first session and 3, 1, 1 on second session.
+
+        testOnclose(firstTab);
     }
 
-    private void testOnopen() {
-        waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
+    private void testOnopen(boolean newtab) {
+        if (!newtab) {
+            waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
+        }
+
         waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
 
         pollUntilOpenedEventsReceived();
 
         var openedChannels = browser.findElement(By.id("serverOpenedMessages")).getText();
-        assertTrue(openedChannels.contains("applicationScopedServerEvent"));
+
+        if (!newtab) {
+            assertTrue(openedChannels.contains("applicationScopedServerEvent"));
+        }
+
         assertTrue(openedChannels.contains("sessionScopedUserTargeted"));
         assertTrue(openedChannels.contains("viewScopedAjaxAware"));
     }
 
-    private void testOnclose() {
+    private void testOnclose(String tabToSwitch) {
         closeAllSse.click();
         waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
@@ -112,6 +130,8 @@ public class SseIT extends OmniFacesIT {
         var closedChannels = browser.findElement(By.id("serverClosedMessages")).getText();
         assertTrue(closedChannels.contains("sessionScopedUserTargeted"));
         assertTrue(closedChannels.contains("viewScopedAjaxAware"));
+
+        closeCurrentTabAndSwitchTo(tabToSwitch);
     }
 
     private void pollUntilOpenedEventsReceived() {
