@@ -176,7 +176,7 @@ public final class FacesLocal {
         if (context != null) {
             var unwrappedContext = context;
 
-            while (unwrappedContext instanceof FacesWrapper wrapper) {
+            while (unwrappedContext instanceof FacesWrapper<?> wrapper) {
                 unwrappedContext = (FacesContext) wrapper.getWrapped();
             }
 

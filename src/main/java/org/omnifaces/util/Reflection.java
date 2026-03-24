@@ -170,7 +170,7 @@ public final class Reflection {
 
         @Override
         public boolean equals(Object object) {
-            return object == this || (object instanceof PropertyPath && ((PropertyPath) object).nodes.equals(this.nodes));
+            return object == this || (object instanceof PropertyPath path && path.nodes.equals(this.nodes));
         }
 
         @Override
@@ -345,11 +345,11 @@ public final class Reflection {
             return;
         }
 
-        if (base instanceof List list) {
-            list.set((Integer) property, value);
+        if (base instanceof List<?>) {
+            ((List<Object>) base).set((Integer) property, value);
         }
-        else if (base instanceof Map map) {
-            map.put(property, value);
+        else if (base instanceof Map<?, ?>) {
+            ((Map<Object, Object>) base).put(property, value);
         }
         else if (base.getClass().isArray()) {
             Array.set(base, (Integer) property, value);
@@ -551,11 +551,9 @@ public final class Reflection {
     }
 
     private static boolean isNeedsFurtherRecursion(Class<?> type) {
-        if (type.isPrimitive() || isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class) || (Iterable.class.isAssignableFrom(type) && !isOneInstanceOf(type, List.class, Map.class))) {
-            return false; // These don't have properties anyway.
-        } else {
-            return true;
-        }
+        return (!type.isPrimitive()
+                && !isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class)
+                && (!Iterable.class.isAssignableFrom(type) || isOneInstanceOf(type, List.class, Map.class)));
     }
 
     /**

@@ -74,8 +74,8 @@ public final class EditableValueHolderStateHelper {
         while (children.hasNext()) {
             UIComponent child = children.next();
 
-            if (child instanceof EditableValueHolder && !child.isTransient()) {
-                get(stateHelper, child.getClientId(context)).save((EditableValueHolder) child);
+            if (child instanceof EditableValueHolder holder && !child.isTransient()) {
+                get(stateHelper, child.getClientId(context)).save(holder);
             }
 
             if (child.getFacetCount() > 0 || child.getChildCount() > 0) {
@@ -96,8 +96,8 @@ public final class EditableValueHolderStateHelper {
             UIComponent child = children.next();
             child.setId(child.getId()); // This implicitly resets the cached client ID. See Faces spec 3.1.6.
 
-            if (child instanceof EditableValueHolder && !child.isTransient()) {
-                get(stateHelper, child.getClientId(context)).restore((EditableValueHolder) child);
+            if (child instanceof EditableValueHolder holder && !child.isTransient()) {
+                get(stateHelper, child.getClientId(context)).restore(holder);
             }
 
             if (child.getFacetCount() > 0 || child.getChildCount() > 0) {

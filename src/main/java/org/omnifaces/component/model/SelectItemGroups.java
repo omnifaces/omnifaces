@@ -103,8 +103,8 @@ public class SelectItemGroups extends UISelectItems {
             List<SelectItem> items = new ArrayList<>();
 
             for (var child : getChildren()) {
-                if (child instanceof UISelectItems) {
-                    createSelectItems(child, ((UISelectItems) child).getValue(), SelectItem::new, items::add);
+                if (child instanceof UISelectItems selectItems) {
+                    createSelectItems(child, selectItems.getValue(), SelectItem::new, items::add);
                 }
                 else if (child instanceof UISelectItem) {
                     items.add(createSelectItem(child, null, SelectItem::new));

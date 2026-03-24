@@ -97,9 +97,9 @@ public final class SelectItemsCollector {
             // A single SelectItem can be added directly without any further processing.
             return Collections.singleton(selectItem);
         }
-        else if (value instanceof Object[]) {
+        else if (value instanceof Object[] array) {
             // An array of objects is supposed to be transformed by the SelectItems iteration construct.
-            return collectFromUISelectItemsIterator(context, uiSelectItems, Arrays.asList((Object[]) value));
+            return collectFromUISelectItemsIterator(context, uiSelectItems, Arrays.asList(array));
         }
         else if (value instanceof Iterable<?> iterable) {
             // An iterable (Collection, List, etc) is also supposed to be transformed by the SelectItems iteration construct.

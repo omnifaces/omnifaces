@@ -940,7 +940,7 @@ public final class Servlets {
      * Servlets.facesRedirect(request, response, "some.xhtml");
      * </pre>
      * <p>
-     * You can use {@link String#String.formatted(Object...)} placeholder <code>%s</code> in the redirect URL to represent
+     * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
      * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
      * <pre>
      * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&amp;bar=%s", foo, bar);

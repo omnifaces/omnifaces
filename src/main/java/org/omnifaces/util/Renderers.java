@@ -193,10 +193,7 @@ public final class Renderers {
      * @since 2.5
      */
     public static void writeIdAttributeIfNecessary(ResponseWriter writer, UIComponent component) throws IOException {
-        if (component.getId() != null
-            || (component instanceof ClientBehaviorHolder
-                && !((ClientBehaviorHolder) component).getClientBehaviors().isEmpty()))
-        {
+        if (component.getId() != null || (component instanceof ClientBehaviorHolder holder && !holder.getClientBehaviors().isEmpty())) {
             writeAttribute(writer, "id", component.getClientId());
         }
     }

@@ -378,7 +378,7 @@ public final class Hacks {
      * @since 3.14.4
      */
     public static VariableMapper findWrappedVariableMapper(VariableMapper mapper) {
-        if (mapper instanceof FacesWrapper wrapper) { // MyFaces
+        if (mapper instanceof FacesWrapper<?> wrapper) { // MyFaces
             return ((VariableMapper) wrapper.getWrapped());
         }
         else { // Mojarra

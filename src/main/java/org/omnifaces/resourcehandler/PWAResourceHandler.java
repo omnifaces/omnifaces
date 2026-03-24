@@ -471,8 +471,8 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
 
         forEachComponent(context).fromRoot(view).ofTypes(UIGraphic.class, UIOutput.class).invoke(component -> {
-            if (component instanceof UIGraphic && ((UIGraphic) component).getValue() != null) {
-                cacheableResources.add(((UIGraphic) component).getValue().toString());
+            if (component instanceof UIGraphic graphic && graphic.getValue() != null) {
+                cacheableResources.add(graphic.getValue().toString());
             }
             else if (component.getAttributes().get("name") != null) {
                 var url = getResourceUrl(context, (String) component.getAttributes().get("library"), (String) component.getAttributes().get("name"));
