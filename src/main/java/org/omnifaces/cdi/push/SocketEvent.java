@@ -40,51 +40,15 @@ import jakarta.websocket.CloseReason.CloseCodes;
  * @see Socket
  * @since 2.3
  */
-public final class SocketEvent implements Serializable {
+public final class SocketEvent extends PushEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final String channel;
-    private final Serializable user;
-    private final Serializable previousUser;
     private final Integer closeCode;
 
     SocketEvent(String channel, Serializable user, Serializable previousUser, CloseCode closeCode) {
-        this.channel = channel;
-        this.user = user;
-        this.previousUser = previousUser;
+        super(channel, user, previousUser);
         this.closeCode = closeCode == null ? null : closeCode.getCode();
-    }
-
-    /**
-     * Returns the <code>&lt;o:socket channel&gt;</code>.
-     * @return The web socket channel name.
-     */
-    public String getChannel() {
-        return channel;
-    }
-
-    /**
-     * Returns the current <code>&lt;o:socket user&gt;</code>, if any.
-     * @param <S> The generic type of the user identifier.
-     * @return The current web socket user identifier, if any.
-     * @throws ClassCastException When <code>S</code> is of wrong type.
-     */
-    @SuppressWarnings("unchecked")
-    public <S extends Serializable> S getUser() {
-        return (S) user;
-    }
-
-    /**
-     * Returns the previous <code>&lt;o:socket user&gt;</code>, if any.
-     * @param <S> The generic type of the user identifier.
-     * @return The previous web socket user identifier, if any.
-     * @throws ClassCastException When <code>S</code> is of wrong type.
-     * @since 3.2
-     */
-    @SuppressWarnings("unchecked")
-    public <S extends Serializable> S getPreviousUser() {
-        return (S) previousUser;
     }
 
     /**
@@ -99,25 +63,23 @@ public final class SocketEvent implements Serializable {
 
     @Override
     public int hashCode() {
-        return super.hashCode() + Objects.hash(channel, user, closeCode);
+        return super.hashCode() + Objects.hash(closeCode);
     }
 
     @Override
     public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) {
+        if (!super.equals(object)) {
             return false;
         }
 
         var other = (SocketEvent) object;
 
-        return Objects.equals(channel, other.channel)
-            && Objects.equals(user, other.user)
-            && Objects.equals(closeCode, other.closeCode);
+        return Objects.equals(closeCode, other.closeCode);
     }
 
     @Override
     public String toString() {
-        return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, getCloseCode());
+        return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", getChannel(), getUser(), getCloseCode());
     }
 
     /**

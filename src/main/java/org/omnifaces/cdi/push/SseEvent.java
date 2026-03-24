@@ -12,7 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.String.format;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -20,7 +19,6 @@ import java.io.Serializable;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.Objects;
 
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.util.AnnotationLiteral;
@@ -38,70 +36,12 @@ import jakarta.inject.Qualifier;
  * @see Sse
  * @since 5.2
  */
-public final class SseEvent implements Serializable {
+public final class SseEvent extends PushEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final String channel;
-    private final Serializable user;
-    private final Serializable previousUser;
-
     SseEvent(String channel, Serializable user, Serializable previousUser) {
-        this.channel = channel;
-        this.user = user;
-        this.previousUser = previousUser;
-    }
-
-    /**
-     * Returns the <code>&lt;o:sse channel&gt;</code>.
-     * @return The SSE channel name.
-     */
-    public String getChannel() {
-        return channel;
-    }
-
-    /**
-     * Returns the current <code>&lt;o:sse user&gt;</code>, if any.
-     * @param <S> The generic type of the user identifier.
-     * @return The current SSE user identifier, if any.
-     * @throws ClassCastException When <code>S</code> is of wrong type.
-     */
-    @SuppressWarnings("unchecked")
-    public <S extends Serializable> S getUser() {
-        return (S) user;
-    }
-
-    /**
-     * Returns the previous <code>&lt;o:sse user&gt;</code>, if any.
-     * @param <S> The generic type of the user identifier.
-     * @return The previous SSE user identifier, if any.
-     * @throws ClassCastException When <code>S</code> is of wrong type.
-     */
-    @SuppressWarnings("unchecked")
-    public <S extends Serializable> S getPreviousUser() {
-        return (S) previousUser;
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode() + Objects.hash(channel, user);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-
-        var other = (SseEvent) object;
-
-        return Objects.equals(channel, other.channel)
-            && Objects.equals(user, other.user);
-    }
-
-    @Override
-    public String toString() {
-        return format("SseEvent[channel=%s, user=%s]", channel, user);
+        super(channel, user, previousUser);
     }
 
     /**
