@@ -32,7 +32,7 @@ import org.omnifaces.cdi.PushContext;
  * @since 5.2
  */
 @Dependent
-class PushContextProducer {
+public class PushContextProducer {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
