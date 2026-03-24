@@ -64,7 +64,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     // Variables ------------------------------------------------------------------------------------------------------
 
     private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
-	private ConcurrentMap<String, Boolean> recentlyUnloadedViewStates;
+    private ConcurrentMap<String, Boolean> recentlyUnloadedViewStates;
 
     // Actions --------------------------------------------------------------------------------------------------------
 
