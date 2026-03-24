@@ -671,7 +671,7 @@ public class ValidateBean extends TagHandler {
             forEachComponent(context).fromRoot(form).havingIds(clientIds).<UIInput>invoke(input -> {
                 input.setValid(false);
 
-                if (labels.isEmpty()) {
+                if (!labels.isEmpty()) {
                     labels.append(", ");
                 }
 

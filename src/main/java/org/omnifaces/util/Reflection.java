@@ -189,7 +189,7 @@ public final class Reflection {
 
             for (Comparable<?> node : nodes) {
                 if (node instanceof String) {
-                    if (stringBuilder.isEmpty()) {
+                    if (!stringBuilder.isEmpty()) {
                         stringBuilder.append('.');
                     }
 
