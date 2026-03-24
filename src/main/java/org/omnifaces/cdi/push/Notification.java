@@ -108,6 +108,26 @@ import org.omnifaces.util.Json;
  *     console.log("Closed: tag=" + event.detail.tag);
  * }
  * </pre>
+ * <p>
+ * When you need to invoke a server-side action on notification click, use <code>&lt;h:commandScript&gt;</code>
+ * to bridge the client-side event to the server. For example, to mark a notification as read when the user clicks it:
+ * <pre>
+ * &lt;o:notification channel="notifications" onclick="handleNotificationClick" /&gt;
+ * &lt;h:form&gt;
+ *     &lt;h:commandScript name="markAsRead" action="#{notificationBean.markAsRead}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * function handleNotificationClick(event) {
+ *     markAsRead({ "notification.url": event.detail.data?.url });
+ * }
+ * </pre>
+ * <pre>
+ * public void markAsRead() {
+ *     var url = Faces.getRequestParameter("notification.url");
+ *     // ...
+ * }
+ * </pre>
  *
  * <h2>JavaScript API</h2>
  * <p>
