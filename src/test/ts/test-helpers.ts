@@ -181,11 +181,14 @@ export interface MockEventSourceInstance {
     onopen: ((event: Event) => void) | null;
     onmessage: ((event: { data: string }) => void) | null;
     onerror: ((event: Event) => void) | null;
+    addEventListener(type: string, listener: (event: MessageEvent) => void): void;
     close(): void;
     /** Test helper: simulate open event. */
     simulateOpen(): void;
     /** Test helper: simulate message event. */
     simulateMessage(data: unknown): void;
+    /** Test helper: simulate a named "close" event from the server with the given code. */
+    simulateCloseEvent(code: number): void;
     /** Test helper: simulate error event with CONNECTING readyState (transient error, browser will retry). */
     simulateError(): void;
     /** Test helper: simulate error event with CLOSED readyState (server closed the connection). */
@@ -200,11 +203,20 @@ export function installMockEventSource(): void {
     OriginalEventSource = window.EventSource;
 
     const MockES = function MockEventSource(this: MockEventSourceInstance, url: string) {
+        const eventListeners: Record<string, ((event: MessageEvent) => void)[]> = {};
+
         this.url = url;
         this.readyState = 0; // CONNECTING
         this.onopen = null;
         this.onmessage = null;
         this.onerror = null;
+
+        this.addEventListener = function (type: string, listener: (event: MessageEvent) => void) {
+            if (!eventListeners[type]) {
+                eventListeners[type] = [];
+            }
+            eventListeners[type].push(listener);
+        };
 
         this.close = function () {
             this.readyState = 2; // CLOSED
@@ -219,8 +231,13 @@ export function installMockEventSource(): void {
 
         this.simulateMessage = function (data: unknown) {
             if (this.onmessage) {
-                this.onmessage({ data: JSON.stringify(data) });
+                this.onmessage({ data: JSON.stringify(data) } as MessageEvent);
             }
+        };
+
+        this.simulateCloseEvent = function (code: number) {
+            const listeners = eventListeners["close"] || [];
+            listeners.forEach(fn => fn({ data: String(code) } as MessageEvent));
         };
 
         this.simulateError = function () {

@@ -293,8 +293,9 @@ import org.omnifaces.util.Json;
  * The optional <strong><code>onerror</code></strong> JavaScript listener function can be used to listen on a
  * connection error whereby the browser will automatically attempt to reconnect. This will be invoked when a transient
  * connection error occurs (e.g. temporary network interruption) while the browser's <code>EventSource</code> is still
- * attempting to reconnect. This will <em>not</em> be invoked when the server has explicitly closed the connection or
- * when the <code>EventSource</code> API is not supported. Instead, the <code>onclose</code> will be invoked.
+ * attempting to reconnect. This will <em>not</em> be invoked when the server has explicitly closed the connection
+ * (e.g. unknown channel, or expired session or view), or when the <code>EventSource</code> API is not supported.
+ * Instead, the <code>onclose</code> will be invoked.
  * <pre>
  * &lt;o:sse ... onerror="sseErrorListener" /&gt;
  * </pre>
@@ -318,7 +319,7 @@ import org.omnifaces.util.Json;
  * <p>
  * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on the final
  * close of an SSE connection. This will be invoked when the <code>EventSource</code> API is not supported by the
- * client, or when the server has explicitly closed the connection (e.g. on session or view expiry), or when the client
+ * client, or when the server has explicitly closed the connection (e.g. on session or view expiry, or unknown channel), or when the client
  * has explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>. This will <em>not</em> be
  * invoked when the browser can make an auto-reconnect attempt. Instead, the <code>onerror</code> will be invoked.
  * <pre>
@@ -332,6 +333,8 @@ import org.omnifaces.util.Json;
  *         // Server explicitly closed the connection (e.g. expired session or view).
  *     } else if (code == 204) {
  *         // Client explicitly closed the connection via OmniFaces.Push.close().
+ *     } else if (code == 404) {
+ *         // Unknown channel (e.g. randomly guessed or spoofed by endusers or manually reconnected after session expiry).
  *     } else {
  *         // Abnormal close reason (as result of an error).
  *     }
@@ -344,12 +347,14 @@ import org.omnifaces.util.Json;
  * <code>EventSource</code> API is simply not
  * <a href="https://caniuse.com/eventsource">supported</a> by the client. If this is <code>200</code>, then the server
  * explicitly closed the connection (e.g. due to an expired session or view). If this is <code>204</code>, then the
- * client explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>.</li>
+ * client explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>. If this is <code>404</code>,
+ * then the channel is unknown (e.g. randomly guessed or spoofed by endusers or manually reconnected after the session
+ * is expired).</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource/error_event">
- * <code>Event</code></a> instance, if available. This is present when the server closed the connection (code
- * <code>200</code>), but absent when the <code>EventSource</code> API is not supported (code <code>-1</code>) or the
- * client explicitly closed the connection (code <code>204</code>).</li>
+ * <code>Event</code></a> instance, if available. This is present when the server closed the connection (codes
+ * <code>200</code> and <code>404</code>), but absent when the <code>EventSource</code> API is not supported (code
+ * <code>-1</code>) or the client explicitly closed the connection (code <code>204</code>).</li>
  * </ul>
  *
  *

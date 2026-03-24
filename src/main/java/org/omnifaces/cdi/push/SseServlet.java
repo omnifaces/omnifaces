@@ -12,7 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 
@@ -47,6 +47,7 @@ public class SseServlet extends HttpServlet {
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final long serialVersionUID = 1L;
+    private static final byte[] SSE_NOT_FOUND_EVENT = "event: close\ndata: 404\n\n".getBytes(UTF_8);
 
     static final String PARAM_CHANNEL = "channel";
 
@@ -54,30 +55,24 @@ public class SseServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/event-stream");
+        response.setHeader("Cache-Control", "no-cache");
+
         var channel = getChannel(request);
-
-        if (channel == null) {
-            response.sendError(SC_NOT_FOUND);
-            return;
-        }
-
         var channelId = channel + "?" + request.getQueryString();
         var sseSessions = Beans.getReference(SseSessionManager.class);
 
-        if (!sseSessions.isRegistered(channelId)) {
-            response.sendError(SC_NOT_FOUND);
+        if (channel == null || !sseSessions.isRegistered(channelId)) {
+            response.getOutputStream().write(SSE_NOT_FOUND_EVENT);
             return;
         }
 
-        response.setContentType("text/event-stream");
-        response.setHeader("Cache-Control", "no-cache");
         response.setHeader("X-Accel-Buffering", "no"); // Disables response buffering in Nginx so SSE events are flushed immediately to the client.
         response.flushBuffer();
 
         var asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
         sseSessions.add(channelId, channel, asyncContext);
-
         asyncContext.addListener(new AsyncListener() {
 
             @Override
@@ -109,5 +104,4 @@ public class SseServlet extends HttpServlet {
         var pathInfo = request.getPathInfo();
         return (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
     }
-
 }

@@ -48,6 +48,7 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
 
     private static final byte[] SSE_DATA_PREFIX = "data: ".getBytes(UTF_8);
     private static final byte[] SSE_DATA_SUFFIX = "\n\n".getBytes(UTF_8);
+    private static final byte[] SSE_CLOSE_EVENT = "event: close\ndata: 200\n\n".getBytes(UTF_8);
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -122,10 +123,17 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
     @Override
     protected void closeSession(AsyncContext asyncContext) {
         try {
+            var output = asyncContext.getResponse().getOutputStream();
+
+            synchronized (output) {
+                output.write(SSE_CLOSE_EVENT);
+                output.flush();
+            }
+
             asyncContext.complete();
         }
-        catch (IllegalStateException ignore) {
-            logger.log(FINEST, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
+        catch (IOException | IllegalStateException ignore) {
+            logger.log(FINEST, "Ignoring thrown exception; the SSE connection is apparently already closed.", ignore);
         }
         finally {
             channels.remove(asyncContext);

@@ -175,10 +175,11 @@ export namespace Push {
          * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>-1</code> means the
          * <code>EventSource</code> API is not supported by the client. <code>200</code> means the server explicitly
          * closed the connection (e.g. on session or view expiry). <code>204</code> means the client explicitly closed
-         * the connection via <code>OmniFaces.Push.close()</code>.</li>
+         * the connection via <code>OmniFaces.Push.close()</code>. <code>404</code> means the channel is unknown.</li>
          * <li><code>channel</code>: the channel name.</li>
          * <li><code>event</code>: the raw <code>Event</code> instance, if available. Present for server close
-         * (<code>200</code>), absent for unsupported (<code>-1</code>) and client close (<code>204</code>).</li>
+         * (<code>200</code> and <code>404</code>), absent for unsupported (<code>-1</code>) and client close
+         * (<code>204</code>).</li>
          * </ul>
          * @constructor
          * @param url The URL of the SSE endpoint.
@@ -220,6 +221,13 @@ export namespace Push {
                 this.onmessage(message, this.channel, event);
                 this.behaviors[message]?.forEach(behavior => behavior());
             };
+
+            this.eventSource.addEventListener("close", (event: MessageEvent) => {
+                const code = parseInt(event.data);
+                this.eventSource?.close();
+                this.eventSource = null;
+                this.onclose(code, this.channel, event);
+            });
 
             this.eventSource.onerror = (event: Event) => {
                 if (this.eventSource?.readyState == EventSource.CLOSED) {

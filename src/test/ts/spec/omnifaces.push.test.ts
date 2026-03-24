@@ -678,6 +678,47 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         expect(closes[0][2]).toBeUndefined();
     });
 
+    test("onclose is called with code 404 when server sends close event for unknown channel", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseCl5?t=1",
+            null, null, null,
+            (code: number, channel: string, event: unknown) => closes.push([code, channel, event]),
+            {}, false);
+        push().open("sseCl5");
+        lastES().simulateOpen();
+        lastES().simulateCloseEvent(404);
+
+        expect(closes.length).toBe(1);
+        expect(closes[0][0]).toBe(404);
+        expect(closes[0][1]).toBe("sseCl5");
+        expect(closes[0][2]).toBeDefined();
+    });
+
+    test("onclose is called with code 200 when server sends close event for session expiry", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseCl7?t=1",
+            null, null, null,
+            (code: number, channel: string, event: unknown) => closes.push([code, channel, event]),
+            {}, false);
+        push().open("sseCl7");
+        lastES().simulateOpen();
+        lastES().simulateCloseEvent(200);
+
+        expect(closes.length).toBe(1);
+        expect(closes[0][0]).toBe(200);
+        expect(closes[0][1]).toBe("sseCl7");
+        expect(closes[0][2]).toBeDefined();
+    });
+
+    test("onclose via close event closes the EventSource", () => {
+        push().init(true, "/ctx", "sseCl6?t=1", null, null, null, null, {}, false);
+        push().open("sseCl6");
+        lastES().simulateOpen();
+        lastES().simulateCloseEvent(404);
+
+        expect(lastES().readyState).toBe(2); // CLOSED
+    });
+
     test("onclose is not called on transient error", () => {
         const closes: unknown[][] = [];
         push().init(true, "/ctx", "sseCl3?t=1",
