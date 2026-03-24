@@ -16,7 +16,8 @@
  */
 
 import { loadOmniFacesJs } from "../test-setup";
-import { installMockWebSocket, uninstallMockWebSocket, lastWS, getWSInstances } from "../test-helpers";
+import { installMockWebSocket, uninstallMockWebSocket, lastWS, getWSInstances,
+    installMockEventSource, uninstallMockEventSource, lastES, getESInstances } from "../test-helpers";
 
 beforeAll(() => loadOmniFacesJs());
 
@@ -464,5 +465,264 @@ describe("OmniFaces.Push: function resolution", () => {
         push().open("resUndef");
         lastWS().simulateOpen();
         expect(() => lastWS().simulateMessage("test")).not.toThrow();
+    });
+});
+
+// ================================================================================================
+// SSE (SseConnection) tests
+// ================================================================================================
+
+// ---- SSE: init ----
+
+describe("OmniFaces.Push SSE: init", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("creates EventSource for SSE channel", () => {
+        push().init(true, "/ctx", "sseCh1?token=abc", null, null, null, null, {}, true);
+        expect(getESInstances().length).toBe(1);
+        expect(lastES().url).toContain("/ctx/omnifaces.sse/sseCh1?token=abc");
+    });
+
+    test("autoconnect=false does not open EventSource", () => {
+        push().init(true, "/ctx", "sseCh2?token=abc", null, null, null, null, {}, false);
+        expect(getESInstances().length).toBe(0);
+    });
+
+    test("does not create duplicate EventSource for same channel", () => {
+        push().init(true, "/ctx", "sseDup?t=1", null, null, null, null, {}, false);
+        push().init(true, "/ctx", "sseDup?t=2", null, null, null, null, {}, false);
+        push().open("sseDup");
+        expect(getESInstances().length).toBe(1);
+    });
+
+    test("calls onclose with -1 when EventSource is not supported", () => {
+        const origES = window.EventSource;
+        delete (window as unknown as Record<string, unknown>).EventSource;
+
+        const closeCalls: unknown[][] = [];
+        push().init(true, "/ctx", "noEsCh?t=1", null, null, null,
+            (code: number, channel: string) => closeCalls.push([code, channel]),
+            {}, false);
+
+        expect(closeCalls.length).toBe(1);
+        expect(closeCalls[0][0]).toBe(-1);
+        expect(closeCalls[0][1]).toBe("noEsCh");
+
+        (window as unknown as Record<string, unknown>).EventSource = origES;
+    });
+});
+
+// ---- SSE: onopen callback ----
+
+describe("OmniFaces.Push SSE: onopen callback", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("onopen is called with channel on connect", () => {
+        const calls: unknown[] = [];
+        push().init(true, "/ctx", "sseOpen1?t=1", (ch: string) => calls.push(ch), null, null, null, {}, false);
+        push().open("sseOpen1");
+        lastES().simulateOpen();
+        expect(calls).toEqual(["sseOpen1"]);
+    });
+
+    test("onopen with null does not throw", () => {
+        push().init(true, "/ctx", "sseOpen2?t=1", null, null, null, null, {}, false);
+        push().open("sseOpen2");
+        expect(() => lastES().simulateOpen()).not.toThrow();
+    });
+});
+
+// ---- SSE: onmessage callback ----
+
+describe("OmniFaces.Push SSE: onmessage callback", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("onmessage receives parsed data, channel and raw event", () => {
+        const calls: unknown[][] = [];
+        push().init(true, "/ctx", "sseMsg1?t=1",
+            null, (message: unknown, channel: string, event: unknown) => calls.push([message, channel, event]),
+            null, null, {}, false);
+        push().open("sseMsg1");
+        lastES().simulateOpen();
+        lastES().simulateMessage("hello");
+
+        expect(calls.length).toBe(1);
+        expect(calls[0][0]).toBe("hello");
+        expect(calls[0][1]).toBe("sseMsg1");
+        expect(calls[0][2]).toBeDefined();
+    });
+
+    test("onmessage receives object data", () => {
+        const calls: unknown[] = [];
+        push().init(true, "/ctx", "sseMsg2?t=1",
+            null, (message: unknown) => calls.push(message),
+            null, null, {}, false);
+        push().open("sseMsg2");
+        lastES().simulateOpen();
+        lastES().simulateMessage({ key: "value" });
+        expect(calls[0]).toEqual({ key: "value" });
+    });
+});
+
+// ---- SSE: behaviors ----
+
+describe("OmniFaces.Push SSE: behaviors", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("behavior function is invoked when message matches key", () => {
+        const called: string[] = [];
+        const behaviors = {
+            update: [() => called.push("update1"), () => called.push("update2")],
+        };
+        push().init(true, "/ctx", "sseBeh1?t=1", null, null, null, null, behaviors, false);
+        push().open("sseBeh1");
+        lastES().simulateOpen();
+        lastES().simulateMessage("update");
+        expect(called).toEqual(["update1", "update2"]);
+    });
+
+    test("behavior function is NOT invoked when message does not match", () => {
+        const called: string[] = [];
+        const behaviors = {
+            update: [() => called.push("update")],
+        };
+        push().init(true, "/ctx", "sseBeh2?t=1", null, null, null, null, behaviors, false);
+        push().open("sseBeh2");
+        lastES().simulateOpen();
+        lastES().simulateMessage("delete");
+        expect(called).toEqual([]);
+    });
+});
+
+// ---- SSE: onerror callback (transient error, code 500) ----
+
+describe("OmniFaces.Push SSE: onerror callback", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("onerror is called with code 500 on transient connection error", () => {
+        const errors: unknown[][] = [];
+        push().init(true, "/ctx", "sseErr1?t=1",
+            null, null,
+            (code: number, channel: string, event: unknown) => errors.push([code, channel, event]),
+            null, {}, false);
+        push().open("sseErr1");
+        lastES().simulateOpen();
+        lastES().simulateError();
+
+        expect(errors.length).toBe(1);
+        expect(errors[0][0]).toBe(500);
+        expect(errors[0][1]).toBe("sseErr1");
+        expect(errors[0][2]).toBeInstanceOf(Event);
+    });
+
+    test("onerror is not called when server closes connection", () => {
+        const errors: unknown[][] = [];
+        push().init(true, "/ctx", "sseErr2?t=1",
+            null, null,
+            (code: number, channel: string) => errors.push([code, channel]),
+            null, {}, false);
+        push().open("sseErr2");
+        lastES().simulateOpen();
+        lastES().simulateServerClose();
+
+        expect(errors.length).toBe(0);
+    });
+});
+
+// ---- SSE: onclose callback ----
+
+describe("OmniFaces.Push SSE: onclose callback", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("onclose is called with code 200 and event when server closes connection", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseCl1?t=1",
+            null, null, null,
+            (code: number, channel: string, event: unknown) => closes.push([code, channel, event]),
+            {}, false);
+        push().open("sseCl1");
+        lastES().simulateOpen();
+        lastES().simulateServerClose();
+
+        expect(closes.length).toBe(1);
+        expect(closes[0][0]).toBe(200);
+        expect(closes[0][1]).toBe("sseCl1");
+        expect(closes[0][2]).toBeInstanceOf(Event);
+    });
+
+    test("onclose is called with code 204 and no event when client explicitly closes", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseCl2?t=1",
+            null, null, null,
+            (code: number, channel: string, event: unknown) => closes.push([code, channel, event]),
+            {}, false);
+        push().open("sseCl2");
+        lastES().simulateOpen();
+        push().close("sseCl2");
+
+        expect(closes.length).toBe(1);
+        expect(closes[0][0]).toBe(204);
+        expect(closes[0][1]).toBe("sseCl2");
+        expect(closes[0][2]).toBeUndefined();
+    });
+
+    test("onclose is not called on transient error", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseCl3?t=1",
+            null, null, null,
+            (code: number, channel: string) => closes.push([code, channel]),
+            {}, false);
+        push().open("sseCl3");
+        lastES().simulateOpen();
+        lastES().simulateError();
+
+        expect(closes.length).toBe(0);
+    });
+
+    test("close before open does not throw", () => {
+        push().init(true, "/ctx", "sseCl4?t=1", null, null, null, null, {}, false);
+        expect(() => push().close("sseCl4")).not.toThrow();
+    });
+});
+
+// ---- SSE: open/close lifecycle ----
+
+describe("OmniFaces.Push SSE: open/close lifecycle", () => {
+
+    beforeEach(() => installMockEventSource());
+    afterEach(() => uninstallMockEventSource());
+
+    test("open does not create second EventSource if already open", () => {
+        push().init(true, "/ctx", "sseLc1?t=1", null, null, null, null, {}, false);
+        push().open("sseLc1");
+        lastES().simulateOpen();
+        push().open("sseLc1");
+        expect(getESInstances().length).toBe(1);
+    });
+
+    test("EventSource is nullified after server close", () => {
+        const closes: unknown[][] = [];
+        push().init(true, "/ctx", "sseLc2?t=1",
+            null, null, null,
+            (code: number, channel: string) => closes.push([code, channel]),
+            {}, false);
+        push().open("sseLc2");
+        lastES().simulateOpen();
+        lastES().simulateServerClose();
+
+        expect(closes.length).toBe(1);
+        expect(closes[0][0]).toBe(200);
     });
 });

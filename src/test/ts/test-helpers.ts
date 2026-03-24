@@ -173,6 +173,94 @@ export function getWSInstances(): MockWebSocketInstance[] {
     return wsInstances;
 }
 
+// ---- Mock EventSource ----
+
+export interface MockEventSourceInstance {
+    url: string;
+    readyState: number;
+    onopen: ((event: Event) => void) | null;
+    onmessage: ((event: { data: string }) => void) | null;
+    onerror: ((event: Event) => void) | null;
+    close(): void;
+    /** Test helper: simulate open event. */
+    simulateOpen(): void;
+    /** Test helper: simulate message event. */
+    simulateMessage(data: unknown): void;
+    /** Test helper: simulate error event with CONNECTING readyState (transient error, browser will retry). */
+    simulateError(): void;
+    /** Test helper: simulate error event with CLOSED readyState (server closed the connection). */
+    simulateServerClose(): void;
+}
+
+let esInstances: MockEventSourceInstance[];
+let OriginalEventSource: typeof EventSource;
+
+export function installMockEventSource(): void {
+    esInstances = [];
+    OriginalEventSource = window.EventSource;
+
+    const MockES = function MockEventSource(this: MockEventSourceInstance, url: string) {
+        this.url = url;
+        this.readyState = 0; // CONNECTING
+        this.onopen = null;
+        this.onmessage = null;
+        this.onerror = null;
+
+        this.close = function () {
+            this.readyState = 2; // CLOSED
+        };
+
+        this.simulateOpen = function () {
+            this.readyState = 1; // OPEN
+            if (this.onopen) {
+                this.onopen(new Event("open"));
+            }
+        };
+
+        this.simulateMessage = function (data: unknown) {
+            if (this.onmessage) {
+                this.onmessage({ data: JSON.stringify(data) });
+            }
+        };
+
+        this.simulateError = function () {
+            this.readyState = 0; // CONNECTING (browser will retry)
+            if (this.onerror) {
+                this.onerror(new Event("error"));
+            }
+        };
+
+        this.simulateServerClose = function () {
+            this.readyState = 2; // CLOSED
+            if (this.onerror) {
+                this.onerror(new Event("error"));
+            }
+        };
+
+        esInstances.push(this);
+    } as unknown as typeof EventSource;
+
+    Object.defineProperties(MockES, {
+        CONNECTING: { value: 0 },
+        OPEN: { value: 1 },
+        CLOSED: { value: 2 },
+    });
+
+    (window as unknown as Record<string, unknown>).EventSource = MockES;
+}
+
+export function uninstallMockEventSource(): void {
+    window.EventSource = OriginalEventSource;
+}
+
+export function lastES(): MockEventSourceInstance {
+    return esInstances[esInstances.length - 1];
+}
+
+export function getESInstances(): MockEventSourceInstance[] {
+    return esInstances;
+}
+
 // ---- Mock navigator.sendBeacon ----
 
 export interface BeaconCall {

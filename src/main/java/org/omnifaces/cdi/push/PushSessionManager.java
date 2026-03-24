@@ -123,6 +123,15 @@ abstract class PushSessionManager<S> {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns whether the given channel identifier is registered.
+     * @param channelId The channel identifier.
+     * @return <code>true</code> if the channel identifier is registered, otherwise <code>false</code>.
+     */
+    protected boolean isRegistered(String channelId) {
+        return sessions.containsKey(channelId);
+    }
+
+    /**
      * Add a session to the collection associated with the given channel identifier.
      * @param channelId The channel identifier.
      * @param session The transport session to add.

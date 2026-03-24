@@ -64,18 +64,19 @@ public class SseServlet extends HttpServlet {
         var channelId = channel + "?" + request.getQueryString();
         var sseSessions = Beans.getReference(SseSessionManager.class);
 
+        if (!sseSessions.isRegistered(channelId)) {
+            response.sendError(SC_NOT_FOUND);
+            return;
+        }
+
         response.setContentType("text/event-stream");
         response.setHeader("Cache-Control", "no-cache");
-        response.setHeader("X-Accel-Buffering", "no");
+        response.setHeader("X-Accel-Buffering", "no"); // Disables response buffering in Nginx so SSE events are flushed immediately to the client.
         response.flushBuffer();
 
         var asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
-
-        if (!sseSessions.add(channelId, channel, asyncContext)) {
-            asyncContext.complete();
-            return;
-        }
+        sseSessions.add(channelId, channel, asyncContext);
 
         asyncContext.addListener(new AsyncListener() {
 

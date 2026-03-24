@@ -51,7 +51,7 @@
                 OmniFaces.Push.close("sessionScopedUserTargeted");
             }
 
-            function clientClosed(channel) {
+            function clientClosed(code, channel) {
                 document.getElementById("clientClosedMessages").innerHTML += "|" + channel + "|";
             }
         </script>

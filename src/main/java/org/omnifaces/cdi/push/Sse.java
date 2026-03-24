@@ -79,7 +79,8 @@ import org.omnifaces.util.Json;
  * HTTP infrastructure compatibility and simplicity are important. SSE is the simpler and more robust choice for most
  * server-to-client push scenarios.
  * <p>
- * <b>When to prefer WebSocket:</b> when you need dynamic connect/disconnect via the {@code connected} attribute.
+ * <b>When to prefer WebSocket:</b> when you need dynamic connect/disconnect via the {@code connected} attribute, or when
+ * your server does not support HTTP/2.
  * <p>
  * <b>Note:</b> browsers limit concurrent HTTP/1.1 connections to 6 per origin. When the server does not support
  * HTTP/2, multiple SSE channels across multiple tabs may exhaust this limit and queue further HTTP requests (including
@@ -276,7 +277,10 @@ import org.omnifaces.util.Json;
  * <h2 id="events-client"><a href="#events-client">Events (client)</a></h2>
  * <p>
  * The optional <strong><code>onopen</code></strong> JavaScript listener function can be used to listen on open of an
- * SSE connection in client side.
+ * SSE connection in client side. It will be invoked with one argument:
+ * <ul>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * </ul>
  * <pre>
  * &lt;o:sse ... onopen="sseOpenListener" /&gt;
  * </pre>
@@ -287,27 +291,66 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * The optional <strong><code>onerror</code></strong> JavaScript listener function can be used to listen on a
- * connection error whereby the SSE connection will attempt to reconnect.
+ * connection error whereby the browser will automatically attempt to reconnect. This will be invoked when a transient
+ * connection error occurs (e.g. temporary network interruption) while the browser's <code>EventSource</code> is still
+ * attempting to reconnect. This will <em>not</em> be invoked when the server has explicitly closed the connection or
+ * when the <code>EventSource</code> API is not supported. Instead, the <code>onclose</code> will be invoked.
  * <pre>
  * &lt;o:sse ... onerror="sseErrorListener" /&gt;
  * </pre>
  * <pre>
- * function sseErrorListener(channel, event) {
- *     // ...
+ * function sseErrorListener(code, channel, event) {
+ *     if (code == 500) {
+ *         // Connection error. The browser will automatically attempt to reconnect.
+ *     }
  * }
  * </pre>
  * <p>
+ * The <code>onerror</code> JavaScript listener function will be invoked with three arguments:
+ * <ul>
+ * <li><code>code</code>: synthetic HTTP-based close code as integer. Currently this is always <code>500</code>
+ * (connection error, browser will auto-reconnect).</li>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource/error_event">
+ * <code>Event</code></a> instance from the <code>EventSource</code> API. Note that unlike WebSocket's
+ * <code>CloseEvent</code>, the SSE error event does not carry a close code or reason.</li>
+ * </ul>
+ * <p>
  * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on the final
- * close of an SSE connection. This is invoked when the server explicitly completes the connection (e.g. on session or
- * view expiry).
+ * close of an SSE connection. This will be invoked when the <code>EventSource</code> API is not supported by the
+ * client, or when the server has explicitly closed the connection (e.g. on session or view expiry), or when the client
+ * has explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>. This will <em>not</em> be
+ * invoked when the browser can make an auto-reconnect attempt. Instead, the <code>onerror</code> will be invoked.
  * <pre>
  * &lt;o:sse ... onclose="sseCloseListener" /&gt;
  * </pre>
  * <pre>
- * function sseCloseListener(channel) {
- *     // ...
+ * function sseCloseListener(code, channel, event) {
+ *     if (code == -1) {
+ *         // EventSource API not supported by client.
+ *     } else if (code == 200) {
+ *         // Server explicitly closed the connection (e.g. expired session or view).
+ *     } else if (code == 204) {
+ *         // Client explicitly closed the connection via OmniFaces.Push.close().
+ *     } else {
+ *         // Abnormal close reason (as result of an error).
+ *     }
  * }
  * </pre>
+ * <p>
+ * The <code>onclose</code> JavaScript listener function will be invoked with three arguments:
+ * <ul>
+ * <li><code>code</code>: synthetic HTTP-based close code as integer. If this is <code>-1</code>, then the
+ * <code>EventSource</code> API is simply not
+ * <a href="https://caniuse.com/eventsource">supported</a> by the client. If this is <code>200</code>, then the server
+ * explicitly closed the connection (e.g. due to an expired session or view). If this is <code>204</code>, then the
+ * client explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>.</li>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource/error_event">
+ * <code>Event</code></a> instance, if available. This is present when the server closed the connection (code
+ * <code>200</code>), but absent when the <code>EventSource</code> API is not supported (code <code>-1</code>) or the
+ * client explicitly closed the connection (code <code>204</code>).</li>
+ * </ul>
  *
  *
  * <h2 id="events-server"><a href="#events-server">Events (server)</a></h2>
@@ -592,10 +635,11 @@ import org.omnifaces.util.Json;
  * @see SseChannelManager
  * @see SseUserManager
  * @see SseSessionManager
+ * @see SseEvent
  * @see Push
  * @see PushContext
- * @see SsePushContext
  * @see PushExtension
+ * @see SsePushContext
  * @since 5.2
  */
 @FacesComponent(value = Sse.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE, tagName = "sse")

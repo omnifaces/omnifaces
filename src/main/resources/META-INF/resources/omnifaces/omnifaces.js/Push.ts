@@ -161,8 +161,25 @@ export namespace Push {
 
         /**
          * Creates an SSE connection. The browser's <code>EventSource</code> API handles reconnect natively.
-         * The <code>onclose</code> function will be called when the server explicitly closes the connection or when
-         * <code>close()</code> is called.
+         * <p>
+         * The <code>onerror</code> function will be invoked with three arguments:
+         * <ul>
+         * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>500</code> means a connection
+         * error occurred and the browser will automatically attempt to reconnect.</li>
+         * <li><code>channel</code>: the channel name.</li>
+         * <li><code>event</code>: the raw <code>Event</code> instance from the <code>EventSource</code> API.</li>
+         * </ul>
+         * <p>
+         * The <code>onclose</code> function will be invoked with three arguments:
+         * <ul>
+         * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>-1</code> means the
+         * <code>EventSource</code> API is not supported by the client. <code>200</code> means the server explicitly
+         * closed the connection (e.g. on session or view expiry). <code>204</code> means the client explicitly closed
+         * the connection via <code>OmniFaces.Push.close()</code>.</li>
+         * <li><code>channel</code>: the channel name.</li>
+         * <li><code>event</code>: the raw <code>Event</code> instance, if available. Present for server close
+         * (<code>200</code>), absent for unsupported (<code>-1</code>) and client close (<code>204</code>).</li>
+         * </ul>
          * @constructor
          * @param url The URL of the SSE endpoint.
          * @param channel The name of the push channel.
@@ -206,11 +223,11 @@ export namespace Push {
 
             this.eventSource.onerror = (event: Event) => {
                 if (this.eventSource?.readyState == EventSource.CLOSED) {
-                    this.onclose(this.channel);
                     this.eventSource = null;
+                    this.onclose(200, this.channel, event);
                 }
                 else {
-                    this.onerror(this.channel, event);
+                    this.onerror(500, this.channel, event);
                 }
             };
         }
@@ -223,7 +240,7 @@ export namespace Push {
                 const es = this.eventSource;
                 this.eventSource = null;
                 es.close();
-                this.onclose(this.channel);
+                this.onclose(204, this.channel);
             }
         }
     }
@@ -252,7 +269,7 @@ export namespace Push {
         onclose = Util.resolveFunction(onclose);
         const channel = uri.split(/\?/)[0];
 
-        if (!sse && !window.WebSocket) {
+        if (sse ? !window.EventSource : !window.WebSocket) {
             onclose(-1, channel);
             return;
         }
