@@ -15,6 +15,7 @@ package org.omnifaces.cdi.push;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
@@ -66,8 +67,8 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
         if (PropertyKeys.scope.toString().equals(name)) {
-            throw new IllegalArgumentException(
-                getTagName() + " 'scope' attribute may not contain an EL expression.");
+            throw new IllegalArgumentException(format(
+                "%s 'scope' attribute may not contain an EL expression.", getTagName()));
         }
 
         super.setValueExpression(name, binding);

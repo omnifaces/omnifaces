@@ -63,8 +63,8 @@ abstract class ChannelComponent extends ScriptFamily {
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
         if (PropertyKeys.channel.toString().equals(name)) {
-            throw new IllegalArgumentException(
-                getTagName() + " 'channel' attribute may not contain an EL expression.");
+            throw new IllegalArgumentException(format(
+                "%s 'channel' attribute may not contain an EL expression.", getTagName()));
         }
 
         if (PropertyKeys.user.toString().equals(name)) {
@@ -72,9 +72,9 @@ abstract class ChannelComponent extends ScriptFamily {
 
             if (user != null && !(user instanceof Serializable)) {
                 throw new IllegalArgumentException(format(
-                    getTagName() + " 'user' attribute '%s' does not represent a valid user identifier."
+                    "%s 'user' attribute '%s' does not represent a valid user identifier."
                         + " It must implement Serializable and preferably have low memory footprint."
-                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.", user));
+                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.", getTagName(), user));
             }
         }
 
@@ -90,8 +90,8 @@ abstract class ChannelComponent extends ScriptFamily {
     void validateChannel(FacesContext context, String channel) {
         if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
             throw new IllegalArgumentException(format(
-                getTagName() + " 'channel' attribute '%s' does not represent a valid channel name."
-                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.", channel));
+                "%s 'channel' attribute '%s' does not represent a valid channel name."
+                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.", getTagName(), channel));
         }
 
         var registeredChannels = getViewAttribute(context, ChannelComponent.class.getName(), HashMap::new);

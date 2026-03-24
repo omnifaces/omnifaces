@@ -47,12 +47,16 @@ public class PushExtension implements Extension {
      */
     public <T> void collect(@Observes ProcessInjectionPoint<T, PushContext> event) {
         for (var qualifier : event.getInjectionPoint().getQualifiers()) {
-            if (qualifier.annotationType() == Push.class) {
-                switch (((Push) qualifier).type()) {
-                    case SSE, NOTIFICATION -> sseActivated = true;
-                    case SOCKET -> socketActivated = true;
-                }
+            if (qualifier instanceof Push push) {
+                activate(push);
             }
+        }
+    }
+
+    private static void activate(Push push) {
+        switch (push.type()) {
+            case SSE, NOTIFICATION -> sseActivated = true;
+            case SOCKET -> socketActivated = true;
         }
     }
 
