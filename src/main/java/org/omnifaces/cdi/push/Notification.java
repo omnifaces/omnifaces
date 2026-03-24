@@ -51,7 +51,7 @@ import org.omnifaces.util.Json;
  * &lt;button type="button" onclick="OmniFaces.Notification.requestPermission()"&gt;Enable Notifications&lt;/button&gt;
  * </pre>
  * <p>
- * The SSE servlet must be activated by having at least one <code>&#64;</code>{@link Push}<code>(sse=true)</code>
+ * The SSE servlet must be activated by having at least one <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>
  * qualified injection point in any CDI managed bean. The channel name used in the injection must match the
  * <code>channel</code> attribute of this component.
  *
@@ -65,7 +65,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In the server side, inject the push context and send notification messages:
  * <pre>
- * &#64;Inject &#64;Push(sse=true)
+ * &#64;Inject &#64;Push(type=NOTIFICATION)
  * private PushContext notifications;
  *
  * public void sendNotification() {

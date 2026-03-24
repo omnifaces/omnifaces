@@ -16,6 +16,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 
+import static org.omnifaces.cdi.Push.Type.SSE;
+
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SseEvent;
@@ -25,7 +27,7 @@ import org.omnifaces.cdi.push.SseEvent.Opened;
 @ApplicationScoped
 public class SseITObserver {
 
-    @Inject @Push(sse=true)
+    @Inject @Push(type=SSE)
     private PushContext applicationScopedServerEvent;
 
     private volatile String closedChannels = "";

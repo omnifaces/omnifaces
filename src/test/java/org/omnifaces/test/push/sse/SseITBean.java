@@ -22,6 +22,8 @@ import java.util.concurrent.Future;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import static org.omnifaces.cdi.Push.Type.SSE;
+
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.ViewScoped;
@@ -32,13 +34,13 @@ public class SseITBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject @Push(sse=true)
+    @Inject @Push(type=SSE)
     private PushContext applicationScopedServerEvent;
 
-    @Inject @Push(sse=true)
+    @Inject @Push(type=SSE)
     private PushContext sessionScopedUserTargeted;
 
-    @Inject @Push(sse=true)
+    @Inject @Push(type=SSE)
     private PushContext viewScopedAjaxAware;
 
     @Inject

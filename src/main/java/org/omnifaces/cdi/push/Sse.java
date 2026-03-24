@@ -47,7 +47,7 @@ import org.omnifaces.util.Json;
  * <p>
  * The <code>&lt;o:sse&gt;</code> is an {@link UIComponent} which opens an one-way (server to client) SSE (Server-Sent
  * Events) based push connection in client side which can be reached from server side via {@link PushContext} interface
- * injected in any CDI/container managed artifact via <code>&#64;</code>{@link Push}<code>(sse=true)</code> annotation.
+ * injected in any CDI/container managed artifact via <code>&#64;</code>{@link Push}<code>(type=SSE)</code> annotation.
  * <p>
  * <strong>Important:</strong> All servlet filters mapped on {@code /*} must have {@code asyncSupported=true} for SSE to
  * work.
@@ -90,7 +90,7 @@ import org.omnifaces.util.Json;
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
  * No explicit configuration is needed. The SSE servlet is automatically registered during application startup when at
- * least one <code>&#64;</code>{@link Push}<code>(sse=true)</code> qualified injection point is detected.
+ * least one <code>&#64;</code>{@link Push}<code>(type=SSE)</code> qualified injection point is detected.
  *
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
@@ -134,12 +134,12 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="usage-server"><a href="#usage-server">Usage (server)</a></h2>
  * <p>
- * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}<code>(sse=true)</code></strong>
+ * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}<code>(type=SSE)</code></strong>
  * annotation on the given channel name in any CDI/container managed artifact such as <code>&#64;Named</code>,
  * <code>&#64;WebServlet</code>, etc wherever you'd like to send a push message and then invoke
  * <strong>{@link PushContext#send(Object)}</strong> with any Java object representing the push message.
  * <pre>
- * &#64;Inject &#64;Push(sse=true)
+ * &#64;Inject &#64;Push(type=SSE)
  * private PushContext someChannel;
  *
  * public void sendMessage(Object message) {
@@ -151,7 +151,7 @@ import org.omnifaces.util.Json;
  * channel name can be optionally specified via the <code>channel</code> attribute. The example below injects the push
  * context for channel name <code>foo</code> into a variable named <code>bar</code>.
  * <pre>
- * &#64;Inject &#64;Push(channel="foo", sse=true)
+ * &#64;Inject &#64;Push(type=SSE, channel="foo")
  * private PushContext bar;
  * </pre>
  * <p>
@@ -221,7 +221,7 @@ import org.omnifaces.util.Json;
  * application itself. This is useful for user-specific feedback triggered by other users (e.g. chat, admin messages,
  * etc) or by application's background tasks (e.g. notifications, event listeners, etc).
  * <pre>
- * &#64;Inject &#64;Push(sse = true)
+ * &#64;Inject &#64;Push(type=SSE)
  * private PushContext someChannel;
  *
  * public void sendMessage(Object message, User recipientUser) {
@@ -433,7 +433,7 @@ import org.omnifaces.util.Json;
  * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and
  * delegate to {@link PushContext} as below.
  * <pre>
- * &#64;Inject &#64;Push(sse = true)
+ * &#64;Inject &#64;Push(type=SSE)
  * private PushContext someChannel;
  *
  * public void onPushEvent(@Observes PushEvent event) {
@@ -463,7 +463,7 @@ import org.omnifaces.util.Json;
  * &#64;Inject
  * private SomeService someService;
  *
- * &#64;Inject &#64;Push(sse = true)
+ * &#64;Inject &#64;Push(type=SSE)
  * private PushContext someChannel;
  *
  * public void someAction() {
@@ -611,7 +611,7 @@ public class Sse extends PushComponent {
 
     private static final String ERROR_SERVLET_NOT_REGISTERED =
         "SSE servlet is not registered."
-            + " Make sure there is at least one CDI managed bean with @Push(sse=true) qualified injection point.";
+            + " Make sure there is at least one CDI managed bean with @Push(type=SSE) or @Push(type=NOTIFICATION) qualified injection point.";
 
     static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(true,'%s','%s',%s,%s);});";
 
@@ -678,7 +678,7 @@ public class Sse extends PushComponent {
 
     /**
      * Register SSE servlet if necessary, i.e. when {@link PushExtension} has detected at least one
-     * <code>&#64;</code>{@link Push}<code>(sse=true)</code> qualified injection point.
+     * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> qualified injection point.
      * @param context The involved servlet context.
      */
     public static void registerServletIfNecessary(ServletContext context) {

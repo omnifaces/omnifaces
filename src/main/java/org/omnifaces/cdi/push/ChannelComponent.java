@@ -64,7 +64,7 @@ abstract class ChannelComponent extends ScriptFamily {
     public void setValueExpression(String name, ValueExpression binding) {
         if (PropertyKeys.channel.toString().equals(name)) {
             throw new IllegalArgumentException(
-                getComponentName() + " 'channel' attribute may not contain an EL expression.");
+                getTagName() + " 'channel' attribute may not contain an EL expression.");
         }
 
         if (PropertyKeys.user.toString().equals(name)) {
@@ -72,7 +72,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
             if (user != null && !(user instanceof Serializable)) {
                 throw new IllegalArgumentException(format(
-                    getComponentName() + " 'user' attribute '%s' does not represent a valid user identifier."
+                    getTagName() + " 'user' attribute '%s' does not represent a valid user identifier."
                         + " It must implement Serializable and preferably have low memory footprint."
                         + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.", user));
             }
@@ -90,21 +90,21 @@ abstract class ChannelComponent extends ScriptFamily {
     void validateChannel(FacesContext context, String channel) {
         if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
             throw new IllegalArgumentException(format(
-                getComponentName() + " 'channel' attribute '%s' does not represent a valid channel name."
+                getTagName() + " 'channel' attribute '%s' does not represent a valid channel name."
                     + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.", channel));
         }
 
         var registeredChannels = getViewAttribute(context, ChannelComponent.class.getName(), HashMap::new);
-        var existingChannel = registeredChannels.put(channel, getComponentName());
+        var existingChannel = registeredChannels.put(channel, getTagName());
 
-        if (existingChannel != null && !existingChannel.equals(getComponentName())) {
+        if (existingChannel != null && !existingChannel.equals(getTagName())) {
             throw new IllegalArgumentException(format(
                 "%s 'channel' attribute '%s' is already used by %s on the same view."
-                    + " Channel names must be unique across o:socket, o:sse and o:notification.", getComponentName(), channel, existingChannel));
+                    + " Channel names must be unique across o:socket, o:sse and o:notification.", getTagName(), channel, existingChannel));
         }
     }
 
-    String getComponentName() {
+    String getTagName() {
         return "o:" + getClass().getSimpleName().toLowerCase();
     }
 

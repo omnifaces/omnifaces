@@ -31,12 +31,13 @@ import jakarta.enterprise.context.SessionScoped;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.cdi.push.Notification.Message;
 import org.omnifaces.util.Json;
 
 /**
  * <p>
  * This is a concrete SSE implementation of {@link PushContext} interface which is to be injected by
- * <code>&#64;</code>{@link Push}<code>(sse=true)</code>.
+ * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>.
  *
  * @author Bauke Scholtz
  * @see Push
@@ -45,81 +46,97 @@ import org.omnifaces.util.Json;
  */
 public class SsePushContext implements PushContext {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    private static final String ERROR_INVALID_NOTIFICATION_MESSAGE =
+        "The message must be a Notification.Message instance when using @Push(type=NOTIFICATION)."
+            + " Use Notification.createNotificationMessage(title, body) to create one.";
 
-	private final String channel;
-	private final Map<String, String> sessionScopedChannels;
-	private final Map<String, String> viewScopedChannels;
-	private transient SseSessionManager sseSessions;
-	private transient SseUserManager sseUsers;
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    private final String channel;
+    private final boolean notification;
+    private final Map<String, String> sessionScopedChannels;
+    private final Map<String, String> viewScopedChannels;
+    private transient SseSessionManager sseSessions;
+    private transient SseUserManager sseUsers;
 
-	/**
-	 * Creates an SSE push context whereby the mutable map of session and view scope channel identifiers is referenced,
-	 * so it's still available when another thread invokes {@link #send(Object)} during which the session and view
-	 * scope is not necessarily active anymore.
-	 */
-	SsePushContext(String channel, SseChannelManager sseChannels, SseSessionManager sseSessions, SseUserManager sseUsers) {
-		this.channel = channel;
-		boolean hasSession = isActive(SessionScoped.class);
-		sessionScopedChannels = hasSession ? sseChannels.getSessionScopedChannels() : EMPTY_SCOPE;
-		viewScopedChannels = hasSession && hasContext() ? sseChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
-		this.sseSessions = sseSessions;
-		this.sseUsers = sseUsers;
-	}
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    /**
+     * Creates an SSE push context whereby the mutable map of session and view scope channel identifiers is referenced,
+     * so it's still available when another thread invokes {@link #send(Object)} during which the session and view
+     * scope is not necessarily active anymore.
+     */
+    SsePushContext(String channel, boolean notification, SseChannelManager sseChannels, SseSessionManager sseSessions, SseUserManager sseUsers) {
+        this.channel = channel;
+        this.notification = notification;
+        boolean hasSession = isActive(SessionScoped.class);
+        sessionScopedChannels = hasSession ? sseChannels.getSessionScopedChannels() : EMPTY_SCOPE;
+        viewScopedChannels = hasSession && hasContext() ? sseChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
+        this.sseSessions = sseSessions;
+        this.sseUsers = sseUsers;
+    }
 
-	@Override
-	public Set<Future<Void>> send(Object message) {
-		return getSseSessions().send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
-	}
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
-		return send(message, singleton(user)).get(user);
-	}
+    @Override
+    public Set<Future<Void>> send(Object message) {
+        validateMessage(message);
+        return getSseSessions().send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
+    }
 
-	@Override
-	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
-		var resultsByUser = new HashMap<S, Set<Future<Void>>>(users.size(), 1);
-		var json = Json.encode(message);
+    @Override
+    public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
+        return send(message, singleton(user)).get(user);
+    }
 
-		for (S user : users) {
-			var channelIds = getSseUsers().getChannelIds(user, channel);
-			var results = new HashSet<Future<Void>>(channelIds.size(), 1);
+    @Override
+    public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
+        validateMessage(message);
+        var resultsByUser = new HashMap<S, Set<Future<Void>>>(users.size(), 1);
+        var json = Json.encode(message);
 
-			for (var channelId : channelIds) {
-				results.addAll(getSseSessions().send(channelId, json));
-			}
+        for (S user : users) {
+            var channelIds = getSseUsers().getChannelIds(user, channel);
+            var results = new HashSet<Future<Void>>(channelIds.size(), 1);
 
-			resultsByUser.put(user, results);
-		}
+            for (var channelId : channelIds) {
+                results.addAll(getSseSessions().send(channelId, json));
+            }
 
-		return resultsByUser;
-	}
+            resultsByUser.put(user, results);
+        }
 
-	// Lazy getters in case this gets serialized ----------------------------------------------------------------------
+        return resultsByUser;
+    }
 
-	private SseSessionManager getSseSessions() {
-		if (sseSessions == null) {
-			sseSessions = getReference(SseSessionManager.class);
-		}
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-		return sseSessions;
-	}
+    private void validateMessage(Object message) {
+        if (notification && !(message instanceof Message)) {
+            throw new IllegalArgumentException(ERROR_INVALID_NOTIFICATION_MESSAGE);
+        }
+    }
 
-	private SseUserManager getSseUsers() {
-		if (sseUsers == null) {
-			sseUsers = getReference(SseUserManager.class);
-		}
+    // Lazy getters in case this gets serialized ----------------------------------------------------------------------
 
-		return sseUsers;
-	}
+    private SseSessionManager getSseSessions() {
+        if (sseSessions == null) {
+            sseSessions = getReference(SseSessionManager.class);
+        }
+
+        return sseSessions;
+    }
+
+    private SseUserManager getSseUsers() {
+        if (sseUsers == null) {
+            sseUsers = getReference(SseUserManager.class);
+        }
+
+        return sseUsers;
+    }
 
 }

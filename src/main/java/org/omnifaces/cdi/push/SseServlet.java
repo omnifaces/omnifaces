@@ -28,9 +28,10 @@ import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This servlet handles SSE connections opened by <code>&lt;o:sse&gt;</code>.
- * It is automatically registered during application startup when <code>&#64;</code>{@link Push}<code>(sse=true)</code>
- * qualified injection points are detected by {@link PushExtension}.
+ * This servlet handles SSE connections opened by <code>&lt;o:sse&gt;</code> and  by <code>&lt;o:notification&gt;</code>.
+ * It is automatically registered during application startup when <code>&#64;</code>{@link Push}<code>(type=SSE)</code>
+ * or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified injection points are detected by
+ * {@link PushExtension}.
  * <p>
  * The servlet is mapped to <code>/omnifaces.sse/*</code> where the channel identifier is passed as query string in the
  * format <code>/{channel}?{uuid}</code>. Each connection is held open using {@link AsyncContext} with an indefinite
@@ -43,69 +44,69 @@ import org.omnifaces.util.Beans;
  */
 public class SseServlet extends HttpServlet {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	static final String PARAM_CHANNEL = "channel";
+    static final String PARAM_CHANNEL = "channel";
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		var channel = getChannel(request);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        var channel = getChannel(request);
 
-		if (channel == null) {
-			response.sendError(SC_NOT_FOUND);
-			return;
-		}
+        if (channel == null) {
+            response.sendError(SC_NOT_FOUND);
+            return;
+        }
 
-		var channelId = channel + "?" + request.getQueryString();
-		var sseSessions = Beans.getReference(SseSessionManager.class);
+        var channelId = channel + "?" + request.getQueryString();
+        var sseSessions = Beans.getReference(SseSessionManager.class);
 
-		response.setContentType("text/event-stream");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setHeader("X-Accel-Buffering", "no");
-		response.flushBuffer();
+        response.setContentType("text/event-stream");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("X-Accel-Buffering", "no");
+        response.flushBuffer();
 
-		var asyncContext = request.startAsync();
-		asyncContext.setTimeout(0);
+        var asyncContext = request.startAsync();
+        asyncContext.setTimeout(0);
 
-		if (!sseSessions.add(channelId, channel, asyncContext)) {
-			asyncContext.complete();
-			return;
-		}
+        if (!sseSessions.add(channelId, channel, asyncContext)) {
+            asyncContext.complete();
+            return;
+        }
 
-		asyncContext.addListener(new AsyncListener() {
+        asyncContext.addListener(new AsyncListener() {
 
-			@Override
-			public void onComplete(AsyncEvent event) {
-				sseSessions.remove(channelId, asyncContext);
-			}
+            @Override
+            public void onComplete(AsyncEvent event) {
+                sseSessions.remove(channelId, asyncContext);
+            }
 
-			@Override
-			public void onTimeout(AsyncEvent event) {
-				sseSessions.remove(channelId, asyncContext);
-				asyncContext.complete();
-			}
+            @Override
+            public void onTimeout(AsyncEvent event) {
+                sseSessions.remove(channelId, asyncContext);
+                asyncContext.complete();
+            }
 
-			@Override
-			public void onError(AsyncEvent event) {
-				sseSessions.remove(channelId, asyncContext);
-			}
+            @Override
+            public void onError(AsyncEvent event) {
+                sseSessions.remove(channelId, asyncContext);
+            }
 
-			@Override
-			public void onStartAsync(AsyncEvent event) {
-				// NOOP.
-			}
-		});
-	}
+            @Override
+            public void onStartAsync(AsyncEvent event) {
+                // NOOP.
+            }
+        });
+    }
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+    // Helpers --------------------------------------------------------------------------------------------------------
 
-	private static String getChannel(HttpServletRequest request) {
-		var pathInfo = request.getPathInfo();
-		return (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
-	}
+    private static String getChannel(HttpServletRequest request) {
+        var pathInfo = request.getPathInfo();
+        return (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
+    }
 
 }

@@ -48,11 +48,9 @@ public class PushExtension implements Extension {
     public <T> void collect(@Observes ProcessInjectionPoint<T, PushContext> event) {
         for (var qualifier : event.getInjectionPoint().getQualifiers()) {
             if (qualifier.annotationType() == Push.class) {
-                if (((Push) qualifier).sse()) {
-                    sseActivated = true;
-                }
-                else {
-                    socketActivated = true;
+                switch (((Push) qualifier).type()) {
+                    case SSE, NOTIFICATION -> sseActivated = true;
+                    case SOCKET -> socketActivated = true;
                 }
             }
         }
@@ -70,8 +68,8 @@ public class PushExtension implements Extension {
     }
 
     /**
-     * Returns whether a <code>&#64;Push(sse=true) PushContext</code> (SSE) injection point was detected during bean
-     * discovery.
+     * Returns whether a <code>&#64;Push(type=SSE)</code> or <code>&#64;Push(type=NOTIFICATION)</code>
+     * {@link PushContext} injection point was detected during bean discovery.
      * @return Whether an SSE push injection point was detected during bean discovery.
      */
     static boolean isSseActivated() {

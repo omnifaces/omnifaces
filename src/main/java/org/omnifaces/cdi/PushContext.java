@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.omnifaces.cdi.push.Notification;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.cdi.push.Sse;
 import org.omnifaces.util.Json;
@@ -32,14 +33,14 @@ import org.omnifaces.util.Json;
  * private PushContext channelName;
  * </pre>
  * <p>
- * By default this uses Web Socket as transport. To use Server-Sent Events (SSE) instead, set {@link Push#sse()} to
- * {@code true}:
+ * By default this uses Web Socket as transport. To use Server-Sent Events (SSE) instead, set {@link Push#type()} to
+ * {@link Push.Type#SSE}:
  * <pre>
- * &#64;Inject &#64;Push(sse=true)
+ * &#64;Inject &#64;Push(type=SSE)
  * private PushContext channelName;
  * </pre>
  * <p>
- * For detailed usage instructions, see {@link Socket} and {@link Sse} javadocs.
+ * For detailed usage instructions, see {@link Socket}, {@link Sse} and {@link Notification} javadocs.
  *
  * @author Bauke Scholtz
  * @see Push

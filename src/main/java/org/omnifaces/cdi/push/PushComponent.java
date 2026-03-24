@@ -67,7 +67,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
     public void setValueExpression(String name, ValueExpression binding) {
         if (PropertyKeys.scope.toString().equals(name)) {
             throw new IllegalArgumentException(
-                getComponentName() + " 'scope' attribute may not contain an EL expression.");
+                getTagName() + " 'scope' attribute may not contain an EL expression.");
         }
 
         super.setValueExpression(name, binding);

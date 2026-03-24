@@ -71,12 +71,11 @@ class PushContextProducer {
         Push push = getQualifier(injectionPoint, Push.class);
         String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
 
-        if (push.sse()) {
-            return new SsePushContext(channel, sseChannels, sseSessions, sseUsers);
-        }
-        else {
-            return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
-        }
+        return switch (push.type()) {
+            case SSE -> new SsePushContext(channel, false, sseChannels, sseSessions, sseUsers);
+            case NOTIFICATION -> new SsePushContext(channel, true, sseChannels, sseSessions, sseUsers);
+            case SOCKET -> new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+        };
     }
 
 }

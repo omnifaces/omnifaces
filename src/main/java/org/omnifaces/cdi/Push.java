@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
 
+import org.omnifaces.cdi.push.Notification;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.cdi.push.Sse;
 
@@ -35,18 +36,39 @@ import org.omnifaces.cdi.push.Sse;
  * private PushContext channelName;
  * </pre>
  * <p>
- * For detailed usage instructions, see {@link Socket} and {@link Sse} javadocs.
+ * For detailed usage instructions, see {@link Socket}, {@link Sse} and {@link Notification} javadocs.
  *
  * @author Bauke Scholtz
  * @see PushContext
  * @see Socket
  * @see Sse
+ * @see Notification
  * @since 2.3
  */
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER })
 public @interface Push {
+
+    /**
+     * Represents the transport type for push messages.
+     *
+     * @since 5.2
+     */
+    enum Type {
+
+        /** Web Socket transport via <code>&lt;o:socket&gt;</code>. This is the default. */
+        SOCKET,
+
+        /** Server-Sent Events transport via <code>&lt;o:sse&gt;</code>. */
+        SSE,
+
+        /**
+         * Notification transport via <code>&lt;o:notification&gt;</code>. Uses SSE internally and validates that
+         * messages sent through this push context are {@link Notification.Message} instances.
+         */
+        NOTIFICATION
+    }
 
     /**
      * (Optional) The name of the push channel. If not specified the name of the injection target field will be used.
@@ -56,10 +78,10 @@ public @interface Push {
     @Nonbinding String channel() default "";
 
     /**
-     * (Optional) Whether to use SSE instead of Web Socket. Defaults to {@code false}.
+     * (Optional) The transport type to use. Defaults to {@link Type#SOCKET}.
      *
-     * @return Whether to use SSE instead of Web Socket.
+     * @return The transport type to use.
      * @since 5.2
      */
-    @Nonbinding boolean sse() default false;
+    @Nonbinding Type type() default Type.SOCKET;
 }
