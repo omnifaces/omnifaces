@@ -69,8 +69,8 @@ public class OmniApplicationFactory extends ApplicationFactory {
     private synchronized Application createOmniApplication(Application application) {
         Application newApplication = application;
 
-        while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {
-            newApplication = ((ApplicationWrapper) newApplication).getWrapped();
+        while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper wrapper) {
+            newApplication = wrapper.getWrapped();
         }
 
         if (!(newApplication instanceof OmniApplication)) {

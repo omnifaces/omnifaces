@@ -12,11 +12,11 @@
  */
 package org.omnifaces.test.push.sse;
 
+import static org.omnifaces.cdi.Push.Type.SSE;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-
-import static org.omnifaces.cdi.Push.Type.SSE;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;

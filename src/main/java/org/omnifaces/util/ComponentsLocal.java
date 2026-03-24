@@ -783,9 +783,9 @@ public final class ComponentsLocal {
             if (holder instanceof UIComponent parent) {
                 component = parent;
             }
-            else if (holder instanceof ParamHolder) {
+            else if (holder instanceof ParamHolder<?> paramHolder) {
                 var parameter = new UIParameter();
-                parameter.setName(((ParamHolder<T>) holder).getName());
+                parameter.setName(paramHolder.getName());
                 parameter.setValue(value);
                 component = parameter;
             }

@@ -389,7 +389,7 @@ public final class Servlets {
                     continue;
                 }
 
-                if (queryString.length() > 0) {
+                if (queryString.isEmpty()) {
                     queryString.append("&");
                 }
 
@@ -418,7 +418,7 @@ public final class Servlets {
             var value = param.getValue();
 
             if (value != null) {
-                if (queryString.length() > 0) {
+                if (queryString.isEmpty()) {
                     queryString.append("&");
                 }
 

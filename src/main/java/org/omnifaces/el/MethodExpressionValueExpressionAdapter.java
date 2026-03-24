@@ -100,8 +100,8 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
             return true;
         }
 
-        if (obj instanceof MethodExpressionValueExpressionAdapter) {
-            return ((MethodExpressionValueExpressionAdapter)obj).getValueExpression().equals(valueExpression);
+        if (obj instanceof MethodExpressionValueExpressionAdapter adapter) {
+            return adapter.getValueExpression().equals(valueExpression);
         }
 
         return false;

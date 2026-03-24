@@ -152,11 +152,11 @@ public class SkipValidators extends TagHandler {
         public void processEvent(SystemEvent event) {
             var source = (UIComponent) event.getSource();
 
-            if (source instanceof UIInput) {
-                processEventForUIInput(event, (UIInput) source);
+            if (source instanceof UIInput input) {
+                processEventForUIInput(event, input);
             }
-            else if (source instanceof ValidateMultipleFields) {
-                processEventForValidateMultipleFields(event, (ValidateMultipleFields) source);
+            else if (source instanceof ValidateMultipleFields validator) {
+                processEventForValidateMultipleFields(event, validator);
             }
         }
 
@@ -189,8 +189,8 @@ public class SkipValidators extends TagHandler {
 
                 var requiredValue = attributes.remove(clientId);
 
-                if (requiredValue instanceof ValueExpression) {
-                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, (ValueExpression) requiredValue);
+                if (requiredValue instanceof ValueExpression expression) {
+                    input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, expression);
                 }
                 else {
                     input.setRequired(TRUE.equals(requiredValue));
@@ -209,8 +209,8 @@ public class SkipValidators extends TagHandler {
             else if (event instanceof PostValidateEvent) {
                 var disabledValue = attributes.remove(clientId);
 
-                if (disabledValue instanceof ValueExpression) {
-                    validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, (ValueExpression) disabledValue);
+                if (disabledValue instanceof ValueExpression expression) {
+                    validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, expression);
                 }
                 else {
                     validator.setDisabled(TRUE.equals(disabledValue));

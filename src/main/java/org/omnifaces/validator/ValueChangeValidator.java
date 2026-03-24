@@ -64,9 +64,9 @@ public abstract class ValueChangeValidator<T> implements Validator<T> {
     @Override
     @SuppressWarnings("unchecked")
     public void validate(FacesContext context, UIComponent component, T submittedValue) {
-        if (component instanceof EditableValueHolder) {
+        if (component instanceof EditableValueHolder holder) {
             T newValue = submittedValue;
-            T oldValue = (T) ((EditableValueHolder) component).getValue();
+            T oldValue = (T) holder.getValue();
 
             if (Objects.equals(newValue, oldValue)) {
                 return;

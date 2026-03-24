@@ -740,8 +740,8 @@ public final class Components {
      * @param label The label to be set on the given UI component.
      */
     public static void setLabel(UIComponent component, Object label) {
-        if (label instanceof ValueExpression) {
-            component.setValueExpression(LABEL_ATTRIBUTE, (ValueExpression) label);
+        if (label instanceof ValueExpression expression) {
+            component.setValueExpression(LABEL_ATTRIBUTE, expression);
         }
         else if (label != null) {
             component.getAttributes().put(LABEL_ATTRIBUTE, label);

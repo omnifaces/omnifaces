@@ -58,10 +58,8 @@ public class ComponentExtraHandler extends ComponentHandler {
     public void setAttributes(FaceletContext ctx, Object component) {
         super.setAttributes(ctx, component);
 
-        if (component instanceof FaceletContextConsumer) {
-            FaceletContextConsumer faceletContextConsumer = (FaceletContextConsumer) component;
-
-            faceletContextConsumer.setFaceletContext(ctx);
+        if (component instanceof FaceletContextConsumer consumer) {
+            consumer.setFaceletContext(ctx);
         }
 
     }

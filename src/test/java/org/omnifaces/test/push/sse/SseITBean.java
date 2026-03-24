@@ -13,6 +13,7 @@
 package org.omnifaces.test.push.sse;
 
 import static java.lang.System.nanoTime;
+import static org.omnifaces.cdi.Push.Type.SSE;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import java.io.Serializable;
@@ -21,8 +22,6 @@ import java.util.concurrent.Future;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
-import static org.omnifaces.cdi.Push.Type.SSE;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;

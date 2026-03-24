@@ -116,8 +116,8 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
             return REJECT;
         }
 
-        if (target instanceof EditableValueHolder) {
-            ((EditableValueHolder) target).resetValue();
+        if (target instanceof EditableValueHolder holder) {
+            holder.resetValue();
         }
         else if (!ALL_IDS.equals(context.getIdsToVisit())) {
             // Render ID didn't specifically point an EditableValueHolder. Visit all children as well.

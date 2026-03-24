@@ -172,13 +172,12 @@ public final class FacesLocal {
     /**
      * @see Faces#getPackage()
      */
-    @SuppressWarnings("unchecked")
     public static Package getPackage(FacesContext context) {
         if (context != null) {
             var unwrappedContext = context;
 
-            while (unwrappedContext instanceof FacesWrapper) {
-                unwrappedContext = ((FacesWrapper<FacesContext>) unwrappedContext).getWrapped();
+            while (unwrappedContext instanceof FacesWrapper wrapper) {
+                unwrappedContext = (FacesContext) wrapper.getWrapped();
             }
 
             return unwrappedContext.getClass().getPackage();

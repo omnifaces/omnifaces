@@ -255,12 +255,12 @@ public class SitemapUrl extends OutputFamily {
         var lastModified = getLastModified();
 
         if (lastModified != null) {
-            if (lastModified instanceof LocalDateTime) {
-                lastModified = ((LocalDateTime) lastModified).atZone(ZoneId.systemDefault()); // Time zone is required by spec.
+            if (lastModified instanceof LocalDateTime localDateTime) {
+                lastModified = localDateTime.atZone(ZoneId.systemDefault()); // Time zone is required by spec.
             }
 
-            if (lastModified instanceof ZonedDateTime) {
-                lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Time zone names are not supported by spec.
+            if (lastModified instanceof ZonedDateTime zonedDateTime) {
+                lastModified = zonedDateTime.toOffsetDateTime(); // Time zone names are not supported by spec.
             }
 
             var writer = context.getResponseWriter();

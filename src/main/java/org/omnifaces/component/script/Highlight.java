@@ -129,7 +129,7 @@ public class Highlight extends OnloadScript {
         var clientIds = new StringBuilder();
         form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
             if (component instanceof UIInput input && !input.isValid()) {
-                if (clientIds.length() > 0) {
+                if (clientIds.isEmpty()) {
                     clientIds.append(',');
                 }
 
@@ -140,7 +140,7 @@ public class Highlight extends OnloadScript {
             return VisitResult.ACCEPT;
         });
 
-        if (clientIds.length() > 0) {
+        if (clientIds.isEmpty()) {
             context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
         }
     }

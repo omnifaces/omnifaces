@@ -164,8 +164,8 @@ public final class BeansLocal {
             return object;
         }
 
-        if (object instanceof Class) {
-            return (T) ((Class<?>) object).getSuperclass();
+        if (object instanceof Class<?> clazz) {
+            return (T) clazz.getSuperclass();
         }
         else {
             return (T) getInstance(beanManager, object.getClass().getSuperclass());
@@ -221,8 +221,8 @@ public final class BeansLocal {
     public static <T> void destroy(BeanManager beanManager, Bean<T> bean) {
         var context = beanManager.getContext(bean.getScope());
 
-        if (context instanceof AlterableContext) {
-            ((AlterableContext) context).destroy(bean);
+        if (context instanceof AlterableContext alterableContext) {
+            alterableContext.destroy(bean);
         }
         else {
             var instance = context.get(bean);

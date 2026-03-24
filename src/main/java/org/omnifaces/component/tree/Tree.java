@@ -421,8 +421,8 @@ public class Tree extends TreeFamily implements NamingContainer {
             if (value == null) {
                 currentModel = new ListTreeModel();
             }
-            else if (value instanceof TreeModel) {
-                currentModel = (TreeModel) value;
+            else if (value instanceof TreeModel treeModel) {
+                currentModel = treeModel;
             }
             else {
                 throw new IllegalArgumentException(format(ERROR_INVALID_MODEL, value.getClass().getName()));

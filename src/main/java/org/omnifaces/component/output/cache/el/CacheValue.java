@@ -59,8 +59,8 @@ public class CacheValue extends TagHandler {
     public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
 
         Cache cacheComponent;
-        if (parent instanceof Cache) {
-            cacheComponent = (Cache) parent;
+        if (parent instanceof Cache cache) {
+            cacheComponent = cache;
         } else {
             throw new IllegalStateException("CacheValue components needs to have a Cache component as direct parent.");
         }

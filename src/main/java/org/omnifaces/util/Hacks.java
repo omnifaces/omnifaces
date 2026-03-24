@@ -379,10 +379,9 @@ public final class Hacks {
      * @return The wrapped variable mapper of the given variable mapper.
      * @since 3.14.4
      */
-    @SuppressWarnings("unchecked")
     public static VariableMapper findWrappedVariableMapper(VariableMapper mapper) {
-        if (mapper instanceof FacesWrapper) { // MyFaces
-            return ((FacesWrapper<VariableMapper>) mapper).getWrapped();
+        if (mapper instanceof FacesWrapper wrapper) { // MyFaces
+            return ((VariableMapper) wrapper.getWrapped());
         }
         else { // Mojarra
             return accessField(mapper, VariableMapper.class);

@@ -98,8 +98,8 @@ public final class ExpressionInspector {
         var base = unwrapIfNecessary(inspectorElContext.getBase());
         var property = inspectorElContext.getProperty();
 
-        if (base instanceof CompositeComponentExpressionHolder) {
-            return getValueReference(context, ((CompositeComponentExpressionHolder) base).getExpression(property.toString()));
+        if (base instanceof CompositeComponentExpressionHolder holder) {
+            return getValueReference(context, holder.getExpression(property.toString()));
         }
 
         return new ValueReference(base, property);
@@ -186,8 +186,8 @@ public final class ExpressionInspector {
 
         MethodExpressionValueExpressionAdapter adapter = null;
 
-        if (methodExpression instanceof MethodExpressionValueExpressionAdapter) {
-            adapter = (MethodExpressionValueExpressionAdapter) methodExpression;
+        if (methodExpression instanceof MethodExpressionValueExpressionAdapter existing) {
+            adapter = existing;
         }
         else {
             adapter = new MethodExpressionValueExpressionAdapter(createValueExpression(methodExpression.getExpressionString(), Object.class));
@@ -347,10 +347,10 @@ public final class ExpressionInspector {
         @Override
         public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
 
-            if (base instanceof FinalBaseHolder) {
+            if (base instanceof FinalBaseHolder finalBase) {
                 // If we get called with a FinalBaseHolder, which was set in the next to last node,
                 // we know we're done and can set the base, method and params as the final ones.
-                lastBase = ((FinalBaseHolder) base).getBase();
+                lastBase = finalBase.getBase();
                 lastProperty = method;
                 lastParams = params;
 

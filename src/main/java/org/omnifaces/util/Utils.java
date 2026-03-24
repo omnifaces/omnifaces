@@ -587,11 +587,11 @@ public final class Utils {
      * @since 1.5
      */
     public static <E> List<E> iterableToList(Iterable<E> iterable) {
-        if (iterable instanceof List) {
-            return (List<E>) iterable;
+        if (iterable instanceof List<E> list) {
+            return list;
         }
-        else if (iterable instanceof Collection) {
-            return new ArrayList<>((Collection<E>) iterable);
+        else if (iterable instanceof Collection<E> collection) {
+            return new ArrayList<>(collection);
         }
         else {
             var list = new ArrayList<E>();
@@ -712,26 +712,26 @@ public final class Utils {
         if (object == null) {
             return Stream.empty();
         }
-        if (object instanceof Collection) {
-            return ((Collection<T>) object).stream();
+        if (object instanceof Collection<?> collection) {
+            return (Stream<T>) collection.stream();
         }
-        if (object instanceof Iterable) {
-            return StreamSupport.stream(((Iterable<T>) object).spliterator(), false);
+        else if (object instanceof Iterable<?> iterable) {
+            return (Stream<T>) StreamSupport.stream(iterable.spliterator(), false);
         }
-        else if (object instanceof Map) {
-            return (Stream<T>) ((Map<?, ?>) object).entrySet().stream();
+        else if (object instanceof Map<?, ?> map) {
+            return (Stream<T>) map.entrySet().stream();
         }
-        else if (object instanceof int[]) {
-            return (Stream<T>) Arrays.stream((int[]) object).boxed();
+        else if (object instanceof int[] ints) {
+            return (Stream<T>) Arrays.stream(ints).boxed();
         }
-        else if (object instanceof long[]) {
-            return (Stream<T>) Arrays.stream((long[]) object).boxed();
+        else if (object instanceof long[] longs) {
+            return (Stream<T>) Arrays.stream(longs).boxed();
         }
-        else if (object instanceof double[]) {
-            return (Stream<T>) Arrays.stream((double[]) object).boxed();
+        else if (object instanceof double[] doubles) {
+            return (Stream<T>) Arrays.stream(doubles).boxed();
         }
-        else if (object instanceof Object[]) {
-            return (Stream<T>) Arrays.stream((Object[]) object);
+        else if (object instanceof Object[] array) {
+            return (Stream<T>) Arrays.stream(array);
         }
         else if (object instanceof Stream) {
             return (Stream<T>) object;
@@ -1076,8 +1076,8 @@ public final class Utils {
         if (locale == null) {
             return null;
         }
-        else if (locale instanceof Locale) {
-            return (Locale) locale;
+        else if (locale instanceof Locale parsed) {
+            return parsed;
         }
         else {
             var localeString = locale.toString();

@@ -77,9 +77,9 @@ public final class SelectItemsCollector {
     private static SelectItem getFromUISelectItem(UISelectItem uiSelectItem) {
         Object value = uiSelectItem.getValue();
 
-        if (value instanceof SelectItem) {
+        if (value instanceof SelectItem selectItem) {
             // A single SelectItem can be added directly without any further processing.
-            return (SelectItem)value;
+            return selectItem;
         }
         else if (value == null) {
             // No value binding specified, create a select item out of the properties of the UI component.
@@ -94,21 +94,21 @@ public final class SelectItemsCollector {
     private static Collection<SelectItem> collectFromUISelectItems(FacesContext context, UISelectItems uiSelectItems) {
         Object value = uiSelectItems.getValue();
 
-        if (value instanceof SelectItem) {
+        if (value instanceof SelectItem selectItem) {
             // A single SelectItem can be added directly without any further processing.
-            return Collections.singleton((SelectItem) value);
+            return Collections.singleton(selectItem);
         }
         else if (value instanceof Object[]) {
             // An array of objects is supposed to be transformed by the SelectItems iteration construct.
             return collectFromUISelectItemsIterator(context, uiSelectItems, Arrays.asList((Object[]) value));
         }
-        else if (value instanceof Iterable) {
+        else if (value instanceof Iterable<?> iterable) {
             // An iterable (Collection, List, etc) is also supposed to be transformed by the SelectItems iteration construct.
-            return collectFromUISelectItemsIterator(context, uiSelectItems, (Iterable<?>) value);
+            return collectFromUISelectItemsIterator(context, uiSelectItems, iterable);
         }
-        else if (value instanceof Map) {
+        else if (value instanceof Map<?, ?> map) {
             // A map has its own algorithm for how it should be turned into a list of SelectItems.
-            return SelectItemsBuilder.fromMap((Map<?, ?>)value);
+            return SelectItemsBuilder.fromMap(map);
         }
         else {
             // A value binding was specified, but of a type we don't support.
@@ -144,8 +144,8 @@ public final class SelectItemsCollector {
             // if there's a "var", "itemLabel" or "itemValue" present, or should we process the entire collection
             // as SelectItems if the first element is a SelectItem and throw an exception as soon as we encounter
             // a non-SelectItem?
-            if (item instanceof SelectItem) {
-                selectItems.add((SelectItem)item);
+            if (item instanceof SelectItem selectItem) {
+                selectItems.add(selectItem);
                 continue;
             }
 

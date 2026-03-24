@@ -155,7 +155,7 @@ public final class Reflection {
                 Comparable thisNode = this.nodes.get(index);
                 Comparable otherNode = other.nodes.get(index);
 
-                if (!(thisNode.getClass().isInstance(otherNode) && otherNode.getClass().isInstance(thisNode))) {
+                if ((!thisNode.getClass().isInstance(otherNode) || !otherNode.getClass().isInstance(thisNode))) {
                     thisNode = thisNode.toString();
                     otherNode = otherNode.toString();
                 }
@@ -189,7 +189,7 @@ public final class Reflection {
 
             for (Comparable<?> node : nodes) {
                 if (node instanceof String) {
-                    if (stringBuilder.length() > 0) {
+                    if (stringBuilder.isEmpty()) {
                         stringBuilder.append('.');
                     }
 
@@ -325,11 +325,11 @@ public final class Reflection {
         for (var index = 0; index < path.nodes.size() - 1; index++) {
             Comparable<?> node = path.nodes.get(index);
 
-            if (base instanceof List) {
-                base = ((List<?>) base).get((Integer) node);
+            if (base instanceof List<?> list) {
+                base = list.get((Integer) node);
             }
-            else if (base instanceof Map) {
-                base = ((Map<?, ?>) base).get(node);
+            else if (base instanceof Map<?, ?> map) {
+                base = map.get(node);
             }
             else if (base.getClass().isArray()) {
                 base = Array.get(base, (Integer) node);
@@ -342,17 +342,17 @@ public final class Reflection {
         return base;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings("unchecked")
     private static void setProperty(Object base, Comparable<?> property, Object value, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {
         if (base == null) {
             return;
         }
 
-        if (base instanceof List) {
-            ((List) base).set((Integer) property, value);
+        if (base instanceof List list) {
+            list.set((Integer) property, value);
         }
-        else if (base instanceof Map) {
-            ((Map) base).put(property, value);
+        else if (base instanceof Map map) {
+            map.put(property, value);
         }
         else if (base.getClass().isArray()) {
             Array.set(base, (Integer) property, value);
@@ -410,7 +410,7 @@ public final class Reflection {
         if (List.class.isAssignableFrom(type)) {
             value = new ArrayList<>();
             Class<?> elementType = (Class<?>) ((ParameterizedType) propertyDescriptor.getReadMethod().getGenericReturnType()).getActualTypeArguments()[0];
-            Integer size = ((Integer) nextPropertyNode) + 1;
+            int size = ((Integer) nextPropertyNode) + 1;
 
             for (var index = 0; index < size; index++) {
                 ((List) value).add(createDefaultValueIfNecessary(elementType));
@@ -499,13 +499,12 @@ public final class Reflection {
 
     private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
         if (base == null) {
-            return;
         }
-        else if (base instanceof List) {
-            collectBasePropertyPathsFromList((List<?>) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
+        else if (base instanceof List<?> list) {
+            collectBasePropertyPathsFromList(list, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
         }
-        else if (base instanceof Map) {
-            collectBasePropertyPathsFromMap((Map<?, ?>) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
+        else if (base instanceof Map<?, ?> map) {
+            collectBasePropertyPathsFromMap(map, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
         }
         else if (base.getClass().isArray()) {
             collectBasePropertyPathsFromArray((Object[]) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
@@ -555,16 +554,9 @@ public final class Reflection {
     }
 
     private static boolean isNeedsFurtherRecursion(Class<?> type) {
-        if (type.isPrimitive()) {
+        if (type.isPrimitive() || isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class) || (Iterable.class.isAssignableFrom(type) && !isOneInstanceOf(type, List.class, Map.class))) {
             return false; // These don't have properties anyway.
-        }
-        else if (isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class)) {
-            return false; // Don't recurse common property types which are guaranteed not beans.
-        }
-        else if (Iterable.class.isAssignableFrom(type) && !isOneInstanceOf(type, List.class, Map.class)) {
-            return false; // We only support iterating List and Map for now.
-        }
-        else {
+        } else {
             return true;
         }
     }

@@ -153,11 +153,11 @@ public class GraphicResource extends DynamicResource {
         super(name, GraphicResourceHandler.LIBRARY_NAME, getContentType(name));
         this.params = coalesce(params, EMPTY_PARAMS);
 
-        if (lastModified instanceof Long) {
-            setLastModified((Long) lastModified);
+        if (lastModified instanceof Long timestamp) {
+            setLastModified(timestamp);
         }
-        else if (lastModified instanceof Date) {
-            setLastModified(((Date) lastModified).getTime());
+        else if (lastModified instanceof Date date) {
+            setLastModified(date.getTime());
         }
         else if (isNumber(String.valueOf(lastModified))) {
             setLastModified(Long.parseLong(lastModified.toString()));
@@ -248,11 +248,11 @@ public class GraphicResource extends DynamicResource {
             throw new FacesException(e);
         }
 
-        if (content instanceof InputStream) {
-            return (InputStream) content;
+        if (content instanceof InputStream inputStream) {
+            return inputStream;
         }
-        else if (content instanceof byte[]) {
-            return new ByteArrayInputStream((byte[]) content);
+        else if (content instanceof byte[] bytes) {
+            return new ByteArrayInputStream(bytes);
         }
         else {
             return null;

@@ -55,8 +55,8 @@ public final class SelectItemsUtils {
         while (items.hasNext()) {
             SelectItem item = items.next();
 
-            if (item instanceof SelectItemGroup) {
-                SelectItem[] groupItems = ((SelectItemGroup) item).getSelectItems();
+            if (item instanceof SelectItemGroup group) {
+                SelectItem[] groupItems = group.getSelectItems();
                 Object object = findValueByStringConversion(context, component, groupItems, value, converter);
 
                 if (object != null) {
@@ -99,8 +99,8 @@ public final class SelectItemsUtils {
     private static void collect(Iterator<SelectItem> items, List<Object> values) {
         while (items.hasNext()) {
             SelectItem item = items.next();
-            if (item instanceof SelectItemGroup) {
-                SelectItem[] subitems = ((SelectItemGroup) item).getSelectItems();
+            if (item instanceof SelectItemGroup group) {
+                SelectItem[] subitems = group.getSelectItems();
                 if (!isEmpty(subitems)) {
                     collect(new ArrayIterator(subitems), values);
                 }

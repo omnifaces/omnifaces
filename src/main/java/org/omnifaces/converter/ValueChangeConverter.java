@@ -68,9 +68,9 @@ public abstract class ValueChangeConverter<T> implements Converter<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-        if (component instanceof EditableValueHolder) {
+        if (component instanceof EditableValueHolder holder) {
             String newStringValue = submittedValue;
-            T oldObjectValue = (T) ((EditableValueHolder) component).getValue();
+            T oldObjectValue = (T) holder.getValue();
             String oldStringValue = getAsString(context, component, oldObjectValue);
 
             if (Objects.equals(newStringValue, oldStringValue)) {
