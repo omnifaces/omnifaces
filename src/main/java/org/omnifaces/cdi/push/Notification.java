@@ -71,18 +71,18 @@ import org.omnifaces.util.Json;
  * private PushContext notifications;
  *
  * public void sendNotification() {
- *     notifications.send(Notification.createNotificationMessage("Order shipped", "Your order #1234 has been shipped."));
+ *     notifications.send(Notification.createNotificationMessage("System maintenance", "The system will undergo maintenance at 22:00 UTC."));
  * }
  * </pre>
  * <p>
  * You can also add a URL so that clicking the notification will navigate to it:
  * <pre>
- * notifications.send(Notification.createNotificationMessage("Order shipped", "Your order has been shipped.", "https://example.com/orders/1234"));
+ * notifications.send(Notification.createNotificationMessage("System maintenance", "The system will undergo maintenance at 22:00 UTC.", "https://example.com/maintenance"));
  * </pre>
  * <p>
  * Relative URLs are also accepted:
  * <pre>
- * notifications.send(Notification.createNotificationMessage("Order shipped", "Your order has been shipped.", "/orders/1234"));
+ * notifications.send(Notification.createNotificationMessage("System maintenance", "The system will undergo maintenance at 22:00 UTC.", "/maintenance"));
  * </pre>
  *
  * <h2 id="user-targeted"><a href="#user-targeted">User-targeted Notifications</a></h2>
@@ -95,7 +95,7 @@ import org.omnifaces.util.Json;
  * <p>
  * The notification can then be sent to a specific user:
  * <pre>
- * notifications.send(Notification.createNotificationMessage("New message", "You have a new message."), recipientUserId);
+ * notifications.send(Notification.createNotificationMessage("Order shipped", "Your order #1234 has been shipped.", "/orders/1234"), recipientUserId);
  * </pre>
  *
  * <h2 id="display-behavior"><a href="#display-behavior">Display behavior</a></h2>
