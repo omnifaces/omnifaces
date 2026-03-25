@@ -21,8 +21,8 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * CDI extension that detects <code>&#64;Inject &#64;Push PushContext</code> injection points during bean discovery.
- * This enables automatic registration of the {@link SocketEndpoint} and/or {@link SseServlet} without requiring
+ * This CDI extension detects <code>&#64;Inject &#64;Push PushContext</code> injection points during bean discovery.
+ * This enables automatic registration of the {@link SocketEndpoint} and/or {@link SseEndpoint} without requiring
  * explicit configuration.
  *
  * @author Bauke Scholtz

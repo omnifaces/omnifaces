@@ -29,7 +29,7 @@ import jakarta.websocket.CloseReason.CloseCodes;
 
 /**
  * <p>
- * This web socket event will be fired by {@link SocketSessionManager} when a socket has been
+ * This web socket event will be fired by {@link SocketSessionManager} when a web socket has been
  * <code>&#64;</code>{@link Opened}, <code>&#64;</code>{@link Switched} or <code>&#64;</code>{@link Closed}.
  * An application scoped CDI bean can <code>&#64;</code>{@link Observes} them.
  * <p>
@@ -83,7 +83,7 @@ public final class SocketEvent extends PushEvent {
 
     /**
      * <p>
-     * Indicates that a socket has opened.
+     * Indicates that a web socket has opened.
      * <p>
      * For detailed usage instructions, see {@link Socket} javadoc.
      *
@@ -108,7 +108,7 @@ public final class SocketEvent extends PushEvent {
 
     /**
      * <p>
-     * Indicates that a socket user was switched.
+     * Indicates that a web socket user was switched.
      * <p>
      * For detailed usage instructions, see {@link Socket} javadoc.
      *
@@ -132,7 +132,7 @@ public final class SocketEvent extends PushEvent {
 
     /**
      * <p>
-     * Indicates that a socket has closed.
+     * Indicates that a web socket has closed.
      * <p>
      * For detailed usage instructions, see {@link Socket} javadoc.
      *

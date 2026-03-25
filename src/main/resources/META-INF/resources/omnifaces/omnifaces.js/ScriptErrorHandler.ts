@@ -46,11 +46,11 @@ export namespace ScriptErrorHandler {
             send({
                 pageURL: window.location.href,
                 errorMessage: String(message),
+                errorName: error?.name ?? null,
+                errorStack: error?.stack ?? null,
                 sourceURL: source ?? null,
                 lineNumber: line != null ? String(line) : null,
-                columnNumber: column != null ? String(column) : null,
-                errorName: error?.name ?? null,
-                errorStack: error?.stack ?? null
+                columnNumber: column != null ? String(column) : null
             });
 
             return false; // Allow the browser's default error handler to continue, e.g. logging to console.

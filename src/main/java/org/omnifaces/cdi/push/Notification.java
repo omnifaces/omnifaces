@@ -12,11 +12,13 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Objects.requireNonNull;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedHashMap;
 
 import jakarta.faces.application.ResourceDependency;
@@ -36,25 +38,25 @@ import org.omnifaces.util.Json;
  * <a href="https://notifications.spec.whatwg.org/">Web Notifications API</a> with SSE (Server-Sent Events) based push.
  * It opens a one-way (server to client) SSE connection and shows incoming push messages as browser notifications.
  *
- * <h2>Prerequisites</h2>
+ * <h2 id="prerequisites"><a href="#prerequisites">Prerequisites</a></h2>
  * <p>
- * This component requires the {@link PWAResourceHandler} to be activated by referencing the web app manifest resource
- * in the <code>&lt;h:head&gt;</code> of the view as follows because it provides the service worker mandatory for
- * cross-platform notification support via {@code ServiceWorkerRegistration.showNotification()}:
+ * This component requires the {@link PWAResourceHandler} to be activated by adding the following line to the
+ * <code>&lt;h:head&gt;</code> because it provides the service worker mandatory for cross-platform notification support
+ * via {@code ServiceWorkerRegistration.showNotification()}:
  * <pre>
  * &lt;link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" /&gt;
  * </pre>
  * <p>
- * Browser notification permission must be requested via a user gesture before any notification can be shown:
+ * The browser notification permission must be requested via a user gesture before any notification can be shown:
  * <pre>
  * &lt;button type="button" onclick="OmniFaces.Notification.requestPermission()"&gt;Enable Notifications&lt;/button&gt;
  * </pre>
  * <p>
- * The SSE servlet must be activated by having at least one <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>
- * qualified injection point in any CDI managed bean. The channel name used in the injection must match the
- * <code>channel</code> attribute of this component.
+ * The CDI backing bean must have at least one <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified
+ * injection point using the channel name matching the <code>channel</code> attribute of this component, so that the
+ * {@link SseEndpoint} will be auto-activated.
  *
- * <h2>Basic Usage</h2>
+ * <h2 id="basic-usage"><a href="#basic-usage">Basic Usage</a></h2>
  * <p>
  * Declare the <code>&lt;o:notification&gt;</code> tag in the Faces view with a <strong><code>channel</code></strong>
  * name.
@@ -62,7 +64,8 @@ import org.omnifaces.util.Json;
  * &lt;o:notification channel="notifications" /&gt;
  * </pre>
  * <p>
- * In the server side, inject the push context and send notification messages:
+ * In the server side, inject the push context and send notification messages created via
+ * {@link Notification#createNotificationMessage(String, String)}.
  * <pre>
  * &#64;Inject &#64;Push(type=NOTIFICATION)
  * private PushContext notifications;
@@ -72,12 +75,17 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * With a URL action (clicking the notification opens the URL):
+ * You can also add a URL so that clicking the notification will navigate to it:
  * <pre>
  * notifications.send(Notification.createNotificationMessage("Order shipped", "Your order has been shipped.", "https://example.com/orders/1234"));
  * </pre>
+ * <p>
+ * Relative URLs are also accepted:
+ * <pre>
+ * notifications.send(Notification.createNotificationMessage("Order shipped", "Your order has been shipped.", "/orders/1234"));
+ * </pre>
  *
- * <h2>User-targeted Notifications</h2>
+ * <h2 id="user-targeted"><a href="#user-targeted">User-targeted Notifications</a></h2>
  * <p>
  * The optional <strong><code>user</code></strong> attribute can be set to the unique identifier of the logged-in user,
  * so that notifications can be targeted to a specific user.
@@ -90,21 +98,46 @@ import org.omnifaces.util.Json;
  * notifications.send(Notification.createNotificationMessage("New message", "You have a new message."), recipientUserId);
  * </pre>
  *
- * <h2>Event Handlers</h2>
+ * <h2 id="display-behavior"><a href="#display-behavior">Display behavior</a></h2>
  * <p>
- * The <code>&lt;o:notification&gt;</code> supports click and close event handlers. The event's <code>detail</code>
- * object contains <code>tag</code> and <code>data</code>. The <code>tag</code> is set to the component's client ID
- * and is used by the browser for notification deduplication: a new notification with the same tag replaces the
- * previous one instead of stacking.
+ * By default, each new notification replaces the previous one from the same component. To let notifications stack
+ * independently instead, set the <strong><code>stacked</code></strong> attribute to <code>true</code>:
+ * <pre>
+ * &lt;o:notification channel="notifications" stacked="true" /&gt;
+ * </pre>
+ * <p>
+ * The <strong><code>requireInteraction</code></strong> attribute controls whether the notification remains visible
+ * until the user explicitly interacts with it (click or dismiss), rather than auto-closing after a timeout. This is
+ * useful for important alerts that should not be missed:
+ * <pre>
+ * &lt;o:notification channel="alerts" requireInteraction="true" /&gt;
+ * </pre>
+ * <p>
+ * The <strong><code>silent</code></strong> attribute suppresses the device's notification sound and vibration:
+ * <pre>
+ * &lt;o:notification channel="updates" silent="true" /&gt;
+ * </pre>
+ *
+ * <h2 id="event-handlers"><a href="#event-handlers">Event Handlers</a></h2>
+ * <p>
+ * The <code>&lt;o:notification&gt;</code> supports click and close event handlers.
  * <pre>
  * &lt;o:notification channel="notifications" onclick="handleClick" onclose="handleClose" /&gt;
  * </pre>
+ * <p>
+ * The event's <code>detail</code> object contains <code>data</code> and <code>tag</code>. The <code>data</code> object
+ * contains the <code>channel</code> name and the optional <code>url</code>. The <code>tag</code> is set to the
+ * component's client ID (when not {@link #setStacked(boolean) stacked}) and is used by the browser for notification
+ * deduplication: a new notification with the same tag replaces the previous one instead of stacking.
  * <pre>
  * function handleClick(event) {
- *     console.log("Clicked: tag=" + event.detail.tag);
+ *     console.log("Channel: " + event.detail.data.channel);
+ *     console.log("URL (if any): " + event.detail.data.url);
+ *     console.log("Tag (if not stacked): " + event.detail.tag);
  * }
  * function handleClose(event) {
- *     console.log("Closed: tag=" + event.detail.tag);
+ *     console.log("Channel: " + event.detail.data.channel);
+ *     console.log("Tag (if not stacked): " + event.detail.tag);
  * }
  * </pre>
  * <p>
@@ -116,11 +149,15 @@ import org.omnifaces.util.Json;
  *     &lt;h:commandScript name="markAsRead" action="#{notificationBean.markAsRead}" /&gt;
  * &lt;/h:form&gt;
  * </pre>
+ * <p>
+ * With this handler:
  * <pre>
  * function handleNotificationClick(event) {
  *     markAsRead({ "notification.url": event.detail.data?.url });
  * }
  * </pre>
+ * <p>
+ * And this bean:
  * <pre>
  * public void markAsRead() {
  *     var url = Faces.getRequestParameter("notification.url");
@@ -128,7 +165,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  *
- * <h2>JavaScript API</h2>
+ * <h2 id="javascript-api"><a href="#javascript-api">JavaScript API</a></h2>
  * <p>
  * The current permission can be checked via <code>OmniFaces.Notification.getPermission()</code>, which returns
  * <code>"granted"</code>, <code>"denied"</code>, <code>"default"</code>, or <code>"unsupported"</code>.
@@ -136,17 +173,16 @@ import org.omnifaces.util.Json;
  * const notificationPermission = OmniFaces.Notification.getPermission();
  * </pre>
  * <p>
- * You can use <code>OmniFaces.Notification.show</code> to programmatically show notifications using JavaScript:
+ * You can use <code>OmniFaces.Notification.show</code> to programmatically show notifications using JavaScript.
+ * The first argument is the channel name, the second the title, the optional third the body, and the optional fourth a
+ * URL:
  * <pre>
- * OmniFaces.Notification.show("Hello!", { body: "This is a notification." });
- * </pre>
- * <p>
- * When the <code>data</code> option contains a <code>url</code>, clicking the notification will open that URL:
- * <pre>
- * OmniFaces.Notification.show("Click me!", { body: "Opens a link.", data: { url: "https://omnifaces.org" } });
+ * OmniFaces.Notification.show("notifications", "Please wait ...");
+ * OmniFaces.Notification.show("notifications", "Hello!", "This is a notification.");
+ * OmniFaces.Notification.show("notifications", "Click me!", "Opens a link.", "https://omnifaces.org");
  * </pre>
  *
- * <h2>Platform limitations</h2>
+ * <h2 id="platform-limitations"><a href="#platform-limitations">Platform limitations</a></h2>
  * <p>
  * The <code>icon</code> attribute is passed to the Notifications API, but custom notification icons are not
  * guaranteed to work across all platforms. As of March 2026, macOS and Linux with GNOME always display the
@@ -156,7 +192,7 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @see PWAResourceHandler
  * @see Sse
- * @see SseServlet
+ * @see SseEndpoint
  * @see Push
  * @see PushContext
  * @since 5.2
@@ -174,14 +210,27 @@ public class Notification extends ChannelComponent {
 
     /**
      * Represents a notification message for use with {@code PushContext.send()}.
-     * The record is JSON-encodable and compatible with {@code OmniFaces.Notification.showMessage} on the client side.
      * @param title The notification title.
-     * @param body The notification body text.
+     * @param body Optional notification body text. May be {@code null}.
      * @param url Optional URL to open when the notification is clicked. May be {@code null}.
      */
-    public record Message(String title, String body, String url) {}
+    public record Message(String title, String body, String url) {
+        /** Validates that the title is not null. */
+        public Message {
+            requireNonNull(title, "title");
+        }
+    }
 
     // Public static methods ------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a notification message with only a title for use with {@code PushContext.send()}.
+     * @param title The notification title.
+     * @return A new {@link Message} instance.
+     */
+    public static Message createNotificationMessage(String title) {
+        return new Message(title, null, null);
+    }
 
     /**
      * Creates a notification message for use with {@code PushContext.send()}.
@@ -194,14 +243,16 @@ public class Notification extends ChannelComponent {
     }
 
     /**
-     * Creates a notification message with a URL action for use with {@code PushContext.send()}.
-     * Clicking the notification will open the specified URL.
+     * Creates a notification message with a navigation URL for use with {@code PushContext.send()}.
+     * Clicking the notification will navigate to the specified URL.
      * @param title The notification title.
      * @param body The notification body text.
-     * @param url The URL to open when the notification is clicked.
+     * @param url The URL to navigate to when the notification is clicked. Both absolute and relative URLs are accepted.
      * @return A new {@link Message} instance.
+     * @throws IllegalArgumentException When the URL syntax is invalid.
      */
     public static Message createNotificationMessage(String title, String body, String url) {
+        URI.create(url);
         return new Message(title, body, url);
     }
 
@@ -214,30 +265,29 @@ public class Notification extends ChannelComponent {
             + " Add <link rel=\"manifest\" href=\"#{resource['omnifaces:manifest.webmanifest']}\" /> to <h:head>."
             + " It provides the service worker needed for cross-platform notification support.";
 
-    private static final String SCRIPT_INIT = "OmniFaces.Notification.init(%s);";
-    private static final String SSE_FUNCTIONS = "null,OmniFaces.Notification.showMessage,null,null";
+    private static final String SCRIPT_INIT = "OmniFaces.Notification.init('%s',%s);";
+    private static final String SSE_FUNCTIONS = "null,OmniFaces.Notification.handle,null,null";
     private static final String SSE_BEHAVIORS = "{}";
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        icon, requireInteraction, silent,
+        stacked, requireInteraction, silent, icon,
         onclick, onclose, onerror, onpermissionchange, onunsupported;
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First check if the SSE servlet is registered and the web app manifest resource is referenced, then validate and
+     * First check if the SSE endpoint is registered and the web app manifest resource is referenced, then validate and
      * register the channel in {@link SseChannelManager}, then render the <code>Notification.init()</code> and
-     * <code>Push.init()</code> scripts. The SSE connection's <code>onmessage</code> is hardwired to
-     * <code>OmniFaces.Notification.showMessage</code>.
-     * @throws IllegalStateException When the SSE servlet is not registered or the web app manifest resource is not
+     * <code>Push.init()</code> scripts.
+     * @throws IllegalStateException When the SSE endpoint is not registered or the web app manifest resource is not
      * referenced.
      * @throws IllegalArgumentException When the channel name is invalid.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        Sse.checkServletRegistered(context);
+        Sse.checkEndpointRegistered(context);
 
         if (!PWAResourceHandler.isActive(context)) {
             throw new IllegalStateException(ERROR_MANIFEST_RESOURCE_NOT_REFERENCED);
@@ -248,25 +298,27 @@ public class Notification extends ChannelComponent {
         var writer = context.getResponseWriter();
 
         writer.write(Sse.SCRIPT_INIT.formatted(contextPath, channelId, SSE_FUNCTIONS, SSE_BEHAVIORS));
-        writer.write(SCRIPT_INIT.formatted(buildInitOptionsJson(getClientId(context))));
+        writer.write(SCRIPT_INIT.formatted(getChannel(), buildInitOptionsJson(getClientId(context))));
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the notification icon URL.
-     * @return The notification icon URL.
+     * Returns whether notifications should be stacked instead of replaced.
+     * @return Whether notifications are stacked.
      */
-    public String getIcon() {
-        return state.get(PropertyKeys.icon);
+    public boolean isStacked() {
+        return state.get(PropertyKeys.stacked, false);
     }
 
     /**
-     * Sets the notification icon URL. Maps to the Notification API <code>icon</code> option.
-     * @param icon The notification icon URL.
+     * Sets whether notifications should be stacked instead of replaced. Defaults to <code>false</code>, meaning each
+     * new notification replaces the previous one (deduplication by component client ID as tag). When set to
+     * <code>true</code>, no tag is set and each notification is displayed independently.
+     * @param stacked Whether notifications should be stacked.
      */
-    public void setIcon(String icon) {
-        state.put(PropertyKeys.icon, icon);
+    public void setStacked(boolean stacked) {
+        state.put(PropertyKeys.stacked, stacked);
     }
 
     /**
@@ -301,6 +353,22 @@ public class Notification extends ChannelComponent {
      */
     public void setSilent(boolean silent) {
         state.put(PropertyKeys.silent, silent);
+    }
+
+    /**
+     * Returns the notification icon URL.
+     * @return The notification icon URL.
+     */
+    public String getIcon() {
+        return state.get(PropertyKeys.icon);
+    }
+
+    /**
+     * Sets the notification icon URL. Maps to the Notification API <code>icon</code> option.
+     * @param icon The notification icon URL.
+     */
+    public void setIcon(String icon) {
+        state.put(PropertyKeys.icon, icon);
     }
 
     /**
@@ -393,9 +461,16 @@ public class Notification extends ChannelComponent {
 
     private String buildInitOptionsJson(String clientId) {
         var options = new LinkedHashMap<String, Object>();
-        options.put("tag", clientId);
+
+        if (!isStacked()) {
+            options.put("tag", clientId);
+        }
 
         for (var key : PropertyKeys.values()) {
+            if (key == PropertyKeys.stacked) {
+                continue;
+            }
+
             var value = state.get(key);
 
             if (value != null && !Boolean.FALSE.equals(value)) {

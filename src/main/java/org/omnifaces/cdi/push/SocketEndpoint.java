@@ -28,9 +28,14 @@ import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 
+import org.omnifaces.cdi.Push;
+
 /**
  * <p>
- * This web socket server endpoint handles web socket requests coming from <code>&lt;o:socket&gt;</code>.
+ * This web socket endpoint handles connections opened by <code>&lt;o:socket&gt;</code>.
+ * It is automatically registered during application startup when <code>&#64;</code>{@link Push}
+ * or <code>&#64;</code>{@link Push}<code>(type=SOCKET)</code> qualified injection points are detected by
+ * {@link PushExtension}.
  *
  * @author Bauke Scholtz
  * @see Socket

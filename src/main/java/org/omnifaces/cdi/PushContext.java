@@ -40,12 +40,19 @@ import org.omnifaces.util.Json;
  * private PushContext channelName;
  * </pre>
  * <p>
+ * To use browser notifications via SSE, set {@link Push#type()} to {@link Push.Type#NOTIFICATION}:
+ * <pre>
+ * &#64;Inject &#64;Push(type=NOTIFICATION)
+ * private PushContext channelName;
+ * </pre>
+ * <p>
  * For detailed usage instructions, see {@link Socket}, {@link Sse} and {@link Notification} javadocs.
  *
  * @author Bauke Scholtz
  * @see Push
  * @see Socket
  * @see Sse
+ * @see Notification
  * @since 2.3
  */
 public interface PushContext extends Serializable {

@@ -15,20 +15,14 @@ package org.omnifaces.cdi.push;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.enterprise.event.Observes;
-
 /**
  * <p>
- * Abstract base for push channel events fired when a connection has been opened, its user switched, or closed.
- * An application scoped CDI bean can <code>&#64;</code>{@link Observes} the concrete subclass events
- * {@link SocketEvent} and {@link SseEvent}.
+ * Base class for push channel events fired when a connection has been opened, its user switched, or closed.
  *
  * @author Bauke Scholtz
- * @see SocketEvent
- * @see SseEvent
  * @since 5.2
  */
-public abstract class PushEvent implements Serializable {
+abstract class PushEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

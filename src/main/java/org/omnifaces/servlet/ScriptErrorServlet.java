@@ -47,11 +47,11 @@ public class ScriptErrorServlet extends HttpServlet {
         var scriptError = new ScriptError(
             request.getParameter("pageURL"),
             request.getParameter("errorMessage"),
+            request.getParameter("errorName"),
+            request.getParameter("errorStack"),
             request.getParameter("sourceURL"),
             request.getParameter("lineNumber"),
             request.getParameter("columnNumber"),
-            request.getParameter("errorName"),
-            request.getParameter("errorStack"),
             Servlets.getRemoteAddr(request),
             Servlets.getUserAgent(request),
             request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : null

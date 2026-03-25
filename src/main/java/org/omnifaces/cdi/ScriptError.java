@@ -45,16 +45,16 @@ import org.omnifaces.component.script.ScriptErrorHandler;
  * @param pageURL The URL of the page where the error occurred, as obtained from <code>window.location.href</code>.
  * @param errorMessage The error message, as obtained from the first argument of <code>window.onerror</code>
  * or the <code>reason</code> of an <code>unhandledrejection</code> event.
+ * @param errorName The error type name (e.g. "TypeError", "ReferenceError", "UnhandledRejection"), as obtained from
+ * the <code>name</code> property of the <code>Error</code> object, or <code>null</code> if unavailable.
+ * @param errorStack The JavaScript stack trace, as obtained from the <code>stack</code> property of the
+ * <code>Error</code> object, or <code>null</code> if unavailable.
  * @param sourceURL The URL of the script file where the error originated, as obtained from the second argument of
  * <code>window.onerror</code>, or <code>null</code> for unhandled promise rejections.
  * @param lineNumber The line number in the script where the error occurred, as obtained from the third argument of
  * <code>window.onerror</code>, or <code>null</code> for unhandled promise rejections.
  * @param columnNumber The column number in the script where the error occurred, as obtained from the fourth argument of
  * <code>window.onerror</code>, or <code>null</code> for unhandled promise rejections.
- * @param errorName The error type name (e.g. "TypeError", "ReferenceError", "UnhandledRejection"), as obtained from
- * the <code>name</code> property of the <code>Error</code> object, or <code>null</code> if unavailable.
- * @param errorStack The JavaScript stack trace, as obtained from the <code>stack</code> property of the
- * <code>Error</code> object, or <code>null</code> if unavailable.
  * @param remoteAddr The remote address of the client, taking proxy headers (<code>X-Forwarded-For</code> etc.) into account.
  * @param userAgent The User-Agent header of the request.
  * @param userPrincipal The name of the authenticated user principal, or <code>null</code> if not authenticated.
@@ -62,11 +62,11 @@ import org.omnifaces.component.script.ScriptErrorHandler;
 public record ScriptError(
     String pageURL,
     String errorMessage,
+    String errorName,
+    String errorStack,
     String sourceURL,
     String lineNumber,
     String columnNumber,
-    String errorName,
-    String errorStack,
     String remoteAddr,
     String userAgent,
     String userPrincipal

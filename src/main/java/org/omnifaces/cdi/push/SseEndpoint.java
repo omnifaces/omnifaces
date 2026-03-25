@@ -18,7 +18,6 @@ import static java.util.logging.Level.FINEST;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
 import jakarta.servlet.http.HttpServlet;
@@ -30,29 +29,26 @@ import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This servlet handles SSE connections opened by <code>&lt;o:sse&gt;</code> and  by <code>&lt;o:notification&gt;</code>.
+ * This SSE endpoint handles connections opened by <code>&lt;o:sse&gt;</code> and <code>&lt;o:notification&gt;</code>.
  * It is automatically registered during application startup when <code>&#64;</code>{@link Push}<code>(type=SSE)</code>
  * or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified injection points are detected by
  * {@link PushExtension}.
- * <p>
- * The servlet is mapped to <code>/omnifaces.sse/*</code> where the channel identifier is passed as query string in the
- * format <code>/{channel}?{uuid}</code>. Each connection is held open using {@link AsyncContext} with an indefinite
- * timeout. Messages are sent as SSE data frames in <code>data: {json}\n\n</code> format.
  *
  * @author Bauke Scholtz
  * @see Sse
  * @see SseSessionManager
  * @since 5.2
  */
-public class SseServlet extends HttpServlet {
+public class SseEndpoint extends HttpServlet {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(SseServlet.class.getName());
+    /** The URI path parameter name of the SSE channel. */
+    static final String PARAM_CHANNEL = "channel";
+
+    private static final Logger logger = Logger.getLogger(SseEndpoint.class.getName());
     private static final long serialVersionUID = 1L;
     private static final byte[] SSE_NOT_FOUND_EVENT = "event: close\ndata: 404\n\n".getBytes(UTF_8);
-
-    static final String PARAM_CHANNEL = "channel";
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -104,7 +100,7 @@ public class SseServlet extends HttpServlet {
                     sseSessions.remove(channelId, asyncContext);
                 }
                 catch (IllegalStateException e) {
-                    logger.log(FINEST, "Ignoring thrown exception; can happen when the CDI context is no longer active.", e);
+                    logger.log(FINEST, "Ignoring thrown exception; can happen when the CDI context is no longer active (e.g. server shutdown).", e);
                 }
             }
         });

@@ -35,7 +35,7 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * This is a concrete implementation of {@link PushContext} interface which is to be injected by
+ * This is a concrete web socket implementation of {@link PushContext} interface which is to be injected by
  * <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
@@ -60,7 +60,7 @@ public class SocketPushContext implements PushContext {
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Creates a socket push context whereby the mutable map of session and view scope channel identifiers is
+     * Creates a web socket push context whereby the mutable map of session and view scope channel identifiers is
      * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
      * and view scope is not necessarily active anymore.
      */

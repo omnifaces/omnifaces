@@ -288,11 +288,10 @@ export namespace Push {
             const resolvedOnerror = Util.resolveFunction(onerror);
 
             if (sse) {
-                const url = host + SSE_URI_PREFIX + "/" + channel + "?" + uri.split(/\?/)[1];
-                connections[channel] = new SseConnection(url, channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+                connections[channel] = new SseConnection(getSseURL(host, uri), channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
             }
             else {
-                connections[channel] = new SocketConnection(getSocketBaseURL(host) + uri, channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+                connections[channel] = new SocketConnection(getSocketURL(host, uri), channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
             }
         }
 
@@ -322,20 +321,31 @@ export namespace Push {
     // Private static functions ---------------------------------------------------------------------------------------
 
     /**
-     * Get base URL from given host.
-     * @param host The host of the web socket in either the format 
+     * Get SSE URL from given host.
+     * @param host The host of the SSE endpoint in the format <code>/context</code>.
+     * @param uri The uri representing the channel name and identifier, separated by a question mark.
+     * @return SSE URL
+     */
+    function getSseURL(host: string, uri: string): string {
+        return host + SSE_URI_PREFIX + "/" + uri;
+    }
+
+    /**
+     * Get web socket URL from given host.
+     * @param host The host of the web socket endpoint in either the format 
      * <code>example.com:8080/context</code>, or <code>:8080/context</code>, or <code>/context</code>.
      * If the value is falsey, then it will default to <code>window.location.host</code>.
      * If the value starts with <code>:</code>, then <code>window.location.hostname</code> will be prepended.
      * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
-     * @return Base URL
+     * @param uri The uri representing the channel name and identifier, separated by a question mark.
+     * @return Web socket URL
      */
-    function getSocketBaseURL(host: string): string {
+    function getSocketURL(host: string, uri: string): string {
         host = host ?? "";
         const base = (!host || host.startsWith("/")) ? window.location.host
                 : (host.startsWith(":")) ? window.location.hostname
                 : "";
-        return `${WS_PROTOCOL}${base}${host}${WS_URI_PREFIX}/`;
+        return `${WS_PROTOCOL}${base}${host}${WS_URI_PREFIX}/${uri}`;
     }
 
     /**

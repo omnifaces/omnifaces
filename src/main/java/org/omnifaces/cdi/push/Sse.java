@@ -89,7 +89,7 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
- * No explicit configuration is needed. The SSE servlet is automatically registered during application startup when at
+ * No explicit configuration is needed. The SSE endpoint is automatically registered during application startup when at
  * least one <code>&#64;</code>{@link Push}<code>(type=SSE)</code> qualified injection point is detected.
  *
  *
@@ -635,7 +635,7 @@ import org.omnifaces.util.Json;
  *
  *
  * @author Bauke Scholtz
- * @see SseServlet
+ * @see SseEndpoint
  * @see SseChannelManager
  * @see SseUserManager
  * @see SseSessionManager
@@ -658,7 +658,7 @@ public class Sse extends PushComponent {
     // Private constants ----------------------------------------------------------------------------------------------
 
     private static final String ERROR_SERVLET_NOT_REGISTERED =
-        "SSE servlet is not registered."
+        "SSE endpoint is not registered."
             + " Make sure there is at least one CDI managed bean with @Push(type=SSE) or @Push(type=NOTIFICATION) qualified injection point.";
 
     static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(true,'%s','%s',%s,%s);});";
@@ -666,10 +666,10 @@ public class Sse extends PushComponent {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First check if the SSE servlet is registered and the channel name and scope is valid, then register it in
+     * First check if the SSE endpoint is registered and the channel name and scope is valid, then register it in
      * {@link SseChannelManager} and get the channel ID, then render the <code>init()</code> script. This script will
-     * instruct the client to open an SSE connection to {@link SseServlet}.
-     * @throws IllegalStateException When the SSE servlet is not registered.
+     * instruct the client to open an SSE connection to {@link SseEndpoint}.
+     * @throws IllegalStateException When the SSE endpoint is not registered.
      * @throws IllegalArgumentException When the channel name, scope or user is invalid.
      * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
      * The allowed channel scope values are "application", "session" and "view", case insensitive.
@@ -678,7 +678,7 @@ public class Sse extends PushComponent {
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
-        checkServletRegistered(context);
+        checkEndpointRegistered(context);
 
         var contextPath = getRequestContextPath(context);
         var channelId = registerChannel(context, this, getScope());
@@ -692,11 +692,11 @@ public class Sse extends PushComponent {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Check if the SSE servlet is registered.
+     * Check if the SSE endpoint is registered.
      * @param context The involved faces context.
-     * @throws IllegalStateException When the SSE servlet is not registered.
+     * @throws IllegalStateException When the SSE endpoint is not registered.
      */
-    static void checkServletRegistered(FacesContext context) {
+    static void checkEndpointRegistered(FacesContext context) {
         if (!context.getExternalContext().getApplicationMap().containsKey(Sse.class.getName())) {
             throw new IllegalStateException(ERROR_SERVLET_NOT_REGISTERED);
         }
@@ -725,17 +725,18 @@ public class Sse extends PushComponent {
     }
 
     /**
-     * Register SSE servlet if necessary, i.e. when {@link PushExtension} has detected at least one
-     * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> qualified injection point.
+     * Register SSE endpoint if necessary, i.e. when {@link PushExtension} has detected at least one
+     * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>
+     * qualified injection point.
      * @param context The involved servlet context.
      */
-    public static void registerServletIfNecessary(ServletContext context) {
+    public static void registerEndpointIfNecessary(ServletContext context) {
         if (TRUE.equals(context.getAttribute(Sse.class.getName())) || !PushExtension.isSseActivated()) {
             return;
         }
 
         try {
-            var registration = context.addServlet(SseServlet.class.getName(), SseServlet.class);
+            var registration = context.addServlet(SseEndpoint.class.getName(), SseEndpoint.class);
             registration.setAsyncSupported(true);
             registration.addMapping(SSE_URI_PREFIX + "/*");
             context.setAttribute(Sse.class.getName(), Boolean.TRUE);

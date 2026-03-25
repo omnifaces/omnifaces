@@ -36,7 +36,7 @@ import org.omnifaces.util.Beans;
  * This SSE session manager holds all SSE connections by their channel identifier.
  *
  * @author Bauke Scholtz
- * @see SseServlet
+ * @see SseEndpoint
  * @since 5.2
  */
 @ApplicationScoped

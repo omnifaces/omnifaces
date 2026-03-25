@@ -24,7 +24,7 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * This producer prepares the {@link PushContext} instance for injection by <code>&#64;</code>{@link Push}.
+ * This CDI producer prepares the {@link PushContext} instance for injection by <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push

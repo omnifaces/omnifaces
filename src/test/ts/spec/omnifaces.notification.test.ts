@@ -66,7 +66,7 @@ describe("OmniFaces.Notification.init", () => {
 
     test("initializes without error", () => {
         installMockNotification("granted");
-        notification().init({ icon: "/icon.png" });
+        notification().init("ch1", { icon: "/icon.png" });
     });
 
     test("calls onunsupported when Notification API is missing", () => {
@@ -75,7 +75,7 @@ describe("OmniFaces.Notification.init", () => {
         delete (window as any).Notification;
         mockSW = installMockServiceWorker();
 
-        notification().init({ onunsupported });
+        notification().init("ch1", { onunsupported });
 
         expect(onunsupported).toHaveBeenCalled();
 
@@ -106,7 +106,7 @@ describe("OmniFaces.Notification.init", () => {
             configurable: true,
         });
 
-        notification().init({ onunsupported });
+        notification().init("ch1", { onunsupported });
 
         expect(onunsupported).toHaveBeenCalled();
 
@@ -129,10 +129,10 @@ describe("OmniFaces.Notification.show", () => {
         uninstallMockNotification();
     });
 
-    test("shows notification with title and options", async () => {
+    test("shows notification with title and body", async () => {
         installMockNotification("granted");
-        notification().init({});
-        notification().show("Test Title", { body: "Test body", tag: "custom" });
+        notification().init("ch1", { tag: "custom" });
+        notification().show("ch1", "Test Title", "Test body");
 
         await mockSW.ready;
 
@@ -142,50 +142,84 @@ describe("OmniFaces.Notification.show", () => {
         }));
     });
 
-    test("falls back to default options", async () => {
+    test("uses component defaults for icon, requireInteraction, silent", async () => {
         installMockNotification("granted");
-        notification().init({ icon: "/default.png" });
-        notification().show("Title");
+        notification().init("ch1", { icon: "/default.png", requireInteraction: true, silent: true });
+        notification().show("ch1", "Title", "Body");
 
         await mockSW.ready;
 
         expect(showNotificationMock).toHaveBeenCalledWith("Title", expect.objectContaining({
             icon: "/default.png",
+            requireInteraction: true,
+            silent: true,
         }));
     });
 
-    test("overrides default options with explicit options", async () => {
+    test("includes channel and url in data", async () => {
         installMockNotification("granted");
-        notification().init({ icon: "/default.png" });
-        notification().show("Title", { icon: "/custom.png" });
-
-        await mockSW.ready;
-
-        expect(showNotificationMock).toHaveBeenCalledWith("Title", expect.objectContaining({
-            icon: "/custom.png",
-        }));
-    });
-
-    test("passes data option for URL action", async () => {
-        installMockNotification("granted");
-        notification().init({});
-        notification().show("Click me", { data: { url: "https://example.com" } });
+        notification().init("ch1", {});
+        notification().show("ch1", "Click me", "Opens a link.", "https://example.com");
 
         await mockSW.ready;
 
         expect(showNotificationMock).toHaveBeenCalledWith("Click me", expect.objectContaining({
-            data: { url: "https://example.com" },
+            data: { channel: "ch1", url: "https://example.com" },
+        }));
+    });
+
+    test("includes channel in data without url", async () => {
+        installMockNotification("granted");
+        notification().init("ch1", {});
+        notification().show("ch1", "Title", "Body");
+
+        await mockSW.ready;
+
+        expect(showNotificationMock).toHaveBeenCalledWith("Title", expect.objectContaining({
+            data: { channel: "ch1", url: undefined },
+        }));
+    });
+
+    test("uses correct defaults for each channel", async () => {
+        installMockNotification("granted");
+        notification().init("ch1", { tag: "tag1", icon: "/icon1.png" });
+        notification().init("ch2", { tag: "tag2", icon: "/icon2.png" });
+
+        notification().show("ch1", "Title 1", "Body 1");
+        notification().show("ch2", "Title 2", "Body 2");
+
+        await mockSW.ready;
+
+        expect(showNotificationMock).toHaveBeenCalledWith("Title 1", expect.objectContaining({
+            tag: "tag1",
+            icon: "/icon1.png",
+        }));
+        expect(showNotificationMock).toHaveBeenCalledWith("Title 2", expect.objectContaining({
+            tag: "tag2",
+            icon: "/icon2.png",
         }));
     });
 
     test("does nothing when permission is not granted", async () => {
         installMockNotification("denied");
-        notification().init({});
-        notification().show("Title");
+        notification().init("ch1", {});
+        notification().show("ch1", "Title", "Body");
 
         await mockSW.ready;
 
         expect(showNotificationMock).not.toHaveBeenCalled();
+    });
+
+    test("shows notification with title only", async () => {
+        installMockNotification("granted");
+        notification().init("ch1", {});
+        notification().show("ch1", "Title Only");
+
+        await mockSW.ready;
+
+        expect(showNotificationMock).toHaveBeenCalledWith("Title Only", expect.objectContaining({
+            body: undefined,
+        }));
     });
 
     test("does nothing when Notification API is missing", () => {
@@ -193,8 +227,8 @@ describe("OmniFaces.Notification.show", () => {
         delete (window as any).Notification;
         mockSW = installMockServiceWorker();
 
-        notification().init({});
-        expect(() => notification().show("Title")).not.toThrow();
+        notification().init("ch1", {});
+        expect(() => notification().show("ch1", "Title")).not.toThrow();
 
         Object.defineProperty(window, "Notification", {
             value: origNotification,
@@ -211,15 +245,29 @@ describe("OmniFaces.Notification.requestPermission", () => {
         uninstallMockNotification();
     });
 
-    test("returns permission and calls onpermissionchange", async () => {
+    test("returns permission and calls onpermissionchange for specific channel", async () => {
         installMockNotification("granted");
         const onpermissionchange = jest.fn();
-        notification().init({ onpermissionchange });
+        notification().init("ch1", { onpermissionchange });
+
+        const result = await notification().requestPermission("ch1");
+
+        expect(result).toBe("granted");
+        expect(onpermissionchange).toHaveBeenCalledWith("granted");
+    });
+
+    test("calls onpermissionchange for all channels when no channel specified", async () => {
+        installMockNotification("granted");
+        const onpermissionchange1 = jest.fn();
+        const onpermissionchange2 = jest.fn();
+        notification().init("ch1", { onpermissionchange: onpermissionchange1 });
+        notification().init("ch2", { onpermissionchange: onpermissionchange2 });
 
         const result = await notification().requestPermission();
 
         expect(result).toBe("granted");
-        expect(onpermissionchange).toHaveBeenCalledWith("granted");
+        expect(onpermissionchange1).toHaveBeenCalledWith("granted");
+        expect(onpermissionchange2).toHaveBeenCalledWith("granted");
     });
 
     test("returns denied when Notification API is missing", async () => {
@@ -227,8 +275,8 @@ describe("OmniFaces.Notification.requestPermission", () => {
         delete (window as any).Notification;
         mockSW = installMockServiceWorker();
 
-        notification().init({});
-        const result = await notification().requestPermission();
+        notification().init("ch1", {});
+        const result = await notification().requestPermission("ch1");
 
         expect(result).toBe("denied");
 
@@ -274,29 +322,56 @@ describe("OmniFaces.Notification event handlers", () => {
         uninstallMockNotification();
     });
 
-    test("onclick is called on notificationclick event", () => {
+    test("onclick is called for matching channel", () => {
         installMockNotification("granted");
         const onclick = jest.fn();
-        notification().init({ onclick });
+        notification().init("ch1", { onclick });
 
         window.dispatchEvent(new CustomEvent("omnifaces.notificationclick", {
-            detail: { tag: "test", data: null },
+            detail: { tag: "test", data: { channel: "ch1" } },
         }));
 
         expect(onclick).toHaveBeenCalledTimes(1);
-        expect(onclick.mock.calls[0][0].detail).toEqual({ tag: "test", data: null });
+        expect(onclick.mock.calls[0][0].detail).toEqual({ tag: "test", data: { channel: "ch1" } });
     });
 
-    test("onclose is called on notificationclose event", () => {
+    test("onclose is called for matching channel", () => {
         installMockNotification("granted");
         const onclose = jest.fn();
-        notification().init({ onclose });
+        notification().init("ch1", { onclose });
 
         window.dispatchEvent(new CustomEvent("omnifaces.notificationclose", {
-            detail: { tag: "test", data: null },
+            detail: { tag: "test", data: { channel: "ch1" } },
         }));
 
         expect(onclose).toHaveBeenCalledTimes(1);
-        expect(onclose.mock.calls[0][0].detail).toEqual({ tag: "test", data: null });
+        expect(onclose.mock.calls[0][0].detail).toEqual({ tag: "test", data: { channel: "ch1" } });
+    });
+
+    test("onclick is not called for non-matching channel", () => {
+        installMockNotification("granted");
+        const onclick = jest.fn();
+        notification().init("ch1", { onclick });
+
+        window.dispatchEvent(new CustomEvent("omnifaces.notificationclick", {
+            detail: { tag: "test", data: { channel: "ch2" } },
+        }));
+
+        expect(onclick).not.toHaveBeenCalled();
+    });
+
+    test("dispatches to correct channel when multiple channels exist", () => {
+        installMockNotification("granted");
+        const onclick1 = jest.fn();
+        const onclick2 = jest.fn();
+        notification().init("ch1", { onclick: onclick1 });
+        notification().init("ch2", { onclick: onclick2 });
+
+        window.dispatchEvent(new CustomEvent("omnifaces.notificationclick", {
+            detail: { tag: "test", data: { channel: "ch2" } },
+        }));
+
+        expect(onclick1).not.toHaveBeenCalled();
+        expect(onclick2).toHaveBeenCalledTimes(1);
     });
 });

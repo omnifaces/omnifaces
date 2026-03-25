@@ -59,7 +59,7 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
- * <li>Register {@link Sse} servlet if necessary.
+ * <li>Register {@link Sse} endpoint if necessary.
  * <li>Register {@link ScriptErrorHandler} servlet if necessary.
  * </ol>
  * <p>
@@ -113,7 +113,7 @@ public class ApplicationListener extends DefaultServletContextListener {
             EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
             GraphicResource.registerGraphicImageBeans();
             Socket.registerEndpointIfNecessary(servletContext);
-            Sse.registerServletIfNecessary(servletContext);
+            Sse.registerEndpointIfNecessary(servletContext);
             ScriptErrorHandler.registerServletIfNecessary(servletContext);
         }
         catch (Exception | LinkageError e) {
