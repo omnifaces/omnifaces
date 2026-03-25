@@ -259,6 +259,10 @@ public final class CombinedResourceInputStream extends InputStream {
                     if (next == '\n') {
                         break;
                     }
+
+                    if (next != ';' && next != ' ' && next != '\t' && next != '\r') {
+                        return next; // Stop: real code follows on the same line.
+                    }
                 }
 
                 return currentStream.read();
