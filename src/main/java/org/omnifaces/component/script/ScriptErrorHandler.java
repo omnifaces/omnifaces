@@ -80,11 +80,11 @@ import org.omnifaces.util.State;
  * <ul>
  * <li>{@link ScriptError#pageURL()}: the URL of the page where the error occurred.</li>
  * <li>{@link ScriptError#errorMessage()}: the error message.</li>
+ * <li>{@link ScriptError#errorName()}: the error type (e.g. "TypeError", "ReferenceError").</li>
+ * <li>{@link ScriptError#errorStack()}: the full stack trace.</li>
  * <li>{@link ScriptError#sourceURL()}: the URL of the script file where the error occurred.</li>
  * <li>{@link ScriptError#lineNumber()}: the line number in the script.</li>
  * <li>{@link ScriptError#columnNumber()}: the column number in the script.</li>
- * <li>{@link ScriptError#errorName()}: the error type (e.g. "TypeError", "ReferenceError").</li>
- * <li>{@link ScriptError#errorStack()}: the full stack trace.</li>
  * <li>{@link ScriptError#remoteAddr()}: the remote address.</li>
  * <li>{@link ScriptError#userAgent()}: the User-Agent header.</li>
  * <li>{@link ScriptError#userPrincipal()}: the authenticated user principal name.</li>
@@ -95,7 +95,8 @@ import org.omnifaces.util.State;
  * <p>
  * To prevent flooding the server with repeated errors (e.g. from a <code>requestAnimationFrame</code> loop), the
  * client-side script deduplicates errors by message, source URL, and line number. The deduplication queue size and
- * expiry time can be configured via the <code>maxRecentErrors</code> and <code>errorExpiry</code> attributes.
+ * expiry time can be configured via the <code>maxRecentErrors</code> and <code>errorExpiry</code> attributes, which
+ * default to 100 and 1 minute respectively.
  *
  * @author Bauke Scholtz
  * @see ScriptError
