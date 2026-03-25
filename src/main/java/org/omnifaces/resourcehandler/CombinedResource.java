@@ -72,7 +72,7 @@ public class CombinedResource extends DynamicResource {
 	public InputStream getInputStream() throws IOException {
 		if (info != null && !info.getResources().isEmpty()) {
 			if (cacheTTL == null) {
-				return new CombinedResourceInputStream(info.getResources());
+				return new CombinedResourceInputStream(info.getResources(), getContentType());
 			}
 			else {
 				return getInputStreamFromCache();
@@ -95,7 +95,7 @@ public class CombinedResource extends DynamicResource {
 		}
 
 		if (cachedCombinedResource == null) {
-			cachedCombinedResource = toByteArray(new CombinedResourceInputStream(info.getResources()));
+			cachedCombinedResource = toByteArray(new CombinedResourceInputStream(info.getResources(), getContentType()));
 
 			synchronized (CombinedResourceHandler.class) {
 				if (combinedResourceCache.getObject(resourceId) == null) {
