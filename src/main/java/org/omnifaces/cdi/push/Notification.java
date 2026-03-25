@@ -188,6 +188,9 @@ import org.omnifaces.util.Json;
  * guaranteed to work across all platforms. As of March 2026, macOS and Linux with GNOME always display the
  * browser's own application icon instead, due to OS/desktop-environment-level policies. Custom icons do work on
  * Windows and Android. Use PNG format at 192x192 or larger for best results.
+ * <pre>
+ * &lt;o:notification channel="alerts" icon="#{resource['icons/alert.png']}" /&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @see PWAResourceHandler
