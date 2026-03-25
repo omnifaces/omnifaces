@@ -278,11 +278,11 @@ public final class Reflection {
 
             Object value = propertiesToSet.get(property.getName());
 
-            if (value instanceof String && !property.getPropertyType().equals(String.class)) {
+            if (value instanceof String text && !property.getPropertyType().equals(String.class)) {
                 try {
                     // Try to convert Strings to the type expected by the converter
                     PropertyEditor editor = findEditor(property.getPropertyType());
-                    editor.setAsText((String) value);
+                    editor.setAsText(text);
                     value = editor.getValue();
                 }
                 catch (Exception e) {
@@ -496,8 +496,10 @@ public final class Reflection {
 
     private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
         if (base == null) {
+            return;
         }
-        else if (base instanceof List<?> list) {
+
+        if (base instanceof List<?> list) {
             collectBasePropertyPathsFromList(list, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
         }
         else if (base instanceof Map<?, ?> map) {
