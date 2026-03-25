@@ -35,9 +35,9 @@ jobs:
       matrix:
         server: [ wildfly-mojarra4, liberty-myfaces3, glassfish-mojarra4, tomee-myfaces4, tomcat-mojarra4, tomcat-mojarra3, tomcat-myfaces4, tomcat-myfaces3, payara-mojarra4 ]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'adopt'
@@ -50,9 +50,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up JDK 11
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '11'
         distribution: 'adopt'
