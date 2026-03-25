@@ -198,8 +198,9 @@ public class EagerBeansRepository {
             if (!Utils.isEmpty(viewId)) {
                 getByViewId(viewId).add(bean);
             }
-
-            logger.severe(() -> MISSING_VIEW_ID.formatted(bean.getBeanClass().getName()));
+            else {
+                logger.severe(() -> MISSING_VIEW_ID.formatted(bean.getBeanClass().getName()));
+            }
         }
 
         void addByRequestURIOrViewId(Bean<?> bean, String requestURI, String viewId) {
@@ -209,8 +210,9 @@ public class EagerBeansRepository {
             else if (!Utils.isEmpty(viewId)) {
                 getByViewId(viewId).add(bean);
             }
-
-            logger.severe(() -> MISSING_REQUEST_URI_OR_VIEW_ID.formatted(bean.getBeanClass().getName()));
+            else {
+                logger.severe(() -> MISSING_REQUEST_URI_OR_VIEW_ID.formatted(bean.getBeanClass().getName()));
+            }
         }
 
         private List<Bean<?>> getByViewId(String viewId) {
