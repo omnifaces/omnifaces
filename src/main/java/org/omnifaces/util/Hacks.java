@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static java.util.logging.Level.FINEST;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentActionSource;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.VariableMapper;
 import javax.faces.FacesWrapper;
@@ -63,6 +65,8 @@ import javax.websocket.Session;
 public final class Hacks {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(Hacks.class.getName());
 
 	private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS =
 		toClassOrNull("org.primefaces.component.api.AjaxSource");
@@ -252,71 +256,76 @@ public final class Hacks {
 	 * @since 2.3
 	 */
 	public static void removeViewState(FacesContext context, ResponseStateManager manager, String viewId) {
-		if (isMyFacesUsed()) {
-			Object state = invokeMethod(manager, "getSavedState", context);
+		try {
+			if (isMyFacesUsed()) {
+				Object state = invokeMethod(manager, "getSavedState", context);
 
-			if (!(state instanceof String)) {
-				return;
-			}
+				if (!(state instanceof String)) {
+					return;
+				}
 
-			Object viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
+				Object viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
 
-			if (viewCollection == null) {
-				return;
-			}
+				if (viewCollection == null) {
+					return;
+				}
 
-			Object stateCache = invokeMethod(manager, "getStateCache", context);
-			Object stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
+				Object stateCache = invokeMethod(manager, "getStateCache", context);
+				Object stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+				Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
 
-			List<Serializable> keys = accessField(viewCollection, "_keys");
-			Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
-			Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
+				List<Serializable> keys = accessField(viewCollection, "_keys");
+				Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
+				Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
 
-			synchronized (viewCollection) { // Those fields are not concurrent maps.
-				keys.remove(key);
-				serializedViews.remove(key);
-				Serializable previousKey = precedence.remove(key);
+				synchronized (viewCollection) { // Those fields are not concurrent maps.
+					keys.remove(key);
+					serializedViews.remove(key);
+					Serializable previousKey = precedence.remove(key);
 
-				if (previousKey != null) {
-					for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
-						if (entry.getValue().equals(key)) {
-							entry.setValue(previousKey);
+					if (previousKey != null) {
+						for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
+							if (entry.getValue().equals(key)) {
+								entry.setValue(previousKey);
+							}
 						}
 					}
+
+					Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+					Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+
+					if (viewScopeIds == null || viewScopeIdCounts == null || viewScopeIds.get(key) == null) {
+						return; // Most likely cached page with client side state saving.
+					}
+
+					String viewScopeId = viewScopeIds.remove(key);
+					int count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
+
+					if (count < 1) {
+						viewScopeIdCounts.remove(viewScopeId);
+						invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
+					}
+					else {
+						viewScopeIdCounts.put(viewScopeId, count);
+					}
+				}
+			}
+			else { // Well, let's assume Mojarra.
+				Map<String, Object> serializedViews = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
+
+				if (serializedViews != null) {
+					serializedViews.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
 				}
 
-				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
-				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+				Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
 
-				if (viewScopeIds == null || viewScopeIdCounts == null || viewScopeIds.get(key) == null) {
-					return; // Most likely cached page with client side state saving.
-				}
-
-				String viewScopeId = viewScopeIds.remove(key);
-				int count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
-
-				if (count < 1) {
-					viewScopeIdCounts.remove(viewScopeId);
-					invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
-				}
-				else {
-					viewScopeIdCounts.put(viewScopeId, count);
+				if (activeViewMaps != null) {
+					activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
 				}
 			}
 		}
-		else { // Well, let's assume Mojarra.
-			Map<String, Object> serializedViews = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
-
-			if (serializedViews != null) {
-				serializedViews.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
-			}
-
-			Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
-
-			if (activeViewMaps != null) {
-				activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
-			}
+		catch (IllegalStateException e) {
+			logger.log(FINEST, "Ignoring thrown exception; this may occur when session is invalidated at the same moment.", e);
 		}
 	}
 
