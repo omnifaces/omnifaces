@@ -40,6 +40,8 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="prerequisites"><a href="#prerequisites">Prerequisites</a></h2>
  * <p>
+ * The environment must support SSE. Please refer to <a href="Sse.html#prerequisites"><code>&lt;o:sse&gt;</code> - Prerequisites</a>.
+ * <p>
  * This component requires the {@link PWAResourceHandler} to be activated by adding the following line to the
  * <code>&lt;h:head&gt;</code> because it provides the service worker mandatory for cross-platform notification support
  * via {@code ServiceWorkerRegistration.showNotification()}:

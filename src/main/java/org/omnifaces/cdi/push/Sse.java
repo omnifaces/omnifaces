@@ -47,10 +47,21 @@ import org.omnifaces.util.Json;
  * The <code>&lt;o:sse&gt;</code> is an {@link UIComponent} which opens an one-way (server to client) SSE (Server-Sent
  * Events) based push connection in client side which can be reached from server side via {@link PushContext} interface
  * injected in any CDI/container managed artifact via <code>&#64;</code>{@link Push}<code>(type=SSE)</code> annotation.
- * <p>
- * <strong>Important:</strong> All servlet filters mapped on {@code /*} must have {@code asyncSupported=true} for SSE to
- * work.
  *
+ * <h2 id="prerequisites"><a href="#prerequisites">Prerequisites</a></h2>
+ * <p>
+ * All servlet filters mapped on {@code /*} must have {@code @WebFilter(asyncSupported=true)} or
+ * {@code web.xml <async-supported>true</async-supported>} for SSE to work. In case that's not possible for your filter
+ * (e.g because it relies on some request/thread-specific state after invoking {@code chain.doFilter()} such as DB
+ * connection, locked/shared resource, {@code ThreadLocal}, etc), then you'll need to map it on a more specific
+ * URL-pattern excluding {@value PushContext#SSE_URI_PREFIX} and create yet another filter on <code>/*</code> which
+ * forwards to that filter when the request path does not match {@value PushContext#SSE_URI_PREFIX}.
+ * <p>
+ * The server (and proxy, if any) must also support HTTP/2 and have it enabled. Otherwise it will fall back to HTTP/1.1
+ * which limits concurrent connections per origin (e.g. Chrome limits to 6). In such case, multiple SSE connections
+ * across multiple tabs may hit this limit and queue further HTTP requests (including Ajax requests!), which has the
+ * consequence that {@code <f:ajax>} will simply stop working. With HTTP/2, SSE streams are multiplexed over a single
+ * TCP connection.
  *
  * <h2 id="sse-vs-websocket"><a href="#sse-vs-websocket">SSE vs WebSocket</a></h2>
  * <p>
@@ -80,11 +91,6 @@ import org.omnifaces.util.Json;
  * <p>
  * <b>When to prefer WebSocket:</b> when you need dynamic connect/disconnect via the {@code connected} attribute, or when
  * your server does not support HTTP/2.
- * <p>
- * <b>Note:</b> browsers limit concurrent HTTP/1.1 connections to 6 per origin. When the server does not support
- * HTTP/2, multiple SSE channels across multiple tabs may exhaust this limit and queue further HTTP requests (including
- * Ajax requests!). This can be resolved by configuring the server to use HTTP/2, where SSE streams are multiplexed
- * over a single TCP connection.
  *
  *
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
