@@ -24,19 +24,19 @@ import org.openqa.selenium.support.ui.Select;
 
 public class SelectItemsConverterIT extends OmniFacesIT {
 
-    @FindBy(id="form:input")
+    @FindBy(id = "form:input")
     private WebElement input;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement submit;
 
-    @FindBy(id="form:output")
+    @FindBy(id = "form:output")
     private WebElement output;
 
-    @FindBy(id="form:messages")
+    @FindBy(id = "form:messages")
     private WebElement messages;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(SelectItemsConverterIT.class);
     }

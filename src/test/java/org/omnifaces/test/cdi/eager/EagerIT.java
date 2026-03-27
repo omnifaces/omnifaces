@@ -24,37 +24,39 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "jakarta.enterprise.context.ContextNotActiveException: ViewScoped context was not active when trying to obtain a bean instance for a client proxy of CLASS bean [class=org.omnifaces.test.cdi.eager.EagerITEagerViewScopedBean]")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "jakarta.enterprise.context.ContextNotActiveException: ViewScoped context was not active when trying to obtain a bean instance for a client proxy of CLASS bean [class=org.omnifaces.test.cdi.eager.EagerITEagerViewScopedBean]"
+)
 public class EagerIT extends OmniFacesIT {
 
-    @FindBy(id="lazyApplicationScopedBean")
+    @FindBy(id = "lazyApplicationScopedBean")
     private WebElement lazyApplicationScopedBean;
 
-    @FindBy(id="eagerApplicationScopedBean")
+    @FindBy(id = "eagerApplicationScopedBean")
     private WebElement eagerApplicationScopedBean;
 
-    @FindBy(id="lazySessionScopedBean")
+    @FindBy(id = "lazySessionScopedBean")
     private WebElement lazySessionScopedBean;
 
-    @FindBy(id="eagerSessionScopedBean")
+    @FindBy(id = "eagerSessionScopedBean")
     private WebElement eagerSessionScopedBean;
 
-    @FindBy(id="lazyViewScopedBean")
+    @FindBy(id = "lazyViewScopedBean")
     private WebElement lazyViewScopedBean;
 
-    @FindBy(id="eagerViewScopedBean")
+    @FindBy(id = "eagerViewScopedBean")
     private WebElement eagerViewScopedBean;
 
-    @FindBy(id="lazyRequestScopedBean")
+    @FindBy(id = "lazyRequestScopedBean")
     private WebElement lazyRequestScopedBean;
 
-    @FindBy(id="eagerRequestScopedBean")
+    @FindBy(id = "eagerRequestScopedBean")
     private WebElement eagerRequestScopedBean;
 
-    @FindBy(id="beanInjectedInStartupBean")
+    @FindBy(id = "beanInjectedInStartupBean")
     private WebElement beanInjectedInStartupBean;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(EagerIT.class);
     }

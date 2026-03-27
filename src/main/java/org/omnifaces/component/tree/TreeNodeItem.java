@@ -32,13 +32,11 @@ import org.omnifaces.model.tree.TreeModel;
 
 /**
  * <p>
- * The <code>&lt;o:treeNodeItem&gt;</code> is an {@link UIComponent} that represents a single child tree node within a
- * parent {@link TreeNode} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
- * component will expose the child tree node.
+ * The <code>&lt;o:treeNodeItem&gt;</code> is an {@link UIComponent} that represents a single child tree node within a parent {@link TreeNode} component. Within
+ * this component, the <code>var</code> attribute of the parent {@link Tree} component will expose the child tree node.
  * <p>
- * This component allows a child component of type {@link TreeInsertChildren} which indicates the place to insert
- * the children of the current child tree node recursively by a {@link TreeNode} component associated with the
- * children's level in the same parent {@link Tree} component.
+ * This component allows a child component of type {@link TreeInsertChildren} which indicates the place to insert the children of the current child tree node
+ * recursively by a {@link TreeNode} component associated with the children's level in the same parent {@link Tree} component.
  *
  * @author Bauke Scholtz
  * @see TreeNode
@@ -56,8 +54,8 @@ public class TreeNodeItem extends TreeFamily {
 
     /**
      * Validate the component hierarchy.
-     * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is
-     * nested in another {@link TreeNodeItem}.
+     * 
+     * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is nested in another {@link TreeNodeItem}.
      */
     @Override
     protected void validateHierarchy(FacesContext context) {
@@ -66,8 +64,8 @@ public class TreeNodeItem extends TreeFamily {
     }
 
     /**
-     * Suppress default behavior of {@link #encodeAll(FacesContext)} (which also checks {@link #isRendered()}) by
-     * delegating directly to {@link #encodeChildren(FacesContext)}.
+     * Suppress default behavior of {@link #encodeAll(FacesContext)} (which also checks {@link #isRendered()}) by delegating directly to
+     * {@link #encodeChildren(FacesContext)}.
      */
     @Override
     public void encodeAll(FacesContext context) throws IOException {
@@ -75,8 +73,9 @@ public class TreeNodeItem extends TreeFamily {
     }
 
     /**
-     * Loop over children of the current model node, set the child as the current model node and continue processing
-     * this component according to the rules of the given phase ID.
+     * Loop over children of the current model node, set the child as the current model node and continue processing this component according to the rules of
+     * the given phase ID.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
@@ -104,8 +103,9 @@ public class TreeNodeItem extends TreeFamily {
     }
 
     /**
-     * Loop over children of the current model node, set the child as the current model node and continue visiting
-     * this component according to the given visit context and callback.
+     * Loop over children of the current model node, set the child as the current model node and continue visiting this component according to the given visit
+     * context and callback.
+     * 
      * @param context The visit context to work with.
      * @param callback The visit callback to work with.
      * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
@@ -137,8 +137,8 @@ public class TreeNodeItem extends TreeFamily {
     }
 
     /**
-     * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
-     * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+     * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID (not used so far in this implementation).
      * @param callback The callback to be invoked.

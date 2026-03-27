@@ -28,8 +28,8 @@ import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
- * The <code>&lt;o:treeInsertChildren&gt;</code> is an {@link UIComponent} that represents the insertion point for the
- * children of a parent tree node which is represented by {@link TreeNodeItem}.
+ * The <code>&lt;o:treeInsertChildren&gt;</code> is an {@link UIComponent} that represents the insertion point for the children of a parent tree node which is
+ * represented by {@link TreeNodeItem}.
  * <p>
  * This component does not allow any children.
  *
@@ -48,8 +48,8 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Validate the component hierarchy.
-     * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any
-     * children.
+     * 
+     * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any children.
      */
     @Override
     protected void validateHierarchy(FacesContext context) {
@@ -59,6 +59,7 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
+     * 
      * @see Tree#processTreeNode(FacesContext, PhaseId)
      */
     @Override
@@ -68,6 +69,7 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Delegate visiting of the tree node to {@link Tree#visitTreeNode(VisitContext, VisitCallback)}.
+     * 
      * @see Tree#visitTreeNode(VisitContext, VisitCallback)
      */
     @Override

@@ -28,14 +28,13 @@ import org.omnifaces.io.ResettableBufferedOutputStream;
 import org.omnifaces.io.ResettableBufferedWriter;
 
 /**
- * Convenience class for extending {@link HttpServletResponseWrapper} wherein the servlet response {@link OutputStream}
- * has to be replaced by a custom implementation. This saves the developer from writing repeated
- * {@link #getOutputStream()}, {@link #getWriter()} and {@link #flushBuffer()} boilerplate. All the developer has to do
- * is to implement the {@link #createOutputStream()} accordingly. This will in turn be used by both
- * {@link #getOutputStream()} and {@link #getWriter()}.
+ * Convenience class for extending {@link HttpServletResponseWrapper} wherein the servlet response {@link OutputStream} has to be replaced by a custom
+ * implementation. This saves the developer from writing repeated {@link #getOutputStream()}, {@link #getWriter()} and {@link #flushBuffer()} boilerplate. All
+ * the developer has to do is to implement the {@link #createOutputStream()} accordingly. This will in turn be used by both {@link #getOutputStream()} and
+ * {@link #getWriter()}.
  * <p>
- * The boolean property <code>passThrough</code>, which defaults to <code>false</code> also enables the developer to
- * control whether to pass through to the wrapped {@link ServletOutputStream} or not.
+ * The boolean property <code>passThrough</code>, which defaults to <code>false</code> also enables the developer to control whether to pass through to the
+ * wrapped {@link ServletOutputStream} or not.
  *
  * @author Bauke Scholtz
  * @since 1.1
@@ -44,10 +43,8 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ERROR_GETOUTPUT_ALREADY_CALLED =
-        "getOutputStream() has already been called on this response.";
-    private static final String ERROR_GETWRITER_ALREADY_CALLED =
-        "getWriter() has already been called on this response.";
+    private static final String ERROR_GETOUTPUT_ALREADY_CALLED = "getOutputStream() has already been called on this response.";
+    private static final String ERROR_GETWRITER_ALREADY_CALLED = "getWriter() has already been called on this response.";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -60,6 +57,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Construct a new {@link HttpServletResponseOutputWrapper} which wraps the given response.
+     * 
      * @param wrappedResponse The wrapped response.
      */
     protected HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
@@ -70,6 +68,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Returns the custom implementation of the servlet response {@link OutputStream}.
+     * 
      * @return The custom implementation of the servlet response {@link OutputStream}.
      */
     protected abstract OutputStream createOutputStream();
@@ -103,8 +102,12 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
         }
 
         if (writer == null) {
-            buffer = new ResettableBufferedWriter(new OutputStreamWriter(createOutputStream(),
-                getCharacterEncoding()), getBufferSize(), getCharacterEncoding());
+            buffer = new ResettableBufferedWriter(
+                new OutputStreamWriter(
+                    createOutputStream(),
+                    getCharacterEncoding()
+                ), getBufferSize(), getCharacterEncoding()
+            );
             writer = new PrintWriter((Writer) buffer);
         }
 
@@ -129,6 +132,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Close the response body. This closes any created writer or output stream.
+     * 
      * @throws IOException When an I/O error occurs.
      */
     public void close() throws IOException {
@@ -152,8 +156,8 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
     // Getters/setters ------------------------------------------------------------------------------------------------
 
     /**
-     * Returns whether the response is committed or not. The response is also considered committed when the resettable
-     * buffer has been flushed.
+     * Returns whether the response is committed or not. The response is also considered committed when the resettable buffer has been flushed.
+     * 
      * @return <code>true</code> if the response is committed, otherwise <code>false</code>.
      */
     @Override
@@ -163,8 +167,8 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-     * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream},
-     * otherwise <code>false</code>.
+     * 
+     * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream}, otherwise <code>false</code>.
      */
     public boolean isPassThrough() {
         return passThrough;
@@ -172,8 +176,8 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-     * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped
-     * {@link ServletOutputStream}.
+     * 
+     * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped {@link ServletOutputStream}.
      */
     public void setPassThrough(boolean passThrough) {
         this.passThrough = passThrough;

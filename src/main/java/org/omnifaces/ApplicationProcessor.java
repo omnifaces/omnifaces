@@ -32,17 +32,16 @@ import org.omnifaces.facesviews.FacesViews;
 
 /**
  * <p>
- * OmniFaces application processor. This runs when the faces application is created.
- * This performs the following tasks:
+ * OmniFaces application processor. This runs when the faces application is created. This performs the following tasks:
  * <ol>
  * <li>Check if {@link Application#getResourceHandler()} chain is unique, otherwise log and fail.
  * <li>Register the {@link FacesViews} view handler.
  * <li>Register the {@link MessagesKeywordResolver}.
  * </ol>
  * <p>
- * This is invoked <strong>after</strong> {@link ApplicationInitializer} and {@link ApplicationListener}.
- * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
- * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
+ * This is invoked <strong>after</strong> {@link ApplicationInitializer} and {@link ApplicationListener}. If any exception is thrown, then the deployment will
+ * fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} context parameter is set to <code>true</code>, it will then merely log a WARNING
+ * line.
  *
  * @author Bauke Scholtz
  * @since 3.1
@@ -53,11 +52,10 @@ public class ApplicationProcessor implements SystemEventListener {
 
     private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
 
-    private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
-        "Resource handler %s is duplicated."
-            + " This will result in erratic resource handling behavior."
-            + " Please check if your build is clean and does not contain duplicate libraries having same resource handler."
-            + " Also check if the same resource handler is not declared multiple times in all your faces-config.xml files combined.";
+    private static final String ERROR_DUPLICATE_RESOURCE_HANDLER = "Resource handler %s is duplicated."
+        + " This will result in erratic resource handling behavior."
+        + " Please check if your build is clean and does not contain duplicate libraries having same resource handler."
+        + " Also check if the same resource handler is not declared multiple times in all your faces-config.xml files combined.";
 
     // Actions --------------------------------------------------------------------------------------------------------
 

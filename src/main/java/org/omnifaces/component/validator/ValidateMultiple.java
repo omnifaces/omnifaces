@@ -27,8 +27,8 @@ import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
  * <p>
- * The <code>&lt;o:validateMultiple&gt;</code> allows the developer to validate multiple fields by either a custom
- * validator method:
+ * The <code>&lt;o:validateMultiple&gt;</code> allows the developer to validate multiple fields by either a custom validator method:
+ * 
  * <pre>
  * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.someMethod}" /&gt;
  * &lt;h:message for="myId" /&gt;
@@ -36,13 +36,18 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * &lt;h:inputText id="bar" /&gt;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
- * <p>whereby the method has the following signature (method name is free to your choice):
+ * <p>
+ * whereby the method has the following signature (method name is free to your choice):
+ * 
  * <pre>
+ * 
  * public boolean someMethod(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
  *     // ...
  * }
  * </pre>
- * <p>Or, by a managed bean instance which implements the {@link MultiFieldValidator} interface:
+ * <p>
+ * Or, by a managed bean instance which implements the {@link MultiFieldValidator} interface:
+ * 
  * <pre>
  * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{validateValuesBean}" /&gt;
  * &lt;h:message for="myId" /&gt;
@@ -50,23 +55,25 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * &lt;h:inputText id="bar" /&gt;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
+ * 
  * <pre>
  * &#64;ManagedBean
  * &#64;RequestScoped
  * public class ValidateValuesBean implements MultiFieldValidator {
+ * 
  *     &#64;Override
  *     public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
  *         // ...
  *     }
+ * 
  * }
  * </pre>
  *
  * <h2>Design notice</h2>
  * <p>
- * Note that this validator does <strong>not</strong> throw {@link ValidatorException}, but returns a boolean! Message
- * handling and invalidation job is up to the {@link ValidateMultipleFields} implementation who will call this method.
- * You can customize the message by the <code>message</code> attribute of the tag. Refer {@link ValidateMultipleFields}
- * documentation for general usage instructions.
+ * Note that this validator does <strong>not</strong> throw {@link ValidatorException}, but returns a boolean! Message handling and invalidation job is up to
+ * the {@link ValidateMultipleFields} implementation who will call this method. You can customize the message by the <code>message</code> attribute of the tag.
+ * Refer {@link ValidateMultipleFields} documentation for general usage instructions.
  *
  * @author Juliano Marques
  * @author Bauke Scholtz
@@ -115,6 +122,7 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
     /**
      * Returns the validator instance.
+     * 
      * @return The validator instance.
      */
     public MultiFieldValidator getValidator() {
@@ -123,6 +131,7 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
     /**
      * Sets the validator instance.
+     * 
      * @param validator The validator instance.
      */
     public void setValidator(MultiFieldValidator validator) {
@@ -131,6 +140,7 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
     /**
      * Returns the validator method expression.
+     * 
      * @return The validator method expression.
      */
     public MethodExpression getValidateMethod() {
@@ -139,6 +149,7 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
     /**
      * Sets the validator method expression.
+     * 
      * @param validateMethod The validator method expression.
      */
     public void setValidateMethod(MethodExpression validateMethod) {

@@ -28,25 +28,25 @@ import org.openqa.selenium.support.FindBy;
 
 public class WebAndFacesConfigXmlIT extends OmniFacesIT {
 
-    @FindBy(id="webXmlInjected")
+    @FindBy(id = "webXmlInjected")
     private WebElement webXmlInjected;
 
-    @FindBy(id="facesConfigXmlInjected")
+    @FindBy(id = "facesConfigXmlInjected")
     private WebElement facesConfigXmlInjected;
 
-    @FindBy(id="errorPageLocations")
+    @FindBy(id = "errorPageLocations")
     private WebElement errorPageLocations;
 
-    @FindBy(id="supportedLocales")
+    @FindBy(id = "supportedLocales")
     private WebElement supportedLocales;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(WebAndFacesConfigXmlIT.class)
-                .withFacesConfig(withSupportedLocales)
-                .withWebXml(withErrorPage)
-                .withPrimeFaces()
-                .createDeployment();
+            .withFacesConfig(withSupportedLocales)
+            .withWebXml(withErrorPage)
+            .withPrimeFaces()
+            .createDeployment();
     }
 
     @Test

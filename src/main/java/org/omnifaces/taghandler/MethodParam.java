@@ -29,21 +29,21 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:methodParam&gt;</code> is a tag handler that can be used to pass a method expression as attribute
- * into a Facelets tag. By default this is not possible, and the expression that's intended to be a method expression
- * will be created and made available as a value expression.
+ * The <code>&lt;o:methodParam&gt;</code> is a tag handler that can be used to pass a method expression as attribute into a Facelets tag. By default this is not
+ * possible, and the expression that's intended to be a method expression will be created and made available as a value expression.
  * <p>
- * This handler wraps a value expression that's actually a method expression by another value expression that returns a
- * method expression that gets the value of first value expression, which as "side-effect" executes the original method
- * expression. This somewhat over-the-top chain of wrapping is done so a method expression can be passed as attribute
- * into a Facelet tag.
+ * This handler wraps a value expression that's actually a method expression by another value expression that returns a method expression that gets the value of
+ * first value expression, which as "side-effect" executes the original method expression. This somewhat over-the-top chain of wrapping is done so a method
+ * expression can be passed as attribute into a Facelet tag.
  *
  * @author Arjan Tijms
  */
 @FacesTagHandler(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class MethodParam extends TagHandler {
 
-    @FacesAttribute(required = true, description = "Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.")
+    @FacesAttribute(
+        required = true, description = "Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag."
+    )
     private final TagAttribute name;
 
     @FacesAttribute(required = true, description = "The method expression to be cached and made available as a new value expression.")
@@ -51,6 +51,7 @@ public class MethodParam extends TagHandler {
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public MethodParam(TagConfig config) {

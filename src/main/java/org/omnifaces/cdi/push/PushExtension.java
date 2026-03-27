@@ -21,9 +21,8 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * This CDI extension detects <code>&#64;Inject &#64;Push PushContext</code> injection points during bean discovery.
- * This enables automatic registration of the {@link SocketEndpoint} and/or {@link SseEndpoint} without requiring
- * explicit configuration.
+ * This CDI extension detects <code>&#64;Inject &#64;Push PushContext</code> injection points during bean discovery. This enables automatic registration of the
+ * {@link SocketEndpoint} and/or {@link SseEndpoint} without requiring explicit configuration.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -40,8 +39,8 @@ public class PushExtension implements Extension {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Collect injection points of type {@link PushContext} qualified with {@link Push} and detect whether Web Socket
-     * and/or SSE push is used.
+     * Collect injection points of type {@link PushContext} qualified with {@link Push} and detect whether Web Socket and/or SSE push is used.
+     * 
      * @param <T> The generic bean type.
      * @param event The process injection point event.
      */
@@ -63,8 +62,8 @@ public class PushExtension implements Extension {
     // Getters --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns whether a <code>&#64;Push PushContext</code> (Web Socket) injection point was detected during bean
-     * discovery.
+     * Returns whether a <code>&#64;Push PushContext</code> (Web Socket) injection point was detected during bean discovery.
+     * 
      * @return Whether a Web Socket push injection point was detected during bean discovery.
      */
     static boolean isSocketActivated() {
@@ -72,8 +71,9 @@ public class PushExtension implements Extension {
     }
 
     /**
-     * Returns whether a <code>&#64;Push(type=SSE)</code> or <code>&#64;Push(type=NOTIFICATION)</code>
-     * {@link PushContext} injection point was detected during bean discovery.
+     * Returns whether a <code>&#64;Push(type=SSE)</code> or <code>&#64;Push(type=NOTIFICATION)</code> {@link PushContext} injection point was detected during
+     * bean discovery.
+     * 
      * @return Whether an SSE push injection point was detected during bean discovery.
      */
     static boolean isSseActivated() {

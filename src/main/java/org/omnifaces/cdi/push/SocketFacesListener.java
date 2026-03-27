@@ -36,8 +36,7 @@ import jakarta.faces.event.SystemEventListener;
 
 /**
  * <p>
- * This Faces listener for {@link UIViewRoot} ensures that the necessary JavaScript code to open or close the
- * <code>WebSocket</code> is properly rendered.
+ * This Faces listener for {@link UIViewRoot} ensures that the necessary JavaScript code to open or close the <code>WebSocket</code> is properly rendered.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -61,10 +60,9 @@ public class SocketFacesListener implements SystemEventListener {
     }
 
     /**
-     * If the socket has just switched the <code>connected</code> attribute, then render either the <code>open()</code>
-     * script or the <code>close()</code> script. During an ajax request with partial rendering, it's added as
-     * <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component with
-     * <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
+     * If the socket has just switched the <code>connected</code> attribute, then render either the <code>open()</code> script or the <code>close()</code>
+     * script. During an ajax request with partial rendering, it's added as <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a
+     * script component with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
      */
     @Override
     public void processEvent(SystemEvent event) {
@@ -114,8 +112,8 @@ public class SocketFacesListener implements SystemEventListener {
     }
 
     /**
-     * Register given socket and returns true if it's new. Note that this method is in first place not invoked when
-     * <code>socket.isRendered()</code> returns <code>false</code>, so this check is not done here.
+     * Register given socket and returns true if it's new. Note that this method is in first place not invoked when <code>socket.isRendered()</code> returns
+     * <code>false</code>, so this check is not done here.
      */
     static boolean register(FacesContext context, Socket socket) {
         Entry<Serializable, Boolean> currentlyConnectedUser = new AbstractMap.SimpleEntry<>(socket.getUser(), socket.isConnected());
@@ -129,8 +127,8 @@ public class SocketFacesListener implements SystemEventListener {
     }
 
     /**
-     * Helper to remember which sockets are initialized on the view. The map key represents the <code>channel</code>
-     * and the map value represents the last known value of the <code>user</code> and <code>connected</code> attributes.
+     * Helper to remember which sockets are initialized on the view. The map key represents the <code>channel</code> and the map value represents the last known
+     * value of the <code>user</code> and <code>connected</code> attributes.
      */
     private static Map<String, Entry<Serializable, Boolean>> getSockets(FacesContext context) {
         return getViewAttribute(context, Socket.class.getName(), () -> new HashMap<>(ESTIMATED_TOTAL_CHANNELS, 1));

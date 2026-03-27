@@ -15,8 +15,7 @@ package org.omnifaces.facesviews;
 /**
  * The action that is done when a Faces Views request with an extension is done.
  * <p>
- * Note that this is only used for views that were discovered via Faces Views. It has no affect on other resources, even
- * if they have the same extension.
+ * Note that this is only used for views that were discovered via Faces Views. It has no affect on other resources, even if they have the same extension.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
@@ -40,8 +39,7 @@ public enum ExtensionAction {
     SEND_404,
 
     /**
-     * No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same
-     * content).
+     * No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same content).
      */
     PROCEED;
 

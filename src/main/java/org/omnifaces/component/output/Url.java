@@ -37,27 +37,24 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or Faces view ID as a bookmarkable
- * URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
- * and <code>&lt;o:param&gt;</code>, and for exposing it into the request scope by the variable name as specified by
- * the <code>var</code> attribute instead of rendering it.
+ * The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or Faces view ID as a bookmarkable URL with support for adding additional
+ * query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>, and for exposing it into the request scope by
+ * the variable name as specified by the <code>var</code> attribute instead of rendering it.
  * <p>
- * This component fills the gap caused by absence of JSTL <code>&lt;c:url&gt;</code> in Facelets. This component is
- * useful for generating URLs for usage in e.g. plain HTML <code>&lt;link&gt;</code> elements and JavaScript variables.
+ * This component fills the gap caused by absence of JSTL <code>&lt;c:url&gt;</code> in Facelets. This component is useful for generating URLs for usage in e.g.
+ * plain HTML <code>&lt;link&gt;</code> elements and JavaScript variables.
  *
  * <h2>Values</h2>
  * <p>
- * You can supply the target URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When
- * both are specified, the <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
- * When none are specified, then the <code>viewId</code> will default to the current view ID.
- * The support for <code>value</code> attribute was added in OmniFaces 3.0.
+ * You can supply the target URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When both are specified, the
+ * <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored. When none are specified, then the <code>viewId</code> will
+ * default to the current view ID. The support for <code>value</code> attribute was added in OmniFaces 3.0.
  *
  * <h2>Domain</h2>
  * <p>
- * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current
- * domain. It is possible to provide a full qualified domain name (FQDN) via the <code>domain</code> attribute which
- * the URL is to be prefixed with. This can be useful if a canonical page shall point to a different domain or a
- * specific subdomain.
+ * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current domain. It is possible to provide a full
+ * qualified domain name (FQDN) via the <code>domain</code> attribute which the URL is to be prefixed with. This can be useful if a canonical page shall point
+ * to a different domain or a specific subdomain.
  * <p>
  * Valid formats and values for <code>domain</code> attribute are:
  * <ul>
@@ -68,23 +65,22 @@ import org.omnifaces.util.State;
  * <li><code>&lt;o:url domain="//" /&gt;</code></li>
  * </ul>
  * <p>
- * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid.
- * If the domain equals <code>/</code>, then the URL becomes domain-relative.
- * If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
- * If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
+ * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid. If the domain equals <code>/</code>,
+ * then the URL becomes domain-relative. If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes
+ * scheme-relative. If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
  *
  * <h2>Request and view parameters</h2>
  * <p>
- * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
- * You can optionally include all GET request query string parameters or only Faces view parameters in the resulting URL via
- * <code>includeRequestParams="true"</code> or <code>includeViewParams="true"</code>.
- * The <code>includeViewParams</code> is ignored when <code>includeRequestParams="true"</code>.
- * The <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name.
- * To conditionally add or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
+ * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>. You can optionally include all GET
+ * request query string parameters or only Faces view parameters in the resulting URL via <code>includeRequestParams="true"</code> or
+ * <code>includeViewParams="true"</code>. The <code>includeViewParams</code> is ignored when <code>includeRequestParams="true"</code>. The
+ * <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name. To conditionally add or override, use the
+ * <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  *
  * <h2>Usage</h2>
  * <p>
  * Some examples:
+ * 
  * <pre>
  * &lt;p&gt;Full URL of current page is: &lt;o:url /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of another page is: &lt;o:url viewId="/another.xhtml" /&gt;&lt;/p&gt;
@@ -98,12 +94,14 @@ import org.omnifaces.util.State;
  *     &lt;o:param name="q" value="#{bean.search}" /&gt;
  * &lt;/url&gt;&lt;/p&gt;
  * </pre>
+ * 
  * <pre>
  * &lt;o:url var="_linkCanonical"&gt;
  *     &lt;o:param name="foo" value="#{bean.foo}" /&gt;
  * &lt;/o:url&gt;
  * &lt;link rel="canonical" href="#{_linkCanonical}" /&gt;
  * </pre>
+ * 
  * <pre>
  * &lt;o:url var="_linkNext" includeViewParams="true"&gt;
  *     &lt;f:param name="page" value="#{bean.pageIndex + 1}" /&gt;
@@ -125,21 +123,20 @@ public class Url extends OutputFamily {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_EXPRESSION_DISALLOWED =
-        "A value expression is disallowed on 'var' attribute of Url.";
+    private static final String ERROR_EXPRESSION_DISALLOWED = "A value expression is disallowed on 'var' attribute of Url.";
 
-    private static final String ERROR_INVALID_DOMAIN =
-        "o:url 'domain' attribute '%s' does not represent a valid domain.";
+    private static final String ERROR_INVALID_DOMAIN = "o:url 'domain' attribute '%s' does not represent a valid domain.";
 
     private enum PropertyKeys {
+
         // Cannot be uppercased. They have to exactly match the attribute names.
-        VAR,
-        value,
-        viewId,
-        domain,
-        includeViewParams,
-        includeRequestParams;
-        @Override public String toString() { return this == VAR ? "var" : name(); }
+        VAR, value, viewId, domain, includeViewParams, includeRequestParams;
+
+        @Override
+        public String toString() {
+            return this == VAR ? "var" : name();
+        }
+
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -149,8 +146,8 @@ public class Url extends OutputFamily {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * An override which checks if this isn't been invoked on <code>var</code> attribute.
-     * Finally it delegates to the super method.
+     * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
+     * 
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -174,7 +171,9 @@ public class Url extends OutputFamily {
     public void encodeEnd(FacesContext context) throws IOException {
         var value = getValue();
         var params = getParams(context, this, isIncludeRequestParams(), isIncludeViewParams());
-        var url = value != null ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
+        var url = value != null
+            ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params)))
+            : getBookmarkableURLWithDomain(context, params);
 
         if (getVar() != null) {
             setRequestAttribute(context, getVar(), url);
@@ -215,6 +214,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the variable name which exposes the URL into the request scope.
+     * 
      * @return The variable name which exposes the URL into the request scope.
      */
     public String getVar() {
@@ -223,6 +223,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the variable name which exposes the URL into the request scope.
+     * 
      * @param varName The variable name which exposes the URL into the request scope.
      */
     public void setVar(String varName) {
@@ -231,6 +232,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
+     * 
      * @return The target URL.
      */
     public String getValue() {
@@ -239,6 +241,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
+     * 
      * @param value The target URL.
      */
     public void setValue(String value) {
@@ -246,8 +249,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Returns the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value}
-     * attribute is specified.
+     * Returns the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value} attribute is specified.
+     * 
      * @return The view ID to create URL for.
      */
     public String getViewId() {
@@ -255,8 +258,8 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value}
-     * attribute is specified.
+     * Sets the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value} attribute is specified.
+     * 
      * @param viewId The view ID to create URL for.
      */
     public void setViewId(String viewId) {
@@ -265,6 +268,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the domain of the URL. Defaults to current domain.
+     * 
      * @return The domain of the URL.
      */
     public String getDomain() {
@@ -273,6 +277,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the domain of the URL. Defaults to current domain.
+     * 
      * @param domain The domain of the URL.
      */
     public void setDomain(String domain) {
@@ -280,8 +285,9 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>.
-     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>. This setting is ignored when
+     * <code>includeRequestParams</code> is set to <code>true</code>.
+     * 
      * @return Whether or not the view parameters should be encoded into the URL.
      */
     public boolean isIncludeViewParams() {
@@ -289,8 +295,9 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets whether or not the view parameters should be encoded into the URL. Defaults to {@code false}.
-     * This setting is ignored when {@code includeRequestParams} is set to {@code true}.
+     * Sets whether or not the view parameters should be encoded into the URL. Defaults to {@code false}. This setting is ignored when
+     * {@code includeRequestParams} is set to {@code true}.
+     * 
      * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
      */
     public void setIncludeViewParams(boolean includeViewParams) {
@@ -298,8 +305,9 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>.
-     * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+     * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>. When set to <code>true</code>,
+     * then this will override the <code>includeViewParams</code> setting.
+     * 
      * @return Whether or not the request query string parameters should be encoded into the URL.
      */
     public boolean isIncludeRequestParams() {
@@ -307,8 +315,9 @@ public class Url extends OutputFamily {
     }
 
     /**
-     * Sets whether or not the request query string parameters should be encoded into the URL. Defaults to
-     * {@code false}. When set to {@code true}, then this will override the {@code includeViewParams} setting.
+     * Sets whether or not the request query string parameters should be encoded into the URL. Defaults to {@code false}. When set to {@code true}, then this
+     * will override the {@code includeViewParams} setting.
+     * 
      * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {

@@ -29,4 +29,5 @@ public class FacesConverterITExtendedManagedConverter extends FacesConverterITBa
     public String getAsString(FacesContext context, UIComponent component, Object value) {
         return service == null ? "null" : service.getClass().getSimpleName();
     }
+
 }

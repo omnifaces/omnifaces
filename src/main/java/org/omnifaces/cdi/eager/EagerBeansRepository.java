@@ -44,15 +44,12 @@ public class EagerBeansRepository {
 
     private static final Logger logger = Logger.getLogger(EagerBeansRepository.class.getName());
 
-    private static final String MISSING_REQUEST_URI_OR_VIEW_ID =
-        "Bean '%s' was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing."
-            + " Bean will not be eagerly instantiated.";
-    private static final String MISSING_VIEW_ID =
-        "Bean '%s' was annotated with @Eager, but required attribute 'viewId' is missing."
-            + " Bean will not be eagerly instantiated.";
-    private static final String WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE =
-        "Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
-            + " This is known to be the case in certain Tomcat and Jetty based configurations.";
+    private static final String MISSING_REQUEST_URI_OR_VIEW_ID = "Bean '%s' was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing."
+        + " Bean will not be eagerly instantiated.";
+    private static final String MISSING_VIEW_ID = "Bean '%s' was annotated with @Eager, but required attribute 'viewId' is missing."
+        + " Bean will not be eagerly instantiated.";
+    private static final String WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE = "Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
+        + " This is known to be the case in certain Tomcat and Jetty based configurations.";
 
     private static EagerBeansRepository instance;
 
@@ -62,6 +59,7 @@ public class EagerBeansRepository {
 
     /**
      * Awkward workaround for it being unavailable via {@link Inject} in listeners in Tomcat+OWB and Jetty.
+     * 
      * @return Current instance of {@link EagerBeansRepository}.
      */
     public static EagerBeansRepository getInstance() {
@@ -74,6 +72,7 @@ public class EagerBeansRepository {
 
     /**
      * Sets the collected eager beans. This is invoked by {@link EagerExtension#load(jakarta.enterprise.inject.spi.AfterDeploymentValidation, BeanManager)}.
+     * 
      * @param eagerBeans The collected eager beans.
      */
     protected void setEagerBeans(EagerBeans eagerBeans) {
@@ -82,6 +81,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate application scoped eager beans and register {@link EagerBeansWebListener} if necessary.
+     * 
      * @param servletContext The involved servlet context.
      */
     public static void instantiateApplicationScopedAndRegisterListenerIfNecessary(ServletContext servletContext) {
@@ -102,6 +102,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any application scoped eager beans.
+     * 
      * @return <code>true</code> if there are any application scoped eager beans.
      */
     protected boolean hasAnyApplicationScopedBeans() {
@@ -110,6 +111,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
+     * 
      * @return <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
      */
     protected boolean hasAnySessionOrRequestURIBeans() {
@@ -118,6 +120,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any eager beans by view ID.
+     * 
      * @return <code>true</code> if there are any eager beans by view ID.
      */
     protected boolean hasAnyViewIdBeans() {
@@ -126,6 +129,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate application scoped eager beans.
+     * 
      * @return <code>true</code> if there were any application scoped eager beans.
      */
     public boolean instantiateApplicationScoped() {
@@ -134,6 +138,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate session scoped eager beans.
+     * 
      * @return <code>true</code> if there were any session scoped eager beans.
      */
     public boolean instantiateSessionScoped() {
@@ -142,6 +147,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate eager beans by request URI.
+     * 
      * @param relativeRequestURI The context-relative request URI;
      * @return <code>true</code> if there were any eager beans by request URI.
      */
@@ -151,6 +157,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate eager beans by view ID.
+     * 
      * @param viewId The view ID;
      * @return <code>true</code> if there were any eager beans by view URI.
      */

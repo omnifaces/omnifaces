@@ -37,12 +37,10 @@ import org.omnifaces.context.OmniPartialViewContext;
  * <p>
  * Collection of utility methods for the Faces API with respect to working with {@link PartialViewContext}.
  * <p>
- * The difference with {@link Ajax} is that no one method of {@link AjaxLocal} obtains the {@link FacesContext}
- * from the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more
- * efficient in situations where multiple utility methods needs to be called at the same time. Invoking
- * {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained
- * as a {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds
- * or so.
+ * The difference with {@link Ajax} is that no one method of {@link AjaxLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
+ * called at the same time. Invoking {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained as a
+ * {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds or so.
  *
  * @author Bauke Scholtz
  * @since 4.6
@@ -52,15 +50,11 @@ public final class AjaxLocal {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ERROR_NO_SCRIPT_RESOURCE =
-        "";
-    private static final String ERROR_NO_PARTIAL_RENDERING =
-        "The current request is not an ajax request with partial rendering."
-            + " Use Components#addScriptXxx() methods instead.";
-    private static final String ERROR_ARGUMENTS_LENGTH =
-        "The arguments length must be even. Encountered %d items.";
-    private static final String ERROR_ARGUMENT_TYPE =
-        "The argument name must be a String. Encountered type '%s' with value '%s'.";
+    private static final String ERROR_NO_SCRIPT_RESOURCE = "";
+    private static final String ERROR_NO_PARTIAL_RENDERING = "The current request is not an ajax request with partial rendering."
+        + " Use Components#addScriptXxx() methods instead.";
+    private static final String ERROR_ARGUMENTS_LENGTH = "The arguments length must be even. Encountered %d items.";
+    private static final String ERROR_ARGUMENT_TYPE = "The argument name must be a String. Encountered type '%s' with value '%s'.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -267,7 +261,7 @@ public final class AjaxLocal {
 
         var omniContext = OmniPartialViewContext.getCurrentInstance(context);
 
-        for (var i = 0; i < namesValues.length; i+= 2) {
+        for (var i = 0; i < namesValues.length; i += 2) {
             if (!(namesValues[i] instanceof String)) {
                 var type = namesValues[i] != null ? namesValues[i].getClass().getName() : "null";
                 throw new IllegalArgumentException(ERROR_ARGUMENT_TYPE.formatted(type, namesValues[i]));
@@ -294,4 +288,5 @@ public final class AjaxLocal {
     public static boolean isExecuted(FacesContext context, String clientId) {
         return getContext(context).getExecuteIds().contains(clientId);
     }
+
 }

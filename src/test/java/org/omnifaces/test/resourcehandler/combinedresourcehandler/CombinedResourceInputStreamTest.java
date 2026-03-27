@@ -211,10 +211,12 @@ class CombinedResourceInputStreamTest {
     }
 
     /**
-     * Wraps content in a {@link FilterInputStream} so it is not a {@link ByteArrayInputStream}, which
-     * {@link CombinedResourceInputStream} uses to distinguish CRLF separators from actual resource streams.
+     * Wraps content in a {@link FilterInputStream} so it is not a {@link ByteArrayInputStream}, which {@link CombinedResourceInputStream} uses to distinguish
+     * CRLF separators from actual resource streams.
      */
     private static FilterInputStream toResourceStream(String content) {
-        return new FilterInputStream(new ByteArrayInputStream(content.getBytes(UTF_8))) {};
+        return new FilterInputStream(new ByteArrayInputStream(content.getBytes(UTF_8))) {
+        };
     }
+
 }

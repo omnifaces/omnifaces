@@ -78,7 +78,15 @@ export namespace Push {
          * reconnect.
          * @param behaviors Client behavior functions to be invoked when specific message is received.
          */
-        constructor(url: string, channel: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>) {
+        constructor(
+            url: string,
+            channel: string,
+            onopen: Function,
+            onmessage: Function,
+            onerror: Function,
+            onclose: Function,
+            behaviors: Record<string, Function[]>
+        ) {
             this.url = url;
             this.channel = channel;
             this.onopen = onopen;
@@ -121,8 +129,8 @@ export namespace Push {
                     || (event.code == 1000 && event.reason == REASON_EXPIRED)
                     || (event.code == 1008 && event.reason == REASON_UNKNOWN_CHANNEL)
                     || (self.reconnectAttempts == null)
-                    || (self.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS))
-                {
+                    || (self.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
+                ) {
                     self.onclose(event.code, self.channel, event);
                 }
                 else {
@@ -190,7 +198,15 @@ export namespace Push {
          * @param onclose The function to be invoked when the SSE connection is closed.
          * @param behaviors Client behavior functions to be invoked when specific message is received.
          */
-        constructor(url: string, channel: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>) {
+        constructor(
+            url: string,
+            channel: string,
+            onopen: Function,
+            onmessage: Function,
+            onerror: Function,
+            onclose: Function,
+            behaviors: Record<string, Function[]>
+        ) {
             this.url = url;
             this.channel = channel;
             this.onopen = onopen;
@@ -273,7 +289,17 @@ export namespace Push {
      * @param behaviors Client behavior functions to be invoked when specific message is received.
      * @param autoconnect Whether or not to immediately open the connection. Defaults to <code>true</code>.
      */
-    export function init(sse: boolean, host: string, uri: string, onopen: Function, onmessage: Function, onerror: Function, onclose: Function, behaviors: Record<string, Function[]>, autoconnect?: boolean) {
+    export function init(
+        sse: boolean,
+        host: string,
+        uri: string,
+        onopen: Function,
+        onmessage: Function,
+        onerror: Function,
+        onclose: Function,
+        behaviors: Record<string, Function[]>,
+        autoconnect?: boolean
+    ) {
         onclose = Util.resolveFunction(onclose);
         const channel = uri.split(/\?/)[0];
 
@@ -283,15 +309,15 @@ export namespace Push {
         }
 
         if (!connections[channel]) {
-            const resolvedOnopen = Util.resolveFunction(onopen);
-            const resolvedOnmessage = Util.resolveFunction(onmessage);
-            const resolvedOnerror = Util.resolveFunction(onerror);
+            onopen = Util.resolveFunction(onopen);
+            onmessage = Util.resolveFunction(onmessage);
+            onerror = Util.resolveFunction(onerror);
 
             if (sse) {
-                connections[channel] = new SseConnection(getSseURL(host, uri), channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+                connections[channel] = new SseConnection(getSseURL(host, uri), channel, onopen, onmessage, onerror, onclose, behaviors);
             }
             else {
-                connections[channel] = new SocketConnection(getSocketURL(host, uri), channel, resolvedOnopen, resolvedOnmessage, resolvedOnerror, onclose, behaviors);
+                connections[channel] = new SocketConnection(getSocketURL(host, uri), channel, onopen, onmessage, onerror, onclose, behaviors);
             }
         }
 
@@ -332,7 +358,7 @@ export namespace Push {
 
     /**
      * Get web socket URL from given host.
-     * @param host The host of the web socket endpoint in either the format 
+     * @param host The host of the web socket endpoint in either the format
      * <code>example.com:8080/context</code>, or <code>:8080/context</code>, or <code>/context</code>.
      * If the value is falsey, then it will default to <code>window.location.host</code>.
      * If the value starts with <code>:</code>, then <code>window.location.hostname</code> will be prepended.
@@ -343,7 +369,7 @@ export namespace Push {
     function getSocketURL(host: string, uri: string): string {
         host = host ?? "";
         const base = (!host || host.startsWith("/")) ? window.location.host
-                : (host.startsWith(":")) ? window.location.hostname
+            : (host.startsWith(":")) ? window.location.hostname
                 : "";
         return `${WS_PROTOCOL}${base}${host}${WS_URI_PREFIX}/${uri}`;
     }

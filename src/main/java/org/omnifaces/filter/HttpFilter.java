@@ -30,19 +30,17 @@ import jakarta.servlet.http.HttpSession;
 /**
  * <p>
  * The {@link HttpFilter} is abstract filter specifically for HTTP requests. It provides a convenient abstract
- * {@link #doFilter(HttpServletRequest, HttpServletResponse, HttpSession, FilterChain)} method directly providing the
- * HTTP servlet request, response and session, so that there's no need to cast them everytime in the
- * {@link #doFilter(ServletRequest, ServletResponse, FilterChain)} implementation. Also, default implementations of
- * {@link #init(FilterConfig)} and {@link #destroy()} are provided, so that there's no need to implement them every time
- * even when not really needed.
+ * {@link #doFilter(HttpServletRequest, HttpServletResponse, HttpSession, FilterChain)} method directly providing the HTTP servlet request, response and
+ * session, so that there's no need to cast them everytime in the {@link #doFilter(ServletRequest, ServletResponse, FilterChain)} implementation. Also, default
+ * implementations of {@link #init(FilterConfig)} and {@link #destroy()} are provided, so that there's no need to implement them every time even when not really
+ * needed.
  * <p>
- * It's a bit the idea of using the convenient {@link HttpServlet} abstract servlet class instead of the barebones
- * {@link Servlet} interface.
+ * It's a bit the idea of using the convenient {@link HttpServlet} abstract servlet class instead of the barebones {@link Servlet} interface.
  *
  * <h2>Usage</h2>
  * <p>
- * To use it, just let your custom filter extend from {@link HttpFilter} instead of implement {@link Filter}.
- * For example:
+ * To use it, just let your custom filter extend from {@link HttpFilter} instead of implement {@link Filter}. For example:
+ * 
  * <pre>
  * &#64;WebFilter("/app/*")
  * public class LoginFilter extends HttpFilter {
@@ -58,6 +56,7 @@ import jakarta.servlet.http.HttpSession;
  *             Servlets.facesRedirect(request, response, "login.xhtml");
  *         }
  *     }
+ * 
  * }
  * </pre>
  *
@@ -79,10 +78,9 @@ public abstract class HttpFilter implements Filter {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Called by the servlet container when the filter is about to be placed into service. This implementation stores
-     * the {@link FilterConfig} object for later use by the getter methods. It's recommended to <strong>not</strong>
-     * override this method. Instead, just use {@link #init()} method. When overriding this method anyway, don't forget
-     * to call <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
+     * Called by the servlet container when the filter is about to be placed into service. This implementation stores the {@link FilterConfig} object for later
+     * use by the getter methods. It's recommended to <strong>not</strong> override this method. Instead, just use {@link #init()} method. When overriding this
+     * method anyway, don't forget to call <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
      */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -92,6 +90,7 @@ public abstract class HttpFilter implements Filter {
 
     /**
      * Convenience init() method without FilterConfig parameter which will be called by init(FilterConfig).
+     * 
      * @throws ServletException When filter's initialization failed.
      */
     public void init() throws ServletException {
@@ -110,6 +109,7 @@ public abstract class HttpFilter implements Filter {
 
     /**
      * Filter the HTTP request. The session argument is <code>null</code> if there is no session.
+     * 
      * @param request The HTTP request.
      * @param response The HTTP response.
      * @param session The HTTP session, if any, else <code>null</code>.
@@ -118,9 +118,8 @@ public abstract class HttpFilter implements Filter {
      * @throws IOException Whenever something fails at I/O level.
      * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
      */
-    public abstract void doFilter
-        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-            throws ServletException, IOException;
+    public abstract void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException;
 
     @Override
     public void destroy() {
@@ -131,6 +130,7 @@ public abstract class HttpFilter implements Filter {
 
     /**
      * Returns the filter config.
+     * 
      * @return The filter config.
      */
     protected FilterConfig getFilterConfig() {
@@ -140,6 +140,7 @@ public abstract class HttpFilter implements Filter {
 
     /**
      * Returns the value of the filter init parameter associated with the given name.
+     * 
      * @param name The filter init parameter name to return the associated value for.
      * @return The value of the filter init parameter associated with the given name.
      */
@@ -150,6 +151,7 @@ public abstract class HttpFilter implements Filter {
 
     /**
      * Returns the servlet context.
+     * 
      * @return The servlet context.
      */
     protected ServletContext getServletContext() {
@@ -160,8 +162,8 @@ public abstract class HttpFilter implements Filter {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Check if the filter config is been set and thus the enduser has properly called super.init(config) when
-     * overriding the init(config).
+     * Check if the filter config is been set and thus the enduser has properly called super.init(config) when overriding the init(config).
+     * 
      * @throws IllegalStateException When this is not the case.
      */
     private void checkFilterConfig() {

@@ -77,4 +77,5 @@ class AnonymousTagHandlerTest extends BaseSecurityTagHandlerTest {
             verify(nextHandler, times(2)).apply(faceletContext, parent);
         });
     }
+
 }

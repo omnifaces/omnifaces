@@ -31,8 +31,8 @@ import org.omnifaces.vdl.FacesFunctions;
 /**
  * <p>
  * Collection of EL functions for string manipulation: <code>o:abbreviate()</code>, <code>o:capitalize()</code>, <code>o:concat()</code>,
- * <code>o:prettyURL()</code>, <code>o:encodeURL()</code>, <code>o:encodeURI()</code>, <code>o:encodeBase64()</code>,
- * <code>o:escapeJS()</code>,  <code>o:stripTags()</code>, <code>o:formatX()</code>, and <code>o:flagEmoji()</code>.
+ * <code>o:prettyURL()</code>, <code>o:encodeURL()</code>, <code>o:encodeURI()</code>, <code>o:encodeBase64()</code>, <code>o:escapeJS()</code>,
+ * <code>o:stripTags()</code>, <code>o:formatX()</code>, and <code>o:flagEmoji()</code>.
  * <p>
  * Instead of <code>o:formatX()</code>, you can also use <code>&lt;o:outputFormat&gt;</code>.
  *
@@ -60,6 +60,7 @@ public final class Strings {
 
     /**
      * Abbreviate the given text on the given size limit with ellipsis.
+     * 
      * @param text The text to be abbreviated.
      * @param size The size limit of the text.
      * @return The abbreviated text, or the unmodified text if it is shorter than the size.
@@ -77,9 +78,9 @@ public final class Strings {
     }
 
     /**
-     * Concatenate the string representation of the given objects. This is useful when you don't know beforehand if one
-     * of the both hands is a string or is <code>null</code>, otherwise the EL
-     * <code>#{bean.string1.concat(bean.string2)}</code> can just be used.
+     * Concatenate the string representation of the given objects. This is useful when you don't know beforehand if one of the both hands is a string or is
+     * <code>null</code>, otherwise the EL <code>#{bean.string1.concat(bean.string2)}</code> can just be used.
+     * 
      * @param left The left hand.
      * @param right The right hand.
      * @return The concatenated strings.
@@ -102,6 +103,7 @@ public final class Strings {
 
     /**
      * Capitalize the given string, i.e. uppercase the first character.
+     * 
      * @param string The string to be capitalized.
      * @return The capitalized string.
      * @since 1.1
@@ -119,6 +121,7 @@ public final class Strings {
 
     /**
      * Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+     * 
      * @param object The object to be parenthesized.
      * @return The parenthesized object.
      * @since 3.0
@@ -133,6 +136,7 @@ public final class Strings {
 
     /**
      * Replace all matches of the given pattern on the given string with the given replacement.
+     * 
      * @param value The string to be replaced.
      * @param pattern The regular expression pattern to be tested.
      * @param replacement The string to be substituted for each match.
@@ -150,6 +154,7 @@ public final class Strings {
 
     /**
      * Returns true if the given string matches the given pattern.
+     * 
      * @param value The string to be matched.
      * @param pattern The regular expression pattern to be tested.
      * @return True if the given string matches the given pattern.
@@ -167,8 +172,8 @@ public final class Strings {
      * <li>Remove combining diacritical marks.
      * <li>Replace non-alphanumeric characters by hyphens.
      * </ul>
-     * This is useful when populating links with dynamic paths obtained from user controlled variables, such as blog
-     * titles.
+     * This is useful when populating links with dynamic paths obtained from user controlled variables, such as blog titles.
+     * 
      * @param string The string to be prettified.
      * @return The prettified string.
      */
@@ -183,8 +188,8 @@ public final class Strings {
     }
 
     /**
-     * URL-encode the given string using UTF-8. This is useful for cases where you can't use
-     * <code>&lt;f:param&gt;</code>.
+     * URL-encode the given string using UTF-8. This is useful for cases where you can't use <code>&lt;f:param&gt;</code>.
+     * 
      * @param string The string to be URL-encoded.
      * @return The URL-encoded string.
      * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -195,6 +200,7 @@ public final class Strings {
 
     /**
      * URI-encode the given string using UTF-8. This is useful for cases where you need to embed path parameters in URLs.
+     * 
      * @param string The string to be URI-encoded.
      * @return The URI-encoded string.
      * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -206,6 +212,7 @@ public final class Strings {
 
     /**
      * Base64-encode the given string. This is useful for cases where you need to create data URLs.
+     * 
      * @param string The string to be Base64-encoded.
      * @return The Base64-encoded string.
      * @since 3.8
@@ -219,9 +226,9 @@ public final class Strings {
     }
 
     /**
-     * Escapes the given string according the JavaScript code rules. This escapes among others the special characters,
-     * the whitespace, the quotes and the unicode characters. Useful whenever you want to use a Java string variable as
-     * a JavaScript string variable.
+     * Escapes the given string according the JavaScript code rules. This escapes among others the special characters, the whitespace, the quotes and the
+     * unicode characters. Useful whenever you want to use a Java string variable as a JavaScript string variable.
+     * 
      * @param string The string to be escaped according the JavaScript code rules.
      * @return The escaped string according the JavaScript code rules.
      */
@@ -231,6 +238,7 @@ public final class Strings {
 
     /**
      * Remove XML tags from a string and return only plain text.
+     * 
      * @param string The string with XML tags.
      * @return The string without XML tags.
      * @since 3.7
@@ -245,9 +253,9 @@ public final class Strings {
     }
 
     /**
-     * Format the given string with 1 parameter using {@link MessageFormat} API. The locale is obtained by
-     * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
-     * because EL functions do not support varargs methods nor overloaded function names.
+     * Format the given string with 1 parameter using {@link MessageFormat} API. The locale is obtained by {@link Faces#getLocale()}. Design notice: There are
+     * five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support varargs methods nor overloaded function names.
+     * 
      * @param pattern The format pattern.
      * @param param1 The first parameter.
      * @return The formatted string.
@@ -258,9 +266,9 @@ public final class Strings {
     }
 
     /**
-     * Format the given string with 2 parameters using {@link MessageFormat} API. The locale is obtained by
-     * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
-     * because EL functions do not support varargs methods nor overloaded function names.
+     * Format the given string with 2 parameters using {@link MessageFormat} API. The locale is obtained by {@link Faces#getLocale()}. Design notice: There are
+     * five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support varargs methods nor overloaded function names.
+     * 
      * @param pattern The format pattern.
      * @param param1 The first parameter.
      * @param param2 The second parameter.
@@ -272,9 +280,9 @@ public final class Strings {
     }
 
     /**
-     * Format the given string with 3 parameters using {@link MessageFormat} API. The locale is obtained by
-     * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
-     * because EL functions do not support varargs methods nor overloaded function names.
+     * Format the given string with 3 parameters using {@link MessageFormat} API. The locale is obtained by {@link Faces#getLocale()}. Design notice: There are
+     * five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support varargs methods nor overloaded function names.
+     * 
      * @param pattern The format pattern.
      * @param param1 The first parameter.
      * @param param2 The second parameter.
@@ -287,9 +295,9 @@ public final class Strings {
     }
 
     /**
-     * Format the given string with 4 parameters using {@link MessageFormat} API. The locale is obtained by
-     * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
-     * because EL functions do not support varargs methods nor overloaded function names.
+     * Format the given string with 4 parameters using {@link MessageFormat} API. The locale is obtained by {@link Faces#getLocale()}. Design notice: There are
+     * five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support varargs methods nor overloaded function names.
+     * 
      * @param pattern The format pattern.
      * @param param1 The first parameter.
      * @param param2 The second parameter.
@@ -303,9 +311,9 @@ public final class Strings {
     }
 
     /**
-     * Format the given string with 5 parameters using {@link MessageFormat} API. The locale is obtained by
-     * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
-     * because EL functions do not support varargs methods nor overloaded function names.
+     * Format the given string with 5 parameters using {@link MessageFormat} API. The locale is obtained by {@link Faces#getLocale()}. Design notice: There are
+     * five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support varargs methods nor overloaded function names.
+     * 
      * @param pattern The format pattern.
      * @param param1 The first parameter.
      * @param param2 The second parameter.
@@ -315,9 +323,7 @@ public final class Strings {
      * @return The formatted string.
      * @see #format1(String, Object)
      */
-    public static String format5
-        (String pattern, Object param1, Object param2, Object param3, Object param4, Object param5)
-    {
+    public static String format5(String pattern, Object param1, Object param2, Object param3, Object param4, Object param5) {
         return format(pattern, param1, param2, param3, param4, param5);
     }
 
@@ -332,6 +338,7 @@ public final class Strings {
 
     /**
      * Converts the given ISO 3166-1 alpha-2 country code to corresponding Unicode flag emoji.
+     * 
      * @param countryCode The two-letter ISO country code (e.g., "US", "NL", "BR"). Case-insensitive.
      * @return The Unicode flag emoji, or {@code null} if input is empty.
      * @throws IllegalArgumentException If the code is not a valid ISO 3166-1 alpha-2 code.
@@ -358,4 +365,5 @@ public final class Strings {
 
         return flagEmoji.toString();
     }
+
 }

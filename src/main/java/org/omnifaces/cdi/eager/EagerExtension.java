@@ -34,8 +34,8 @@ import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans;
 
 /**
- * CDI extension that collects beans annotated with <code>&#64;</code>{@link Eager}. After deployment
- * collected beans are transferred to the {@link EagerBeansRepository}.
+ * CDI extension that collects beans annotated with <code>&#64;</code>{@link Eager}. After deployment collected beans are transferred to the
+ * {@link EagerBeansRepository}.
  *
  * @author Arjan Tijms
  * @since 1.8
@@ -47,8 +47,7 @@ public class EagerExtension implements Extension {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_EAGER_UNAVAILABLE =
-        "@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
+    private static final String ERROR_EAGER_UNAVAILABLE = "@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -58,6 +57,7 @@ public class EagerExtension implements Extension {
 
     /**
      * Collect beans annotated with {@link Eager} into {@link EagerBeans}.
+     * 
      * @param <T> The generic bean type.
      * @param event The process bean event.
      * @param beanManager The involved bean manager.
@@ -77,7 +77,10 @@ public class EagerExtension implements Extension {
             else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
                 eagerBeans.addSessionScoped(bean);
             }
-            else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null || getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
+            else if (
+                getAnnotation(beanManager, annotated, ViewScoped.class) != null
+                    || getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null
+            ) {
                 eagerBeans.addByViewId(bean, eager.viewId());
             }
             else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
@@ -89,6 +92,7 @@ public class EagerExtension implements Extension {
     /**
      * Load collected beans annotated with {@link Eager} into {@link EagerBeansRepository} via
      * {@link EagerBeansRepository#setEagerBeans(org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans)}.
+     * 
      * @param event The after deployment validation event.
      * @param beanManager The involved bean manager.
      */
@@ -101,7 +105,8 @@ public class EagerExtension implements Extension {
         EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
 
         if (eagerBeansRepository == null) {
-            eagerBeansRepository = getReference(EagerBeansRepository.class); // #744: Work around for Payara. Apparently its beanManager instance has become "stale" somehow?
+            eagerBeansRepository = getReference(EagerBeansRepository.class); // #744: Work around for Payara. Apparently its beanManager instance has become
+                                                                             // "stale" somehow?
 
             if (eagerBeansRepository == null) {
                 logger.warning(ERROR_EAGER_UNAVAILABLE);

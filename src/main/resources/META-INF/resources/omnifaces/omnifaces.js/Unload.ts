@@ -16,10 +16,10 @@ import { VIEW_STATE_PARAM } from "./OmniFaces";
 import { Util } from "./Util";
 
 /**
- * Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a 
+ * Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a
  * non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes page,
  * or navigates away, or closes browser.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2

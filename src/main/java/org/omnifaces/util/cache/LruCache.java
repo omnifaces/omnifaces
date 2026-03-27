@@ -29,8 +29,8 @@ import java.util.function.Supplier;
 import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 
 /**
- * Minimal implementation of thread safe LRU cache with support for eviction listener.
- * Inspired by <a href="https://github.com/ben-manes/concurrentlinkedhashmap">ConcurrentLinkedHashMap</a>.
+ * Minimal implementation of thread safe LRU cache with support for eviction listener. Inspired by
+ * <a href="https://github.com/ben-manes/concurrentlinkedhashmap">ConcurrentLinkedHashMap</a>.
  *
  * @author Bauke Scholtz
  * @param <K> The generic map key type.
@@ -53,15 +53,18 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     /**
      * Construct LRU cache with given maximum capacity.
+     * 
      * @param maximumCapacity The maximum capacity.
      * @throws IllegalArgumentException when maximum capacity is less than 2.
      */
     public LruCache(int maximumCapacity) {
-        this(maximumCapacity, (key, value) -> {});
+        this(maximumCapacity, (key, value) -> {
+        });
     }
 
     /**
      * Construct LRU cache with given maximum capacity and eviction listener.
+     * 
      * @param maximumCapacity The maximum capacity.
      * @param evictionListener The eviction listener.
      * @throws IllegalArgumentException when maximum capacity is less than 2.
@@ -204,4 +207,5 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
     private <E> Set<E> copyAtomically(Supplier<Collection<E>> collectionSupplier) {
         return executeAtomically(lock, () -> Set.copyOf(collectionSupplier.get()));
     }
+
 }

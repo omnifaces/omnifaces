@@ -94,32 +94,34 @@ import org.omnifaces.util.FunctionalInterfaces.ThrowingConsumer;
 
 /**
  * <p>
- * Collection of utility methods for the Faces API that are mainly shortcuts for obtaining stuff from the provided
- * {@link FacesContext} argument. In effect, it 'flattens' the hierarchy of nested objects.
+ * Collection of utility methods for the Faces API that are mainly shortcuts for obtaining stuff from the provided {@link FacesContext} argument. In effect, it
+ * 'flattens' the hierarchy of nested objects.
  * <p>
- * The difference with {@link Faces} is that no one method of {@link FacesLocal} obtains the {@link FacesContext} from
- * the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient
- * in situations where multiple utility methods needs to be called at the same time. Invoking
- * {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained
- * as a {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds
- * or so.
+ * The difference with {@link Faces} is that no one method of {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
+ * called at the same time. Invoking {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained as a
+ * {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds or so.
  * <p>
- * Note that methods which are <strong>directly</strong> available on {@link FacesContext} instance itself, such as
- * {@link FacesContext#getExternalContext()}, {@link FacesContext#getViewRoot()},
- * {@link FacesContext#isValidationFailed()}, etc are not delegated by the this utility class, because it would design
+ * Note that methods which are <strong>directly</strong> available on {@link FacesContext} instance itself, such as {@link FacesContext#getExternalContext()},
+ * {@link FacesContext#getViewRoot()}, {@link FacesContext#isValidationFailed()}, etc are not delegated by the this utility class, because it would design
  * technically not make any sense to delegate a single-depth method call like follows:
+ * 
  * <pre>
+ * 
  * ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);
  * </pre>
  * <p>
  * instead of just calling it directly like follows:
+ * 
  * <pre>
+ * 
  * ExternalContext externalContext = facesContext.getExternalContext();
  * </pre>
  *
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
+ * 
  * <pre>
  * FacesContext context = Faces.getContext();
  * User user = FacesLocal.getSessionAttribute(context, "user");
@@ -299,7 +301,6 @@ public final class FacesLocal {
     public static <T> T getContextAttribute(FacesContext context, String name) {
         return (T) context.getAttributes().get(name);
     }
-
 
     /**
      * @see Faces#getContextAttribute(String, Supplier)
@@ -814,9 +815,7 @@ public final class FacesLocal {
     /**
      * @see Faces#getBookmarkableURL(Map, boolean)
      */
-    public static String getBookmarkableURL
-        (FacesContext context, Map<String, List<String>> params, boolean includeViewParams)
-    {
+    public static String getBookmarkableURL(FacesContext context, Map<String, List<String>> params, boolean includeViewParams) {
         var viewId = getViewId(context);
 
         if (viewId == null) {
@@ -829,9 +828,7 @@ public final class FacesLocal {
     /**
      * @see Faces#getBookmarkableURL(String, Map, boolean)
      */
-    public static String getBookmarkableURL
-        (FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams)
-    {
+    public static String getBookmarkableURL(FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams) {
         var map = new HashMap<String, List<String>>();
 
         if (params != null) {
@@ -844,9 +841,7 @@ public final class FacesLocal {
     /**
      * @see Faces#getBookmarkableURL(Collection, boolean)
      */
-    public static String getBookmarkableURL
-        (FacesContext context, Collection<? extends ParamHolder<?>> params, boolean includeViewParams)
-    {
+    public static String getBookmarkableURL(FacesContext context, Collection<? extends ParamHolder<?>> params, boolean includeViewParams) {
         var viewId = getViewId(context);
 
         if (viewId == null) {
@@ -859,9 +854,7 @@ public final class FacesLocal {
     /**
      * @see Faces#getBookmarkableURL(String, Collection, boolean)
      */
-    public static String getBookmarkableURL
-        (FacesContext context, String viewId, Collection<? extends ParamHolder<?>> params, boolean includeViewParams)
-    {
+    public static String getBookmarkableURL(FacesContext context, String viewId, Collection<? extends ParamHolder<?>> params, boolean includeViewParams) {
         var map = new HashMap<String, List<String>>();
 
         if (params != null) {
@@ -977,7 +970,10 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getRequestParameter(FacesContext context, String name, Class<T> type) {
-        return getRequestParameter(context, name, value -> (T) ofNullable(createConverter(context, type)).map(c -> c.getAsObject(context, context.getViewRoot(), value)).orElse(value));
+        return getRequestParameter(
+            context, name,
+            value -> (T) ofNullable(createConverter(context, type)).map(c -> c.getAsObject(context, context.getViewRoot(), value)).orElse(value)
+        );
     }
 
     /**
@@ -1444,7 +1440,11 @@ public final class FacesLocal {
     /**
      * @see Faces#addResponseCookie(String, String, String, String, int, boolean, Map)
      */
-    public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly, Map<String, String> attributes) {
+    public static void addResponseCookie(
+        FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly,
+        Map<String, String> attributes
+    )
+    {
         var externalContext = context.getExternalContext();
         var properties = new HashMap<String, Object>();
 
@@ -1938,6 +1938,7 @@ public final class FacesLocal {
 
     /**
      * Internal global method to send the given input stream to the response.
+     * 
      * @param input The file content as input stream.
      * @param filename The file name which should appear in content disposition header.
      * @param contentLength The content length, or -1 if it is unknown.

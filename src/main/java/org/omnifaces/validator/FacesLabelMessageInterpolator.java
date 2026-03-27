@@ -22,22 +22,18 @@ import java.util.Locale;
 
 import jakarta.validation.MessageInterpolator;
 
-
 /**
  * <p>
- * Unlike native Faces validation error messages, in a bean validation message by default the label of the component where
- * a validation constraint violation originated from can not be displayed in the middle of a message. Using the
- * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
- * message, but that's it. With this {@link FacesLabelMessageInterpolator} a label can appear in the middle of a message,
- * by using the special placeholder <code>{faces.label}</code> in bean validation messages.
+ * Unlike native Faces validation error messages, in a bean validation message by default the label of the component where a validation constraint violation
+ * originated from can not be displayed in the middle of a message. Using the <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> bundle key such label
+ * can be put in front or behind the message, but that's it. With this {@link FacesLabelMessageInterpolator} a label can appear in the middle of a message, by
+ * using the special placeholder <code>{faces.label}</code> in bean validation messages.
  * <p>
- * Note that Bean Validation is not only called from within Faces, and as such Faces might not be available. If Faces
- * is not available occurrences of <code>{faces.label}</code> will be replaced by an empty string. The user should take
- * care that messages are compatible with both situations if needed.
+ * Note that Bean Validation is not only called from within Faces, and as such Faces might not be available. If Faces is not available occurrences of
+ * <code>{faces.label}</code> will be replaced by an empty string. The user should take care that messages are compatible with both situations if needed.
  * <p>
- * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean
- * validation message. That functionality is already provided by Faces itself via the
- * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to Faces.
+ * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean validation message. That functionality is
+ * already provided by Faces itself via the <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to Faces.
  *
  * <h2>Installation</h2>
  * <p>
@@ -56,7 +52,9 @@ import jakarta.validation.MessageInterpolator;
  * </pre>
  *
  * <h2>Usage</h2>
- * <p>As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
+ * <p>
+ * As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
+ * 
  * <pre>
  * jakarta.validation.constraints.Size.message = The size of {faces.label} must be between {min} and {max} characters
  * </pre>

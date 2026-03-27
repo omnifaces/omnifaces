@@ -28,10 +28,11 @@ import jakarta.faces.event.PhaseListener;
 public abstract class DefaultPhaseListener implements PhaseListener {
 
     private static final long serialVersionUID = 1L;
-    private    transient PhaseId phaseId; // PhaseId is not serializable
+    private transient PhaseId phaseId; // PhaseId is not serializable
 
     /**
      * Construct default phase listener for given phase ID.
+     * 
      * @param phaseId Phase ID to create new default phase listener for.
      */
     protected DefaultPhaseListener(PhaseId phaseId) {

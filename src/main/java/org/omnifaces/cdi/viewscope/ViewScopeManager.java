@@ -44,13 +44,12 @@ import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
- * registered by {@link ViewScopeExtension} and the destroy is initiated by {@link ViewScopeEventListener} which is
- * registered in <code>faces-config.xml</code>.
+ * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is registered by {@link ViewScopeExtension} and
+ * the destroy is initiated by {@link ViewScopeEventListener} which is registered in <code>faces-config.xml</code>.
  * <p>
- * Depending on {@link ViewScoped#saveInViewState()}, this view scope manager will delegate the creation and destroy
- * further to either {@link ViewScopeStorageInSession} or {@link ViewScopeStorageInViewState} which saves the concrete
- * bean instances in respectively HTTP session or Faces view state.
+ * Depending on {@link ViewScoped#saveInViewState()}, this view scope manager will delegate the creation and destroy further to either
+ * {@link ViewScopeStorageInSession} or {@link ViewScopeStorageInViewState} which saves the concrete bean instances in respectively HTTP session or Faces view
+ * state.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -64,16 +63,13 @@ public class ViewScopeManager {
     // Public constants -----------------------------------------------------------------------------------------------
 
     /** OmniFaces specific context parameter name of maximum active view scopes in session. */
-    public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
-        "org.omnifaces.VIEW_SCOPE_MANAGER_MAX_ACTIVE_VIEW_SCOPES";
+    public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES = "org.omnifaces.VIEW_SCOPE_MANAGER_MAX_ACTIVE_VIEW_SCOPES";
 
     /** Mojarra specific context parameter name of maximum number of logical views in session. */
-    public static final String PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS =
-        "com.sun.faces.numberOfLogicalViews";
+    public static final String PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS = "com.sun.faces.numberOfLogicalViews";
 
     /** MyFaces specific context parameter name of maximum number of views in session. */
-    public static final String PARAM_NAME_MYFACES_NUMBER_OF_VIEWS =
-        "org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
+    public static final String PARAM_NAME_MYFACES_NUMBER_OF_VIEWS = "org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
 
     /** Default value of maximum active view scopes in session. */
     public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20; // Mojarra's default is 15 and MyFaces' default is 20.
@@ -86,12 +82,12 @@ public class ViewScopeManager {
     private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
     private static final String WARNING_UNSUPPORTED_STATE_SAVING = "@ViewScoped %s"
-            + " requires non-stateless views in order to be able to properly destroy the bean."
-            + " The current view %s is stateless and this may cause memory leaks."
-            + " Consider subclassing the bean with @jakarta.faces.view.ViewScoped annotation.";
+        + " requires non-stateless views in order to be able to properly destroy the bean."
+        + " The current view %s is stateless and this may cause memory leaks."
+        + " Consider subclassing the bean with @jakarta.faces.view.ViewScoped annotation.";
 
     private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
-            + " requires web.xml context parameter 'jakarta.faces.STATE_SAVING_METHOD' being set to 'client'.";
+        + " requires web.xml context parameter 'jakarta.faces.STATE_SAVING_METHOD' being set to 'client'.";
 
     private static final String ERROR_VIEW_ALREADY_UNLOADED = "View %s was already unloaded.";
 
@@ -110,6 +106,7 @@ public class ViewScopeManager {
 
     /**
      * Returns the CDI view scoped managed bean from the current Faces view scope, and auto-creates one if it doesn't exist.
+     * 
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
      * @param context The CDI context to create the CDI managed bean in.
@@ -122,6 +119,7 @@ public class ViewScopeManager {
 
     /**
      * Returns the CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
+     * 
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
      * @return The CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
@@ -131,8 +129,7 @@ public class ViewScopeManager {
     }
 
     /**
-     * This method is invoked during view destroy by {@link ViewScopeEventListener}, in that case destroy all beans in
-     * current active view scope.
+     * This method is invoked during view destroy by {@link ViewScopeEventListener}, in that case destroy all beans in current active view scope.
      */
     public void preDestroyView() {
         var context = getContext();
@@ -148,10 +145,17 @@ public class ViewScopeManager {
             }
         }
         else if (isAjaxRequestWithPartialRendering(context)) {
-            context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
+            context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME); // Otherwise MyFaces
+                                                                                                                                        // will load a new one
+                                                                                                                                        // during
+                                                                                                                                        // createViewScope()
+                                                                                                                                        // when still in same
+                                                                                                                                        // document (e.g.
+                                                                                                                                        // navigation).
         }
 
-        if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for nothing.
+        if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for
+                                                                                    // nothing.
             if (beanStorageId == null) {
                 beanStorageId = storageInSession.getBeanStorageId();
             }
@@ -227,6 +231,7 @@ public class ViewScopeManager {
 
     /**
      * Returns <code>true</code> if the current request is triggered by an unload request.
+     * 
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by an unload request.
      * @since 2.2
@@ -237,6 +242,7 @@ public class ViewScopeManager {
 
     /**
      * Returns <code>true</code> if the given request is triggered by an unload request.
+     * 
      * @param request The involved request.
      * @return <code>true</code> if the given request is triggered by an unload request.
      * @since 3.1

@@ -38,8 +38,8 @@ import jakarta.faces.view.facelets.TagHandlerDelegate;
 import jakarta.faces.view.facelets.ValidatorHandler;
 
 /**
- * Helper class for OmniFaces {@link Converter} and {@link Validator}. It can't be an abstract class as they have to
- * extend from {@link ConverterHandler} and {@link ValidatorHandler}.
+ * Helper class for OmniFaces {@link Converter} and {@link Validator}. It can't be an abstract class as they have to extend from {@link ConverterHandler} and
+ * {@link ValidatorHandler}.
  *
  * @author Bauke Scholtz
  */
@@ -47,10 +47,8 @@ final class DeferredTagHandlerHelper {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_MISSING_ID =
-        "o:%1$s '%1$sId' or 'binding' attribute must be specified.";
-    private static final String ERROR_INVALID_ID =
-        "o:%1$s '%1$sId' attribute must refer an valid %1$s ID. The %1$s ID '%2$s' cannot be found.";
+    private static final String ERROR_MISSING_ID = "o:%1$s '%1$sId' or 'binding' attribute must be specified.";
+    private static final String ERROR_INVALID_ID = "o:%1$s '%1$sId' attribute must refer an valid %1$s ID. The %1$s ID '%2$s' cannot be found.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -65,14 +63,15 @@ final class DeferredTagHandlerHelper {
 
     /**
      * Create the tag instance based on the <code>binding</code> and/or <code>instanceId</code> attribute.
+     * 
      * @param context The involved EL context.
      * @param binding The involved binding attribute.
      * @param id The involved id attribute.
      * @param factory The factory to obtain the instance by id.
      * @param name The name of the deferred tag, solely for error reporting.
      * @return The created instance.
-     * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
-     * <code>binding</code> attribute is also missing.
+     * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the <code>binding</code> attribute is also
+     * missing.
      * @throws ClassCastException When <code>T</code> is of wrong type.
      */
     @SuppressWarnings("unchecked")
@@ -89,7 +88,8 @@ final class DeferredTagHandlerHelper {
             }
             catch (FacesException e) {
                 throw new IllegalArgumentException(
-                    ERROR_INVALID_ID.formatted(name, id), e);
+                    ERROR_INVALID_ID.formatted(name, id), e
+                );
             }
 
             if (binding != null) {
@@ -98,23 +98,22 @@ final class DeferredTagHandlerHelper {
         }
         else if (instance == null) {
             throw new IllegalArgumentException(
-                ERROR_MISSING_ID.formatted(name));
+                ERROR_MISSING_ID.formatted(name)
+            );
         }
 
         return instance;
     }
 
     /**
-     * Collect the deferred attributes of the given object. If the property is a literal text (i.e. no EL expression),
-     * then it will just be set directly on the given object, else it will be collected as {@link ValueExpression} and
-     * setter method pairs and returned.
+     * Collect the deferred attributes of the given object. If the property is a literal text (i.e. no EL expression), then it will just be set directly on the
+     * given object, else it will be collected as {@link ValueExpression} and setter method pairs and returned.
+     * 
      * @param context The involved facelet context.
      * @param instance The instance to collect EL properties for.
      * @return The deferred attributes of the given object.
      */
-    static <T> DeferredAttributes collectDeferredAttributes
-        (FaceletContext context, DeferredTagHandler tag, T instance)
-    {
+    static <T> DeferredAttributes collectDeferredAttributes(FaceletContext context, DeferredTagHandler tag, T instance) {
         var attributes = new DeferredAttributes();
 
         try {
@@ -143,16 +142,14 @@ final class DeferredTagHandlerHelper {
     }
 
     /**
-     * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is
-     * no such attribute.
+     * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is no such attribute.
+     * 
      * @param context The involved facelet context.
      * @param name The attribute name to return the value expression for.
      * @param type The type of the value expression.
      * @return The given attribute as a {@link ValueExpression}.
      */
-    private static <T> ValueExpression getValueExpression
-        (FaceletContext context, DeferredTagHandler tag, String name, Class<T> type)
-    {
+    private static <T> ValueExpression getValueExpression(FaceletContext context, DeferredTagHandler tag, String name, Class<T> type) {
         var attribute = tag.getTagAttribute(name);
         return attribute != null ? attribute.getValueExpression(context, type) : null;
     }
@@ -160,20 +157,22 @@ final class DeferredTagHandlerHelper {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * So that we can extract tag attributes from both {@link ConverterHandler} and {@link ValidatorHandler} and create
-     * concrete {@link Converter} and {@link Validator} instances.
+     * So that we can extract tag attributes from both {@link ConverterHandler} and {@link ValidatorHandler} and create concrete {@link Converter} and
+     * {@link Validator} instances.
      *
      * @author Bauke Scholtz
      */
     interface DeferredTagHandler {
 
         /**
-         * Just return TagHandler#getAttribute() via a public method (it's by default protected and otherwise thus
-         * unavailable inside collectDeferredAttributes().
+         * Just return TagHandler#getAttribute() via a public method (it's by default protected and otherwise thus unavailable inside
+         * collectDeferredAttributes().
+         * 
          * @param name The attribute name.
          * @return The tag attribute associated with given attribute name.
          */
         TagAttribute getTagAttribute(String name);
+
     }
 
     /**
@@ -206,11 +205,12 @@ final class DeferredTagHandlerHelper {
                 }
             }
         }
+
     }
 
     /**
-     * Convenience tag handler delegate which delegates {@link #applyAttachedObject(FacesContext, UIComponent)} to the
-     * owning tag itself. This all is used when composite components come into picture.
+     * Convenience tag handler delegate which delegates {@link #applyAttachedObject(FacesContext, UIComponent)} to the owning tag itself. This all is used when
+     * composite components come into picture.
      *
      * @author Bauke Scholtz
      */

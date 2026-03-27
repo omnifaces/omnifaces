@@ -25,7 +25,8 @@ import org.omnifaces.cdi.push.SocketEvent.Opened;
 @ApplicationScoped
 public class SocketITObserver {
 
-    @Inject @Push
+    @Inject
+    @Push
     private PushContext applicationScopedServerEvent;
 
     public void onopen(@Observes @Opened SocketEvent event) {
@@ -37,4 +38,5 @@ public class SocketITObserver {
         String channel = event.getChannel();
         applicationScopedServerEvent.send("closed:" + channel);
     }
+
 }

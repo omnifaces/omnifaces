@@ -29,10 +29,13 @@ import org.omnifaces.cdi.push.Sse;
 
 /**
  * <p>
- * The CDI annotation <code>&#64;</code>{@link Push} allows you to inject a {@link PushContext} associated with a given
- * channel in any container managed artifact in WAR (not in EAR/EJB!).
+ * The CDI annotation <code>&#64;</code>{@link Push} allows you to inject a {@link PushContext} associated with a given channel in any container managed
+ * artifact in WAR (not in EAR/EJB!).
+ * 
  * <pre>
- * &#64;Inject &#64;Push
+ * 
+ * &#64;Inject
+ * &#64;Push
  * private PushContext channelName;
  * </pre>
  * <p>
@@ -64,8 +67,8 @@ public @interface Push {
         SSE,
 
         /**
-         * Notification transport via <code>&lt;o:notification&gt;</code>. Uses SSE internally and validates that
-         * messages sent through this push context are {@link Notification.Message} instances.
+         * Notification transport via <code>&lt;o:notification&gt;</code>. Uses SSE internally and validates that messages sent through this push context are
+         * {@link Notification.Message} instances.
          */
         NOTIFICATION
     }
@@ -75,7 +78,8 @@ public @interface Push {
      *
      * @return The name of the push channel.
      */
-    @Nonbinding String channel() default "";
+    @Nonbinding
+    String channel() default "";
 
     /**
      * (Optional) The transport type to use. Defaults to {@link Type#SOCKET}.
@@ -83,5 +87,7 @@ public @interface Push {
      * @return The transport type to use.
      * @since 5.2
      */
-    @Nonbinding Type type() default Type.SOCKET;
+    @Nonbinding
+    Type type() default Type.SOCKET;
+
 }

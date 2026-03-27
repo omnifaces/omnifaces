@@ -37,4 +37,5 @@ public class SocketPushContextProducer extends PushContextProducer {
     static {
         logger.warning("SocketPushContextProducer is deprecated since 5.2, please migrate to PushContextProducer.");
     }
+
 }

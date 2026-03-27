@@ -27,14 +27,12 @@ import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
- * The <code>&lt;o:outputLabel&gt;</code> is a component that extends the standard <code>&lt;h:outputLabel&gt;</code>
- * with support for automatically setting its value as the label of the component identified by its <code>for</code>
- * attribute (if any). This way there's no need to duplicate the very same label into the <code>label</code> attribute
- * of the input component. After submitting the form without having entered a value, a validation message is posted that
- * should contain the label printed before the input instead of some generated ID.
+ * The <code>&lt;o:outputLabel&gt;</code> is a component that extends the standard <code>&lt;h:outputLabel&gt;</code> with support for automatically setting its
+ * value as the label of the component identified by its <code>for</code> attribute (if any). This way there's no need to duplicate the very same label into the
+ * <code>label</code> attribute of the input component. After submitting the form without having entered a value, a validation message is posted that should
+ * contain the label printed before the input instead of some generated ID.
  * <p>
- * You can use it the same way as <code>&lt;h:outputLabel&gt;</code>, you only need to change <code>h:</code> into
- * <code>o:</code>.
+ * You can use it the same way as <code>&lt;h:outputLabel&gt;</code>, you only need to change <code>h:</code> into <code>o:</code>.
  *
  * @author Arjan Tijms
  */
@@ -44,8 +42,7 @@ public class OutputLabel extends HtmlOutputLabel {
     /** The component type, which is {@value org.omnifaces.component.output.OutputLabel#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
 
-    private static final String ERROR_FOR_COMPONENT_NOT_FOUND =
-        "A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
+    private static final String ERROR_FOR_COMPONENT_NOT_FOUND = "A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
 
     @Override
     public void processEvent(ComponentSystemEvent event) {
@@ -70,4 +67,5 @@ public class OutputLabel extends HtmlOutputLabel {
         }
 
     }
+
 }

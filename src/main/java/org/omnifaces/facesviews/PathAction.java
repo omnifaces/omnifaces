@@ -24,8 +24,7 @@ package org.omnifaces.facesviews;
 public enum PathAction {
 
     /**
-     * Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and
-     * optionally "/foo.xhtml".
+     * Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and optionally "/foo.xhtml".
      * <p>
      * This is the default value.
      */

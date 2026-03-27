@@ -24,12 +24,12 @@ import jakarta.faces.event.PhaseId;
 import org.omnifaces.eventlistener.InvokeActionEventListener;
 
 /**
- * Use this event to have a hook on a listener method during the beforephase of the {@link PhaseId#INVOKE_APPLICATION}.
- * This event is supported on {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and {@link UICommand} components.
+ * Use this event to have a hook on a listener method during the beforephase of the {@link PhaseId#INVOKE_APPLICATION}. This event is supported on
+ * {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and {@link UICommand} components.
  * <p>
- * This event is particularly helpful as a replacement of <code>&lt;f:event type="preRenderView"&gt;</code> and also
- * provides the possibility to invoke multiple action listeners on a single {@link UIInput} and {@link UICommand}
- * components on an easy manner.
+ * This event is particularly helpful as a replacement of <code>&lt;f:event type="preRenderView"&gt;</code> and also provides the possibility to invoke multiple
+ * action listeners on a single {@link UIInput} and {@link UICommand} components on an easy manner.
+ * 
  * <pre>
  * &lt;f:event type="preInvokeAction" listener="#{bean.preInvokeAction}" /&gt;
  * </pre>
@@ -50,6 +50,7 @@ public class PreInvokeActionEvent extends ComponentSystemEvent {
 
     /**
      * Construct a new pre invoke action event on the given component.
+     * 
      * @param component The component to invoke the event on.
      */
     public PreInvokeActionEvent(UIComponent component) {

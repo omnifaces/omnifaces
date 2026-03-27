@@ -35,8 +35,7 @@ import jakarta.faces.context.FacesContext;
 import org.omnifaces.util.Hacks;
 
 /**
- * This {@link Resource} implementation represents a cacheable dynamic resource which doesn't necessarily exist as a
- * regular classpath resource.
+ * This {@link Resource} implementation represents a cacheable dynamic resource which doesn't necessarily exist as a regular classpath resource.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -55,6 +54,7 @@ public abstract class DynamicResource extends Resource {
 
     /**
      * Constructs a new dynamic resource based on the given resource name, library name and content type.
+     * 
      * @param resourceName The resource name.
      * @param libraryName The library name.
      * @param contentType The content type.
@@ -101,6 +101,7 @@ public abstract class DynamicResource extends Resource {
 
     /**
      * Returns the "last modified" timestamp of this resource.
+     * 
      * @return The "last modified" timestamp of this resource.
      */
     public long getLastModified() {
@@ -109,6 +110,7 @@ public abstract class DynamicResource extends Resource {
 
     /**
      * Sets the "last modified" timestamp of this resource.
+     * 
      * @param lastModified The "last modified" timestamp of this resource.
      */
     public void setLastModified(long lastModified) {

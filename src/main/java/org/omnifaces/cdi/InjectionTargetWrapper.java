@@ -21,9 +21,9 @@ import jakarta.faces.FacesWrapper;
 
 /**
  * <p>
- * Provides a simple implementation of {@link InjectionTarget} that can be sub-classed by developers wishing to
- * provide specialized behavior to an existing {@link InjectionTarget} instance. The default implementation of all
- * methods is to call through to the wrapped {@link InjectionTarget}.</p>
+ * Provides a simple implementation of {@link InjectionTarget} that can be sub-classed by developers wishing to provide specialized behavior to an existing
+ * {@link InjectionTarget} instance. The default implementation of all methods is to call through to the wrapped {@link InjectionTarget}.
+ * </p>
  *
  * <p>
  * Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.
@@ -37,6 +37,7 @@ public class InjectionTargetWrapper<T> implements InjectionTarget<T>, FacesWrapp
 
     /**
      * Construct a injection target wrapper which wraps the given injection target.
+     * 
      * @param wrapped The injection target to be wrapped.
      */
     public InjectionTargetWrapper(InjectionTarget<T> wrapped) {

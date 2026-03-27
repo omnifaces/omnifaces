@@ -23,22 +23,22 @@ import org.openqa.selenium.support.FindBy;
 
 public class HashParamIT extends OmniFacesIT {
 
-    @FindBy(id="pageLoadTimestamp")
+    @FindBy(id = "pageLoadTimestamp")
     private WebElement pageLoadTimestamp;
 
-    @FindBy(id="hashLoadTimestamp")
+    @FindBy(id = "hashLoadTimestamp")
     private WebElement hashLoadTimestamp;
 
-    @FindBy(id="form:foo")
+    @FindBy(id = "form:foo")
     private WebElement foo;
 
-    @FindBy(id="form:bar")
+    @FindBy(id = "form:bar")
     private WebElement bar;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement submit;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(HashParamIT.class);
     }

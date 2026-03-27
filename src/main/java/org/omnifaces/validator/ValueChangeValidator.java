@@ -21,12 +21,12 @@ import jakarta.faces.validator.Validator;
 
 /**
  * <p>
- * By default, Faces validators run on every request, regardless of whether the submitted value has changed or not. In
- * case of validation against the DB on complex objects which are already stored in the model in a broader scope, such
- * as the view scope, this may result in unnecessarily expensive service/DAO calls. In such case, you'd like to perform
- * the expensive service/DAO call only when the submitted value is really changed as compared to the model value.
+ * By default, Faces validators run on every request, regardless of whether the submitted value has changed or not. In case of validation against the DB on
+ * complex objects which are already stored in the model in a broader scope, such as the view scope, this may result in unnecessarily expensive service/DAO
+ * calls. In such case, you'd like to perform the expensive service/DAO call only when the submitted value is really changed as compared to the model value.
  * <p>
  * This validator offers you a template to do it transparently. To use it, just change your validators from:
+ * 
  * <pre>
  * public class YourValidator implements Validator&lt;YourEntity&gt; {
  *
@@ -36,7 +36,9 @@ import jakarta.faces.validator.Validator;
  *
  * }
  * </pre>
- * <p>to
+ * <p>
+ * to
+ * 
  * <pre>
  * public class YourValidator extends ValueChangeValidator&lt;YourEntity&gt; {
  *
@@ -46,8 +48,9 @@ import jakarta.faces.validator.Validator;
  *
  * }
  * </pre>
- * So, essentially, just replace <code>implements Validator</code> by <code>extends ValueChangeValidator</code> and
- * rename the method from <code>validate</code> to <code>validateChangedObject</code>.
+ * 
+ * So, essentially, just replace <code>implements Validator</code> by <code>extends ValueChangeValidator</code> and rename the method from <code>validate</code>
+ * to <code>validateChangedObject</code>.
  *
  * @author Juliano
  * @author Bauke Scholtz
@@ -56,10 +59,9 @@ import jakarta.faces.validator.Validator;
 public abstract class ValueChangeValidator<T> implements Validator<T> {
 
     /**
-     * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
-     * submitted value, then return immediately from the method and don't perform any validation. Otherwise, invoke
-     * {@link #validateChangedObject(FacesContext, UIComponent, Object)} which may in turn do the necessary possibly
-     * expensive DAO operations.
+     * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the submitted value, then return immediately from the
+     * method and don't perform any validation. Otherwise, invoke {@link #validateChangedObject(FacesContext, UIComponent, Object)} which may in turn do the
+     * necessary possibly expensive DAO operations.
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -77,8 +79,9 @@ public abstract class ValueChangeValidator<T> implements Validator<T> {
     }
 
     /**
-     * Use this method instead of {@link #validate(FacesContext, UIComponent, Object)} if you intend to perform the
-     * validation only when the submitted value is really changed as compared to the model value.
+     * Use this method instead of {@link #validate(FacesContext, UIComponent, Object)} if you intend to perform the validation only when the submitted value is
+     * really changed as compared to the model value.
+     * 
      * @param context The involved faces context.
      * @param component The involved UI component.
      * @param submittedValue The submitted value.

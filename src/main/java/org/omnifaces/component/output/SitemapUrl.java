@@ -41,25 +41,23 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or Faces view ID as a sitemap
- * URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
- * and <code>&lt;o:param&gt;</code>.
+ * The <code>&lt;o:sitemapUrl&gt;</code> is a component which renders the given target URL or Faces view ID as a sitemap URL with support for adding additional
+ * query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
  * <p>
- * This component is largely based off the {@link Url} component behind <code>&lt;o:url&gt;</code>, but then tailored
- * specifically for usage in <code>sitemap.xml</code> file. The {@link ViewResourceHandler} must be registered in
- * <code>faces-config.xml</code> in order to get Faces components to run in <code>/sitemap.xml</code>.
+ * This component is largely based off the {@link Url} component behind <code>&lt;o:url&gt;</code>, but then tailored specifically for usage in
+ * <code>sitemap.xml</code> file. The {@link ViewResourceHandler} must be registered in <code>faces-config.xml</code> in order to get Faces components to run in
+ * <code>/sitemap.xml</code>.
  *
  * <h2>Values</h2>
  * <p>
- * You can supply the sitemap URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When
- * both are specified, the <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
+ * You can supply the sitemap URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When both are specified, the
+ * <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
  *
  * <h2>Domain</h2>
  * <p>
- * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current
- * domain. It is possible to provide a full qualified domain name (FQDN) via the <code>domain</code> attribute which
- * the URL is to be prefixed with. This can be useful if a canonical page shall point to a different domain or a
- * specific subdomain.
+ * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current domain. It is possible to provide a full
+ * qualified domain name (FQDN) via the <code>domain</code> attribute which the URL is to be prefixed with. This can be useful if a canonical page shall point
+ * to a different domain or a specific subdomain.
  * <p>
  * Valid formats and values for <code>domain</code> attribute are:
  * <ul>
@@ -70,19 +68,19 @@ import org.omnifaces.util.State;
  * <li><code>&lt;o:sitemapUrl ... domain="//" /&gt;</code></li>
  * </ul>
  * <p>
- * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid.
- * If the domain equals <code>/</code>, then the URL becomes domain-relative.
- * If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
- * If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
+ * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid. If the domain equals <code>/</code>,
+ * then the URL becomes domain-relative. If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes
+ * scheme-relative. If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
  *
  * <h2>Request parameters</h2>
  * <p>
- * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
- * To conditionally add or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
+ * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>. To conditionally add or override,
+ * use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  *
  * <h2>Usage</h2>
  * <p>
  * Usage example of <code>/sitemap.xml</code> as a Faces view:
+ * 
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;urlset
@@ -139,34 +137,26 @@ public class SitemapUrl extends OutputFamily {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_INVALID_REQUEST =
-        "o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
+    private static final String ERROR_INVALID_REQUEST = "o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
 
-    private static final String ERROR_MISSING_VALUE_OR_VIEWID =
-        "o:sitemapUrl 'value' or 'viewId' attribute must be set.";
+    private static final String ERROR_MISSING_VALUE_OR_VIEWID = "o:sitemapUrl 'value' or 'viewId' attribute must be set.";
 
-    private static final String ERROR_INVALID_DOMAIN =
-        "o:sitemapUrl 'domain' attribute '%s' does not represent a valid domain.";
+    private static final String ERROR_INVALID_DOMAIN = "o:sitemapUrl 'domain' attribute '%s' does not represent a valid domain.";
 
-    private static final String ERROR_INVALID_PRIORITY =
-        "o:sitemapUrl 'priority' attribute '%s' must be between 0.0 and 1.0.";
+    private static final String ERROR_INVALID_PRIORITY = "o:sitemapUrl 'priority' attribute '%s' must be between 0.0 and 1.0.";
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        value,
-        viewId,
-        domain,
-        lastModified,
-        changeFrequency,
-        priority
+        value, viewId, domain, lastModified, changeFrequency, priority
     }
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * Constructs the {@link SitemapUrl} component.
-     * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and
-     * the current request is not for the {@link ViewResourceHandler} at all.
+     * 
+     * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and the current request is not for the
+     * {@link ViewResourceHandler} at all.
      */
     public SitemapUrl() {
         if (isDevelopment() && !isViewResourceRequest(getFacesContext())) {
@@ -213,8 +203,9 @@ public class SitemapUrl extends OutputFamily {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Renders the <code>&lt;loc&gt;</code> child element with either the value of {@link #getValue()},
-     * or the value of {@link #getViewId()} and {@link #getDomain()} combined.
+     * Renders the <code>&lt;loc&gt;</code> child element with either the value of {@link #getValue()}, or the value of {@link #getViewId()} and
+     * {@link #getDomain()} combined.
+     * 
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      * @throws IllegalArgumentException When the {@link #getDomain()} does not represent a valid domain.
@@ -245,8 +236,9 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any.
-     * It may only encode formats specified in https://www.w3.org/TR/NOTE-datetime
+     * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any. It may only encode formats specified in
+     * https://www.w3.org/TR/NOTE-datetime
+     * 
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      */
@@ -271,6 +263,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Renders the <code>&lt;changefreq&gt;</code> child element with the value of {@link #getChangeFrequency()}, if any.
+     * 
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      */
@@ -287,6 +280,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Renders the <code>&lt;priority&gt;</code> child element with the value of {@link #getPriority()}, if any.
+     * 
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      * @throws IllegalArgumentException When the {@link #getPriority()} is not between 0.0 and 1.0 (inclusive).
@@ -309,8 +303,8 @@ public class SitemapUrl extends OutputFamily {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the value of the "loc" element of the sitemap URL.
-     * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * Returns the value of the "loc" element of the sitemap URL. Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * 
      * @return The value of the "loc" element of the sitemap URL.
      */
     public String getValue() {
@@ -318,8 +312,8 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Sets the value of the "loc" element of the sitemap URL.
-     * Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * Sets the value of the "loc" element of the sitemap URL. Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
+     * 
      * @param value The value of the "loc" element of the sitemap URL.
      */
     public void setValue(String value) {
@@ -327,8 +321,8 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Returns the view ID to create the URI part of the "loc" element of the sitemap URL for.
-     * Note: this is ignored when {@link #getValue()} is specified.
+     * Returns the view ID to create the URI part of the "loc" element of the sitemap URL for. Note: this is ignored when {@link #getValue()} is specified.
+     * 
      * @return The view ID to create the URI part of the "loc" element of the sitemap URL for.
      */
     public String getViewId() {
@@ -336,8 +330,8 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Sets the view ID to create the URI part of the "loc" element of the sitemap URL for.
-     * Note: this is ignored when {@link #getValue()} is specified.
+     * Sets the view ID to create the URI part of the "loc" element of the sitemap URL for. Note: this is ignored when {@link #getValue()} is specified.
+     * 
      * @param viewId The view ID to create the URI part of the "loc" element of the sitemap URL for.
      */
     public void setViewId(String viewId) {
@@ -345,8 +339,8 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Returns the domain of the "loc" element of the sitemap URL.
-     * Note: this is ignored when {@link #getValue()} is specified.
+     * Returns the domain of the "loc" element of the sitemap URL. Note: this is ignored when {@link #getValue()} is specified.
+     * 
      * @return The domain of the "loc" element of the sitemap URL for.
      */
     public String getDomain() {
@@ -354,8 +348,8 @@ public class SitemapUrl extends OutputFamily {
     }
 
     /**
-     * Sets the domain of the "loc" element of the sitemap URL.
-     * Note: this is ignored when {@link #getValue()} is specified.
+     * Sets the domain of the "loc" element of the sitemap URL. Note: this is ignored when {@link #getValue()} is specified.
+     * 
      * @param domain The domain of the "loc" element of the sitemap URL for.
      */
     public void setDomain(String domain) {
@@ -364,6 +358,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "lastmod" element of the sitemap URL.
+     * 
      * @return The value of the "lastmod" element of the sitemap URL.
      */
     public Temporal getLastModified() {
@@ -372,6 +367,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "lastmod" element of the sitemap URL.
+     * 
      * @param lastModified The value of the "lastmod" element of the sitemap URL.
      */
     public void setLastModified(Temporal lastModified) {
@@ -380,6 +376,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "changefreq" element of the sitemap URL.
+     * 
      * @return The value of the "changefreq" element of the sitemap URL.
      */
     public ChangeFrequency getChangeFrequency() {
@@ -388,6 +385,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "changefreq" element of the sitemap URL.
+     * 
      * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
      */
     public void setChangeFrequency(ChangeFrequency changeFrequency) {
@@ -396,6 +394,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "priority" element of the sitemap URL.
+     * 
      * @return The value of the "priority" element of the sitemap URL.
      */
     public BigDecimal getPriority() {
@@ -404,6 +403,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "priority" element of the sitemap URL.
+     * 
      * @param priority The value of the "priority" element of the sitemap URL.
      */
     public void setPriority(BigDecimal priority) {

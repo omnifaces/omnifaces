@@ -28,15 +28,12 @@ import jakarta.faces.event.PhaseListener;
 /**
  * <p>
  * This phase listener picks up phase listener instances and phase event callbacks from the request scope subscribed via
- * <code>subscribeToRequestXxxPhase()</code> methods of the {@link org.omnifaces.util.Events} utility class and calls
- * them back for each matching phase.
+ * <code>subscribeToRequestXxxPhase()</code> methods of the {@link org.omnifaces.util.Events} utility class and calls them back for each matching phase.
  * <p>
- * This differs in a few subtle ways from <code>subscribeToViewXxxPhase()</code> methods of the
- * {@link org.omnifaces.util.Events} class which subscribes to the view scope. Namely, this phase listener will execute
- * slightly earlier for its before phase and slightly later for its after phase as compared to the view scoped ones.
- * Additionally, the phase listener instances and phase event callbacks registered via this phase listener will not
- * become part of the view state, but will execute only once during the current request instead of during every
- * (postback) request on the same view.
+ * This differs in a few subtle ways from <code>subscribeToViewXxxPhase()</code> methods of the {@link org.omnifaces.util.Events} class which subscribes to the
+ * view scope. Namely, this phase listener will execute slightly earlier for its before phase and slightly later for its after phase as compared to the view
+ * scoped ones. Additionally, the phase listener instances and phase event callbacks registered via this phase listener will not become part of the view state,
+ * but will execute only once during the current request instead of during every (postback) request on the same view.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -74,6 +71,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
     /**
      * Adds the given phase listener to the current request scope.
+     * 
      * @param phaseListener The phase listener to be added to the current request scope.
      */
     public static void add(PhaseListener phaseListener) {
@@ -82,6 +80,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
     /**
      * Removes the given phase listener from the current request scope.
+     * 
      * @param phaseListener The phase listener to be removed from the current request scope.
      * @return <code>true</code> if the current request scope indeed contained the given phase listener.
      */

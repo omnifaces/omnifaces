@@ -26,7 +26,8 @@ import org.omnifaces.cdi.Param;
 @ParamITCustomAnnotation
 public class ParamITCustomAnnotationBean {
 
-    @Param @Size(min = 2)
+    @Param
+    @Size(min = 2)
     private String stringParam;
 
     private String initResult;

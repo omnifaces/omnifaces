@@ -23,11 +23,15 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Constraint(validatedBy=ValidateBeanITEntityValidator.class)
+@Constraint(validatedBy = ValidateBeanITEntityValidator.class)
 @Target({ TYPE, METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface ValidateBeanITEntityConstraint {
+
     String message() default "invalidEntity";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
+
 }

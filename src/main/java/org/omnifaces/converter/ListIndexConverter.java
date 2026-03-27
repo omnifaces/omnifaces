@@ -29,16 +29,16 @@ import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
- * The <code>omnifaces.ListIndexConverter</code> is a variant of the {@link ListConverter} which automatically converts
- * based on the position (index) of the selected item in the list instead of the {@link #toString()} of the selected
- * item.
+ * The <code>omnifaces.ListIndexConverter</code> is a variant of the {@link ListConverter} which automatically converts based on the position (index) of the
+ * selected item in the list instead of the {@link #toString()} of the selected item.
  *
  * <h2>Usage</h2>
  * <p>
- * This converter is available by converter ID <code>omnifaces.ListIndexConverter</code> and should be used in
- * combination with <code>&lt;o:converter&gt;</code> in order to be able to pass the {@link List} source to it, which it
- * can use for conversion. Here's a basic usage example with PrimeFaces <code>&lt;p:pickList&gt;</code>, which is one of
- * the few select components which doesn't use {@link SelectItem}s as the source, but work directly via a {@link List}.
+ * This converter is available by converter ID <code>omnifaces.ListIndexConverter</code> and should be used in combination with <code>&lt;o:converter&gt;</code>
+ * in order to be able to pass the {@link List} source to it, which it can use for conversion. Here's a basic usage example with PrimeFaces
+ * <code>&lt;p:pickList&gt;</code>, which is one of the few select components which doesn't use {@link SelectItem}s as the source, but work directly via a
+ * {@link List}.
+ * 
  * <pre>
  * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
  *     &lt;o:converter converterId="omnifaces.ListIndexConverter" list="#{bean.dualListModel.source}" /&gt;
@@ -46,6 +46,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:listIndexConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
  *     &lt;o:listIndexConverter" list="#{bean.dualListModel.source}" /&gt;
@@ -54,9 +55,8 @@ import org.omnifaces.vdl.FacesConverterTag;
  *
  * <h2>Pros and cons as compared to {@link ListConverter}</h2>
  * <p>
- * For detail, refer the javadoc of {@link SelectItemsIndexConverter} and substitute
- * "<code>SelectItemsIndexConverter</code>" by "<code>ListIndexConverter</code>" and "<code>SelectItemsConverter</code>"
- * by "<code>ListConverter</code>".
+ * For detail, refer the javadoc of {@link SelectItemsIndexConverter} and substitute "<code>SelectItemsIndexConverter</code>" by
+ * "<code>ListIndexConverter</code>" and "<code>SelectItemsConverter</code>" by "<code>ListConverter</code>".
  *
  * @author Arjan Tijms
  */
@@ -64,14 +64,11 @@ import org.omnifaces.vdl.FacesConverterTag;
 @FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class ListIndexConverter implements Converter<Object> {
 
-    private static final String ERROR_LIST_INDEX =
-            "Could not determine index for value ''{0}'' in component {1}.";
+    private static final String ERROR_LIST_INDEX = "Could not determine index for value ''{0}'' in component {1}.";
 
-    private static final String ERROR_LIST_INDEX_BOUNDS =
-            "Index {0} for value {1} in component {2} is out of bounds.";
+    private static final String ERROR_LIST_INDEX_BOUNDS = "Index {0} for value {1} in component {2} is out of bounds.";
 
-    private static final String ERROR_VALUE_NOT_IN_LIST =
-            "Object {0} in component {1} does not appear to be present in the given list.";
+    private static final String ERROR_VALUE_NOT_IN_LIST = "Object {0} in component {1} does not appear to be present in the given list.";
 
     private List<?> list;
 
@@ -84,7 +81,8 @@ public class ListIndexConverter implements Converter<Object> {
         }
         catch (NumberFormatException e) {
             throw new ConverterException(
-                createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e);
+                createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e
+            );
         }
 
         if (index < 0 || index >= list.size()) {
@@ -111,6 +109,7 @@ public class ListIndexConverter implements Converter<Object> {
 
     /**
      * Sets the list of available items.
+     * 
      * @param list The list of available items.
      */
     @FacesAttribute(required = true)

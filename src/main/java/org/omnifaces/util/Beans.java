@@ -41,32 +41,40 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
 
 /**
  * <p>
- * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the
- * {@link BeanManager}.
+ * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the {@link BeanManager}.
  *
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
+ * 
  * <pre>
+ * 
  * // Get the CDI managed bean reference (proxy) of the given bean class.
  * SomeBean someBean = Beans.getReference(SomeBean.class);
  * </pre>
+ * 
  * <pre>
+ * 
  * // Get the CDI managed bean instance (actual) of the given bean class.
  * SomeBean someBean = Beans.getInstance(SomeBean.class);
  * </pre>
+ * 
  * <pre>
  * // Check if CDI session scope is active in current context.
  * Beans.isActive(SessionScope.class);
  * </pre>
+ * 
  * <pre>
+ * 
  * // Get all currently active CDI managed bean instances in the session scope.
  * Map&lt;Object, String&gt; activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
  * </pre>
+ * 
  * <pre>
  * // Destroy any currently active CDI managed bean instance of given bean class.
  * Beans.destroy(SomeBean.class);
  * </pre>
+ * 
  * <pre>
  * // Fire a CDI event.
  * Beans.fireEvent(someEvent);
@@ -94,7 +102,6 @@ public final class Beans {
     // Hopefully unknown CDI proxy implementations follow the same de-facto standard.
     private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("(.+)(\\$\\$(.*)Proxy|Proxy(.*)\\$\\$)(.*)", CASE_INSENSITIVE);
 
-
     // Constructors ---------------------------------------------------------------------------------------------------
 
     private Beans() {
@@ -105,6 +112,7 @@ public final class Beans {
 
     /**
      * Returns the CDI bean manager.
+     * 
      * @return The CDI bean manager.
      * @since 2.0
      * @see CDI#getBeanManager()
@@ -127,6 +135,7 @@ public final class Beans {
 
     /**
      * Returns the CDI managed bean representation of the given bean class, optionally with the given qualifiers.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param beanClass The CDI managed bean class.
      * @param qualifiers The CDI managed bean qualifiers, if any.
@@ -139,8 +148,8 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean representation of exactly the given bean class, optionally with the given qualifiers.
-     * This will ignore any subclasses.
+     * Returns the CDI managed bean representation of exactly the given bean class, optionally with the given qualifiers. This will ignore any subclasses.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param beanClass The CDI managed bean class.
      * @param qualifiers The CDI managed bean qualifiers, if any.
@@ -154,8 +163,9 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean reference (proxy) of the given bean class, optionally with the given qualifiers.
-     * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
+     * Returns the CDI managed bean reference (proxy) of the given bean class, optionally with the given qualifiers. Note that this actually returns a client
+     * proxy and the underlying actual instance is thus always auto-created.
+     * 
      * @param <T> The expected return type.
      * @param beanClass The CDI managed bean class.
      * @param qualifiers The CDI managed bean qualifiers, if any.
@@ -169,8 +179,9 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean reference (proxy) of the given bean representation.
-     * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
+     * Returns the CDI managed bean reference (proxy) of the given bean representation. Note that this actually returns a client proxy and the underlying actual
+     * instance is thus always auto-created.
+     * 
      * @param <T> The expected return type.
      * @param bean The CDI managed bean representation.
      * @return The CDI managed bean reference (proxy) of the given bean, or <code>null</code> if there is none.
@@ -182,8 +193,8 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
-     * and creates one if one doesn't exist.
+     * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers, and creates one if one doesn't exist.
+     * 
      * @param <T> The expected return type.
      * @param beanClass The CDI managed bean class.
      * @param qualifiers The CDI managed bean qualifiers, if any.
@@ -196,15 +207,15 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
-     * and creates one if one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't
-     * create one and return <code>null</code> if there's no current instance.
+     * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers, and creates one if one doesn't exist and
+     * <code>create</code> argument is <code>true</code>, otherwise don't create one and return <code>null</code> if there's no current instance.
+     * 
      * @param <T> The expected return type.
      * @param beanClass The CDI managed bean class.
      * @param create Whether to create create CDI managed bean instance if one doesn't exist.
      * @param qualifiers The CDI managed bean qualifiers, if any.
-     * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
-     * and/or the <code>create</code> argument is <code>false</code>.
+     * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none and/or the <code>create</code> argument is
+     * <code>false</code>.
      * @since 1.7
      * @see #resolve(Class, Annotation...)
      * @see #getInstance(Bean, boolean)
@@ -214,14 +225,14 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean instance (actual) of the given bean representation and creates one if one doesn't
-     * exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
-     * <code>null</code> if there's no current instance.
+     * Returns the CDI managed bean instance (actual) of the given bean representation and creates one if one doesn't exist and <code>create</code> argument is
+     * <code>true</code>, otherwise don't create one and return <code>null</code> if there's no current instance.
+     * 
      * @param <T> The expected return type.
      * @param bean The CDI managed bean representation.
      * @param create Whether to create create CDI managed bean instance if one doesn't exist.
-     * @return The CDI managed bean instance (actual) of the given bean, or <code>null</code> if there is none and/or
-     * the <code>create</code> argument is <code>false</code>.
+     * @return The CDI managed bean instance (actual) of the given bean, or <code>null</code> if there is none and/or the <code>create</code> argument is
+     * <code>false</code>.
      * @since 1.7
      * @see BeanManager#getContext(Class)
      * @see BeanManager#createCreationalContext(jakarta.enterprise.context.spi.Contextual)
@@ -232,14 +243,14 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't
-     * exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
-     * <code>null</code> if there's no current instance.
+     * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't exist and <code>create</code> argument
+     * is <code>true</code>, otherwise don't create one and return <code>null</code> if there's no current instance.
+     * 
      * @param <T> The expected return type.
      * @param name The CDI managed bean name.
      * @param create Whether to create create CDI managed bean instance if one doesn't exist.
-     * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there
-     * is none and/or the <code>create</code> argument is <code>false</code>.
+     * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there is none and/or the <code>create</code>
+     * argument is <code>false</code>.
      * @since 3.14
      * @see BeanManager#getBeans(String)
      * @see BeanManager#resolve(java.util.Set)
@@ -252,12 +263,11 @@ public final class Beans {
     }
 
     /**
-     * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't
-     * exist.
+     * Returns the CDI managed bean instance (actual) associated with the given bean name and creates one if one doesn't exist.
+     * 
      * @param <T> The expected return type.
      * @param name The CDI managed bean name.
-     * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there
-     * is none.
+     * @return The CDI managed bean instance (actual) associated with the given bean name, or <code>null</code> if there is none.
      * @since 3.14
      * @see BeanManager#getBeans(String)
      * @see BeanManager#resolve(java.util.Set)
@@ -271,6 +281,7 @@ public final class Beans {
 
     /**
      * Returns <code>true</code> if given object or class is actually a CDI proxy.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param object The object to be checked.
      * @return <code>true</code> if given object or class is actually a CDI proxy.
@@ -293,6 +304,7 @@ public final class Beans {
 
     /**
      * Returns the actual instance or class of the given object or class if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param object The object or class to be unwrapped.
      * @return The actual instance or class of the given object or class if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
@@ -303,8 +315,9 @@ public final class Beans {
     }
 
     /**
-     * Returns <code>true</code> when the given CDI managed bean scope is active. I.e., all beans therein can be
-     * accessed without facing {@link ContextNotActiveException}.
+     * Returns <code>true</code> when the given CDI managed bean scope is active. I.e., all beans therein can be accessed without facing
+     * {@link ContextNotActiveException}.
+     * 
      * @param <S> The generic CDI managed bean scope type.
      * @param scope The CDI managed bean scope, e.g. <code>SessionScoped.class</code>.
      * @return <code>true</code> when the given CDI managed bean scope is active.
@@ -317,8 +330,9 @@ public final class Beans {
     }
 
     /**
-     * Returns all active CDI managed bean instances in the given CDI managed bean scope. The map key represents
-     * the active CDI managed bean instance and the map value represents the CDI managed bean name, if any.
+     * Returns all active CDI managed bean instances in the given CDI managed bean scope. The map key represents the active CDI managed bean instance and the
+     * map value represents the CDI managed bean name, if any.
+     * 
      * @param <S> The generic CDI managed bean scope type.
      * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
      * @return All active CDI managed bean instances in the given CDI managed bean scope.
@@ -333,6 +347,7 @@ public final class Beans {
 
     /**
      * Destroy the currently active instance of the given CDI managed bean class, optionally with the given qualifiers.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param beanClass The CDI managed bean class.
      * @param qualifiers The CDI managed bean qualifiers, if any.
@@ -347,10 +362,10 @@ public final class Beans {
 
     /**
      * Destroy the currently active instance of the given CDI managed bean representation.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param bean The CDI managed bean representation.
-     * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
-     * context.
+     * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable context.
      * @since 2.0
      * @see BeanManager#getContext(Class)
      * @see AlterableContext#destroy(jakarta.enterprise.context.spi.Contextual)
@@ -361,10 +376,10 @@ public final class Beans {
 
     /**
      * Destroy the currently active instance of the given CDI managed bean instance.
+     * 
      * @param <T> The generic CDI managed bean type.
      * @param instance The CDI managed bean instance.
-     * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
-     * context.
+     * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable context.
      * @since 2.5
      * @see #resolve(Class, Annotation...)
      * @see BeanManager#createCreationalContext(Contextual)
@@ -375,14 +390,13 @@ public final class Beans {
     }
 
     /**
-     * Get program element annotation of a certain annotation type. The difference with
-     * {@link Annotated#getAnnotation(Class)} is that this method will recursively search inside all {@link Stereotype}
-     * annotations.
+     * Get program element annotation of a certain annotation type. The difference with {@link Annotated#getAnnotation(Class)} is that this method will
+     * recursively search inside all {@link Stereotype} annotations.
+     * 
      * @param <A> The generic annotation type.
      * @param annotated A Java program element that can be annotated.
      * @param annotationType The class of the annotation type.
-     * @return The program element annotation of the given annotation type if it could be found, otherwise
-     * <code>null</code>.
+     * @return The program element annotation of the given annotation type if it could be found, otherwise <code>null</code>.
      * @since 1.8
      */
     public static <A extends Annotation> A getAnnotation(Annotated annotated, Class<A> annotationType) {
@@ -392,12 +406,10 @@ public final class Beans {
     /**
      * Gets the current injection point when called from a context where injection is taking place (e.g. from a producer).
      * <p>
-     * This is mostly intended to be used from within a dynamic producer {@link Bean}. For a "regular" producer (using {@link Produces})
-     * an <code>InjectionPoint</code> can either be injected into the bean that contains the producer method, or directly provided as argument
-     * of said method.
+     * This is mostly intended to be used from within a dynamic producer {@link Bean}. For a "regular" producer (using {@link Produces}) an
+     * <code>InjectionPoint</code> can either be injected into the bean that contains the producer method, or directly provided as argument of said method.
      *
-     * @param creationalContext a {@link CreationalContext} used to manage objects with a
-     *        {@link jakarta.enterprise.context.Dependent} scope
+     * @param creationalContext a {@link CreationalContext} used to manage objects with a {@link jakarta.enterprise.context.Dependent} scope
      * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
      */
     public static InjectionPoint getCurrentInjectionPoint(CreationalContext<?> creationalContext) {
@@ -406,6 +418,7 @@ public final class Beans {
 
     /**
      * Returns the qualifier annotation of the given qualifier class from the given injection point.
+     * 
      * @param <A> The generic annotation type.
      * @param injectionPoint The injection point to obtain the qualifier annotation of the given qualifier class from.
      * @param qualifierClass The class of the qualifier annotation to be looked up in the given injection point.
@@ -424,6 +437,7 @@ public final class Beans {
 
     /**
      * Fires the given CDI event, optionally with the given qualifiers.
+     * 
      * @param event The event object.
      * @param qualifiers The event qualifiers, if any.
      * @since 2.3

@@ -23,8 +23,7 @@ import jakarta.faces.view.facelets.TagHandler;
 import jakarta.security.enterprise.SecurityContext;
 
 /**
- * Base class for security-related tag handlers.
- * Provides common functionality for retrieving and validating SecurityContext.
+ * Base class for security-related tag handlers. Provides common functionality for retrieving and validating SecurityContext.
  *
  * @author Bauke Scholtz
  * @since 5.0
@@ -36,8 +35,7 @@ abstract class BaseSecurityTagHandler extends TagHandler {
     }
 
     /**
-     * Retrieves the current SecurityContext from CDI.
-     * If the SecurityContext is not available, logs a warning and returns empty Optional.
+     * Retrieves the current SecurityContext from CDI. If the SecurityContext is not available, logs a warning and returns empty Optional.
      *
      * @return Optional containing the SecurityContext, or empty if not available
      */
@@ -50,4 +48,5 @@ abstract class BaseSecurityTagHandler extends TagHandler {
 
         return ofNullable(identity);
     }
+
 }

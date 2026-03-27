@@ -24,33 +24,35 @@ import jakarta.enterprise.inject.Stereotype;
 
 /**
  * <p>
- * Stereo type that designates a bean as an eagerly instantiated bean with application scope.
- * Watch out with IDE autocomplete on import that you don't accidentally import EJB's one.
+ * Stereo type that designates a bean as an eagerly instantiated bean with application scope. Watch out with IDE autocomplete on import that you don't
+ * accidentally import EJB's one.
+ * 
  * <pre>
  * import org.omnifaces.cdi.Startup;
  *
  * &#64;Startup
- * public class MyStartupBean {}
+ * public class MyStartupBean {
+ * }
  * </pre>
  * <p>
  * In effect, this annotation does exactly the same as:
+ * 
  * <pre>
  * import jakarta.enterprise.context.ApplicationScoped;
  * import org.omnifaces.cdi.Eager;
  *
  * &#64;Eager
  * &#64;ApplicationScoped
- * public class MyStartupBean {}
+ * public class MyStartupBean {
+ * }
  * </pre>
  * <p>
  * This bean type effectively functions as a CDI based startup listener for the web application.
  * <p>
- * Note that Java EE thus also provides the <code>jakarta.ejb.Startup</code> and <code>jakarta.ejb.Singleton</code>
- * annotations which together provide similar functionality, but it requires an EJB dependency (which may not be
- * applicable on e.g. Tomcat+Weld) and it will result in the bean annotated with these annotations to become an EJB
- * session bean (with automatic transaction management and automatic locking which you might need to turn off with yet
- * more additional <code>jakarta.ejb.TransactionAttribute</code> and <code>jakarta.ejb.Lock</code> annotations if these are
- * not appropriate for some situation).
+ * Note that Java EE thus also provides the <code>jakarta.ejb.Startup</code> and <code>jakarta.ejb.Singleton</code> annotations which together provide similar
+ * functionality, but it requires an EJB dependency (which may not be applicable on e.g. Tomcat+Weld) and it will result in the bean annotated with these
+ * annotations to become an EJB session bean (with automatic transaction management and automatic locking which you might need to turn off with yet more
+ * additional <code>jakarta.ejb.TransactionAttribute</code> and <code>jakarta.ejb.Lock</code> annotations if these are not appropriate for some situation).
  *
  * @since 1.8
  * @author Arjan Tijms

@@ -29,97 +29,97 @@ import org.openqa.selenium.support.FindBy;
 
 public class InputFileIT extends OmniFacesIT {
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="uploadSingle:file")
+    @FindBy(id = "uploadSingle:file")
     private WebElement uploadSingleFile;
 
-    @FindBy(id="uploadSingle:submit")
+    @FindBy(id = "uploadSingle:submit")
     private WebElement uploadSingleSubmit;
 
-    @FindBy(id="uploadSingleAjax:file")
+    @FindBy(id = "uploadSingleAjax:file")
     private WebElement uploadSingleAjaxFile;
 
-    @FindBy(id="uploadSingleAjax:submit")
+    @FindBy(id = "uploadSingleAjax:submit")
     private WebElement uploadSingleAjaxSubmit;
 
-    @FindBy(id="uploadSingleAcceptAnyImage:file")
+    @FindBy(id = "uploadSingleAcceptAnyImage:file")
     private WebElement uploadSingleAcceptAnyImageFile;
 
-    @FindBy(id="uploadSingleAcceptAnyImage:submit")
+    @FindBy(id = "uploadSingleAcceptAnyImage:submit")
     private WebElement uploadSingleAcceptAnyImageSubmit;
 
-    @FindBy(id="uploadSingleAcceptSvgImage:file")
+    @FindBy(id = "uploadSingleAcceptSvgImage:file")
     private WebElement uploadSingleAcceptSvgImageFile;
 
-    @FindBy(id="uploadSingleAcceptSvgImage:submit")
+    @FindBy(id = "uploadSingleAcceptSvgImage:submit")
     private WebElement uploadSingleAcceptSvgImageSubmit;
 
-    @FindBy(id="uploadSingleMaxsizeClient:file")
+    @FindBy(id = "uploadSingleMaxsizeClient:file")
     private WebElement uploadSingleMaxsizeClientFile;
 
-    @FindBy(id="uploadSingleMaxsizeClient:message")
+    @FindBy(id = "uploadSingleMaxsizeClient:message")
     private WebElement uploadSingleMaxsizeClientMessage;
 
-    @FindBy(id="uploadSingleMaxsizeClient:submit")
+    @FindBy(id = "uploadSingleMaxsizeClient:submit")
     private WebElement uploadSingleMaxsizeClientSubmit;
 
-    @FindBy(id="uploadSingleMaxsizeServer:file")
+    @FindBy(id = "uploadSingleMaxsizeServer:file")
     private WebElement uploadSingleMaxsizeServerFile;
 
-    @FindBy(id="uploadSingleMaxsizeServer:submit")
+    @FindBy(id = "uploadSingleMaxsizeServer:submit")
     private WebElement uploadSingleMaxsizeServerSubmit;
 
-    @FindBy(id="uploadMultiple:file1")
+    @FindBy(id = "uploadMultiple:file1")
     private WebElement uploadMultipleFile1;
 
-    @FindBy(id="uploadMultiple:file2")
+    @FindBy(id = "uploadMultiple:file2")
     private WebElement uploadMultipleFile2;
 
-    @FindBy(id="uploadMultiple:submit")
+    @FindBy(id = "uploadMultiple:submit")
     private WebElement uploadMultipleSubmit;
 
-    @FindBy(id="uploadMultipleAjax:file1")
+    @FindBy(id = "uploadMultipleAjax:file1")
     private WebElement uploadMultipleAjaxFile1;
 
-    @FindBy(id="uploadMultipleAjax:file2")
+    @FindBy(id = "uploadMultipleAjax:file2")
     private WebElement uploadMultipleAjaxFile2;
 
-    @FindBy(id="uploadMultipleAjax:submit")
+    @FindBy(id = "uploadMultipleAjax:submit")
     private WebElement uploadMultipleAjaxSubmit;
 
-    @FindBy(id="uploadMultipleMaxsizeClient:file1")
+    @FindBy(id = "uploadMultipleMaxsizeClient:file1")
     private WebElement uploadMultipleMaxsizeClientFile1;
 
-    @FindBy(id="uploadMultipleMaxsizeClient:file2")
+    @FindBy(id = "uploadMultipleMaxsizeClient:file2")
     private WebElement uploadMultipleMaxsizeClientFile2;
 
-    @FindBy(id="uploadSingleAcceptAnyImageAndPdf:file")
+    @FindBy(id = "uploadSingleAcceptAnyImageAndPdf:file")
     private WebElement uploadSingleAcceptAnyImageAndPdfFile;
 
-    @FindBy(id="uploadSingleAcceptAnyImageAndPdf:submit")
+    @FindBy(id = "uploadSingleAcceptAnyImageAndPdf:submit")
     private WebElement uploadSingleAcceptAnyImageAndPdfSubmit;
 
-    @FindBy(id="uploadMultipleMaxsizeClient:message")
+    @FindBy(id = "uploadMultipleMaxsizeClient:message")
     private WebElement uploadMultipleMaxsizeClientMessage;
 
-    @FindBy(id="uploadMultipleMaxsizeClient:submit")
+    @FindBy(id = "uploadMultipleMaxsizeClient:submit")
     private WebElement uploadMultipleMaxsizeClientSubmit;
 
-    @FindBy(id="uploadMultipleMaxsizeServer:file1")
+    @FindBy(id = "uploadMultipleMaxsizeServer:file1")
     private WebElement uploadMultipleMaxsizeServerFile1;
 
-    @FindBy(id="uploadMultipleMaxsizeServer:file2")
+    @FindBy(id = "uploadMultipleMaxsizeServer:file2")
     private WebElement uploadMultipleMaxsizeServerFile2;
 
-    @FindBy(id="uploadMultipleMaxsizeServer:message")
+    @FindBy(id = "uploadMultipleMaxsizeServer:message")
     private WebElement uploadMultipleMaxsizeServerMessage;
 
-    @FindBy(id="uploadMultipleMaxsizeServer:submit")
+    @FindBy(id = "uploadMultipleMaxsizeServer:submit")
     private WebElement uploadMultipleMaxsizeServerSubmit;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(InputFileIT.class);
     }
@@ -254,7 +254,10 @@ public class InputFileIT extends OmniFacesIT {
         uploadMultipleFile2.sendKeys(txtFile2.getAbsolutePath());
         guardHttp(uploadMultipleSubmit::click);
         assertTrue(uploadMultipleFile1.getText().isEmpty());
-        assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
+        assertEquals(
+            "uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(),
+            getMessagesText()
+        );
     }
 
     @Test
@@ -264,7 +267,10 @@ public class InputFileIT extends OmniFacesIT {
         uploadMultipleAjaxFile1.sendKeys(txtFile1.getAbsolutePath());
         uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
         guardAjaxUpload(uploadMultipleAjaxSubmit::click, messages);
-        assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
+        assertEquals(
+            "uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(),
+            getMessagesText()
+        );
     }
 
     @Test
@@ -283,7 +289,10 @@ public class InputFileIT extends OmniFacesIT {
         guardHttp(uploadMultipleMaxsizeClientSubmit::click);
         assertTrue(uploadMultipleMaxsizeClientFile1.getText().isEmpty());
         assertTrue(uploadMultipleMaxsizeClientFile2.getText().isEmpty());
-        assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
+        assertEquals(
+            "uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(),
+            getMessagesText()
+        );
     }
 
     @Test
@@ -303,7 +312,10 @@ public class InputFileIT extends OmniFacesIT {
         guardHttp(uploadMultipleMaxsizeServerSubmit::click);
         assertTrue(uploadMultipleMaxsizeServerFile1.getText().isEmpty());
         assertTrue(uploadMultipleMaxsizeServerFile2.getText().isEmpty());
-        assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), getMessagesText());
+        assertEquals(
+            "uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(),
+            getMessagesText()
+        );
     }
 
     private static File createTempFile(String name, String extension, String content) throws IOException {

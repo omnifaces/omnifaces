@@ -237,4 +237,5 @@ class ComponentsLocalTest {
         // Then: Only the pure numeric iteration index should be removed
         assertEquals("123form:456table:input", result);
     }
+
 }

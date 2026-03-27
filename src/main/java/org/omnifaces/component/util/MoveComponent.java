@@ -44,21 +44,20 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>&lt;o:moveComponent&gt;</code> component is a utility component via which components, facets and behaviors can be moved at runtime
- * to a target component in various ways. This allows for simple programmatic composition of components using a declarative page author
- * centric approach.
+ * The <code>&lt;o:moveComponent&gt;</code> component is a utility component via which components, facets and behaviors can be moved at runtime to a target
+ * component in various ways. This allows for simple programmatic composition of components using a declarative page author centric approach.
  *
  * <p>
- * The destination of a move operation is specified in terms of a location that's relative to a given target component. The following
- * shows a list of supported destinations:
+ * The destination of a move operation is specified in terms of a location that's relative to a given target component. The following shows a list of supported
+ * destinations:
  *
  * <ul>
- *         <li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower.
- *        <li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1.
- *        <li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location.
- *        <li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet".
- *        <li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component.
- *        <li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher.
+ * <li><code>BEFORE</code> - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower.
+ * <li><code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1.
+ * <li><code>ADD_LAST</code> - Component is added as the last child of the target component, any other children will stay at their original location.
+ * <li><code>FACET</code> - Component will be moved to the facet section of the target component under the name denoted by "facet".
+ * <li><code>BEHAVIOR</code> - A Behavior will be moved to the behavior section of the target component.
+ * <li><code>AFTER</code> - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher.
  * </ul>
  *
  * @since 2.0
@@ -71,8 +70,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     /** The component type, which is {@value org.omnifaces.component.util.MoveComponent#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.util.MoveComponent";
 
-    private static final String ERROR_COMPONENT_NOT_FOUND =
-        "A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
+    private static final String ERROR_COMPONENT_NOT_FOUND = "A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
 
     /** The default scope, which is "facelet". */
     public static final String DEFAULT_SCOPE = "facelet";
@@ -125,11 +123,14 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     // Used to fool over-eager tag handlers that check in advance whether a given component indeed
     // supports the event for which a behavior is attached.
     private List<String> containsTrueList = new ArrayList<>() {
+
         private static final long serialVersionUID = 1L;
+
         @Override
         public boolean contains(Object o) {
             return true;
         }
+
     };
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -190,22 +191,22 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             var children = getChildrenInNewList();
 
             switch (getDestination()) {
-                case BEFORE:
+                case BEFORE :
                     moveBefore(component, children);
                     break;
-                case ADD_FIRST:
+                case ADD_FIRST :
                     moveAddFirst(component, children);
                     break;
-                case ADD_LAST:
+                case ADD_LAST :
                     moveAddLast(component, children);
                     break;
-                case FACET:
+                case FACET :
                     moveFacet(component, children);
                     break;
-                case BEHAVIOR:
+                case BEHAVIOR :
                     moveBehavior(component, attachedEventName, attachedBehavior);
                     break;
-                case AFTER:
+                case AFTER :
                     moveAfter(component, children);
                     break;
             }
@@ -285,16 +286,18 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns ID of the target component for which the component moving will be done.
+     * 
      * @return ID of the target component for which the component moving will be done.
      */
-      public String getFor() {
+    public String getFor() {
         return state.get("for");
     }
 
-      /**
-       * Sets ID of the target component for which the component moving will be done.
-       * @param forValue ID of the target component for which the component moving will be done.
-       */
+    /**
+     * Sets ID of the target component for which the component moving will be done.
+     * 
+     * @param forValue ID of the target component for which the component moving will be done.
+     */
     @FacesAttribute(required = true)
     public void setFor(String forValue) {
         state.put("for", forValue);
@@ -302,6 +305,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns the destination relative to the target component where the source component(s) are moved to. Default is <code>ADD_LAST</code>.
+     * 
      * @return The destination relative to the target component where the source component(s) are moved to.
      */
     public Destination getDestination() {
@@ -311,13 +315,14 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     /**
      * Sets the destination relative to the target component where the source component(s) are moved to. Valid values are
      * <ul>
-     * <li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower
-     * <li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
-     * <li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
-     * <li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet"
-     * <li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
-     * <li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
+     * <li><code>BEFORE</code> - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower
+     * <li><code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
+     * <li><code>ADD_LAST</code> - Component is added as the last child of the target component, any other children will stay at their original location
+     * <li><code>FACET</code> - Component will be moved to the facet section of the target component under the name denoted by "facet"
+     * <li><code>BEHAVIOR</code> - A Behavior will be moved to the behavior section of the target component
+     * <li><code>AFTER</code> - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
      * </ul>
+     * 
      * @param destinationValue The destination relative to the target component where the source component(s) are moved to.
      */
     public void setDestination(Destination destinationValue) {
@@ -326,6 +331,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+     * 
      * @return In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
      */
     public String getFacet() {
@@ -334,7 +340,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Sets in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
-     * @param facetValue In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
+     * 
+     * @param facetValue In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be
+     * moved.
      */
     public void setFacet(String facetValue) {
         state.put(facet, facetValue);
@@ -342,6 +350,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+     * 
      * @return In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
      */
     public String getBehaviorDefaultEvent() {
@@ -349,18 +358,23 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     }
 
     /**
-     * Sets in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
-     * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
-     * to check whether the behavior event matches with what the component supports.
-     * @param behaviorDefaultEventValue In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+     * Sets in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have. This
+     * normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try to check whether
+     * the behavior event matches with what the component supports.
+     * 
+     * @param behaviorDefaultEventValue In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component
+     * is 'supposed' to have.
      */
     public void setBehaviorDefaultEvent(String behaviorDefaultEventValue) {
         state.put(behaviorDefaultEvent, behaviorDefaultEventValue);
     }
 
     /**
-     * Returns in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
-     * @return In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+     * Returns in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to
+     * support.
+     * 
+     * @return In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to
+     * support.
      */
     public String getBehaviorEvents() {
         return state.get(behaviorEvents);
@@ -368,9 +382,11 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Sets in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
-     * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
-     * to check whether the behavior event matches with what the component supports.
-     * @param behaviorEventsValue In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+     * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try to check
+     * whether the behavior event matches with what the component supports.
+     * 
+     * @param behaviorEventsValue In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is
+     * 'supposed' to support.
      */
     public void setBehaviorEvents(String behaviorEventsValue) {
         state.put(behaviorEvents, behaviorEventsValue);

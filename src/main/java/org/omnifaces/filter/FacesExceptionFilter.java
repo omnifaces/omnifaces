@@ -46,20 +46,20 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  * The {@link FacesExceptionFilter} will solve 2 problems with exceptions thrown in Faces methods.
  * <ol>
  * <li>Mojarra's <code>FacesFileNotFoundException</code> needs to be interpreted as 404.
- * <li>Root cause needs to be unwrapped from {@link FacesException} and {@link ELException} to utilize standard
- * Servlet API error page handling.
+ * <li>Root cause needs to be unwrapped from {@link FacesException} and {@link ELException} to utilize standard Servlet API error page handling.
  * </ol>
  * <p>
- * Noted should be that this filter won't run on exceptions thrown during ajax requests. To handle them using
- * <code>web.xml</code> configured error pages, use {@link FullAjaxExceptionHandler}.
+ * Noted should be that this filter won't run on exceptions thrown during ajax requests. To handle them using <code>web.xml</code> configured error pages, use
+ * {@link FullAjaxExceptionHandler}.
  * <p>
  * Since version 3.2, the {@link FacesExceptionFilter} also logs exceptions with an UUID and IP via the
- * {@link #logException(HttpServletRequest, Throwable, String, String, Object...)} method. The UUID is in turn available
- * in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+ * {@link #logException(HttpServletRequest, Throwable, String, String, Object...)} method. The UUID is in turn available in EL by
+ * <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
  *
  * <h2>Installation</h2>
  * <p>
  * To get it to run, map this filter on an <code>&lt;url-pattern&gt;</code> of <code>/*</code> in <code>web.xml</code>.
+ * 
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;facesExceptionFilter&lt;/filter-name&gt;
@@ -71,24 +71,21 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
- * Note that since OmniFaces 4.5, the {@link FullAjaxExceptionHandler} will automatically register the
- * {@link FacesExceptionFilter} on its default URL pattern of {@code /*} when it is absent in {@code web.xml}, so you
- * do not need to explicitly register it then.
+ * Note that since OmniFaces 4.5, the {@link FullAjaxExceptionHandler} will automatically register the {@link FacesExceptionFilter} on its default URL pattern
+ * of {@code /*} when it is absent in {@code web.xml}, so you do not need to explicitly register it then.
  *
  * <h2>Error pages</h2>
  * <p>
- * Please refer the "Error pages" section of the {@link FullAjaxExceptionHandler} javadoc for recommended error page
- * configuration.
+ * Please refer the "Error pages" section of the {@link FullAjaxExceptionHandler} javadoc for recommended error page configuration.
  *
  * <h2>Configuration</h2>
  * <p>
- * Please refer the "Configuration" section of the {@link FullAjaxExceptionHandler} javadoc for available context
- * parameters.
+ * Please refer the "Configuration" section of the {@link FullAjaxExceptionHandler} javadoc for available context parameters.
  *
  * <h2>Customizing <code>FacesExceptionFilter</code></h2>
  * <p>
- * If more fine grained control is desired for logging the exception, then the developer can opt to extend this
- * {@link FacesExceptionFilter} and override one or more of the following protected methods:
+ * If more fine grained control is desired for logging the exception, then the developer can opt to extend this {@link FacesExceptionFilter} and override one or
+ * more of the following protected methods:
  * <ul>
  * <li>{@link #logException(HttpServletRequest, Throwable, String, String, Object...)}
  * </ul>
@@ -101,12 +98,10 @@ public class FacesExceptionFilter extends HttpFilter {
 
     private static final Logger logger = Logger.getLogger(FacesExceptionFilter.class.getName());
 
-    private static final String LOG_EXCEPTION_HANDLED =
-            "FacesExceptionFilter: An exception occurred during processing servlet request."
-                + " Error page '%s' will be shown.";
-    private static final String LOG_EXCEPTION_UNHANDLED =
-            "FacesExceptionFilter: An exception occurred during processing servlet request."
-                + " Error page '%s' CANNOT be shown as response is already committed.";
+    private static final String LOG_EXCEPTION_HANDLED = "FacesExceptionFilter: An exception occurred during processing servlet request."
+        + " Error page '%s' will be shown.";
+    private static final String LOG_EXCEPTION_UNHANDLED = "FacesExceptionFilter: An exception occurred during processing servlet request."
+        + " Error page '%s' CANNOT be shown as response is already committed.";
 
     private Class<? extends Throwable>[] exceptionTypesToUnwrap;
     private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
@@ -118,9 +113,8 @@ public class FacesExceptionFilter extends HttpFilter {
     }
 
     @Override
-    public void doFilter
-        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-            throws ServletException, IOException
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException
     {
         try {
             chain.doFilter(request, response);
@@ -158,13 +152,11 @@ public class FacesExceptionFilter extends HttpFilter {
     }
 
     /**
-     * Log the thrown exception and determined error page location with the given message, optionally parameterized
-     * with the given parameters.
-     * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
-     * not an instance of any type specified in context parameter
-     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
-     * The log message will be prepended with the UUID and IP address.
-     * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * Log the thrown exception and determined error page location with the given message, optionally parameterized with the given parameters. The default
+     * implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is not an instance of any type specified in context
+     * parameter {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}. The log message will be
+     * prepended with the UUID and IP address. The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * 
      * @param request The involved servlet request.
      * @param exception The exception to log.
      * @param location The error page location.
@@ -172,9 +164,7 @@ public class FacesExceptionFilter extends HttpFilter {
      * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
      * @since 3.2
      */
-    protected void logException
-        (HttpServletRequest request, Throwable exception, String location, String message, Object... parameters)
-    {
+    protected void logException(HttpServletRequest request, Throwable exception, String location, String message, Object... parameters) {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
             logger.log(SEVERE, "[%s][%s] %s".formatted(request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), message.formatted(parameters)), exception);
         }

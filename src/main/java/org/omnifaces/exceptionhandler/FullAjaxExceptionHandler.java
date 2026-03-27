@@ -71,18 +71,18 @@ import org.omnifaces.util.Reflection;
 
 /**
  * <p>
- * The {@link FullAjaxExceptionHandler} will transparently handle exceptions during ajax requests exactly the same way
- * as exceptions during synchronous (non-ajax) requests.
+ * The {@link FullAjaxExceptionHandler} will transparently handle exceptions during ajax requests exactly the same way as exceptions during synchronous
+ * (non-ajax) requests.
  * <p>
- * By default, when an exception occurs during a Faces ajax request, the enduser would not get any form of feedback if the
- * action was successfully performed or not. In Mojarra, only when the project stage is set to <code>Development</code>,
- * the enduser would see a bare JavaScript alert with only the exception type and message. It would make sense if
- * exceptions during ajax requests are handled the same way as exceptions during synchronous requests, which is
- * utilizing the standard Servlet API <code>&lt;error-page&gt;</code> mechanisms in <code>web.xml</code>.
+ * By default, when an exception occurs during a Faces ajax request, the enduser would not get any form of feedback if the action was successfully performed or
+ * not. In Mojarra, only when the project stage is set to <code>Development</code>, the enduser would see a bare JavaScript alert with only the exception type
+ * and message. It would make sense if exceptions during ajax requests are handled the same way as exceptions during synchronous requests, which is utilizing
+ * the standard Servlet API <code>&lt;error-page&gt;</code> mechanisms in <code>web.xml</code>.
  *
  * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
+ * 
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -91,10 +91,10 @@ import org.omnifaces.util.Reflection;
  *
  * <h2>Error pages</h2>
  * <p>
- * This exception handler will parse the <code>web.xml</code> and <code>web-fragment.xml</code> files to find the error
- * page locations of the HTTP error code <code>500</code> and all declared specific exception types. Those locations
- * need to point to Facelets files (JSP is not supported) and the URL must match the {@link FacesServlet} mapping (just
- * mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs). E.g.
+ * This exception handler will parse the <code>web.xml</code> and <code>web-fragment.xml</code> files to find the error page locations of the HTTP error code
+ * <code>500</code> and all declared specific exception types. Those locations need to point to Facelets files (JSP is not supported) and the URL must match the
+ * {@link FacesServlet} mapping (just mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs). E.g.
+ * 
  * <pre>
  * &lt;error-page&gt;
  *     &lt;exception-type&gt;jakarta.faces.application.ViewExpiredException&lt;/exception-type&gt;
@@ -102,11 +102,11 @@ import org.omnifaces.util.Reflection;
  * &lt;/error-page&gt;
  * </pre>
  * <p>
- * The location of the HTTP error code <code>500</code> or the exception type <code>java.lang.Throwable</code> is
- * <b>required</b> in order to get the {@link FullAjaxExceptionHandler} to work, because there's then at least a fall
- * back error page when there's no match with any of the declared specific exceptions types. You can have both, but the
- * <code>java.lang.Throwable</code> one will always get precedence over all others. When you have error pages for
+ * The location of the HTTP error code <code>500</code> or the exception type <code>java.lang.Throwable</code> is <b>required</b> in order to get the
+ * {@link FullAjaxExceptionHandler} to work, because there's then at least a fall back error page when there's no match with any of the declared specific
+ * exceptions types. You can have both, but the <code>java.lang.Throwable</code> one will always get precedence over all others. When you have error pages for
  * specific exception types, then you'd better use the <code>500</code> one as fallback error page.
+ * 
  * <pre>
  * &lt;error-page&gt;
  *     &lt;error-code&gt;500&lt;/error-code&gt;
@@ -114,8 +114,9 @@ import org.omnifaces.util.Reflection;
  * &lt;/error-page&gt;
  * </pre>
  * <p>
- * The exception detail is available in the request scope by the standard Servlet error request attributes like as in a
- * normal synchronous error page response. You could for example show them in the error page as follows:
+ * The exception detail is available in the request scope by the standard Servlet error request attributes like as in a normal synchronous error page response.
+ * You could for example show them in the error page as follows:
+ * 
  * <pre>
  * &lt;ul&gt;
  *     &lt;li&gt;Date/time: #{o:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
@@ -133,35 +134,32 @@ import org.omnifaces.util.Reflection;
  * &lt;/ul&gt;
  * </pre>
  * <p>
- * Exceptions during render response can only be handled when the <code>jakarta.faces.FACELETS_BUFFER_SIZE</code> is
- * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
- * therefore safely be resetted.
+ * Exceptions during render response can only be handled when the <code>jakarta.faces.FACELETS_BUFFER_SIZE</code> is large enough so that the so far rendered
+ * response until the occurrence of the exception fits in there and can therefore safely be resetted.
  *
  * <h2>Error in error page itself</h2>
  * <p>
- * When the rendering of the error page failed due to a bug in the error page itself, and the response can still be
- * resetted, then the {@link FullAjaxExceptionHandler} will display a hardcoded error message in "plain text" informing
- * the developer about the double mistake.
+ * When the rendering of the error page failed due to a bug in the error page itself, and the response can still be resetted, then the
+ * {@link FullAjaxExceptionHandler} will display a hardcoded error message in "plain text" informing the developer about the double mistake.
  *
  * <h2>Normal requests</h2>
  * <p>
- * Note that the {@link FullAjaxExceptionHandler} does not deal with normal (non-ajax) requests at all. To properly
- * handle Faces and EL exceptions on normal requests as well, you need an additional {@link FacesExceptionFilter}. This
- * will extract the root cause from a wrapped {@link FacesException} and {@link ELException} before delegating the
- * {@link ServletException} further to the container (the container will namely use the first root cause of
+ * Note that the {@link FullAjaxExceptionHandler} does not deal with normal (non-ajax) requests at all. To properly handle Faces and EL exceptions on normal
+ * requests as well, you need an additional {@link FacesExceptionFilter}. This will extract the root cause from a wrapped {@link FacesException} and
+ * {@link ELException} before delegating the {@link ServletException} further to the container (the container will namely use the first root cause of
  * {@link ServletException} to match an error page by exception in web.xml).
  * <p>
- * Before OmniFaces 4.5, you needed to explicitly register the {@link FacesExceptionFilter} in {@code web.xml}. Since
- * OmniFaces 4.5, the {@link FullAjaxExceptionHandler} will automatically register the {@link FacesExceptionFilter} on
- * its default URL pattern of {@code /*} when it is absent in {@code web.xml}. In case you wish to map it on a different
- * URL pattern for some reason, then you'll still need to explicitly register it in {@code web.xml}.
+ * Before OmniFaces 4.5, you needed to explicitly register the {@link FacesExceptionFilter} in {@code web.xml}. Since OmniFaces 4.5, the
+ * {@link FullAjaxExceptionHandler} will automatically register the {@link FacesExceptionFilter} on its default URL pattern of {@code /*} when it is absent in
+ * {@code web.xml}. In case you wish to map it on a different URL pattern for some reason, then you'll still need to explicitly register it in {@code web.xml}.
  *
  * <h2>Configuration</h2>
  * <p>
  * By default only {@link FacesException} and {@link ELException} are unwrapped. You can supply a context parameter
- * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify
- * additional exception types to unwrap. The context parameter value must be a commaseparated string of fully qualified
- * names of additional exception types. Note that this also covers subclasses of specified exception types.
+ * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify additional exception types to unwrap. The
+ * context parameter value must be a commaseparated string of fully qualified names of additional exception types. Note that this also covers subclasses of
+ * specified exception types.
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP&lt;/param-name&gt;
@@ -172,9 +170,10 @@ import org.omnifaces.util.Reflection;
  * This context parameter will also be read and used by {@link FacesExceptionFilter}.
  * <p>
  * By default all exceptions are logged. You can supply a context parameter
- * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING} to
- * specify exception types to ignore from logging. The context parameter value must be a commaseparated string of fully
- * qualified names of exception types. Note that this also covers subclasses of specified exception types.
+ * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING} to specify exception types to ignore from
+ * logging. The context parameter value must be a commaseparated string of fully qualified names of exception types. Note that this also covers subclasses of
+ * specified exception types.
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING&lt;/param-name&gt;
@@ -184,15 +183,15 @@ import org.omnifaces.util.Reflection;
  * <p>
  * This context parameter will also be read and used by {@link FacesExceptionFilter}.
  * <p>
- * This context parameter will <strong>not</strong> suppress standard Faces and/or container builtin logging. This will
- * only suppress <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that
- * standard Faces and/or container will still log it. This may need to be configured separately.
+ * This context parameter will <strong>not</strong> suppress standard Faces and/or container builtin logging. This will only suppress
+ * <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that standard Faces and/or container will still log it. This may
+ * need to be configured separately.
  *
  * <h2>Customizing <code>FullAjaxExceptionHandler</code></h2>
  * <p>
- * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should
- * be handled, or determining the error page, or logging the exception, then the developer can opt to extend this
- * {@link FullAjaxExceptionHandler} and override one or more of the following protected methods:
+ * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should be handled, or determining the error
+ * page, or logging the exception, then the developer can opt to extend this {@link FullAjaxExceptionHandler} and override one or more of the following
+ * protected methods:
  * <ul>
  * <li>{@link #findExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #shouldHandleExceptionRootCause(FacesContext, Throwable)}
@@ -201,9 +200,8 @@ import org.omnifaces.util.Reflection;
  * <li>{@link #logException(FacesContext, Throwable, String, String, Object...)}
  * </ul>
  * <p>
- * Don't forget to create a custom {@link ExceptionHandlerFactory} for it as well, so that it could be registered
- * in <code>faces-config.xml</code>. This does not necessarily need to extend from
- * {@link FullAjaxExceptionHandlerFactory}.
+ * Don't forget to create a custom {@link ExceptionHandlerFactory} for it as well, so that it could be registered in <code>faces-config.xml</code>. This does
+ * not necessarily need to extend from {@link FullAjaxExceptionHandlerFactory}.
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
@@ -217,28 +215,26 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     // Public constants -----------------------------------------------------------------------------------------------
 
     /**
-     * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
-     * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
+     * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler} and {@link FacesExceptionFilter}.
+     * Those will be added to exception types {@link FacesException} and {@link ELException}.
+     * 
      * @since 2.3
      */
-    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP =
-        "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP = "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
 
     /**
-     * The context parameter name to specify exception types to ignore in logging by both {@link FullAjaxExceptionHandler}
-     * and {@link FacesExceptionFilter}.
+     * The context parameter name to specify exception types to ignore in logging by both {@link FullAjaxExceptionHandler} and {@link FacesExceptionFilter}.
+     * 
      * @since 2.5
      */
-    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING =
-        "org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING = "org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
 
     /**
-     * The request attribute name of the UUID of the thrown exception which is logged by both {@link FullAjaxExceptionHandler}
-     * and {@link FacesExceptionFilter}.
+     * The request attribute name of the UUID of the thrown exception which is logged by both {@link FullAjaxExceptionHandler} and {@link FacesExceptionFilter}.
+     * 
      * @since 3.2
      */
-    public static final String EXCEPTION_UUID =
-        "org.omnifaces.exception_uuid";
+    public static final String EXCEPTION_UUID = "org.omnifaces.exception_uuid";
 
     /**
      * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
@@ -247,6 +243,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
      * @since 2.4
      */
     protected enum LogReason {
+
         /** An exception occurred during processing Faces ajax request. Error page will be shown. */
         EXCEPTION_HANDLED(LOG_EXCEPTION_HANDLED),
 
@@ -267,47 +264,40 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
         /**
          * Returns the default message associated with the log reason.
+         * 
          * @return The default message associated with the log reason.
          */
         public String getMessage() {
             return message;
         }
+
     }
 
     // Private constants ----------------------------------------------------------------------------------------------
 
     private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
 
-    private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
-        unmodifiableSet(FacesException.class, ELException.class);
+    private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP = unmodifiableSet(FacesException.class, ELException.class);
 
-    private static final String FACES_EXCEPTION_FILTER_AUTO_INSTALLED =
-        "FullAjaxExceptionHandler: the FacesExceptionFilter has been automatically installed at URL pattern of /*";
-    private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS =
-        "Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
-    private static final String ERROR_DEFAULT_LOCATION_MISSING =
-        "Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
-            + " Neither was found.";
-    private static final String LOG_EXCEPTION_HANDLED =
-        "FullAjaxExceptionHandler: An exception occurred during processing Faces ajax request."
-            + " Error page '%s' will be shown.";
-    private static final String LOG_RENDER_EXCEPTION_HANDLED =
-        "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
-            + " Error page '%s' will be shown.";
-    private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
-        "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
-            + " Error page '%s' CANNOT be shown as response is already committed."
-            + " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
-    private static final String LOG_ERROR_PAGE_ERROR =
-        "FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
-            + " Trying to render a hardcoded error page now.";
-    private static final String ERROR_PAGE_ERROR =
-        "<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
-            + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
-            + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
-            + " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
-            + " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
-            + "</body></html>]]></update></changes></partial-response>";
+    private static final String FACES_EXCEPTION_FILTER_AUTO_INSTALLED = "FullAjaxExceptionHandler: the FacesExceptionFilter has been automatically installed at URL pattern of /*";
+    private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS = "Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
+    private static final String ERROR_DEFAULT_LOCATION_MISSING = "Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
+        + " Neither was found.";
+    private static final String LOG_EXCEPTION_HANDLED = "FullAjaxExceptionHandler: An exception occurred during processing Faces ajax request."
+        + " Error page '%s' will be shown.";
+    private static final String LOG_RENDER_EXCEPTION_HANDLED = "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
+        + " Error page '%s' will be shown.";
+    private static final String LOG_RENDER_EXCEPTION_UNHANDLED = "FullAjaxExceptionHandler: An exception occurred during rendering Faces ajax response."
+        + " Error page '%s' CANNOT be shown as response is already committed."
+        + " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
+    private static final String LOG_ERROR_PAGE_ERROR = "FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
+        + " Trying to render a hardcoded error page now.";
+    private static final String ERROR_PAGE_ERROR = "<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
+        + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
+        + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
+        + " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
+        + " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
+        + "</body></html>]]></update></changes></partial-response>";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -317,18 +307,21 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     // Initialization -------------------------------------------------------------------------------------------------
 
     /**
-     * This will register the {@link FacesExceptionFilter} when {@link FullAjaxExceptionHandler} is explicitly registered.
-     * This is invoked by {@link ApplicationListener}.
+     * This will register the {@link FacesExceptionFilter} when {@link FullAjaxExceptionHandler} is explicitly registered. This is invoked by
+     * {@link ApplicationListener}.
+     * 
      * @param servletContext The involved servlet context.
      * @since 4.5
      */
     public static void registerFacesExceptionFilterIfNecessary(ServletContext servletContext) {
-        if (FacesConfigXml.instance().getExceptionHandlerFactories().stream()
-                .noneMatch(FullAjaxExceptionHandlerFactory.class::equals) || servletContext.getFilterRegistrations().values().stream()
-                .map(FilterRegistration::getClassName)
-                .map(Reflection::toClassOrNull).filter(Objects::nonNull)
-                .anyMatch(FacesExceptionFilter.class::isAssignableFrom))
-        {
+        if (
+            FacesConfigXml.instance().getExceptionHandlerFactories().stream()
+                .noneMatch(FullAjaxExceptionHandlerFactory.class::equals)
+                || servletContext.getFilterRegistrations().values().stream()
+                    .map(FilterRegistration::getClassName)
+                    .map(Reflection::toClassOrNull).filter(Objects::nonNull)
+                    .anyMatch(FacesExceptionFilter.class::isAssignableFrom)
+        ) {
             return; // FacesExceptionFilter is already explicitly registered.
         }
 
@@ -342,6 +335,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
     /**
      * Construct a new ajax exception handler around the given wrapped exception handler.
+     * 
      * @param wrapped The wrapped exception handler.
      */
     public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
@@ -351,9 +345,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Get the exception types to unwrap. This contains at least the standard types to unwrap {@link FacesException} and
-     * {@link ELException}. Additional types can be specified via context parameter
-     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+     * Get the exception types to unwrap. This contains at least the standard types to unwrap {@link FacesException} and {@link ELException}. Additional types
+     * can be specified via context parameter {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+     * 
      * @param context The involved servlet context.
      * @return Exception types to unwrap.
      * @since 2.3
@@ -365,6 +359,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     /**
      * Get the exception types to ignore in logging. This can be specified via context parameter
      * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+     * 
      * @param context The involved servlet context.
      * @return Exception types to ignore in logging.
      * @since 2.5
@@ -390,7 +385,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
                 }
                 catch (ClassNotFoundException e) {
                     throw new IllegalArgumentException(
-                        ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS.formatted(paramName, typeParam), e);
+                        ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS.formatted(paramName, typeParam), e
+                    );
                 }
             });
         }
@@ -401,13 +397,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted
-     * response and there is at least one unhandled exception:
+     * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted response and there is at least one
+     * unhandled exception:
      * <ul>
-     *   <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
-     *   <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
-     *   <li>Set the standard servlet error request attributes.
-     *   <li>Force Faces to render the full error page in its entirety.
+     * <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
+     * <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
+     * <li>Set the standard servlet error request attributes.
+     * <li>Force Faces to render the full error page in its entirety.
      * </ul>
      * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
      */
@@ -478,10 +474,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Determine the root cause based on the caught exception, which will then be used to find the error page location.
-     * The default implementation delegates to {@link Exceptions#unwrap(Throwable, Class...)} with {@link FacesException},
-     * {@link ELException} and the types specified in context parameter
+     * Determine the root cause based on the caught exception, which will then be used to find the error page location. The default implementation delegates to
+     * {@link Exceptions#unwrap(Throwable, Class...)} with {@link FacesException}, {@link ELException} and the types specified in context parameter
      * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+     * 
      * @param context The involved faces context.
      * @param exception The caught exception to determine the root cause for.
      * @return The root cause of the caught exception.
@@ -492,9 +488,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Returns <code>true</code> if the {@link FullAjaxExceptionHandler} should handle this exception root cause. If
-     * this returns <code>false</code>, then the {@link FullAjaxExceptionHandler} will skip handling this exception and
-     * delegate it further to the wrapped exception handler. The default implementation just returns <code>true</code>.
+     * Returns <code>true</code> if the {@link FullAjaxExceptionHandler} should handle this exception root cause. If this returns <code>false</code>, then the
+     * {@link FullAjaxExceptionHandler} will skip handling this exception and delegate it further to the wrapped exception handler. The default implementation
+     * just returns <code>true</code>.
+     * 
      * @param context The involved faces context.
      * @param exception The caught exception to determine the root cause for.
      * @return <code>true</code> if the given exception should be handled by the {@link FullAjaxExceptionHandler}.
@@ -505,8 +502,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Determine the error page location based on the given exception.
-     * The default implementation delegates to {@link WebXml#findErrorPageLocation(Throwable)}.
+     * Determine the error page location based on the given exception. The default implementation delegates to {@link WebXml#findErrorPageLocation(Throwable)}.
+     * 
      * @param context The involved faces context.
      * @param exception The exception to determine the error page for.
      * @return The location of the error page. It must start with <code>/</code> and be relative to the context path.
@@ -517,9 +514,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Log the thrown exception and determined error page location for the given log reason.
-     * The default implementation delegates to {@link #logException(FacesContext, Throwable, String, String, Object...)}
-     * with the default message associated with the log reason.
+     * Log the thrown exception and determined error page location for the given log reason. The default implementation delegates to
+     * {@link #logException(FacesContext, Throwable, String, String, Object...)} with the default message associated with the log reason.
+     * 
      * @param context The involved faces context.
      * @param exception The exception to log.
      * @param location The error page location.
@@ -531,13 +528,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Log the thrown exception and determined error page location with the given message, optionally parameterized
-     * with the given parameters.
-     * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
-     * not an instance of any type specified in context parameter
-     * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
-     * Since version 3.2, the log message will be prepended with the UUID and IP address.
-     * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * Log the thrown exception and determined error page location with the given message, optionally parameterized with the given parameters. The default
+     * implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is not an instance of any type specified in context
+     * parameter {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}. Since version 3.2, the log
+     * message will be prepended with the UUID and IP address. The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
+     * 
      * @param context The involved faces context.
      * @param exception The exception to log.
      * @param location The error page location.
@@ -547,7 +542,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
      */
     protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-            logger.log(SEVERE, "[%s][%s] %s".formatted(getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), message.formatted(parameters)), exception);
+            logger.log(
+                SEVERE, "[%s][%s] %s".formatted(getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), message.formatted(parameters)),
+                exception
+            );
         }
     }
 

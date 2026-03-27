@@ -35,12 +35,10 @@ import org.omnifaces.cdi.beans.InjectionPointGenerator;
 
 /**
  * <p>
- * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the
- * {@link BeanManager}.
+ * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the {@link BeanManager}.
  * <p>
- * The difference with {@link Beans} is that no one method of {@link BeansLocal} obtains the {@link BeanManager} from
- * JNDI. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
- * called at the same time.
+ * The difference with {@link Beans} is that no one method of {@link BeansLocal} obtains the {@link BeanManager} from JNDI. This job is up to the caller. This
+ * is more efficient in situations where multiple utility methods needs to be called at the same time.
  *
  * @author Bauke Scholtz
  * @since 2.0

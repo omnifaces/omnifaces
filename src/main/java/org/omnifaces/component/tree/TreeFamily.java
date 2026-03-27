@@ -36,8 +36,7 @@ public abstract class TreeFamily extends UIComponentBase {
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * The base constructor sets the renderer type to <code>null</code> as the components of the Tree family does not
-     * render anything by themselves.
+     * The base constructor sets the renderer type to <code>null</code> as the components of the Tree family does not render anything by themselves.
      */
     protected TreeFamily() {
         setRendererType(null);
@@ -86,8 +85,8 @@ public abstract class TreeFamily extends UIComponentBase {
     }
 
     /**
-     * Calls {@link #validateHierarchy(FacesContext)} when project stage is <code>Development</code> and then
-     * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
+     * Calls {@link #validateHierarchy(FacesContext)} when project stage is <code>Development</code> and then calls {@link #process(FacesContext, PhaseId)} with
+     * {@link PhaseId#RENDER_RESPONSE}.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
@@ -102,6 +101,7 @@ public abstract class TreeFamily extends UIComponentBase {
 
     /**
      * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
+     * 
      * @param context The faces context to work with.
      * @throws IllegalStateException When component hierarchy is wrong.
      * @since 4.6
@@ -110,14 +110,15 @@ public abstract class TreeFamily extends UIComponentBase {
 
     /**
      * Process the component according to the rules of the given phase ID.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      */
     protected abstract void process(FacesContext context, PhaseId phaseId);
 
     /**
-     * Helper method to delegate the processing further to the {@link UIComponentBase} superclass which will handle
-     * all children.
+     * Helper method to delegate the processing further to the {@link UIComponentBase} superclass which will handle all children.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      */

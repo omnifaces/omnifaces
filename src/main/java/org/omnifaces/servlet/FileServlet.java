@@ -41,22 +41,21 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * The well known "<a href="https://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
- * as an abstract template, slightly refactored, rewritten and modernized with a.o. fast NIO stuff instead of legacy
- * RandomAccessFile. GZIP support is stripped off as that can be done application wide via {@link CompressedResponseFilter}.
+ * The well known "<a href="https://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>", as an abstract template,
+ * slightly refactored, rewritten and modernized with a.o. fast NIO stuff instead of legacy RandomAccessFile. GZIP support is stripped off as that can be done
+ * application wide via {@link CompressedResponseFilter}.
  * <p>
- * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code>
- * caching requests, hereby improving browser caching. This servlet also properly deals with <code>Range</code> and
- * <code>If-Range</code> ranging requests (<a href="https://datatracker.ietf.org/doc/html/rfc7233">RFC 7233</a>), which is required
- * by most media players for proper audio/video streaming, and by webbrowsers and for a proper resume of an paused
- * download, and by download accelerators to be able to request smaller parts simultaneously. This servlet is ideal when
- * you have large files like media files placed outside the web application and you can't use the default servlet.
+ * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code> caching requests, hereby improving browser
+ * caching. This servlet also properly deals with <code>Range</code> and <code>If-Range</code> ranging requests
+ * (<a href="https://datatracker.ietf.org/doc/html/rfc7233">RFC 7233</a>), which is required by most media players for proper audio/video streaming, and by
+ * webbrowsers and for a proper resume of an paused download, and by download accelerators to be able to request smaller parts simultaneously. This servlet is
+ * ideal when you have large files like media files placed outside the web application and you can't use the default servlet.
  *
  * <h2>Usage</h2>
  * <p>
- * Just extend this class and override the {@link #getFile(HttpServletRequest)} method to return the desired file. If
- * you want to trigger a HTTP 400 "Bad Request" error, simply throw {@link IllegalArgumentException}. If you want to
- * trigger a HTTP 404 "Not Found" error, simply return <code>null</code>, or a non-existent file.
+ * Just extend this class and override the {@link #getFile(HttpServletRequest)} method to return the desired file. If you want to trigger a HTTP 400 "Bad
+ * Request" error, simply throw {@link IllegalArgumentException}. If you want to trigger a HTTP 404 "Not Found" error, simply return <code>null</code>, or a
+ * non-existent file.
  * <p>
  * Here's a concrete example which serves it via an URL like <code>/media/foo.ext</code>:
  *
@@ -86,15 +85,15 @@ import org.omnifaces.util.Servlets;
  * </pre>
  * <p>
  * You can embed it in e.g. HTML5 video tag as below:
+ * 
  * <pre>
  * &lt;video src="#{request.contextPath}/media/video.mp4" controls="controls" /&gt;
  * </pre>
  *
  * <h2>Customizing <code>FileServlet</code></h2>
  * <p>
- * If more fine grained control is desired for handling "file not found" error, determining the cache expire time, the
- * content type, whether the file should be supplied as an attachment and the attachment's file name, then the developer
- * can opt to override one or more of the following protected methods:
+ * If more fine grained control is desired for handling "file not found" error, determining the cache expire time, the content type, whether the file should be
+ * supplied as an attachment and the attachment's file name, then the developer can opt to override one or more of the following protected methods:
  * <ul>
  * <li>{@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}
  * <li>{@link #getExpireTime(HttpServletRequest, File)}
@@ -103,7 +102,8 @@ import org.omnifaces.util.Servlets;
  * <li>{@link #getAttachmentName(HttpServletRequest, File)}
  * </ul>
  *
- * <p><strong>See also</strong>:
+ * <p>
+ * <strong>See also</strong>:
  * <ul>
  * <li><a href="https://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
  * <li><a href="https://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
@@ -192,14 +192,14 @@ public abstract class FileServlet extends HttpServlet {
     }
 
     /**
-     * Returns the file associated with the given HTTP servlet request.
-     * If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400 error.
-     * If this method returns <code>null</code>, or if {@link File#isFile()} returns <code>false</code>, then the
-     * servlet will invoke {@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}.
+     * Returns the file associated with the given HTTP servlet request. If this method throws {@link IllegalArgumentException}, then the servlet will return a
+     * HTTP 400 error. If this method returns <code>null</code>, or if {@link File#isFile()} returns <code>false</code>, then the servlet will invoke
+     * {@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}.
+     * 
      * @param request The involved HTTP servlet request.
      * @return The file associated with the given HTTP servlet request.
-     * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
-     * file request. The servlet will then return a HTTP 400 error.
+     * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid file request. The servlet will then return
+     * a HTTP 400 error.
      */
     protected abstract File getFile(HttpServletRequest request);
 
@@ -207,6 +207,7 @@ public abstract class FileServlet extends HttpServlet {
      * Handles the case when the file is not found.
      * <p>
      * The default implementation sends a HTTP 404 error.
+     * 
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @throws IOException When something fails at I/O level.
@@ -220,6 +221,7 @@ public abstract class FileServlet extends HttpServlet {
      * Returns how long the resource may be cached by the client before it expires, in seconds.
      * <p>
      * The default implementation returns 30 days in seconds.
+     * 
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The client cache expire time in seconds (not milliseconds!).
@@ -231,8 +233,9 @@ public abstract class FileServlet extends HttpServlet {
     /**
      * Returns the content type associated with the given HTTP servlet request and file.
      * <p>
-     * The default implementation delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a
-     * fallback default value of <code>application/octet-stream</code>.
+     * The default implementation delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a fallback default value of
+     * <code>application/octet-stream</code>.
+     * 
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The content type associated with the given HTTP servlet request and file.
@@ -242,16 +245,15 @@ public abstract class FileServlet extends HttpServlet {
     }
 
     /**
-     * Returns <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
-     * type as obtained from {@link #getContentType(HttpServletRequest, File)}.
+     * Returns <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content type as obtained from
+     * {@link #getContentType(HttpServletRequest, File)}.
      * <p>
-     * The default implementation will return <code>true</code> if the content type does <strong>not</strong> start with
-     * <code>text</code> or <code>image</code>, and the <code>Accept</code> request header is either <code>null</code>
-     * or does not match the given content type.
+     * The default implementation will return <code>true</code> if the content type does <strong>not</strong> start with <code>text</code> or
+     * <code>image</code>, and the <code>Accept</code> request header is either <code>null</code> or does not match the given content type.
+     * 
      * @param request The involved HTTP servlet request.
      * @param contentType The content type of the involved file.
-     * @return <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
-     * type.
+     * @return <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content type.
      */
     protected boolean isAttachment(HttpServletRequest request, String contentType) {
         var accept = request.getHeader("Accept");
@@ -259,10 +261,10 @@ public abstract class FileServlet extends HttpServlet {
     }
 
     /**
-     * Returns the file name to be used in <code>Content-Disposition</code> header.
-     * This does not need to be URL-encoded as this will be taken care of.
+     * Returns the file name to be used in <code>Content-Disposition</code> header. This does not need to be URL-encoded as this will be taken care of.
      * <p>
      * The default implementation returns {@link File#getName()}.
+     * 
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The file name to be used in <code>Content-Disposition</code> header.
@@ -434,8 +436,8 @@ public abstract class FileServlet extends HttpServlet {
     }
 
     /**
-     * Returns a substring of the given string value from the given begin index to the given end index as a long.
-     * If the substring is empty, then -1 will be returned.
+     * Returns a substring of the given string value from the given begin index to the given end index as a long. If the substring is empty, then -1 will be
+     * returned.
      */
     private static long sublong(String value, int beginIndex, int endIndex) {
         var substring = value.substring(beginIndex, endIndex);
@@ -456,6 +458,7 @@ public abstract class FileServlet extends HttpServlet {
      * Convenience class for a file resource.
      */
     private static class Resource {
+
         private final File file;
         private final long length;
         private final long lastModified;
@@ -482,6 +485,7 @@ public abstract class FileServlet extends HttpServlet {
      * Convenience class for a byte range.
      */
     private static class Range {
+
         private final long start;
         private final long end;
         private final long length;

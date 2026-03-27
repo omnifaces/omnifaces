@@ -22,8 +22,8 @@ import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
- * Collection of EL functions for array manipulation: <code>o:createArray()</code>, <code>o:createIntegerArray()</code>,
- * <code>o:contains()</code> and <code>o:reverseArray()</code>.
+ * Collection of EL functions for array manipulation: <code>o:createArray()</code>, <code>o:createIntegerArray()</code>, <code>o:contains()</code> and
+ * <code>o:reverseArray()</code>.
  *
  * @author Bauke Scholtz
  */
@@ -43,9 +43,9 @@ public final class Arrays {
     // Utility --------------------------------------------------------------------------------------------------------
 
     /**
-     * Creates and returns a dummy object array of the given size. This is useful if you want to iterate <i>n</i> times
-     * over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code> and <code>end</code>
-     * attributes.
+     * Creates and returns a dummy object array of the given size. This is useful if you want to iterate <i>n</i> times over an <code>&lt;ui:repeat&gt;</code>,
+     * which doesn't support EL in <code>begin</code> and <code>end</code> attributes.
+     * 
      * @param size The size of the dummy object array.
      * @return A dummy object array of the given size.
      * @throws IllegalArgumentException When the size is less than 0.
@@ -59,10 +59,10 @@ public final class Arrays {
     }
 
     /**
-     * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive.
-     * This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer
-     * range to represent days and years. If the begin is greater than end, then the array will be decremental. If the
-     * begin equals end, then the array will contain only one item.
+     * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is useful if you want to for
+     * example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to represent days and years. If the begin is greater than end, then
+     * the array will be decremental. If the begin equals end, then the array will contain only one item.
+     * 
      * @param begin The begin integer.
      * @param end The end integer.
      * @return An integer array which starts at the given integer and ends at the given integer, inclusive
@@ -78,13 +78,13 @@ public final class Arrays {
     }
 
     /**
-     * Returns <code>true</code> if the string representation of an item of the given array equals to the string
-     * representation of the given item. This returns <code>false</code> if either the array or the item is null. This
-     * is useful if you want to for example check if <code>#{paramValues.foo}</code> contains a certain value.
+     * Returns <code>true</code> if the string representation of an item of the given array equals to the string representation of the given item. This returns
+     * <code>false</code> if either the array or the item is null. This is useful if you want to for example check if <code>#{paramValues.foo}</code> contains a
+     * certain value.
+     * 
      * @param array The array whose items have to be compared.
      * @param item The item to be compared.
-     * @return <code>true</code> if the string representation of an item of the given array equals to the string
-     * representation of the given item.
+     * @return <code>true</code> if the string representation of an item of the given array equals to the string representation of the given item.
      */
     public static boolean contains(Object[] array, Object item) {
         if (array == null || item == null) {
@@ -102,6 +102,7 @@ public final class Arrays {
 
     /**
      * Returns a copy of the array with items in reversed order.
+     * 
      * @param array The array to reverse.
      * @return A copy of the array with items in reversed order.
      * @since 2.4

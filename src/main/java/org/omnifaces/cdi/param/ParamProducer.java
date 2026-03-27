@@ -76,7 +76,7 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  */
 @Dependent
-@SuppressWarnings({"rawtypes", "unchecked"}) // For now.
+@SuppressWarnings({ "rawtypes", "unchecked" }) // For now.
 public class ParamProducer {
 
     private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
@@ -89,6 +89,7 @@ public class ParamProducer {
 
     /**
      * Returns {@link ParamValue} associated with param name derived from given injection point.
+     * 
      * @param <V> The generic {@link ParamValue} type.
      * @param injectionPoint Injection point to derive param name from.
      * @return {@link ParamValue} associated with param name derived from given injection point.
@@ -264,7 +265,16 @@ public class ParamProducer {
 
         try {
             setAttribute(component, LABEL_ATTRIBUTE, paramValue.label);
-            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression(context, "#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
+            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression(context, "#{param['" + paramValue.name + "']}", paramValue.targetType)); // This
+                                                                                                                                                    // gives any
+                                                                                                                                                    // converter
+                                                                                                                                                    // the
+                                                                                                                                                    // opportunity
+                                                                                                                                                    // to
+                                                                                                                                                    // inspect
+                                                                                                                                                    // the
+                                                                                                                                                    // target
+                                                                                                                                                    // type.
             return callback.getAsBoolean();
         }
         finally {
@@ -311,7 +321,10 @@ public class ParamProducer {
     }
 
     private static <V> boolean validateValues(FacesContext context, ParamValue paramValue, Object[] convertedValues, V value, InjectionPoint injectionPoint) {
-        var valid = runWithSimulatedLabelAndValueOnViewRoot(context, paramValue, () -> invokeValidators(context, paramValue, convertedValues, value, injectionPoint));
+        var valid = runWithSimulatedLabelAndValueOnViewRoot(
+            context, paramValue,
+            () -> invokeValidators(context, paramValue, convertedValues, value, injectionPoint)
+        );
 
         if (!valid) {
             context.validationFailed();
@@ -432,10 +445,13 @@ public class ParamProducer {
 
         // If bean validation is explicitly disabled for this instance, immediately return false
 
-
         // Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
         // Next check if this is a field injection; other cases are not supported by Validator#validateValue().
-        if (requestParameter.disableBeanValidation() || !requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME)) || !(injectionPoint.getMember() instanceof Field)) {
+        if (
+            requestParameter.disableBeanValidation()
+                || !requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))
+                || !(injectionPoint.getMember() instanceof Field)
+        ) {
             return false;
         }
 

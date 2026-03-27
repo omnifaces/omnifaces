@@ -237,7 +237,8 @@ class DatesTest {
         }
         else {
             actualResult = Dates.formatDateWithTimezone(date, pattern, zone);
-            expectedTime = LocalTime.parse(expectedTime).atDate(LocalDate.now()).atZone(UTC).withZoneSameInstant(Utils.toZoneId(zone)).toLocalTime().format(ISO_TIME);
+            expectedTime = LocalTime.parse(expectedTime).atDate(LocalDate.now()).atZone(UTC).withZoneSameInstant(Utils.toZoneId(zone)).toLocalTime()
+                .format(ISO_TIME);
         }
 
         String expectedResult;
@@ -294,7 +295,7 @@ class DatesTest {
         minutesBetween = Dates.minutesBetween(start, end);
         assertEquals(9, minutesBetween, "Diff is 9 minutes");
     }
-    
+
     @Test
     void testDaysBetweenDifferentDateTypes() {
         LocalDateTime localDateTime = LocalDateTime.now();

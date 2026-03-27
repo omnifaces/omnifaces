@@ -36,7 +36,7 @@ public abstract class StylesheetFamily extends UIComponentBase {
     public String getFamily() {
         return COMPONENT_FAMILY;
     }
-    
+
     /**
      * Returns <code>false</code>.
      */
@@ -44,4 +44,5 @@ public abstract class StylesheetFamily extends UIComponentBase {
     public boolean getRendersChildren() {
         return false;
     }
+
 }

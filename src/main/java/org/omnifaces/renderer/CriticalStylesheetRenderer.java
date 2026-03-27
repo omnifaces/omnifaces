@@ -35,7 +35,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  * @author Bauke Scholtz
  * @since 4.5
  */
-@FacesRenderer(componentFamily=StylesheetFamily.COMPONENT_FAMILY, rendererType=CriticalStylesheetRenderer.RENDERER_TYPE)
+@FacesRenderer(componentFamily = StylesheetFamily.COMPONENT_FAMILY, rendererType = CriticalStylesheetRenderer.RENDERER_TYPE)
 public class CriticalStylesheetRenderer extends Renderer<CriticalStylesheet> {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -46,9 +46,8 @@ public class CriticalStylesheetRenderer extends Renderer<CriticalStylesheet> {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Writes a <code>&lt;link rel="preload" as="style"&gt;</code> element with a <code>href</code> attribute
-     * representing {@link Resource#getRequestPath()}. If the resource is not resolvable, then a
-     * <code>RES_NOT_FOUND</code> will be written to the <code>href</code> attribute instead.
+     * Writes a <code>&lt;link rel="preload" as="style"&gt;</code> element with a <code>href</code> attribute representing {@link Resource#getRequestPath()}. If
+     * the resource is not resolvable, then a <code>RES_NOT_FOUND</code> will be written to the <code>href</code> attribute instead.
      */
     @Override
     public void encodeBegin(FacesContext context, CriticalStylesheet component) throws IOException {
@@ -67,8 +66,7 @@ public class CriticalStylesheetRenderer extends Renderer<CriticalStylesheet> {
     }
 
     /**
-     * Ends the <code>&lt;link&gt;</code> and writes a <code>&lt;noscript&gt;</code> with a "plain vanilla"
-     * <code>&lt;link rel="stylesheet"&gt;</code>
+     * Ends the <code>&lt;link&gt;</code> and writes a <code>&lt;noscript&gt;</code> with a "plain vanilla" <code>&lt;link rel="stylesheet"&gt;</code>
      */
     @Override
     public void encodeEnd(FacesContext context, CriticalStylesheet component) throws IOException {

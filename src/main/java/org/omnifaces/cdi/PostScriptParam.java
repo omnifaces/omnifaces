@@ -25,9 +25,8 @@ import org.omnifaces.component.input.ScriptParam;
 
 /**
  * <p>
- * The annotation <code>&#64;</code>{@link PostScriptParam} allows you to invoke a managed bean method when all
- * <code>&lt;o:scriptParam&gt;</code> values have been set in the associated managed bean. It's basically like a
- * {@link PostConstruct} for them, but then for <code>&lt;o:scriptParam&gt;</code>.
+ * The annotation <code>&#64;</code>{@link PostScriptParam} allows you to invoke a managed bean method when all <code>&lt;o:scriptParam&gt;</code> values have
+ * been set in the associated managed bean. It's basically like a {@link PostConstruct} for them, but then for <code>&lt;o:scriptParam&gt;</code>.
  *
  * @since 3.6
  * @author Bauke Scholtz

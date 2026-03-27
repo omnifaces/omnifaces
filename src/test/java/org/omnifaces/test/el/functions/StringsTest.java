@@ -58,14 +58,16 @@ class StringsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"A", "USA", "12", "U!", "  "})
+    @ValueSource(strings = { "A", "USA", "12", "U!", "  " })
     void testFlagEmoji_InvalidFormat_ShouldThrowException(String invalidCode) {
-        assertThrows(IllegalArgumentException.class, () ->  Strings.flagEmoji(invalidCode), "Invalid format or non-letter code should throw IllegalArgumentException");
+        assertThrows(
+            IllegalArgumentException.class, () -> Strings.flagEmoji(invalidCode),
+            "Invalid format or non-letter code should throw IllegalArgumentException"
+        );
     }
 
     /**
-     * This test ensures that the 'Turkish I' problem doesn't break the emoji math.
-     * In Turkish locale, "i".toUpperCase() is "İ" (U+0130), not "I".
+     * This test ensures that the 'Turkish I' problem doesn't break the emoji math. In Turkish locale, "i".toUpperCase() is "İ" (U+0130), not "I".
      */
     @Test
     void testFlagEmoji_TurkishLocaleCompatibility() {
@@ -78,4 +80,5 @@ class StringsTest {
             Locale.setDefault(originalDefaultLocale);
         }
     }
+
 }

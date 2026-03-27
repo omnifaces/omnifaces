@@ -36,9 +36,11 @@ class LazyTest {
     }
 
     class Expensive {
+
         Expensive() {
             numCreations.incrementAndGet();
         }
+
     }
 
     @Test
@@ -54,4 +56,5 @@ class LazyTest {
         assertEquals(Expensive.class, cheap.get().getClass());
         assertEquals(2, numCreations.get());
     }
+
 }

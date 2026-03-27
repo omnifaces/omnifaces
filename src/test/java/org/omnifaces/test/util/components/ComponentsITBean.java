@@ -36,4 +36,5 @@ public class ComponentsITBean {
     public List<String> getExpressions() {
         return expressions;
     }
+
 }

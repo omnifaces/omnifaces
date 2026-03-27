@@ -21,13 +21,14 @@ import jakarta.el.VariableMapper;
 import jakarta.faces.FacesWrapper;
 
 /**
- * <p>Provides a simple implementation of {@link ELContext} that can
- * be sub-classed by developers wishing to provide specialized behavior
- * to an existing {@link ELContext} instance. The default
- * implementation of all methods is to call through to the wrapped
- * {@link ELContext}.</p>
+ * <p>
+ * Provides a simple implementation of {@link ELContext} that can be sub-classed by developers wishing to provide specialized behavior to an existing
+ * {@link ELContext} instance. The default implementation of all methods is to call through to the wrapped {@link ELContext}.
+ * </p>
  *
- * <p>Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.</p>
+ * <p>
+ * Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.
+ * </p>
  *
  * @author Arjan Tijms
  */
@@ -37,6 +38,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
     /**
      * Construct EL context wrapper.
+     * 
      * @param wrapped The EL context to be wrapped.
      */
     public ELContextWrapper(ELContext wrapped) {

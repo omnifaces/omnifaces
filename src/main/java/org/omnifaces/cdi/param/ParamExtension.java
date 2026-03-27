@@ -42,17 +42,14 @@ import org.omnifaces.cdi.Param;
 import org.omnifaces.util.Beans;
 
 /**
- * CDI extension that works around the fact that CDI insists on doing absolutely
- * guaranteed type safe injections. While generally applaudable this unfortunately
- * impedes writing true generic producers that dynamically do conversion based on
- * the target type.
+ * CDI extension that works around the fact that CDI insists on doing absolutely guaranteed type safe injections. While generally applaudable this unfortunately
+ * impedes writing true generic producers that dynamically do conversion based on the target type.
  * <p>
- * This extension collects the target types of each injection point qualified with
- * the <code>&#64;</code>{@link Param} annotation and dynamically registers Beans that effectively
- * represents producers for each type.
+ * This extension collects the target types of each injection point qualified with the <code>&#64;</code>{@link Param} annotation and dynamically registers
+ * Beans that effectively represents producers for each type.
  * <p>
- * Since OmniFaces 3.6, this extension also scans for <code>&#64;</code>{@link Param} without
- * <code>&#64;</code>{@link Inject} and manually takes care of them while creating the bean.
+ * Since OmniFaces 3.6, this extension also scans for <code>&#64;</code>{@link Param} without <code>&#64;</code>{@link Inject} and manually takes care of them
+ * while creating the bean.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -63,6 +60,7 @@ public class ParamExtension implements Extension {
 
     /**
      * Collect fields annotated with {@link Param}.
+     * 
      * @param <T> The generic injection target type.
      * @param event The process injection target event.
      */
@@ -90,7 +88,10 @@ public class ParamExtension implements Extension {
                 return; // Skip ParamValue as it is already handled by RequestParameterProducer.
             }
 
-            if (annotated.isAnnotationPresent(Inject.class) || annotated instanceof AnnotatedParameter<?> annotatedParameter && annotatedParameter.getDeclaringCallable().isAnnotationPresent(Inject.class)) {
+            if (
+                annotated.isAnnotationPresent(Inject.class) || annotated instanceof AnnotatedParameter<?> annotatedParameter
+                    && annotatedParameter.getDeclaringCallable().isAnnotationPresent(Inject.class)
+            ) {
                 paramsWithInject.add(type);
             }
             else if (annotated instanceof AnnotatedField<?> annotatedField) {
@@ -101,6 +102,7 @@ public class ParamExtension implements Extension {
 
     /**
      * Process {@link Param} fields annotated with {@link Inject}.
+     * 
      * @param event The after bean discovery event.
      */
     public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
@@ -110,8 +112,8 @@ public class ParamExtension implements Extension {
     }
 
     /**
-    /**
-     * Process {@link Param} fields without {@link Inject} annotation.
+     * /** Process {@link Param} fields without {@link Inject} annotation.
+     * 
      * @param <T> The generic injection target type.
      * @param event The process injection target event.
      * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.
@@ -161,7 +163,8 @@ public class ParamExtension implements Extension {
 
             @Override
             public Set<Annotation> getQualifiers() {
-                return stream(paramWithoutInject.getJavaMember().getAnnotations()).filter(annotation -> annotation.annotationType().isAnnotationPresent(Qualifier.class)).collect(toSet());
+                return stream(paramWithoutInject.getJavaMember().getAnnotations())
+                    .filter(annotation -> annotation.annotationType().isAnnotationPresent(Qualifier.class)).collect(toSet());
             }
 
             @Override
@@ -188,6 +191,9 @@ public class ParamExtension implements Extension {
             public boolean isTransient() {
                 return true;
             }
+
         }
+
     }
+
 }

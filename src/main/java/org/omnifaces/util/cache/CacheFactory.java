@@ -33,11 +33,9 @@ public final class CacheFactory {
     /**
      * Gets an instance of a Cache using the configured cache provider.
      *
-     * @param context
-     *            faces context used for retrieving the cache provider and for resolving the given scope.
-     * @param scope
-     *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
-     *            provider, but generally at least "session" and "application" should be supported.
+     * @param context faces context used for retrieving the cache provider and for resolving the given scope.
+     * @param scope scope for which the cache should be obtained. Supported scopes are dependent on the specific caching provider, but generally at least
+     * "session" and "application" should be supported.
      *
      * @return a cache provider specific Cache instance
      */
@@ -46,11 +44,9 @@ public final class CacheFactory {
     }
 
     /**
-     * Gets the cache provider as it has been set in the ServletContext. Does NOT return the default cache provider if
-     * none is present.
+     * Gets the cache provider as it has been set in the ServletContext. Does NOT return the default cache provider if none is present.
      *
-     * @param servletContext
-     *            the servlet context where the cache provider is retrieved from
+     * @param servletContext the servlet context where the cache provider is retrieved from
      * @return the previously set provider if one is set, null otherwise
      */
     public static CacheProvider getCacheProvider(ServletContext servletContext) {
@@ -64,8 +60,7 @@ public final class CacheFactory {
     /**
      * Gets the cache provider that has been set, or the default provider if none is present.
      *
-     * @param context
-     *            the faces context where the cache provider is retrieved from
+     * @param context the faces context where the cache provider is retrieved from
      * @return the previously set provider if one is set, otherwise the default provider
      */
     public static CacheProvider getCacheProvider(FacesContext context) {
@@ -74,9 +69,8 @@ public final class CacheFactory {
     }
 
     /**
-     * Returns an instance of the default cache provider. This is the provider that is used in
-     * {@link CacheFactory#getCache(FacesContext, String)} and {@link CacheFactory#getCacheProvider(FacesContext)} if no
-     * explicit provider has been set.
+     * Returns an instance of the default cache provider. This is the provider that is used in {@link CacheFactory#getCache(FacesContext, String)} and
+     * {@link CacheFactory#getCacheProvider(FacesContext)} if no explicit provider has been set.
      *
      * @return the default cache provider
      */

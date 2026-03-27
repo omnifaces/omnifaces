@@ -25,19 +25,19 @@ import org.openqa.selenium.support.FindBy;
 
 public class ScriptParamIT extends OmniFacesIT {
 
-    @FindBy(id="pageLoadTimestamp")
+    @FindBy(id = "pageLoadTimestamp")
     private WebElement pageLoadTimestamp;
 
-    @FindBy(id="scriptLoadTimestamp")
+    @FindBy(id = "scriptLoadTimestamp")
     private WebElement scriptLoadTimestamp;
 
-    @FindBy(id="clientTimeZoneOffset")
+    @FindBy(id = "clientTimeZoneOffset")
     private WebElement clientTimeZoneOffset;
 
-    @FindBy(id="appName")
+    @FindBy(id = "appName")
     private WebElement appName;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(ScriptParamIT.class);
     }

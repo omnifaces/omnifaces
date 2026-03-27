@@ -60,40 +60,51 @@ import org.omnifaces.util.Faces;
 
 /**
  * <p>
- * The <code>FacesRequestLogger</code> is a {@link PhaseListener} which logs the Faces request detail as {@link Level#INFO}.
- * The log format is as below:
+ * The <code>FacesRequestLogger</code> is a {@link PhaseListener} which logs the Faces request detail as {@link Level#INFO}. The log format is as below:
+ * 
  * <pre>
  * method{url, user, action, params, messages, timer}
  * </pre>
+ * 
  * Where:
  * <ul>
  * <li><code>method</code>: the HTTP request method, usually <code>GET</code> or <code>POST</code>.</li>
  * <li><code>url</code>: the request URI with query string.</li>
- * <li><code>user</code>: the user detail, composed of:<ul>
- *     <li><code>ip</code>: the user IP, as obtained by {@link Faces#getRemoteAddr()}.</li>
- *     <li><code>login</code>: the user login, as obtained by {@link Faces#getRemoteUser()}.</li>
- *     <li><code>session</code>: the session ID, as obtained by {@link Faces#getSessionId()}.</li>
- *     <li><code>viewState</code>: the server side Faces view state identifier, if any.</li></ul>
- * <li><code>action</code>: the action detail, composed of:<ul>
- *     <li><code>source</code>: the action source, as obtained by {@link Components#getCurrentActionSource()}.</li>
- *     <li><code>event</code>: the action event name, if any.</li>
- *     <li><code>methods</code>: the action methods, as obtained by {@link Components#getActionExpressionsAndListeners(UIComponent)}</li>
- *     <li><code>validationFailed</code>: whether Faces validation has failed.</li></ul></li>
- * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>jakarta.faces.*</code> are skipped,
- * and whose name ends with <code>password</code> or <code>token</code> are masked with value <code>********</code>.</li>
+ * <li><code>user</code>: the user detail, composed of:
+ * <ul>
+ * <li><code>ip</code>: the user IP, as obtained by {@link Faces#getRemoteAddr()}.</li>
+ * <li><code>login</code>: the user login, as obtained by {@link Faces#getRemoteUser()}.</li>
+ * <li><code>session</code>: the session ID, as obtained by {@link Faces#getSessionId()}.</li>
+ * <li><code>viewState</code>: the server side Faces view state identifier, if any.</li>
+ * </ul>
+ * <li><code>action</code>: the action detail, composed of:
+ * <ul>
+ * <li><code>source</code>: the action source, as obtained by {@link Components#getCurrentActionSource()}.</li>
+ * <li><code>event</code>: the action event name, if any.</li>
+ * <li><code>methods</code>: the action methods, as obtained by {@link Components#getActionExpressionsAndListeners(UIComponent)}</li>
+ * <li><code>validationFailed</code>: whether Faces validation has failed.</li>
+ * </ul>
+ * </li>
+ * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>jakarta.faces.*</code> are skipped, and whose name ends
+ * with <code>password</code> or <code>token</code> are masked with value <code>********</code>.</li>
  * <li><code>messages</code>: all Faces messages added so far.</li>
- * <li><code>timer</code>: the duration of each phase measured in milliseconds, or -1 if the phase has been skipped, composed of:<ul>
- *     <li><code>0</code>: total time.</li>
- *     <li><code>1</code>: duration of {@link PhaseId#RESTORE_VIEW}.</li>
- *     <li><code>2</code>: duration of {@link PhaseId#APPLY_REQUEST_VALUES}.</li>
- *     <li><code>3</code>: duration of {@link PhaseId#PROCESS_VALIDATIONS}.</li>
- *     <li><code>4</code>: duration of {@link PhaseId#UPDATE_MODEL_VALUES}.</li>
- *     <li><code>5</code>: duration of {@link PhaseId#INVOKE_APPLICATION}.</li>
- *     <li><code>6</code>: duration of {@link PhaseId#RENDER_RESPONSE}.</li></ul></li></ul>
+ * <li><code>timer</code>: the duration of each phase measured in milliseconds, or -1 if the phase has been skipped, composed of:
+ * <ul>
+ * <li><code>0</code>: total time.</li>
+ * <li><code>1</code>: duration of {@link PhaseId#RESTORE_VIEW}.</li>
+ * <li><code>2</code>: duration of {@link PhaseId#APPLY_REQUEST_VALUES}.</li>
+ * <li><code>3</code>: duration of {@link PhaseId#PROCESS_VALIDATIONS}.</li>
+ * <li><code>4</code>: duration of {@link PhaseId#UPDATE_MODEL_VALUES}.</li>
+ * <li><code>5</code>: duration of {@link PhaseId#INVOKE_APPLICATION}.</li>
+ * <li><code>6</code>: duration of {@link PhaseId#RENDER_RESPONSE}.</li>
+ * </ul>
+ * </li>
+ * </ul>
  *
  * <h2>Installation</h2>
  * <p>
  * Register it as <code>&lt;phase-listener&gt;</code> in <code>faces-config.xml</code>.
+ * 
  * <pre>
  * &lt;lifecycle&gt;
  *     &lt;phase-listener&gt;org.omnifaces.eventlistener.FacesRequestLogger&lt;/phase-listener&gt;
@@ -128,8 +139,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
     }
 
     /**
-     * After any phase, stop the timer, and if the current phase is RENDER_RESPONSE, or the response is complete, then log the Faces request
-     * detail.
+     * After any phase, stop the timer, and if the current phase is RENDER_RESPONSE, or the response is complete, then log the Faces request detail.
      */
     @Override
     public void afterPhase(PhaseEvent event) {
@@ -150,6 +160,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over log details.
+     * 
      * @param context The involved faces context.
      * @return Log details.
      */
@@ -166,6 +177,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of user details.
+     * 
      * @param context The involved faces context.
      * @return User details.
      */
@@ -182,6 +194,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of action details.
+     * 
      * @param context The involved faces context.
      * @return Action details.
      */
@@ -197,6 +210,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of request parameters.
+     * 
      * @param context The involved faces context.
      * @return Request parameters.
      */
@@ -226,8 +240,9 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need to change the default pattern for password based request parameters which will be filtered in
-     * {@link #getRequestParameters(FacesContext)}.
-     * The default pattern matches every request parameter name ending with "password" or "token", case insensitive.
+     * {@link #getRequestParameters(FacesContext)}. The default pattern matches every request parameter name ending with "password" or "token", case
+     * insensitive.
+     * 
      * @param context The involved faces context.
      * @return Pattern for password request parameters.
      */
@@ -237,6 +252,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of faces messages.
+     * 
      * @param context The involved faces context.
      * @return Faces messages.
      */
@@ -275,7 +291,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
         public String getDuration(PhaseId phase) {
             var startTime = startTimes.get(phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal());
             var endTime = endTimes.get(phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal());
-            return (startTime != null && endTime != null ?  (endTime - startTime) / 1_000_000 : -1) + "ms";
+            return (startTime != null && endTime != null ? (endTime - startTime) / 1_000_000 : -1) + "ms";
         }
 
         @Override
@@ -288,6 +304,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
             return duration.toString();
         }
+
     }
 
 }

@@ -26,12 +26,12 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:outputFormat&gt;</code> is a component that extends the standard <code>&lt;h:outputFormat&gt;</code>
- * with support for capturing the output and exposing it into the request scope by the variable name as specified by the
- * <code>var</code> attribute.
+ * The <code>&lt;o:outputFormat&gt;</code> is a component that extends the standard <code>&lt;h:outputFormat&gt;</code> with support for capturing the output
+ * and exposing it into the request scope by the variable name as specified by the <code>var</code> attribute.
  * <p>
- * You can use it the same way as <code>&lt;h:outputFormat&gt;</code>, you only need to change <code>h:</code> into
- * <code>o:</code> to get the extra support for <code>var</code> attribute. Here's are some usage examples:
+ * You can use it the same way as <code>&lt;h:outputFormat&gt;</code>, you only need to change <code>h:</code> into <code>o:</code> to get the extra support for
+ * <code>var</code> attribute. Here's are some usage examples:
+ * 
  * <pre>
  * &lt;o:outputFormat value="#{i18n['link.title']}" var="_link_title"&gt;
  *     &lt;f:param value="#{bean.foo}" /&gt;
@@ -39,6 +39,7 @@ import org.omnifaces.util.State;
  * &lt;/o:outputFormat&gt;
  * &lt;h:commandLink value="#{i18n['link.value']}" title="#{_link_title}" /&gt;
  * </pre>
+ * 
  * <pre>
  * &lt;o:outputFormat value="#{bean.number}" var="_percentage"&gt;
  *     &lt;f:convertNumber type="percent" /&gt;
@@ -46,9 +47,8 @@ import org.omnifaces.util.State;
  * &lt;div title="Percentage: #{_percentage}" /&gt;
  * </pre>
  * <p>
- * Make sure that the <code>var</code> attribute value doesn't conflict with any of existing variable names in the
- * current EL scope, such as managed bean names. It would be a good naming convention to start their names with
- * <code>_</code>.
+ * Make sure that the <code>var</code> attribute value doesn't conflict with any of existing variable names in the current EL scope, such as managed bean names.
+ * It would be a good naming convention to start their names with <code>_</code>.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -63,12 +63,17 @@ public class OutputFormat extends HtmlOutputFormat {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_EXPRESSION_DISALLOWED =
-        "A value expression is disallowed on 'var' attribute of OutputFormat.";
+    private static final String ERROR_EXPRESSION_DISALLOWED = "A value expression is disallowed on 'var' attribute of OutputFormat.";
 
     private enum PropertyKeys {
+
         VAR;
-        @Override public String toString() { return this == VAR ? "var" : name(); }
+
+        @Override
+        public String toString() {
+            return this == VAR ? "var" : name();
+        }
+
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -78,8 +83,8 @@ public class OutputFormat extends HtmlOutputFormat {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * An override which checks if this isn't been invoked on <code>var</code> attribute.
-     * Finally it delegates to the super method.
+     * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
+     * 
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -108,8 +113,8 @@ public class OutputFormat extends HtmlOutputFormat {
     }
 
     /**
-     * If the <code>var</code> attribute is set, stop capturing the output and expose it in request scope by the
-     * <code>var</code> attribute value as variable name.
+     * If the <code>var</code> attribute is set, stop capturing the output and expose it in request scope by the <code>var</code> attribute value as variable
+     * name.
      */
     @Override
     public void encodeEnd(FacesContext context) throws IOException {
@@ -127,6 +132,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
     /**
      * Returns the variable name which exposes the captured output into the request scope.
+     * 
      * @return The variable name which exposes the captured output into the request scope.
      */
     public String getVar() {
@@ -135,6 +141,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
     /**
      * Sets the variable name which exposes the captured output into the request scope.
+     * 
      * @param varName The variable name which exposes the captured output into the request scope.
      */
     public void setVar(String varName) {

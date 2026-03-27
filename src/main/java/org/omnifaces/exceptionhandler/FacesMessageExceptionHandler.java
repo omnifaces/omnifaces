@@ -30,6 +30,7 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
+ * 
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FacesMessageExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -38,16 +39,15 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  *
  * <h2>Note</h2>
  * <p>
- * It's your own responsibility to make sure that the faces messages are being shown. Make sure that there's a
- * <code>&lt;h:messages&gt;</code> or any equivalent component (OmniFaces, PrimeFaces, etc) is present in the view and
- * that it can handle global messages and that it's explicitly or automatically updated in case of ajax requests. Also
- * make sure that you don't have bugs in rendering of your views. This exception handler is not capable of handling
- * exceptions during render response. It will fail silently.
+ * It's your own responsibility to make sure that the faces messages are being shown. Make sure that there's a <code>&lt;h:messages&gt;</code> or any equivalent
+ * component (OmniFaces, PrimeFaces, etc) is present in the view and that it can handle global messages and that it's explicitly or automatically updated in
+ * case of ajax requests. Also make sure that you don't have bugs in rendering of your views. This exception handler is not capable of handling exceptions
+ * during render response. It will fail silently.
  *
  * <h2>Customizing <code>FacesMessageExceptionHandler</code></h2>
  * <p>
- * If more fine grained control of creating the FATAL faces message is desired, then the developer can opt to extend
- * this {@link FacesMessageExceptionHandler} and override the following method:
+ * If more fine grained control of creating the FATAL faces message is desired, then the developer can opt to extend this {@link FacesMessageExceptionHandler}
+ * and override the following method:
  * <ul>
  * <li>{@link #createFatalMessage(Throwable)}
  * </ul>
@@ -62,6 +62,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
     /**
      * Construct a new faces message exception handler around the given wrapped exception handler.
+     * 
      * @param wrapped The wrapped exception handler.
      */
     public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
@@ -85,8 +86,8 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
     /**
      * Create fatal message based on given exception which will in turn be passed to
-     * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}.
-     * The default implementation returns {@link Throwable#toString()}.
+     * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}. The default implementation returns {@link Throwable#toString()}.
+     * 
      * @param exception The exception to create fatal message for.
      * @return The fatal message created based on the given exception.
      */

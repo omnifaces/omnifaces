@@ -31,13 +31,14 @@ import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
- * This converter won't output the percent or currency symbols, that's up to the UI. This converter will implicitly
- * infer percent or currency symbols on submitted value when absent, just to prevent an unnecessary conversion error.
+ * This converter won't output the percent or currency symbols, that's up to the UI. This converter will implicitly infer percent or currency symbols on
+ * submitted value when absent, just to prevent an unnecessary conversion error.
  *
  * <h2>Usage</h2>
  * <p>
- * This converter is available by converter ID <code>omnifaces.ImplicitNumberConverter</code>. Just specify it as
- * <code>&lt;o:converter&gt;</code> nested in the component referring the <code>Number</code> property. For example:
+ * This converter is available by converter ID <code>omnifaces.ImplicitNumberConverter</code>. Just specify it as <code>&lt;o:converter&gt;</code> nested in the
+ * component referring the <code>Number</code> property. For example:
+ * 
  * <pre>
  * &lt;span class="currency"&gt;
  *     &lt;span class="symbol"&gt;$&lt;/span&gt;
@@ -48,6 +49,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:implicitNumberConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;span class="currency"&gt;
  *     &lt;span class="symbol"&gt;$&lt;/span&gt;

@@ -17,8 +17,8 @@ import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
 
 /**
- * Default implementation for the SystemEventListener interface that's used for the subset of system events
- * that are registered as "view event" on the component tree's view root.
+ * Default implementation for the SystemEventListener interface that's used for the subset of system events that are registered as "view event" on the component
+ * tree's view root.
  *
  * @see org.omnifaces.util.Events#subscribeToViewEvent(Class, SystemEventListener)
  * @see UIViewRoot#subscribeToViewEvent(Class, SystemEventListener)

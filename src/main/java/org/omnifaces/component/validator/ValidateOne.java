@@ -25,11 +25,9 @@ import org.omnifaces.validator.MultiFieldValidator;
 
 /**
  * <p>
- * The <code>&lt;o:validateOne&gt;</code> validates if ONLY ONE of the given {@link UIInput} components have been filled
- * out.
+ * The <code>&lt;o:validateOne&gt;</code> validates if ONLY ONE of the given {@link UIInput} components have been filled out.
  * <p>
- * The default message is
- * <blockquote>{0}: Please fill out only one of those fields</blockquote>
+ * The default message is <blockquote>{0}: Please fill out only one of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *

@@ -25,21 +25,22 @@ import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
- * The <code>omnifaces.ToLowerCaseConverter</code> is intented to convert submitted {@link String} values to lower case
- * based on current {@link Locale}. Additionally, it trims any whitespace from the submitted value. This is useful for
- * among others email address inputs.
+ * The <code>omnifaces.ToLowerCaseConverter</code> is intented to convert submitted {@link String} values to lower case based on current {@link Locale}.
+ * Additionally, it trims any whitespace from the submitted value. This is useful for among others email address inputs.
  * <p>
  * This converter does by design no conversion in <code>getAsString()</code>.
  *
  * <h2>Usage</h2>
  * <p>
- * This converter is available by converter ID <code>omnifaces.ToLowerCaseConverter</code>. Just specify it in the
- * <code>converter</code> attribute of the component referring the <code>String</code> property. For example:
+ * This converter is available by converter ID <code>omnifaces.ToLowerCaseConverter</code>. Just specify it in the <code>converter</code> attribute of the
+ * component referring the <code>String</code> property. For example:
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.email}" converter="omnifaces.ToLowerCaseConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toLowerCaseConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.email}"&gt;
  *     &lt;o:toLowerCaseConverter /&gt;

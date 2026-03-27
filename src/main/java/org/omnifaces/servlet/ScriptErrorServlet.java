@@ -27,8 +27,8 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * This servlet receives script error reports sent by <code>&lt;o:scriptErrorHandler&gt;</code> via
- * <code>navigator.sendBeacon()</code> and fires them as {@link ScriptError} CDI events.
+ * This servlet receives script error reports sent by <code>&lt;o:scriptErrorHandler&gt;</code> via <code>navigator.sendBeacon()</code> and fires them as
+ * {@link ScriptError} CDI events.
  *
  * @author Bauke Scholtz
  * @see ScriptErrorHandler

@@ -28,17 +28,16 @@ import org.omnifaces.util.Platform;
 
 /**
  * <p>
- * OmniFaces application initializer. This runs when the servlet container starts up.
- * This performs the following tasks:
+ * OmniFaces application initializer. This runs when the servlet container starts up. This performs the following tasks:
  * <ol>
  * <li>Log OmniFaces version.
  * <li>Determine the default {@link FacesServlet} mapping.
  * <li>Register {@link FacesViews} forwarding filter.
  * </ol>
  * <p>
- * This is invoked <strong>before</strong> {@link ApplicationListener} and {@link ApplicationProcessor}.
- * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
- * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
+ * This is invoked <strong>before</strong> {@link ApplicationListener} and {@link ApplicationProcessor}. If any exception is thrown, then the deployment will
+ * fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} context parameter is set to <code>true</code>, it will then merely log a WARNING
+ * line.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -49,10 +48,8 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 
     private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
 
-    static final String WARNING_OMNIFACES_INITIALIZATION_FAIL =
-            "OmniFaces failed to initialize! %s";
-    static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
-            "OmniFaces failed to initialize! Report an issue to OmniFaces.";
+    static final String WARNING_OMNIFACES_INITIALIZATION_FAIL = "OmniFaces failed to initialize! %s";
+    static final String ERROR_OMNIFACES_INITIALIZATION_FAIL = "OmniFaces failed to initialize! Report an issue to OmniFaces.";
 
     // Actions --------------------------------------------------------------------------------------------------------
 

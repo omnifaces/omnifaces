@@ -27,7 +27,8 @@ import org.omnifaces.cdi.push.SseEvent.Opened;
 @ApplicationScoped
 public class SseITObserver {
 
-    @Inject @Push(type=SSE)
+    @Inject
+    @Push(type = SSE)
     private PushContext applicationScopedServerEvent;
 
     private final StringBuffer openedChannels = new StringBuffer();
@@ -52,4 +53,5 @@ public class SseITObserver {
     public String getClosedChannels() {
         return closedChannels.toString();
     }
+
 }

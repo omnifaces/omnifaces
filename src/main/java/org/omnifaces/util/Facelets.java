@@ -37,6 +37,7 @@ public final class Facelets {
 
     /**
      * Returns the String value of the given tag attribute.
+     * 
      * @param context The involved Facelet context.
      * @param tagAttribute The tag attribute to retrieve the value from.
      * @return The String value of the given tag attribute, or null if the tag attribute is null.
@@ -47,6 +48,7 @@ public final class Facelets {
 
     /**
      * Returns the String literal of the given tag attribute.
+     * 
      * @param tagAttribute The tag attribute to retrieve the value from.
      * @param name The tag attribute name; this is only used in exception message.
      * @return The String literal of the given tag attribute, or null if the tag attribute is null.
@@ -68,6 +70,7 @@ public final class Facelets {
 
     /**
      * Returns the boolean value of the given tag attribute.
+     * 
      * @param context The involved Facelet context.
      * @param tagAttribute The tag attribute to retrieve the value from.
      * @return The boolean value of the given tag attribute, or false if the tag attribute is null.
@@ -78,6 +81,7 @@ public final class Facelets {
 
     /**
      * Returns the Object value of the given tag attribute
+     * 
      * @param context The involved Facelet context.
      * @param tagAttribute The tag attribute to retrieve the value from.
      * @return The Object value of the given tag attribute, or null if the tag attribute is null.
@@ -88,6 +92,7 @@ public final class Facelets {
 
     /**
      * Returns the typed Object value of the given tag attribute
+     * 
      * @param <T> The expected return type.
      * @param context The involved Facelet context.
      * @param tagAttribute The tag attribute to retrieve the value from.
@@ -101,8 +106,9 @@ public final class Facelets {
     }
 
     /**
-     * Returns the value of the given tag attribute as a value expression, so it can be carried around and evaluated at
-     * a later moment in the lifecycle without needing the Facelet context.
+     * Returns the value of the given tag attribute as a value expression, so it can be carried around and evaluated at a later moment in the lifecycle without
+     * needing the Facelet context.
+     * 
      * @param context The involved Facelet context.
      * @param tagAttribute The tag attribute to extract the value expression from.
      * @param type The expected type of the value behind the value expression.

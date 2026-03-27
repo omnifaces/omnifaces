@@ -24,11 +24,9 @@ import org.omnifaces.validator.MultiFieldValidator;
 
 /**
  * <p>
- * The <code>&lt;o:validateUnique&gt;</code> validates if ALL of the given {@link UIInput} components have an unique
- * value.
+ * The <code>&lt;o:validateUnique&gt;</code> validates if ALL of the given {@link UIInput} components have an unique value.
  * <p>
- * The default message is
- * <blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
+ * The default message is <blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *

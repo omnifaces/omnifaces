@@ -23,25 +23,27 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file in web.xml, the servlet path returns wrong value")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file in web.xml, the servlet path returns wrong value"
+)
 public class MultiViewsIT extends OmniFacesIT {
 
-    @FindBy(id="firstPathParamAsString")
+    @FindBy(id = "firstPathParamAsString")
     private WebElement firstPathParamAsString;
 
-    @FindBy(id="secondPathParamAsInteger")
+    @FindBy(id = "secondPathParamAsInteger")
     private WebElement secondPathParamAsInteger;
 
-    @FindBy(id="form")
+    @FindBy(id = "form")
     private WebElement form;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement formSubmit;
 
-    @FindBy(id="link")
+    @FindBy(id = "link")
     private WebElement link;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(MultiViewsIT.class)
             .withWebXml(withMultiViews)
@@ -157,10 +159,13 @@ public class MultiViewsIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one"
+    )
     void testNonExistingPage() {
         open("MultiViewsITNonExistingPage");
-        verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as welcome file with path parameters.
+        verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", ""); // So it should just have been reinterpreted as
+                                                                                                                // welcome file with path parameters.
 
         open("MultiViewsITNonExistingPage/");
         verify200("MultiViewsITWelcomeFile", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
@@ -170,7 +175,9 @@ public class MultiViewsIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one"
+    )
     void testExcludedFolder() {
         open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
         verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
@@ -207,4 +214,5 @@ public class MultiViewsIT extends OmniFacesIT {
         assertEquals("404", browser.getTitle());
         assertEquals(contextPath + "/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
     }
+
 }

@@ -24,7 +24,7 @@ import org.omnifaces.component.util.FaceletContextConsumer;
  * Those extra services consist of:
  *
  * <ul>
- * <li> Receiving the {@link FaceletContext} for the Facelet in which the component appears
+ * <li>Receiving the {@link FaceletContext} for the Facelet in which the component appears
  * </ul>
  *
  * <p>
@@ -48,6 +48,7 @@ public class ComponentExtraHandler extends ComponentHandler {
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ComponentExtraHandler(ComponentConfig config) {

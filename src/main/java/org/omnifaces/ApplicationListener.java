@@ -47,8 +47,7 @@ import org.omnifaces.util.cache.CacheInitializer;
 
 /**
  * <p>
- * OmniFaces application listener. This runs when the servlet context is created.
- * This performs the following tasks:
+ * OmniFaces application listener. This runs when the servlet context is created. This performs the following tasks:
  * <ol>
  * <li>Check if Faces 3.0 is available, otherwise log and fail.
  * <li>Check if CDI 3.0 is available, otherwise log and fail.
@@ -63,9 +62,9 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Register {@link ScriptErrorHandler} servlet if necessary.
  * </ol>
  * <p>
- * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
- * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
- * context parameter is set to <code>true</code>, it will then merely log a WARNING line.
+ * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}. If any exception is thrown,
+ * then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} context parameter is set to <code>true</code>, it will then
+ * merely log a WARNING line.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -77,14 +76,10 @@ public class ApplicationListener extends DefaultServletContextListener {
 
     private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
 
-    private static final String ERROR_FACES_API_UNAVAILABLE =
-        "Faces API is not available in this environment.";
-    private static final String ERROR_FACES_API_INCOMPATIBLE =
-        "Faces API of this environment is not Faces 4.1 compatible.";
-    private static final String ERROR_CDI_API_UNAVAILABLE =
-        "CDI API is not available in this environment.";
-    private static final String ERROR_CDI_IMPL_UNAVAILABLE =
-        "CDI BeanManager instance is not available in this environment.";
+    private static final String ERROR_FACES_API_UNAVAILABLE = "Faces API is not available in this environment.";
+    private static final String ERROR_FACES_API_INCOMPATIBLE = "Faces API of this environment is not Faces 4.1 compatible.";
+    private static final String ERROR_CDI_API_UNAVAILABLE = "CDI API is not available in this environment.";
+    private static final String ERROR_CDI_IMPL_UNAVAILABLE = "CDI BeanManager instance is not available in this environment.";
 
     // Actions --------------------------------------------------------------------------------------------------------
 
@@ -147,7 +142,7 @@ public class ApplicationListener extends DefaultServletContextListener {
                 ████████████████████████████████████████████████████████████████████████████████""");
             throw e;
         }
-     }
+    }
 
     private static void checkCDIAvailable() {
         try {
@@ -234,11 +229,11 @@ public class ApplicationListener extends DefaultServletContextListener {
     // Inner classes --------------------------------------------------------------------------------------------------
 
     /**
-     * This faces context wrapper basically makes ServletContext available by {@link Servlets#getContext()} further down
-     * in the chain and ignores all the other things Faces. It's currently only used by
-     * {@link FullAjaxExceptionHandler#registerFacesExceptionFilterIfNecessary(ServletContext)}. See also #831.
+     * This faces context wrapper basically makes ServletContext available by {@link Servlets#getContext()} further down in the chain and ignores all the other
+     * things Faces. It's currently only used by {@link FullAjaxExceptionHandler#registerFacesExceptionFilterIfNecessary(ServletContext)}. See also #831.
      */
     private static class ServletContextFacesContext extends FacesContextWrapper {
+
         private ExternalContext externalContext;
 
         public ServletContextFacesContext(ServletContext servletContext) {
@@ -252,6 +247,7 @@ public class ApplicationListener extends DefaultServletContextListener {
         }
 
         private static class ServletContextExternalContext extends ExternalContextWrapper {
+
             private ServletContext servletContext;
 
             public ServletContextExternalContext(ServletContext servletContext) {
@@ -263,6 +259,9 @@ public class ApplicationListener extends DefaultServletContextListener {
             public Object getContext() {
                 return servletContext;
             }
+
         }
+
     }
+
 }

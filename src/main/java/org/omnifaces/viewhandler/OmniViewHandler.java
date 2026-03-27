@@ -56,19 +56,16 @@ import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Hacks;
 
 /**
- * OmniFaces view handler.
- * This class was before version 2.5 known as <code>RestorableViewHandler</code>.
- * This view handler performs the following tasks:
+ * OmniFaces view handler. This class was before version 2.5 known as <code>RestorableViewHandler</code>. This view handler performs the following tasks:
  * <ol>
- * <li>Since 1.3: Recreate entire view when {@link EnableRestorableView} tag is in the metadata. This effectively
- * prevents the {@link ViewExpiredException} on the view.
- * <li>Since 2.2: Detect unload requests coming from {@link ViewScoped} beans. This will create a dummy view and only
- * restore the view scoped state instead of building and restoring the entire view.
- * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested
- * {@link UIForm} component.
- * <li>Since 3.10: If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)} is <code>true</code>, then
- * replace the HTML response writer with a XML response writer in {@link #renderView(FacesContext, UIViewRoot)}, and
- * ensure that proper action URL is returned in {@link #getActionURL(FacesContext, String)}.
+ * <li>Since 1.3: Recreate entire view when {@link EnableRestorableView} tag is in the metadata. This effectively prevents the {@link ViewExpiredException} on
+ * the view.
+ * <li>Since 2.2: Detect unload requests coming from {@link ViewScoped} beans. This will create a dummy view and only restore the view scoped state instead of
+ * building and restoring the entire view.
+ * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested {@link UIForm} component.
+ * <li>Since 3.10: If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)} is <code>true</code>, then replace the HTML response writer with a XML
+ * response writer in {@link #renderView(FacesContext, UIViewRoot)}, and ensure that proper action URL is returned in
+ * {@link #getActionURL(FacesContext, String)}.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -82,13 +79,13 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     private static final String XML_CONTENT_TYPE = "text/xml";
 
-    private static final String ERROR_NESTED_FORM_ENCOUNTERED =
-        "Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
+    private static final String ERROR_NESTED_FORM_ENCOUNTERED = "Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * Construct a new OmniFaces view handler around the given wrapped view handler.
+     * 
      * @param wrapped The wrapped view handler.
      */
     public OmniViewHandler(ViewHandler wrapped) {
@@ -98,8 +95,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the current request is a sw.js request from {@link PWAResourceHandler}, then create a dummy view and trigger
-     * {@link FacesContext#responseComplete()} so that it won't be built nor rendered.
+     * If the current request is a sw.js request from {@link PWAResourceHandler}, then create a dummy view and trigger {@link FacesContext#responseComplete()}
+     * so that it won't be built nor rendered.
      */
     @Override
     public UIViewRoot createView(FacesContext context, String viewId) {
@@ -111,10 +108,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the
-     * view root state and then immediately explicitly destroy the view, else restore the view as usual. If the
-     * <code>&lt;o:enableRestoreView&gt;</code> is used once in the application, and the restored view is null and the
-     * current request is a postback, then recreate and rebuild the view from scratch. If it indeed contains the
+     * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the view root state and then immediately
+     * explicitly destroy the view, else restore the view as usual. If the <code>&lt;o:enableRestoreView&gt;</code> is used once in the application, and the
+     * restored view is null and the current request is a postback, then recreate and rebuild the view from scratch. If it indeed contains the
      * <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return <code>null</code>.
      */
     @Override
@@ -149,7 +145,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             var externalContext = context.getExternalContext();
             externalContext.setResponseContentType(contentType);
             externalContext.setResponseCharacterEncoding(characterEncoding);
-            context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
+            context
+                .setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
             context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the setResponseContentType.
 
             try {
@@ -175,10 +172,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
-     * view state. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send
-     * a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
-     * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the view state. Or, if the session is new
+     * (during an unload request, it implies it had expired), then explicitly send a permanent redirect to the original request URI. This way any authentication
+     * framework which remembers the "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
@@ -198,10 +194,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * Restore only the view root state. This ensures that the view scope map and all view root component system event
-     * listeners are also restored (including those for {@link PreDestroyViewMapEvent}). This is done so because calling
-     * <code>super.restoreView()</code> would implicitly also build the entire view and restore state of all other
-     * components in the tree. This is unnecessary during an unload request.
+     * Restore only the view root state. This ensures that the view scope map and all view root component system event listeners are also restored (including
+     * those for {@link PreDestroyViewMapEvent}). This is done so because calling <code>super.restoreView()</code> would implicitly also build the entire view
+     * and restore state of all other components in the tree. This is unnecessary during an unload request.
      */
     private static boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
         var state = manager.getState(context, view.getViewId());
@@ -262,7 +257,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
                 if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
                     throw new IllegalStateException(
-                        ERROR_NESTED_FORM_ENCOUNTERED.formatted(form.getClientId(context), nestedParent.getClientId(context)));
+                        ERROR_NESTED_FORM_ENCOUNTERED.formatted(form.getClientId(context), nestedParent.getClientId(context))
+                    );
                 }
             }
 
@@ -289,6 +285,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         public ExternalContext getExternalContext() {
             return externalContext;
         }
+
     }
 
     private static class RenderViewResourceExternalContext extends ExternalContextWrapper {
@@ -316,5 +313,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         public String encodeActionURL(String url) {
             return super.encodeActionURL(url).replaceAll(";jsessionid=[^&?#]*", "");
         }
+
     }
+
 }

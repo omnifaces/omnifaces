@@ -29,9 +29,8 @@ import jakarta.websocket.CloseReason.CloseCodes;
 
 /**
  * <p>
- * This web socket event will be fired by {@link SocketSessionManager} when a web socket has been
- * <code>&#64;</code>{@link Opened}, <code>&#64;</code>{@link Switched} or <code>&#64;</code>{@link Closed}.
- * An application scoped CDI bean can <code>&#64;</code>{@link Observes} them.
+ * This web socket event will be fired by {@link SocketSessionManager} when a web socket has been <code>&#64;</code>{@link Opened},
+ * <code>&#64;</code>{@link Switched} or <code>&#64;</code>{@link Closed}. An application scoped CDI bean can <code>&#64;</code>{@link Observes} them.
  * <p>
  * For detailed usage instructions, see {@link Socket} javadoc.
  *
@@ -51,9 +50,8 @@ public final class SocketEvent extends PushEvent {
     }
 
     /**
-     * Returns the close code.
-     * If this returns <code>null</code>, then it was {@link Opened}.
-     * If this returns non-<code>null</code>, then it was {@link Closed}.
+     * Returns the close code. If this returns <code>null</code>, then it was {@link Opened}. If this returns non-<code>null</code>, then it was {@link Closed}.
+     * 
      * @return The close code.
      */
     public CloseCode getCloseCode() {
@@ -99,11 +97,15 @@ public final class SocketEvent extends PushEvent {
 
         /**
          * The literal of {@link Opened}.
+         * 
          * @since 3.2
          */
         AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
     /**
@@ -126,8 +128,11 @@ public final class SocketEvent extends PushEvent {
          * The literal of {@link Switched}.
          */
         AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
     /**
@@ -148,11 +153,15 @@ public final class SocketEvent extends PushEvent {
 
         /**
          * The literal of {@link Closed}.
+         * 
          * @since 3.2
          */
         AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
 }

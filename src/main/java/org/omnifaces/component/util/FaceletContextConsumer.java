@@ -17,8 +17,7 @@ import jakarta.faces.view.facelets.FaceletContext;
 import org.omnifaces.taghandler.ComponentExtraHandler;
 
 /**
- * Interface to be implemented by components that wish to receive the {@link FaceletContext} for the
- * Facelet in which they are declared.
+ * Interface to be implemented by components that wish to receive the {@link FaceletContext} for the Facelet in which they are declared.
  *
  * <p>
  * This has to be combined with the {@link ComponentExtraHandler}.
@@ -31,6 +30,7 @@ public interface FaceletContextConsumer {
 
     /**
      * Sets the Facelet context.
+     * 
      * @param faceletContext The involved Facelet context.
      */
     void setFaceletContext(FaceletContext faceletContext);

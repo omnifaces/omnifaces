@@ -15,7 +15,7 @@ import { Util } from "./Util";
 
 /**
  * Lazy image loader.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.output.GraphicImage
  * @see https://css-tricks.com/the-complete-guide-to-lazy-loading-images/
@@ -30,7 +30,7 @@ export namespace GraphicImage {
      */
     function initLazyImages() {
         const lazyImages = getLazyImages();
-        
+
         if (lazyImages.length == 0) {
             return;
         }
@@ -74,7 +74,7 @@ export namespace GraphicImage {
                         Util.removeEventListener(document, "scroll", lazyImageListener);
                     }
                 }, 50);
-            }
+            };
 
             Util.addEventListener(window, "resize orientationChange", lazyImageListener);
             Util.addEventListener(document, "scroll", lazyImageListener);

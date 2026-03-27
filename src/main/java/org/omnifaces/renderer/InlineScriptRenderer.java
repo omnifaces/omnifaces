@@ -25,14 +25,13 @@ import jakarta.faces.render.FacesRenderer;
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
 
 /**
- * This renderer enables rendering a JS resource inline.
- * This is internally only used by {@link CombinedResourceHandler}
+ * This renderer enables rendering a JS resource inline. This is internally only used by {@link CombinedResourceHandler}
  *
  * @author Bauke Scholtz
  * @since 1.2
  * @see CombinedResourceHandler
  */
-@FacesRenderer(componentFamily=UIOutput.COMPONENT_FAMILY, rendererType=InlineScriptRenderer.RENDERER_TYPE)
+@FacesRenderer(componentFamily = UIOutput.COMPONENT_FAMILY, rendererType = InlineScriptRenderer.RENDERER_TYPE)
 public class InlineScriptRenderer extends InlineResourceRenderer {
 
     // Constants ------------------------------------------------------------------------------------------------------

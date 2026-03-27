@@ -54,4 +54,5 @@ public class WebAndFacesConfigXmlBean {
     public FacesConfigXml getFacesConfigXml() {
         return facesConfigXml;
     }
+
 }

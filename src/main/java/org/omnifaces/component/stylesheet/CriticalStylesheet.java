@@ -25,19 +25,21 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>&lt;o:criticalStylesheet&gt;</code> is a component based on the standard <code>&lt;h:outputStylesheet&gt;</code>
- * which renders a <code>&lt;link rel="preload" as="style"&gt;</code> instead of <code>&lt;link rel="stylesheet"&gt;</code>
- * and automatically changes the <code>rel="preload"</code> to <code>rel="stylesheet"</code> during window load event.
- * Additionally, it will automatically be moved to the very top of the head.
+ * The <code>&lt;o:criticalStylesheet&gt;</code> is a component based on the standard <code>&lt;h:outputStylesheet&gt;</code> which renders a
+ * <code>&lt;link rel="preload" as="style"&gt;</code> instead of <code>&lt;link rel="stylesheet"&gt;</code> and automatically changes the
+ * <code>rel="preload"</code> to <code>rel="stylesheet"</code> during window load event. Additionally, it will automatically be moved to the very top of the
+ * head.
  *
  * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputStylesheet&gt;</code>, with a <code>library</code> and <code>name</code>.
+ * 
  * <pre>
  * &lt;o:criticalStylesheet library="yourlibrary" name="scripts/filename.js" /&gt;
  * </pre>
  * <p>
  * You can even explicitly configure third-party stylesheet resources to be loaded this way, such as PrimeFaces stylesheets.
+ * 
  * <pre>
  * &lt;o:criticalStylesheet library="primefaces" name="components.css" /&gt;
  * &lt;o:criticalStylesheet library="primefaces" name="layout.css" /&gt;
@@ -49,7 +51,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * @see CriticalStylesheetRenderer
  */
 @FacesComponent(value = CriticalStylesheet.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
-@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass = PostAddToViewEvent.class)
 public class CriticalStylesheet extends StylesheetFamily {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -58,9 +60,7 @@ public class CriticalStylesheet extends StylesheetFamily {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.stylesheet.CriticalStylesheet";
 
     enum PropertyKeys {
-        library,
-        name,
-        media
+        library, name, media
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -70,8 +70,7 @@ public class CriticalStylesheet extends StylesheetFamily {
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Construct a new {@link CriticalStylesheet} component whereby the renderer type is set to
-     * {@link CriticalStylesheetRenderer#RENDERER_TYPE}.
+     * Construct a new {@link CriticalStylesheet} component whereby the renderer type is set to {@link CriticalStylesheetRenderer#RENDERER_TYPE}.
      */
     public CriticalStylesheet() {
         setRendererType(CriticalStylesheetRenderer.RENDERER_TYPE);
@@ -94,6 +93,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the "library name" part of the resource identifier.
+     * 
      * @return The library name.
      */
     public String getLibrary() {
@@ -102,6 +102,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the "library name" part of the resource identifier.
+     * 
      * @param library The library name.
      */
     public void setLibrary(String library) {
@@ -110,6 +111,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the "resource name" part of the resource identifier.
+     * 
      * @return The resource name.
      */
     public String getName() {
@@ -118,6 +120,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the "resource name" part of the resource identifier.
+     * 
      * @param name The resource name.
      */
     @FacesAttribute(required = true)
@@ -127,6 +130,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the media that the stylesheet applies to.
+     * 
      * @return The media type.
      */
     public String getMedia() {
@@ -135,6 +139,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the media that the stylesheet applies to.
+     * 
      * @param media The media type.
      */
     public void setMedia(String media) {

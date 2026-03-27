@@ -28,4 +28,5 @@ public class VersionedResourceHandlerITAfterResourceHandler extends DefaultResou
         resource.setResourceName(resource.getResourceName().replace(".", ".min."));
         return resource;
     }
+
 }

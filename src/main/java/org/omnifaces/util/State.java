@@ -62,9 +62,8 @@ public class State {
     }
 
     /**
-     * Puts a value in the component's state and returns the previous value.
-     * Note that the previous value has to be of the same type as the value
-     * being set. If this is unwanted, use the original StateHelper.
+     * Puts a value in the component's state and returns the previous value. Note that the previous value has to be of the same type as the value being set. If
+     * this is unwanted, use the original StateHelper.
      * <p>
      * See {@link StateHelper#put(Serializable, Object)}
      *

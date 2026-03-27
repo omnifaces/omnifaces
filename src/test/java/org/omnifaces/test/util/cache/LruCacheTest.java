@@ -45,7 +45,7 @@ class LruCacheTest {
     @BeforeEach
     void setup() {
         evicted = ConcurrentHashMap.newKeySet();
-        lruCache = new LruCache<>(SIZE, (k,v) -> evicted.add(k));
+        lruCache = new LruCache<>(SIZE, (k, v) -> evicted.add(k));
         range(0, SIZE).forEach(i -> lruCache.put("k" + (i * SIZE), "v" + i));
     }
 
@@ -99,8 +99,11 @@ class LruCacheTest {
         }, ITERATIONS);
 
         assertAll(
-            () -> assertTrue(lruCache.size() <= SIZE, lruCache.size() + "may not be greater than " + SIZE), // On i9-10900X this seems to have lower limit of SIZE - 10.
-            () -> assertTrue(evicted.size() <= (ITERATIONS - SIZE), evicted.size() + " may not be more than " + (ITERATIONS - SIZE)) // On i9-10900X this seems to be around 3% of ITERATIONS.
+            () -> assertTrue(lruCache.size() <= SIZE, lruCache.size() + "may not be greater than " + SIZE), // On i9-10900X this seems to have lower limit of
+                                                                                                            // SIZE - 10.
+            () -> assertTrue(evicted.size() <= (ITERATIONS - SIZE), evicted.size() + " may not be more than " + (ITERATIONS - SIZE)) // On i9-10900X this seems
+                                                                                                                                     // to be around 3% of
+                                                                                                                                     // ITERATIONS.
         );
     }
 
@@ -116,7 +119,10 @@ class LruCacheTest {
             rangeClosed(0, MAX_VALUE).boxed().forEach(index -> {
                 tasks.add(runAsync(() -> {
                     cache.put(index, index);
-                    assertDoesNotThrow(() -> (cache.size() + "," + cache.entrySet().size()), "calling size() and entrySet().size() at same time may not throw ConcurrentModificationException");
+                    assertDoesNotThrow(
+                        () -> (cache.size() + "," + cache.entrySet().size()),
+                        "calling size() and entrySet().size() at same time may not throw ConcurrentModificationException"
+                    );
                 }));
             });
         }, ROUNDS);
@@ -133,9 +139,11 @@ class LruCacheTest {
 
         assertAll(
             () -> assertEquals(SIZE, lruCache.size(), "size must be still " + SIZE),
-            () -> assertEquals(Set.of("k" + SIZE, "k" + (4 * SIZE)), evicted, "k0 should not be evicted as it was explicitly accessed; "
-                                                                            + "k" + (2 * SIZE) + " should not be evicted as it was explicitly replaced; "
-                                                                            + "k" + (3 * SIZE) + " should not be evicted as it was explicitly removed")
+            () -> assertEquals(
+                Set.of("k" + SIZE, "k" + (4 * SIZE)), evicted, "k0 should not be evicted as it was explicitly accessed; "
+                    + "k" + (2 * SIZE) + " should not be evicted as it was explicitly replaced; "
+                    + "k" + (3 * SIZE) + " should not be evicted as it was explicitly removed"
+            )
         );
     }
 
@@ -146,8 +154,14 @@ class LruCacheTest {
             () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.keySet().remove("k0"), "lruCache.keySet().remove(\"k0\")"),
             () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.values().add("v"), "lruCache.values().add(\"v\")"),
             () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.values().remove("v0"), "lruCache.values().remove(\"v0\")"),
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.entrySet().add(new SimpleEntry<>("k", "v")), "lruCache.entrySet().remove(new SimpleEntry<>(\"k\", \"v\"))"),
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.entrySet().remove(new SimpleEntry<>("k0", "v0")), "lruCache.entrySet().remove(new SimpleEntry<>(\"k0\", \"v0\"))")
+            () -> assertThrows(
+                UnsupportedOperationException.class, () -> lruCache.entrySet().add(new SimpleEntry<>("k", "v")),
+                "lruCache.entrySet().remove(new SimpleEntry<>(\"k\", \"v\"))"
+            ),
+            () -> assertThrows(
+                UnsupportedOperationException.class, () -> lruCache.entrySet().remove(new SimpleEntry<>("k0", "v0")),
+                "lruCache.entrySet().remove(new SimpleEntry<>(\"k0\", \"v0\"))"
+            )
         );
     }
 
@@ -196,4 +210,5 @@ class LruCacheTest {
             () -> assertThrows(NullPointerException.class, () -> lruCache.replace(null, value, value), "lruCache.replace(null, value, value)")
         );
     }
+
 }

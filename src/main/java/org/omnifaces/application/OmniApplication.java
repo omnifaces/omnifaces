@@ -27,13 +27,12 @@ import org.omnifaces.cdi.validator.ValidatorManager;
  * <p>
  * This OmniFaces application extends the standard Faces application as follows:
  * <ul>
- * <li>Support for CDI in {@link Converter}s and {@link Validator}s, so that e.g. <code>@Inject</code> and
- * <code>@EJB</code> work directly in Faces converters and validators without any further modification.</li>
+ * <li>Support for CDI in {@link Converter}s and {@link Validator}s, so that e.g. <code>@Inject</code> and <code>@EJB</code> work directly in Faces converters
+ * and validators without any further modification.</li>
  * </ul>
  * <p>
- * This application is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
- * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
- * application explicitly themselves.
+ * This application is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets auto-initialized when the OmniFaces JAR is bundled in a
+ * web application, so end-users do not need to register this application explicitly themselves.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -53,6 +52,7 @@ public class OmniApplication extends ApplicationWrapper {
 
     /**
      * Construct a new OmniFaces application around the given wrapped application.
+     * 
      * @param wrapped The wrapped application.
      */
     public OmniApplication(Application wrapped) {
@@ -64,8 +64,8 @@ public class OmniApplication extends ApplicationWrapper {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-     * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
+     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to {@link #getWrapped()} which may return the Faces
+     * managed {@link Converter} instance.
      */
     @Override
     public Converter createConverter(String converterId) {
@@ -73,8 +73,8 @@ public class OmniApplication extends ApplicationWrapper {
     }
 
     /**
-     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
-     * {@link #getWrapped()} which may return the Faces managed {@link Converter} instance.
+     * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to {@link #getWrapped()} which may return the Faces
+     * managed {@link Converter} instance.
      */
     @Override
     public Converter createConverter(Class<?> forClass) {
@@ -83,8 +83,8 @@ public class OmniApplication extends ApplicationWrapper {
     }
 
     /**
-     * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
-     * {@link #getWrapped()} which may return the Faces managed {@link Validator} instance.
+     * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to {@link #getWrapped()} which may return the Faces
+     * managed {@link Validator} instance.
      */
     @Override
     public Validator createValidator(String validatorId) {

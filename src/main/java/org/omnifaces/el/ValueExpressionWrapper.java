@@ -18,17 +18,18 @@ import jakarta.el.ValueReference;
 import jakarta.faces.FacesWrapper;
 
 /**
- * <p>Provides a simple implementation of {@link ValueExpression} that can
- * be sub-classed by developers wishing to provide specialized behavior
- * to an existing {@link ValueExpression} instance. The default
- * implementation of all methods is to call through to the wrapped
- * {@link ValueExpression}.</p>
+ * <p>
+ * Provides a simple implementation of {@link ValueExpression} that can be sub-classed by developers wishing to provide specialized behavior to an existing
+ * {@link ValueExpression} instance. The default implementation of all methods is to call through to the wrapped {@link ValueExpression}.
+ * </p>
  *
- * <p>Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.</p>
+ * <p>
+ * Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.
+ * </p>
  *
  * @author Arjan Tijms
  */
-public class ValueExpressionWrapper extends ValueExpression implements FacesWrapper<ValueExpression>  {
+public class ValueExpressionWrapper extends ValueExpression implements FacesWrapper<ValueExpression> {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,6 +37,7 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
 
     /**
      * Construct the value expression wrapper.
+     * 
      * @param wrapped The value expression to be wrapped.
      */
     public ValueExpressionWrapper(ValueExpression wrapped) {

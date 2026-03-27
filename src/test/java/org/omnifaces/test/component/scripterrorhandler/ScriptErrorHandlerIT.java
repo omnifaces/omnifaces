@@ -24,28 +24,28 @@ import org.openqa.selenium.support.FindBy;
 
 public class ScriptErrorHandlerIT extends OmniFacesIT {
 
-    @FindBy(id="triggerError")
+    @FindBy(id = "triggerError")
     private WebElement triggerError;
 
-    @FindBy(id="triggerRejection")
+    @FindBy(id = "triggerRejection")
     private WebElement triggerRejection;
 
-    @FindBy(id="poll:pollResult")
+    @FindBy(id = "poll:pollResult")
     private WebElement pollResult;
 
-    @FindBy(id="poll:reset")
+    @FindBy(id = "poll:reset")
     private WebElement reset;
 
-    @FindBy(id="errorMessage")
+    @FindBy(id = "errorMessage")
     private WebElement errorMessage;
 
-    @FindBy(id="errorName")
+    @FindBy(id = "errorName")
     private WebElement errorName;
 
-    @FindBy(id="pageURL")
+    @FindBy(id = "pageURL")
     private WebElement pageURL;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(ScriptErrorHandlerIT.class);
     }

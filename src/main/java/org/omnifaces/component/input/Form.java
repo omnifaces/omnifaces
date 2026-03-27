@@ -37,59 +37,56 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to
- * exactly the request URI with query string as seen in browser's address. Standard Faces <code>&lt;h:form&gt;</code>
- * submits to the view ID and does not include any query string parameters or path parameters and may therefore fail
- * in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters
- * or path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or
- * forwarding everything to 1 page.
+ * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to exactly the request URI with query string
+ * as seen in browser's address. Standard Faces <code>&lt;h:form&gt;</code> submits to the view ID and does not include any query string parameters or path
+ * parameters and may therefore fail in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters or
+ * path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or forwarding everything to 1 page.
  * <p>
- * Additionally, it offers in combination with the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an
- * {@link UICommand} component the possibility to ignore validation failures so that the invoke action phase will be
- * executed anyway.
+ * Additionally, it offers in combination with the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
+ * validation failures so that the invoke action phase will be executed anyway.
  * <p>
- * Since version 2.1 this component also supports adding query string parameters to the action URL via nested
- * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * Since version 2.1 this component also supports adding query string parameters to the action URL via nested <code>&lt;f:param&gt;</code> and
+ * <code>&lt;o:param&gt;</code>.
  * <p>
- * Since version 3.0, it will also during ajax requests automatically send only the form data which actually need to
- * be processed as opposed to the entire form, based on the <code>execute</code> attribute of any nested
- * <code>&lt;f:ajax&gt;</code>. This feature is similar to <code>partialSubmit</code> feature of PrimeFaces.
- * This will reduce the request payload when used in large forms such as editable tables.
+ * Since version 3.0, it will also during ajax requests automatically send only the form data which actually need to be processed as opposed to the entire form,
+ * based on the <code>execute</code> attribute of any nested <code>&lt;f:ajax&gt;</code>. This feature is similar to <code>partialSubmit</code> feature of
+ * PrimeFaces. This will reduce the request payload when used in large forms such as editable tables.
  * <p>
- * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
- * <code>o:</code>.
+ * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to <code>o:</code>.
  *
  * <h2>Use request URI</h2>
  * <p>
- * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using
- * <code>&lt;o:form&gt;</code> will already submit to the exact request URI with query string as seen in browser's
- * address bar. In order to turn off this behavior, set <code>useRequestURI</code> attribute to <code>false</code>.
+ * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using <code>&lt;o:form&gt;</code> will already
+ * submit to the exact request URI with query string as seen in browser's address bar. In order to turn off this behavior, set <code>useRequestURI</code>
+ * attribute to <code>false</code>.
+ * 
  * <pre>
  * &lt;o:form useRequestURI="false"&gt;
  * </pre>
  *
  * <h2>Include request params</h2>
  * <p>
- * When you want to include request parameters only instead of the entire request URI with query string, set the
- * <code>includeRequestParams</code> attribute to <code>true</code>. This will implicitly set <code>useRequestURI</code>
- * attribute to <code>false</code>.
+ * When you want to include request parameters only instead of the entire request URI with query string, set the <code>includeRequestParams</code> attribute to
+ * <code>true</code>. This will implicitly set <code>useRequestURI</code> attribute to <code>false</code>.
+ * 
  * <pre>
  * &lt;o:form includeRequestParams="true"&gt;
  * </pre>
  *
  * <h2>Partial submit</h2>
  * <p>
- * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the
- * <code>&lt;f:ajax&gt;</code> to send only the form data which actually need to be processed. In order to turn off this
- * behavior, set <code>partialSubmit</code> attribute to <code>false</code>.
+ * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the <code>&lt;f:ajax&gt;</code> to send only the form data which
+ * actually need to be processed. In order to turn off this behavior, set <code>partialSubmit</code> attribute to <code>false</code>.
+ * 
  * <pre>
  * &lt;o:form partialSubmit="false"&gt;
  * </pre>
  *
  * <h2>Add query string parameters to action URL</h2>
  * <p>
- * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers
- * this possibility via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers this possibility via nested
+ * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * 
  * <pre>
  * &lt;o:form&gt;
  *     &lt;f:param name="somename" value="somevalue" /&gt;
@@ -97,16 +94,15 @@ import org.omnifaces.util.State;
  * &lt;/o:form&gt;
  * </pre>
  * <p>
- * The <code>&lt;f|o:param&gt;</code> will override any included view or request parameters on the same name. To conditionally add
- * or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
+ * The <code>&lt;f|o:param&gt;</code> will override any included view or request parameters on the same name. To conditionally add or override, use the
+ * <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  * <p>
  * The support was added in OmniFaces 2.2.
  *
  * <h2>Ignore Validation Failed</h2>
  * <p>
- * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its
- * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
- * See also {@link IgnoreValidationFailed}.
+ * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its parent <code>&lt;h:form&gt;</code>
+ * component has to be replaced by this <code>&lt;o:form&gt;</code> component. See also {@link IgnoreValidationFailed}.
  *
  *
  * @since 1.1
@@ -115,7 +111,7 @@ import org.omnifaces.util.State;
  * @see ActionURLDecorator
  */
 @FacesComponent(value = Form.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Form.ts.
+@ResourceDependency(library = OMNIFACES_LIBRARY_NAME, name = OMNIFACES_SCRIPT_NAME, target = "head") // Specifically Form.ts.
 public class Form extends HtmlForm {
 
     // Constants ------------------------------------------------------------------------------------------------------
@@ -125,9 +121,7 @@ public class Form extends HtmlForm {
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        useRequestURI,
-        includeRequestParams,
-        partialSubmit,
+        useRequestURI, includeRequestParams, partialSubmit,
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -170,6 +164,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether or not the request parameters should be encoded into the form's action URL.
+     * 
      * @return Whether or not the request parameters should be encoded into the form's action URL.
      * @since 1.5
      */
@@ -178,8 +173,8 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Sets whether or not the request parameters should be encoded into the form's action URL. Defaults to
-     * {@code false}.
+     * Sets whether or not the request parameters should be encoded into the form's action URL. Defaults to {@code false}.
+     * 
      * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
      * @since 1.5
      */
@@ -188,8 +183,9 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
-     * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+     * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>. This setting is ignored when
+     * <code>includeRequestParams</code> is set to <code>true</code>.
+     * 
      * @return Whether the request URI should be used as form's action URL.
      * @since 1.6
      */
@@ -198,8 +194,9 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Sets whether the request URI should be used as form's action URL. Defaults to {@code true}.
-     * This setting is ignored when {@code includeRequestParams} is set to {@code true}.
+     * Sets whether the request URI should be used as form's action URL. Defaults to {@code true}. This setting is ignored when {@code includeRequestParams} is
+     * set to {@code true}.
+     * 
      * @param useRequestURI Whether the request URI should be used as form's action URL.
      * @since 1.6
      */
@@ -209,6 +206,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether or not the form should ignore validation fail (and thus proceed to update model/invoke action).
+     * 
      * @return Whether or not the form should ignore validation fail.
      * @since 2.1
      */
@@ -218,6 +216,7 @@ public class Form extends HtmlForm {
 
     /**
      * Sets whether the form should ignore validation fail (and thus proceed to update model/invoke action).
+     * 
      * @param ignoreValidationFailed Whether the form should ignore validation fail.
      * @since 2.1
      */
@@ -227,6 +226,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
+     * 
      * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
      * @since 3.0
      */
@@ -235,8 +235,8 @@ public class Form extends HtmlForm {
     }
 
     /**
-     * Sets whether to send only the form data which actually need to be processed as opposed to the entire form.
-     * Defaults to {@code true}.
+     * Sets whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to {@code true}.
+     * 
      * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
      * @since 3.0
      */
@@ -247,8 +247,7 @@ public class Form extends HtmlForm {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * FacesContext wrapper which performs NOOP during {@link FacesContext#validationFailed()} and
-     * {@link FacesContext#renderResponse()}.
+     * FacesContext wrapper which performs NOOP during {@link FacesContext#validationFailed()} and {@link FacesContext#renderResponse()}.
      *
      * @author Bauke Scholtz
      */
@@ -267,5 +266,7 @@ public class Form extends HtmlForm {
         public void renderResponse() {
             // NOOP.
         }
+
     }
+
 }

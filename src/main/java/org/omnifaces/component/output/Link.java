@@ -27,19 +27,18 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:link&gt;</code> is a component that extends the standard <code>&lt;h:link&gt;</code> and allows
- * including the request query string parameters of the current URL into the link's target URL. Standard Faces
- * <code>&lt;h:link&gt;</code> does not include any query string parameters which are not declared as view parameters.
- * This is particularly useful if you expect some state in the target page and don't want to repeat
- * <code>&lt;f|o:param&gt;</code> all over place.
+ * The <code>&lt;o:link&gt;</code> is a component that extends the standard <code>&lt;h:link&gt;</code> and allows including the request query string parameters
+ * of the current URL into the link's target URL. Standard Faces <code>&lt;h:link&gt;</code> does not include any query string parameters which are not declared
+ * as view parameters. This is particularly useful if you expect some state in the target page and don't want to repeat <code>&lt;f|o:param&gt;</code> all over
+ * place.
  * <p>
- * You can use it the same way as <code>&lt;h:link&gt;</code>, you only need to change <code>h:</code> to
- * <code>o:</code>.
+ * You can use it the same way as <code>&lt;h:link&gt;</code>, you only need to change <code>h:</code> to <code>o:</code>.
  *
  * <h2>Include request params</h2>
  * <p>
- * When you want to include request query string parameters of the current URL into the link's target URL, set the
- * <code>includeRequestParams</code> attribute to <code>true</code>.
+ * When you want to include request query string parameters of the current URL into the link's target URL, set the <code>includeRequestParams</code> attribute
+ * to <code>true</code>.
+ * 
  * <pre>
  * &lt;o:link value="Go to some page with same query string" outcome="some-page" includeRequestParams="true"&gt;
  * </pre>
@@ -58,8 +57,7 @@ public class Link extends HtmlOutcomeTargetLink {
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        includeRequestParams,
-        fragment
+        includeRequestParams, fragment
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -77,6 +75,7 @@ public class Link extends HtmlOutcomeTargetLink {
 
     /**
      * Returns whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
+     * 
      * @return Whether or not the request parameters should be encoded into the target URL.
      */
     public boolean isIncludeRequestParams() {
@@ -85,6 +84,7 @@ public class Link extends HtmlOutcomeTargetLink {
 
     /**
      * Sets whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
+     * 
      * @param includeRequestParams Whether or not the request parameters should be encoded into the target URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {
@@ -92,9 +92,9 @@ public class Link extends HtmlOutcomeTargetLink {
     }
 
     /**
-     * Returns the identifier of the page fragment which should be brought into focus when the target page is
-     * rendered. The value of this attribute is appended to the end of target URL following a hash (#) mark. This
-     * notation is part of the standard URL syntax.
+     * Returns the identifier of the page fragment which should be brought into focus when the target page is rendered. The value of this attribute is appended
+     * to the end of target URL following a hash (#) mark. This notation is part of the standard URL syntax.
+     * 
      * @return The page fragment identifier.
      */
     public String getFragment() {
@@ -102,12 +102,13 @@ public class Link extends HtmlOutcomeTargetLink {
     }
 
     /**
-     * Sets the identifier of the page fragment which should be brought into focus when the target page is
-     * rendered. The value of this attribute is appended to the end of target URL following a hash (#) mark. This
-     * notation is part of the standard URL syntax.
+     * Sets the identifier of the page fragment which should be brought into focus when the target page is rendered. The value of this attribute is appended to
+     * the end of target URL following a hash (#) mark. This notation is part of the standard URL syntax.
+     * 
      * @param fragment The page fragment identifier.
      */
     public void setFragment(String fragment) {
         state.put(PropertyKeys.fragment, fragment);
     }
+
 }

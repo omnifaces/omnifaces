@@ -29,34 +29,34 @@ import org.openqa.selenium.support.FindBy;
 @TestMethodOrder(OrderAnnotation.class)
 public class ViewScopedIT extends OmniFacesIT {
 
-    @FindBy(id="bean")
+    @FindBy(id = "bean")
     private WebElement bean;
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="unload")
+    @FindBy(id = "unload")
     private WebElement unload;
 
-    @FindBy(id="newtab")
+    @FindBy(id = "newtab")
     private WebElement newtab;
 
-    @FindBy(id="non-ajax:submit")
+    @FindBy(id = "non-ajax:submit")
     private WebElement nonAjaxSubmit;
 
-    @FindBy(id="non-ajax:navigate")
+    @FindBy(id = "non-ajax:navigate")
     private WebElement nonAjaxNavigate;
 
-    @FindBy(id="ajax:submit")
+    @FindBy(id = "ajax:submit")
     private WebElement ajaxSubmit;
 
-    @FindBy(id="ajax:navigate")
+    @FindBy(id = "ajax:navigate")
     private WebElement ajaxNavigate;
 
-    @FindBy(id="form:conditionallyRenderViewScopedIT")
+    @FindBy(id = "form:conditionallyRenderViewScopedIT")
     private WebElement conditionallyRenderViewScopedIT;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ViewScopedIT.class)
             .withWebXml(withThreeViewsInSession)
@@ -81,7 +81,6 @@ public class ViewScopedIT extends OmniFacesIT {
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
 
-
         // Submit then unload.
         guardHttp(nonAjaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
@@ -91,7 +90,6 @@ public class ViewScopedIT extends OmniFacesIT {
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
 
-
         // Navigate then unload.
         guardHttp(nonAjaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
@@ -100,7 +98,6 @@ public class ViewScopedIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
-
 
         // Submit then navigate then unload.
         guardHttp(nonAjaxSubmit::click);
@@ -114,7 +111,6 @@ public class ViewScopedIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
-
 
         // Navigate then submit then unload.
         guardHttp(nonAjaxNavigate::click);
@@ -136,7 +132,6 @@ public class ViewScopedIT extends OmniFacesIT {
         assertEquals("init", getMessagesText());
         var previousBean = bean.getText();
 
-
         // Submit then unload.
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
@@ -146,7 +141,6 @@ public class ViewScopedIT extends OmniFacesIT {
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
 
-
         // Navigate then unload.
         guardAjax(ajaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
@@ -155,7 +149,6 @@ public class ViewScopedIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
-
 
         // Submit then navigate then unload.
         guardAjax(ajaxSubmit::click);
@@ -169,7 +162,6 @@ public class ViewScopedIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("unload init", getMessagesText());
-
 
         // Navigate then submit then unload.
         guardAjax(ajaxNavigate::click);
@@ -253,4 +245,5 @@ public class ViewScopedIT extends OmniFacesIT {
     private String getMessagesText() {
         return messages.getText().replaceAll("\\s+", " ");
     }
+
 }

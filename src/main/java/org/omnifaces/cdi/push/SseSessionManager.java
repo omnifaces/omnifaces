@@ -61,8 +61,9 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * On open, add given async context to the mapping associated with given channel identifier and return
-     * <code>true</code> if it's accepted (i.e. the channel identifier is known), otherwise <code>false</code>.
+     * On open, add given async context to the mapping associated with given channel identifier and return <code>true</code> if it's accepted (i.e. the channel
+     * identifier is known), otherwise <code>false</code>.
+     * 
      * @param channelId The channel identifier.
      * @param channel The channel name.
      * @param asyncContext The opened async context.
@@ -86,6 +87,7 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
 
     /**
      * Remove given async context from the mapping associated with given channel identifier.
+     * 
      * @param channelId The channel identifier.
      * @param asyncContext The async context to remove.
      */

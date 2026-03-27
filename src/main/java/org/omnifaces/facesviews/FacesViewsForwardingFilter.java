@@ -47,11 +47,11 @@ import jakarta.servlet.http.HttpSession;
 import org.omnifaces.filter.HttpFilter;
 
 /**
- * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is
- * mapped, and that non-extensionless requests are handled according to a set preference.
+ * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is mapped, and that non-extensionless
+ * requests are handled according to a set preference.
  * <p>
- * A filter like this is needed for extensionless requests, since the FacesServlet does not take into account any other
- * mapping than prefix- and extension (suffix) mapping.
+ * A filter like this is needed for extensionless requests, since the FacesServlet does not take into account any other mapping than prefix- and extension
+ * (suffix) mapping.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
@@ -80,18 +80,19 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     }
 
     @Override
-    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException
+    {
         if (!filterExtensionLessIfNecessary(request, response, chain) && !filterExtension(request, response) && !filterPublicPath(request, response)) {
             chain.doFilter(request, response);
         }
     }
 
     /**
-     * A mapped resource request without extension is encountered.
-     * The user setting "dispatchMethod" determines how we handle this.
+     * A mapped resource request without extension is encountered. The user setting "dispatchMethod" determines how we handle this.
      */
     private boolean filterExtensionLessIfNecessary(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException
+        throws IOException, ServletException
     {
         var servletPath = request.getServletPath();
 
@@ -128,8 +129,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
     }
 
-    private static boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-            Map<String, String> resources, String resource, String path) throws IOException, ServletException
+    private static boolean filterExtensionLess(
+        HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+        Map<String, String> resources, String resource, String path
+    ) throws IOException, ServletException
     {
         if (resources.containsKey(resource)) {
             if (redirectExtensionLessWelcomeFileToFolderIfNecessary(request, response, path)) {
@@ -153,7 +156,11 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     /**
      * Check if a welcome file was explicitly requested and if so, redirect back to its parent folder.
      */
-    private static boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(HttpServletRequest request, HttpServletResponse response, String normalizedServletPath) {
+    private static boolean redirectExtensionLessWelcomeFileToFolderIfNecessary(
+        HttpServletRequest request, HttpServletResponse response,
+        String normalizedServletPath
+    )
+    {
         if ((getRequestRelativeURI(request) + "/").startsWith(normalizedServletPath + "/")) {
             var servletPath = request.getServletPath();
             var normalizedResource = stripWelcomeFilePrefix(request.getServletContext(), servletPath);
@@ -170,10 +177,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     }
 
     /**
-     * Continue the chain, but make the request appear to be to the resource with an extension.
-     * This assumes that the FacesServlet has been mapped to something that includes the extensionless request.
+     * Continue the chain, but make the request appear to be to the resource with an extension. This assumes that the FacesServlet has been mapped to something
+     * that includes the extensionless request.
      */
-    private static void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath) throws IOException, ServletException {
+    private static void filterExtensionLessToExtension(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String mappedServletPath)
+        throws IOException, ServletException
+    {
         try {
             request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
             var pathInfo = request.getPathInfo();
@@ -191,11 +200,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     }
 
     /**
-     * Forward the resource (view) using its original extension, on which the Facelets Servlet is mapped.
-     * Technically it matters most that the Facelets Servlet picks up the request,
-     * and the exact extension or even prefix is perhaps less relevant.
+     * Forward the resource (view) using its original extension, on which the Facelets Servlet is mapped. Technically it matters most that the Facelets Servlet
+     * picks up the request, and the exact extension or even prefix is perhaps less relevant.
      */
-    private static boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension) throws ServletException, IOException {
+    private static boolean forwardExtensionLessToExtensionIfNecessary(HttpServletRequest request, HttpServletResponse response, String servletPathWithExtension)
+        throws ServletException, IOException
+    {
         var requestDispatcher = request.getServletContext().getRequestDispatcher(servletPathWithExtension);
 
         if (requestDispatcher != null) {
@@ -207,8 +217,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     }
 
     /**
-     * A mapped resource request with extension is encountered.
-     * The user setting "extensionAction" determines how we handle this.
+     * A mapped resource request with extension is encountered. The user setting "extensionAction" determines how we handle this.
      */
     private boolean filterExtension(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var resource = request.getServletPath();
@@ -233,8 +242,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     }
 
     /**
-     * A direct request to one of the public paths (excluding /) from where we scanned resources is encountered.
-     * The user setting "pathAction" determines how we handle this.
+     * A direct request to one of the public paths (excluding /) from where we scanned resources is encountered. The user setting "pathAction" determines how we
+     * handle this.
      */
     private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var resource = request.getServletPath();
@@ -247,13 +256,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
         if (reverseResources.containsKey(resource)) {
             switch (pathAction) {
-                case REDIRECT_TO_SCANNED_EXTENSIONLESS:
+                case REDIRECT_TO_SCANNED_EXTENSIONLESS :
                     redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));
                     return true;
-                case SEND_404:
+                case SEND_404 :
                     response.sendError(SC_NOT_FOUND);
                     return true;
-                case PROCEED:
+                case PROCEED :
                     break;
             }
         }

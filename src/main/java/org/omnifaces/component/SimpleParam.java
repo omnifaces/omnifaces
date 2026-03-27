@@ -19,9 +19,8 @@ import jakarta.faces.component.UIParameter;
 import jakarta.faces.convert.Converter;
 
 /**
- * This class provides a basic and default implementation of the {@link ParamHolder} interface. Ultimately, this class
- * can be used as a simple key-value pair holder (parameter name-value) which uses an explicit/implicit Faces converter
- * to convert the object value to string.
+ * This class provides a basic and default implementation of the {@link ParamHolder} interface. Ultimately, this class can be used as a simple key-value pair
+ * holder (parameter name-value) which uses an explicit/implicit Faces converter to convert the object value to string.
  *
  * @author Bauke Scholtz
  * @param <T> The type of the value.
@@ -46,6 +45,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
 
     /**
      * Construct a simple param with name and value.
+     * 
      * @param name The parameter name.
      * @param value The parameter value.
      */
@@ -56,6 +56,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
 
     /**
      * Construct a simple param with name, value and converter.
+     * 
      * @param name The parameter name.
      * @param value The parameter value.
      * @param converter The converter.
@@ -67,6 +68,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
 
     /**
      * Construct a simple param with name and value of given {@link UIParameter} component.
+     * 
      * @param param The {@link UIParameter} to copy.
      * @throws ClassCastException When actual parameter value is not <code>T</code>.
      * @since 2.2
@@ -87,6 +89,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
 
     /**
      * Construct a simple param with name, value and converter of given {@link ParamHolder} instance.
+     * 
      * @param param The {@link ParamHolder} to copy.
      * @since 2.2
      */
@@ -103,6 +106,7 @@ public class SimpleParam<T> implements ParamHolder<T> {
 
     /**
      * Sets the parameter name.
+     * 
      * @param name The parameter name.
      */
     public void setName(String name) {

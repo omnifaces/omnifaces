@@ -17,12 +17,10 @@ import java.util.Map;
 import jakarta.faces.context.FacesContext;
 
 /**
- * Base class for Cache providers where for each scope a new instance of the cache is created if for that scope no instance
- * is present yet.
+ * Base class for Cache providers where for each scope a new instance of the cache is created if for that scope no instance is present yet.
  * <p>
- * This kind of cache provider is suitable for simple in-memory cache implementations, where the cache is very cheap
- * to create. This is in contrast to caches where there is typically one expensive to create instance active per JVM,
- * and where scoped caches are better expressed as nodes in a tree structure.
+ * This kind of cache provider is suitable for simple in-memory cache implementations, where the cache is very cheap to create. This is in contrast to caches
+ * where there is typically one expensive to create instance active per JVM, and where scoped caches are better expressed as nodes in a tree structure.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -51,7 +49,8 @@ public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 
         if ("application".equals(scope)) {
             return getAppScopeCache(context);
-        } else if ("session".equals(scope)) {
+        }
+        else if ("session".equals(scope)) {
             return getSessionScopeCache(context);
         }
 

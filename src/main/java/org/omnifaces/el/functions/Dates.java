@@ -47,14 +47,14 @@ import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
- * Collection of EL functions for date and time: <code>o:formatDate()</code>, <code>o:formatDateWithTimezone()</code>,
- * <code>o:addXxx()</code> like <code>o:addDays()</code>, <code>o:xxxBetween()</code> like <code>o:daysBetween()</code>,
- * <code>o:getMonths()</code>, <code>o:getShortMonths()</code>, <code>o:getDaysOfWeek()</code>, <code>o:getShortDaysOfWeek()</code>,
- * <code>o:getMonth()</code>, <code>o:getShortMonth()</code>, <code>o:getDayOfWeek()</code> and <code>o:getShortDayOfWeek()</code>.
+ * Collection of EL functions for date and time: <code>o:formatDate()</code>, <code>o:formatDateWithTimezone()</code>, <code>o:addXxx()</code> like
+ * <code>o:addDays()</code>, <code>o:xxxBetween()</code> like <code>o:daysBetween()</code>, <code>o:getMonths()</code>, <code>o:getShortMonths()</code>,
+ * <code>o:getDaysOfWeek()</code>, <code>o:getShortDaysOfWeek()</code>, <code>o:getMonth()</code>, <code>o:getShortMonth()</code>, <code>o:getDayOfWeek()</code>
+ * and <code>o:getShortDayOfWeek()</code>.
  * <p>
- * Historical note: before OmniFaces 3.6, these functions accepted <code>java.util.Date</code> and <code>java.util.TimeZone</code> only.
- * Since OmniFaces 3.6, these functions <em>also</em> accept <code>java.time.Temporal</code> and <code>java.time.ZoneId</code>.
- * Since OmniFaces 4.7, these functions <em>also</em> accept <code>java.lang.Long</code> as epoch milli.
+ * Historical note: before OmniFaces 3.6, these functions accepted <code>java.util.Date</code> and <code>java.util.TimeZone</code> only. Since OmniFaces 3.6,
+ * these functions <em>also</em> accept <code>java.time.Temporal</code> and <code>java.time.ZoneId</code>. Since OmniFaces 4.7, these functions <em>also</em>
+ * accept <code>java.lang.Long</code> as epoch milli.
  *
  * @author Bauke Scholtz
  */
@@ -77,10 +77,10 @@ public final class Dates {
     // Formatting -----------------------------------------------------------------------------------------------------
 
     /**
-     * Format the given date in the given pattern with the default timezone. This is useful when you want to format
-     * dates in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute
-     * of select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag. The format locale will
-     * be set to the one as obtained by {@link Faces#getLocale()}.
+     * Format the given date in the given pattern with the default timezone. This is useful when you want to format dates in for example the <code>title</code>
+     * attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
+     * <code>&lt;f:convertDateTime&gt;</code> tag. The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to be formatted in the given pattern.
      * @param pattern The pattern to format the given date in.
@@ -94,10 +94,10 @@ public final class Dates {
     }
 
     /**
-     * Format the given date in the given pattern with the given timezone. This is useful when you want to format dates
-     * in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of
-     * select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag. The format locale will be
-     * set to the one as obtained by {@link Faces#getLocale()}.
+     * Format the given date in the given pattern with the given timezone. This is useful when you want to format dates in for example the <code>title</code>
+     * attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
+     * <code>&lt;f:convertDateTime&gt;</code> tag. The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param <Z> The timezone type, can be either {@link String}, {@link TimeZone} or {@link ZoneId}.
      * @param date The date to be formatted in the given pattern.
@@ -105,8 +105,8 @@ public final class Dates {
      * @param timezone The timezone to format the given date with.
      * @return The date which is formatted in the given pattern.
      * @throws NullPointerException When the pattern is <code>null</code>.
-     * @throws IllegalArgumentException When date is not {@link Long}, {@link Date}, {@link Calendar} or {@link Temporal},
-     * or when timezone is not {@link String}, {@link TimeZone} or {@link ZoneId}.
+     * @throws IllegalArgumentException When date is not {@link Long}, {@link Date}, {@link Calendar} or {@link Temporal}, or when timezone is not
+     * {@link String}, {@link TimeZone} or {@link ZoneId}.
      */
     public static <D, Z> String formatDateWithTimezone(D date, String pattern, Z timezone) {
         if (date == null) {
@@ -120,6 +120,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of years.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of years to.
      * @param years The amount of years to be added to the given date. It can be negative.
@@ -133,6 +134,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of months.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of months to.
      * @param months The amount of months to be added to the given date. It can be negative.
@@ -146,6 +148,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of weeks.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of weeks to.
      * @param weeks The amount of weeks to be added to the given date. It can be negative.
@@ -159,6 +162,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of days.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of days to.
      * @param days The amount of days to be added to the given date. It can be negative.
@@ -172,6 +176,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of hours.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of hours to.
      * @param hours The amount of hours to be added to the given date. It can be negative.
@@ -185,6 +190,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of minutes.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of minutes to.
      * @param minutes The amount of minutes to be added to the given date. It can be negative.
@@ -198,6 +204,7 @@ public final class Dates {
 
     /**
      * Returns a new date instance which is a sum of the given date and the given amount of seconds.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The date to add the given amount of seconds to.
      * @param seconds The amount of seconds to be added to the given date. It can be negative.
@@ -210,8 +217,7 @@ public final class Dates {
     }
 
     /**
-     * Helper method which converts the given date to {@link ZonedDateTime} and adds the given amount to the given
-     * chrono unit.
+     * Helper method which converts the given date to {@link ZonedDateTime} and adds the given amount to the given chrono unit.
      */
     @SuppressWarnings("unchecked")
     private static <D> D add(D date, int amount, ChronoUnit unit) {
@@ -221,8 +227,8 @@ public final class Dates {
     // Calculating ----------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the amount of years between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of years between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -235,8 +241,8 @@ public final class Dates {
     }
 
     /**
-     * Returns the amount of months between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of months between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -249,8 +255,8 @@ public final class Dates {
     }
 
     /**
-     * Returns the amount of weeks between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of weeks between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -263,8 +269,8 @@ public final class Dates {
     }
 
     /**
-     * Returns the amount of days between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of days between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -277,16 +283,15 @@ public final class Dates {
     }
 
     /**
-     * Helper method which converts the given dates to zoned dates and returns the unit difference of the
-     * given chrono unit.
+     * Helper method which converts the given dates to zoned dates and returns the unit difference of the given chrono unit.
      */
     private static <D> int dateDiff(D start, D end, ChronoUnit unit) {
         return (int) unit.between(toZonedDateTime(start).truncatedTo(ChronoUnit.DAYS), toZonedDateTime(end).truncatedTo(ChronoUnit.DAYS));
     }
 
     /**
-     * Returns the amount of hours between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of hours between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -299,8 +304,8 @@ public final class Dates {
     }
 
     /**
-     * Returns the amount of minutes between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of minutes between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -313,8 +318,8 @@ public final class Dates {
     }
 
     /**
-     * Returns the amount of seconds between two given dates.
-     * This will be negative when the end date is before the start date.
+     * Returns the amount of seconds between two given dates. This will be negative when the end date is before the start date.
+     * 
      * @param <D> The date type, can be {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param start The start date.
      * @param end The end date.
@@ -336,10 +341,10 @@ public final class Dates {
     // Mappings -------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
-     * etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-     * months. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale stored in a local cache
-     * to improve retrieving performance.
+     * Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2", etc. This is useful if you want to for
+     * example populate a <code>&lt;f:selectItems&gt;</code> which shows all months. The locale is obtained by {@link Faces#getLocale()}. The mapping is per
+     * locale stored in a local cache to improve retrieving performance.
+     * 
      * @return Month names for the current locale.
      * @see DateFormatSymbols#getMonths()
      */
@@ -349,10 +354,10 @@ public final class Dates {
     }
 
     /**
-     * Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2",
-     * etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
-     * short months. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale stored in a local
-     * cache to improve retrieving performance.
+     * Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2", etc. This is useful if you want to for
+     * example populate a <code>&lt;f:selectItems&gt;</code> which shows all short months. The locale is obtained by {@link Faces#getLocale()}. The mapping is
+     * per locale stored in a local cache to improve retrieving performance.
+     * 
      * @return Short month names for the current locale.
      * @see DateFormatSymbols#getShortMonths()
      */
@@ -365,16 +370,19 @@ public final class Dates {
      * Helper method to map months.
      */
     private static Map<String, Integer> mapMonths(TextStyle style, Locale locale) {
-        return stream(Month.values()).collect(collectingAndThen(
-            toMap(month -> month.getDisplayName(style, locale), Month::getValue, (l, r) -> l, LinkedHashMap::new),
-            Collections::unmodifiableMap));
+        return stream(Month.values()).collect(
+            collectingAndThen(
+                toMap(month -> month.getDisplayName(style, locale), Month::getValue, (l, r) -> l, LinkedHashMap::new),
+                Collections::unmodifiableMap
+            )
+        );
     }
 
     /**
-     * Returns a mapping of day of week names in ISO 8601 order (Monday first) for the current locale. For example:
-     * "Monday=1", "Tuesday=2", etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code>
-     * which shows all days of week. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale
-     * stored in a local cache to improve retrieving performance.
+     * Returns a mapping of day of week names in ISO 8601 order (Monday first) for the current locale. For example: "Monday=1", "Tuesday=2", etc. This is useful
+     * if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all days of week. The locale is obtained by
+     * {@link Faces#getLocale()}. The mapping is per locale stored in a local cache to improve retrieving performance.
+     * 
      * @return Day of week names for the current locale.
      * @see DateFormatSymbols#getWeekdays()
      */
@@ -384,10 +392,10 @@ public final class Dates {
     }
 
     /**
-     * Returns a mapping of short day of week names in ISO 8601 order (Monday first) for the current locale. For example:
-     * "Mon=1", "Tue=2", etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code>
-     * which shows all short days of week. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale
-     * stored in a local cache to improve retrieving performance.
+     * Returns a mapping of short day of week names in ISO 8601 order (Monday first) for the current locale. For example: "Mon=1", "Tue=2", etc. This is useful
+     * if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all short days of week. The locale is obtained by
+     * {@link Faces#getLocale()}. The mapping is per locale stored in a local cache to improve retrieving performance.
+     * 
      * @return Short day of week names for the current locale.
      * @see DateFormatSymbols#getShortWeekdays()
      */
@@ -400,14 +408,18 @@ public final class Dates {
      * Helper method to map days of week.
      */
     private static Map<String, Integer> mapDaysOfWeek(TextStyle style, Locale locale) {
-        return stream(DayOfWeek.values()).collect(collectingAndThen(
-            toMap(dayOfWeek -> dayOfWeek.getDisplayName(style, locale), DayOfWeek::getValue, (l, r) -> l, LinkedHashMap::new),
-            Collections::unmodifiableMap));
+        return stream(DayOfWeek.values()).collect(
+            collectingAndThen(
+                toMap(dayOfWeek -> dayOfWeek.getDisplayName(style, locale), DayOfWeek::getValue, (l, r) -> l, LinkedHashMap::new),
+                Collections::unmodifiableMap
+            )
+        );
     }
 
     /**
-     * Returns the month name from the mapping associated with the given month number for the current locale. For
-     * example: "1=January", "2=February", etc. The locale is obtained by {@link Faces#getLocale()}.
+     * Returns the month name from the mapping associated with the given month number for the current locale. For example: "1=January", "2=February", etc. The
+     * locale is obtained by {@link Faces#getLocale()}.
+     * 
      * @param monthNumber The month number to return the month name from the mapping for.
      * @return The month name form the mapping associated with the given month number.
      * @since 1.4
@@ -417,8 +429,9 @@ public final class Dates {
     }
 
     /**
-     * Returns the short month name from the mapping associated with the given month number for the current locale. For
-     * example: "1=Jan", "2=Feb", etc. The locale is obtained by {@link Faces#getLocale()}.
+     * Returns the short month name from the mapping associated with the given month number for the current locale. For example: "1=Jan", "2=Feb", etc. The
+     * locale is obtained by {@link Faces#getLocale()}.
+     * 
      * @param monthNumber The month number to return the short month name from the mapping for.
      * @return The short month name form the mapping associated with the given month number.
      * @since 1.4
@@ -428,9 +441,9 @@ public final class Dates {
     }
 
     /**
-     * Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order
-     * (Monday first) for the current locale. For example: "1=Monday", "2=Tuesday", etc. The locale is obtained by
-     * {@link Faces#getLocale()}.
+     * Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order (Monday first) for the current locale. For
+     * example: "1=Monday", "2=Tuesday", etc. The locale is obtained by {@link Faces#getLocale()}.
+     * 
      * @param dayOfWeekNumber The day of week number to return the day of week name from the mapping for.
      * @return The day of week name from the mapping associated with the given day of week number.
      * @since 1.4
@@ -440,9 +453,9 @@ public final class Dates {
     }
 
     /**
-     * Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601
-     * order (Monday first) for the current locale. For example: "1=Mon", "2=Tue", etc. The locale is obtained by
-     * {@link Faces#getLocale()}.
+     * Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601 order (Monday first) for the current locale.
+     * For example: "1=Mon", "2=Tue", etc. The locale is obtained by {@link Faces#getLocale()}.
+     * 
      * @param dayOfWeekNumber The day of week number to return the short day of week name from the mapping for.
      * @return The short day of week name from the mapping associated with the given day of week number.
      * @since 1.4

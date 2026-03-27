@@ -31,4 +31,5 @@ public class ViewResourceHandlerITEntity {
     public Temporal getLastModified() {
         return lastModified;
     }
+
 }

@@ -24,43 +24,43 @@ import org.openqa.selenium.support.FindBy;
 
 public class ValidateUniqueIT extends OmniFacesIT {
 
-    @FindBy(id="form1:input1")
+    @FindBy(id = "form1:input1")
     private WebElement form1Input1;
 
-    @FindBy(id="form1:input1_m")
+    @FindBy(id = "form1:input1_m")
     private WebElement form1Input1Message;
 
-    @FindBy(id="form1:input2")
+    @FindBy(id = "form1:input2")
     private WebElement form1Input2;
 
-    @FindBy(id="form1:input2_m")
+    @FindBy(id = "form1:input2_m")
     private WebElement form1Input2Message;
 
-    @FindBy(id="form1:submit")
+    @FindBy(id = "form1:submit")
     private WebElement form1Submit;
 
-    @FindBy(id="form1:ok")
+    @FindBy(id = "form1:ok")
     private WebElement form1Ok;
 
-    @FindBy(id="form2:input1")
+    @FindBy(id = "form2:input1")
     private WebElement form2Input1;
 
-    @FindBy(id="form2:input1_m")
+    @FindBy(id = "form2:input1_m")
     private WebElement form2Input1Message;
 
-    @FindBy(id="form2:input2")
+    @FindBy(id = "form2:input2")
     private WebElement form2Input2;
 
-    @FindBy(id="form2:input2_m")
+    @FindBy(id = "form2:input2_m")
     private WebElement form2Input2Message;
 
-    @FindBy(id="form2:submit")
+    @FindBy(id = "form2:submit")
     private WebElement form2Submit;
 
-    @FindBy(id="form2:ok")
+    @FindBy(id = "form2:ok")
     private WebElement form2Ok;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ValidateUniqueIT.class)
             .withWebXml(withInterpretEmptyStringSubmittedValuesAsNull)
@@ -120,4 +120,5 @@ public class ValidateUniqueIT extends OmniFacesIT {
         assertEquals("", form2Input2Message.getText());
         assertEquals("OK!", form2Ok.getText());
     }
+
 }

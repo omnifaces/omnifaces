@@ -68,8 +68,8 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params.
-     * See javadoc of {@link ViewScoped} for details.
+     * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params. See javadoc of {@link ViewScoped} for
+     * details.
      */
     @PostConstruct
     public void postConstructSession() {
@@ -96,6 +96,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     /**
      * Destroys all beans associated with given bean storage identifier.
+     * 
      * @param context The involved faces context.
      * @param beanStorageId The bean storage identifier.
      */
@@ -114,6 +115,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     /**
      * Returns {@code true} if given faces context is recently unloaded.
+     * 
      * @param context The involved faces context.
      * @return {@code true} if given faces context is recently unloaded.
      * @since 2.7.27
@@ -135,9 +137,8 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the max active view scopes depending on available context params. This will be calculated lazily once
-     * and re-returned everytime; the faces context is namely not available during class' initialization/construction,
-     * but only during a post construct.
+     * Returns the max active view scopes depending on available context params. This will be calculated lazily once and re-returned everytime; the faces
+     * context is namely not available during class' initialization/construction, but only during a post construct.
      */
     private static int getMaxActiveViewScopes() {
         if (maxActiveViewScopes != null) {

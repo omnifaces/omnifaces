@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Meta data for a value that's stored in a cache. Can be used for cache implementations that don't support both validity
- * and attributes natively. Cache implementations are not required to use this type.
+ * Meta data for a value that's stored in a cache. Can be used for cache implementations that don't support both validity and attributes natively. Cache
+ * implementations are not required to use this type.
  * <p>
- * Since OmniFaces 3.0 the <code>Object value</code> and <code>Map&lt;String, Object&gt; attributes</code> have been reworked to
- * <code>Serializable value</code> and <code>Map&lt;String, Serializable&gt; attributes</code> in order to explicitly set the expected type.
+ * Since OmniFaces 3.0 the <code>Object value</code> and <code>Map&lt;String, Object&gt; attributes</code> have been reworked to <code>Serializable value</code>
+ * and <code>Map&lt;String, Serializable&gt; attributes</code> in order to explicitly set the expected type.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -54,16 +54,14 @@ public class CacheEntry implements Serializable {
     /**
      * Sets the value for which this object is keeping meta data
      *
-     * @param value
-     *            The value for which meta data is kept
+     * @param value The value for which meta data is kept
      */
     public void setValue(Serializable value) {
         this.value = value;
     }
 
     /**
-     * Returns the date that's the last moment in time the value obtained via getValue() is valid. After that moment,
-     * the value should not be used.
+     * Returns the date that's the last moment in time the value obtained via getValue() is valid. After that moment, the value should not be used.
      *
      * @return date indicating last moment value hold by this object is valid.
      */
@@ -72,11 +70,9 @@ public class CacheEntry implements Serializable {
     }
 
     /**
-     * Sets the date that's the last moment in time the value obtained via getValue() is valid. After that moment, the
-     * value should not be used.
+     * Sets the date that's the last moment in time the value obtained via getValue() is valid. After that moment, the value should not be used.
      *
-     * @param validTill
-     *            date indicating last moment value hold by this object is valid.
+     * @param validTill date indicating last moment value hold by this object is valid.
      * @since 1.2
      */
     public void setValidTill(Date validTill) {
@@ -84,8 +80,8 @@ public class CacheEntry implements Serializable {
     }
 
     /**
-     * Returns whether this entry holds a valid value. If false is returned, the value should not be used and the cache
-     * implementation should try to remove this entry and its associated value from the cache.
+     * Returns whether this entry holds a valid value. If false is returned, the value should not be used and the cache implementation should try to remove this
+     * entry and its associated value from the cache.
      *
      * @return true if this entry is still valid, false otherwise.
      */
@@ -96,8 +92,8 @@ public class CacheEntry implements Serializable {
     /**
      * Gets a map of attributes associated with this entry.
      * <p>
-     * Attributes are general key,value pairs, that are currently mainly used to store the result of EL expressions that
-     * appear in the rendering represented by the main value this entry represents.
+     * Attributes are general key,value pairs, that are currently mainly used to store the result of EL expressions that appear in the rendering represented by
+     * the main value this entry represents.
      *
      * @return a map of attributes associated with this entry.
      * @since 1.2

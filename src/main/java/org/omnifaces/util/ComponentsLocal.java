@@ -110,16 +110,14 @@ import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>
- * Collection of utility methods for the Faces API with respect to working with {@link UIComponent}. There are several
- * traversal/lookup methods, there are several {@link UIForm} and {@link UIInput} related methods which makes it easier
- * to deal with forms and inputs.
+ * Collection of utility methods for the Faces API with respect to working with {@link UIComponent}. There are several traversal/lookup methods, there are
+ * several {@link UIForm} and {@link UIInput} related methods which makes it easier to deal with forms and inputs.
  * <p>
- * The difference with {@link Components} is that no one method of {@link ComponentsLocal} obtains the {@link FacesContext}
- * from the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more
- * efficient in situations where multiple utility methods needs to be called at the same time. Invoking
- * {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained
- * as a {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds
- * or so.
+ * The difference with {@link Components} is that no one method of {@link ComponentsLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
+ * called at the same time. Invoking {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained as a
+ * {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds or so.
+ * 
  * @since 4.6
  * @author Bauke Scholtz
  * @see Components
@@ -130,20 +128,13 @@ public final class ComponentsLocal {
 
     private static final Logger logger = Logger.getLogger(ComponentsLocal.class.getName());
 
-    private static final String ERROR_MISSING_PARENT =
-            "Component '%s' must have a parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_DIRECT_PARENT =
-            "Component '%s' must have a direct parent of type '%s', but it cannot be found.";
-    private static final String ERROR_MISSING_CHILD =
-            "Component '%s' must have at least one child of type '%s', but it cannot be found.";
-    private static final String ERROR_ILLEGAL_PARENT =
-            "Component '%s' may not have a parent of type '%s'.";
-    private static final String ERROR_ILLEGAL_CHILDREN =
-            "Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
-    private static final String ERROR_CHILDREN_DISALLOWED =
-            "Component '%s' may not have any children. Encountered children of types '%s'.";
-    private static final String ERROR_ILLEGAL_UIINPUT =
-            "Relative client ID '%s' must represent an UIInput component, but encountered '%s'.";
+    private static final String ERROR_MISSING_PARENT = "Component '%s' must have a parent of type '%s', but it cannot be found.";
+    private static final String ERROR_MISSING_DIRECT_PARENT = "Component '%s' must have a direct parent of type '%s', but it cannot be found.";
+    private static final String ERROR_MISSING_CHILD = "Component '%s' must have at least one child of type '%s', but it cannot be found.";
+    private static final String ERROR_ILLEGAL_PARENT = "Component '%s' may not have a parent of type '%s'.";
+    private static final String ERROR_ILLEGAL_CHILDREN = "Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
+    private static final String ERROR_CHILDREN_DISALLOWED = "Component '%s' may not have any children. Encountered children of types '%s'.";
+    private static final String ERROR_ILLEGAL_UIINPUT = "Relative client ID '%s' must represent an UIInput component, but encountered '%s'.";
 
     private static final Set<SearchExpressionHint> RESOLVE_LABEL_FOR = EnumSet.of(RESOLVE_SINGLE_COMPONENT, IGNORE_NO_RESULT);
 
@@ -289,13 +280,17 @@ public final class ComponentsLocal {
     /**
      * @see Components#includeCompositeComponent(UIComponent, String, String, String, Map)
      */
-    public static UIComponent includeCompositeComponent(FacesContext context, UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
+    public static UIComponent includeCompositeComponent(
+        FacesContext context, UIComponent parent, String libraryName, String tagName, String id,
+        Map<String, String> attributes
+    )
+    {
         var taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
         var attrs = attributes == null ? null : new HashMap<String, Object>(attributes);
 
         var composite = context.getApplication().getViewHandler()
-                .getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
-                .createComponent(context, taglibURI, tagName, attrs);
+            .getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
+            .createComponent(context, taglibURI, tagName, attrs);
 
         composite.setId(id);
         parent.getChildren().add(composite);
@@ -310,7 +305,8 @@ public final class ComponentsLocal {
             oncomplete(context, script);
         }
         else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(getContext(), script)); // Just to avoid it misses when view rebuilds in the meanwhile.
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(getContext(), script)); // Just to avoid it misses when view rebuilds in the
+                                                                                                         // meanwhile.
         }
         else {
             addScriptToBody(context, script);
@@ -323,13 +319,18 @@ public final class ComponentsLocal {
     public static void addScriptResource(FacesContext context, String libraryName, String resourceName) {
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
-                load(context, libraryName, resourceName); // Because component resources are rendered BEFORE components and thus addScriptResource would be too late.
+                load(context, libraryName, resourceName); // Because component resources are rendered BEFORE components and thus addScriptResource would be too
+                                                          // late.
                 addScriptResourceToBody(context, libraryName, resourceName); // Just to register it in the component tree as we need to mark it rendered.
                 context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
                 addScriptResourceToHead(context, libraryName, resourceName);
-                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName)); // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
+                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName)); // Fallback in case view
+                                                                                                                                        // rebuilds in the
+                                                                                                                                        // meanwhile. It will
+                                                                                                                                        // re-check if already
+                                                                                                                                        // added.
             }
             else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
                 addScriptResourceToHead(context, libraryName, resourceName);
@@ -541,7 +542,8 @@ public final class ComponentsLocal {
             }
         }
 
-        if (parent instanceof UIViewRoot) { // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
+        if (parent instanceof UIViewRoot) { // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully
+                                            // it will be deprecated one day.
             return getCurrentActionSource(context, getCurrentForm(context));
         }
 
@@ -761,7 +763,8 @@ public final class ComponentsLocal {
 
         var form = new Form();
         form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
-        form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
+        form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as
+                                                           // margin/padding/border on any <form> for some reason.
         body.get().getChildren().add(form);
     }
 
@@ -835,7 +838,7 @@ public final class ComponentsLocal {
      * @see Components#invalidateInput(String, String, Object...)
      */
     public static void invalidateInput(FacesContext context, String relativeClientId, String message, Object... params) {
-        addError(findAndInvalidateInputs(context,relativeClientId).iterator().next(), message, params);
+        addError(findAndInvalidateInputs(context, relativeClientId).iterator().next(), message, params);
     }
 
     private static Set<String> findAndInvalidateInputs(FacesContext context, String... relativeClientIds) {
@@ -858,7 +861,8 @@ public final class ComponentsLocal {
                 input.setValid(false);
             }
             else {
-                fullClientIds.add(stripIterationIndex(context,fullClientId).replaceAll(quote(stripIterationIndex(context,relativeClientId)) + "$", relativeClientId));
+                fullClientIds
+                    .add(stripIterationIndex(context, fullClientId).replaceAll(quote(stripIterationIndex(context, relativeClientId)) + "$", relativeClientId));
             }
         }
 
@@ -877,9 +881,9 @@ public final class ComponentsLocal {
      */
     public static ValueExpression createValueExpression(FacesContext context, String expression, Class<?> type) {
         return context
-                .getApplication()
-                .getExpressionFactory()
-                .createValueExpression(context.getELContext(), expression, type);
+            .getApplication()
+            .getExpressionFactory()
+            .createValueExpression(context.getELContext(), expression, type);
     }
 
     /**
@@ -887,9 +891,9 @@ public final class ComponentsLocal {
      */
     public static MethodExpression createMethodExpression(FacesContext context, String expression, Class<?> returnType, Class<?>... parameterTypes) {
         return context
-                .getApplication()
-                .getExpressionFactory()
-                .createMethodExpression(context.getELContext(), expression, returnType, parameterTypes);
+            .getApplication()
+            .getExpressionFactory()
+            .createMethodExpression(context.getELContext(), expression, returnType, parameterTypes);
     }
 
     /**
@@ -903,7 +907,7 @@ public final class ComponentsLocal {
      * @see Components#createActionListenerMethodExpression(String)
      */
     public static MethodExpressionActionListener createActionListenerMethodExpression(FacesContext context, String expression) {
-        return new MethodExpressionActionListener(createVoidMethodExpression(context,expression, ActionEvent.class));
+        return new MethodExpressionActionListener(createVoidMethodExpression(context, expression, ActionEvent.class));
     }
 
     /**
@@ -1069,8 +1073,7 @@ public final class ComponentsLocal {
     }
 
     /**
-     * Use {@link UIComponent#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
-     * returning null instead.
+     * Use {@link UIComponent#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by returning null instead.
      */
     private static UIComponent findComponentIgnoringIAE(FacesContext context, UIComponent parent, String clientId) {
         try {
@@ -1118,11 +1121,10 @@ public final class ComponentsLocal {
     // Inner classes --------------------------------------------------------------------------------------------------
 
     /**
-     * This faces context wrapper allows returning the given temporary view on {@link #getViewRoot()} and its
-     * associated renderer in {@link #getRenderKit()}. This can then be used in cases when a different view needs to be
-     * built within the current view. Using {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be
-     * cleared afterwards when the current view is actually <code>null</code>. The {@link #setViewRoot(UIViewRoot)}
-     * doesn't accept a <code>null</code> being set.
+     * This faces context wrapper allows returning the given temporary view on {@link #getViewRoot()} and its associated renderer in {@link #getRenderKit()}.
+     * This can then be used in cases when a different view needs to be built within the current view. Using {@link FacesContext#setViewRoot(UIViewRoot)} isn't
+     * desired as it can't be cleared afterwards when the current view is actually <code>null</code>. The {@link #setViewRoot(UIViewRoot)} doesn't accept a
+     * <code>null</code> being set.
      *
      * @author Bauke Scholtz
      */
@@ -1144,5 +1146,7 @@ public final class ComponentsLocal {
         public RenderKit getRenderKit() {
             return FacesLocal.getRenderKit(this);
         }
+
     }
+
 }

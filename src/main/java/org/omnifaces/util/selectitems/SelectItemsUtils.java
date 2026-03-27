@@ -34,11 +34,12 @@ import jakarta.faces.model.SelectItemGroup;
  */
 public final class SelectItemsUtils {
 
-    private SelectItemsUtils() {}
+    private SelectItemsUtils() {
+    }
 
     /**
-     * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with
-     * the given string value.
+     * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with the given
+     * string value.
      *
      * @param context The involved faces context.
      * @param component the component with which {@link SelectItem}s should be associated that are used to search in.
@@ -51,7 +52,11 @@ public final class SelectItemsUtils {
         return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
     }
 
-    private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter<Object> converter) {
+    private static Object findValueByStringConversion(
+        FacesContext context, UIComponent component, Iterator<SelectItem> items, String value,
+        Converter<Object> converter
+    )
+    {
         while (items.hasNext()) {
             SelectItem item = items.next();
 
@@ -76,7 +81,11 @@ public final class SelectItemsUtils {
         return null;
     }
 
-    private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter<Object> converter) {
+    private static Object findValueByStringConversion(
+        FacesContext context, UIComponent component, SelectItem[] items, String value,
+        Converter<Object> converter
+    )
+    {
         return isEmpty(items) ? null : findValueByStringConversion(context, component, new ArrayIterator(items), value, converter);
     }
 
@@ -104,7 +113,8 @@ public final class SelectItemsUtils {
                 if (!isEmpty(subitems)) {
                     collect(new ArrayIterator(subitems), values);
                 }
-            } else if (!item.isNoSelectionOption()) {
+            }
+            else if (!item.isNoSelectionOption()) {
                 values.add(item.getValue());
             }
         }

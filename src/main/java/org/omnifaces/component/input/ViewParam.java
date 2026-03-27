@@ -33,53 +33,47 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>&lt;o:viewParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code> and
- * provides a stateless mode of operation and fixes the issue wherein null model values are converted to empty string
- * parameters in query string (e.g. when <code>includeViewParams=true</code>) and the (bean) validation never being
- * triggered when the parameter is completely absent in query string, causing e.g. <code>@NotNull</code> to fail.
+ * The <code>&lt;o:viewParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code> and provides a stateless mode of operation and
+ * fixes the issue wherein null model values are converted to empty string parameters in query string (e.g. when <code>includeViewParams=true</code>) and the
+ * (bean) validation never being triggered when the parameter is completely absent in query string, causing e.g. <code>@NotNull</code> to fail.
  *
  * <h2>Stateless mode to avoid unnecessary conversion, validation and model updating on postbacks</h2>
  * <p>
- * The standard {@link UIViewParameter} implementation calls the model setter again after postback. This is not always
- * desired when being bound to a view scoped bean and can lead to performance problems when combined with an expensive
- * converter. To solve this, this component by default stores the submitted value as a component property instead of in
- * the model (and thus in the view state in case the binding is to a view scoped bean).
+ * The standard {@link UIViewParameter} implementation calls the model setter again after postback. This is not always desired when being bound to a view scoped
+ * bean and can lead to performance problems when combined with an expensive converter. To solve this, this component by default stores the submitted value as a
+ * component property instead of in the model (and thus in the view state in case the binding is to a view scoped bean).
  * <p>
- * The standard {@link UIViewParameter} implementation calls the converter and validators again on postbacks. This is
- * not always desired when you have e.g. a <code>required="true"</code>, but the parameter is not retained on form
- * submit. You would need to retain it on every single command link/button by <code>&lt;f:param&gt;</code>. To solve
- * this, this component doesn't call the converter and validators again on postbacks.
+ * The standard {@link UIViewParameter} implementation calls the converter and validators again on postbacks. This is not always desired when you have e.g. a
+ * <code>required="true"</code>, but the parameter is not retained on form submit. You would need to retain it on every single command link/button by
+ * <code>&lt;f:param&gt;</code>. To solve this, this component doesn't call the converter and validators again on postbacks.
  *
  * <h2>Using name as default for label</h2>
  * <p>
- * The <code>&lt;o:viewParam&gt;</code> also provides a default for the <code>label</code> atrribute. When the
- * <code>label</code> attribute is omitted, the <code>name</code> attribute will be used as label.
+ * The <code>&lt;o:viewParam&gt;</code> also provides a default for the <code>label</code> atrribute. When the <code>label</code> attribute is omitted, the
+ * <code>name</code> attribute will be used as label.
  *
  * <h2>Avoid unnecessary empty parameter in query string</h2>
  * <p>
- * The standard {@link UIViewParameter} implementation calls the converter regardless of whether the evaluated model
- * value is <code>null</code> or not. As converters by specification return an empty string in case of <code>null</code>
- * value, this is being added to the query string as an empty parameter when e.g. <code>includeViewParams=true</code> is
- * used. This is not desired. The workaround was added in OmniFaces 1.8.
+ * The standard {@link UIViewParameter} implementation calls the converter regardless of whether the evaluated model value is <code>null</code> or not. As
+ * converters by specification return an empty string in case of <code>null</code> value, this is being added to the query string as an empty parameter when
+ * e.g. <code>includeViewParams=true</code> is used. This is not desired. The workaround was added in OmniFaces 1.8.
  *
  * <h2>Support bean validation and triggering validate events on null value</h2>
  * <p>
- * The standard {@link UIViewParameter} implementation uses in JSF 2.0-2.2 an internal "is required" check when the
- * submitted value is <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including
- * any bean validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is
- * not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
+ * The standard {@link UIViewParameter} implementation uses in JSF 2.0-2.2 an internal "is required" check when the submitted value is <code>null</code>, hereby
+ * completely bypassing the standard {@link UIInput} validation, including any bean validation annotations and even the {@link PreValidateEvent} and
+ * {@link PostValidateEvent} events. This is not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
  * <code>jakarta.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
  *
  * <h2>Default value when no parameter is set</h2>
  * <p>
- * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the <code>default</code>
- * attribute. When the parameter is not available, then the value specified in <code>default</code> attribute will be
- * set in the model instead. The support was added in OmniFaces 2.2.
+ * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the <code>default</code> attribute. When the parameter is not available,
+ * then the value specified in <code>default</code> attribute will be set in the model instead. The support was added in OmniFaces 2.2.
  *
  * <h2>Usage</h2>
  * <p>
- * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
- * <code>o:</code>.
+ * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.
+ * 
  * <pre>
  * &lt;o:viewParam name="foo" value="#{bean.foo}" /&gt;
  * </pre>
@@ -139,9 +133,9 @@ public class ViewParam extends UIViewParameter {
     }
 
     /**
-     * When there's a value expression and the evaluated model value is <code>null</code>, then just return
-     * <code>null</code> instead of delegating to default implementation which would return an empty string when a
-     * converter is attached.
+     * When there's a value expression and the evaluated model value is <code>null</code>, then just return <code>null</code> instead of delegating to default
+     * implementation which would return an empty string when a converter is attached.
+     * 
      * @since 1.8
      */
     @Override
@@ -169,6 +163,7 @@ public class ViewParam extends UIViewParameter {
 
     /**
      * Returns the default value in case the actual request parameter is <code>null</code> or empty.
+     * 
      * @return The default value in case the actual request parameter is <code>null</code> or empty.
      * @since 2.2
      */
@@ -178,6 +173,7 @@ public class ViewParam extends UIViewParameter {
 
     /**
      * Sets the default value in case the actual request parameter is <code>null</code> or empty.
+     * 
      * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
      * @since 2.2
      */

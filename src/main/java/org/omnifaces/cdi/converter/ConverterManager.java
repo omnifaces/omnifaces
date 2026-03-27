@@ -42,45 +42,39 @@ import org.omnifaces.application.OmniApplicationFactory;
 
 /**
  * <p>
- * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
- * It that only when the <code>managed=true</code> attribute is set. But this doesn't support setting custom attributes.
- * OmniFaces solves this by implicitly making all {@link FacesConverter} instances eligible for dependency injection
- * <strong>without any further modification</strong>. In order to utilize OmniFaces managed converter, simply remove the
- * Faces native <code>managed=true</code> attribute.
+ * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>. It that only when the
+ * <code>managed=true</code> attribute is set. But this doesn't support setting custom attributes. OmniFaces solves this by implicitly making all
+ * {@link FacesConverter} instances eligible for dependency injection <strong>without any further modification</strong>. In order to utilize OmniFaces managed
+ * converter, simply remove the Faces native <code>managed=true</code> attribute.
  * <p>
- * The {@link ConverterManager} provides access to all {@link FacesConverter} annotated {@link Converter} instances
- * which are made eligible for CDI.
+ * The {@link ConverterManager} provides access to all {@link FacesConverter} annotated {@link Converter} instances which are made eligible for CDI.
  *
  * <h2>bean-discovery-mode</h2>
  * <p>
- * Since CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an
- * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
- * {@link FacesConverter} annotated classes as well, you need to explicitly set <code>bean-discovery-mode="all"</code>
- * attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
- * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
- * <code>bean-discovery-mode="annotated"</code>, then you need to add {@link Dependent} annotation to the converter class.
+ * Since CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an explicit CDI managed bean scope annotation will be
+ * registered for dependency injection support. In order to cover {@link FacesConverter} annotated classes as well, you need to explicitly set
+ * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
+ * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
+ * you need to add {@link Dependent} annotation to the converter class.
  *
  * <h2>AmbiguousResolutionException</h2>
  * <p>
- * In case you have a {@link FacesConverter} annotated class extending another {@link FacesConverter} annotated class
- * which in turn extends a standard converter, then you may with <code>bean-discovery-mode="all"</code> face an
- * {@link AmbiguousResolutionException}. This can be solved by placing {@link Specializes} annotation on the subclass.
+ * In case you have a {@link FacesConverter} annotated class extending another {@link FacesConverter} annotated class which in turn extends a standard
+ * converter, then you may with <code>bean-discovery-mode="all"</code> face an {@link AmbiguousResolutionException}. This can be solved by placing
+ * {@link Specializes} annotation on the subclass.
  *
  * <h2>Converters with special Class constructor</h2>
  * <p>
- * By default, CDI only instantiates beans via the default constructor. In case a converter for a class is created,
- * and the returned converter does not have a default constructor, or has a single argument constructor that takes a
- * {@link Class} instance, then this converter will <strong>not</strong> be made eligible for CDI. This change was added
- * in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
+ * By default, CDI only instantiates beans via the default constructor. In case a converter for a class is created, and the returned converter does not have a
+ * default constructor, or has a single argument constructor that takes a {@link Class} instance, then this converter will <strong>not</strong> be made eligible
+ * for CDI. This change was added in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
  *
  * <h2>JSF 2.3 compatibility</h2>
  * <p>
- * JSF 2.3 introduced two new features for converters: parameterized converters and managed converters.
- * When the converter is parameterized as in <code>implements Converter&lt;T&gt;</code>, then you need to use
- * at least OmniFaces 3.1 wherein the incompatibility was fixed. When the converter is managed with the
- * <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, then the converter won't be
- * managed by OmniFaces and will continue to work fine for Faces. But the &lt;o:converter&gt; tag won't be able to
- * set attributes on it.
+ * JSF 2.3 introduced two new features for converters: parameterized converters and managed converters. When the converter is parameterized as in
+ * <code>implements Converter&lt;T&gt;</code>, then you need to use at least OmniFaces 3.1 wherein the incompatibility was fixed. When the converter is managed
+ * with the <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, then the converter won't be managed by OmniFaces and will continue
+ * to work fine for Faces. But the &lt;o:converter&gt; tag won't be able to set attributes on it.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -107,21 +101,19 @@ public class ConverterManager {
      */
     @PostConstruct
     public void init() {
-        dateTimeConverterDefaultTimeZone =
-            parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
-                ? TimeZone.getDefault()
-                : null;
+        dateTimeConverterDefaultTimeZone = parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
+            ? TimeZone.getDefault()
+            : null;
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the converter instance associated with the given converter ID,
-     * or <code>null</code> if there is none.
+     * Returns the converter instance associated with the given converter ID, or <code>null</code> if there is none.
+     * 
      * @param application The involved Faces application.
      * @param converterId The converter ID of the desired converter instance.
-     * @return the converter instance associated with the given converter ID,
-     * or <code>null</code> if there is none.
+     * @return the converter instance associated with the given converter ID, or <code>null</code> if there is none.
      */
     public Converter createConverter(Application application, String converterId) {
         var converter = application.createConverter(converterId);
@@ -148,12 +140,11 @@ public class ConverterManager {
     }
 
     /**
-     * Returns the converter instance associated with the given converter for-class,
-     * or <code>null</code> if there is none.
+     * Returns the converter instance associated with the given converter for-class, or <code>null</code> if there is none.
+     * 
      * @param application The involved Faces application.
      * @param converterForClass The converter for-class of the desired converter instance.
-     * @return the converter instance associated with the given converter for-class,
-     * or <code>null</code> if there is none.
+     * @return the converter instance associated with the given converter for-class, or <code>null</code> if there is none.
      */
     public Converter createConverter(Application application, Class<?> converterForClass) {
         var converter = application.createConverter(converterForClass);
@@ -216,22 +207,27 @@ public class ConverterManager {
             if (bean == null) {
                 // Else by fabricated annotation literal.
                 bean = (Bean<Converter>) resolveExact(manager, converterClass, new FacesConverter() {
+
                     @Override
                     public Class<? extends Annotation> annotationType() {
                         return FacesConverter.class;
                     }
+
                     @Override
                     public String value() {
                         return converterId;
                     }
+
                     @Override
                     public boolean managed() {
                         return false;
                     }
+
                     @Override
                     public Class forClass() {
                         return converterForClass;
                     }
+
                 });
             }
         }

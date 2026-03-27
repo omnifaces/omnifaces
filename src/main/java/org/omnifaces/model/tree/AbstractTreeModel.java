@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A base implementation of {@link TreeModel}. Implementors basically only need to implement {@link #createChildren()}
- * wherein a concrete instance of the desired underlying {@link Collection} is returned.
+ * A base implementation of {@link TreeModel}. Implementors basically only need to implement {@link #createChildren()} wherein a concrete instance of the
+ * desired underlying {@link Collection} is returned.
  *
  * @author Bauke Scholtz
  * @param <T> The type of the wrapped data of the tree node.
@@ -52,6 +52,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
     /**
      * Returns a concrete (and usually empty) {@link Collection} instance which should hold the tree's children.
+     * 
      * @return A concrete (and usually empty) {@link Collection} instance which should hold the tree's children.
      */
     protected abstract Collection<TreeModel<T>> createChildren();
@@ -167,8 +168,11 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
     @Override
     public List<TreeModel<T>> getChildren() {
         if (unmodifiableChildren.size() != getChildCount()) {
-            unmodifiableChildren = Collections.unmodifiableList(children instanceof List
-                ? (List<TreeModel<T>>) children : new ArrayList<>(children));
+            unmodifiableChildren = Collections.unmodifiableList(
+                children instanceof List
+                    ? (List<TreeModel<T>>) children
+                    : new ArrayList<>(children)
+            );
         }
 
         return unmodifiableChildren;

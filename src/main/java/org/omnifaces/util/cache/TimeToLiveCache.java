@@ -49,7 +49,8 @@ public abstract class TimeToLiveCache implements Cache {
         if (entry != null) {
             if (entry.isValid()) {
                 return entry.getValue();
-            } else {
+            }
+            else {
                 cacheStore.remove(key);
             }
         }
@@ -61,7 +62,8 @@ public abstract class TimeToLiveCache implements Cache {
     public void put(String key, String value) {
         if (defaultTimeToLive != null) {
             put(key, value, defaultTimeToLive);
-        } else {
+        }
+        else {
             put(key, value, -1);
         }
     }
@@ -76,9 +78,14 @@ public abstract class TimeToLiveCache implements Cache {
         var entry = cacheStore.get(key);
 
         if (entry == null || !entry.isValid()) {
-            cacheStore.put(key, new CacheEntry(value,
-                    timeToLiveToDate(timeToLive)));
-        } else {
+            cacheStore.put(
+                key, new CacheEntry(
+                    value,
+                    timeToLiveToDate(timeToLive)
+                )
+            );
+        }
+        else {
             entry.setValue(value);
             entry.setValidTill(timeToLiveToDate(timeToLive));
         }
@@ -104,7 +111,8 @@ public abstract class TimeToLiveCache implements Cache {
         if (entry != null) {
             if (entry.isValid()) {
                 return entry.getAttributes().get(name);
-            } else {
+            }
+            else {
                 cacheStore.remove(key);
             }
         }
@@ -129,7 +137,8 @@ public abstract class TimeToLiveCache implements Cache {
     private static Date timeToLiveToDate(int timeToLive) {
         if (timeToLive != -1) {
             return new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive));
-        } else {
+        }
+        else {
             return null;
         }
     }

@@ -25,10 +25,10 @@ import org.openqa.selenium.support.FindBy;
 
 public class VersionedResourceHandlerIT extends OmniFacesIT {
 
-    @FindBy(css="link[rel=stylesheet]")
+    @FindBy(css = "link[rel=stylesheet]")
     private WebElement someCss;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(VersionedResourceHandlerIT.class)
             .withWebXml(WebXml.withVersionedResourceHandler)

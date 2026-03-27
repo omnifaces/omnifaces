@@ -15,7 +15,7 @@ import { VIEW_STATE_PARAM } from "./OmniFaces";
 
 /**
  * Utility scripts.
- * 
+ *
  * @author Bauke Scholtz
  * @since 2.2
  */
@@ -75,11 +75,11 @@ export namespace Util {
         }
 
         if (window.myfaces) {
-             decorateFacesSubmit(window.myfaces.oam, "submitForm", listener); // Decorate MyFaces h:commandLink submit handler to invoke given listener first.
+            decorateFacesSubmit(window.myfaces.oam, "submitForm", listener); // Decorate MyFaces h:commandLink submit handler to invoke given listener first.
         }
 
         if (window.PrimeFaces) {
-             decorateFacesSubmit(window.PrimeFaces, "addSubmitParam", listener); // Decorate PrimeFaces p:commandLink ajax=false submit handler to invoke given listener first.
+            decorateFacesSubmit(window.PrimeFaces, "addSubmitParam", listener); // Decorate PrimeFaces p:commandLink ajax=false submit handler to invoke given listener first.
         }
     }
 

@@ -30,8 +30,8 @@ import org.omnifaces.filter.OnDemandResponseBufferFilter;
 /**
  * Optional initializer for the {@link Cache} used by the Omnifaces Cache component.
  * <p>
- * It takes a configuration from web.xml context parameters and used that to set a cache provider and/or configure the
- * caching provider. If no initialization is done defaults are used.
+ * It takes a configuration from web.xml context parameters and used that to set a cache provider and/or configure the caching provider. If no initialization is
+ * done defaults are used.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -72,7 +72,8 @@ public final class CacheInitializer {
         if (cacheProviderName != null) {
             cacheProvider = instance(cacheProviderName);
             CacheFactory.setCacheProvider(cacheProvider, context);
-        } else {
+        }
+        else {
             cacheProvider = CacheFactory.getDefaultCacheProvider();
         }
 

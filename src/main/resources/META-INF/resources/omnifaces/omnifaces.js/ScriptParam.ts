@@ -16,7 +16,7 @@ import { Util } from "./Util";
 
 /**
  * Script param handling.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.ScriptParam
  * @since 3.6
@@ -34,7 +34,7 @@ export namespace ScriptParam {
         if (!form) {
             return;
         }
-        
+
         const params: Record<string, string> = {};
 
         for (let clientId in scripts) {
@@ -56,7 +56,7 @@ export namespace ScriptParam {
 
         const clone: Record<any, any> = {};
 
-        for (let property in object) { 
+        for (let property in object) {
             object[property] instanceof Function || object[property] instanceof Object || (clone[property] = object[property]);
         }
 

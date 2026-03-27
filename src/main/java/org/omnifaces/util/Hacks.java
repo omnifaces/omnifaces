@@ -59,12 +59,11 @@ import jakarta.websocket.Session;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
- * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods here once we encounter non-DRY code in
+ * OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
- * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
- * accept the risk that the method signatures can be changed without notice. This utility class exists because OmniFaces
- * intends to be free of 3rd party dependencies.
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to accept the risk that the method signatures
+ * can be changed without notice. This utility class exists because OmniFaces intends to be free of 3rd party dependencies.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -76,17 +75,15 @@ public final class Hacks {
 
     private static final Logger logger = Logger.getLogger(Hacks.class.getName());
 
-    private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS =
-        toClassOrNull("org.primefaces.component.api.AjaxSource");
-    private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
-        toClassOrNull("org.primefaces.component.dialog.Dialog");
+    private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS = toClassOrNull("org.primefaces.component.api.AjaxSource");
+    private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS = toClassOrNull("org.primefaces.component.dialog.Dialog");
 
     private static final String MOJARRA_PACKAGE_PREFIX = "com.sun.faces.";
     private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
-    private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
-        unmodifiableSet(
-            "org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET", // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
-            "org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET"); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
+    private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS = unmodifiableSet(
+        "org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET", // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
+        "org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET"
+    ); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
     private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
     private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
     private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
@@ -99,17 +96,16 @@ public final class Hacks {
     private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
     private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
     private static final String MOJARRA_VIEW_MAP_ID = "com.sun.faces.application.view.viewMapId";
-    private static final Set<String> MYFACES_SERIALIZED_VIEWS =
-        unmodifiableSet(
-            "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW", // MyFaces 2.3.9
-            "org.apache.myfaces.application.viewstate.StateCacheServerSide.SERIALIZED_VIEW"); // MyFaces 2.3-next-M6
+    private static final Set<String> MYFACES_SERIALIZED_VIEWS = unmodifiableSet(
+        "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW", // MyFaces 2.3.9
+        "org.apache.myfaces.application.viewstate.StateCacheServerSide.SERIALIZED_VIEW"
+    ); // MyFaces 2.3-next-M6
     private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
     private static final String MOJARRA_CACHED_SERVLET_MAPPING_KEY = "com.sun.faces.INVOCATION_PATH";
     private static final String MYFACES_CACHED_SERVLET_MAPPING_KEY = "org.apache.myfaces.shared.application.DefaultViewHandlerSupport.CACHED_SERVLET_MAPPING";
 
-    private static final String ERROR_MAX_AGE =
-        "The '%s' init param must be a number. Encountered an invalid value of '%s'.";
+    private static final String ERROR_MAX_AGE = "The '%s' init param must be a number. Encountered an invalid value of '%s'.";
 
     // Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
@@ -127,6 +123,7 @@ public final class Hacks {
 
     /**
      * Returns true if Mojarra is used. That is, when the FacesContext instance is from the Mojarra specific package.
+     * 
      * @return Whether Mojarra is used.
      * @since 3.9
      */
@@ -147,6 +144,7 @@ public final class Hacks {
 
     /**
      * Returns true if MyFaces is used. That is, when the FacesContext instance is from the MyFaces specific package.
+     * 
      * @return Whether MyFaces is used.
      * @since 1.8
      */
@@ -169,6 +167,7 @@ public final class Hacks {
 
     /**
      * Returns the default resource maximum age in milliseconds.
+     * 
      * @return The default resource maximum age in milliseconds.
      */
     public static long getDefaultResourceMaxAge() {
@@ -202,6 +201,7 @@ public final class Hacks {
 
     /**
      * Remove the resource dependency processing related attributes from the given faces context.
+     * 
      * @param context The involved faces context.
      */
     public static void removeResourceDependencyState(FacesContext context) {
@@ -210,18 +210,19 @@ public final class Hacks {
 
         if (isRenderResponse(context) || isPrimeFacesAjaxRequest(context)) {
             // Mojarra 2.3+ resource dependency state is not properly cleared during render response, so it needs to be manually cleared.
-            // PrimeFaces core.js updateHead() function basically replaces the entire head instead of appending to it, so all state should be cleared nonetheless.
+            // PrimeFaces core.js updateHead() function basically replaces the entire head instead of appending to it, so all state should be cleared
+            // nonetheless.
             context.getAttributes().remove(ResourceHandler.RESOURCE_IDENTIFIER);
         }
 
         // PrimeFaces puts "namelibrary=true" for every rendered resource dependency.
         // NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
         context.getAttributes().values().removeAll(Collections.singleton(true));
-     }
+    }
 
     /**
-     * Set the unique ID of the component resource, taking into account MyFaces-specific way of generating a
-     * resource specific unique ID.
+     * Set the unique ID of the component resource, taking into account MyFaces-specific way of generating a resource specific unique ID.
+     * 
      * @param context The involved faces context.
      * @param resource The involved component resource.
      * @since 2.6.1
@@ -244,8 +245,9 @@ public final class Hacks {
     }
 
     /**
-     * Clear the cached faces servlet mapping as interpreted by either Mojarra or MyFaces.
-     * This is useful if you want to force the impl to recalculate the faces servlet mapping.
+     * Clear the cached faces servlet mapping as interpreted by either Mojarra or MyFaces. This is useful if you want to force the impl to recalculate the faces
+     * servlet mapping.
+     * 
      * @param context The involved faces context.
      * @since 3.10
      */
@@ -253,10 +255,11 @@ public final class Hacks {
         context.getAttributes().remove(isMyFacesUsed() ? MYFACES_CACHED_SERVLET_MAPPING_KEY : MOJARRA_CACHED_SERVLET_MAPPING_KEY);
     }
 
-    //  Faces state saving related ------------------------------------------------------------------------------------
+    // Faces state saving related ------------------------------------------------------------------------------------
 
     /**
      * Remove server side Faces view state (and view scoped beans) associated with current request.
+     * 
      * @param context The involved faces context.
      * @param manager The involved response state manager.
      * @param viewId The view ID of the involved view.
@@ -271,7 +274,8 @@ public final class Hacks {
                     return;
                 }
 
-                var viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst().orElse(null);
+                var viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst()
+                    .orElse(null);
 
                 if (viewCollection == null) {
                     return;
@@ -279,7 +283,10 @@ public final class Hacks {
 
                 var stateCache = invokeMethod(manager, "getStateCache", context);
                 var stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-                var key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, normalizeViewId(context, viewId), stateId);
+                var key = invokeMethod(
+                    invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context,
+                    normalizeViewId(context, viewId), stateId
+                );
 
                 List<Serializable> keys = accessField(viewCollection, "_keys");
                 Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
@@ -342,6 +349,7 @@ public final class Hacks {
 
     /**
      * Expose protected state helper into public.
+     * 
      * @param component The component to obtain state helper for.
      * @return The state helper of the given component.
      * @since 2.3
@@ -353,8 +361,8 @@ public final class Hacks {
     // Faces component related ----------------------------------------------------------------------------------------
 
     /**
-     * Returns f:metadata facet from UIViewRoot.
-     * MyFaces 3.x unexpectedly doesn't use {@link UIViewRoot#METADATA_FACET_NAME} anymore to identify the facet.
+     * Returns f:metadata facet from UIViewRoot. MyFaces 3.x unexpectedly doesn't use {@link UIViewRoot#METADATA_FACET_NAME} anymore to identify the facet.
+     * 
      * @param viewRoot The UIViewRoot to obtain f:metadata facet from.
      * @return f:metadata facet from UIViewRoot.
      * @since 4.0
@@ -373,6 +381,7 @@ public final class Hacks {
 
     /**
      * Finds the wrapped variable mapper of the given variable mapper.
+     * 
      * @param mapper The variable mapper to find wrapped variable mapper for.
      * @return The wrapped variable mapper of the given variable mapper.
      * @since 3.14.4
@@ -390,6 +399,7 @@ public final class Hacks {
 
     /**
      * Returns true if the current request is a PrimeFaces dynamic resource request.
+     * 
      * @param context The involved faces context.
      * @return Whether the current request is a PrimeFaces dynamic resource request.
      * @since 1.8
@@ -401,6 +411,7 @@ public final class Hacks {
 
     /**
      * Returns true if the current request is a PrimeFaces ajax request.
+     * 
      * @param context The involved faces context.
      * @return Whether the current request is a PrimeFaces ajax request.
      * @since 2.7.12
@@ -440,6 +451,7 @@ public final class Hacks {
 
     /**
      * Returns true if the given components are nested in (same) PrimeFaces dialog.
+     * 
      * @param components The components to be checked.
      * @return Whether the given components are nested in (same) PrimeFaces dialog.
      * @since 2.6
@@ -456,9 +468,9 @@ public final class Hacks {
     // Tomcat related -------------------------------------------------------------------------------------------------
 
     /**
-     * Returns true if the given WS session is from Tomcat and given illegal state exception is caused by a push bomb
-     * which Tomcat couldn't handle. See also https://bz.apache.org/bugzilla/show_bug.cgi?id=56026 and
-     * https://github.com/omnifaces/omnifaces/issues/234
+     * Returns true if the given WS session is from Tomcat and given illegal state exception is caused by a push bomb which Tomcat couldn't handle. See also
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=56026 and https://github.com/omnifaces/omnifaces/issues/234
+     * 
      * @param session The WS session.
      * @param illegalStateException The illegal state exception.
      * @return Whether it was Tomcat who couldn't handle the push bomb.

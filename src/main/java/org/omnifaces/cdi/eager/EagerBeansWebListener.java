@@ -25,9 +25,9 @@ import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * <p>
- * A web listener that instantiates eager session beans and request/view beans by request URI. This is auto-registered
- * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListenerIfNecessary(jakarta.servlet.ServletContext)}
- * when any eager session beans or request/view beans by request URI are available.
+ * A web listener that instantiates eager session beans and request/view beans by request URI. This is auto-registered by
+ * {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListenerIfNecessary(jakarta.servlet.ServletContext)} when any eager session beans or
+ * request/view beans by request URI are available.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -39,9 +39,8 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 
     private static final Logger logger = Logger.getLogger(EagerBeansWebListener.class.getName());
 
-    private static final String POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE =
-        "Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
-            + " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
+    private static final String POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE = "Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
+        + " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
 
     private static boolean sessionListenerDisabled;
     private static boolean requestListenerDisabled;

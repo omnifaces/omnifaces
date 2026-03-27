@@ -37,27 +37,24 @@ import org.omnifaces.cdi.Eager;
  * <p>
  * Producer for <code>#{startup}</code> and <code>#{now}</code>.
  * <p>
- * Since 4.0 it produces by default an instance of {@link Temporal} whereas it previously produced an instance of
- * {@link Date}.
+ * Since 4.0 it produces by default an instance of {@link Temporal} whereas it previously produced an instance of {@link Date}.
  * <p>
- * Historical note: since 1.0 these were registered as beans in faces-config.xml. Since 3.6 these were migrated to
- * CDI producers, because the CDI implementation being used may emit warnings on them not being proxyable.
+ * Historical note: since 1.0 these were registered as beans in faces-config.xml. Since 3.6 these were migrated to CDI producers, because the CDI implementation
+ * being used may emit warnings on them not being proxyable.
  *
  * <h2>Usage</h2>
  * <ul>
  * <li>You can reference the application startup time as {@link Temporal} via <code>#{startup}</code> in EL.</li>
  * <li>You can reference the current time as {@link Temporal} via <code>#{now}</code> in EL.</li>
- * <li>They have a {@link TemporalDate#getTime()} method which allows you to obtain the epoch time via
- * <code>#{startup.time}</code> and <code>#{now.time}</code> in EL.</li>
- * <li>They have a {@link TemporalDate#getInstant()} method which allows you to convert them to {@link Instant} at
- * {@link ZoneOffset#UTC} via <code>#{startup.instant}</code> and <code>#{now.instant}</code> in EL.</li>
- * <li>They have a {@link TemporalDate#getZonedDateTime()} method which allows you to convert them to
- * {@link ZonedDateTime} at {@link ZoneId#systemDefault()} via <code>#{startup.zonedDateTime}</code> and
- * <code>#{now.zonedDateTime}</code> in EL.</li>
- * <li>Since 4.7, they also have {@link TemporalDate#getLocalDateTime()}, {@link TemporalDate#getLocalDate()} and
- * {@link TemporalDate#getLocalTime()} methods which allows you to convert them to {@link LocalDateTime},
- * {@link LocalDate} and {@link LocalTime} via <code>#{startup.localDateTime}</code>, <code>#{now.localDateTime}</code>,
- * etc in EL.</li>
+ * <li>They have a {@link TemporalDate#getTime()} method which allows you to obtain the epoch time via <code>#{startup.time}</code> and <code>#{now.time}</code>
+ * in EL.</li>
+ * <li>They have a {@link TemporalDate#getInstant()} method which allows you to convert them to {@link Instant} at {@link ZoneOffset#UTC} via
+ * <code>#{startup.instant}</code> and <code>#{now.instant}</code> in EL.</li>
+ * <li>They have a {@link TemporalDate#getZonedDateTime()} method which allows you to convert them to {@link ZonedDateTime} at {@link ZoneId#systemDefault()}
+ * via <code>#{startup.zonedDateTime}</code> and <code>#{now.zonedDateTime}</code> in EL.</li>
+ * <li>Since 4.7, they also have {@link TemporalDate#getLocalDateTime()}, {@link TemporalDate#getLocalDate()} and {@link TemporalDate#getLocalTime()} methods
+ * which allows you to convert them to {@link LocalDateTime}, {@link LocalDate} and {@link LocalTime} via <code>#{startup.localDateTime}</code>,
+ * <code>#{now.localDateTime}</code>, etc in EL.</li>
  * <li>They are injectable in CDI beans via e.g. <code>&#64;Inject &#64;Named private Temporal startup;</code>.
  * </ul>
  *
@@ -69,26 +66,33 @@ public class DateProducer {
 
     /**
      * This makes an instance of {@link Temporal} as startup datetime available by <code>#{startup}</code>.
+     * 
      * @return Startup datetime.
      */
-    @Produces @Named @ApplicationScoped @Eager
+    @Produces
+    @Named
+    @ApplicationScoped
+    @Eager
     public TemporalDate getStartup() {
         return new TemporalDate();
     }
 
     /**
      * This makes an instance of {@link Temporal} as current datetime available by <code>#{now}</code>.
+     * 
      * @return Current datetime.
      */
-    @Produces @Named @RequestScoped
+    @Produces
+    @Named
+    @RequestScoped
     public TemporalDate getNow() {
         return new TemporalDate();
     }
 
     /**
-     * {@link ZonedDateTime} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL
-     * expressions relying on {@link Date#getTime()} such as <code>#{now.time}</code> so that they continue working
-     * after migration from {@link Date} to {@link Temporal} in OmniFaces 4.0.
+     * {@link ZonedDateTime} is a final class, hence this proxy for CDI. Plus, it also offers a fallback for existing EL expressions relying on
+     * {@link Date#getTime()} such as <code>#{now.time}</code> so that they continue working after migration from {@link Date} to {@link Temporal} in OmniFaces
+     * 4.0.
      *
      * @author Bauke Scholtz
      * @since 4.0
@@ -109,6 +113,7 @@ public class DateProducer {
 
         /**
          * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
+         * 
          * @param zonedDateTime ZonedDateTime to initialize with.
          * @throws NullPointerException when given ZonedDateTime is {@code null}.
          */
@@ -119,6 +124,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link ZonedDateTime}.
+         * 
          * @return This as {@link ZonedDateTime}.
          */
         public ZonedDateTime getZonedDateTime() {
@@ -127,6 +133,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalDateTime}.
+         * 
          * @return This as {@link LocalDateTime}.
          * @since 4.7
          */
@@ -136,6 +143,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalDate}.
+         * 
          * @return This as {@link LocalDateTime}.
          * @since 4.7
          */
@@ -145,6 +153,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalTime}.
+         * 
          * @return This as {@link LocalTime}.
          * @since 4.7
          */
@@ -154,6 +163,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link Instant} at {@link ZoneOffset#UTC}.
+         * 
          * @return This as {@link Instant} at {@link ZoneOffset#UTC}.
          */
         public Instant getInstant() {
@@ -161,8 +171,8 @@ public class DateProducer {
         }
 
         /**
-         * Has the same signature as {@link Date#getTime()}.
-         * This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
+         * Has the same signature as {@link Date#getTime()}. This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
+         * 
          * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this temporal date.
          */
         public long getTime() {
@@ -237,4 +247,5 @@ public class DateProducer {
         }
 
     }
+
 }

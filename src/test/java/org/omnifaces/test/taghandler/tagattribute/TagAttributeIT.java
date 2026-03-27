@@ -23,13 +23,13 @@ import org.openqa.selenium.support.FindBy;
 
 public class TagAttributeIT extends OmniFacesIT {
 
-    @FindBy(css="#first")
+    @FindBy(css = "#first")
     private WebElement first;
 
-    @FindBy(css="#second")
+    @FindBy(css = "#second")
     private WebElement second;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(TagAttributeIT.class)
             .withWebXml(WebXml.withTaglib)

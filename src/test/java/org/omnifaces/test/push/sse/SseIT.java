@@ -24,49 +24,51 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces needs to be upgraded to support PushContextProducer and SseChannelManager.ViewScope")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces needs to be upgraded to support PushContextProducer and SseChannelManager.ViewScope"
+)
 public class SseIT extends OmniFacesIT {
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="newtab")
+    @FindBy(id = "newtab")
     private WebElement newtab;
 
-    @FindBy(id="clientOpenedMessages")
+    @FindBy(id = "clientOpenedMessages")
     private WebElement clientOpenedMessages;
 
-    @FindBy(id="applicationScopedServerEventMessage")
+    @FindBy(id = "applicationScopedServerEventMessage")
     private WebElement applicationScopedServerEventMessage;
 
-    @FindBy(id="push:applicationScopedServerEvent")
+    @FindBy(id = "push:applicationScopedServerEvent")
     private WebElement pushApplicationScopedServerEvent;
 
-    @FindBy(id="sessionScopedUserTargetedMessage")
+    @FindBy(id = "sessionScopedUserTargetedMessage")
     private WebElement sessionScopedUserTargetedMessage;
 
-    @FindBy(id="push:sessionScopedUserTargeted")
+    @FindBy(id = "push:sessionScopedUserTargeted")
     private WebElement pushSessionScopedUserTargeted;
 
-    @FindBy(id="viewScopedAjaxAwareMessage")
+    @FindBy(id = "viewScopedAjaxAwareMessage")
     private WebElement viewScopedAjaxAwareMessage;
 
-    @FindBy(id="push:viewScopedAjaxAware")
+    @FindBy(id = "push:viewScopedAjaxAware")
     private WebElement pushViewScopedAjaxAware;
 
-    @FindBy(id="clientClosedMessages")
+    @FindBy(id = "clientClosedMessages")
     private WebElement clientClosedMessages;
 
-    @FindBy(id="closeAllSse")
+    @FindBy(id = "closeAllSse")
     private WebElement closeAllSse;
 
-    @FindBy(id="poll:pollOpenedChannels")
+    @FindBy(id = "poll:pollOpenedChannels")
     private WebElement pollOpenedChannels;
 
-    @FindBy(id="poll:pollClosedChannels")
+    @FindBy(id = "poll:pollClosedChannels")
     private WebElement pollClosedChannels;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(SseIT.class);
     }
@@ -85,7 +87,8 @@ public class SseIT extends OmniFacesIT {
 
         String firstTab = browser.getWindowHandle();
         openNewTab(newtab);
-        testOnopen(true); // NOTE: application scoped push is disabled in new tab because currently used Chrome browser limits concurrent HTTP 1.1 connections to 6 (so we cannot use 3 SSE channels in second tab and expect ajax to continue working).
+        testOnopen(true); // NOTE: application scoped push is disabled in new tab because currently used Chrome browser limits concurrent HTTP 1.1 connections
+                          // to 6 (so we cannot use 3 SSE channels in second tab and expect ajax to continue working).
 
         assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
         assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());

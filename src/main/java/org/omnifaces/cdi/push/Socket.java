@@ -48,18 +48,19 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * The <code>&lt;o:socket&gt;</code> is an {@link UIComponent} whith opens an one-way (server to client) web socket
- * based push connection in client side which can be reached from server side via {@link PushContext} interface injected
- * in any CDI/container managed artifact via <code>&#64;</code>{@link Push} annotation.
+ * The <code>&lt;o:socket&gt;</code> is an {@link UIComponent} whith opens an one-way (server to client) web socket based push connection in client side which
+ * can be reached from server side via {@link PushContext} interface injected in any CDI/container managed artifact via <code>&#64;</code>{@link Push}
+ * annotation.
  *
  *
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
- * Since OmniFaces 5.2, the web socket endpoint is automatically registered when <code>&#64;Inject &#64;Push PushContext</code>
- * is used anywhere in the application. No additional configuration is needed.
+ * Since OmniFaces 5.2, the web socket endpoint is automatically registered when <code>&#64;Inject &#64;Push PushContext</code> is used anywhere in the
+ * application. No additional configuration is needed.
  * <p>
- * Alternatively, if you want to explicitly enable the endpoint without using <code>&#64;Push</code> injection, you can
- * set the below boolean context parameter in <code>web.xml</code>:
+ * Alternatively, if you want to explicitly enable the endpoint without using <code>&#64;Push</code> injection, you can set the below boolean context parameter
+ * in <code>web.xml</code>:
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_ENABLED&lt;/param-name&gt;
@@ -70,15 +71,16 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
  * <p>
- * Declare <strong><code>&lt;o:socket&gt;</code></strong> tag in the Faces view with at least a
- * <strong><code>channel</code></strong> name and an <strong><code>onmessage</code></strong> JavaScript listener
- * function. The channel name may not be an EL expression and it may only contain alphanumeric characters, hyphens,
- * underscores and periods.
+ * Declare <strong><code>&lt;o:socket&gt;</code></strong> tag in the Faces view with at least a <strong><code>channel</code></strong> name and an
+ * <strong><code>onmessage</code></strong> JavaScript listener function. The channel name may not be an EL expression and it may only contain alphanumeric
+ * characters, hyphens, underscores and periods.
  * <p>
  * Here's an example which refers an existing JavaScript listener function (do not include the parentheses!).
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" onmessage="socketListener" /&gt;
  * </pre>
+ * 
  * <pre>
  * function socketListener(message, channel, event) {
  *     console.log(message);
@@ -86,6 +88,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Here's an example which declares an inline JavaScript listener function.
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" onmessage="function(message) { console.log(message); }" /&gt;
  * </pre>
@@ -93,35 +96,36 @@ import org.omnifaces.util.Json;
  * The <code>onmessage</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
  * <li><code>message</code>: the push message as JSON object.</li>
- * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener, or want to manually
- * control the close.</li>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener, or want to manually control the close.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent"><code>
  * MessageEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
- * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
- * use the optional <strong><code>port</code></strong> attribute to explicitly specify the port.
+ * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can use the optional
+ * <strong><code>port</code></strong> attribute to explicitly specify the port.
+ * 
  * <pre>
  * &lt;o:socket port="8000" ... /&gt;
  * </pre>
  * <p>
- * When successfully connected, the web socket is by default open as long as the document is open, and it will
- * auto-reconnect at increasing intervals when the connection is closed/aborted as result of e.g. a network error or
- * server restart. It will not auto-reconnect when the very first connection attempt already fails. The web socket will
- * be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc).
+ * When successfully connected, the web socket is by default open as long as the document is open, and it will auto-reconnect at increasing intervals when the
+ * connection is closed/aborted as result of e.g. a network error or server restart. It will not auto-reconnect when the very first connection attempt already
+ * fails. The web socket will be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc).
  * <p>
- * In order to successfully reconnect after a server restart, or when switching to a new server node, you need to ensure
- * that session persistence is enabled on the server.
+ * In order to successfully reconnect after a server restart, or when switching to a new server node, you need to ensure that session persistence is enabled on
+ * the server.
  *
  *
  * <h2 id="usage-server"><a href="#usage-server">Usage (server)</a></h2>
  * <p>
- * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}</strong>
- * annotation on the given channel name in any CDI/container managed artifact such as <code>@Named</code>,
- * <code>@WebServlet</code>, etc wherever you'd like to send a push message and then invoke
+ * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}</strong> annotation on the given channel name in
+ * any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc wherever you'd like to send a push message and then invoke
  * <strong>{@link PushContext#send(Object)}</strong> with any Java object representing the push message.
+ * 
  * <pre>
- * &#64;Inject &#64;Push
+ * 
+ * &#64;Inject
+ * &#64;Push
  * private PushContext someChannel;
  *
  * public void sendMessage(Object message) {
@@ -129,90 +133,88 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * By default the name of the channel is taken from the name of the variable into which injection takes place. The
- * channel name can be optionally specified via the <code>channel</code> attribute. The example below injects the push
- * context for channel name <code>foo</code> into a variable named <code>bar</code>.
+ * By default the name of the channel is taken from the name of the variable into which injection takes place. The channel name can be optionally specified via
+ * the <code>channel</code> attribute. The example below injects the push context for channel name <code>foo</code> into a variable named <code>bar</code>.
+ * 
  * <pre>
- * &#64;Inject &#64;Push(channel="foo")
+ * 
+ * &#64;Inject
+ * &#64;Push(channel = "foo")
  * private PushContext bar;
  * </pre>
  * <p>
- * The message object will be encoded as JSON and be delivered as <code>message</code> argument of the
- * <code>onmessage</code> JavaScript listener function associated with the <code>channel</code> name. It can be a
- * plain vanilla <code>String</code>, but it can also be a collection, map and even a javabean. For supported argument
- * types, see also {@link Json#encode(Object)}.
+ * The message object will be encoded as JSON and be delivered as <code>message</code> argument of the <code>onmessage</code> JavaScript listener function
+ * associated with the <code>channel</code> name. It can be a plain vanilla <code>String</code>, but it can also be a collection, map and even a javabean. For
+ * supported argument types, see also {@link Json#encode(Object)}.
  * <p>
- * Although web sockets support two-way communication, the <code>&lt;o:socket&gt;</code> push is designed for one-way
- * communication, from server to client. In case you intend to send some data from client to server, just continue
- * using Faces ajax the usual way, if necessary from JavaScript on with <code>&lt;h:commandScript&gt;</code> or perhaps
- * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the Faces view
- * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those
- * security constraints are not available during an incoming web socket message per se. See also a.o.
- * <a href="https://github.com/jakartaee/websocket/issues/238">WS spec issue 238</a>.
+ * Although web sockets support two-way communication, the <code>&lt;o:socket&gt;</code> push is designed for one-way communication, from server to client. In
+ * case you intend to send some data from client to server, just continue using Faces ajax the usual way, if necessary from JavaScript on with
+ * <code>&lt;h:commandScript&gt;</code> or perhaps <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the Faces
+ * view state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those security constraints are not available
+ * during an incoming web socket message per se. See also a.o. <a href="https://github.com/jakartaee/websocket/issues/238">WS spec issue 238</a>.
  *
  *
  * <h2 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h2>
  * <p>
- * By default the web socket is <code>application</code> scoped, i.e. any view/session throughout the web application
- * having the same web socket channel open will receive the same push message. The push message can be sent by all users
- * and the application itself. This is useful for application-wide feedback triggered by site itself such as real time
- * updates of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
+ * By default the web socket is <code>application</code> scoped, i.e. any view/session throughout the web application having the same web socket channel open
+ * will receive the same push message. The push message can be sent by all users and the application itself. This is useful for application-wide feedback
+ * triggered by site itself such as real time updates of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
  * <p>
- * The optional <strong><code>scope</code></strong> attribute can be set to <code>session</code> to restrict the push
- * messages to all views in the current user session only. The push message can only be sent by the user itself and not
- * by the application. This is useful for session-wide feedback triggered by user itself (e.g. as result of asynchronous
- * tasks triggered by user specific action).
+ * The optional <strong><code>scope</code></strong> attribute can be set to <code>session</code> to restrict the push messages to all views in the current user
+ * session only. The push message can only be sent by the user itself and not by the application. This is useful for session-wide feedback triggered by user
+ * itself (e.g. as result of asynchronous tasks triggered by user specific action).
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
- * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current
- * view only. The push message will not show up in other views in the same session even if it's the same URL. The push
- * message can only be sent by the user itself and not by the application. This is useful for view-wide feedback
- * triggered by user itself (e.g. progress bar tied to a user specific action on current view).
+ * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current view only. The push message will not show
+ * up in other views in the same session even if it's the same URL. The push message can only be sent by the user itself and not by the application. This is
+ * useful for view-wide feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
  * <p>
- * The <code>scope</code> attribute may not be an EL expression and allowed values are <code>application</code>,
- * <code>session</code> and <code>view</code>, case insensitive.
+ * The <code>scope</code> attribute may not be an EL expression and allowed values are <code>application</code>, <code>session</code> and <code>view</code>,
+ * case insensitive.
  * <p>
- * Additionally, the optional <strong><code>user</code></strong> attribute can be set to the unique identifier of the
- * logged-in user, usually the login name or the user ID. This way the push message can be targeted to a specific user
- * and can also be sent by other users and the application itself. The value of the <code>user</code> attribute must at
- * least implement {@link Serializable} and have a low memory footprint, so putting entire user entity is not
- * recommended.
+ * Additionally, the optional <strong><code>user</code></strong> attribute can be set to the unique identifier of the logged-in user, usually the login name or
+ * the user ID. This way the push message can be targeted to a specific user and can also be sent by other users and the application itself. The value of the
+ * <code>user</code> attribute must at least implement {@link Serializable} and have a low memory footprint, so putting entire user entity is not recommended.
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
  * <p>
- * Or when you have a custom user entity around in EL as <code>#{someLoggedInUser}</code> which has an <code>id</code>
- * property representing its identifier:
+ * Or when you have a custom user entity around in EL as <code>#{someLoggedInUser}</code> which has an <code>id</code> property representing its identifier:
+ * 
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
  * <p>
- * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and
- * cannot be set to <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should
- * only be used if the logged-in user represented by <code>user</code> has a shorter lifetime than the HTTP session
- * (e.g. when your application allows changing a logged-in user during same HTTP session without invaliding it &mdash;
- * which is in turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may
- * occur when user-targeted push message is sent. It may target previously logged-in user only. This can be solved by
- * setting the scope to <code>view</code>, but better is to fix the logout to invalidate the HTTP session altogether.
+ * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and cannot be set to
+ * <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should only be used if the logged-in user represented by
+ * <code>user</code> has a shorter lifetime than the HTTP session (e.g. when your application allows changing a logged-in user during same HTTP session without
+ * invaliding it &mdash; which is in turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may occur when
+ * user-targeted push message is sent. It may target previously logged-in user only. This can be solved by setting the scope to <code>view</code>, but better is
+ * to fix the logout to invalidate the HTTP session altogether.
  * <p>
- * When the <code>user</code> attribute is an EL expression and it changes during an ajax request, then the socket
- * user will be actually switched, even though you did not cover the <code>&lt;o:socket&gt;</code> component in any ajax
- * render/update. So make sure the value is tied to at least a view scoped property in case you intend to control it
- * during the view scope.
+ * When the <code>user</code> attribute is an EL expression and it changes during an ajax request, then the socket user will be actually switched, even though
+ * you did not cover the <code>&lt;o:socket&gt;</code> component in any ajax render/update. So make sure the value is tied to at least a view scoped property in
+ * case you intend to control it during the view scope.
  * <p>
  * In the server side, the push message can be targeted to the user specified in the <code>user</code> attribute via
- * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the
- * application itself. This is useful for user-specific feedback triggered by other users (e.g. chat, admin messages,
- * etc) or by application's background tasks (e.g. notifications, event listeners, etc).
+ * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the application itself. This is useful for
+ * user-specific feedback triggered by other users (e.g. chat, admin messages, etc) or by application's background tasks (e.g. notifications, event listeners,
+ * etc).
+ * 
  * <pre>
- * &#64;Inject &#64;Push
+ * 
+ * &#64;Inject
+ * &#64;Push
  * private PushContext someChannel;
  *
  * public void sendMessage(Object message, User recipientUser) {
@@ -221,9 +223,10 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Multiple users can be targeted by passing a {@link Collection} holding user identifiers to
- * <strong>{@link PushContext#send(Object, Collection)}</strong>.
+ * Multiple users can be targeted by passing a {@link Collection} holding user identifiers to <strong>{@link PushContext#send(Object, Collection)}</strong>.
+ * 
  * <pre>
+ * 
  * public void sendMessage(Object message, Group recipientGroup) {
  *     Collection&lt;Long&gt; recipientUserIds = recipientGroup.getUserIds();
  *     someChannel.send(message, recipientUserIds);
@@ -233,12 +236,12 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="channels"><a href="#channels">Channel design hints</a></h2>
  * <p>
- * You can declare multiple push channels on different scopes with or without user target throughout the application.
- * Be however aware that the same channel name can easily be reused across multiple views, even if it's view scoped.
- * It's more efficient if you use as few different channel names as possible and tie the channel name to a specific
- * push socket scope/user combination, not to a specific Faces view. In case you intend to have multiple view scoped
- * channels for different purposes, best is to use only one view scoped channel and have a global JavaScript listener
- * which can distinguish its task based on the delivered message. E.g. by sending the message in server as below:
+ * You can declare multiple push channels on different scopes with or without user target throughout the application. Be however aware that the same channel
+ * name can easily be reused across multiple views, even if it's view scoped. It's more efficient if you use as few different channel names as possible and tie
+ * the channel name to a specific push socket scope/user combination, not to a specific Faces view. In case you intend to have multiple view scoped channels for
+ * different purposes, best is to use only one view scoped channel and have a global JavaScript listener which can distinguish its task based on the delivered
+ * message. E.g. by sending the message in server as below:
+ * 
  * <pre>
  * Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
  * message.put("functionName", "someFunction");
@@ -247,6 +250,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Which is processed in the <code>onmessage</code> JavaScript listener function as below:
+ * 
  * <pre>
  * function someSocketListener(message) {
  *     window[message.functionName](message.functionData);
@@ -266,23 +270,23 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="connecting"><a href="#connecting">Conditionally connecting</a></h2>
  * <p>
- * You can use the optional <strong><code>connected</code></strong> attribute to control whether to auto-connect the web
- * socket or not.
+ * You can use the optional <strong><code>connected</code></strong> attribute to control whether to auto-connect the web socket or not.
+ * 
  * <pre>
  * &lt;o:socket ... connected="#{bean.pushable}" /&gt;
  * </pre>
  * <p>
- * It defaults to <code>true</code> and it's under the covers interpreted as a JavaScript instruction whether to open or
- * close the web socket push connection. If the value of the <code>connected</code> or <code>rendered</code> attribute
- * is an EL expression and it becomes <code>false</code> during an ajax request, then any opened push connection will
- * explicitly be closed during oncomplete of that ajax request, even though you did not cover the
- * <code>&lt;o:socket&gt;</code> component in ajax render/update. So make sure the value is tied to at least a view
- * scoped property in case you intend to control it during the view scope.
+ * It defaults to <code>true</code> and it's under the covers interpreted as a JavaScript instruction whether to open or close the web socket push connection.
+ * If the value of the <code>connected</code> or <code>rendered</code> attribute is an EL expression and it becomes <code>false</code> during an ajax request,
+ * then any opened push connection will explicitly be closed during oncomplete of that ajax request, even though you did not cover the
+ * <code>&lt;o:socket&gt;</code> component in ajax render/update. So make sure the value is tied to at least a view scoped property in case you intend to
+ * control it during the view scope.
  * <p>
- * You can also explicitly set it to <code>false</code> and manually open the push connection in client side by
- * invoking <strong><code>OmniFaces.Push.open(channel)</code></strong>, passing the channel name, for example in an
- * onclick listener function of a command button which initiates a long running asynchronous task in server side. This
- * is particularly useful on view scoped sockets which doesn't necessarily need to immediately open on page load.
+ * You can also explicitly set it to <code>false</code> and manually open the push connection in client side by invoking
+ * <strong><code>OmniFaces.Push.open(channel)</code></strong>, passing the channel name, for example in an onclick listener function of a command button which
+ * initiates a long running asynchronous task in server side. This is particularly useful on view scoped sockets which doesn't necessarily need to immediately
+ * open on page load.
+ * 
  * <pre>
  * &lt;h:commandButton ... onclick="OmniFaces.Push.open('foo')"&gt;
  *     &lt;f:ajax ... /&gt;
@@ -290,11 +294,11 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="foo" scope="view" ... connected="false" /&gt;
  * </pre>
  * <p>
- * In case you intend to have an one-time push and don't expect more messages, usually because you only wanted to
- * present the result of an one-time asynchronous action in a manually opened view scoped push socket as in above
- * example, you can optionally explicitly close the push connection from client side by invoking
- * <strong><code>OmniFaces.Push.close(channel)</code></strong>, passing the channel name. For example, in the
- * <code>onmessage</code> JavaScript listener function as below:
+ * In case you intend to have an one-time push and don't expect more messages, usually because you only wanted to present the result of an one-time asynchronous
+ * action in a manually opened view scoped push socket as in above example, you can optionally explicitly close the push connection from client side by invoking
+ * <strong><code>OmniFaces.Push.close(channel)</code></strong>, passing the channel name. For example, in the <code>onmessage</code> JavaScript listener
+ * function as below:
+ * 
  * <pre>
  * function someSocketListener(message, channel) {
  *     // ...
@@ -302,21 +306,21 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in
- * <code>connected</code> attribute, or the client side way of explicitly setting <code>connected="false"</code> and
- * manually invoking <code>OmniFaces.Push</code> functions. Mixing them ends up in undefined behavior because the
- * associated Faces view state in the server side can't be notified if a socket is manually opened in client side.
+ * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in <code>connected</code> attribute, or the client
+ * side way of explicitly setting <code>connected="false"</code> and manually invoking <code>OmniFaces.Push</code> functions. Mixing them ends up in undefined
+ * behavior because the associated Faces view state in the server side can't be notified if a socket is manually opened in client side.
  *
  *
  * <h2 id="events-client"><a href="#events-client">Events (client)</a></h2>
  * <p>
- * The optional <strong><code>onopen</code></strong> JavaScript listener function can be used to listen on open of a web
- * socket in client side. This will be invoked on the very first connection attempt, regardless of whether it will be
- * successful or not. This will not be invoked when the web socket auto-reconnects a broken connection after the first
- * successful connection.
+ * The optional <strong><code>onopen</code></strong> JavaScript listener function can be used to listen on open of a web socket in client side. This will be
+ * invoked on the very first connection attempt, regardless of whether it will be successful or not. This will not be invoked when the web socket
+ * auto-reconnects a broken connection after the first successful connection.
+ * 
  * <pre>
  * &lt;o:socket ... onopen="socketOpenListener" /&gt;
  * </pre>
+ * 
  * <pre>
  * function socketOpenListener(channel) {
  *     // ...
@@ -328,15 +332,15 @@ import org.omnifaces.util.Json;
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * </ul>
  * <p>
- * The optional <strong><code>onerror</code></strong> JavaScript listener function can be used to listen on a connection
- * error whereby the web socket will attempt to reconnect. This will be invoked when the web socket can make an
- * auto-reconnect attempt on a broken connection after the first successful connection. This will be <em>not</em>
- * invoked when the very first connection attempt fails, or the server has returned close reason code <code>1000</code>
- * (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect attempts has exceeded. Instead,
- * the <code>onclose</code> will be invoked.
+ * The optional <strong><code>onerror</code></strong> JavaScript listener function can be used to listen on a connection error whereby the web socket will
+ * attempt to reconnect. This will be invoked when the web socket can make an auto-reconnect attempt on a broken connection after the first successful
+ * connection. This will be <em>not</em> invoked when the very first connection attempt fails, or the server has returned close reason code <code>1000</code>
+ * (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect attempts has exceeded. Instead, the <code>onclose</code> will be invoked.
+ * 
  * <pre>
  * &lt;o:socket ... onerror="socketErrorListener" /&gt;
  * </pre>
+ * 
  * <pre>
  * function socketErrorListener(code, channel, event) {
  *     if (code == 1001) {
@@ -354,22 +358,22 @@ import org.omnifaces.util.Json;
  * <p>
  * The <code>onerror</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
- * <li><code>code</code>: the close reason code as integer. See also
- * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
- * {@link CloseCodes} API for an elaborate list of all close codes.</li>
+ * <li><code>code</code>: the close reason code as integer. See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section
+ * 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
- * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on (ab)normal
- * close of a web socket. This will be invoked when the very first connection attempt fails, or the server has returned
- * close reason code <code>1000</code> (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect
- * attempts has exceeded. This will <em>not</em> be invoked when the web socket can make an auto-reconnect attempt on a
- * broken connection after the first successful connection. Instead, the <code>onerror</code> will be invoked.
+ * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on (ab)normal close of a web socket. This will be
+ * invoked when the very first connection attempt fails, or the server has returned close reason code <code>1000</code> (normal closure) or <code>1008</code>
+ * (policy violated), or the maximum reconnect attempts has exceeded. This will <em>not</em> be invoked when the web socket can make an auto-reconnect attempt
+ * on a broken connection after the first successful connection. Instead, the <code>onerror</code> will be invoked.
+ * 
  * <pre>
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
+ * 
  * <pre>
  * function socketCloseListener(code, channel, event) {
  *     if (code == -1) {
@@ -384,36 +388,32 @@ import org.omnifaces.util.Json;
  * <p>
  * The <code>onclose</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
- * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket
- * is simply not <a href="https://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>,
- * then it was normally closed due to an expired session or view. Else if this is not <code>1000</code>, then there may
- * be an error. See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a>
- * and {@link CloseCodes} API for an elaborate list of all close codes.</li>
+ * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket is simply not
+ * <a href="https://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>, then it was normally closed due to an expired session or
+ * view. Else if this is not <code>1000</code>, then there may be an error. See also <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1">RFC
+ * 6455 section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
- * When a session or view scoped socket is automatically closed with close reason code <code>1000</code> by the server
- * (and thus not manually by the client via <code>OmniFaces.Push.close(channel)</code>), then it means that the session
- * or view has expired. In case of a session scoped socket you could take the opportunity to let JavaScript show a
- * "Session expired" message and/or immediately redirect to the login page via <code>window.location</code>. In case of
- * a view scoped socket the handling depends on the reason of the view expiration. A view can be expired when the
- * associated session has expired, but it can also be expired as result of (accidental) navigation or rebuild, or when
- * the Faces "views per session" configuration setting is set relatively low and the client has many views (windows/tabs)
- * open in the same session. You might take the opportunity to warn the client and/or let JavaScript reload the page as
- * submitting any form in it would throw <code>ViewExpiredException</code> anyway.
+ * When a session or view scoped socket is automatically closed with close reason code <code>1000</code> by the server (and thus not manually by the client via
+ * <code>OmniFaces.Push.close(channel)</code>), then it means that the session or view has expired. In case of a session scoped socket you could take the
+ * opportunity to let JavaScript show a "Session expired" message and/or immediately redirect to the login page via <code>window.location</code>. In case of a
+ * view scoped socket the handling depends on the reason of the view expiration. A view can be expired when the associated session has expired, but it can also
+ * be expired as result of (accidental) navigation or rebuild, or when the Faces "views per session" configuration setting is set relatively low and the client
+ * has many views (windows/tabs) open in the same session. You might take the opportunity to warn the client and/or let JavaScript reload the page as submitting
+ * any form in it would throw <code>ViewExpiredException</code> anyway.
  *
  *
  * <h2 id="events-server"><a href="#events-server">Events (server)</a></h2>
  * <p>
- * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
- * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When the <code>user</code> attribute of the
- * <code>&lt;o:socket&gt;</code> changes, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
- * <strong><code>&#64;</code>{@link Switched}</strong> qualifier. When a web socket has been closed, a new CDI
- * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
- * observed and collected in an application scoped CDI bean as below. Observing in a request/view/session scoped CDI
- * bean is not possible as there's no means of a HTTP request anywhere at that moment.
+ * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with <strong><code>&#64;</code>{@link Opened}</strong>
+ * qualifier. When the <code>user</code> attribute of the <code>&lt;o:socket&gt;</code> changes, a new CDI <strong>{@link SocketEvent}</strong> will be fired
+ * with <strong><code>&#64;</code>{@link Switched}</strong> qualifier. When a web socket has been closed, a new CDI {@link SocketEvent} will be fired with
+ * <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be observed and collected in an application scoped CDI bean as below. Observing in
+ * a request/view/session scoped CDI bean is not possible as there's no means of a HTTP request anywhere at that moment.
+ * 
  * <pre>
  * &#64;ApplicationScoped
  * public class SocketObserver {
@@ -442,19 +442,19 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * You could take the opportunity to send another push message to an application scoped socket, e.g. "User X has been
- * logged in" (or out) when a session scoped socket is opened (or closed).
+ * You could take the opportunity to send another push message to an application scoped socket, e.g. "User X has been logged in" (or out) when a session scoped
+ * socket is opened (or closed).
  *
  *
  * <h2 id="security"><a href="#security">Security considerations</a></h2>
  * <p>
- * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
- * want to add the URL of the push handshake request URL to the set of restricted URLs.
+ * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may want to add the URL of the push handshake
+ * request URL to the set of restricted URLs.
  * <p>
- * The push handshake request URL is composed of the URI prefix <strong><code>/omnifaces.socket/</code></strong>, followed
- * by channel name. So, in case of for example container managed security which has already restricted an example page
- * <code>/user/foo.xhtml</code> to logged-in users with the example role <code>USER</code> on the example URL pattern
- * <code>/user/*</code> in <code>web.xml</code> like below,
+ * The push handshake request URL is composed of the URI prefix <strong><code>/omnifaces.socket/</code></strong>, followed by channel name. So, in case of for
+ * example container managed security which has already restricted an example page <code>/user/foo.xhtml</code> to logged-in users with the example role
+ * <code>USER</code> on the example URL pattern <code>/user/*</code> in <code>web.xml</code> like below,
+ * 
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
@@ -467,8 +467,9 @@ import org.omnifaces.util.Json;
  * &lt;/security-constraint&gt;
  * </pre>
  * <p>
- * .. and the page <code>/user/foo.xhtml</code> in turn contains a <code>&lt;o:socket channel="foo"&gt;</code>, then you
- * need to add a restriction on push handshake request URL pattern of <code>/omnifaces.socket/foo</code> like below.
+ * .. and the page <code>/user/foo.xhtml</code> in turn contains a <code>&lt;o:socket channel="foo"&gt;</code>, then you need to add a restriction on push
+ * handshake request URL pattern of <code>/omnifaces.socket/foo</code> like below.
+ * 
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
@@ -482,22 +483,20 @@ import org.omnifaces.util.Json;
  * &lt;/security-constraint&gt;
  * </pre>
  * <p>
- * As extra security, particularly for those public channels which can't be restricted by security constraints, the
- * <code>&lt;o:socket&gt;</code> will register all so far declared channels in the current HTTP session, and any
- * incoming web socket open request will be checked whether they match the so far registered channels in the current
- * HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers or manually reconnected
- * after the session is expired), then the web socket will immediately be closed with close reason code
- * <code>1008</code> ({@link CloseCodes#VIOLATED_POLICY}). Also, when the HTTP session gets destroyed, all session and
- * view scoped channels which are still open will explicitly be closed from server side with close reason code
- * <code>1000</code> ({@link CloseCodes#NORMAL_CLOSURE}). Only application scoped sockets remain open and are still
- * reachable from server end even when the session or view associated with the page in client side is expired.
+ * As extra security, particularly for those public channels which can't be restricted by security constraints, the <code>&lt;o:socket&gt;</code> will register
+ * all so far declared channels in the current HTTP session, and any incoming web socket open request will be checked whether they match the so far registered
+ * channels in the current HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers or manually reconnected after the session
+ * is expired), then the web socket will immediately be closed with close reason code <code>1008</code> ({@link CloseCodes#VIOLATED_POLICY}). Also, when the
+ * HTTP session gets destroyed, all session and view scoped channels which are still open will explicitly be closed from server side with close reason code
+ * <code>1000</code> ({@link CloseCodes#NORMAL_CLOSURE}). Only application scoped sockets remain open and are still reachable from server end even when the
+ * session or view associated with the page in client side is expired.
  *
  *
  * <h2 id="business-service"><a href="#business-service">Business service design hints</a></h2>
  * <p>
- * In case you'd like to trigger a push from business service side to an application scoped push socket, then you could make use
- * of CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code>
- * below taking whatever you'd like to pass as push message.
+ * In case you'd like to trigger a push from business service side to an application scoped push socket, then you could make use of CDI events. First create a
+ * custom bean class representing the push event something like <code>PushEvent</code> below taking whatever you'd like to pass as push message.
+ * 
  * <pre>
  * public final class PushEvent {
  *
@@ -510,11 +509,14 @@ import org.omnifaces.util.Json;
  *     public String getMessage() {
  *         return message;
  *     }
+ * 
  * }
  * </pre>
  * <p>
  * Then use {@link jakarta.enterprise.inject.spi.BeanManager#getEvent()} to fire the CDI event.
+ * 
  * <pre>
+ * 
  * &#64;Inject
  * private BeanManager beanManager;
  *
@@ -523,14 +525,16 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Note that OmniFaces own {@link Beans#fireEvent(Object, java.lang.annotation.Annotation...)} utility method is
- * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like Faces and OmniFaces in business
- * service (back end) side.
+ * Note that OmniFaces own {@link Beans#fireEvent(Object, java.lang.annotation.Annotation...)} utility method is insuitable as it is not allowed to use WAR
+ * (front end) frameworks and libraries like Faces and OmniFaces in business service (back end) side.
  * <p>
- * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and
- * delegate to {@link PushContext} as below.
+ * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and delegate to {@link PushContext} as
+ * below.
+ * 
  * <pre>
- * &#64;Inject &#64;Push
+ * 
+ * &#64;Inject
+ * &#64;Push
  * private PushContext someChannel;
  *
  * public void onPushEvent(@Observes PushEvent event) {
@@ -538,16 +542,16 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
- * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
- * would not work (as they require respectively the Faces view state and HTTP session which can only be identified by a
- * HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be
- * application scoped. The {@link FacesContext} will also be unavailable in the above event listener method.
+ * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that there's no means of a HTTP request anywhere
+ * at that moment. For exactly this reason a view and session scoped bean would not work (as they require respectively the Faces view state and HTTP session
+ * which can only be identified by a HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be application
+ * scoped. The {@link FacesContext} will also be unavailable in the above event listener method.
  * <p>
- * In case the trigger in business service side is an asynchronous service method which is in turn initiated in WAR side, then
- * you could make use of callbacks from WAR side. Let the business service method take a callback instance as argument,
- * e.g. the <code>java.util.function.Consumer</code> functional interface.
+ * In case the trigger in business service side is an asynchronous service method which is in turn initiated in WAR side, then you could make use of callbacks
+ * from WAR side. Let the business service method take a callback instance as argument, e.g. the <code>java.util.function.Consumer</code> functional interface.
+ * 
  * <pre>
+ * 
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
  *     // ... (some long process)
@@ -556,11 +560,14 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * And invoke the asynchronous service method in WAR as below.
+ * 
  * <pre>
+ * 
  * &#64;Inject
  * private SomeService someService;
  *
- * &#64;Inject &#64;Push
+ * &#64;Inject
+ * &#64;Push
  * private PushContext someChannel;
  *
  * public void someAction() {
@@ -568,19 +575,19 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push
- * socket, and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
- * (<code>final</code>) argument.
+ * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push socket, and/or want to pass something from
+ * {@link FacesContext} or the initial request/view/session scope along as (<code>final</code>) argument.
  *
  *
  * <h2 id="cluster"><a href="#cluster">Cluster design hints</a></h2>
  * <p>
- * In case your web application is deployed to a server cluster with multiple nodes, and the push event could be
- * triggered in a different node than where the client is connected to, then it won't reach the socket. One solution is
- * to activate and configure a JMS topic in the server configuration, trigger the push event via JMS instead of CDI,
- * and use a JMS listener (a message driven bean, MDB) to delegate the push event to CDI.</p>
+ * In case your web application is deployed to a server cluster with multiple nodes, and the push event could be triggered in a different node than where the
+ * client is connected to, then it won't reach the socket. One solution is to activate and configure a JMS topic in the server configuration, trigger the push
+ * event via JMS instead of CDI, and use a JMS listener (a message driven bean, MDB) to delegate the push event to CDI.
+ * </p>
  * <p>
  * Below is an example extending on the above given business service example.
+ * 
  * <pre>
  * &#64;ApplicationScoped
  * public class PushManager {
@@ -601,12 +608,16 @@ import org.omnifaces.util.Json;
  *             // Handle.
  *         }
  *     }
+ * 
  * }
  * </pre>
+ * 
  * <pre>
- * &#64;MessageDriven(activationConfig = {
- *     &#64;ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/topic/push")
- * })
+ * &#64;MessageDriven(
+ *     activationConfig = {
+ *         &#64;ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/topic/push")
+ *     }
+ * )
  * public class PushListener implements MessageListener {
  *
  *     &#64;Inject
@@ -622,11 +633,14 @@ import org.omnifaces.util.Json;
  *             // Handle.
  *         }
  *     }
+ * 
  * }
  * </pre>
  * <p>
  * Then, in your business service, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
+ * 
  * <pre>
+ * 
  * &#64;Inject
  * private BeanManager beanManager;
  *
@@ -635,9 +649,11 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * use the newly created <code>PushManager#fireEvent()</code> to fire the JMS event from one server node of the cluster,
- * which in turn will fire the CDI event in all server nodes of the cluster.
+ * use the newly created <code>PushManager#fireEvent()</code> to fire the JMS event from one server node of the cluster, which in turn will fire the CDI event
+ * in all server nodes of the cluster.
+ * 
  * <pre>
+ * 
  * &#64;Inject
  * private PushManager pushManager;
  *
@@ -649,8 +665,9 @@ import org.omnifaces.util.Json;
  *
  * <h2 id="ui"><a href="#ui">UI update design hints</a></h2>
  * <p>
- * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside
- * <code>&lt;o:socket&gt;</code>. The support was added in OmniFaces 2.6. Here's an example:
+ * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside <code>&lt;o:socket&gt;</code>. The support
+ * was added in OmniFaces 2.6. Here's an example:
+ * 
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -664,11 +681,13 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Here, the push message simply represents the ajax event name. You can use any custom event name.
+ * 
  * <pre>
  * someChannel.send("someEvent");
  * </pre>
  * <p>
  * An alternative is to combine <code>&lt;o:socket&gt;</code> with <code>&lt;h:commandScript&gt;</code>. E.g.
+ * 
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -680,8 +699,8 @@ import org.omnifaces.util.Json;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
- * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
+ * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will transparently be available as request
+ * parameters in the command script method <code>#{bean.pushed}</code>.
  *
  *
  * @author Bauke Scholtz
@@ -697,8 +716,8 @@ import org.omnifaces.util.Json;
  * @since 2.3
  */
 @FacesComponent(value = Socket.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
-@ListenerFor(systemEventClass=PostAddToViewEvent.class)
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Socket.ts.
+@ListenerFor(systemEventClass = PostAddToViewEvent.class)
+@ResourceDependency(library = OMNIFACES_LIBRARY_NAME, name = OMNIFACES_SCRIPT_NAME, target = "head") // Specifically Socket.ts.
 public class Socket extends PushComponent {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -706,15 +725,16 @@ public class Socket extends PushComponent {
     /** The component type, which is {@value org.omnifaces.cdi.push.Socket#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.Socket";
 
-    /** The boolean context parameter name to explicitly register web socket endpoint during startup.
-     * Since 5.2, this is no longer necessary when <code>&#64;Inject &#64;Push PushContext</code> is used. */
+    /**
+     * The boolean context parameter name to explicitly register web socket endpoint during startup. Since 5.2, this is no longer necessary when
+     * <code>&#64;Inject &#64;Push PushContext</code> is used.
+     */
     public static final String PARAM_SOCKET_ENDPOINT_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ENABLED";
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_ENDPOINT_NOT_ENABLED =
-        "o:socket endpoint is not enabled."
-            + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
+    private static final String ERROR_ENDPOINT_NOT_ENABLED = "o:socket endpoint is not enabled."
+        + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
     private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(false,'%s','%s',%s,%s,%s);});";
 
@@ -736,15 +756,13 @@ public class Socket extends PushComponent {
     }
 
     /**
-     * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
-     * valid, then register it in {@link SocketChannelManager} and get the channel ID, then render the
-     * <code>init()</code> script. This scripts will in turn hit {@link SocketEndpoint}.
+     * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is valid, then register it in
+     * {@link SocketChannelManager} and get the channel ID, then render the <code>init()</code> script. This scripts will in turn hit {@link SocketEndpoint}.
+     * 
      * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
-     * @throws IllegalArgumentException When the channel name, scope or user is invalid.
-     * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
-     * The allowed channel scope values are "application", "session" and "view", case insensitive.
-     * The channel name must be uniquely tied to the channel scope.
-     * The user, if any, must implement <code>Serializable</code>.
+     * @throws IllegalArgumentException When the channel name, scope or user is invalid. The channel name may only contain alphanumeric characters, hyphens,
+     * underscores and periods. The allowed channel scope values are "application", "session" and "view", case insensitive. The channel name must be uniquely
+     * tied to the channel scope. The user, if any, must implement <code>Serializable</code>.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
@@ -772,6 +790,7 @@ public class Socket extends PushComponent {
 
     /**
      * Returns the port number of the web socket host.
+     * 
      * @return The port number of the web socket host.
      */
     public Integer getPort() {
@@ -779,8 +798,9 @@ public class Socket extends PushComponent {
     }
 
     /**
-     * Sets the port number of the web socket host, in case it is different from the port number in the request URI.
-     * Defaults to the port number of the request URI.
+     * Sets the port number of the web socket host, in case it is different from the port number in the request URI. Defaults to the port number of the request
+     * URI.
+     * 
      * @param port The port number of the web socket host.
      */
     public void setPort(Integer port) {
@@ -789,6 +809,7 @@ public class Socket extends PushComponent {
 
     /**
      * Returns whether to (auto)connect the web socket or not.
+     * 
      * @return Whether to (auto)connect the web socket or not.
      */
     public boolean isConnected() {
@@ -796,11 +817,10 @@ public class Socket extends PushComponent {
     }
 
     /**
-     * Sets whether to (auto)connect the web socket or not. Defaults to <code>true</code>. It's interpreted as a
-     * JavaScript instruction whether to open or close the web socket push connection. Note that this attribute is
-     * re-evaluated on every ajax request. You can also explicitly set it to <code>false</code> and then manually
-     * control in JavaScript by <code>OmniFaces.Push.open("channelName")</code> and
-     * <code>OmniFaces.Push.close("channelName")</code>.
+     * Sets whether to (auto)connect the web socket or not. Defaults to <code>true</code>. It's interpreted as a JavaScript instruction whether to open or close
+     * the web socket push connection. Note that this attribute is re-evaluated on every ajax request. You can also explicitly set it to <code>false</code> and
+     * then manually control in JavaScript by <code>OmniFaces.Push.open("channelName")</code> and <code>OmniFaces.Push.close("channelName")</code>.
+     * 
      * @param connected Whether to (auto)connect the web socket or not.
      */
     public void setConnected(boolean connected) {
@@ -810,12 +830,16 @@ public class Socket extends PushComponent {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Register web socket endpoint if necessary, i.e. when it's enabled via context param or when
-     * <code>&#64;Inject &#64;Push PushContext</code> is detected, and not already installed.
+     * Register web socket endpoint if necessary, i.e. when it's enabled via context param or when <code>&#64;Inject &#64;Push PushContext</code> is detected,
+     * and not already installed.
+     * 
      * @param context The involved servlet context.
      */
     public static void registerEndpointIfNecessary(ServletContext context) {
-        if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED)) && !PushExtension.isSocketActivated()) {
+        if (
+            TRUE.equals(context.getAttribute(Socket.class.getName()))
+                || !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED)) && !PushExtension.isSocketActivated()
+        ) {
             return;
         }
 

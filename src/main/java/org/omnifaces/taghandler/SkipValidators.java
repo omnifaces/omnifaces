@@ -44,14 +44,14 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:skipValidators&gt;</code> taghandler allows the developer to entirely skip validation when
- * executing an {@link UICommand} or {@link ClientBehaviorHolder} action. This taghandler must be placed inside an
- * {@link UICommand} or {@link ClientBehaviorHolder} component (client behavior holder components are those components
- * supporting <code>&lt;f:ajax&gt;</code>).
+ * The <code>&lt;o:skipValidators&gt;</code> taghandler allows the developer to entirely skip validation when executing an {@link UICommand} or
+ * {@link ClientBehaviorHolder} action. This taghandler must be placed inside an {@link UICommand} or {@link ClientBehaviorHolder} component (client behavior
+ * holder components are those components supporting <code>&lt;f:ajax&gt;</code>).
  *
  * <h2>Usage</h2>
  * <p>
  * For example, when adding a new row to the data table, you'd like to not immediately validate all empty rows.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:dataTable value="#{bean.items}" var="item"&gt;
@@ -81,13 +81,13 @@ public class SkipValidators extends TagHandler {
     private static final String UIINPUT_REQUIRED_PROPERTY = "required";
     private static final String UIINPUT_DISABLED_PROPERTY = "disabled";
 
-    private static final String ERROR_INVALID_PARENT =
-        "Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
+    private static final String ERROR_INVALID_PARENT = "Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public SkipValidators(TagConfig config) {
@@ -97,10 +97,10 @@ public class SkipValidators extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and
-     * we're in the restore view phase of a postback, then delegate to {@link #processSkipValidators(UIComponent)}.
-     * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or
-     * {@link ClientBehaviorHolder}.
+     * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and we're in the restore view phase of a
+     * postback, then delegate to {@link #processSkipValidators(UIComponent)}.
+     * 
+     * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or {@link ClientBehaviorHolder}.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -120,9 +120,9 @@ public class SkipValidators extends TagHandler {
     }
 
     /**
-     * Check if the given component has been invoked during the current request and if so, then register the skip
-     * validators event listener which removes the validators during {@link PreValidateEvent} and restores them during
-     * {@link PostValidateEvent}.
+     * Check if the given component has been invoked during the current request and if so, then register the skip validators event listener which removes the
+     * validators during {@link PreValidateEvent} and restores them during {@link PostValidateEvent}.
+     * 
      * @param parent The parent component of this tag.
      */
     protected void processSkipValidators(UIComponent parent) {

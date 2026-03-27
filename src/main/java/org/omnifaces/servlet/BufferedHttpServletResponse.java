@@ -20,10 +20,9 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * This HTTP servlet response implementation buffers the entire response body. The buffered response body is available
- * as a byte array via the {@link #getBuffer()} method. Note that the buffered response writer will use same character
- * encoding as is been set on the response supplied to the constructor and that this way any
- * {@link ServletResponse#setCharacterEncoding(String)} calls on the included JSP/Servlet resource have thus no effect.
+ * This HTTP servlet response implementation buffers the entire response body. The buffered response body is available as a byte array via the
+ * {@link #getBuffer()} method. Note that the buffered response writer will use same character encoding as is been set on the response supplied to the
+ * constructor and that this way any {@link ServletResponse#setCharacterEncoding(String)} calls on the included JSP/Servlet resource have thus no effect.
  *
  * @author Bauke Scholtz
  * @since 1.1
@@ -38,6 +37,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 
     /**
      * Construct a buffered HTTP servlet response which wraps the given response.
+     * 
      * @param response The response to be wrapped.
      */
     public BufferedHttpServletResponse(HttpServletResponse response) {
@@ -54,6 +54,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 
     /**
      * Flushes and returns the buffered response.
+     * 
      * @return The buffered response.
      * @throws IOException When an I/O error occurs.
      */
@@ -63,8 +64,8 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
     }
 
     /**
-     * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by
-     * {@link #getCharacterEncoding()}.
+     * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by {@link #getCharacterEncoding()}.
+     * 
      * @return The buffered response as string.
      * @throws IOException When an I/O error occurs.
      */

@@ -22,7 +22,7 @@ import jakarta.inject.Named;
 
 import org.omnifaces.cdi.Eager;
 
-@Eager(viewId="/EagerIT.xhtml")
+@Eager(viewId = "/EagerIT.xhtml")
 @Named
 @ViewScoped
 public class EagerITEagerViewScopedBean implements Serializable {

@@ -39,14 +39,14 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the
- * given fully qualified name of a type in the Facelet scope using the usual EL functions syntax without the need to
- * register them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
- * <strong>non</strong>-<code>void</code> return type.
+ * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the given fully qualified name of a type in the
+ * Facelet scope using the usual EL functions syntax without the need to register them in <code>.taglib.xml</code> file. The functions are those
+ * <code>public static</code> methods with a <strong>non</strong>-<code>void</code> return type.
  *
  * <h2>Usage</h2>
  * <p>
  * For example:
+ * 
  * <pre>
  * &lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
  * ...
@@ -54,36 +54,31 @@ import org.omnifaces.vdl.FacesTagHandler;
  * #{m:max(bean.number1, bean.number2)}
  * </pre>
  * <p>
- * The functions prefix becomes by default the simple name of the type. You can override this by explicitly
- * specifying the <code>var</code> attribute.
+ * The functions prefix becomes by default the simple name of the type. You can override this by explicitly specifying the <code>var</code> attribute.
  * <p>
  * The resolved functions are by reference stored in the cache to improve retrieving performance.
  *
  * <h2>Precaution as to multiple functions with exactly the same method name</h2>
  * <p>
- * EL functions does <strong>not</strong> support method overloading. It's therefore <strong>not</strong> possible to
- * provide overloaded methods like {@link Math#abs(int)}, {@link Math#abs(long)}, {@link Math#abs(float)} and
- * {@link Math#abs(double)} in four separate EL functions.
+ * EL functions does <strong>not</strong> support method overloading. It's therefore <strong>not</strong> possible to provide overloaded methods like
+ * {@link Math#abs(int)}, {@link Math#abs(long)}, {@link Math#abs(float)} and {@link Math#abs(double)} in four separate EL functions.
  * <p>
- * If there are multiple function methods discovered with exactly the same name, then the one with the least amount of
- * parameters will be used. If there are multiple function methods with exactly the same name and amount of parameters,
- * then the choice is unspecified (technically, JVM-dependent, the first one in the methods array as found by reflection
- * would be picked up) and should not be relied upon. So if you absolutely need to differentiate functions in such case,
- * give them each a different name.
+ * If there are multiple function methods discovered with exactly the same name, then the one with the least amount of parameters will be used. If there are
+ * multiple function methods with exactly the same name and amount of parameters, then the choice is unspecified (technically, JVM-dependent, the first one in
+ * the methods array as found by reflection would be picked up) and should not be relied upon. So if you absolutely need to differentiate functions in such
+ * case, give them each a different name.
  * <p>
- * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used
- * to load the class specified in the <code>type</code> attribute. The class loader of the given object is resolved as
- * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific class when
- * there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+ * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used to load the class specified in the
+ * <code>type</code> attribute. The class loader of the given object is resolved as specified in {@link Utils#getClassLoader(Object)}. In the end this should
+ * allow you to use a more specific class when there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
  *
  * <h2>Design notes</h2>
  * <p>
- * Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
- * design not easily possible to change it to the period <code>.</code> operator. Also note that in case of
- * <code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is already available
- * through the implicit EL objects <code>#{faces}</code>, <code>#{facesContext}</code>, <code>#{view}</code>,
- * <code>#{request}</code>, etc such as <code>#{faces.development}</code> or <code>#{request.contextPath}</code> which
- * should be preferred over <code>#{Faces:isDevelopment()}</code> or <code>#{Faces:getRequestContextPath()}</code>.
+ * Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by design not easily possible to change it to the
+ * period <code>.</code> operator. Also note that in case of <code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is
+ * already available through the implicit EL objects <code>#{faces}</code>, <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc
+ * such as <code>#{faces.development}</code> or <code>#{request.contextPath}</code> which should be preferred over <code>#{Faces:isDevelopment()}</code> or
+ * <code>#{Faces:getRequestContextPath()}</code>.
  *
  * @author Bauke Scholtz
  * @since 1.4
@@ -107,13 +102,16 @@ public class ImportFunctions extends TagHandler {
     @FacesAttribute(name = "type", required = true, description = "The fully qualified name of the class to import the public static non-void methods for.")
     private final TagAttribute typeAttribute;
 
-    @FacesAttribute(name = "loader", description = "The object to be used as source of the class loader to load the class specified in the type attribute. Can be an instance of ClassLoader, Class or any object.")
+    @FacesAttribute(
+        name = "loader", description = "The object to be used as source of the class loader to load the class specified in the type attribute. Can be an instance of ClassLoader, Class or any object."
+    )
     private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ImportFunctions(TagConfig config) {
@@ -126,8 +124,8 @@ public class ImportFunctions extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Register a new {@link FunctionMapper} which checks if the given prefix matches our own <code>var</code> and then
-     * find the associated method based on the given method name.
+     * Register a new {@link FunctionMapper} which checks if the given prefix matches our own <code>var</code> and then find the associated method based on the
+     * given method name.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -142,16 +140,19 @@ public class ImportFunctions extends TagHandler {
 
     /**
      * Returns the class loader associated with the object specified in given tag attribute, if any.
+     * 
      * @param context The involved facelet context.
      * @param attribute The optional tag attribute to obtain the class loader from.
      * @return The class loader associated with the object specified in given tag attribute, if any.
      */
-    static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants and LoadBundle can also use it.
+    static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants and LoadBundle can also use
+                                                                                        // it.
         return Utils.getClassLoader(attribute == null ? null : attribute.getObject(context));
     }
 
     /**
      * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
+     * 
      * @param type The fully qualified name of the class.
      * @return The concrete {@link Class} instance.
      * @throws IllegalArgumentException When it is missing in the classpath.
@@ -220,8 +221,8 @@ public class ImportFunctions extends TagHandler {
         }
 
         /**
-         * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
-         * and return the first one.
+         * Collect all public static methods of the given name in the given class, sort them by the amount of parameters and return the first one.
+         * 
          * @param cls The class to find the method in.
          * @param name The method name.
          * @return The found method, or <code>null</code> if none is found.
@@ -239,8 +240,8 @@ public class ImportFunctions extends TagHandler {
         }
 
         /**
-         * Returns whether the given method is an utility method, that is when it is public and static and returns a
-         * non-void type.
+         * Returns whether the given method is an utility method, that is when it is public and static and returns a non-void type.
+         * 
          * @param method The method to be checked.
          * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
          */

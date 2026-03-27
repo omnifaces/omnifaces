@@ -26,9 +26,10 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>&lt;o:conditionalComment&gt;</code> component renders a conditional comment. Conditional
- * comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
- * the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:
+ * The <code>&lt;o:conditionalComment&gt;</code> component renders a conditional comment. Conditional comments are an IE specific feature which enables the
+ * developer to (out)comment blocks of HTML depending on whether the client is using IE and if so even which version. They are often seen in combination with
+ * CSS stylesheets like so:
+ * 
  * <pre>
  * &lt;!--[if lte IE 7]&gt;
  *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
@@ -36,28 +37,32 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * However, Facelets renders the comment's contents HTML-escaped which makes it unusable.
+ * 
  * <pre>
  * &lt;!--[if lte IE 7]&amp;gt;
  *     &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;
  * &amp;lt;![endif]--&gt;
  * </pre>
  * <p>
- * Also, if <code>jakarta.faces.FACELETS_SKIP_COMMENTS</code> context param is
- * set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
- * <code>&lt;h:outputText escape="false"&gt;</code>.
+ * Also, if <code>jakarta.faces.FACELETS_SKIP_COMMENTS</code> context param is set to <code>true</code> then it will even not be rendered at all. You would need
+ * to workaround this with an ugly <code>&lt;h:outputText escape="false"&gt;</code>.
+ * 
  * <pre>
  * &lt;h:outputText
  *     value="&amp;lt;!--[if lte IE 7]&amp;gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;&amp;lt;![endif]--&amp;gt;"
  *     escape="false" /&gt;
  * </pre>
- * <p>This component is designed to solve this problem.
+ * <p>
+ * This component is designed to solve this problem.
+ * 
  * <pre>
  * &lt;o:conditionalComment if="lte IE 7"&gt;
  *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
  * &lt;/o:conditionalComment&gt;
  * </pre>
- * <p>Note that you cannot use this with <code>&lt;h:outputStylesheet&gt;</code> as it would implicitly be relocated as
- * direct child of <code>&lt;h:head&gt;</code>.
+ * <p>
+ * Note that you cannot use this with <code>&lt;h:outputStylesheet&gt;</code> as it would implicitly be relocated as direct child of
+ * <code>&lt;h:head&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see OutputFamily
@@ -72,12 +77,17 @@ public class ConditionalComment extends OutputFamily {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_MISSING_IF =
-        "ConditionalComment attribute 'if' must be specified.";
+    private static final String ERROR_MISSING_IF = "ConditionalComment attribute 'if' must be specified.";
 
     private enum PropertyKeys {
+
         IF;
-        @Override public String toString() { return name().toLowerCase(); }
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -112,8 +122,8 @@ public class ConditionalComment extends OutputFamily {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the {@code if} condition of the conditional comment. This is exactly the value you would use in
-     * {@code <!--[if ...]>}.
+     * Returns the {@code if} condition of the conditional comment. This is exactly the value you would use in {@code <!--[if ...]>}.
+     * 
      * @return The {@code if} condition.
      */
     public String getIf() {
@@ -121,8 +131,8 @@ public class ConditionalComment extends OutputFamily {
     }
 
     /**
-     * Sets the {@code if} condition of the conditional comment. This is exactly the value you would use in
-     * {@code <!--[if ...]>}.
+     * Sets the {@code if} condition of the conditional comment. This is exactly the value you would use in {@code <!--[if ...]>}.
+     * 
      * @param condition The {@code if} condition.
      */
     @FacesAttribute(required = true)

@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public final class Concurrency {
 
     public static final int DEFAULT_ITERATIONS = 1000;
-    
+
     private Concurrency() {
         throw new AssertionError();
     }
@@ -48,11 +48,14 @@ public final class Concurrency {
         tasks.forEach(t -> {
             try {
                 t.get();
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            } catch (ExecutionException e) {
+            }
+            catch (ExecutionException e) {
                 throw new IllegalStateException(e);
             }
         });
     }
+
 }

@@ -32,13 +32,16 @@ public class SocketITBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject @Push
+    @Inject
+    @Push
     private PushContext applicationScopedServerEvent;
 
-    @Inject @Push
+    @Inject
+    @Push
     private PushContext sessionScopedUserTargeted;
 
-    @Inject @Push
+    @Inject
+    @Push
     private PushContext viewScopedAjaxAware;
 
     private String ajaxAwareMessage;

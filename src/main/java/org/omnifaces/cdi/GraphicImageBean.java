@@ -35,9 +35,9 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
 
 /**
  * <p>
- * Stereo type that designates a bean with one or more methods returning <code>byte[]</code> or <code>InputStream</code>
- * as a named application scoped bean specifically for serving graphic images via <code>&lt;o:graphicImage&gt;</code>
- * component or <code>#{o:graphicImageURL()}</code> EL functions.
+ * Stereo type that designates a bean with one or more methods returning <code>byte[]</code> or <code>InputStream</code> as a named application scoped bean
+ * specifically for serving graphic images via <code>&lt;o:graphicImage&gt;</code> component or <code>#{o:graphicImageURL()}</code> EL functions.
+ * 
  * <pre>
  * import org.omnifaces.cdi.GraphicImageBean;
  *
@@ -54,18 +54,16 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * }
  * </pre>
  * <p>
- * When using <code>@Named @ApplicationScoped</code> instead, serving graphic images via a Faces page will continue to
- * work, but when the server restarts, then hotlinking/bookmarking will stop working until the Faces page referencing the
- * same bean method is requested for the first time. This is caused by a security restriction which should prevent users
- * from invoking arbitrary bean methods by manipulating the URL. The <code>@GraphicImageBean</code> basically enables
- * endusers to invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just
- * a HTTP GET request.
+ * When using <code>@Named @ApplicationScoped</code> instead, serving graphic images via a Faces page will continue to work, but when the server restarts, then
+ * hotlinking/bookmarking will stop working until the Faces page referencing the same bean method is requested for the first time. This is caused by a security
+ * restriction which should prevent users from invoking arbitrary bean methods by manipulating the URL. The <code>@GraphicImageBean</code> basically enables
+ * endusers to invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just a HTTP GET request.
  *
  * <h2>Usage</h2>
  * <p>
- * You can use <code>#{o:graphicImageURL()}</code> EL functions to generate URLs referring the
- * <code>&#64;GraphicImageBean</code> bean, optionally with the image <code>type</code> and <code>lastModified</code>
- * arguments. Below are some usage examples:
+ * You can use <code>#{o:graphicImageURL()}</code> EL functions to generate URLs referring the <code>&#64;GraphicImageBean</code> bean, optionally with the
+ * image <code>type</code> and <code>lastModified</code> arguments. Below are some usage examples:
+ * 
  * <pre>
  * &lt;ui:repeat value="#{bean.products}" var="product"&gt;
  *
@@ -86,21 +84,18 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * &lt;/ui:repeat&gt;
  * </pre>
  * <p>
- * Note that in the <code>#{o:graphicImageURL()}</code> EL functions the expression string represents the same value as
- * you would use in <code>&lt;o:graphicImage&gt;</code> and that it must be a quoted string. Any nested quotes can be
- * escaped with backslash.
+ * Note that in the <code>#{o:graphicImageURL()}</code> EL functions the expression string represents the same value as you would use in
+ * <code>&lt;o:graphicImage&gt;</code> and that it must be a quoted string. Any nested quotes can be escaped with backslash.
  * <p>
- * The <code>type</code> argument/attribute is the image type represented as file extension. E.g. "webp", "jpg", "png", "gif",
- * "ico", "svg", "bmp", "tiff", etc. When unspecified then the content type will default to <code>"image"</code>
- * without any subtype. This should work for most images in most browsers. This may however fail on newer images or in
- * older browsers. In that case, you can explicitly specify the image type via the <code>type</code> argument/attribute
- * which must represent a valid file extension.
+ * The <code>type</code> argument/attribute is the image type represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+ * When unspecified then the content type will default to <code>"image"</code> without any subtype. This should work for most images in most browsers. This may
+ * however fail on newer images or in older browsers. In that case, you can explicitly specify the image type via the <code>type</code> argument/attribute which
+ * must represent a valid file extension.
  * <p>
- * The <code>lastModified</code> argument/attribute is the "last modified" timestamp, can be {@link Long} or
- * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}. When unspecified, then the "default
- * resource maximum age" as set in either the Mojarra specific context parameter
- * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter
- * <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be used, else a default of 1 week will be assumed.
+ * The <code>lastModified</code> argument/attribute is the "last modified" timestamp, can be {@link Long} or {@link Date}, or otherwise an attempt will be made
+ * to parse it as {@link Long}. When unspecified, then the "default resource maximum age" as set in either the Mojarra specific context parameter
+ * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be
+ * used, else a default of 1 week will be assumed.
  *
  * @since 2.5
  * @author Bauke Scholtz

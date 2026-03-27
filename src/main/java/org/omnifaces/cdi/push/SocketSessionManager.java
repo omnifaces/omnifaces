@@ -53,14 +53,12 @@ public class SocketSessionManager extends PushSessionManager<Session> {
     private static final CloseReason REASON_EXPIRED = new CloseReason(NORMAL_CLOSURE, "Expired");
     private static final long TOMCAT_WEB_SOCKET_RETRY_TIMEOUT = 10; // Milliseconds.
     private static final long TOMCAT_WEB_SOCKET_MAX_RETRIES = 100; // So, that's retrying for about 1 second.
-    private static final String WARNING_TOMCAT_WEB_SOCKET_BOMBED =
-        "Tomcat cannot handle concurrent push messages."
-            + " A push message has been sent only after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
-            + " Consider rate limiting sending push messages. For example, once every 500ms.";
-    private static final String ERROR_TOMCAT_WEB_SOCKET_BOMBED =
-        "Tomcat cannot handle concurrent push messages."
-            + " A push message could NOT be sent after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
-            + " Consider rate limiting sending push messages. For example, once every 500ms.";
+    private static final String WARNING_TOMCAT_WEB_SOCKET_BOMBED = "Tomcat cannot handle concurrent push messages."
+        + " A push message has been sent only after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
+        + " Consider rate limiting sending push messages. For example, once every 500ms.";
+    private static final String ERROR_TOMCAT_WEB_SOCKET_BOMBED = "Tomcat cannot handle concurrent push messages."
+        + " A push message could NOT be sent after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
+        + " Consider rate limiting sending push messages. For example, once every 500ms.";
 
     private static volatile SocketSessionManager instance;
 
@@ -72,9 +70,9 @@ public class SocketSessionManager extends PushSessionManager<Session> {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * On open, add given web socket session to the mapping associated with its channel identifier and returns
-     * <code>true</code> if it's accepted (i.e. the channel identifier is known) and the same session hasn't been added
-     * before, otherwise <code>false</code>.
+     * On open, add given web socket session to the mapping associated with its channel identifier and returns <code>true</code> if it's accepted (i.e. the
+     * channel identifier is known) and the same session hasn't been added before, otherwise <code>false</code>.
+     * 
      * @param session The opened web socket session.
      * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
      */
@@ -97,6 +95,7 @@ public class SocketSessionManager extends PushSessionManager<Session> {
 
     /**
      * On close, remove given web socket session from the mapping.
+     * 
      * @param session The closed web socket session.
      * @param reason The close reason.
      */
@@ -133,9 +132,9 @@ public class SocketSessionManager extends PushSessionManager<Session> {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
-     * Internal usage only. Awkward workaround for it being unavailable via {@code @Inject} in endpoint in Tomcat+Weld/OWB.
-     * The instance is refreshed on every successful CDI lookup so that hot-redeploys are picked up automatically.
-     * When CDI is unavailable (e.g. during {@code SocketEndpoint#onClose()} in WildFly), the last cached instance is returned.
+     * Internal usage only. Awkward workaround for it being unavailable via {@code @Inject} in endpoint in Tomcat+Weld/OWB. The instance is refreshed on every
+     * successful CDI lookup so that hot-redeploys are picked up automatically. When CDI is unavailable (e.g. during {@code SocketEndpoint#onClose()} in
+     * WildFly), the last cached instance is returned.
      */
     static SocketSessionManager getInstance() {
         try {

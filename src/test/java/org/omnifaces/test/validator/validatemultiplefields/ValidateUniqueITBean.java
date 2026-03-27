@@ -43,4 +43,5 @@ public class ValidateUniqueITBean {
     public void setInput2(String input2) {
         this.input2 = input2;
     }
+
 }

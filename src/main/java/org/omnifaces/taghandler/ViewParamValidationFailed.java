@@ -47,33 +47,30 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * <code>&lt;o:viewParamValidationFailed&gt;</code> allows the developer to handle a view parameter validation failure
- * with either a redirect or an HTTP error status, optionally with respectively a flash message or HTTP error message.
- * This tag can be placed inside <code>&lt;f:metadata&gt;</code> or <code>&lt;f|o:viewParam&gt;</code>. When placed in
- * <code>&lt;f|o:viewParam&gt;</code>, it will be applied when the particular view parameter has a validation
- * error as per {@link UIViewParameter#isValid()}. When placed in <code>&lt;f:metadata&gt;</code>, and no one view
- * parameter has already handled the validation error via its own <code>&lt;o:viewParamValidationFailed&gt;</code>,
- * it will be applied when there's a general validation error as per {@link FacesContext#isValidationFailed()}.
+ * <code>&lt;o:viewParamValidationFailed&gt;</code> allows the developer to handle a view parameter validation failure with either a redirect or an HTTP error
+ * status, optionally with respectively a flash message or HTTP error message. This tag can be placed inside <code>&lt;f:metadata&gt;</code> or
+ * <code>&lt;f|o:viewParam&gt;</code>. When placed in <code>&lt;f|o:viewParam&gt;</code>, it will be applied when the particular view parameter has a validation
+ * error as per {@link UIViewParameter#isValid()}. When placed in <code>&lt;f:metadata&gt;</code>, and no one view parameter has already handled the validation
+ * error via its own <code>&lt;o:viewParamValidationFailed&gt;</code>, it will be applied when there's a general validation error as per
+ * {@link FacesContext#isValidationFailed()}.
  * <p>
- * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, Object...)} is made
- * internally to send the redirect. So, the same rules as to scheme and leading slash apply here.
- * When the <code>sendError</code> attribute is set, a call to {@link Faces#responseSendError(int, String)} is made
- * internally to send the error. You can therefore customize HTTP error pages via <code>&lt;error-page&gt;</code>
- * entries in <code>web.xml</code>. Otherwise the server-default one will be displayed instead.
+ * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, Object...)} is made internally to send the redirect. So, the
+ * same rules as to scheme and leading slash apply here. When the <code>sendError</code> attribute is set, a call to
+ * {@link Faces#responseSendError(int, String)} is made internally to send the error. You can therefore customize HTTP error pages via
+ * <code>&lt;error-page&gt;</code> entries in <code>web.xml</code>. Otherwise the server-default one will be displayed instead.
  *
  * <h2>&lt;f:viewParam required="true"&gt; fail</h2>
  * <p>
- * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current
- * Mojarra and MyFaces releases (as of now, Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in
- * the query string, it is retrieved as <code>null</code>, which causes an internal <code>isRequired()</code> check to
- * be performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the
- * consequence that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which
- * the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
- * <code>&lt;o:viewParam&gt;</code>.
+ * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current Mojarra and MyFaces releases (as of now,
+ * Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in the query string, it is retrieved as <code>null</code>, which causes an internal
+ * <code>isRequired()</code> check to be performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the consequence
+ * that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which the <code>&lt;o:viewParamValidationFailed&gt;</code>
+ * is actually relying on. This is fixed in <code>&lt;o:viewParam&gt;</code>.
  *
  * <h2>Examples</h2>
  * <p>
  * In the example below the client will be presented an HTTP 400 error when at least one view param is absent.
+ * 
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true" /&gt;
@@ -82,10 +79,10 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/f:metadata&gt;
  * </pre>
  * <p>
- * In the example below the client will be redirected to "login.xhtml" when the "foo" parameter is absent, regardless of
- * the "bar" parameter. When the "foo" parameter is present, but the "bar" parameter is absent, nothing new will happen.
- * The process will proceed "as usual". I.e. the validation error will end up as a faces message in the current view the
- * usual way.
+ * In the example below the client will be redirected to "login.xhtml" when the "foo" parameter is absent, regardless of the "bar" parameter. When the "foo"
+ * parameter is present, but the "bar" parameter is absent, nothing new will happen. The process will proceed "as usual". I.e. the validation error will end up
+ * as a faces message in the current view the usual way.
+ * 
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -95,9 +92,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/f:metadata&gt;
  * </pre>
  * <p>
- * In the example below the client will be presented an HTTP 401 error when the "foo" parameter is absent, regardless of
- * the "bar" or "baz" parameters. When the "foo" parameter is present, but either the "bar" or "baz" parameter is
- * absent, the client will be redirected to "search.xhtml".
+ * In the example below the client will be presented an HTTP 401 error when the "foo" parameter is absent, regardless of the "bar" or "baz" parameters. When the
+ * "foo" parameter is present, but either the "bar" or "baz" parameter is absent, the client will be redirected to "search.xhtml".
+ * 
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -109,18 +106,19 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/f:metadata&gt;
  * </pre>
  * <p>
- * In a nutshell: when there are multiple <code>&lt;o:viewParamValidationFailed&gt;</code> tags, they will be
- * applied in the same order as they are declared in the view. So, with the example above, the one nested in
- * <code>&lt;f|o:viewParam&gt;</code> takes precedence over the one nested in <code>&lt;f:metadata&gt;</code>.
+ * In a nutshell: when there are multiple <code>&lt;o:viewParamValidationFailed&gt;</code> tags, they will be applied in the same order as they are declared in
+ * the view. So, with the example above, the one nested in <code>&lt;f|o:viewParam&gt;</code> takes precedence over the one nested in
+ * <code>&lt;f:metadata&gt;</code>.
  *
  * <h2>Messaging</h2>
  * <p>
- * By default, the first occurring faces message on the parent component will be copied, or when there is none then the
- * first occurring global faces message will be copied. When <code>sendRedirect</code> is used, it will be set
- * as a global flash error message. When <code>sendError</code> is used, it will be set as HTTP status message.
+ * By default, the first occurring faces message on the parent component will be copied, or when there is none then the first occurring global faces message
+ * will be copied. When <code>sendRedirect</code> is used, it will be set as a global flash error message. When <code>sendError</code> is used, it will be set
+ * as HTTP status message.
  * <p>
- * You can override this message by explicitly specifying the <code>message</code> attribute. This is applicable for
- * both <code>sendRedirect</code> and <code>sendError</code>.
+ * You can override this message by explicitly specifying the <code>message</code> attribute. This is applicable for both <code>sendRedirect</code> and
+ * <code>sendError</code>.
+ * 
  * <pre>
  * &lt;o:viewParamValidationFailed sendRedirect="search.xhtml" message="You need to perform a search." /&gt;
  * ...
@@ -129,19 +127,17 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * Note, although all of above examples use <code>required="true"</code>, this does not mean that you can only use
- * <code>&lt;o:viewParamValidationFailed&gt;</code> in combination with <code>required="true"</code> validation. You
- * can use it in combination with any kind of conversion/validation on <code>&lt;f|o:viewParam&gt;</code>, even bean
- * validation.
+ * <code>&lt;o:viewParamValidationFailed&gt;</code> in combination with <code>required="true"</code> validation. You can use it in combination with any kind of
+ * conversion/validation on <code>&lt;f|o:viewParam&gt;</code>, even bean validation.
  *
  * <h2>Design notes</h2>
  * <p>
- * You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
- * is not the documented approach and only the first one would be used.
+ * You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this is not the documented approach and only
+ * the first one would be used.
  * <p>
- * You can <strong>not</strong> change the HTTP status code of a redirect. This is not a Faces limitation, but an HTTP
- * limitation. The status code of a redirect will <strong>always</strong> end up as the one of the redirected response.
- * If you intend to "redirect" with a different HTTP status code, then you should be using <code>sendError</code>
- * instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.
+ * You can <strong>not</strong> change the HTTP status code of a redirect. This is not a Faces limitation, but an HTTP limitation. The status code of a redirect
+ * will <strong>always</strong> end up as the one of the redirected response. If you intend to "redirect" with a different HTTP status code, then you should be
+ * using <code>sendError</code> instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -153,33 +149,33 @@ public class ViewParamValidationFailed extends TagHandler {
 
     private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9][0-9][0-9]");
 
-    private static final String ERROR_INVALID_PARENT =
-        "%s This must be a child of UIViewRoot or UIViewParameter. Encountered parent of type '%s'."
-            + " You need to enclose it in f:metadata or f|o:viewParam.";
-    private static final String ERROR_MISSING_ATTRIBUTE =
-        "%s You need to specify either 'sendRedirect' or 'sendError' attribute.";
-    private static final String ERROR_DOUBLE_ATTRIBUTE =
-        "%s You cannot specify both 'sendRedirect' and 'sendError' attributes. You can specify only one of them.";
-    private static final String ERROR_REQUIRED_ATTRIBUTE =
-        "%s This attribute is required, it cannot be set to null.";
-    private static final String ERROR_INVALID_SENDERROR =
-        "%s This attribute must represent a 3-digit HTTP status code. Encountered an invalid value '%s'.";
+    private static final String ERROR_INVALID_PARENT = "%s This must be a child of UIViewRoot or UIViewParameter. Encountered parent of type '%s'."
+        + " You need to enclose it in f:metadata or f|o:viewParam.";
+    private static final String ERROR_MISSING_ATTRIBUTE = "%s You need to specify either 'sendRedirect' or 'sendError' attribute.";
+    private static final String ERROR_DOUBLE_ATTRIBUTE = "%s You cannot specify both 'sendRedirect' and 'sendError' attributes. You can specify only one of them.";
+    private static final String ERROR_REQUIRED_ATTRIBUTE = "%s This attribute is required, it cannot be set to null.";
+    private static final String ERROR_INVALID_SENDERROR = "%s This attribute must represent a 3-digit HTTP status code. Encountered an invalid value '%s'.";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
     @FacesAttribute(description = "The URL to send redirect to on validation failure. This attribute is required when the sendError attribute is absent.")
     private ValueExpression sendRedirect;
 
-    @FacesAttribute(description = "The HTTP status to send error with on validation failure. This attribute cannot be specified when the sendRedirect is already specified.")
+    @FacesAttribute(
+        description = "The HTTP status to send error with on validation failure. This attribute cannot be specified when the sendRedirect is already specified."
+    )
     private ValueExpression sendError;
 
-    @FacesAttribute(description = "The message to send along with the redirect or error. If this attribute is not specified, then by default the validation error message will be used.")
+    @FacesAttribute(
+        description = "The message to send along with the redirect or error. If this attribute is not specified, then by default the validation error message will be used."
+    )
     private ValueExpression message;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ViewParamValidationFailed(TagConfig config) {
@@ -189,15 +185,13 @@ public class ViewParamValidationFailed extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the
-     * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
-     * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
-     * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
-     * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or
-     * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
-     * registered on the same parent.
-     * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are
-     * missing or simultaneously specified.
+     * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the current request is <strong>not</strong> a
+     * postback, and <strong>not</strong> in render response, and all required attributes are set, then subscribe the parent component to the
+     * {@link PostValidateEvent}. This will invoke the {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
+     * 
+     * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or {@link UIViewParameter}, or when there's already
+     * another <code>&lt;o:viewParamValidationFailed&gt;</code> tag registered on the same parent.
+     * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are missing or simultaneously specified.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -226,19 +220,21 @@ public class ViewParamValidationFailed extends TagHandler {
     }
 
     /**
-     * If the current request is <strong>not</strong> a postback and the current response is <strong>not</strong>
-     * already completed, and validation on the parent component has failed (for {@link UIViewRoot} this is checked by
-     * {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is checked by
-     * {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
+     * If the current request is <strong>not</strong> a postback and the current response is <strong>not</strong> already completed, and validation on the
+     * parent component has failed (for {@link UIViewRoot} this is checked by {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is
+     * checked by {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
+     * 
      * @param event The component system event.
-     * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit
-     * HTTP status code.
+     * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit HTTP status code.
      */
     protected void processViewParamValidationFailed(ComponentSystemEvent event) {
         var context = getContext();
         var component = event.getComponent();
 
-        if ((component instanceof UIViewParameter viewParamter ? viewParamter.isValid() : !context.isValidationFailed()) || TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
+        if (
+            (component instanceof UIViewParameter viewParamter ? viewParamter.isValid() : !context.isValidationFailed())
+                || TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))
+        ) {
             return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
         }
 
@@ -289,7 +285,8 @@ public class ViewParamValidationFailed extends TagHandler {
 
             if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
                 throw new IllegalArgumentException(
-                    ERROR_INVALID_SENDERROR.formatted(sendError, evaluatedSendError));
+                    ERROR_INVALID_SENDERROR.formatted(sendError, evaluatedSendError)
+                );
             }
 
             responseSendError(context, Integer.parseInt(evaluatedSendError), evaluatedMessage);

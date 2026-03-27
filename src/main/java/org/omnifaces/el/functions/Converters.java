@@ -41,17 +41,16 @@ import org.omnifaces.vdl.FacesFunctions;
 /**
  * <p>
  * Collection of EL functions for data conversion: <code>o:iterableToList()</code> (with alternative <code>o:iterableToModel</code>),
- * <code>o:setToList()</code>, <code>o:mapToList()</code>, <code>o:joinArray()</code>, <code>o:joinCollection()</code>,
- * <code>o:joinMap()</code>, <code>o:splitArray()</code>, <code>o:splitList()</code>, and <code>o:toJson()</code>.
+ * <code>o:setToList()</code>, <code>o:mapToList()</code>, <code>o:joinArray()</code>, <code>o:joinCollection()</code>, <code>o:joinMap()</code>,
+ * <code>o:splitArray()</code>, <code>o:splitList()</code>, and <code>o:toJson()</code>.
  * <p>
- * The <code>o:joinXxx()</code> functions basically joins the elements of the array, collection or map to a string using the given separator.
- * This may be helpful if you want to display the contents of a collection as a commaseparated string without the need for an <code>&lt;ui:repeat&gt;</code>.
+ * The <code>o:joinXxx()</code> functions basically joins the elements of the array, collection or map to a string using the given separator. This may be
+ * helpful if you want to display the contents of a collection as a commaseparated string without the need for an <code>&lt;ui:repeat&gt;</code>.
  * <p>
- * The <code>o:splitXxx()</code> functions basically splits an array or list into an array of subarrays or list of sublists of the given fragment size.
- * This may be helpful if you want to create a two-dimensional matrix of a fixed width based on a single-dimensional array or list.
+ * The <code>o:splitXxx()</code> functions basically splits an array or list into an array of subarrays or list of sublists of the given fragment size. This may
+ * be helpful if you want to create a two-dimensional matrix of a fixed width based on a single-dimensional array or list.
  * <p>
- * The <code>o:toJson()</code> function encodes any object to a string in JSON format according the rules of
- * {@link Json#encode(Object)}.
+ * The <code>o:toJson()</code> function encodes any object to a string in JSON format according the rules of {@link Json#encode(Object)}.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -77,6 +76,7 @@ public final class Converters {
 
     /**
      * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>.
+     * 
      * @param <E> The generic set element type.
      * @param set The set to be converted to list of its entries.
      * @return The converted list.
@@ -90,8 +90,9 @@ public final class Converters {
     }
 
     /**
-     * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Each of the entries has the
-     * usual <code>getKey()</code> and <code>getValue()</code> methods.
+     * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Each of the entries has the usual <code>getKey()</code> and
+     * <code>getValue()</code> methods.
+     * 
      * @param <K> The generic map key type.
      * @param <V> The generic map value type.
      * @param map The map to be converted to list of its entries.
@@ -108,8 +109,7 @@ public final class Converters {
     /**
      * Converts a <code>Iterable&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>.
      * <p>
-     * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is
-     * an alternative to this.
+     * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is an alternative to this.
      *
      * @param <E> The generic iterable element type.
      * @param iterable The Iterable to be converted to a List.
@@ -128,11 +128,10 @@ public final class Converters {
     /**
      * Converts an <code>Iterable&lt;E&gt;</code> to a <code>DataModel&lt;E&gt;</code>.
      * <p>
-     * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is
-     * an alternative to this. Use this for more general cases or when the exact collection type is unknown.
+     * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is an alternative to this. Use this for
+     * more general cases or when the exact collection type is unknown.
      * <p>
-     * For those same components {@link Converters#iterableToList(Iterable)} is another alternative. Use this when
-     * a DataModel is specifically needed.
+     * For those same components {@link Converters#iterableToList(Iterable)} is another alternative. Use this when a DataModel is specifically needed.
      *
      * @param <E> The generic iterable element type.
      * @param iterable The Iterable to be converted to a DataModel.
@@ -150,6 +149,7 @@ public final class Converters {
 
     /**
      * Joins all elements of the given array to a single string, separated by the given separator.
+     * 
      * @param array The array to be joined.
      * @param separator The separator to be used. If null, then it defaults to empty string.
      * @return All elements of the given array as a single string, separated by the given separator.
@@ -180,6 +180,7 @@ public final class Converters {
 
     /**
      * Joins all elements of the given collection to a single string, separated by the given separator.
+     * 
      * @param <E> The generic collection element type.
      * @param collection The collection to be joined.
      * @param separator The separator to be used. If null, then it defaults to empty string.
@@ -206,8 +207,8 @@ public final class Converters {
     }
 
     /**
-     * Joins all elements of the given map to a single string, separated by the given key-value pair separator and
-     * entry separator.
+     * Joins all elements of the given map to a single string, separated by the given key-value pair separator and entry separator.
+     * 
      * @param <K> The generic map key type.
      * @param <V> The generic map value type.
      * @param map The map to be joined.
@@ -242,9 +243,9 @@ public final class Converters {
     }
 
     /**
-     * Splits the given array into an array of subarrays of the given fragment size. This is useful for creating nested
-     * <code>&lt;ui:repeat&gt;</code> structures, for example, when positioning a list of items into a grid based
-     * layout system such as Twitter Bootstrap.
+     * Splits the given array into an array of subarrays of the given fragment size. This is useful for creating nested <code>&lt;ui:repeat&gt;</code>
+     * structures, for example, when positioning a list of items into a grid based layout system such as Twitter Bootstrap.
+     * 
      * @param array The array to be split.
      * @param fragmentSize The size of each subarray.
      * @return A new array consisting of subarrays of the given array.
@@ -276,9 +277,9 @@ public final class Converters {
     }
 
     /**
-     * Splits the given list into a list of sublists of the given fragment size. This is useful for creating nested
-     * <code>&lt;ui:repeat&gt;</code> structures, for example, when positioning a list of items into a grid based
-     * layout system such as Twitter Bootstrap.
+     * Splits the given list into a list of sublists of the given fragment size. This is useful for creating nested <code>&lt;ui:repeat&gt;</code> structures,
+     * for example, when positioning a list of items into a grid based layout system such as Twitter Bootstrap.
+     * 
      * @param <E> The generic list element type.
      * @param list The list to be split.
      * @param fragmentSize The size of each sublist.
@@ -306,8 +307,8 @@ public final class Converters {
     }
 
     /**
-     * Encode given object as JSON.
-     * Currently, this delegates directly to {@link Json#encode(Object)}.
+     * Encode given object as JSON. Currently, this delegates directly to {@link Json#encode(Object)}.
+     * 
      * @param object Object to be encoded as JSON.
      * @return The encoded JSON string.
      * @see Json#encode(Object)
@@ -319,6 +320,7 @@ public final class Converters {
 
     /**
      * Print the stack trace of the given exception.
+     * 
      * @param exception The exception to print the stack trace for.
      * @return The printed stack trace.
      */
@@ -333,14 +335,13 @@ public final class Converters {
     }
 
     /**
-     * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the
-     * converter identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
-     * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+     * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter identified by the given converter
+     * ID, invoked with {@link FacesContext#getCurrentInstance()}, {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+     * 
      * @param converterId The converter ID of the desired converter instance.
      * @param object The object to be converted to {@link String} by the converter identified by given converter ID.
-     * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter
-     * identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
-     * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+     * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter identified by the given converter ID, invoked
+     * with {@link FacesContext#getCurrentInstance()}, {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
      * @since 3.10
      */
     public static String convert(String converterId, Object object) {

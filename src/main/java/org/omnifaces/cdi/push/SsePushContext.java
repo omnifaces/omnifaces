@@ -36,8 +36,8 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * This is a concrete SSE implementation of {@link PushContext} interface which is to be injected by
- * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>.
+ * This is a concrete SSE implementation of {@link PushContext} interface which is to be injected by <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or
+ * <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code>.
  *
  * @author Bauke Scholtz
  * @see Push
@@ -50,9 +50,8 @@ public class SsePushContext implements PushContext {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_INVALID_NOTIFICATION_MESSAGE =
-        "The message must be a Notification.Message instance when using @Push(type=NOTIFICATION)."
-            + " Use Notification.createNotificationMessage(title, body) to create one.";
+    private static final String ERROR_INVALID_NOTIFICATION_MESSAGE = "The message must be a Notification.Message instance when using @Push(type=NOTIFICATION)."
+        + " Use Notification.createNotificationMessage(title, body) to create one.";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -66,9 +65,8 @@ public class SsePushContext implements PushContext {
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Creates an SSE push context whereby the mutable map of session and view scope channel identifiers is referenced,
-     * so it's still available when another thread invokes {@link #send(Object)} during which the session and view
-     * scope is not necessarily active anymore.
+     * Creates an SSE push context whereby the mutable map of session and view scope channel identifiers is referenced, so it's still available when another
+     * thread invokes {@link #send(Object)} during which the session and view scope is not necessarily active anymore.
      */
     SsePushContext(String channel, boolean notification, SseChannelManager sseChannels, SseSessionManager sseSessions, SseUserManager sseUsers) {
         this.channel = channel;

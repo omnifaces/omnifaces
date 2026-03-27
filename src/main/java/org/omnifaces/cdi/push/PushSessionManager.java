@@ -27,8 +27,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * <p>
- * Base class for push session managers that hold transport-specific sessions by channel identifier.
- * The subclasses must be {@link ApplicationScoped}.
+ * Base class for push session managers that hold transport-specific sessions by channel identifier. The subclasses must be {@link ApplicationScoped}.
  *
  * @param <S> The transport session type.
  * @author Bauke Scholtz
@@ -45,6 +44,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Register given channel identifier.
+     * 
      * @param channelId The channel identifier to register.
      */
     protected void register(String channelId) {
@@ -53,6 +53,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Register given channel identifiers.
+     * 
      * @param channelIds The channel identifiers to register.
      */
     protected void register(Iterable<String> channelIds) {
@@ -61,11 +62,12 @@ abstract class PushSessionManager<S> {
 
     /**
      * Send the given message to all open sessions associated with given channel identifier.
+     * 
      * @param channelId The channel identifier.
      * @param message The push message string.
-     * @return The results of the send operation. If it returns an empty set, then there was no open session associated
-     * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
-     * message was successfully delivered and otherwise throw {@link ExecutionException}.
+     * @return The results of the send operation. If it returns an empty set, then there was no open session associated with given channel identifier. The
+     * returned futures will return <code>null</code> on {@link Future#get()} if the message was successfully delivered and otherwise throw
+     * {@link ExecutionException}.
      */
     protected Set<Future<Void>> send(String channelId, String message) {
         var channelSessions = channelId != null ? sessions.get(channelId) : null;
@@ -83,6 +85,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Deregister given channel identifiers and explicitly close all open sessions associated with them.
+     * 
      * @param channelIds The channel identifiers to deregister.
      */
     protected void deregister(Iterable<String> channelIds) {
@@ -99,6 +102,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Send the given message to the given session.
+     * 
      * @param session The transport session.
      * @param message The push message string.
      * @return The result of the send operation, or <code>null</code> if the session is no longer usable.
@@ -107,6 +111,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Returns whether the given session is still open.
+     * 
      * @param session The transport session.
      * @return <code>true</code> if the session is open.
      */
@@ -116,6 +121,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Close the given session.
+     * 
      * @param session The transport session to close.
      */
     protected abstract void closeSession(S session);
@@ -124,6 +130,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Returns whether the given channel identifier is registered.
+     * 
      * @param channelId The channel identifier.
      * @return <code>true</code> if the channel identifier is registered, otherwise <code>false</code>.
      */
@@ -133,10 +140,10 @@ abstract class PushSessionManager<S> {
 
     /**
      * Add a session to the collection associated with the given channel identifier.
+     * 
      * @param channelId The channel identifier.
      * @param session The transport session to add.
-     * @return <code>true</code> if the channel identifier is known and the session was added, otherwise
-     * <code>false</code>.
+     * @return <code>true</code> if the channel identifier is known and the session was added, otherwise <code>false</code>.
      */
     protected boolean addSession(String channelId, S session) {
         var channelSessions = sessions.get(channelId);
@@ -151,6 +158,7 @@ abstract class PushSessionManager<S> {
 
     /**
      * Remove a session from the collection associated with the given channel identifier.
+     * 
      * @param channelId The channel identifier.
      * @param session The transport session to remove.
      * @return <code>true</code> if the session was present and removed, otherwise <code>false</code>.

@@ -24,14 +24,15 @@ import org.omnifaces.util.Lazy;
 import org.omnifaces.util.Utils;
 
 /**
- * Automatically adds version parameter with query string name <code>v</code> to all resource URLs so that the browser
- * cache will be busted whenever the version parameter changes.
+ * Automatically adds version parameter with query string name <code>v</code> to all resource URLs so that the browser cache will be busted whenever the version
+ * parameter changes.
  * <p>
  * NOTE: if resource URL already has <code>v</code> query string parameter, or when it is URL-rewritten to not include
  * <code>{@value jakarta.faces.application.ResourceHandler#RESOURCE_IDENTIFIER}</code> path anymore, then these will be ignored.
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
+ * 
  * <pre>
  * {@code
  * <application>
@@ -41,6 +42,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * And the version parameter needs to be configured as follows in <code>web.xml</code>:
+ * 
  * <pre>
  * {@code
  * <context-param>
@@ -51,8 +53,8 @@ import org.omnifaces.util.Utils;
  * }
  * </pre>
  * <p>
- * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/ui/EnvironmentInfo.java"
- * target="_blank">Example Code (GitHub)</a>
+ * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/ui/EnvironmentInfo.java" target=
+ * "_blank">Example Code (GitHub)</a>
  *
  * @author Lenny Primak
  * @since 3.9
@@ -67,13 +69,16 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
     private final Lazy<String> versionString;
 
     /**
-     * Creates a new instance of this versioned resource handler which wraps the given resource handler.
-     * This will also initialize the version based on the context parameter.
+     * Creates a new instance of this versioned resource handler which wraps the given resource handler. This will also initialize the version based on the
+     * context parameter.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public VersionedResourceHandler(ResourceHandler wrapped) {
         super(wrapped);
-        versionString = new Lazy<>(() -> ofNullable(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))).map(String::valueOf).map(Utils::encodeURL).orElse(null));
+        versionString = new Lazy<>(
+            () -> ofNullable(evaluateExpressionGet(getInitParameter(PARAM_NAME_VERSION))).map(String::valueOf).map(Utils::encodeURL).orElse(null)
+        );
     }
 
     @Override

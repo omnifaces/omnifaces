@@ -23,25 +23,25 @@ import org.openqa.selenium.support.FindBy;
 
 public class ImportConstantsIT extends OmniFacesIT {
 
-    @FindBy(id="parent")
+    @FindBy(id = "parent")
     private WebElement parent;
 
-    @FindBy(id="child")
+    @FindBy(id = "child")
     private WebElement child;
 
-    @FindBy(id="interface")
+    @FindBy(id = "interface")
     private WebElement iface;
 
-    @FindBy(id="enumValues")
+    @FindBy(id = "enumValues")
     private WebElement enumValues;
 
-    @FindBy(id="enumInterfaceValues")
+    @FindBy(id = "enumInterfaceValues")
     private WebElement enumInterfaceValues;
 
-    @FindBy(id="enumInterfaceMembers")
+    @FindBy(id = "enumInterfaceMembers")
     private WebElement enumInterfaceMembers;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ImportConstantsIT.class)
             .createDeployment();

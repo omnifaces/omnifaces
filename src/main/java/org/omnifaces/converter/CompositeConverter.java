@@ -35,6 +35,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <h2>Usage</h2>
  * <p>
  * This converter is available by <code>&lt;o:compositeConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.value}"&gt;
  *     &lt;o:compositeConverter converterIds="trimConverter, sanitizeConverter, entityConverter" /&gt;
@@ -43,10 +44,12 @@ import org.omnifaces.vdl.FacesConverterTag;
  *
  * <h2>Execution Order</h2>
  * <p>
- * The converters are executed in the order they are defined in the <code>converterIds</code> attribute during the <strong>getAsObject</strong> and in reverse order during the <strong>getAsString</strong>.
+ * The converters are executed in the order they are defined in the <code>converterIds</code> attribute during the <strong>getAsObject</strong> and in reverse
+ * order during the <strong>getAsString</strong>.
  * <ul>
  * <li><strong>getAsObject</strong>: Executed 1st &rarr; 2nd &rarr; 3rd. The result of the first converter is passed as the input to the next converter.</li>
- * <li><strong>getAsString</strong>: Executed 3rd &rarr; 2nd &rarr; 1st. The result of the last converter is passed as the input to the previous converter to ensure symmetry.</li>
+ * <li><strong>getAsString</strong>: Executed 3rd &rarr; 2nd &rarr; 1st. The result of the last converter is passed as the input to the previous converter to
+ * ensure symmetry.</li>
  * </ul>
  *
  * @author Bauke Scholtz
@@ -106,10 +109,12 @@ public class CompositeConverter implements Converter<Object> {
 
     /**
      * Sets the comma-separated string of converter IDs.
+     * 
      * @param converterIds The comma-separated string of converter IDs.
      */
     @FacesAttribute(required = true)
     public void setConverterIds(String converterIds) {
         this.converterIds = converterIds;
     }
+
 }

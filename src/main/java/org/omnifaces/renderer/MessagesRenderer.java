@@ -38,14 +38,14 @@ import jakarta.faces.render.Renderer;
 import org.omnifaces.component.messages.OmniMessages;
 
 /**
- * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
- * including the fix of tooltip rendering as described in <a href="https://github.com/eclipse-ee4j/mojarra/issues/2164">
- * issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
+ * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2, including the fix of tooltip rendering as
+ * described in <a href="https://github.com/eclipse-ee4j/mojarra/issues/2164"> issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to
+ * take the new features into account.
  *
  * @author Bauke Scholtz
  * @since 1.5
  */
-@FacesRenderer(componentFamily=UIMessages.COMPONENT_FAMILY, rendererType=MessagesRenderer.RENDERER_TYPE)
+@FacesRenderer(componentFamily = UIMessages.COMPONENT_FAMILY, rendererType = MessagesRenderer.RENDERER_TYPE)
 public class MessagesRenderer extends Renderer<OmniMessages> {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -104,8 +104,9 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
     }
 
     /**
-     * Collect all messages associated with components identified by <code>for</code> attribute and return it. An empty
-     * list will be returned when there are no messages.
+     * Collect all messages associated with components identified by <code>for</code> attribute and return it. An empty list will be returned when there are no
+     * messages.
+     * 
      * @param context The involved faces context.
      * @param component The messages component.
      * @return All messages associated with components identified by <code>for</code> attribute.
@@ -138,9 +139,9 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
     }
 
     /**
-     * Encode the case when the <code>var</code> attribute is specified. This will render without any HTML markup and
-     * put the current message in the request scope as identified by the <code>var</code> attribute.
-     * Note: the iteration is by design completely stateless.
+     * Encode the case when the <code>var</code> attribute is specified. This will render without any HTML markup and put the current message in the request
+     * scope as identified by the <code>var</code> attribute. Note: the iteration is by design completely stateless.
+     * 
      * @param context The involved faces context.
      * @param component The messages component.
      * @param messages The queued faces messages.
@@ -180,6 +181,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode the case when there are no messages. This will render a div when the ID is specified.
+     * 
      * @param context The involved faces context.
      * @param component The messages component.
      * @throws IOException When an I/O error occurs.
@@ -198,15 +200,15 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode the case when the faces messages are to be rendered as either a HTML table or a HTML list.
+     * 
      * @param context The involved faces context.
      * @param component The messages component.
      * @param messages The queued faces messages.
      * @param table Whether to render the messages as a HTML table or a HTML list.
      * @throws IOException When an I/O error occurs.
      */
-    protected void encodeMessages
-        (FacesContext context, OmniMessages component, List<FacesMessage> messages, boolean table)
-            throws IOException
+    protected void encodeMessages(FacesContext context, OmniMessages component, List<FacesMessage> messages, boolean table)
+        throws IOException
     {
         var writer = context.getResponseWriter();
         writer.startElement(table ? LAYOUT_TABLE : "ul", component);
@@ -226,6 +228,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode a single faces message.
+     * 
      * @param context The involved faces context.
      * @param component The messages component.
      * @param message The queued faces message.

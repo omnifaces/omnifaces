@@ -34,21 +34,20 @@ import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>
- * The <code>&lt;o:enableRestorableView&gt;</code> taghandler instructs the view handler to recreate the entire view
- * whenever the view has been expired, i.e. whenever {@link ViewHandler#restoreView(FacesContext, String)} returns
- * <code>null</code> and the current request is a postback. This effectively prevents {@link ViewExpiredException} on
- * the view. This tag needs to be placed in <code>&lt;f:metadata&gt;</code> of the view.
+ * The <code>&lt;o:enableRestorableView&gt;</code> taghandler instructs the view handler to recreate the entire view whenever the view has been expired, i.e.
+ * whenever {@link ViewHandler#restoreView(FacesContext, String)} returns <code>null</code> and the current request is a postback. This effectively prevents
+ * {@link ViewExpiredException} on the view. This tag needs to be placed in <code>&lt;f:metadata&gt;</code> of the view.
  * <p>
- * There are however technical design limitations: the recreated view is <b>exactly</b> the same as during the initial
- * request. In other words, the view has lost its state. Any modifications which were made after the original initial
- * request, either by taghandlers or (ajax) conditionally rendered components based on some view or even session
- * scoped variables, are completely lost. Thus, the view should be designed that way that it can be used with a request
- * scoped bean. You <em>can</em> use it with a view scoped bean, but then you should add a <code>@PostConstruct</code>
- * which checks if the request is a postback and then fill the missing bean properties based on request parameters.
+ * There are however technical design limitations: the recreated view is <b>exactly</b> the same as during the initial request. In other words, the view has
+ * lost its state. Any modifications which were made after the original initial request, either by taghandlers or (ajax) conditionally rendered components based
+ * on some view or even session scoped variables, are completely lost. Thus, the view should be designed that way that it can be used with a request scoped
+ * bean. You <em>can</em> use it with a view scoped bean, but then you should add a <code>@PostConstruct</code> which checks if the request is a postback and
+ * then fill the missing bean properties based on request parameters.
  *
  * <h2>Usage</h2>
  * <p>
  * To enable the restorable view, just add the <code>&lt;enableRestorableView&gt;</code> to the view metadata.
+ * 
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:enableRestorableView/&gt;
@@ -57,19 +56,18 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  *
  * <h2>Mojarra's new stateless mode</h2>
  * <p>
- * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>,
- * it's possible to enable a stateless mode on the view by simply setting its <code>transient</code> attribute to
- * <code>true</code>:
+ * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>, it's possible to enable a stateless mode on
+ * the view by simply setting its <code>transient</code> attribute to <code>true</code>:
+ * 
  * <pre>
  * &lt;f:view transient="true"&gt;
  *     ...
  * &lt;/f:view&gt;
  * </pre>
  * <p>
- * This goes actually a step further than <code>&lt;o:enableRestorableView&gt;</code> as no state would be saved at all.
- * However, on those kind of pages where <code>&lt;o:enableRestorableView&gt;</code> would work just fine, this
- * statelessness should not form any problem at all. So, if you have at least Mojarra 2.1.19 at hands, use the
- * <code>transient="true"</code> instead.
+ * This goes actually a step further than <code>&lt;o:enableRestorableView&gt;</code> as no state would be saved at all. However, on those kind of pages where
+ * <code>&lt;o:enableRestorableView&gt;</code> would work just fine, this statelessness should not form any problem at all. So, if you have at least Mojarra
+ * 2.1.19 at hands, use the <code>transient="true"</code> instead.
  *
  * @author Bauke Scholtz
  * @since 1.3
@@ -80,14 +78,14 @@ public class EnableRestorableView extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ERROR_INVALID_PARENT =
-        "EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
-            + " It is recommended to enclose o:enableRestorableView in f:metadata.";
+    private static final String ERROR_INVALID_PARENT = "EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
+        + " It is recommended to enclose o:enableRestorableView in f:metadata.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public EnableRestorableView(TagConfig config) {
@@ -98,15 +96,16 @@ public class EnableRestorableView extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Enable the current view to be restorable. This basically sets a specific view attribute which the
-     * {@link OmniViewHandler} could intercept on.
+     * Enable the current view to be restorable. This basically sets a specific view attribute which the {@link OmniViewHandler} could intercept on.
+     * 
      * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
         if (!(parent instanceof UIViewRoot)) {
             throw new IllegalStateException(
-                ERROR_INVALID_PARENT.formatted(parent != null ? parent.getClass().getName() : null));
+                ERROR_INVALID_PARENT.formatted(parent != null ? parent.getClass().getName() : null)
+            );
         }
 
         if (!ComponentHandler.isNew(parent)) {
@@ -120,6 +119,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+     * 
      * @param context The involved faces context.
      * @param view The involved view.
      * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
@@ -132,6 +132,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * Returns true if given view indeed contains {@link EnableRestorableView}.
+     * 
      * @param view The involved view.
      * @return true if given view indeed contains {@link EnableRestorableView}.
      */

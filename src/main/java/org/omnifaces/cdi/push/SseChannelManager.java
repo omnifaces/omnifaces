@@ -32,8 +32,7 @@ import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This SSE channel manager holds all application and session scoped SSE channel identifiers registered by
- * <code>&lt;o:sse&gt;</code>.
+ * This SSE channel manager holds all application and session scoped SSE channel identifiers registered by <code>&lt;o:sse&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see Sse
@@ -46,9 +45,8 @@ public class SseChannelManager extends PushChannelManager {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_VIEW_SCOPE_UNAVAILABLE =
-        "o:sse view scope is unavailable."
-            + " Perhaps you need to explicitly register the SseChannelManager.ViewScope as a CDI managed bean?";
+    private static final String ERROR_VIEW_SCOPE_UNAVAILABLE = "o:sse view scope is unavailable."
+        + " Perhaps you need to explicitly register the SseChannelManager.ViewScope as a CDI managed bean?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -64,13 +62,12 @@ public class SseChannelManager extends PushChannelManager {
 
     /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
+     * 
      * @param channel The SSE channel.
-     * @param scope The SSE scope. Supported values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
-     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
-     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
+     * @param scope The SSE scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
+     * <code>null</code>, the default is <code>application</code>.
+     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
+     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      */
     protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
         if (oldUser != null) {
@@ -86,8 +83,8 @@ public class SseChannelManager extends PushChannelManager {
     }
 
     /**
-     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close
-     * any open SSE connections associated with it to avoid stale connections. If any, also deregister session users.
+     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close any open SSE connections associated with
+     * it to avoid stale connections. If any, also deregister session users.
      */
     @PreDestroy
     @Override
@@ -130,11 +127,10 @@ public class SseChannelManager extends PushChannelManager {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * This helps the SSE channel manager to hold view scoped SSE channel identifiers registered by
-     * <code>&lt;o:sse&gt;</code>.
+     * This helps the SSE channel manager to hold view scoped SSE channel identifiers registered by <code>&lt;o:sse&gt;</code>.
      * <p>
-     * Since this class is {@code public} it can be externally registered into environment-specific CDI bean
-     * management facility.
+     * Since this class is {@code public} it can be externally registered into environment-specific CDI bean management facility.
+     * 
      * @author Bauke Scholtz
      * @see SseChannelManager
      * @since 5.2
@@ -148,6 +144,7 @@ public class SseChannelManager extends PushChannelManager {
 
         /**
          * Returns the view scoped channels.
+         * 
          * @return The view scoped channels.
          */
         protected Map<String, String> getChannels() {
@@ -155,8 +152,8 @@ public class SseChannelManager extends PushChannelManager {
         }
 
         /**
-         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly
-         * complete any open SSE connections associated with it to avoid stale connections.
+         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly complete any open SSE connections associated
+         * with it to avoid stale connections.
          */
         @PreDestroy
         protected void deregisterViewScope() {
@@ -175,8 +172,7 @@ public class SseChannelManager extends PushChannelManager {
     }
 
     /**
-     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push
-     * send time in {@link SsePushContext}.
+     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push send time in {@link SsePushContext}.
      */
     static String getChannelId(String channel, Map<String, String> sessionScope, Map<String, String> viewScope) {
         return PushChannelManager.getChannelId(channel, APPLICATION_SCOPE, sessionScope, viewScope);

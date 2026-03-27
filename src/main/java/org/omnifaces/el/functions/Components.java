@@ -43,11 +43,11 @@ public final class Components {
     // Utility --------------------------------------------------------------------------------------------------------
 
     /**
-     * Evaluates an attribute of a component by first checking if there's a value expression associated with it, and only if there isn't one
-     * look at a component property with that name.
+     * Evaluates an attribute of a component by first checking if there's a value expression associated with it, and only if there isn't one look at a component
+     * property with that name.
      * <p>
-     * The regular attribute collection ({@link UIComponent#getAttributes()}) does exactly the reverse; it looks at a component property
-     * first, then at the attribute collection and only looks at a value binding as the last option.
+     * The regular attribute collection ({@link UIComponent#getAttributes()}) does exactly the reverse; it looks at a component property first, then at the
+     * attribute collection and only looks at a value binding as the last option.
      *
      * @param component The component for which the attribute is to be evaluated
      * @param name Name of attribute that is to be evaluated
@@ -61,7 +61,8 @@ public final class Components {
         var valueExpression = component.getValueExpression(name);
         if (valueExpression != null) {
             return valueExpression.getValue(getELContext());
-        } else {
+        }
+        else {
             return component.getAttributes().get(name);
         }
     }
@@ -71,13 +72,15 @@ public final class Components {
      * Returns <code>@GraphicImageBean</code> URL based on given expression string.
      * <p>
      * Usage example:
+     * 
      * <pre>
      * &lt;a href="#{o:graphicImageURL('images.full(product.imageId)')}"&gt;
      *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" /&gt;
      * &lt;/a&gt;
      * </pre>
-     * @param expression Expression string representing the same value as you would use in
-     * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
+     * 
+     * @param expression Expression string representing the same value as you would use in <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any
+     * nested quotes can be escaped with backslash.
      * @return <code>@GraphicImageBean</code> URL based on given expression string.
      * @since 2.5
      * @see GraphicImageBean
@@ -92,15 +95,17 @@ public final class Components {
      * Returns <code>@GraphicImageBean</code> URL based on given expression string and image type.
      * <p>
      * Usage example:
+     * 
      * <pre>
      * &lt;a href="#{o:graphicImageURLWithType('images.full(product.imageId)', 'png')}"&gt;
      *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" /&gt;
      * &lt;/a&gt;
      * </pre>
-     * @param expression Expression string representing the same value as you would use in
-     * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
-     * @param type The image type, represented as file extension.
-     * E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
+     * 
+     * @param expression Expression string representing the same value as you would use in <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any
+     * nested quotes can be escaped with backslash.
+     * @param type The image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be
+     * <code>null</code>.
      * @return <code>@GraphicImageBean</code> URL based on given expression string and image type.
      * @since 2.5
      * @see GraphicImageBean
@@ -115,17 +120,19 @@ public final class Components {
      * Returns <code>@GraphicImageBean</code> URL based on given expression string, image type and last modified.
      * <p>
      * Usage example:
+     * 
      * <pre>
      * &lt;a href="#{o:graphicImageURLWithTypeAndLastModified('images.full(product.imageId)', 'png', product.lastModified)}"&gt;
      *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" lastModified="#{product.lastModified}" /&gt;
      * &lt;/a&gt;
      * </pre>
-     * @param expression Expression string representing the same value as you would use in
-     * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
-     * @param type The image type, represented as file extension.
-     * E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
-     * @param lastModified The "last modified" timestamp, can be either a {@link Long}, {@link Date}, or {@link String}
-     * which is parseable as {@link Long}. This may be <code>null</code>.
+     * 
+     * @param expression Expression string representing the same value as you would use in <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any
+     * nested quotes can be escaped with backslash.
+     * @param type The image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be
+     * <code>null</code>.
+     * @param lastModified The "last modified" timestamp, can be either a {@link Long}, {@link Date}, or {@link String} which is parseable as {@link Long}. This
+     * may be <code>null</code>.
      * @return <code>@GraphicImageBean</code> URL based on given expression string, image type and last modified.
      * @since 2.5
      * @see GraphicImageBean

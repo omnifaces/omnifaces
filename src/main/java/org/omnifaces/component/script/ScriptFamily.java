@@ -103,10 +103,10 @@ public abstract class ScriptFamily extends UIComponentBase {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Move this ScriptFamily component to end of body and returns <code>true</code> if done so. This method
-     * needs to be called from {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or
-     * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
-     * component resource.
+     * Move this ScriptFamily component to end of body and returns <code>true</code> if done so. This method needs to be called from
+     * {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}. This has basically the same effect as
+     * setting <code>target="body"</code> on a component resource.
+     * 
      * @param event The involved event, which can be either {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}.
      * @return <code>true</code> if the move has taken place.
      */

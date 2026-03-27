@@ -25,17 +25,14 @@ import java.lang.reflect.Method;
  */
 public class CloneCopier implements Copier {
 
-    private static final String ERROR_MISSING_INTERFACE =
-        "Can not clone object of type %s because it doesn't implement Cloneable,"
-            + " you need to make sure that the class implements java.lang.Cloneable";
+    private static final String ERROR_MISSING_INTERFACE = "Can not clone object of type %s because it doesn't implement Cloneable,"
+        + " you need to make sure that the class implements java.lang.Cloneable";
 
-    private static final String ERROR_INACCESSIBLE_METHOD =
-        "Can not clone object of type %s because clone() method is not accessible,"
-            + " you need to make sure that the clone() method is overridden and that it is public instead of protected";
+    private static final String ERROR_INACCESSIBLE_METHOD = "Can not clone object of type %s because clone() method is not accessible,"
+        + " you need to make sure that the clone() method is overridden and that it is public instead of protected";
 
-    private static final String ERROR_UNINVOKABLE_METHOD =
-        "Can not clone object of type %s because clone() method is not invokable,"
-            + " you need to make sure that invoking the clone() method does not throw an exception";
+    private static final String ERROR_UNINVOKABLE_METHOD = "Can not clone object of type %s because clone() method is not invokable,"
+        + " you need to make sure that invoking the clone() method does not throw an exception";
 
     @Override
     public Object copy(Object object) {

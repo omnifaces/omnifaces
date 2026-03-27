@@ -25,8 +25,8 @@ import org.omnifaces.util.cache.CacheFactory;
 
 /**
  * <p>
- * This {@link Resource} implementation holds all the necessary information about combined resources in order to
- * properly serve combined resources on a single HTTP request.
+ * This {@link Resource} implementation holds all the necessary information about combined resources in order to properly serve combined resources on a single
+ * HTTP request.
  *
  * @author Bauke Scholtz
  * @author Stephan Rauh {@literal <www.beyondjava.net>}
@@ -48,6 +48,7 @@ public class CombinedResource extends DynamicResource {
     /**
      * Constructs a new combined resource based on the given resource name. This constructor is only used by
      * {@link CombinedResourceHandler#createResource(String, String)}.
+     * 
      * @param resourceName The resource name of the combined resource.
      * @param cacheTTL The combined resource content cache TTL.
      */

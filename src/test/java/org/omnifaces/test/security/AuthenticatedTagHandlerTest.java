@@ -95,4 +95,5 @@ class AuthenticatedTagHandlerTest extends BaseSecurityTagHandlerTest {
             verify(nextHandler, times(2)).apply(faceletContext, parent);
         });
     }
+
 }

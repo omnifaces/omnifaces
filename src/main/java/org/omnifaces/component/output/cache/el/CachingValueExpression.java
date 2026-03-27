@@ -24,8 +24,7 @@ import org.omnifaces.component.output.Cache;
 import org.omnifaces.el.ValueExpressionWrapper;
 
 /**
- * A value expression implementation that caches its main value at the moment it's evaluated and uses
- * this cache value in future evaluations.
+ * A value expression implementation that caches its main value at the moment it's evaluated and uses this cache value in future evaluations.
  *
  * @author Arjan Tijms
  *
@@ -39,6 +38,7 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 
     /**
      * Construct the caching value expression.
+     * 
      * @param name The cache name.
      * @param valueExpression The value expression to be wrapped.
      * @param cache The cache itself.

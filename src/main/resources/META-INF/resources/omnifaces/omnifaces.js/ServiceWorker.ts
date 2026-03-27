@@ -15,13 +15,13 @@ import { EVENT } from "./OmniFaces";
 
 /**
  * Service worker register.
- * 
+ *
  * @author Bauke Scholtz
  * @since 3.7
  * @see PWAResourceHandler
  */
 export namespace ServiceWorker {
-    
+
     // Public static functions ----------------------------------------------------------------------------------------
 
     /**

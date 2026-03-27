@@ -52,7 +52,10 @@ public class ExpressionInspectorITBean {
         var methodExpressionValueExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
         valueMethodReference = ExpressionInspector.getMethodReference(elContext, methodExpressionValueExpression);
 
-        var valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(methodExpressionValueExpression, MethodExpression.class);
+        var valueExpressionMethodExpression = getApplication().getExpressionFactory().createValueExpression(
+            methodExpressionValueExpression,
+            MethodExpression.class
+        );
         methodValueReference = ExpressionInspector.getValueReference(elContext, valueExpressionMethodExpression);
         methodMethodReference = ExpressionInspector.getMethodReference(elContext, valueExpressionMethodExpression);
     }
@@ -84,20 +87,25 @@ public class ExpressionInspectorITBean {
     @Named
     @RequestScoped
     public static class Foo {
+
         public void create(@SuppressWarnings("unused") Baz baz) {
             //
         }
+
     }
 
     @Named
     @RequestScoped
     public static class Bar {
+
         public Baz getSelected() {
             return new Baz();
         }
+
     }
 
     public static class Baz {
         //
     }
+
 }

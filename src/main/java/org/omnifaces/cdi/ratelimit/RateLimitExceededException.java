@@ -39,4 +39,5 @@ public class RateLimitExceededException extends RuntimeException {
     public long getRecommendedDelayInMillis() {
         return recommendedDelayInMillis;
     }
+
 }

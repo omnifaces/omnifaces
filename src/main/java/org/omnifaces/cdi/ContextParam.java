@@ -27,23 +27,27 @@ import org.omnifaces.cdi.contextparam.ContextParamProducer;
 
 /**
  * <p>
- * The CDI annotation <code>&#64;</code>{@link ContextParam} allows you to inject a <code>web.xml</code> context
- * parameter from the current application in a CDI managed bean. It's basically like
- * <code>&#64;ManagedProperty("#{initParam['some.key']}") private String someKey;</code>
- * in a "plain old" Faces managed bean.
+ * The CDI annotation <code>&#64;</code>{@link ContextParam} allows you to inject a <code>web.xml</code> context parameter from the current application in a CDI
+ * managed bean. It's basically like <code>&#64;ManagedProperty("#{initParam['some.key']}") private String someKey;</code> in a "plain old" Faces managed bean.
  * <p>
- * By default the name of the context parameter is taken from the name of the variable into which injection takes place.
- * The example below injects the context parameter with name <code>foo</code>.
+ * By default the name of the context parameter is taken from the name of the variable into which injection takes place. The example below injects the context
+ * parameter with name <code>foo</code>.
+ * 
  * <pre>
- * &#64;Inject &#64;ContextParam
+ * 
+ * &#64;Inject
+ * &#64;ContextParam
  * private String foo;
  * </pre>
  * <p>
- * The name can be optionally specified via the <code>name</code> attribute, which shall more often be used as context
- * parameters may have a.o. periods and/or hyphens in the name, which are illegal in variable names.
- * The example below injects the context parameter with name <code>foo.bar</code> into a variable named <code>bar</code>.
+ * The name can be optionally specified via the <code>name</code> attribute, which shall more often be used as context parameters may have a.o. periods and/or
+ * hyphens in the name, which are illegal in variable names. The example below injects the context parameter with name <code>foo.bar</code> into a variable
+ * named <code>bar</code>.
+ * 
  * <pre>
- * &#64;Inject &#64;ContextParm(name="foo.bar")
+ * 
+ * &#64;Inject
+ * &#64;ContextParm(name = "foo.bar")
  * private String bar;
  * </pre>
  *
@@ -61,6 +65,7 @@ public @interface ContextParam {
      *
      * @return The name of the context parameter.
      */
-    @Nonbinding String name() default "";
+    @Nonbinding
+    String name() default "";
 
 }

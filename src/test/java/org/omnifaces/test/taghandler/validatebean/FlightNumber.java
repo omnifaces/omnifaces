@@ -51,4 +51,5 @@ public class FlightNumber implements Serializable {
     public void setFlightIdentifier(Integer flightIdentifier) {
         this.flightIdentifier = flightIdentifier;
     }
+
 }

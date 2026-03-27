@@ -23,10 +23,10 @@ import java.util.logging.Logger;
  * <p>
  * The strategies that will be attempted in order are:
  * <ol>
- * <li> Cloning
- * <li> Serialization
- * <li> Copy constructor
- * <li> New instance
+ * <li>Cloning
+ * <li>Serialization
+ * <li>Copy constructor
+ * <li>New instance
  * </ol>
  *
  *
@@ -38,7 +38,8 @@ public class MultiStrategyCopier implements Copier {
 
     private static final Logger logger = Logger.getLogger(MultiStrategyCopier.class.getName());
 
-    private static final List<Copier> COPIERS = asList( // Note: copier instances used here must be thread-safe!
+    private static final List<Copier> COPIERS = asList(
+        // Note: copier instances used here must be thread-safe!
         new CloneCopier(), new SerializationCopier(), new CopyCtorCopier(), new NewInstanceCopier()
     );
 

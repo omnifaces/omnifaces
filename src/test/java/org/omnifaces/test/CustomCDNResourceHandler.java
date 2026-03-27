@@ -35,6 +35,8 @@ public class CustomCDNResourceHandler extends DefaultResourceHandler {
             return resource;
         }
 
-        return new CDNResource(resource, resource.getRequestPath()); // Just a dummy CDN resource for testing! In real world you'd prepend CDN host to the request path.
+        return new CDNResource(resource, resource.getRequestPath()); // Just a dummy CDN resource for testing! In real world you'd prepend CDN host to the
+                                                                     // request path.
     }
+
 }

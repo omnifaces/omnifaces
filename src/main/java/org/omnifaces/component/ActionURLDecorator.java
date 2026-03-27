@@ -32,8 +32,7 @@ import org.omnifaces.component.input.Form;
 import org.omnifaces.component.output.Link;
 
 /**
- * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler
- * -&gt; getActionURL.
+ * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler -&gt; getActionURL.
  *
  * @author Arjan Tijms
  * @since 4.5
@@ -76,10 +75,9 @@ public class ActionURLDecorator extends FacesContextWrapper {
             }
 
             /**
-             * The actual method we're decorating in order to either include the view parameters into the
-             * action URL, or include the request parameters into the action URL, or use request URI as
-             * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
-             * in the query string, overriding any existing view or request parameters on same name.
+             * The actual method we're decorating in order to either include the view parameters into the action URL, or include the request parameters into the
+             * action URL, or use request URI as action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included in the query
+             * string, overriding any existing view or request parameters on same name.
              */
             @Override
             public String getActionURL(FacesContext context, String viewId) {
@@ -92,6 +90,9 @@ public class ActionURLDecorator extends FacesContextWrapper {
                 var actionURL = getRequestAttribute(context, ERROR_REQUEST_URI) != null ? getRequestContextPath(context) : getRequestURI(context);
                 return actionURL.isEmpty() ? "/" : actionURL;
             }
+
         }
+
     }
+
 }

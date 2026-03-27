@@ -62,6 +62,7 @@ public class PushContextProducer {
 
     /**
      * Returns {@link PushContext} associated with channel name derived from given injection point.
+     * 
      * @param injectionPoint Injection point to derive channel name from.
      * @return {@link PushContext} associated with channel name derived from given injection point.
      */

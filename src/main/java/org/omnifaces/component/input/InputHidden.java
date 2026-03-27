@@ -24,39 +24,34 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:inputHidden&gt;</code> is a component that extends the standard <code>&lt;h:inputHidden&gt;</code>
- * and changes the behavior to immediately convert, validate and update during apply request values phase, regardless of
- * any conversion/validation errors on other <code>UIInput</code> components within the same form. The standard
- * <code>&lt;h:inputHidden&gt;</code> follows the same lifecycle as other <code>UIInput</code> components which is in
- * the end unintuive as hidden input fields are usually under control of the developer.
+ * The <code>&lt;o:inputHidden&gt;</code> is a component that extends the standard <code>&lt;h:inputHidden&gt;</code> and changes the behavior to immediately
+ * convert, validate and update during apply request values phase, regardless of any conversion/validation errors on other <code>UIInput</code> components
+ * within the same form. The standard <code>&lt;h:inputHidden&gt;</code> follows the same lifecycle as other <code>UIInput</code> components which is in the end
+ * unintuive as hidden input fields are usually under control of the developer.
  * <p>
- * Use case 1: Imagine a form with a <code>&lt;h:inputHidden&gt;</code> and a <code>&lt;h:inputText&gt;</code>. The
- * hidden input holds some prepopulated value of a request scoped bean which is intended to be passed through to the
- * request scoped bean instance of the next request. However, when conversion/validation fails on the text input, then
- * the hidden input won't update the bean property and then becomes empty. I.e. the original value gets permanently lost.
- * This can be bypassed by using ajax to update only specific fields, but this will fail when the update of the hidden
- * input is actually needed (e.g. because the value can possibly be adjusted in action/listener method).
+ * Use case 1: Imagine a form with a <code>&lt;h:inputHidden&gt;</code> and a <code>&lt;h:inputText&gt;</code>. The hidden input holds some prepopulated value
+ * of a request scoped bean which is intended to be passed through to the request scoped bean instance of the next request. However, when conversion/validation
+ * fails on the text input, then the hidden input won't update the bean property and then becomes empty. I.e. the original value gets permanently lost. This can
+ * be bypassed by using ajax to update only specific fields, but this will fail when the update of the hidden input is actually needed (e.g. because the value
+ * can possibly be adjusted in action/listener method).
  * <p>
- * Use case 2: Imagine a form with an <code>UIInput</code> or <code>UICommand</code> component whose
- * <code>rendered</code> attribute relies on a request scoped bean property which is retained for the next request
- * through a <code>&lt;h:inputHidden&gt;</code>. However, when Faces needs to decode the <code>UIInput</code> or
- * <code>UICommand</code> component during the postback, the <code>rendered</code> attribute has defaulted back to
- * <code>false</code> because the <code>&lt;h:inputHidden&gt;</code> hasn't yet updated the request scoped bean property
- * yet.
+ * Use case 2: Imagine a form with an <code>UIInput</code> or <code>UICommand</code> component whose <code>rendered</code> attribute relies on a request scoped
+ * bean property which is retained for the next request through a <code>&lt;h:inputHidden&gt;</code>. However, when Faces needs to decode the
+ * <code>UIInput</code> or <code>UICommand</code> component during the postback, the <code>rendered</code> attribute has defaulted back to <code>false</code>
+ * because the <code>&lt;h:inputHidden&gt;</code> hasn't yet updated the request scoped bean property yet.
  * <p>
- * This behavior cannot be achieved by using <code>immediate="true"</code> on <code>&lt;h:inputHidden&gt;</code>. It
- * would only move the conversion/validation into the apply request values phase. The model still won't be updated on
- * time.
+ * This behavior cannot be achieved by using <code>immediate="true"</code> on <code>&lt;h:inputHidden&gt;</code>. It would only move the conversion/validation
+ * into the apply request values phase. The model still won't be updated on time.
  * <p>
- * Also, the <code>&lt;h:inputHidden&gt;</code> didn't support the <code>readonly</code> attribute. This is however
- * useful when used in combination with a validator which should block the form submit. Since version 4.1, the
- * <code>&lt;o:inputHidden&gt;</code> supports this use case by simply grabbing and validating the model value during
- * the apply request values phase. The setter method associated with the model won't be invoked.
+ * Also, the <code>&lt;h:inputHidden&gt;</code> didn't support the <code>readonly</code> attribute. This is however useful when used in combination with a
+ * validator which should block the form submit. Since version 4.1, the <code>&lt;o:inputHidden&gt;</code> supports this use case by simply grabbing and
+ * validating the model value during the apply request values phase. The setter method associated with the model won't be invoked.
  *
  * <h2>Usage</h2>
  * <p>
- * You can use it the same way as <code>&lt;h:inputHidden&gt;</code>, you only need to change <code>h:</code> into
- * <code>o:</code> to get the "immediate v2.0" behavior.
+ * You can use it the same way as <code>&lt;h:inputHidden&gt;</code>, you only need to change <code>h:</code> into <code>o:</code> to get the "immediate v2.0"
+ * behavior.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     &lt;o:inputHidden value="#{bean.hidden}" /&gt;
@@ -126,9 +121,10 @@ public class InputHidden extends HtmlInputHidden {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the
-     * submitted value will be ignored and the model value will be used as submitted value. All associated validators
-     * will still be invoked based on the model value, not on the submitted value. Also the setter won't be invoked.
+     * Returns whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the submitted value will be ignored and the
+     * model value will be used as submitted value. All associated validators will still be invoked based on the model value, not on the submitted value. Also
+     * the setter won't be invoked.
+     * 
      * @return Whether this component is readonly.
      * @since 4.1
      */
@@ -137,9 +133,10 @@ public class InputHidden extends HtmlInputHidden {
     }
 
     /**
-     * Sets whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the
-     * submitted value will be ignored and the model value will be used as submitted value. All associated validators
-     * will still be invoked based on the model value, not on the submitted value. Also the setter won't be invoked.
+     * Sets whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the submitted value will be ignored and the model
+     * value will be used as submitted value. All associated validators will still be invoked based on the model value, not on the submitted value. Also the
+     * setter won't be invoked.
+     * 
      * @param readonly Whether this component is readonly.
      * @since 4.1
      */

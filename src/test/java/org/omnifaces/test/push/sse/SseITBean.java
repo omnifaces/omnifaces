@@ -33,13 +33,16 @@ public class SseITBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject @Push(type=SSE)
+    @Inject
+    @Push(type = SSE)
     private PushContext applicationScopedServerEvent;
 
-    @Inject @Push(type=SSE)
+    @Inject
+    @Push(type = SSE)
     private PushContext sessionScopedUserTargeted;
 
-    @Inject @Push(type=SSE)
+    @Inject
+    @Push(type = SSE)
     private PushContext viewScopedAjaxAware;
 
     @Inject

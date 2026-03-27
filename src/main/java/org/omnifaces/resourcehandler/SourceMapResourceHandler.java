@@ -24,31 +24,32 @@ import jakarta.faces.application.ResourceWrapper;
 
 /**
  * <p>
- * This {@link ResourceHandler} implementation will set the <code>SourceMap</code> response header with the correctly
- * mapped request path to any discovered source map of any CSS and JS resource.
+ * This {@link ResourceHandler} implementation will set the <code>SourceMap</code> response header with the correctly mapped request path to any discovered
+ * source map of any CSS and JS resource.
  * <p>
- * By default, CSS and JS minifiers will embed the path to the source map in a comment like as the below one in our own
- * <code>omnifaces.js</code>.
+ * By default, CSS and JS minifiers will embed the path to the source map in a comment like as the below one in our own <code>omnifaces.js</code>.
+ * 
  * <pre>
- * //# sourceMappingURL=omnifaces.js.map
+ * // # sourceMappingURL=omnifaces.js.map
  * </pre>
  * <p>
- * The web browser will then attempt to resolve this against the current request URL, but this would fail with a 404
- * error because the Faces mapping such as <code>*.xhtml</code> is missing.
+ * The web browser will then attempt to resolve this against the current request URL, but this would fail with a 404 error because the Faces mapping such as
+ * <code>*.xhtml</code> is missing.
  * <p>
- * In order to sovle that, first configure your minifier to disable writing the <code># sourceMappingURL</code> comment,
- * otherwise that would still take precedence over the <code>SourceMap</code> response header, and register the
- * {@link SourceMapResourceHandler} in <code>faces-config.xml</code> as below.
+ * In order to sovle that, first configure your minifier to disable writing the <code># sourceMappingURL</code> comment, otherwise that would still take
+ * precedence over the <code>SourceMap</code> response header, and register the {@link SourceMapResourceHandler} in <code>faces-config.xml</code> as below.
+ * 
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.SourceMapResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  * <p>
- * By default, the {@link SourceMapResourceHandler} will use <code>*.map</code> pattern to create the source map URL.
- * In other words, it's expected that the source map file is located in exactly the same folder and has the <code>.map</code>
- * extension. In case you need a different pattern, e.g. <code>sourcemaps/*.map</code>, then you can set that via the
- * {@value org.omnifaces.resourcehandler.SourceMapResourceHandler#PARAM_NAME_SOURCE_MAP_PATTERN} context parameter.
+ * By default, the {@link SourceMapResourceHandler} will use <code>*.map</code> pattern to create the source map URL. In other words, it's expected that the
+ * source map file is located in exactly the same folder and has the <code>.map</code> extension. In case you need a different pattern, e.g.
+ * <code>sourcemaps/*.map</code>, then you can set that via the {@value org.omnifaces.resourcehandler.SourceMapResourceHandler#PARAM_NAME_SOURCE_MAP_PATTERN}
+ * context parameter.
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN&lt;/param-name&gt;
@@ -64,8 +65,7 @@ import jakarta.faces.application.ResourceWrapper;
 public class SourceMapResourceHandler extends DefaultResourceHandler {
 
     /** The context parameter name to configure the source map pattern. */
-    public static final String PARAM_NAME_SOURCE_MAP_PATTERN =
-        "org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN";
+    public static final String PARAM_NAME_SOURCE_MAP_PATTERN = "org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN";
 
     private static final Map<ResourceIdentifier, String> SOURCE_MAPS = new ConcurrentHashMap<>();
 
@@ -77,8 +77,9 @@ public class SourceMapResourceHandler extends DefaultResourceHandler {
     private String sourceMapPattern;
 
     /**
-     * Creates a new instance of this source map resource handler which wraps the given resource handler.
-     * This will also initialize the source map pattern based on the context parameter.
+     * Creates a new instance of this source map resource handler which wraps the given resource handler. This will also initialize the source map pattern based
+     * on the context parameter.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public SourceMapResourceHandler(ResourceHandler wrapped) {
@@ -95,12 +96,14 @@ public class SourceMapResourceHandler extends DefaultResourceHandler {
         String sourceMap = SOURCE_MAPS.computeIfAbsent(new ResourceIdentifier(libraryName, resourceName), this::computeSourceMap);
 
         return super.decorateResource(sourceMap.isEmpty() ? resource : new ResourceWrapper(resource) {
+
             @Override
             public Map<String, String> getResponseHeaders() {
                 Map<String, String> responseHeaders = super.getResponseHeaders();
                 responseHeaders.put(HEADER_SOURCE_MAP, sourceMap);
                 return responseHeaders;
             }
+
         }, resourceName, libraryName);
     }
 

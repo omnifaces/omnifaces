@@ -21,8 +21,8 @@ import jakarta.faces.convert.Converter;
 import jakarta.faces.validator.Validator;
 
 /**
- * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and
- * injected via the <code>&#64;</code>{@link org.omnifaces.cdi.Param} qualifier.
+ * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and injected via the
+ * <code>&#64;</code>{@link org.omnifaces.cdi.Param} qualifier.
  *
  * @since 1.6
  * @author Arjan Tijms
@@ -34,13 +34,16 @@ public @interface Attribute {
 
     /**
      * Name of the attribute.
+     * 
      * @return Name of the attribute.
      */
     String name();
 
     /**
      * Value of the attribute.
+     * 
      * @return Value of the attribute.
      */
     String value();
+
 }

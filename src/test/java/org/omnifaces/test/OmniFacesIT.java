@@ -92,7 +92,12 @@ public abstract class OmniFacesIT {
                 var originalClassLoader = Thread.currentThread().getContextClassLoader();
 
                 try {
-                    Thread.currentThread().setContextClassLoader(ChromeDriver.class.getClassLoader()); // Because quarkus-arquillian loads selenium-remote-driver and selenium-chrome-driver from different classloaders and this would cause Chrome driver to throw java.util.ServiceConfigurationError: org.openqa.selenium.remote.AdditionalHttpCommands: org.openqa.selenium.chrome.AddHasCasting not a subtype
+                    Thread.currentThread().setContextClassLoader(ChromeDriver.class.getClassLoader()); // Because quarkus-arquillian loads
+                                                                                                       // selenium-remote-driver and selenium-chrome-driver from
+                                                                                                       // different classloaders and this would cause Chrome
+                                                                                                       // driver to throw java.util.ServiceConfigurationError:
+                                                                                                       // org.openqa.selenium.remote.AdditionalHttpCommands:
+                                                                                                       // org.openqa.selenium.chrome.AddHasCasting not a subtype
                     var chrome = new ChromeDriver(new ChromeOptions().addArguments("--no-sandbox", "--headless"));
                     chrome.setLogLevel(Level.INFO);
 
@@ -135,7 +140,8 @@ public abstract class OmniFacesIT {
         logger.fine(this + "#init(); " + browser + "; " + baseURL);
 
         if (browser == null) {
-            setup(); // Because quarkus-arquillian doesn't recognize the different lifecycle of @BeforeAll on a @TestInstance(Lifecycle.PER_CLASS) and forgets to invoke it on each instantiation.
+            setup(); // Because quarkus-arquillian doesn't recognize the different lifecycle of @BeforeAll on a @TestInstance(Lifecycle.PER_CLASS) and forgets
+                     // to invoke it on each instantiation.
         }
 
         try {
@@ -183,7 +189,8 @@ public abstract class OmniFacesIT {
     }
 
     protected void openWithHashString(String hashString) {
-        open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver may not forcibly reload page.
+        open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver
+                                                                                                      // may not forcibly reload page.
     }
 
     protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
@@ -206,7 +213,9 @@ public abstract class OmniFacesIT {
         var uuid = UUID.randomUUID().toString();
         executeScript("window.$ajax=true;faces.ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
         action.run();
-        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be falsey when ajax redirect has occurred.
+        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be
+                                                                                                                                     // falsey when ajax
+                                                                                                                                     // redirect has occurred.
     }
 
     protected void guardPrimeFacesAjax(Runnable action) {
@@ -226,7 +235,8 @@ public abstract class OmniFacesIT {
     }
 
     protected String getResponseBody() {
-        return networkResponses.entrySet().stream().filter(entry -> browser.getCurrentUrl().endsWith(entry.getKey())).map(Entry::getValue).findFirst().orElseThrow();
+        return networkResponses.entrySet().stream().filter(entry -> browser.getCurrentUrl().endsWith(entry.getKey())).map(Entry::getValue).findFirst()
+            .orElseThrow();
     }
 
     private void waitUntil(Supplier<Boolean> predicate) {
@@ -424,17 +434,17 @@ public abstract class OmniFacesIT {
             addWebInfResource("WEB-INF/web.xml/" + webXml.name() + ".xml", "web.xml");
 
             switch (webXml) {
-                case withDevelopmentStage:
+                case withDevelopmentStage :
                     addQuarkusPropertyIfNecessary("jakarta.faces.PROJECT_STAGE", "Development");
-                case withErrorPage:
+                case withErrorPage :
                     addWebResource("WEB-INF/500.xhtml");
                     break;
-                case withFacesViews:
-                case withFacesViewsLowercasedRequestURI:
-                case withMultiViews:
+                case withFacesViews :
+                case withFacesViewsLowercasedRequestURI :
+                case withMultiViews :
                     addWebResource("WEB-INF/404.xhtml");
                     break;
-                default:
+                default :
                     break;
             }
 
@@ -448,7 +458,8 @@ public abstract class OmniFacesIT {
             }
 
             var maven = Maven.resolver();
-            archive.addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
+            archive
+                .addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
             primeFacesSet = true;
             return this;
         }
@@ -463,41 +474,23 @@ public abstract class OmniFacesIT {
             }
 
             if (isQuarkusUsed() && !quarkusProperties.isEmpty()) {
-                archive.addAsResource(new StringAsset(quarkusProperties.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(joining("\n"))), "application.properties");
+                archive.addAsResource(
+                    new StringAsset(quarkusProperties.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(joining("\n"))),
+                    "application.properties"
+                );
             }
 
             return archive;
         }
+
     }
 
     public enum FacesConfig {
-        basic,
-        withFullAjaxExceptionHandler,
-        withCombinedResourceHandler,
-        withMessageBundle,
-        withCDNResourceHandler,
-        withCustomCDNResourceHandler,
-        withVersionedResourceHandler,
-        withViewExpiredExceptionHandler,
-        withViewResourceHandler,
-        withSupportedLocales;
+        basic, withFullAjaxExceptionHandler, withCombinedResourceHandler, withMessageBundle, withCDNResourceHandler, withCustomCDNResourceHandler, withVersionedResourceHandler, withViewExpiredExceptionHandler, withViewResourceHandler, withSupportedLocales;
     }
 
     public enum WebXml {
-        basic,
-        distributable,
-        withDevelopmentStage,
-        withErrorPage,
-        withFacesViews,
-        withFacesViewsLowercasedRequestURI,
-        withMultiViews,
-        withThreeViewsInSession,
-        withClientStateSaving,
-        withCDNResources,
-        withInterpretEmptyStringSubmittedValuesAsNull,
-        withVersionedResourceHandler,
-        withViewResources,
-        withTaglib;
+        basic, distributable, withDevelopmentStage, withErrorPage, withFacesViews, withFacesViewsLowercasedRequestURI, withMultiViews, withThreeViewsInSession, withClientStateSaving, withCDNResources, withInterpretEmptyStringSubmittedValuesAsNull, withVersionedResourceHandler, withViewResources, withTaglib;
     }
 
 }

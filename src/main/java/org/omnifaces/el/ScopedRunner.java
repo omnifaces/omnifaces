@@ -18,8 +18,8 @@ import java.util.Map;
 import jakarta.faces.context.FacesContext;
 
 /**
- * This class helps in letting code run within its own scope. Such scope is defined by specific variables being
- * available to EL within it. The request scope is used to store the variables.
+ * This class helps in letting code run within its own scope. Such scope is defined by specific variables being available to EL within it. The request scope is
+ * used to store the variables.
  *
  * @author Arjan Tijms
  *
@@ -32,6 +32,7 @@ public class ScopedRunner {
 
     /**
      * Construct a scoped runner.
+     * 
      * @param context The involved faces context.
      */
     public ScopedRunner(FacesContext context) {
@@ -40,6 +41,7 @@ public class ScopedRunner {
 
     /**
      * Construct a scoped runner.
+     * 
      * @param context The involved faces context.
      * @param scopedVariables Initial scoped variables.
      */
@@ -62,13 +64,15 @@ public class ScopedRunner {
 
     /**
      * Invokes the callback within the scope of the variables being given in the constructor.
+     * 
      * @param callback The callback.
      */
     public void invoke(Runnable callback) {
         try {
             setNewScope();
             callback.run();
-        } finally {
+        }
+        finally {
             restorePreviousScope();
         }
     }
@@ -92,17 +96,20 @@ public class ScopedRunner {
                 Object previousVariable = previousVariables.get(entry.getKey());
                 if (previousVariable != null) {
                     requestMap.put(entry.getKey(), previousVariable);
-                } else {
+                }
+                else {
                     requestMap.remove(entry.getKey());
                 }
             }
-        } finally {
+        }
+        finally {
             previousVariables.clear();
         }
     }
 
     /**
      * Invokes the callback within the scope of the given variable.
+     * 
      * @param context The involved faces context.
      * @param key the key name of the variable
      * @param value the value of the variable

@@ -26,46 +26,46 @@ import org.openqa.selenium.support.FindBy;
 
 public class CorsAwareResourceRendererIT extends OmniFacesIT {
 
-    @FindBy(css="script[src]")
+    @FindBy(css = "script[src]")
     private List<WebElement> scripts;
 
-    @FindBy(css="link[rel=stylesheet]")
+    @FindBy(css = "link[rel=stylesheet]")
     private List<WebElement> stylesheets;
 
-    @FindBy(id="bodyWithTargetBody")
+    @FindBy(id = "bodyWithTargetBody")
     private WebElement bodyWithTargetBody;
 
-    @FindBy(id="headWithoutTarget")
+    @FindBy(id = "headWithoutTarget")
     private WebElement headWithoutTarget;
 
-    @FindBy(id="headWithTarget")
+    @FindBy(id = "headWithTarget")
     private WebElement headWithTarget;
 
-    @FindBy(id="bodyWithTargetHead")
+    @FindBy(id = "bodyWithTargetHead")
     private WebElement bodyWithTargetHead;
 
-    @FindBy(id="bodyWithoutTarget")
+    @FindBy(id = "bodyWithoutTarget")
     private WebElement bodyWithoutTarget;
 
-    @FindBy(id="deferredInHead")
+    @FindBy(id = "deferredInHead")
     private WebElement deferredInHead;
 
-    @FindBy(id="deferredInBody")
+    @FindBy(id = "deferredInBody")
     private WebElement deferredInBody;
 
-    @FindBy(id="nonAjax:submit")
+    @FindBy(id = "nonAjax:submit")
     private WebElement nonAjaxSubmit;
 
-    @FindBy(id="nonAjax:rebuild")
+    @FindBy(id = "nonAjax:rebuild")
     private WebElement nonAjaxRebuild;
 
-    @FindBy(id="ajax:submit")
+    @FindBy(id = "ajax:submit")
     private WebElement ajaxSubmit;
 
-    @FindBy(id="ajax:rebuild")
+    @FindBy(id = "ajax:rebuild")
     private WebElement ajaxRebuild;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(CorsAwareResourceRendererIT.class)
             .withFacesConfig(withCustomCDNResourceHandler)
@@ -117,8 +117,10 @@ public class CorsAwareResourceRendererIT extends OmniFacesIT {
 
         assertEquals(9, scripts.size());
         verifyResource(cdn, scripts.get(0), "headWithoutTarget.js", "sha384-gznUcovbufIIDvmyJg3HGej1em1Wg0KSPR14QNgpqu84TA8XWD8taMq0gDymjbjd");
-        verifyResource(cdn, scripts.get(1), "omnifaces.js", null); // Integrity depends on OmniFaces JS source changes and therefore fluctuates during development, so we skip integrity check on omnifaces.js.
-        verifyResource(cdn, scripts.get(2), "faces.js", null); // Integrity depends on Faces impl being used by server and therefore fluctuates across test environments, so we skip integrity check on faces.js.
+        verifyResource(cdn, scripts.get(1), "omnifaces.js", null); // Integrity depends on OmniFaces JS source changes and therefore fluctuates during
+                                                                   // development, so we skip integrity check on omnifaces.js.
+        verifyResource(cdn, scripts.get(2), "faces.js", null); // Integrity depends on Faces impl being used by server and therefore fluctuates across test
+                                                               // environments, so we skip integrity check on faces.js.
         verifyResource(cdn, scripts.get(3), "headWithTarget.js", "sha384-krDifaBExNHcMs9Yv1ZQAgmP53EhTO2OPqaBFT8MeGKADaqT+NVjuc8crvGE/qbW");
         verifyResource(cdn, scripts.get(4), "bodyWithTargetHead.js", "sha384-180HIFdg/5q9rsSGfQZ+CApl+wuRymzd+CNTzfce6o6LKSh0hrpSPQcAr5TQvA4Y");
         verifyResource(cdn, scripts.get(5), "deferredInHead.js", "sha384-6Hy/7a4f4PqRSr5HGMWEWaZjJgFR1zR/QrQxaVMSYgWBgvuyTlrdExzNH9DFfzIY");
@@ -150,4 +152,5 @@ public class CorsAwareResourceRendererIT extends OmniFacesIT {
             assertEquals(cdn ? integrity : "", element.getAttribute("integrity"));
         }
     }
+
 }

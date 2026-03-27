@@ -56,4 +56,5 @@ public class ValidateBeanITWithCustomTypeAsProperty implements Serializable {
     public void setFlightNumbers(List<FlightNumber> flightNumbers) {
         this.flightNumbers = flightNumbers;
     }
+
 }

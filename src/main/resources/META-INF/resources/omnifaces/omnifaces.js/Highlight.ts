@@ -15,7 +15,7 @@ import { Util } from "./Util";
 
 /**
  * Highlight/focus.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.Highlight
  */
@@ -90,7 +90,7 @@ export namespace Highlight {
     /**
      * Returns an element by ID or name.
      * @param Client ID.
-     * @return HTML element identified by given client ID. 
+     * @return HTML element identified by given client ID.
      */
     function getElementByIdOrName(clientId: string): HTMLElement {
         let element = document.getElementById(clientId);

@@ -41,8 +41,9 @@ public class ViewScopedITBean implements Serializable {
     @PostConstruct
     public void init() {
         try {
-            Thread.sleep(500);  // Give unload opportunity to hit server.
-        }catch (InterruptedException e) {
+            Thread.sleep(500); // Give unload opportunity to hit server.
+        }
+        catch (InterruptedException e) {
             throw new FacesException(e);
         }
 

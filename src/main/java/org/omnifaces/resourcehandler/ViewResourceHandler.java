@@ -38,24 +38,27 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
- * This {@link ResourceHandler} basically turns any concrete non-Facelets file into a Faces view, so that you can use EL expressions and even Faces components in them.
- * The response content type will default to {@link Faces#getMimeType(String)} which is configureable in <code>web.xml</code> and overrideable via <code>&lt;f:view contentType="..."&gt;</code>.
+ * This {@link ResourceHandler} basically turns any concrete non-Facelets file into a Faces view, so that you can use EL expressions and even Faces components
+ * in them. The response content type will default to {@link Faces#getMimeType(String)} which is configureable in <code>web.xml</code> and overrideable via
+ * <code>&lt;f:view contentType="..."&gt;</code>.
  * <p>
  * Real world examples are <code>/sitemap.xml</code> and <code>/robots.txt</code>.
  *
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
+ * 
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.ViewResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  * <p>
- * To configure the Faces view resources, a {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
- * context parameter has to be provided wherein the view resources are specified as a comma separated string of context-relative URIs.
+ * To configure the Faces view resources, a {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES} context parameter has to be
+ * provided wherein the view resources are specified as a comma separated string of context-relative URIs.
  * <p>
  * Here is an example configuration:
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.VIEW_RESOURCE_HANDLER_URIS&lt;/param-name&gt;
@@ -83,6 +86,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
     private static final Set<String> VIEW_RESOURCES = new HashSet<>();
     private static final ViewResource VIEW_RESOURCE = new ViewResource() {
+
         @Override
         public URL getURL() {
             try {
@@ -93,12 +97,13 @@ public class ViewResourceHandler extends DefaultResourceHandler {
                 throw new IllegalStateException(e);
             }
         }
+
     };
 
     /**
      * This will map the {@link FacesServlet} to the URIs specified in {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
-     * context parameter.
-     * This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
+     * context parameter. This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
+     * 
      * @param servletContext The involved servlet context.
      * @throws MalformedURLException When one of the URIs specified in context parameter is malformed.
      */
@@ -134,15 +139,20 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the current HTTP request is requesting for a view resource managed by this resource handler.
+     * 
      * @param context The involved faces context.
      * @return <code>true</code> if the current HTTP request is requesting for a view resource managed by this resource handler.
      */
     public static boolean isViewResourceRequest(FacesContext context) {
-        return !VIEW_RESOURCES.isEmpty() && getContextAttribute(context, ViewResourceHandler.class.getName(), () -> getRequest(context) != null && VIEW_RESOURCES.contains(getRequest(context).getServletPath()));
+        return !VIEW_RESOURCES.isEmpty() && getContextAttribute(
+            context, ViewResourceHandler.class.getName(),
+            () -> getRequest(context) != null && VIEW_RESOURCES.contains(getRequest(context).getServletPath())
+        );
     }
 
     /**
      * Creates a new instance of this view resource handler which wraps the given resource handler.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public ViewResourceHandler(ResourceHandler wrapped) {
@@ -150,8 +160,8 @@ public class ViewResourceHandler extends DefaultResourceHandler {
     }
 
     /**
-     * This override ensures that {@link Faces#getRequestServletPath()} is returned as concrete resource rather than the provided <code>resourceName</code>
-     * when the {@link #isViewResourceRequest(FacesContext)} returns true.
+     * This override ensures that {@link Faces#getRequestServletPath()} is returned as concrete resource rather than the provided <code>resourceName</code> when
+     * the {@link #isViewResourceRequest(FacesContext)} returns true.
      */
     @Override
     public ViewResource createViewResource(FacesContext context, String resourceName) {

@@ -32,10 +32,8 @@ import org.omnifaces.cdi.Push;
 
 /**
  * <p>
- * This web socket endpoint handles connections opened by <code>&lt;o:socket&gt;</code>.
- * It is automatically registered during application startup when <code>&#64;</code>{@link Push}
- * or <code>&#64;</code>{@link Push}<code>(type=SOCKET)</code> qualified injection points are detected by
- * {@link PushExtension}.
+ * This web socket endpoint handles connections opened by <code>&lt;o:socket&gt;</code>. It is automatically registered during application startup when
+ * <code>&#64;</code>{@link Push} or <code>&#64;</code>{@link Push}<code>(type=SOCKET)</code> qualified injection points are detected by {@link PushExtension}.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -58,8 +56,9 @@ public class SocketEndpoint extends Endpoint {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Add given web socket session to the {@link SocketSessionManager}. If web socket session is not accepted (i.e. the
-     * channel identifier is unknown), then immediately close with reason VIOLATED_POLICY (close code 1008).
+     * Add given web socket session to the {@link SocketSessionManager}. If web socket session is not accepted (i.e. the channel identifier is unknown), then
+     * immediately close with reason VIOLATED_POLICY (close code 1008).
+     * 
      * @param session The opened web socket session.
      * @param config The endpoint configuration.
      */
@@ -80,6 +79,7 @@ public class SocketEndpoint extends Endpoint {
 
     /**
      * Delegate exception to onClose.
+     * 
      * @param session The errored web socket session.
      * @param throwable The cause.
      */
@@ -91,15 +91,17 @@ public class SocketEndpoint extends Endpoint {
     }
 
     /**
-     * Remove given web socket session from the {@link SocketSessionManager}. If there is any exception from onError which was
-     * not caused by {@link CloseCodes#GOING_AWAY} (i.e. "connection reset by peer"), then log it as {@link Level#SEVERE},
-     * else as {@link Level#FINE}. Before OmniFaces 4.6, the {@link CloseCodes#GOING_AWAY} was not logged at all.
+     * Remove given web socket session from the {@link SocketSessionManager}. If there is any exception from onError which was not caused by
+     * {@link CloseCodes#GOING_AWAY} (i.e. "connection reset by peer"), then log it as {@link Level#SEVERE}, else as {@link Level#FINE}. Before OmniFaces 4.6,
+     * the {@link CloseCodes#GOING_AWAY} was not logged at all.
+     * 
      * @param session The closed web socket session.
      * @param reason The close reason.
      */
     @Override
     public void onClose(Session session, CloseReason reason) {
-        SocketSessionManager.getInstance().remove(session, reason); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
+        SocketSessionManager.getInstance().remove(session, reason); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close
+                                                                    // doesn't work in WildFly.
 
         var throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 

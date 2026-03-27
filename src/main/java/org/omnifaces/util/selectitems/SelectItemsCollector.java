@@ -39,19 +39,17 @@ import org.omnifaces.model.ExtendedSelectItem;
  */
 public final class SelectItemsCollector {
 
-    private static final String ERROR_UNKNOWN_SELECT_TYPE =
-        "A value expression of type '%s' is disallowed for a select item";
+    private static final String ERROR_UNKNOWN_SELECT_TYPE = "A value expression of type '%s' is disallowed for a select item";
 
     private SelectItemsCollector() {
         //
     }
 
     /**
-     * This method gets all select items that are expressed via {@link UISelectItem} or {@link UISelectItems}
-     * children of the given parent component.
+     * This method gets all select items that are expressed via {@link UISelectItem} or {@link UISelectItems} children of the given parent component.
      * <p>
-     * Note that if {@link SelectItemGroup} instances are present then those will be inserted directly in the returned list
-     * and the using code still has to iterate over its children recursively to obtain all separate {@link SelectItem} instances.
+     * Note that if {@link SelectItemGroup} instances are present then those will be inserted directly in the returned list and the using code still has to
+     * iterate over its children recursively to obtain all separate {@link SelectItem} instances.
      *
      * @param parent the parent whose children are scanned
      * @param context The involved faces context.
@@ -116,8 +114,8 @@ public final class SelectItemsCollector {
     }
 
     /**
-     * This method runs the algorithm expressed by a <code>UISelectItems</code> component that uses the <code>var</code> iterator construct to generate
-     * a list of <code>SelectItem</code>s.
+     * This method runs the algorithm expressed by a <code>UISelectItems</code> component that uses the <code>var</code> iterator construct to generate a list
+     * of <code>SelectItem</code>s.
      *
      * @param uiSelectItems The involved select items component.
      * @param items The available select items.
@@ -158,14 +156,16 @@ public final class SelectItemsCollector {
                 Object noSelectionValue = attributes.get("noSelectionValue");
                 boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
-                selectItems.add(new SelectItem(
-                    itemValue,
-                    getItemLabel(attributes, itemValue),
-                    getItemDescription(attributes),
-                    getBooleanAttribute(attributes, "itemDisabled", false),
-                    getBooleanAttribute(attributes, "itemLabelEscaped", true),
-                    getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
-                ));
+                selectItems.add(
+                    new SelectItem(
+                        itemValue,
+                        getItemLabel(attributes, itemValue),
+                        getItemDescription(attributes),
+                        getBooleanAttribute(attributes, "itemDisabled", false),
+                        getBooleanAttribute(attributes, "itemLabelEscaped", true),
+                        getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
+                    )
+                );
             });
         }
 
@@ -227,6 +227,7 @@ public final class SelectItemsCollector {
 
     /**
      * Gets the name boolean attribute. It defaults to <code>false</code> if not specified.
+     * 
      * @param attributes the attributes from which the attribute is fetched.
      * @param key name of the attribute
      * @return the boolean represented by the attribute or false if there's no such attribute

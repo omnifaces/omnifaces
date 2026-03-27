@@ -60,26 +60,16 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String APP_FACES_CONFIG_XML =
-        "/WEB-INF/faces-config.xml";
-    private static final String LIB_FACES_CONFIG_XML =
-        "META-INF/faces-config.xml";
-    private static final String XPATH_RESOURCE_BUNDLE =
-        "application/resource-bundle";
-    private static final String XPATH_DEFAULT_LOCALE =
-        "application/locale-config/default-locale";
-    private static final String XPATH_SUPPORTED_LOCALE =
-        "application/locale-config/supported-locale";
-    private static final String XPATH_RESOURCE_HANDLER =
-        "application/resource-handler";
-    private static final String XPATH_EXCEPTION_HANDLER_FACTORY =
-        "factory/exception-handler-factory";
-    private static final String XPATH_VAR =
-        "var";
-    private static final String XPATH_BASE_NAME =
-        "base-name";
-    private static final String ERROR_INITIALIZATION_FAIL =
-        "FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
+    private static final String APP_FACES_CONFIG_XML = "/WEB-INF/faces-config.xml";
+    private static final String LIB_FACES_CONFIG_XML = "META-INF/faces-config.xml";
+    private static final String XPATH_RESOURCE_BUNDLE = "application/resource-bundle";
+    private static final String XPATH_DEFAULT_LOCALE = "application/locale-config/default-locale";
+    private static final String XPATH_SUPPORTED_LOCALE = "application/locale-config/supported-locale";
+    private static final String XPATH_RESOURCE_HANDLER = "application/resource-handler";
+    private static final String XPATH_EXCEPTION_HANDLER_FACTORY = "factory/exception-handler-factory";
+    private static final String XPATH_VAR = "var";
+    private static final String XPATH_BASE_NAME = "base-name";
+    private static final String ERROR_INITIALIZATION_FAIL = "FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -131,8 +121,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
-     * into a single {@link Document}.
+     * Load, merge and return all <code>faces-config.xml</code> files found in the classpath into a single {@link Document}.
      */
     private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
         List<URL> facesConfigURLs = new ArrayList<>();
@@ -143,6 +132,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a mapping of all resource bundle base names by var found in the given document.
+     * 
      * @throws XPathExpressionException
      */
     private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -161,6 +151,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of default locale and all supported locales in same order as in the given document.
+     * 
      * @throws XPathExpressionException
      */
     private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -186,6 +177,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of all resource handlers in same order as in the given document.
+     * 
      * @throws XPathExpressionException
      */
     private static List<Class<? extends ResourceHandler>> parseResourceHandlers(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -202,9 +194,12 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of all exception handler factories in same order as in the given document.
+     * 
      * @throws XPathExpressionException
      */
-    private static List<Class<? extends ExceptionHandlerFactory>> parseExceptionHandlerFactories(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+    private static List<Class<? extends ExceptionHandlerFactory>> parseExceptionHandlerFactories(Element facesConfigXml, XPath xpath)
+        throws XPathExpressionException
+    {
         List<Class<? extends ExceptionHandlerFactory>> exceptionHandlerFactories = new ArrayList<>();
         NodeList exceptionHandlerFactoryNodes = getNodeList(facesConfigXml, xpath, XPATH_EXCEPTION_HANDLER_FACTORY);
 

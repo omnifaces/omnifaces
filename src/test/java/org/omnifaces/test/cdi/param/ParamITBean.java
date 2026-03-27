@@ -34,41 +34,36 @@ import org.omnifaces.cdi.param.Attribute;
 @RequestScoped
 public class ParamITBean {
 
-    @Param @Size(min = 2)
+    @Param
+    @Size(min = 2)
     private String stringParam;
 
-    @Param(
-        validatorClasses = LengthValidator.class,
-        validatorAttributes = @Attribute(name = "minimum", value = "2"),
-        label = "String param array")
+    @Param(validatorClasses = LengthValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "2"), label = "String param array")
     private String[] stringParamArray;
 
-    @Param(
-        validatorClasses = LengthValidator.class,
-        validatorAttributes = @Attribute(name = "minimum", value = "2"),
-        validatorMessage = "Invalid length")
+    @Param(validatorClasses = LengthValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "2"), validatorMessage = "Invalid length")
     private List<String> stringParamList;
 
-    @Param @Min(value = 42, message = "Invalid range")
+    @Param
+    @Min(value = 42, message = "Invalid range")
     private Long longParam;
 
-    @Param(
-        validatorClasses = LongRangeValidator.class,
-        validatorAttributes = @Attribute(name = "minimum", value="42"),
-        validatorMessage = "Invalid range")
+    @Param(validatorClasses = LongRangeValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "42"), validatorMessage = "Invalid range")
     private Long[] longParamArray;
 
     @Param(
-        validatorClasses = LongRangeValidator.class,
-        validatorAttributes = @Attribute(name = "minimum", value="42"),
-        label = "Long param list",
-        globalMessage = true)
+        validatorClasses = LongRangeValidator.class, validatorAttributes = @Attribute(
+            name = "minimum", value = "42"
+        ), label = "Long param list", globalMessage = true
+    )
     private List<Long> longParamList;
 
     @Param(
-        converterClass = DateTimeConverter.class,
-        converterAttributes = { @Attribute(name = "type", value = "localDate"), @Attribute(name = "pattern", value = "yyyyMMdd") },
-        converterMessage = "{1}: \"{0}\" is not the date format we had in mind! Please use the format yyyyMMdd.")
+        converterClass = DateTimeConverter.class, converterAttributes = { @Attribute(name = "type", value = "localDate"),
+            @Attribute(
+                name = "pattern", value = "yyyyMMdd"
+            ) }, converterMessage = "{1}: \"{0}\" is not the date format we had in mind! Please use the format yyyyMMdd."
+    )
     private LocalDate dateParam;
 
     @Param(validatorClasses = ParamITEntityValidator.class)
@@ -76,9 +71,7 @@ public class ParamITBean {
 
     private ParamITEntity entityViewParam;
 
-    @Param(
-        converter = "jakarta.faces.Long",
-        converterMessage = "Nope.")
+    @Param(converter = "jakarta.faces.Long", converterMessage = "Nope.")
     private Object paramWithConverterId;
 
     private String initResult;
@@ -144,4 +137,5 @@ public class ParamITBean {
     public void setParamWithConverterId(Object paramWithConverterId) {
         this.paramWithConverterId = paramWithConverterId;
     }
+
 }

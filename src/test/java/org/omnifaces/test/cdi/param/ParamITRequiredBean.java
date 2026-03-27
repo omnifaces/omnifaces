@@ -46,4 +46,5 @@ public class ParamITRequiredBean {
     public String getInitResult() {
         return initResult;
     }
+
 }

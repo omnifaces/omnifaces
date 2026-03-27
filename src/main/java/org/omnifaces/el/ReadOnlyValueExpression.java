@@ -19,8 +19,8 @@ import jakarta.el.ValueExpression;
 import org.omnifaces.util.FunctionalInterfaces.SerializableSupplier;
 
 /**
- * Implementation of a read only value expression that can be used when the value is not yet available at construction time, or when the
- * value would be too expensive to create and it's not yet clear if the expression will actually be evaluated.
+ * Implementation of a read only value expression that can be used when the value is not yet available at construction time, or when the value would be too
+ * expensive to create and it's not yet clear if the expression will actually be evaluated.
  *
  * <p>
  * A callback (lambda in Java 8) that obtains the value can be provided, or the getValue() method can be overridden.
@@ -37,6 +37,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     /**
      * Construct a read only value expression.
+     * 
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      * @param callback The functional interface that will be called when the value expression is resolved.
      */
@@ -47,6 +48,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     /**
      * Construct a read only value expression.
+     * 
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      */
     public ReadOnlyValueExpression(Class<?> expectedType) {

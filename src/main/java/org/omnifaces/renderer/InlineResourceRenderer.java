@@ -46,9 +46,9 @@ public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
     }
 
     /**
-     * Obtain the resource, construct a {@link Reader} around it using the character encoding as obtained from the
-     * response writer and then invoke {@link #startElement(FacesContext, ResponseWriter, UIOutput)}
-     * {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in sequence.
+     * Obtain the resource, construct a {@link Reader} around it using the character encoding as obtained from the response writer and then invoke
+     * {@link #startElement(FacesContext, ResponseWriter, UIOutput)} {@link #writeResource(Reader, ResponseWriter)} and {@link #endElement(ResponseWriter)} in
+     * sequence.
      */
     @Override
     public void encodeChildren(FacesContext context, UIOutput component) throws IOException {
@@ -68,6 +68,7 @@ public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
 
     /**
      * Start the element.
+     * 
      * @param writer The response writer.
      * @param component The {@link UIComponent} to which this element corresponds.
      * @throws IOException When an I/O error occurs.
@@ -76,6 +77,7 @@ public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
 
     /**
      * Write the resource inline.
+     * 
      * @param reader The reader providing the resource content.
      * @param writer The response writer where the resource content has to be written to.
      * @throws IOException When an I/O error occurs.
@@ -84,6 +86,7 @@ public abstract class InlineResourceRenderer extends Renderer<UIOutput> {
 
     /**
      * End the element.
+     * 
      * @param writer The response writer.
      * @throws IOException When an I/O error occurs.
      */

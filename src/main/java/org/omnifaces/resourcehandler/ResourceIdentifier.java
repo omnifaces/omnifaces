@@ -41,8 +41,7 @@ public class ResourceIdentifier {
 
     private static final Map<String, String> INTEGRITIES = new ConcurrentHashMap<>();
 
-    private static final String WARNING_CANNOT_COMPUTE_INTEGRITY =
-        "Cannot compute integrity for %s; defaulting to empty string";
+    private static final String WARNING_CANNOT_COMPUTE_INTEGRITY = "Cannot compute integrity for %s; defaulting to empty string";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -53,6 +52,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given standard Faces resource identifier string format <code>library:name</code>.
+     * 
      * @param resourceIdentifier The standard Faces resource identifier.
      */
     public ResourceIdentifier(String resourceIdentifier) {
@@ -62,6 +62,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on library and name attributes of the given component resource.
+     * 
      * @param componentResource The component resource.
      */
     public ResourceIdentifier(UIComponent componentResource) {
@@ -71,6 +72,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given resource library and name.
+     * 
      * @param library The resource lirbary.
      * @param name The resource name.
      */
@@ -80,6 +82,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given resource.
+     * 
      * @param resource The resource.
      * @since 3.13
      */
@@ -96,6 +99,7 @@ public class ResourceIdentifier {
 
     /**
      * Returns the resource library.
+     * 
      * @return The resource library.
      */
     public String getLibrary() {
@@ -104,6 +108,7 @@ public class ResourceIdentifier {
 
     /**
      * Returns the resource name.
+     * 
      * @return The resource name.
      */
     public String getName() {
@@ -111,9 +116,9 @@ public class ResourceIdentifier {
     }
 
     /**
-     * Returns the resource integrity as base64 encoded sha384 hash.
-     * This is lazily computed and will return an empty string when the integrity could not be computed.
-     * The reason for the compute failure will be logged as WARNING.
+     * Returns the resource integrity as base64 encoded sha384 hash. This is lazily computed and will return an empty string when the integrity could not be
+     * computed. The reason for the compute failure will be logged as WARNING.
+     * 
      * @return The resource integrity as base64 encoded sha384 hash.
      * @since 3.13
      */
@@ -145,8 +150,8 @@ public class ResourceIdentifier {
     }
 
     /**
-     * Returns the resource identifier as string in standard Faces resource identifier format <code>library:name</code>.
-     * If there is no library, then only the name is returned without the colon separator like so <code>name</code>.
+     * Returns the resource identifier as string in standard Faces resource identifier format <code>library:name</code>. If there is no library, then only the
+     * name is returned without the colon separator like so <code>name</code>.
      */
     @Override
     public String toString() {
@@ -171,4 +176,5 @@ public class ResourceIdentifier {
     static void clearIntegrity(Predicate<String> keyPredicate) {
         INTEGRITIES.keySet().removeIf(keyPredicate::test);
     }
+
 }

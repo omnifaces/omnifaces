@@ -46,4 +46,5 @@ public class OmniRenderKitFactory extends RenderKitFactory {
     public Iterator<String> getRenderKitIds() {
         return getWrapped().getRenderKitIds();
     }
+
 }

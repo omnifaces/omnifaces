@@ -29,37 +29,37 @@ import org.openqa.selenium.support.FindBy;
 @TestMethodOrder(OrderAnnotation.class)
 public class ViewScopedViewStateIT extends OmniFacesIT {
 
-    @FindBy(id="bean")
+    @FindBy(id = "bean")
     private WebElement bean;
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="unload")
+    @FindBy(id = "unload")
     private WebElement unload;
 
-    @FindBy(id="newtab")
+    @FindBy(id = "newtab")
     private WebElement newtab;
 
-    @FindBy(id="non-ajax:submit")
+    @FindBy(id = "non-ajax:submit")
     private WebElement nonAjaxSubmit;
 
-    @FindBy(id="non-ajax:navigate")
+    @FindBy(id = "non-ajax:navigate")
     private WebElement nonAjaxNavigate;
 
-    @FindBy(id="ajax:submit")
+    @FindBy(id = "ajax:submit")
     private WebElement ajaxSubmit;
 
-    @FindBy(id="ajax:navigate")
+    @FindBy(id = "ajax:navigate")
     private WebElement ajaxNavigate;
 
-    @FindBy(css="#non-ajax > [name='jakarta.faces.ViewState']")
+    @FindBy(css = "#non-ajax > [name='jakarta.faces.ViewState']")
     private WebElement nonAjaxViewState;
 
-    @FindBy(css="#ajax > [name='jakarta.faces.ViewState']")
+    @FindBy(css = "#ajax > [name='jakarta.faces.ViewState']")
     private WebElement ajaxViewState;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ViewScopedViewStateIT.class)
             .withWebXml(withClientStateSaving)
@@ -79,12 +79,10 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertEquals("init", getMessagesText());
         var previousBean = bean.getText();
 
-
         // Unload.
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
-
 
         // Submit then unload.
         guardHttp(nonAjaxSubmit::click);
@@ -95,7 +93,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
 
-
         // Navigate then unload.
         guardHttp(nonAjaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
@@ -104,7 +101,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
-
 
         // Submit then navigate then unload.
         guardHttp(nonAjaxSubmit::click);
@@ -118,7 +114,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
-
 
         // Navigate then submit then unload.
         guardHttp(nonAjaxNavigate::click);
@@ -140,7 +135,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertEquals("init", getMessagesText());
         var previousBean = bean.getText();
 
-
         // Submit then unload.
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
@@ -150,7 +144,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
 
-
         // Navigate then unload.
         guardAjax(ajaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
@@ -159,7 +152,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
-
 
         // Submit then navigate then unload.
         guardAjax(ajaxSubmit::click);
@@ -173,7 +165,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
         assertEquals("init", getMessagesText());
-
 
         // Navigate then submit then unload.
         guardAjax(ajaxNavigate::click);
@@ -209,7 +200,6 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
         guardAjax(ajaxSubmit::click);
         assertEquals(firstBean, bean.getText());
         assertEquals("submit", getMessagesText());
-
 
         // Close second tab, copy view state from second tab into first tab and re-execute via non-ajax.
         closeCurrentTabAndSwitchTo(firstTab);

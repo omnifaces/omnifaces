@@ -18,9 +18,8 @@ import jakarta.faces.application.ResourceHandlerWrapper;
 
 /**
  * <p>
- * A default {@link ResourceHandler} implementation which hooks on all three {@link #createResource(String)},
- * {@link #createResource(String, String)} and {@link #createResource(String, String, String)} methods. Implementors
- * should only need to override <strong>either</strong> {@link #getLibraryName()} and
+ * A default {@link ResourceHandler} implementation which hooks on all three {@link #createResource(String)}, {@link #createResource(String, String)} and
+ * {@link #createResource(String, String, String)} methods. Implementors should only need to override <strong>either</strong> {@link #getLibraryName()} and
  * {@link #createResourceFromLibrary(String, String)}, <strong>or</strong> {@link #decorateResource(Resource)}.
  *
  * @author Bauke Scholtz
@@ -37,6 +36,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 
     /**
      * Creates a new instance of this default resource handler which wraps the given resource handler.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     protected DefaultResourceHandler(ResourceHandler wrapped) {
@@ -46,8 +46,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Delegate to {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String)}
-     * from the wrapped resource handler.
+     * Delegate to {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String)} from the wrapped resource handler.
      * <p>
      * Implementors should <strong>not</strong> override this.
      */
@@ -57,10 +56,9 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
     }
 
     /**
-     * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
-     * {@link #createResourceFromLibrary(String, String)} with <code>null</code> as content type, else delegate to
-     * {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String, String)}
-     * from the wrapped resource handler.
+     * If library name is not null and it equals {@link #getLibraryName()}, then delegate to {@link #createResourceFromLibrary(String, String)} with
+     * <code>null</code> as content type, else delegate to {@link #decorateResource(Resource, String, String)} with result of
+     * {@link #createResource(String, String)} from the wrapped resource handler.
      * <p>
      * Implementors should <strong>not</strong> override this.
      */
@@ -75,10 +73,8 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
     }
 
     /**
-     * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
-     * {@link #createResourceFromLibrary(String, String)}, else delegate to
-     * {@link #decorateResource(Resource, String, String)} with result of
-     * {@link #createResource(String, String, String)} from the wrapped resource handler.
+     * If library name is not null and it equals {@link #getLibraryName()}, then delegate to {@link #createResourceFromLibrary(String, String)}, else delegate
+     * to {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String, String, String)} from the wrapped resource handler.
      * <p>
      * Implementors should <strong>not</strong> override this.
      */
@@ -93,12 +89,12 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
     }
 
     /**
-     * Returns the library name on which this resource handler implementation should listen. If a resource from
-     * specifically this library name is requested, then {@link #createResourceFromLibrary(String, String)} will be
-     * called to create the resource, else {@link #decorateResource(Resource)} will be called with result of the call
-     * from the wrapped resource handler.
+     * Returns the library name on which this resource handler implementation should listen. If a resource from specifically this library name is requested,
+     * then {@link #createResourceFromLibrary(String, String)} will be called to create the resource, else {@link #decorateResource(Resource)} will be called
+     * with result of the call from the wrapped resource handler.
      * <p>
      * The default implementation returns <code>null</code>.
+     * 
      * @return The library name on which this resource handler implementation should listen.
      */
     public String getLibraryName() {
@@ -106,10 +102,10 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
     }
 
     /**
-     * Returns the library-specific resource in case a resource from specifically the library name as identified by
-     * {@link #getLibraryName()} is requested.
+     * Returns the library-specific resource in case a resource from specifically the library name as identified by {@link #getLibraryName()} is requested.
      * <p>
      * The default implementation returns <code>null</code>.
+     * 
      * @param resourceName The resource name.
      * @param contentType The content type.
      * @return The library-specific resource.
@@ -122,6 +118,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * Decorate the given resource. This will only be called if no library-specific resource has been requested.
      * <p>
      * The default implementation delegates to {@link #decorateResource(Resource)}.
+     * 
      * @param resource The resource to be decorated.
      * @param resourceName The resource name.
      * @param libraryName The library name.
@@ -136,6 +133,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * Decorate the given resource. This will only be called if no library-specific resource has been requested.
      * <p>
      * The default implementation just returns the given resource unmodified.
+     * 
      * @param resource The resource to be decorated.
      * @return The decorated resource.
      */

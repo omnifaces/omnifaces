@@ -23,28 +23,30 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one"
+)
 public class LowercasedRequestURIIT extends OmniFacesIT {
 
-    @FindBy(id="linkWithExtensionOutcome")
+    @FindBy(id = "linkWithExtensionOutcome")
     private WebElement linkWithExtensionOutcome;
 
-    @FindBy(id="linkWithExtensionlessOutcome")
+    @FindBy(id = "linkWithExtensionlessOutcome")
     private WebElement linkWithExtensionlessOutcome;
 
-    @FindBy(id="lowercasedLinkWithExtensionOutcome")
+    @FindBy(id = "lowercasedLinkWithExtensionOutcome")
     private WebElement lowercasedLinkWithExtensionOutcome;
 
-    @FindBy(id="lowercasedLinkWithExtensionlessOutcome")
+    @FindBy(id = "lowercasedLinkWithExtensionlessOutcome")
     private WebElement lowercasedLinkWithExtensionlessOutcome;
 
-    @FindBy(id="form")
+    @FindBy(id = "form")
     private WebElement form;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement formSubmit;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(LowercasedRequestURIIT.class)
             .withWebXml(withFacesViewsLowercasedRequestURI)

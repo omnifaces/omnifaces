@@ -31,13 +31,13 @@ import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
 
 /**
- * This renderer is the default renderer of {@link DeferredScript}. The rendering is extracted from the component so
- * that it can be reused by {@link CombinedResourceHandler}.
+ * This renderer is the default renderer of {@link DeferredScript}. The rendering is extracted from the component so that it can be reused by
+ * {@link CombinedResourceHandler}.
  *
  * @author Bauke Scholtz
  * @since 1.8
  */
-@FacesRenderer(componentFamily=ScriptFamily.COMPONENT_FAMILY, rendererType=DeferredScriptRenderer.RENDERER_TYPE)
+@FacesRenderer(componentFamily = ScriptFamily.COMPONENT_FAMILY, rendererType = DeferredScriptRenderer.RENDERER_TYPE)
 public class DeferredScriptRenderer extends Renderer<DeferredScript> {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -48,9 +48,9 @@ public class DeferredScriptRenderer extends Renderer<DeferredScript> {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Writes a <code>&lt;script&gt;</code> element which calls <code>OmniFaces.DeferredScript.add</code> with as
-     * arguments the script URL and, if any, the onbegin, onsuccess and/or onerror callbacks. If the script resource is
-     * not resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
+     * Writes a <code>&lt;script&gt;</code> element which calls <code>OmniFaces.DeferredScript.add</code> with as arguments the script URL and, if any, the
+     * onbegin, onsuccess and/or onerror callbacks. If the script resource is not resolvable, then a <code>RES_NOT_FOUND</code> will be written to
+     * <code>src</code> attribute instead.
      */
     @Override
     public void encodeBegin(FacesContext context, DeferredScript component) throws IOException {

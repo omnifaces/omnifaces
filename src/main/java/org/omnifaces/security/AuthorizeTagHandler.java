@@ -31,26 +31,27 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;sec:authorize&gt;</code> tag conditionally renders its content based on role-based access control
- * using {@link SecurityContext}. It provides three mutually exclusive ways to check user roles: single role check,
- * any-of-roles check, or all-of-roles check.
+ * The <code>&lt;sec:authorize&gt;</code> tag conditionally renders its content based on role-based access control using {@link SecurityContext}. It provides
+ * three mutually exclusive ways to check user roles: single role check, any-of-roles check, or all-of-roles check.
  *
  *
  * <h2 id="usage"><a href="#usage">Usage</a></h2>
  * <p>
  * To use the security taglib, declare the <code>omnifaces.security</code> namespace in your Facelets view:
+ * 
  * <pre>
  * &lt;html xmlns:sec="omnifaces.security"&gt;
  * </pre>
  * <p>
- * The <code>&lt;sec:authorize&gt;</code> tag requires exactly one of the following attributes:
- * <strong><code>role</code></strong>, <strong><code>anyRole</code></strong>, or <strong><code>allRoles</code></strong>.
+ * The <code>&lt;sec:authorize&gt;</code> tag requires exactly one of the following attributes: <strong><code>role</code></strong>,
+ * <strong><code>anyRole</code></strong>, or <strong><code>allRoles</code></strong>.
  *
  *
  * <h2 id="single-role"><a href="#single-role">Single role check</a></h2>
  * <p>
- * Use the <strong><code>role</code></strong> attribute to check if the user has a specific role. The content will
- * only be rendered if the user has the specified role.
+ * Use the <strong><code>role</code></strong> attribute to check if the user has a specific role. The content will only be rendered if the user has the
+ * specified role.
+ * 
  * <pre>
  * &lt;sec:authorize role="ADMIN"&gt;
  *     &lt;h:link value="Admin Panel" outcome="/admin" /&gt;
@@ -60,8 +61,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <h2 id="any-role"><a href="#any-role">Any-of-roles check</a></h2>
  * <p>
- * Use the <strong><code>anyRole</code></strong> attribute with comma-separated role names to check if the user has
- * at least one of the specified roles. The content will be rendered if the user has <em>any</em> of the roles.
+ * Use the <strong><code>anyRole</code></strong> attribute with comma-separated role names to check if the user has at least one of the specified roles. The
+ * content will be rendered if the user has <em>any</em> of the roles.
+ * 
  * <pre>
  * &lt;sec:authorize anyRole="ADMIN, MODERATOR, EDITOR"&gt;
  *     &lt;h:link value="Content Management" outcome="/cms" /&gt;
@@ -71,8 +73,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <h2 id="all-roles"><a href="#all-roles">All-of-roles check</a></h2>
  * <p>
- * Use the <strong><code>allRoles</code></strong> attribute with comma-separated role names to check if the user has
- * all of the specified roles. The content will only be rendered if the user has <em>all</em> of the roles.
+ * Use the <strong><code>allRoles</code></strong> attribute with comma-separated role names to check if the user has all of the specified roles. The content
+ * will only be rendered if the user has <em>all</em> of the roles.
+ * 
  * <pre>
  * &lt;sec:authorize allRoles="ADMIN, AUDITOR"&gt;
  *     &lt;h:link value="Audit Logs" outcome="/audit" /&gt;
@@ -82,9 +85,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <h2 id="var"><a href="#var">Exposing authorization result</a></h2>
  * <p>
- * The optional <strong><code>var</code></strong> attribute exposes the boolean authorization result as a view-scoped
- * variable. This is useful when you need to use the authorization result in multiple places without repeating the
- * role check.
+ * The optional <strong><code>var</code></strong> attribute exposes the boolean authorization result as a view-scoped variable. This is useful when you need to
+ * use the authorization result in multiple places without repeating the role check.
+ * 
  * <pre>
  * &lt;sec:authorize role="ADMIN" var="isAdmin" /&gt;
  *
@@ -100,9 +103,8 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
- * This tag requires {@link SecurityContext} from <code>jakarta.security.enterprise</code> to be available. If the
- * security context is not available, a warning will be logged and no content will be rendered. Make sure your
- * application has Jakarta Security properly configured.
+ * This tag requires {@link SecurityContext} from <code>jakarta.security.enterprise</code> to be available. If the security context is not available, a warning
+ * will be logged and no content will be rendered. Make sure your application has Jakarta Security properly configured.
  *
  * @see BaseSecurityTagHandler
  * @see AnonymousTagHandler
@@ -117,13 +119,19 @@ public class AuthorizeTagHandler extends BaseSecurityTagHandler {
     @FacesAttribute(description = "Allows content to be rendered if the user has the role specified here. Mutually exclusive with anyRole and allRoles.")
     private final TagAttribute role;
 
-    @FacesAttribute(description = "Allows content to be rendered if the user has any of the comma-separated roles added here. Mutually exclusive with role and allRoles.")
+    @FacesAttribute(
+        description = "Allows content to be rendered if the user has any of the comma-separated roles added here. Mutually exclusive with role and allRoles."
+    )
     private final TagAttribute anyRole;
 
-    @FacesAttribute(description = "Allows content to be rendered if the user has all of the comma-separated roles added here. Mutually exclusive with role and anyRole.")
+    @FacesAttribute(
+        description = "Allows content to be rendered if the user has all of the comma-separated roles added here. Mutually exclusive with role and anyRole."
+    )
     private final TagAttribute allRoles;
 
-    @FacesAttribute(name = "var", description = "Name for a boolean EL variable containing the authorization result. Always set regardless of whether content is rendered.")
+    @FacesAttribute(
+        name = "var", description = "Name for a boolean EL variable containing the authorization result. Always set regardless of whether content is rendered."
+    )
     private final TagAttribute varAttribute;
 
     /**

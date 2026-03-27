@@ -32,8 +32,7 @@ import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This web socket channel manager holds all application and session scoped web socket channel identifiers registered by
- * <code>&lt;o:socket&gt;</code>.
+ * This web socket channel manager holds all application and session scoped web socket channel identifiers registered by <code>&lt;o:socket&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -46,9 +45,8 @@ public class SocketChannelManager extends PushChannelManager {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_VIEW_SCOPE_UNAVAILABLE =
-        "o:socket view scope is unavailable."
-            + " Perhaps you need to explicitly register the SocketChannelManager.ViewScope as a CDI managed bean?";
+    private static final String ERROR_VIEW_SCOPE_UNAVAILABLE = "o:socket view scope is unavailable."
+        + " Perhaps you need to explicitly register the SocketChannelManager.ViewScope as a CDI managed bean?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -64,13 +62,12 @@ public class SocketChannelManager extends PushChannelManager {
 
     /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
+     * 
      * @param channel The web socket channel.
-     * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
-     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
-     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
+     * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
+     * <code>null</code>, the default is <code>application</code>.
+     * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
+     * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      */
     protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
         if (oldUser != null) {
@@ -86,8 +83,8 @@ public class SocketChannelManager extends PushChannelManager {
     }
 
     /**
-     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close
-     * any open web sockets associated with it to avoid stale websockets. If any, also deregister session users.
+     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close any open web sockets associated with it
+     * to avoid stale websockets. If any, also deregister session users.
      */
     @PreDestroy
     @Override
@@ -130,11 +127,11 @@ public class SocketChannelManager extends PushChannelManager {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * This helps the web socket channel manager to hold view scoped web socket channel identifiers registered by
-     * <code>&lt;o:socket&gt;</code>.
+     * This helps the web socket channel manager to hold view scoped web socket channel identifiers registered by <code>&lt;o:socket&gt;</code>.
      * <p>
-     * Since OmniFaces 4.6 this class is {@code public} instead of {@code protected} so it can be externally registered
-     * into environment-specific CDI bean management facility.
+     * Since OmniFaces 4.6 this class is {@code public} instead of {@code protected} so it can be externally registered into environment-specific CDI bean
+     * management facility.
+     * 
      * @author Bauke Scholtz
      * @see SocketChannelManager
      * @since 2.3
@@ -148,6 +145,7 @@ public class SocketChannelManager extends PushChannelManager {
 
         /**
          * Returns the view scoped channels.
+         * 
          * @return The view scoped channels.
          */
         protected Map<String, String> getChannels() {
@@ -155,8 +153,8 @@ public class SocketChannelManager extends PushChannelManager {
         }
 
         /**
-         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly close
-         * any open web sockets associated with it to avoid stale websockets.
+         * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly close any open web sockets associated with it to
+         * avoid stale websockets.
          */
         @PreDestroy
         protected void deregisterViewScope() {
@@ -175,8 +173,7 @@ public class SocketChannelManager extends PushChannelManager {
     }
 
     /**
-     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push
-     * send time in {@link SocketPushContext}.
+     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push send time in {@link SocketPushContext}.
      */
     static String getChannelId(String channel, Map<String, String> sessionScope, Map<String, String> viewScope) {
         return PushChannelManager.getChannelId(channel, APPLICATION_SCOPE, sessionScope, viewScope);

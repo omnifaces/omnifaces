@@ -30,55 +30,57 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret error-page in web.xml and instead uses own one"
+)
 public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
-    @FindBy(id="exception")
+    @FindBy(id = "exception")
     private WebElement exception;
 
-    @FindBy(id="form1:throwDuringInvokeApplication")
+    @FindBy(id = "form1:throwDuringInvokeApplication")
     private WebElement throwDuringInvokeApplication;
 
-    @FindBy(id="form1:throwDuringUpdateModelValues")
+    @FindBy(id = "form1:throwDuringUpdateModelValues")
     private WebElement throwDuringUpdateModelValues;
 
-    @FindBy(id="form1:throwDuringRenderResponse")
+    @FindBy(id = "form1:throwDuringRenderResponse")
     private WebElement throwDuringRenderResponse;
 
-    @FindBy(id="form1:throwDuringSecondUpdateOfRenderResponse")
+    @FindBy(id = "form1:throwDuringSecondUpdateOfRenderResponse")
     private WebElement throwDuringSecondUpdateOfRenderResponse;
 
-    @FindBy(id="form1:throwDuringTreeVisitingOnRenderResponse")
+    @FindBy(id = "form1:throwDuringTreeVisitingOnRenderResponse")
     private WebElement throwDuringTreeVisitingOnRenderResponse;
 
-    @FindBy(id="form1:throwPrimeFacesDuringInvokeApplication")
+    @FindBy(id = "form1:throwPrimeFacesDuringInvokeApplication")
     private WebElement throwPrimeFacesDuringInvokeApplication;
 
-    @FindBy(id="form1:throwMixedDuringInvokeApplication")
+    @FindBy(id = "form1:throwMixedDuringInvokeApplication")
     private WebElement throwMixedDuringInvokeApplication;
 
-    @FindBy(id="form1:throwPrimeFacesDuringUpdateModelValues")
+    @FindBy(id = "form1:throwPrimeFacesDuringUpdateModelValues")
     private WebElement throwPrimeFacesDuringUpdateModelValues;
 
-    @FindBy(id="form1:throwPrimeFacesDuringRenderResponse")
+    @FindBy(id = "form1:throwPrimeFacesDuringRenderResponse")
     private WebElement throwPrimeFacesDuringRenderResponse;
 
-    @FindBy(id="form1:throwPrimeFacesDuringSecondUpdateOfRenderResponse")
+    @FindBy(id = "form1:throwPrimeFacesDuringSecondUpdateOfRenderResponse")
     private WebElement throwPrimeFacesDuringSecondUpdateOfRenderResponse;
 
-    @FindBy(id="form1:throwPrimeFacesDuringTreeVisitingOnRenderResponse")
+    @FindBy(id = "form1:throwPrimeFacesDuringTreeVisitingOnRenderResponse")
     private WebElement throwPrimeFacesDuringTreeVisitingOnRenderResponse;
 
-    @FindBy(id="form2:throwNonAjaxDuringInvokeApplication")
+    @FindBy(id = "form2:throwNonAjaxDuringInvokeApplication")
     private WebElement throwNonAjaxDuringInvokeApplication;
 
-    @FindBy(id="form1:throwNonAjaxDuringUpdateModelValues")
+    @FindBy(id = "form1:throwNonAjaxDuringUpdateModelValues")
     private WebElement throwNonAjaxDuringUpdateModelValues;
 
-    @FindBy(id="form3:throwNonAjaxDuringRenderResponse")
+    @FindBy(id = "form3:throwNonAjaxDuringRenderResponse")
     private WebElement throwNonAjaxDuringRenderResponse;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(FullAjaxExceptionHandlerIT.class)
             .withFacesConfig(withFullAjaxExceptionHandler)
@@ -113,7 +115,8 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
     @Test
     void throwDuringSecondUpdateOfRenderResponse() {
-        refresh(); // TODO: fix so that this is not necessary anymore -- PrimeFaces will unnecessarily render duplicate CSS resources in error page because existing ones have JSESSIONID path param appended and new ones not.
+        refresh(); // TODO: fix so that this is not necessary anymore -- PrimeFaces will unnecessarily render duplicate CSS resources in error page because
+                   // existing ones have JSESSIONID path param appended and new ones not.
         assertAllResourcesRendered();
         guardAjax(throwDuringSecondUpdateOfRenderResponse::click);
         assertTrue(exception.getText().contains("throwDuringRenderResponse"));
@@ -177,7 +180,9 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)"
+    )
     void throwNonAjaxDuringInvokeApplication() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringInvokeApplication::click);
@@ -186,7 +191,9 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)"
+    )
     void throwNonAjaxDuringUpdateModelValues() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringUpdateModelValues::click);
@@ -195,7 +202,9 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus test mode ignores error-page in web.xml and instead uses own one (works in non-test)"
+    )
     void throwNonAjaxDuringRenderResponse() {
         assertAllResourcesRendered();
         guardHttp(throwNonAjaxDuringRenderResponse::click);
@@ -215,8 +224,16 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
     }
 
     private void assertStylesheetResourceRendered(String library, String name) {
-        List<WebElement> stylesheets = new ArrayList<>(browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : "[href*='ln=" + library + "']"))));
-        stylesheets.addAll(browser.findElements(By.xpath("//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : "[contains(text(),'ln=" + library + "')]"))));
+        List<WebElement> stylesheets = new ArrayList<>(
+            browser.findElements(By.cssSelector("link[rel=stylesheet][href*='" + name + "']" + (library == null ? "" : "[href*='ln=" + library + "']")))
+        );
+        stylesheets.addAll(
+            browser.findElements(
+                By.xpath(
+                    "//style[contains(text(),'@import')][contains(text(),'" + name + "')]" + (library == null ? "" : "[contains(text(),'ln=" + library + "')]")
+                )
+            )
+        );
 
         if (stylesheets.isEmpty()) {
             fail("Missing stylesheet " + new ResourceIdentifier(library, name));

@@ -34,7 +34,10 @@ class UtilsTest {
     void testSerializeURLSafe() {
         for (var originalString : URL_SAFE_SERIALIZATION_EXAMPLES) {
             var serializedString = Utils.serializeURLSafe(originalString);
-            assertTrue(!serializedString.contains("="), "The serialized string '" + serializedString + "' based on '" + originalString + "' may not contain the '=' character");
+            assertTrue(
+                !serializedString.contains("="),
+                "The serialized string '" + serializedString + "' based on '" + originalString + "' may not contain the '=' character"
+            );
             var unserializedString = Utils.unserializeURLSafe(serializedString);
             assertEquals(originalString, unserializedString, "The unserialized string must exactly match the original string '" + originalString + "'");
         }

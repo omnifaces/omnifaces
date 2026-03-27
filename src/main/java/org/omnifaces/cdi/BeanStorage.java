@@ -29,8 +29,7 @@ import org.omnifaces.util.BeansLocal;
 import org.omnifaces.util.Utils;
 
 /**
- * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
- * the OmniFaces CDI view scope.
+ * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by the OmniFaces CDI view scope.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -52,6 +51,7 @@ public class BeanStorage implements Serializable {
 
     /**
      * Construct a new CDI bean storage with the given initial capacity of the map holding all beans.
+     * 
      * @param initialCapacity The initial capacity of the map holding all beans.
      */
     public BeanStorage(int initialCapacity) {
@@ -63,6 +63,7 @@ public class BeanStorage implements Serializable {
 
     /**
      * Returns the bean associated with the given context, or if there is none, then create one with the given creational context.
+     * 
      * @param <T> The generic bean type.
      * @param type The contextual type of the CDI managed bean.
      * @return The bean associated with given context and creational context.
@@ -87,6 +88,7 @@ public class BeanStorage implements Serializable {
 
     /**
      * Returns the bean associated with the given context, or <code>null</code> if there is none.
+     * 
      * @param <T> The generic bean type.
      * @param type The contextual type of the CDI managed bean.
      * @return The bean associated with the given context, or <code>null</code> if there is none.

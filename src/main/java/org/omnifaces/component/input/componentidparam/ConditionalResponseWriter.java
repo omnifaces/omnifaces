@@ -28,8 +28,7 @@ import org.omnifaces.component.input.ComponentIdParam;
 /**
  * ResponseWriter intended to work in conjunction with the {@link ComponentIdParam} component.
  * <p>
- * This allows rendering to proceed to the output if the current component matches any of the given ids, otherwise simply does not send anything to
- * the output.
+ * This allows rendering to proceed to the output if the current component matches any of the given ids, otherwise simply does not send anything to the output.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -49,13 +48,18 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
     /**
      * Construct conditional response writer.
+     * 
      * @param responseWriter Response writer to be wrapped.
      * @param facesContext Involved faces context.
      * @param componentIds Component IDs.
      * @param clientIds Client IDs.
      * @param renderChildren Whether to render children.
      */
-    public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+    public ConditionalResponseWriter(
+        ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds,
+        boolean renderChildren
+    )
+    {
         super(responseWriter);
         this.facesContext = facesContext;
         this.componentIds = componentIds;
@@ -259,7 +263,8 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
                     break;
                 }
             }
-        } else {
+        }
+        else {
             // Explicitly rendered component, remember this by reference, since client-id can change even for components
             // that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
             renderedReferenceCache.put(component, lastRendered);

@@ -26,385 +26,385 @@ import org.openqa.selenium.support.FindBy;
 
 public class ValidateBeanIT extends OmniFacesIT {
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="validateByCommand:input")
+    @FindBy(id = "validateByCommand:input")
     private WebElement input;
 
-    @FindBy(id="validateByCommand:validateDefaultByCommand")
+    @FindBy(id = "validateByCommand:validateDefaultByCommand")
     private WebElement validateDefaultByCommand;
 
-    @FindBy(id="validateByCommand:validateGroupByCommand")
+    @FindBy(id = "validateByCommand:validateGroupByCommand")
     private WebElement validateGroupByCommand;
 
-    @FindBy(id="validateByCommand:validateDefaultAndGroupByCommand")
+    @FindBy(id = "validateByCommand:validateDefaultAndGroupByCommand")
     private WebElement validateDefaultAndGroupByCommand;
 
-    @FindBy(id="validateByCommand:validateDisabledByCommand")
+    @FindBy(id = "validateByCommand:validateDisabledByCommand")
     private WebElement validateDisabledByCommand;
 
-    @FindBy(id="validateByInput:validateDefaultByInput")
+    @FindBy(id = "validateByInput:validateDefaultByInput")
     private WebElement validateDefaultByInput;
 
-    @FindBy(id="validateByInput:validateGroupByInput")
+    @FindBy(id = "validateByInput:validateGroupByInput")
     private WebElement validateGroupByInput;
 
-    @FindBy(id="validateByInput:validateDefaultAndGroupByInput")
+    @FindBy(id = "validateByInput:validateDefaultAndGroupByInput")
     private WebElement validateDefaultAndGroupByInput;
 
-    @FindBy(id="validateByInput:validateDisabledByInput")
+    @FindBy(id = "validateByInput:validateDisabledByInput")
     private WebElement validateDisabledByInput;
 
-    @FindBy(id="validateDefaultWithMessageForViolating:input")
+    @FindBy(id = "validateDefaultWithMessageForViolating:input")
     private WebElement validateDefaultWithMessageForViolatingInput;
 
-    @FindBy(id="validateDefaultWithMessageForViolating:inputMessage")
+    @FindBy(id = "validateDefaultWithMessageForViolating:inputMessage")
     private WebElement validateDefaultWithMessageForViolatingInputMessage;
 
-    @FindBy(id="validateDefaultWithMessageForViolating:formMessage")
+    @FindBy(id = "validateDefaultWithMessageForViolating:formMessage")
     private WebElement validateDefaultWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateDefaultWithMessageForViolating:command")
+    @FindBy(id = "validateDefaultWithMessageForViolating:command")
     private WebElement validateDefaultWithMessageForViolatingCommand;
 
-    @FindBy(id="validateClassLevelDefault:number1")
+    @FindBy(id = "validateClassLevelDefault:number1")
     private WebElement validateClassLevelDefaultNumber1;
 
-    @FindBy(id="validateClassLevelDefault:number2")
+    @FindBy(id = "validateClassLevelDefault:number2")
     private WebElement validateClassLevelDefaultNumber2;
 
-    @FindBy(id="validateClassLevelDefault:command")
+    @FindBy(id = "validateClassLevelDefault:command")
     private WebElement validateClassLevelDefaultCommand;
 
-    @FindBy(id="validateClassLevelActual:number1")
+    @FindBy(id = "validateClassLevelActual:number1")
     private WebElement validateClassLevelActualNumber1;
 
-    @FindBy(id="validateClassLevelActual:number2")
+    @FindBy(id = "validateClassLevelActual:number2")
     private WebElement validateClassLevelActualNumber2;
 
-    @FindBy(id="validateClassLevelActual:command")
+    @FindBy(id = "validateClassLevelActual:command")
     private WebElement validateClassLevelActualCommand;
 
-    @FindBy(id="validateClassLevelByCopier:number1")
+    @FindBy(id = "validateClassLevelByCopier:number1")
     private WebElement validateClassLevelByCopierNumber1;
 
-    @FindBy(id="validateClassLevelByCopier:number2")
+    @FindBy(id = "validateClassLevelByCopier:number2")
     private WebElement validateClassLevelByCopierNumber2;
 
-    @FindBy(id="validateClassLevelByCopier:command")
+    @FindBy(id = "validateClassLevelByCopier:command")
     private WebElement validateClassLevelByCopierCommand;
 
-    @FindBy(id="validateClassLevelWithMessageFormat:number1")
+    @FindBy(id = "validateClassLevelWithMessageFormat:number1")
     private WebElement validateClassLevelWithMessageFormatNumber1;
 
-    @FindBy(id="validateClassLevelWithMessageFormat:number2")
+    @FindBy(id = "validateClassLevelWithMessageFormat:number2")
     private WebElement validateClassLevelWithMessageFormatNumber2;
 
-    @FindBy(id="validateClassLevelWithMessageFormat:globalMessage")
+    @FindBy(id = "validateClassLevelWithMessageFormat:globalMessage")
     private WebElement validateClassLevelWithMessageFormatMessage;
 
-    @FindBy(id="validateClassLevelWithMessageFormat:command")
+    @FindBy(id = "validateClassLevelWithMessageFormat:command")
     private WebElement validateClassLevelWithMessageFormatCommand;
 
-    @FindBy(id="validateClassLevelWithMessageForForm:number1")
+    @FindBy(id = "validateClassLevelWithMessageForForm:number1")
     private WebElement validateClassLevelWithMessageForFormNumber1;
 
-    @FindBy(id="validateClassLevelWithMessageForForm:number2")
+    @FindBy(id = "validateClassLevelWithMessageForForm:number2")
     private WebElement validateClassLevelWithMessageForFormNumber2;
 
-    @FindBy(id="validateClassLevelWithMessageForForm:formMessage")
+    @FindBy(id = "validateClassLevelWithMessageForForm:formMessage")
     private WebElement validateClassLevelWithMessageForFormMessage;
 
-    @FindBy(id="validateClassLevelWithMessageForForm:command")
+    @FindBy(id = "validateClassLevelWithMessageForForm:command")
     private WebElement validateClassLevelWithMessageForFormCommand;
 
-    @FindBy(id="validateClassLevelWithMessageForAll:number1")
+    @FindBy(id = "validateClassLevelWithMessageForAll:number1")
     private WebElement validateClassLevelWithMessageForAllNumber1;
 
-    @FindBy(id="validateClassLevelWithMessageForAll:number1Message")
+    @FindBy(id = "validateClassLevelWithMessageForAll:number1Message")
     private WebElement validateClassLevelWithMessageForAllNumber1Message;
 
-    @FindBy(id="validateClassLevelWithMessageForAll:number2")
+    @FindBy(id = "validateClassLevelWithMessageForAll:number2")
     private WebElement validateClassLevelWithMessageForAllNumber2;
 
-    @FindBy(id="validateClassLevelWithMessageForAll:number2Message")
+    @FindBy(id = "validateClassLevelWithMessageForAll:number2Message")
     private WebElement validateClassLevelWithMessageForAllNumber2Message;
 
-    @FindBy(id="validateClassLevelWithMessageForAll:command")
+    @FindBy(id = "validateClassLevelWithMessageForAll:command")
     private WebElement validateClassLevelWithMessageForAllCommand;
 
-    @FindBy(id="validateClassLevelWithMessageForGlobal:number1")
+    @FindBy(id = "validateClassLevelWithMessageForGlobal:number1")
     private WebElement validateClassLevelWithMessageForGlobalNumber1;
 
-    @FindBy(id="validateClassLevelWithMessageForGlobal:number2")
+    @FindBy(id = "validateClassLevelWithMessageForGlobal:number2")
     private WebElement validateClassLevelWithMessageForGlobalNumber2;
 
-    @FindBy(id="validateClassLevelWithMessageForGlobal:globalMessage")
+    @FindBy(id = "validateClassLevelWithMessageForGlobal:globalMessage")
     private WebElement validateClassLevelWithMessageForGlobalMessage;
 
-    @FindBy(id="validateClassLevelWithMessageForGlobal:command")
+    @FindBy(id = "validateClassLevelWithMessageForGlobal:command")
     private WebElement validateClassLevelWithMessageForGlobalCommand;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:number1")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:number1")
     private WebElement validateClassLevelWithMessageForViolatingNumber1;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:number1Message")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:number1Message")
     private WebElement validateClassLevelWithMessageForViolatingNumber1Message;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:number2")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:number2")
     private WebElement validateClassLevelWithMessageForViolatingNumber2;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:number2Message")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:number2Message")
     private WebElement validateClassLevelWithMessageForViolatingNumber2Message;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:formMessage")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:formMessage")
     private WebElement validateClassLevelWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateClassLevelWithMessageForViolating:command")
+    @FindBy(id = "validateClassLevelWithMessageForViolating:command")
     private WebElement validateClassLevelWithMessageForViolatingCommand;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:number1")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:number1")
     private WebElement validateClassLevelActualWithMessageForViolatingNumber1;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:number1Message")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:number1Message")
     private WebElement validateClassLevelActualWithMessageForViolatingNumber1Message;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:number2")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:number2")
     private WebElement validateClassLevelActualWithMessageForViolatingNumber2;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:number2Message")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:number2Message")
     private WebElement validateClassLevelActualWithMessageForViolatingNumber2Message;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:formMessage")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:formMessage")
     private WebElement validateClassLevelActualWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateClassLevelActualWithMessageForViolating:command")
+    @FindBy(id = "validateClassLevelActualWithMessageForViolating:command")
     private WebElement validateClassLevelActualWithMessageForViolatingCommand;
 
-    @FindBy(id="validateConvertedEntityActualWithMessageForViolating:input")
+    @FindBy(id = "validateConvertedEntityActualWithMessageForViolating:input")
     private WebElement validateConvertedEntityActualWithMessageForViolatingInput;
 
-    @FindBy(id="validateConvertedEntityActualWithMessageForViolating:inputMessage")
+    @FindBy(id = "validateConvertedEntityActualWithMessageForViolating:inputMessage")
     private WebElement validateConvertedEntityActualWithMessageForViolatingInputMessage;
 
-    @FindBy(id="validateConvertedEntityActualWithMessageForViolating:formMessage")
+    @FindBy(id = "validateConvertedEntityActualWithMessageForViolating:formMessage")
     private WebElement validateConvertedEntityActualWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateConvertedEntityActualWithMessageForViolating:command")
+    @FindBy(id = "validateConvertedEntityActualWithMessageForViolating:command")
     private WebElement validateConvertedEntityActualWithMessageForViolatingCommand;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:number1")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:number1")
     private WebElement validateNestedClassLevelWithMessageForViolatingNumber1;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:number1Message")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:number1Message")
     private WebElement validateNestedClassLevelWithMessageForViolatingNumber1Message;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:number2")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:number2")
     private WebElement validateNestedClassLevelWithMessageForViolatingNumber2;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:number2Message")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:number2Message")
     private WebElement validateNestedClassLevelWithMessageForViolatingNumber2Message;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:formMessage")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:formMessage")
     private WebElement validateNestedClassLevelWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateNestedClassLevelWithMessageForViolating:command")
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolating:command")
     private WebElement validateNestedClassLevelWithMessageForViolatingCommand;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number1")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:number1")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber1;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number1Message")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:number1Message")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber1Message;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number2")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:number2")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber2;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number2Message")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:number2Message")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber2Message;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:formMessage")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:formMessage")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateNestedClassLevelActualWithMessageForViolating:command")
+    @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:command")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingCommand;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number1")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:0:number1")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number1;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number1Message")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:0:number1Message")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number1Message;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number2")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:0:number2")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number2;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number2Message")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:0:number2Message")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number2Message;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number1")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:1:number1")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number1;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number1Message")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:1:number1Message")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number1Message;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number2")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:1:number2")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number2;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number2Message")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:1:number2Message")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number2Message;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:formMessage")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:formMessage")
     private WebElement validateNestedListClassLevelWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateNestedListClassLevelWithMessageForViolating:command")
+    @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:command")
     private WebElement validateNestedListClassLevelWithMessageForViolatingCommand;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number1")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:0:number1")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number1;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number1Message")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:0:number1Message")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number2")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:0:number2")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number2;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number2Message")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:0:number2Message")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number1")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:1:number1")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number1;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number1Message")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:1:number1Message")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number2")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:1:number2")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number2;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number2Message")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:list:1:number2Message")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:formMessage")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:formMessage")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:command")
+    @FindBy(id = "validateNestedListClassLevelActualWithMessageForViolating:command")
     private WebElement validateNestedListClassLevelActualWithMessageForViolatingCommand;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number1")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number1")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList0Number1;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number1Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number1Message")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList0Number1Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number2")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number2")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number2Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:0:number2Message")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number1")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number1")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number1Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number1Message")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number2")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number2")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number2Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:nested:0:list:1:number2Message")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:formMessage")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:formMessage")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateDoubleNestedListClassLevelWithMessageForViolating:command")
+    @FindBy(id = "validateDoubleNestedListClassLevelWithMessageForViolating:command")
     private WebElement validateDoubleNestedListClassLevelWithMessageForViolatingCommand;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number1")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number1")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number1;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number1Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number1Message")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number1Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number2")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number2")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number2Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:0:number2Message")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number1")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number1")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number1Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number1Message")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number2")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number2")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number2Message")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:nested:0:list:1:number2Message")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2Message;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:formMessage")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:formMessage")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingFormMessage;
 
-    @FindBy(id="validateDoubleNestedListClassLevelActualWithMessageForViolating:command")
+    @FindBy(id = "validateDoubleNestedListClassLevelActualWithMessageForViolating:command")
     private WebElement validateDoubleNestedListClassLevelActualWithMessageForViolatingCommand;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:composite:number1")
     private WebElement validateClassLevelWithInputEntityCompositeNumber1;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1Message")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:composite:number1Message")
     private WebElement validateClassLevelWithInputEntityCompositeNumber1Message;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:composite:number2")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:composite:number2")
     private WebElement validateClassLevelWithInputEntityCompositeNumber2;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:composite:number2Message")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:composite:number2Message")
     private WebElement validateClassLevelWithInputEntityCompositeNumber2Message;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:formMessage")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:formMessage")
     private WebElement validateClassLevelWithInputEntityCompositeFormMessage;
 
-    @FindBy(id="validateClassLevelWithInputEntityComposite:command")
+    @FindBy(id = "validateClassLevelWithInputEntityComposite:command")
     private WebElement validateClassLevelWithInputEntityCompositeCommand;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:number1")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:number1")
     private WebElement validateClassLevelWithFormEntityCompositeNumber1;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:number1Message")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:number1Message")
     private WebElement validateClassLevelWithFormEntityCompositeNumber1Message;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:number2")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:number2")
     private WebElement validateClassLevelWithFormEntityCompositeNumber2;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:number2Message")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:number2Message")
     private WebElement validateClassLevelWithFormEntityCompositeNumber2Message;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:formMessage")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:formMessage")
     private WebElement validateClassLevelWithFormEntityCompositeFormMessage;
 
-    @FindBy(id="validateClassLevelWithFormEntityComposite:form:command")
+    @FindBy(id = "validateClassLevelWithFormEntityComposite:form:command")
     private WebElement validateClassLevelWithFormEntityCompositeCommand;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:0:input")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:flightNumbers:0:input")
     private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber1;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:0:message")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:flightNumbers:0:message")
     private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber1Message;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:1:input")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:flightNumbers:1:input")
     private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber2;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:flightNumbers:1:message")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:flightNumbers:1:message")
     private WebElement validateBeanWithCustomTypeAsPropertyFlightNumber2Message;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:command")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:command")
     private WebElement validateBeanWithCustomTypeAsPropertyCommand;
 
-    @FindBy(id="validateBeanWithCustomTypeAsProperty:messages")
+    @FindBy(id = "validateBeanWithCustomTypeAsProperty:messages")
     private WebElement validateBeanWithCustomTypeAsPropertyMessages;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ValidateBeanIT.class)
             .withFacesConfig(withMessageBundle)
@@ -432,12 +432,13 @@ public class ValidateBeanIT extends OmniFacesIT {
         guardAjax(validateGroupByCommand::click);
         assertEquals("actionSuccess", getMessagesText());
 
-// Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
-//        input.clear();
-//        input.sendKeys("x");
-//        guardAjax(validateDefaultAndGroupByCommand::click);
-//        var message = getMessagesText()
-//        assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's unordered.
+        // Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
+        // input.clear();
+        // input.sendKeys("x");
+        // guardAjax(validateDefaultAndGroupByCommand::click);
+        // var message = getMessagesText()
+        // assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's
+        // unordered.
 
         input.clear();
         input.sendKeys("xx");
@@ -475,12 +476,13 @@ public class ValidateBeanIT extends OmniFacesIT {
         guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
         assertEquals("actionSuccess", getMessagesText());
 
-// Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
-//        validateDefaultAndGroupByInput.clear();
-//        validateDefaultAndGroupByInput.sendKeys("x");
-//        guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
-//        var message = getMessagesText();
-//        assertTrue(message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"), message + " contains default and group"); // It's unordered.
+        // Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
+        // validateDefaultAndGroupByInput.clear();
+        // validateDefaultAndGroupByInput.sendKeys("x");
+        // guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
+        // var message = getMessagesText();
+        // assertTrue(message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"),
+        // message + " contains default and group"); // It's unordered.
 
         validateDefaultAndGroupByInput.clear();
         validateDefaultAndGroupByInput.sendKeys("xx");
@@ -498,7 +500,14 @@ public class ValidateBeanIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "jakarta.validation.ValidationException: HV000250: Uninitialized locale: en. Please register your locale as a locale to initialize when initializing your ValidatorFactory.") // Unclear why. Adding ValidationMessages_en.properties didn't help.
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "quarkus-.*", disabledReason = "jakarta.validation.ValidationException: HV000250: Uninitialized locale: en. Please register your locale as a locale to initialize when initializing your ValidatorFactory."
+    ) // Unclear
+      // why.
+      // Adding
+      // ValidationMessages_en.properties
+      // didn't
+      // help.
     void validateDefaultWithMessageForViolating() {
         validateDefaultWithMessageForViolatingInput.sendKeys("x");
         guardAjax(validateDefaultWithMessageForViolatingCommand::click);
@@ -760,9 +769,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @Test
     void validateNestedListClassLevelActualWithMessagesForViolating() {
-        validateNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                             // ValidateBeanITEntityValidator.
         validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("1");
-        validateNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                             // ValidateBeanITEntityValidator.
         validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("1");
         guardAjax(validateNestedListClassLevelActualWithMessageForViolatingCommand::click);
         assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
@@ -810,9 +821,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @Test
     void validateDoubleNestedListClassLevelWithMessagesForViolating() {
-        validateDoubleNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateDoubleNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                             // ValidateBeanITEntityValidator.
         validateDoubleNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
-        validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateDoubleNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                             // ValidateBeanITEntityValidator.
         validateDoubleNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("1");
         guardAjax(validateDoubleNestedListClassLevelWithMessageForViolatingCommand::click);
         assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
@@ -860,9 +873,11 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @Test
     void validateDoubleNestedListClassLevelActualWithMessagesForViolating() {
-        validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                                   // ValidateBeanITEntityValidator.
         validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("1");
-        validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in
+                                                                                                   // ValidateBeanITEntityValidator.
         validateDoubleNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("1");
         guardAjax(validateDoubleNestedListClassLevelActualWithMessageForViolatingCommand::click);
         assertEquals("number1Label: invalidEntity", validateDoubleNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
@@ -953,4 +968,5 @@ public class ValidateBeanIT extends OmniFacesIT {
         assertEquals("", validateBeanWithCustomTypeAsPropertyFlightNumber2Message.getText());
         assertEquals("actionSuccess", validateBeanWithCustomTypeAsPropertyMessages.getText());
     }
+
 }

@@ -42,12 +42,11 @@ import org.xml.sax.SAXParseException;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
- * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods here once we encounter non-DRY code in
+ * OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
- * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
- * accept the risk that the method signatures can be changed without notice. This utility class exists because OmniFaces
- * intends to be free of 3rd party dependencies.
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to accept the risk that the method signatures
+ * can be changed without notice. This utility class exists because OmniFaces intends to be free of 3rd party dependencies.
  *
  * @author Bauke Scholtz
  * @since 2.1
@@ -67,8 +66,9 @@ public final class Xml {
     // Create ---------------------------------------------------------------------------------------------------------
 
     /**
-     * Creates a single XML {@link Document} based on given URLs representing XML documents. All those XML documents
-     * are merged into a single root element named <code>root</code>.
+     * Creates a single XML {@link Document} based on given URLs representing XML documents. All those XML documents are merged into a single root element named
+     * <code>root</code>.
+     * 
      * @param urls The URLs representing XML documents.
      * @return A single XML document containing all given XML documents.
      * @throws IOException When an I/O error occurs.
@@ -83,8 +83,9 @@ public final class Xml {
     }
 
     /**
-     * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-     * references and disables external entity processing (to keep it as lenient and secure as possible).
+     * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity references and disables external entity
+     * processing (to keep it as lenient and secure as possible).
+     * 
      * @return A lenient instance of {@link DocumentBuilder}.
      */
     public static DocumentBuilder createDocumentBuilder() {
@@ -117,8 +118,8 @@ public final class Xml {
     // Manipulate -----------------------------------------------------------------------------------------------------
 
     /**
-     * Parse the given URLs as a document using the given builder and then append all its child nodes to the given
-     * document.
+     * Parse the given URLs as a document using the given builder and then append all its child nodes to the given document.
+     * 
      * @param builder The document builder.
      * @param document The document.
      * @param urls The URLs representing XML documents.
@@ -151,6 +152,7 @@ public final class Xml {
 
     /**
      * Convenience method to return a node list matching given XPath expression.
+     * 
      * @param node The node to return node list matching given XPath expression for.
      * @param xpath The XPath instance.
      * @param expression The XPath expression to match node list.
@@ -162,9 +164,9 @@ public final class Xml {
     }
 
     /**
-     * Convenience method to return trimmed text content of given node. This uses
-     * <code>getFirstChild().getNodeValue()</code> instead of <code>getTextContent()</code> to workaround some buggy
-     * JAXP implementations.
+     * Convenience method to return trimmed text content of given node. This uses <code>getFirstChild().getNodeValue()</code> instead of
+     * <code>getTextContent()</code> to workaround some buggy JAXP implementations.
+     * 
      * @param node The node to return text content for.
      * @return Trimmed text content of given node.
      */
@@ -173,8 +175,8 @@ public final class Xml {
     }
 
     /**
-     * Convenience method to return a list of node text contents for given URL representing XML document matching given
-     * XPath expression.
+     * Convenience method to return a list of node text contents for given URL representing XML document matching given XPath expression.
+     * 
      * @param url The URL representing XML document.
      * @param expression The XPath expression to match node list whose text content has to be collected.
      * @return A list of node text contents.

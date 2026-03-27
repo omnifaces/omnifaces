@@ -39,22 +39,21 @@ import org.omnifaces.util.JNDI;
 
 /**
  * <p>
- * CDI managed bean for rate limiting requests per client identifier. This utility provides a thread-safe
- * sliding window rate limiting mechanism with configurable request limits and time windows.
+ * CDI managed bean for rate limiting requests per client identifier. This utility provides a thread-safe sliding window rate limiting mechanism with
+ * configurable request limits and time windows.
  * <p>
- * The rate limiter supports both HTTP request-based rate limiting (using client IP addresses) and custom
- * client identifier-based rate limiting (using any string identifier such as user IDs, API keys, etc.).
- * It uses a {@link ConcurrentHashMap} to track request counts per client identifier and automatically
+ * The rate limiter supports both HTTP request-based rate limiting (using client IP addresses) and custom client identifier-based rate limiting (using any
+ * string identifier such as user IDs, API keys, etc.). It uses a {@link ConcurrentHashMap} to track request counts per client identifier and automatically
  * cleans up expired entries to prevent memory leaks.
  * <p>
- * When the rate limit is exceeded, the rate limiter will by default immediately throw a {@link RateLimitExceededException}.
- * Optionally, you can configure automatic retries via the {@code maxRetries} parameter, which will retry the request
- * after a calculated delay based on the remaining time window. If all retries are exhausted, a
- * {@link RateLimitExceededException} is thrown.
+ * When the rate limit is exceeded, the rate limiter will by default immediately throw a {@link RateLimitExceededException}. Optionally, you can configure
+ * automatic retries via the {@code maxRetries} parameter, which will retry the request after a calculated delay based on the remaining time window. If all
+ * retries are exhausted, a {@link RateLimitExceededException} is thrown.
  *
  * <h2>Usage</h2>
  * <p>
  * The recommended usage is with the {@link RateLimit} annotation.
+ * 
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -64,14 +63,15 @@ import org.omnifaces.util.JNDI;
  *     public void processFooApiRequest() {
  *         // Process Foo API request ...
  *     }
+ * 
  * }
  * </pre>
  *
  * <p>
- * For more fine grained usage, or when you have a variable rate limit parameter which therefore cannot be set as an
- * annotation attribute, then you can inject this CDI bean in any CDI managed artifact and explicitly invoke either
- * {@link #checkRateLimit(HttpServletRequest, int, Duration, int)} or {@link #checkRateLimit(String, int, Duration, int)}.
- * Below is an example of a servlet filter that applies rate limiting to all requests depending on client IP address:
+ * For more fine grained usage, or when you have a variable rate limit parameter which therefore cannot be set as an annotation attribute, then you can inject
+ * this CDI bean in any CDI managed artifact and explicitly invoke either {@link #checkRateLimit(HttpServletRequest, int, Duration, int)} or
+ * {@link #checkRateLimit(String, int, Duration, int)}. Below is an example of a servlet filter that applies rate limiting to all requests depending on client
+ * IP address:
  *
  * <pre>
  * &#64;WebFilter("/*")
@@ -94,6 +94,7 @@ import org.omnifaces.util.JNDI;
  *             response.sendError(429); // Too Many Requests
  *         }
  *     }
+ * 
  * }
  * </pre>
  *
@@ -112,12 +113,9 @@ public class RateLimiter {
 
     private static final String THREAD_ID = "omnifaces.RateLimiter.executorService";
 
-    private static final String WARNING_RETRY =
-            "Rate limit exceeded for client ID '%s'; now retry attempt #%d ...";
-    private static final String WARNING_INTERRUPTED =
-            "Rate limit delay interrupted for client ID '%s'; continuing with retry ...";
-    private static final String WARNING_UNEXPECTED_ERROR =
-            "Unexpected error during rate limit delay for client ID '%s'.";
+    private static final String WARNING_RETRY = "Rate limit exceeded for client ID '%s'; now retry attempt #%d ...";
+    private static final String WARNING_INTERRUPTED = "Rate limit delay interrupted for client ID '%s'; continuing with retry ...";
+    private static final String WARNING_UNEXPECTED_ERROR = "Unexpected error during rate limit delay for client ID '%s'.";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -128,8 +126,8 @@ public class RateLimiter {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First looks up the JEE default managed scheduled executor service in JNDI.
-     * If it isn't available, then create scheduled executor service ourselves with help of {@link Executors#newSingleThreadExecutor()}.
+     * First looks up the JEE default managed scheduled executor service in JNDI. If it isn't available, then create scheduled executor service ourselves with
+     * help of {@link Executors#newSingleThreadExecutor()}.
      */
     @PostConstruct
     public void init() {
@@ -153,30 +151,28 @@ public class RateLimiter {
     }
 
     /**
-     * Checks if the current request exceeds the configured rate limit for the client IP address associated with the
-     * given request.
+     * Checks if the current request exceeds the configured rate limit for the client IP address associated with the given request.
      * <p>
-     * This method implements a sliding window rate limiting algorithm. It tracks the number of requests
-     * per IP address within the specified time window and throws an exception if the limit is exceeded.
-     * Expired tracking entries are automatically cleaned up to prevent memory leaks.
+     * This method implements a sliding window rate limiting algorithm. It tracks the number of requests per IP address within the specified time window and
+     * throws an exception if the limit is exceeded. Expired tracking entries are automatically cleaned up to prevent memory leaks.
      *
      * @param request The HTTP servlet request to check.
      * @param maxRequestsPerTimeWindow The maximum number of requests allowed within the time window.
      * @param timeWindow The time window duration.
      * @param maxRetries The maximum number of retries.
-     * @throws RateLimitExceededException When the rate limit is exceeded for the client IP address associated with
-     * the given request.
+     * @throws RateLimitExceededException When the rate limit is exceeded for the client IP address associated with the given request.
      */
-    public void checkRateLimit(HttpServletRequest request, int maxRequestsPerTimeWindow, Duration timeWindow, int maxRetries) throws RateLimitExceededException {
+    public void checkRateLimit(HttpServletRequest request, int maxRequestsPerTimeWindow, Duration timeWindow, int maxRetries)
+        throws RateLimitExceededException
+    {
         checkRateLimit(getRemoteAddr(request), maxRequestsPerTimeWindow, timeWindow, maxRetries);
     }
 
     /**
      * Checks if the current request exceeds the configured rate limit for the given client identifier.
      * <p>
-     * This method implements a sliding window rate limiting algorithm. It tracks the number of requests
-     * per client identifier within the specified time window and throws an exception if the limit is exceeded.
-     * Expired tracking entries are automatically cleaned up to prevent memory leaks.
+     * This method implements a sliding window rate limiting algorithm. It tracks the number of requests per client identifier within the specified time window
+     * and throws an exception if the limit is exceeded. Expired tracking entries are automatically cleaned up to prevent memory leaks.
      *
      * @param clientId The client identifier to check, whether client IP, user ID, API key, etc.
      * @param maxRequestsPerTimeWindow The maximum number of requests allowed within the time window.
@@ -235,8 +231,8 @@ public class RateLimiter {
     }
 
     /**
-     * If the scheduled executor service was created with help of {@link Executors#newSingleThreadExecutor()},
-     * then attempt to orderly shut down it. If it's still not shut down after 5 seconds, then terminate it.
+     * If the scheduled executor service was created with help of {@link Executors#newSingleThreadExecutor()}, then attempt to orderly shut down it. If it's
+     * still not shut down after 5 seconds, then terminate it.
      */
     @PreDestroy
     public void destroy() {
@@ -261,6 +257,7 @@ public class RateLimiter {
      * Convenience class for a request counter.
      */
     private static class RequestCounter {
+
         long starttime;
         int count;
 
@@ -273,5 +270,7 @@ public class RateLimiter {
             count++;
             return this;
         }
+
     }
+
 }

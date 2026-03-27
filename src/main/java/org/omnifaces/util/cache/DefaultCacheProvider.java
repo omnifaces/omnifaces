@@ -13,8 +13,7 @@
 package org.omnifaces.util.cache;
 
 /**
- * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been
- * configured.
+ * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been configured.
  * <p>
  * This will create a Cache instance that uses a {@link LruCache} for the actual implementation.
  *

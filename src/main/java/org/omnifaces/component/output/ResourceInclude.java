@@ -33,12 +33,11 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>&lt;o:resourceInclude&gt;</code> component can be used to catch the output from a JSP or Servlet
- * resource and render it as output to the Faces writer. In effect, this allows you to include both Servlets and
- * JSP pages in e.g. Facelets.
+ * The <code>&lt;o:resourceInclude&gt;</code> component can be used to catch the output from a JSP or Servlet resource and render it as output to the Faces
+ * writer. In effect, this allows you to include both Servlets and JSP pages in e.g. Facelets.
  * <p>
- * Note that this isn't recommended as a lasting solution, but it might ease a migration from legacy JSP with
- * smelly scriptlets and all on them to a more sane and modern Facelets application.
+ * Note that this isn't recommended as a lasting solution, but it might ease a migration from legacy JSP with smelly scriptlets and all on them to a more sane
+ * and modern Facelets application.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -67,8 +66,7 @@ public class ResourceInclude extends OutputFamily {
     // UIComponent overrides ------------------------------------------------------------------------------------------
 
     /**
-     * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to
-     * the Faces response writer.
+     * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to the Faces response writer.
      */
     @Override
     public void encodeBegin(FacesContext context) throws IOException {
@@ -92,8 +90,8 @@ public class ResourceInclude extends OutputFamily {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to
-     * the current context root.
+     * Returns the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to the current context root.
+     * 
      * @return The pathname to the resource.
      */
     public String getPath() {
@@ -101,8 +99,8 @@ public class ResourceInclude extends OutputFamily {
     }
 
     /**
-     * Sets the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to
-     * the current context root.
+     * Sets the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to the current context root.
+     * 
      * @param path The pathname to the resource.
      */
     @FacesAttribute(required = true)

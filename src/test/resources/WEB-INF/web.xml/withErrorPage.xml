@@ -33,7 +33,7 @@
         <servlet-name>facesServlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
-    
+
     <error-page>
         <error-code>500</error-code>
         <location>/WEB-INF/500.xhtml</location>

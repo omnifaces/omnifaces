@@ -63,12 +63,11 @@ import jakarta.enterprise.inject.Typed;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
- * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods here once we encounter non-DRY code in
+ * OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
- * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
- * accept the risk that the method signatures can be changed without notice. This utility class exists because OmniFaces
- * intends to be free of 3rd party dependencies.
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to accept the risk that the method signatures
+ * can be changed without notice. This utility class exists because OmniFaces intends to be free of 3rd party dependencies.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -89,8 +88,8 @@ public final class Reflection {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * This class represents a property path. This is intended to be immutable.
-     * This is primarily used in {@link Reflection#getBaseBeanPropertyPaths(Object)} and {@link Reflection#setBeanProperties(Object, Map)}.
+     * This class represents a property path. This is intended to be immutable. This is primarily used in {@link Reflection#getBaseBeanPropertyPaths(Object)}
+     * and {@link Reflection#setBeanProperties(Object, Map)}.
      *
      * @author Bauke Scholtz
      * @since 3.8
@@ -107,6 +106,7 @@ public final class Reflection {
 
         /**
          * Create a new property path composed of given nodes.
+         * 
          * @param nodes Nodes of property path.
          * @return A new property path composed of given nodes.
          * @throws NullPointerException When one of the nodes is null.
@@ -126,11 +126,11 @@ public final class Reflection {
         }
 
         /**
-         * Create a new property path composed of the nodes of the current property path with the given node added.
-         * E.g. if the current property path is "person" and the given node is "name", then this returns a new property
-         * path representing "person.name". Or, if the current property path is "list" and the given node is "0", then
-         * this returns a new property path representing "list[0]". Or, if the current property path is "persons[0]"
-         * and the given node is "name", then this returns a new property path representing "persons[0].name"
+         * Create a new property path composed of the nodes of the current property path with the given node added. E.g. if the current property path is
+         * "person" and the given node is "name", then this returns a new property path representing "person.name". Or, if the current property path is "list"
+         * and the given node is "0", then this returns a new property path representing "list[0]". Or, if the current property path is "persons[0]" and the
+         * given node is "name", then this returns a new property path representing "persons[0].name"
+         * 
          * @param node Node to extend the current property path with.
          * @return A new property path composed of the nodes of the current property path added with the given node.
          * @throws NullPointerException When node is null.
@@ -200,6 +200,7 @@ public final class Reflection {
 
             return stringBuilder.toString();
         }
+
     }
 
     // Constructors ---------------------------------------------------------------------------------------------------
@@ -213,23 +214,21 @@ public final class Reflection {
     /**
      * Sets a collection of properties of a given bean to the values associated with those properties.
      * <p>
-     * In the map that represents these properties, each key represents the name of the property, with the value
-     * associated with that key being the value that is set for the property.
+     * In the map that represents these properties, each key represents the name of the property, with the value associated with that key being the value that
+     * is set for the property.
      * <p>
-     * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
-     * following call: <code>bean.setFoo("string");</code>
+     * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the following call:
+     * <code>bean.setFoo("string");</code>
      *
      * <p>
-     * NOTE: This particular method assumes that there's a write method for each property in the map with the right
-     * type. No specific checking is done whether this is indeed the case.
+     * NOTE: This particular method assumes that there's a write method for each property in the map with the right type. No specific checking is done whether
+     * this is indeed the case.
      *
      * <p>
      * If you need to set nested properties recursively as well, use {@link #setBeanProperties(Object, Map)} instead.
      *
-     * @param bean
-     *            the bean on which properties will be set
-     * @param propertiesToSet
-     *            the map containing properties and their values to be set on the bean
+     * @param bean the bean on which properties will be set
+     * @param propertiesToSet the map containing properties and their values to be set on the bean
      */
     public static void setProperties(Object bean, Map<String, Object> propertiesToSet) {
         Map<String, PropertyDescriptor> availableProperties = getPropertyDescriptors(bean.getClass());
@@ -242,31 +241,27 @@ public final class Reflection {
     /**
      * Sets a collection of properties of a given bean to the (optionally coerced) values associated with those properties.
      * <p>
-     * In the map that represents these properties, each key represents the name of the property, with the value
-     * associated with that key being the value that is set for the property.
+     * In the map that represents these properties, each key represents the name of the property, with the value associated with that key being the value that
+     * is set for the property.
      * <p>
-     * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
-     * following call: <code>bean.setFoo("string");</code>
-     *
-     * <p>
-     * NOTE 1: In case the value is a String, and the target type is not String, the standard property editor mechanism
-     * will be used to attempt a conversion.
+     * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the following call:
+     * <code>bean.setFoo("string");</code>
      *
      * <p>
-     * Note 2: This method operates somewhat as the reverse of {@link Reflection#setProperties(Object, Map)}. Here only
-     * the available writable properties of the bean are matched against the map with properties to set. Properties
-     * in the map for which there isn't a corresponding writable property on the bean are ignored.
+     * NOTE 1: In case the value is a String, and the target type is not String, the standard property editor mechanism will be used to attempt a conversion.
      *
      * <p>
-     * Following the above two notes, use this method when attempting to set properties on an bean in a lenient best effort
-     * basis. Use {@link Reflection#setProperties(Object, Map)} when all properties need to be set with the exact type as the value
-     * appears in the map.
+     * Note 2: This method operates somewhat as the reverse of {@link Reflection#setProperties(Object, Map)}. Here only the available writable properties of the
+     * bean are matched against the map with properties to set. Properties in the map for which there isn't a corresponding writable property on the bean are
+     * ignored.
+     *
+     * <p>
+     * Following the above two notes, use this method when attempting to set properties on an bean in a lenient best effort basis. Use
+     * {@link Reflection#setProperties(Object, Map)} when all properties need to be set with the exact type as the value appears in the map.
      *
      *
-     * @param bean
-     *            the bean on which properties will be set
-     * @param propertiesToSet
-     *            the map containing properties and their values to be set on the object
+     * @param bean the bean on which properties will be set
+     * @param propertiesToSet the map containing properties and their values to be set on the object
      */
     public static void setPropertiesWithCoercion(Object bean, Map<String, Object> propertiesToSet) {
         for (var property : getPropertyDescriptors(bean.getClass()).values()) {
@@ -295,15 +290,16 @@ public final class Reflection {
     }
 
     /**
-     * Recursively set given properties on given bean.
-     * It will automatically prepopulate nested lists, maps, arrays and beans where necessary.
+     * Recursively set given properties on given bean. It will automatically prepopulate nested lists, maps, arrays and beans where necessary.
+     * 
      * @param bean Bean to recursively set properties on.
      * @param properties Properties to recursively set on bean. The map key represents the property path and the map value represents the property value.
      * @since 3.8
      */
     public static void setBeanProperties(Object bean, Map<PropertyPath, Object> properties) {
         Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors = new HashMap<>();
-        Map<PropertyPath, Object> sortedProperties = new TreeMap<>(reverseOrder()); // Reverse order ensures that e.g. "list[4].property" comes before e.g. "list[0].property", so that the code knows how many items to prepopulate.
+        Map<PropertyPath, Object> sortedProperties = new TreeMap<>(reverseOrder()); // Reverse order ensures that e.g. "list[4].property" comes before e.g.
+                                                                                    // "list[0].property", so that the code knows how many items to prepopulate.
         sortedProperties.putAll(properties);
 
         for (var entry : sortedProperties.entrySet()) {
@@ -370,6 +366,7 @@ public final class Reflection {
 
     /**
      * Obtain given property from given bean.
+     * 
      * @param bean Bean to obtain property from.
      * @param property Property name.
      * @return Value of given property of given bean.
@@ -388,7 +385,11 @@ public final class Reflection {
         }
     }
 
-    private static Object getBeanProperty(Object bean, String property, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Comparable<?> nextPropertyNode) {
+    private static Object getBeanProperty(
+        Object bean, String property, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors,
+        Comparable<?> nextPropertyNode
+    )
+    {
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(bean.getClass(), property, cachedDescriptors);
         Object value = getBeanProperty(bean, propertyDescriptor);
 
@@ -462,10 +463,10 @@ public final class Reflection {
     }
 
     /**
-     * Recursively collect all base bean property paths from the given bean which resolve to non-null bases. A "base" is
-     * represented by the bean itself and all of its nested lists, maps, arrays and beans. This does not include the
-     * non-nested properties of any base. E.g. "person.address.street" will return a map with actual instances of
-     * "person" and "person.address" as keys. Note that the "street" is not included as it does not represent a base.
+     * Recursively collect all base bean property paths from the given bean which resolve to non-null bases. A "base" is represented by the bean itself and all
+     * of its nested lists, maps, arrays and beans. This does not include the non-nested properties of any base. E.g. "person.address.street" will return a map
+     * with actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it does not represent a base.
+     * 
      * @param bean The given bean.
      * @return All base bean property paths which resolve to non-null values, mapped by the base.
      * @since 3.8
@@ -475,11 +476,11 @@ public final class Reflection {
     }
 
     /**
-     * Recursively collect all base bean property paths from the given bean which resolve to non-null bases and are
-     * recursable. A "base" is represented by the bean itself and all of its nested lists, maps, arrays and beans. This
-     * does not include the non-nested properties of any base. E.g. "person.address.street" will return a map with
-     * actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it does not
-     * represent a base.
+     * Recursively collect all base bean property paths from the given bean which resolve to non-null bases and are recursable. A "base" is represented by the
+     * bean itself and all of its nested lists, maps, arrays and beans. This does not include the non-nested properties of any base. E.g.
+     * "person.address.street" will return a map with actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it
+     * does not represent a base.
+     * 
      * @param bean The given bean.
      * @param recursableGetter Whether the given getter method is recursable.
      * @return All base bean property paths which resolve to non-null values, mapped by the base.
@@ -494,7 +495,11 @@ public final class Reflection {
         return collectedBasePropertyPaths;
     }
 
-    private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+    private static void collectBasePropertyPaths(
+        Object base, PropertyPath basePath, Predicate<Method> recursableGetter,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths
+    )
+    {
         if (base == null) {
             return;
         }
@@ -513,38 +518,65 @@ public final class Reflection {
         }
     }
 
-    private static void collectBasePropertyPathsFromList(List<?> list, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+    private static void collectBasePropertyPathsFromList(
+        List<?> list, PropertyPath basePath, Predicate<Method> recursableGetter,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths
+    )
+    {
         for (var index = 0; index < list.size(); index++) {
             collectBasePropertyPath(list.get(index), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, index);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static void collectBasePropertyPathsFromMap(Map<?, ?> map, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+    private static void collectBasePropertyPathsFromMap(
+        Map<?, ?> map, PropertyPath basePath, Predicate<Method> recursableGetter,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths
+    )
+    {
         for (Entry<?, ?> entry : map.entrySet()) {
             Object key = entry.getKey();
 
             if (key instanceof Comparable && key instanceof Serializable) {
-                collectBasePropertyPath(entry.getValue(), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, (Comparable<? extends Serializable>) key);
+                collectBasePropertyPath(
+                    entry.getValue(), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths,
+                    (Comparable<? extends Serializable>) key
+                );
             }
         }
     }
 
-    private static void collectBasePropertyPathsFromArray(Object[] array, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+    private static void collectBasePropertyPathsFromArray(
+        Object[] array, PropertyPath basePath, Predicate<Method> recursableGetter,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths
+    )
+    {
         for (var index = 0; index < array.length; index++) {
             collectBasePropertyPath(array[index], recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, index);
         }
     }
 
-    private static void collectBasePropertyPathsFromBean(Object bean, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+    private static void collectBasePropertyPathsFromBean(
+        Object bean, PropertyPath basePath, Predicate<Method> recursableGetter,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths
+    )
+    {
         for (var propertyDescriptor : getPropertyDescriptors(bean.getClass(), cachedDescriptors).values()) {
             if (recursableGetter.test(propertyDescriptor.getReadMethod())) {
-                collectBasePropertyPath(getBeanProperty(bean, propertyDescriptor), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, propertyDescriptor.getName());
+                collectBasePropertyPath(
+                    getBeanProperty(bean, propertyDescriptor), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths,
+                    propertyDescriptor.getName()
+                );
             }
         }
     }
 
-    private static void collectBasePropertyPath(Object value, Predicate<Method> recursableGetter, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths, Comparable<? extends Serializable> property) {
+    private static void collectBasePropertyPath(
+        Object value, Predicate<Method> recursableGetter, PropertyPath basePath,
+        Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths,
+        Comparable<? extends Serializable> property
+    )
+    {
         if (value != null && isNeedsFurtherRecursion(value.getClass()) && !collectedBasePropertyPaths.containsKey(value)) {
             PropertyPath path = basePath.with(property);
             collectedBasePropertyPaths.put(value, path);
@@ -554,18 +586,18 @@ public final class Reflection {
 
     private static boolean isNeedsFurtherRecursion(Class<?> type) {
         return (!type.isPrimitive()
-                && !isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class)
-                && (!Iterable.class.isAssignableFrom(type) || isOneInstanceOf(type, List.class, Map.class)));
+            && !isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class)
+            && (!Iterable.class.isAssignableFrom(type) || isOneInstanceOf(type, List.class, Map.class)));
     }
 
     /**
-     * Given a method name, e.g. "getName", "isCompleted" or "setValue", return the name of the corresponding bean
-     * property based on the JavaBeans specification, e.g. "name", "completed" or "value", if any. If the method name
-     * does not represent a valid bean property getter or setter, then return {@code null}.
+     * Given a method name, e.g. "getName", "isCompleted" or "setValue", return the name of the corresponding bean property based on the JavaBeans
+     * specification, e.g. "name", "completed" or "value", if any. If the method name does not represent a valid bean property getter or setter, then return
+     * {@code null}.
      *
      * @param methodName The name of the method to return property name for.
-     * @return The name of the bean property corresponding to the given method name, or {@code null} if the given method
-     * name does not represent a valid bean property getter or setter.
+     * @return The name of the bean property corresponding to the given method name, or {@code null} if the given method name does not represent a valid bean
+     * property getter or setter.
      * @since 4.7
      */
     public static String getPropertyName(String methodName) {
@@ -586,12 +618,10 @@ public final class Reflection {
     // Methods --------------------------------------------------------------------------------------------------------
 
     /**
-     * Finds a method based on the method name, amount of parameters and limited typing and returns <code>null</code>
-     * is none is found.
+     * Finds a method based on the method name, amount of parameters and limited typing and returns <code>null</code> is none is found.
      * <p>
-     * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select
-     * a method accepting Number when the choice is between Number and a non-compatible type like String. However,
-     * it will NOT select the best match if the choice is between Number and Long.
+     * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select a method accepting Number when the
+     * choice is between Number and a non-compatible type like String. However, it will NOT select the best match if the choice is between Number and Long.
      *
      * @param base the object in which the method is to be found
      * @param methodName name of the method to be found
@@ -614,7 +644,7 @@ public final class Reflection {
             return methods.get(0);
         }
         else {
-            return closestMatchingMethod(methods, params);  // Overloaded methods were found. Try to find closest match.
+            return closestMatchingMethod(methods, params); // Overloaded methods were found. Try to find closest match.
         }
     }
 
@@ -628,7 +658,10 @@ public final class Reflection {
 
     private static void collectMethods(List<Method> methods, Class<?> type, boolean iface, String methodName, Object... params) {
         for (var method : type.getDeclaredMethods()) {
-            if ((!iface || method.isDefault()) && method.getName().equals(methodName) && method.getParameterTypes().length == params.length && isNotOverridden(methods, method)) {
+            if (
+                (!iface || method.isDefault()) && method.getName().equals(methodName) && method.getParameterTypes().length == params.length
+                    && isNotOverridden(methods, method)
+            ) {
                 methods.add(method);
             }
         }
@@ -666,8 +699,10 @@ public final class Reflection {
 
         return null;
     }
+
     /**
      * Finds methods having the given annotation.
+     * 
      * @param base The object in which the methods are to be found.
      * @param annotation Annotation of the method to be found.
      * @return List of matching methods.
@@ -691,8 +726,9 @@ public final class Reflection {
     // Classes --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns true if given source is assignable to target type, taking into account autoboxing.
-     * Java returns namely false on int.class.isAssignableFrom(Integer.class).
+     * Returns true if given source is assignable to target type, taking into account autoboxing. Java returns namely false on
+     * int.class.isAssignableFrom(Integer.class).
+     * 
      * @param source The source to be checked.
      * @param targetType The target type to be checked.
      * @return True if the given source is assignable to the given target type.
@@ -709,8 +745,9 @@ public final class Reflection {
     }
 
     /**
-     * Returns the class object associated with the given class name, using the context class loader and if
-     * that fails the defining class loader of the current class.
+     * Returns the class object associated with the given class name, using the context class loader and if that fails the defining class loader of the current
+     * class.
+     * 
      * @param <T> The expected class type.
      * @param className Fully qualified class name of the class for which a class object needs to be created.
      * @return The class object associated with the given class name.
@@ -736,9 +773,9 @@ public final class Reflection {
     }
 
     /**
-     * Returns the class object associated with the given class name, using the context class loader and if
-     * that fails the defining class loader of the current class. If the class cannot be loaded, then return null
-     * instead of throwing illegal state exception.
+     * Returns the class object associated with the given class name, using the context class loader and if that fails the defining class loader of the current
+     * class. If the class cannot be loaded, then return null instead of throwing illegal state exception.
+     * 
      * @param <T> The expected class type.
      * @param className Fully qualified class name of the class for which a class object needs to be created.
      * @return The class object associated with the given class name.
@@ -757,6 +794,7 @@ public final class Reflection {
 
     /**
      * Finds a constructor based on the given parameter types and returns <code>null</code> is none is found.
+     * 
      * @param clazz The class object for which the constructor is to be found.
      * @param parameterTypes The desired method parameter types.
      * @return A constructor if one is found, null otherwise.
@@ -774,6 +812,7 @@ public final class Reflection {
 
     /**
      * Returns a new instance of the given class name using the default constructor.
+     * 
      * @param <T> The expected return type.
      * @param className Fully qualified class name of the class for which an instance needs to be created.
      * @return A new instance of the given class name using the default constructor.
@@ -787,11 +826,11 @@ public final class Reflection {
 
     /**
      * Returns a new instance of the given class object using the default constructor.
+     * 
      * @param <T> The generic object type.
      * @param clazz The class object for which an instance needs to be created.
      * @return A new instance of the given class object using the default constructor.
-     * @throws IllegalStateException If the class cannot be found, or cannot be instantiated, or when a security manager
-     * prevents this operation.
+     * @throws IllegalStateException If the class cannot be found, or cannot be instantiated, or when a security manager prevents this operation.
      */
     public static <T> T instance(Class<T> clazz) {
         try {
@@ -806,6 +845,7 @@ public final class Reflection {
 
     /**
      * Returns the value of the field of the given instance on the given field name.
+     * 
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param fieldName The name of the field to be accessed on the given instance.
@@ -827,14 +867,13 @@ public final class Reflection {
     }
 
     /**
-     * Returns the value of the field of the given instance on the given field type. Note that this returns only the
-     * first encountered field of the given type and thus the result is undetermined when there are multiple fields of
-     * the given type.
+     * Returns the value of the field of the given instance on the given field type. Note that this returns only the first encountered field of the given type
+     * and thus the result is undetermined when there are multiple fields of the given type.
+     * 
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param fieldType The type of the field to be accessed on the given instance.
-     * @return The value of the field of the given instance on the given field type, or <code>null</code> when there is
-     * no such field.
+     * @return The value of the field of the given instance on the given field type, or <code>null</code> when there is no such field.
      * @throws ClassCastException When <code>T</code> is of wrong type.
      * @throws IllegalStateException If the field cannot be accessed.
      * @since 4.3
@@ -844,17 +883,16 @@ public final class Reflection {
     }
 
     /**
-     * Returns the value of the field of the given class type on the given field type from the given instance. Note that
-     * this returns only the first encountered field of the given type and thus the result is undetermined when there
-     * are multiple fields of the given type. The difference with {@link #accessField(Object, Class)} is that any
-     * subclass of the given class type are not searched in might the given instance being such one subclass with its
-     * own field.
+     * Returns the value of the field of the given class type on the given field type from the given instance. Note that this returns only the first encountered
+     * field of the given type and thus the result is undetermined when there are multiple fields of the given type. The difference with
+     * {@link #accessField(Object, Class)} is that any subclass of the given class type are not searched in might the given instance being such one subclass
+     * with its own field.
+     * 
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param classType The type of the class to find the given field in.
      * @param fieldType The type of the field to be accessed on the given instance.
-     * @return The value of the field of the given class type on the given field type from the given instance, or
-     * <code>null</code> when there is no such field.
+     * @return The value of the field of the given class type on the given field type from the given instance, or <code>null</code> when there is no such field.
      * @throws ClassCastException When <code>T</code> is of wrong type.
      * @throws IllegalStateException If the field cannot be accessed.
      * @since 4.3
@@ -880,6 +918,7 @@ public final class Reflection {
 
     /**
      * Modifies the value of the field of the given instance on the given field name with the given value.
+     * 
      * @param <T> The field type.
      * @param instance The instance to access the given field on.
      * @param fieldName The name of the field to be accessed on the given instance.
@@ -900,6 +939,7 @@ public final class Reflection {
 
     /**
      * Modifies the value of the given field of the given instance with the given value.
+     * 
      * @param <T> The field type.
      * @param instance The instance to access the given field on.
      * @param field The field to be accessed on the given instance.
@@ -918,15 +958,18 @@ public final class Reflection {
             return (T) oldValue;
         }
         catch (Exception e) {
-            throw new IllegalStateException(ERROR_MODIFY_FIELD.formatted(field != null ? field.getName() : null, instance != null ? instance.getClass() : null, value), e);
+            throw new IllegalStateException(
+                ERROR_MODIFY_FIELD.formatted(field != null ? field.getName() : null, instance != null ? instance.getClass() : null, value), e
+            );
         }
     }
 
     /**
      * Invoke a method of the given instance on the given method name with the given parameters and return the result.
      * <p>
-     * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of
-     * them is still null, a NullPointerException will be thrown.
+     * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of them is still null, a NullPointerException
+     * will be thrown.
+     * 
      * @param <T> The expected return type.
      * @param instance The instance to invoke the given method on.
      * @param methodName The name of the method to be invoked on the given instance.
@@ -948,12 +991,15 @@ public final class Reflection {
             return invokeMethod(instance, method, parameters);
         }
         catch (Exception e) {
-            throw new IllegalStateException(ERROR_INVOKE_METHOD.formatted(methodName, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+            throw new IllegalStateException(
+                ERROR_INVOKE_METHOD.formatted(methodName, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e
+            );
         }
     }
 
     /**
      * Invoke given method of the given instance with the given parameters and return the result.
+     * 
      * @param <T> The expected return type.
      * @param instance The instance to invoke the given method on.
      * @param method The method to be invoked on the given instance.
@@ -970,12 +1016,18 @@ public final class Reflection {
             return (T) method.invoke(instance, parameters);
         }
         catch (Exception e) {
-            throw new IllegalStateException(ERROR_INVOKE_METHOD.formatted(method != null ? method.getName() : null, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+            throw new IllegalStateException(
+                ERROR_INVOKE_METHOD.formatted(
+                    method != null ? method.getName() : null,
+                    instance != null ? instance.getClass() : null, Arrays.toString(parameters)
+                ), e
+            );
         }
     }
 
     /**
      * Invoke methods of the given instance having the given annotation.
+     * 
      * @param instance The instance to invoke the methods having the given annotation on.
      * @param annotation Annotation of the methods to be invoked.
      * @throws IllegalStateException If the method cannot be invoked.
@@ -988,7 +1040,8 @@ public final class Reflection {
             }
             catch (Exception e) {
                 throw new IllegalStateException(
-                    ERROR_INVOKE_METHOD.formatted(method.getName(), instance.getClass(), "[]"), e);
+                    ERROR_INVOKE_METHOD.formatted(method.getName(), instance.getClass(), "[]"), e
+                );
             }
         }
     }
@@ -996,8 +1049,9 @@ public final class Reflection {
     /**
      * Invoke a static method of the given type on the given method name with the given parameters and return the result.
      * <p>
-     * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of
-     * them is still null, a NullPointerException will be thrown.
+     * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of them is still null, a NullPointerException
+     * will be thrown.
+     * 
      * @param <T> The expected return type.
      * @param type The type to invoke the given static method on.
      * @param methodName The name of the static method to be invoked on the given type.

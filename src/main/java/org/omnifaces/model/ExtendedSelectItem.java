@@ -26,17 +26,19 @@ public class ExtendedSelectItem extends SelectItem {
     private static final long serialVersionUID = 1L;
 
     /**
-     * <p>Construct a <code>SelectItem</code> with no initialized property
-     * values.</p>
+     * <p>
+     * Construct a <code>SelectItem</code> with no initialized property values.
+     * </p>
      */
     public ExtendedSelectItem() {
         //
     }
 
     /**
-     * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
-     * properties on the <code>UISelectItem</code>.
+     * <p>
+     * Construct a <code>SelectItem</code> with property values initialized from the corresponding properties on the <code>UISelectItem</code>.
      * </p>
+     * 
      * @param uiSelectItem The UI select item.
      */
     public ExtendedSelectItem(UISelectItem uiSelectItem) {

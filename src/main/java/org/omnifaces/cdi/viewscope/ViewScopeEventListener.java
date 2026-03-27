@@ -39,9 +39,8 @@ public class ViewScopeEventListener implements ViewMapListener {
     }
 
     /**
-     * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the Faces view scope is about to
-     * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
-     * {@link ViewScopeManager#preDestroyView()} method.
+     * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the Faces view scope is about to be destroyed, then find the current
+     * instance of {@link ViewScopeManager} and invoke its {@link ViewScopeManager#preDestroyView()} method.
      */
     @Override
     public void processEvent(SystemEvent event) {

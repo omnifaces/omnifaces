@@ -41,8 +41,8 @@ import org.omnifaces.vdl.FacesComponentConfig;
 
 /**
  * <p>
- * The <code>&lt;o:resolveComponent&gt;</code> component is a utility component via which a component can be looked up
- * by its ID and a reference to it put in either the "facelet scope" (default) or the request scope.
+ * The <code>&lt;o:resolveComponent&gt;</code> component is a utility component via which a component can be looked up by its ID and a reference to it put in
+ * either the "facelet scope" (default) or the request scope.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -57,11 +57,9 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     /** The component type, which is {@value org.omnifaces.component.util.ResolveComponent#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.component.util.ResolveComponent";
 
-    private static final String ERROR_COMPONENT_NOT_FOUND =
-        "A component with ID '%s' as specified by the 'for' attribute of the ResolveComponent with Id '%s' could not be found.";
+    private static final String ERROR_COMPONENT_NOT_FOUND = "A component with ID '%s' as specified by the 'for' attribute of the ResolveComponent with Id '%s' could not be found.";
 
-    private static final String ERROR_ILLEGAL_SCOPE =
-        "o:resolveComponent 'scope' attribute only supports 'facelet' (default) or 'request'. Encountered an invalid value of '%s'.";
+    private static final String ERROR_ILLEGAL_SCOPE = "o:resolveComponent 'scope' attribute only supports 'facelet' (default) or 'request'. Encountered an invalid value of '%s'.";
 
     /** The default scope, which is "facelet". */
     public static final String DEFAULT_SCOPE = "facelet";
@@ -80,7 +78,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
      */
     public ResolveComponent() {
         if (!isPostback()) { // For an initial (GET) request, there's no restore
-                                // state event and we use pre-render view
+                             // state event and we use pre-render view
             subscribeToViewEvent(PreRenderViewEvent.class, this);
         }
     }
@@ -163,12 +161,14 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
             }
             return foundComponent;
         }
+
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
      * Returns name under which the component will be made available to EL.
+     * 
      * @return Name under which the component will be made available to EL.
      */
     public String getName() {
@@ -176,8 +176,8 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     }
 
     /**
-     * Sets name under which the component will be made available to EL, scoped to the body of the Facelets tag (default)
-     * or to the request.
+     * Sets name under which the component will be made available to EL, scoped to the body of the Facelets tag (default) or to the request.
+     * 
      * @param nameValue Name under which the component will be made available to EL.
      */
     @FacesAttribute(required = true)
@@ -187,6 +187,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Returns ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
+     * 
      * @return ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      */
     public String getFor() {
@@ -195,6 +196,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Sets ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
+     * 
      * @param forValue ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      */
     @FacesAttribute(required = true)
@@ -204,6 +206,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Returns optional scope identifier used to set the scope in which the component reference is inserted. Default is <code>facelet</code>.
+     * 
      * @return Optional scope identifier used to set the scope in which the component reference is inserted.
      */
     public String getScope() {
@@ -211,10 +214,11 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     }
 
     /**
-     * Optional scope identifier used to set the scope in which the component reference is inserted. If no scope is specified,
-     * the default scope "facelet" will be used.
+     * Optional scope identifier used to set the scope in which the component reference is inserted. If no scope is specified, the default scope "facelet" will
+     * be used.
      * <p>
      * Values values are "facelet" (default) and "request".
+     * 
      * @param scopeValue Optional scope identifier used to set the scope in which the component reference is inserted.
      */
     public void setScope(String scopeValue) {

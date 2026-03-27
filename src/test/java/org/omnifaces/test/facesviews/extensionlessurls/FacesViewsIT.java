@@ -23,22 +23,24 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file and error-page in web.xml")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly interpret welcome-file and error-page in web.xml"
+)
 public class FacesViewsIT extends OmniFacesIT {
 
-    @FindBy(id="linkWithExtensionOutcome")
+    @FindBy(id = "linkWithExtensionOutcome")
     private WebElement linkWithExtensionOutcome;
 
-    @FindBy(id="linkWithExtensionlessOutcome")
+    @FindBy(id = "linkWithExtensionlessOutcome")
     private WebElement linkWithExtensionlessOutcome;
 
-    @FindBy(id="form")
+    @FindBy(id = "form")
     private WebElement form;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement formSubmit;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(FacesViewsIT.class)
             .withWebXml(withFacesViews)

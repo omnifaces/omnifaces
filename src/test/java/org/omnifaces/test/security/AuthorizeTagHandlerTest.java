@@ -306,4 +306,5 @@ class AuthorizeTagHandlerTest extends BaseSecurityTagHandlerTest {
         lenient().when(attr.getValue(any(FaceletContext.class))).thenReturn(value);
         mockedAttributes.put(name, attr);
     }
+
 }

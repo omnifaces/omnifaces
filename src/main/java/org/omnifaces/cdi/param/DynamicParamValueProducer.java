@@ -34,8 +34,7 @@ import org.omnifaces.cdi.Param;
 /**
  * Dynamic CDI producer used to work around CDI's restriction to create true generic producers.
  * <p>
- * This dynamic producer calls through to the "real" producer for <code>&#64;</code>{@link Param}
- * annotated injection points.
+ * This dynamic producer calls through to the "real" producer for <code>&#64;</code>{@link Param} annotated injection points.
  *
  * @see ParamExtension
  * @see ParamProducer
@@ -51,6 +50,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
     /**
      * Construct dynamic param value producer for given type.
+     * 
      * @param type Type to construct dynamic param value producer for.
      */
     public DynamicParamValueProducer(Type type) {
@@ -119,6 +119,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
      */
     @SuppressWarnings("all")
     public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
+
         private static final long serialVersionUID = 1L;
 
         private static final String EMPTY_STRING = "";
@@ -205,6 +206,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
         public boolean globalMessage() {
             return false;
         }
+
     }
 
 }

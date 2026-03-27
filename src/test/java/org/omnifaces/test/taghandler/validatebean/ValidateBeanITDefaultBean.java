@@ -11,6 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.test.taghandler.validatebean;
+
 import static org.omnifaces.util.Faces.isValidationFailed;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 import static org.omnifaces.util.Messages.addGlobalWarn;
@@ -25,8 +26,8 @@ import jakarta.validation.constraints.Size;
 @RequestScoped
 public class ValidateBeanITDefaultBean {
 
-    @Pattern(regexp=".{2,}", message="default")
-    @Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
+    @Pattern(regexp = ".{2,}", message = "default")
+    @Size(min = 2, groups = ValidateBeanITValidationGroup.class, message = "group")
     private String input;
 
     @NotNull

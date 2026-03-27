@@ -34,6 +34,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
     /**
      * Construct a new OmniFaces application factory around the given wrapped factory.
+     * 
      * @param wrapped The wrapped factory.
      */
     public OmniApplicationFactory(ApplicationFactory wrapped) {
@@ -51,8 +52,8 @@ public class OmniApplicationFactory extends ApplicationFactory {
     }
 
     /**
-     * Sets the given application instance as the current instance. If it's not an instance of {@link OmniApplication},
-     * nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of {@link OmniApplication}.
+     * Sets the given application instance as the current instance. If it's not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication},
+     * then it will be wrapped by a new instance of {@link OmniApplication}.
      */
     @Override
     public void setApplication(Application application) {
@@ -62,9 +63,9 @@ public class OmniApplicationFactory extends ApplicationFactory {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
-     * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
-     * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
+     * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of
+     * {@link OmniApplication} and set as the current instance and returned. Additionally, it will check if all Application implementations properly extend from
+     * ApplicationWrapper.
      */
     private synchronized Application createOmniApplication(Application application) {
         Application newApplication = application;

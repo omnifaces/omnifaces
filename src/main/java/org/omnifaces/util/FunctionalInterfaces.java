@@ -40,6 +40,7 @@ public final class FunctionalInterfaces {
          * @see Runnable#run()
          */
         void run();
+
     }
 
     /**
@@ -56,6 +57,7 @@ public final class FunctionalInterfaces {
          * @see Supplier#get()
          */
         T get();
+
     }
 
     /**
@@ -72,6 +74,7 @@ public final class FunctionalInterfaces {
          * @see Consumer#accept(Object)
          */
         void accept(T t);
+
     }
 
     /**
@@ -89,6 +92,7 @@ public final class FunctionalInterfaces {
          * @see BiConsumer#accept(Object, Object)
          */
         void accept(T t, U u);
+
     }
 
     /**
@@ -106,6 +110,7 @@ public final class FunctionalInterfaces {
          * @see Function#apply(Object)
          */
         R apply(T t);
+
     }
 
     /**
@@ -124,6 +129,7 @@ public final class FunctionalInterfaces {
          * @see BiFunction#apply(Object, Object)
          */
         R apply(T t, U u);
+
     }
 
     /**
@@ -140,6 +146,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         void run() throws Exception;
+
     }
 
     /**
@@ -157,6 +164,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         T get() throws Exception;
+
     }
 
     /**
@@ -174,6 +182,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         void accept(T t) throws Exception;
+
     }
 
     /**
@@ -192,6 +201,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         void accept(T t, U u) throws Exception;
+
     }
 
     /**
@@ -210,6 +220,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         R apply(T t) throws Exception;
+
     }
 
     /**
@@ -229,5 +240,7 @@ public final class FunctionalInterfaces {
          * @throws Exception When something irrecoverably fails.
          */
         R apply(T t, U u) throws Exception;
+
     }
+
 }

@@ -28,9 +28,8 @@ import org.omnifaces.vdl.FacesFunctions;
 
 /**
  * <p>
- * Collection of EL functions for number formatting: <code>o:formatBytes()</code>, <code>o:formatCurrency()</code>,
- * <code>o:formatNumber()</code>, <code>o:formatNumberDefault()</code>, <code>o:formatPercent()</code>,
- * <code>o:formatThousands()</code> and <code>o:formatThousandsUnit()</code>.
+ * Collection of EL functions for number formatting: <code>o:formatBytes()</code>, <code>o:formatCurrency()</code>, <code>o:formatNumber()</code>,
+ * <code>o:formatNumberDefault()</code>, <code>o:formatPercent()</code>, <code>o:formatThousands()</code> and <code>o:formatThousandsUnit()</code>.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -53,8 +52,8 @@ public final class Numbers {
     // Utility --------------------------------------------------------------------------------------------------------
 
     /**
-     * Format the given bytes to nearest 10<sup>n</sup> in the default pattern of the default locale with IEC binary
-     * unit (KiB, MiB, etc) with rounding precision of 1 fraction. For example (with English locale):
+     * Format the given bytes to nearest 10<sup>n</sup> in the default pattern of the default locale with IEC binary unit (KiB, MiB, etc) with rounding
+     * precision of 1 fraction. For example (with English locale):
      * <ul>
      * <li>1023 bytes will appear as 1023 B
      * <li>1024 bytes will appear as 1.0 KiB
@@ -62,6 +61,7 @@ public final class Numbers {
      * <li>1048576 bytes will appear as 1.0 MiB
      * </ul>
      * The default locale is the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param bytes The bytes to be formatted in the default pattern of the default locale.
      * @return The formatted bytes.
      */
@@ -70,8 +70,8 @@ public final class Numbers {
     }
 
     /**
-     * Format the given bytes to nearest 10<sup>n</sup> in the default pattern of the given locale with IEC binary
-     * unit (KiB, MiB, etc) with rounding precision of 1 fraction. For example (with English locale):
+     * Format the given bytes to nearest 10<sup>n</sup> in the default pattern of the given locale with IEC binary unit (KiB, MiB, etc) with rounding precision
+     * of 1 fraction. For example (with English locale):
      * <ul>
      * <li>1023 bytes will appear as 1023 B
      * <li>1024 bytes will appear as 1.0 KiB
@@ -79,6 +79,7 @@ public final class Numbers {
      * <li>1048576 bytes will appear as 1.0 MiB
      * </ul>
      * The given locale can be a {@link Locale} object or a string representation.
+     * 
      * @param bytes The bytes to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The formatted bytes.
@@ -89,11 +90,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number as currency with the given symbol in the default pattern of the default locale. This is
-     * useful when you want to format numbers as currency in for example the <code>title</code> attribute of an UI
-     * component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
-     * <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as obtained by
-     * {@link Faces#getLocale()}.
+     * Format the given number as currency with the given symbol in the default pattern of the default locale. This is useful when you want to format numbers as
+     * currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you
+     * can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param number The number to be formatted as currency in the default pattern of the default locale.
      * @param currencySymbol The currency symbol to be used.
      * @return The number which is formatted as currency with the given symbol.
@@ -104,11 +104,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number as currency with the given symbol in the default pattern of the given locale. This is
-     * useful when you want to format numbers as currency in for example the <code>title</code> attribute of an UI
-     * component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
-     * <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string
-     * representation.
+     * Format the given number as currency with the given symbol in the default pattern of the given locale. This is useful when you want to format numbers as
+     * currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you
+     * can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string representation.
+     * 
      * @param number The number to be formatted as currency in the default pattern of the given locale.
      * @param currencySymbol The currency symbol to be used.
      * @param locale The locale to obtain the default pattern from.
@@ -129,10 +128,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number in the given pattern. This is useful when you want to format numbers in for example the
-     * <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or
-     * wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as
-     * obtained by {@link Faces#getLocale()}.
+     * Format the given number in the given pattern. This is useful when you want to format numbers in for example the <code>title</code> attribute of an UI
+     * component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
+     * locale will be set to the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param number The number to be formatted in the given pattern.
      * @param pattern The pattern to format the given number in.
      * @return The number which is formatted in the given pattern.
@@ -149,10 +148,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number in the default pattern of the default locale. This is useful when you want to format
-     * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
-     * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default
-     * locale is the one as obtained by {@link Faces#getLocale()}.
+     * Format the given number in the default pattern of the default locale. This is useful when you want to format numbers in for example the
+     * <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
+     * <code>&lt;f:convertNumber&gt;</code> tag. The default locale is the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param number The number to be formatted in the default pattern of the default locale.
      * @return The number which is formatted in the default pattern of the default locale.
      * @since 1.3
@@ -162,10 +161,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number in the default pattern of the given locale. This is useful when you want to format
-     * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
-     * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
-     * locale can be a {@link Locale} object or a string representation.
+     * Format the given number in the default pattern of the given locale. This is useful when you want to format numbers in for example the <code>title</code>
+     * attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code>
+     * tag. The given locale can be a {@link Locale} object or a string representation.
+     * 
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The number which is formatted in the default pattern of the given locale.
@@ -180,10 +179,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number as percentage in the default pattern of the default locale. This is useful when you want
-     * to format numbers as percentage in for example the <code>title</code> attribute of an UI component, or the
-     * <code>itemLabel</code> attribute of select item, or wherever you can't use the
+     * Format the given number as percentage in the default pattern of the default locale. This is useful when you want to format numbers as percentage in for
+     * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
      * <code>&lt;f:convertNumber&gt;</code> tag. The default locale is the one as obtained by {@link Faces#getLocale()}.
+     * 
      * @param number The number to be formatted as percentage in the default pattern of the default locale.
      * @return The number which is formatted as percentage.
      * @since 1.6
@@ -193,11 +192,10 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number as percentage in the default pattern of the given locale. This is useful when you want
-     * to format numbers as percentage in for example the <code>title</code> attribute of an UI component, or the
-     * <code>itemLabel</code> attribute of select item, or wherever you can't use the
-     * <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string
-     * representation.
+     * Format the given number as percentage in the default pattern of the given locale. This is useful when you want to format numbers as percentage in for
+     * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
+     * <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string representation.
+     * 
      * @param number The number to be formatted as percentage in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The number which is formatted as percentage.
@@ -212,9 +210,8 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the default
-     * locale, immediately suffixed (without space) with metric unit (k, M, G, T, P or E), rounding half up with a
-     * precision of 3 digits, whereafter trailing zeroes in fraction part are stripped.
+     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the default locale, immediately suffixed (without
+     * space) with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter trailing zeroes in fraction part are stripped.
      * For example (with English locale):
      * <ul>
      * <li>1.6666 will appear as 1.67
@@ -232,8 +229,9 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99M
      * <li>9995000 will appear as 10M
      * </ul>
-     * The default locale is the one as obtained by {@link Faces#getLocale()}.
-     * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+     * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
+     * return <code>null</code>.
+     * 
      * @param number The number to be formatted in the default pattern of the default locale.
      * @return The formatted number.
      * @since 2.3
@@ -243,10 +241,9 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the given
-     * locale, immediately suffixed (without space) with metric unit (k, M, G, T, P or E), rounding half up with a
-     * precision of 3 digits, whereafter trailing zeroes in fraction part are stripped.
-     * For example (with English locale):
+     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the given locale, immediately suffixed (without space)
+     * with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter trailing zeroes in fraction part are stripped. For
+     * example (with English locale):
      * <ul>
      * <li>1.6666 will appear as 1.67
      * <li>999.4 will appear as 999
@@ -263,8 +260,9 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99M
      * <li>9995000 will appear as 10M
      * </ul>
-     * The given locale can be a {@link Locale} object or a string representation.
-     * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+     * The given locale can be a {@link Locale} object or a string representation. If the value is <code>null</code>, <code>NaN</code> or infinity, then this
+     * will return <code>null</code>.
+     * 
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The formatted number.
@@ -275,10 +273,9 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the default
-     * locale, suffixed with a space, the metric unit prefix (k, M, G, T, P or E) and the given unit, rounding half up
-     * with a precision of 3 digits, whereafter trailing zeroes in fraction part are stripped.
-     * For example (with English locale and unit <code>B</code>):
+     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the default locale, suffixed with a space, the metric
+     * unit prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter trailing zeroes in fraction part are
+     * stripped. For example (with English locale and unit <code>B</code>):
      * <ul>
      * <li>1.6666 will appear as 1.67 B
      * <li>999.4 will appear as 999 B
@@ -295,11 +292,12 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99 MB
      * <li>9995000 will appear as 10 MB
      * </ul>
-     * The default locale is the one as obtained by {@link Faces#getLocale()}.
-     * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+     * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
+     * return <code>null</code>.
+     * 
      * @param number The number to be formatted in the default pattern of the default locale.
-     * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit
-     * is <code>null</code>, then this method will behave exactly as described in {@link #formatThousands(Number)}.
+     * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit is <code>null</code>, then this method
+     * will behave exactly as described in {@link #formatThousands(Number)}.
      * @return The formatted number with unit.
      * @since 2.3
      */
@@ -308,10 +306,9 @@ public final class Numbers {
     }
 
     /**
-     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the given
-     * locale, suffixed with a space, the metric unit prefix (k, M, G, T, P or E) and the given unit, rounding half up
-     * with a precision of 3 digits, whereafter trailing zeroes in fraction part are stripped.
-     * For example (with English locale and unit <code>B</code>):
+     * Format the given number to nearest 10<sup>n</sup> (rounded to thousands) in the default pattern of the given locale, suffixed with a space, the metric
+     * unit prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter trailing zeroes in fraction part are
+     * stripped. For example (with English locale and unit <code>B</code>):
      * <ul>
      * <li>1.6666 will appear as 1.67 B
      * <li>999.4 will appear as 999 B
@@ -328,12 +325,13 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99 MB
      * <li>9995000 will appear as 10 MB
      * </ul>
-     * The given locale can be a {@link Locale} object or a string representation.
-     * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+     * The given locale can be a {@link Locale} object or a string representation. If the value is <code>null</code>, <code>NaN</code> or infinity, then this
+     * will return <code>null</code>.
+     * 
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit
-     * @param locale The locale to obtain the default pattern from.
-     * is <code>null</code>, then this method will behave exactly as described in {@link #formatThousands(Number)}.
+     * @param locale The locale to obtain the default pattern from. is <code>null</code>, then this method will behave exactly as described in
+     * {@link #formatThousands(Number)}.
      * @return The formatted number with unit.
      * @since 5.0
      */

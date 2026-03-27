@@ -27,8 +27,8 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * Base class for channel-based components ({@link Socket}, {@link Sse} and {@link Notification}) that share the
- * channel and user attributes with their validation.
+ * Base class for channel-based components ({@link Socket}, {@link Sse} and {@link Notification}) that share the channel and user attributes with their
+ * validation.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -54,10 +54,11 @@ abstract class ChannelComponent extends ScriptFamily {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * An override which checks if this isn't been invoked on <code>channel</code> attribute, and if the
-     * <code>user</code> attribute is <code>Serializable</code>. Finally it delegates to the super method.
-     * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> attribute,
-     * or when the <code>user</code> attribute is not <code>Serializable</code>.
+     * An override which checks if this isn't been invoked on <code>channel</code> attribute, and if the <code>user</code> attribute is
+     * <code>Serializable</code>. Finally it delegates to the super method.
+     * 
+     * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> attribute, or when the <code>user</code> attribute is not
+     * <code>Serializable</code>.
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
@@ -69,9 +70,11 @@ abstract class ChannelComponent extends ScriptFamily {
             var user = binding.getValue(getFacesContext().getELContext());
 
             if (user != null && !(user instanceof Serializable)) {
-                throw new IllegalArgumentException("%s 'user' attribute '%s' does not represent a valid user identifier."
+                throw new IllegalArgumentException(
+                    "%s 'user' attribute '%s' does not represent a valid user identifier."
                         + " It must implement Serializable and preferably have low memory footprint."
-                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.".formatted(getTagName(), user));
+                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.".formatted(getTagName(), user)
+                );
             }
         }
 
@@ -80,22 +83,27 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Validate the channel name and check that it is not already used by a different component type on the current view.
+     * 
      * @param context The involved faces context.
      * @param channel The channel name to validate.
      * @throws IllegalArgumentException When the channel name is invalid or already used by a different component type.
      */
     void validateChannel(FacesContext context, String channel) {
         if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-            throw new IllegalArgumentException("%s 'channel' attribute '%s' does not represent a valid channel name."
-                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.".formatted(getTagName(), channel));
+            throw new IllegalArgumentException(
+                "%s 'channel' attribute '%s' does not represent a valid channel name."
+                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.".formatted(getTagName(), channel)
+            );
         }
 
         var registeredChannels = getViewAttribute(context, ChannelComponent.class.getName(), HashMap::new);
         var existingChannel = registeredChannels.put(channel, getTagName());
 
         if (existingChannel != null && !existingChannel.equals(getTagName())) {
-            throw new IllegalArgumentException("%s 'channel' attribute '%s' is already used by %s on the same view."
-                    + " Channel names must be unique across o:socket, o:sse and o:notification.".formatted(getTagName(), channel, existingChannel));
+            throw new IllegalArgumentException(
+                "%s 'channel' attribute '%s' is already used by %s on the same view."
+                    + " Channel names must be unique across o:socket, o:sse and o:notification.".formatted(getTagName(), channel, existingChannel)
+            );
         }
     }
 
@@ -107,6 +115,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Returns the name of the push channel.
+     * 
      * @return The name of the push channel.
      */
     public String getChannel() {
@@ -114,9 +123,9 @@ abstract class ChannelComponent extends ScriptFamily {
     }
 
     /**
-     * Sets the name of the push channel.
-     * It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods.
-     * All open connections on the same channel will receive the same push message from the server.
+     * Sets the name of the push channel. It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods. All
+     * open connections on the same channel will receive the same push message from the server.
+     * 
      * @param channel The name of the push channel.
      */
     @FacesAttribute(required = true)
@@ -126,6 +135,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Returns the user identifier of the push channel.
+     * 
      * @return The user identifier of the push channel.
      */
     public Serializable getUser() {
@@ -133,10 +143,10 @@ abstract class ChannelComponent extends ScriptFamily {
     }
 
     /**
-     * Sets the user identifier of the push channel, so that user-targeted push messages can be sent.
-     * All open connections on the same channel and user will receive the same push message from the server.
-     * It must implement <code>Serializable</code> and preferably have low memory footprint.
-     * Suggestion: use <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
+     * Sets the user identifier of the push channel, so that user-targeted push messages can be sent. All open connections on the same channel and user will
+     * receive the same push message from the server. It must implement <code>Serializable</code> and preferably have low memory footprint. Suggestion: use
+     * <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
+     * 
      * @param user The user identifier of the push channel.
      */
     public void setUser(Serializable user) {

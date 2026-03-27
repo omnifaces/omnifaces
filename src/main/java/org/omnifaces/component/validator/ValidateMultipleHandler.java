@@ -28,8 +28,8 @@ import jakarta.faces.view.facelets.TagAttribute;
 import org.omnifaces.validator.MultiFieldValidator;
 
 /**
- * A handler for {@link ValidateMultiple} component, which will take care of setting the <code>validator</code>
- * attribute the right way as either {@link ValueExpression} or {@link MethodExpression}.
+ * A handler for {@link ValidateMultiple} component, which will take care of setting the <code>validator</code> attribute the right way as either
+ * {@link ValueExpression} or {@link MethodExpression}.
  *
  * @author Juliano Marques
  * @author Bauke Scholtz
@@ -47,6 +47,7 @@ public class ValidateMultipleHandler extends ComponentHandler {
 
     /**
      * Construct the tag handler for {@link ValidateMultiple} component.
+     * 
      * @param config The component config.
      */
     public ValidateMultipleHandler(ComponentConfig config) {
@@ -56,11 +57,10 @@ public class ValidateMultipleHandler extends ComponentHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Delegate to super and then try to get a {@link ValueExpression} representing a {@link MultiFieldValidator}
-     * implementation and set it as <code>validator</code> property of current {@link ValidateMultiple} component, or
-     * if it couldn't be obtained, then get a {@link MethodExpression} representing a method with the same signature
-     * as {@link MultiFieldValidator#validateValues(FacesContext, List, List)} and set it as <code>validateMethod</code>
-     * property of current {@link ValidateMultiple} component.
+     * Delegate to super and then try to get a {@link ValueExpression} representing a {@link MultiFieldValidator} implementation and set it as
+     * <code>validator</code> property of current {@link ValidateMultiple} component, or if it couldn't be obtained, then get a {@link MethodExpression}
+     * representing a method with the same signature as {@link MultiFieldValidator#validateValues(FacesContext, List, List)} and set it as
+     * <code>validateMethod</code> property of current {@link ValidateMultiple} component.
      */
     @Override
     public void setAttributes(FaceletContext context, Object component) {

@@ -21,10 +21,10 @@ import org.omnifaces.cdi.Param;
 @RequestScoped
 public class MultiViewsITBean {
 
-    @Param(pathIndex=0, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
+    @Param(pathIndex = 0, disableBeanValidation = true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
     private String firstPathParamAsString;
 
-    @Param(pathIndex=1, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
+    @Param(pathIndex = 1, disableBeanValidation = true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
     private Integer secondPathParamAsInteger;
 
     public String getFirstPathParamAsString() {

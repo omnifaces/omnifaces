@@ -22,58 +22,60 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "Ambiguous dependencies exceptions on following @Param fields: stringParam, requiredStringParam and paramWithConverterId")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "Ambiguous dependencies exceptions on following @Param fields: stringParam, requiredStringParam and paramWithConverterId"
+)
 public class ParamIT extends OmniFacesIT {
 
-    @FindBy(id="stringParam")
+    @FindBy(id = "stringParam")
     private WebElement stringParam;
 
-    @FindBy(id="requiredStringParam")
+    @FindBy(id = "requiredStringParam")
     private WebElement requiredStringParam;
 
-    @FindBy(id="stringParamArray")
+    @FindBy(id = "stringParamArray")
     private WebElement stringParamArray;
 
-    @FindBy(id="stringParamList")
+    @FindBy(id = "stringParamList")
     private WebElement stringParamList;
 
-    @FindBy(id="longParam")
+    @FindBy(id = "longParam")
     private WebElement longParam;
 
-    @FindBy(id="longParamArray")
+    @FindBy(id = "longParamArray")
     private WebElement longParamArray;
 
-    @FindBy(id="longParamList")
+    @FindBy(id = "longParamList")
     private WebElement longParamList;
 
-    @FindBy(id="longParamListTypes")
+    @FindBy(id = "longParamListTypes")
     private WebElement longParamListTypes;
 
-    @FindBy(id="dateParam")
+    @FindBy(id = "dateParam")
     private WebElement dateParam;
 
-    @FindBy(id="entityParam")
+    @FindBy(id = "entityParam")
     private WebElement entityParam;
 
-    @FindBy(id="entityViewParam")
+    @FindBy(id = "entityViewParam")
     private WebElement entityViewParam;
 
-    @FindBy(id="paramWithConverterId")
+    @FindBy(id = "paramWithConverterId")
     private WebElement paramWithConverterId;
 
-    @FindBy(id="initResult")
+    @FindBy(id = "initResult")
     private WebElement initResult;
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="viewRootMessages")
+    @FindBy(id = "viewRootMessages")
     private WebElement viewRootMessages;
 
-    @FindBy(id="globalMessages")
+    @FindBy(id = "globalMessages")
     private WebElement globalMessages;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ParamIT.class)
             .withWebXml(WebXml.withInterpretEmptyStringSubmittedValuesAsNull)
@@ -120,9 +122,10 @@ public class ParamIT extends OmniFacesIT {
         assertEquals("requiredStringParam: Validation Error: Value is required.", messages.getText());
     }
 
-
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = "tomee-.*", disabledReason = "BVal doesn't support this. You really have to add @Inject to @Param.")
+    @DisabledIfSystemProperty(
+        named = "profile.id", matches = "tomee-.*", disabledReason = "BVal doesn't support this. You really have to add @Inject to @Param."
+    )
     void testStringParamOnBeanWithCustomAnnotation() {
         open("ParamITCustomAnnotation.xhtml?stringParam=foo");
         assertEquals("foo", stringParam.getText());
@@ -222,7 +225,8 @@ public class ParamIT extends OmniFacesIT {
     void testLongParamList() {
         openWithQueryString("longParamList=42&longParamList=64");
         assertEquals("[42, 64]", longParamList.getText());
-        assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit Faces converters are also invoked when List<T> is used instead of T[].
+        assertEquals("[java.lang.Long, java.lang.Long]", longParamListTypes.getText()); // Ensure that implicit Faces converters are also invoked when List<T>
+                                                                                        // is used instead of T[].
         assertEquals("initSuccess", initResult.getText());
         assertGlobalMessageEquals("");
     }

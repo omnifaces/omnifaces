@@ -30,12 +30,11 @@ import java.util.function.UnaryOperator;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
- * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods here once we encounter non-DRY code in
+ * OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
- * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
- * accept the risk that the method signatures can be changed without notice. This utility class exists because OmniFaces
- * intends to be free of 3rd party dependencies.
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to accept the risk that the method signatures
+ * can be changed without notice. This utility class exists because OmniFaces intends to be free of 3rd party dependencies.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -56,13 +55,12 @@ public final class Json {
     // Encode ---------------------------------------------------------------------------------------------------------
 
     /**
-     * Encodes the given object as JSON. This supports the standard types {@link Boolean}, {@link Number},
-     * {@link CharSequence}, {@link Date} and since OmniFaces 3.6 also {@link Enum} and {@link Temporal}. If the given
-     * object type does not match any of them, then it will attempt to inspect the object as a javabean whereby the
-     * public properties (with public getters) will be encoded as a JS object. It also supports {@link Collection}s,
-     * {@link Map}s and arrays of them, even nested ones. The {@link Date} and {@link Temporal} are formatted in
-     * <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format, so you can if necessary just pass it
-     * straight to <code>new Date()</code> in JavaScript.
+     * Encodes the given object as JSON. This supports the standard types {@link Boolean}, {@link Number}, {@link CharSequence}, {@link Date} and since
+     * OmniFaces 3.6 also {@link Enum} and {@link Temporal}. If the given object type does not match any of them, then it will attempt to inspect the object as
+     * a javabean whereby the public properties (with public getters) will be encoded as a JS object. It also supports {@link Collection}s, {@link Map}s and
+     * arrays of them, even nested ones. The {@link Date} and {@link Temporal} are formatted in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC
+     * 1123</a> format, so you can if necessary just pass it straight to <code>new Date()</code> in JavaScript.
+     * 
      * @param object The object to be encoded as JSON.
      * @return The JSON-encoded representation of the given object.
      * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
@@ -73,9 +71,9 @@ public final class Json {
 
     /**
      * Does the same as {@link #encode(Object)} but then with a custom property name formatter.
+     * 
      * @param object The object to be encoded as JSON.
-     * @param propertyNameFormatter The property name formatter. When this is null, then the property names are not
-     * adjusted.
+     * @param propertyNameFormatter The property name formatter. When this is null, then the property names are not adjusted.
      * @return The JSON-encoded representation of the given object.
      * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
      * @since 3.6
@@ -203,7 +201,8 @@ public final class Json {
             }
             catch (Exception e) {
                 throw new IllegalArgumentException(
-                    ERROR_INVALID_GETTER.formatted(component.getName(), instance.getClass()), e);
+                    ERROR_INVALID_GETTER.formatted(component.getName(), instance.getClass()), e
+                );
             }
 
             if (value != null) {
@@ -231,7 +230,8 @@ public final class Json {
         }
         catch (IntrospectionException e) {
             throw new IllegalArgumentException(
-                ERROR_INVALID_BEAN.formatted(bean.getClass()), e);
+                ERROR_INVALID_BEAN.formatted(bean.getClass()), e
+            );
         }
 
         builder.append('{');
@@ -249,7 +249,8 @@ public final class Json {
             }
             catch (Exception e) {
                 throw new IllegalArgumentException(
-                    ERROR_INVALID_GETTER.formatted(property.getName(), bean.getClass()), e);
+                    ERROR_INVALID_GETTER.formatted(property.getName(), bean.getClass()), e
+                );
             }
 
             if (value != null) {
@@ -269,8 +270,7 @@ public final class Json {
     /**
      * Encode a Java String as JS object property name.
      */
-    private static void encodePropertyName(String string, StringBuilder builder, UnaryOperator<String> propertyNameFormatter)
-    {
+    private static void encodePropertyName(String string, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
         encodeString(propertyNameFormatter == null ? string : propertyNameFormatter.apply(string), builder);
     }
 

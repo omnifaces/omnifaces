@@ -17,7 +17,7 @@ import { Util } from "./Util";
 
 /**
  * Form partial submit.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.Form
  * @since 3.0
@@ -68,10 +68,10 @@ export namespace Form {
                     });
 
                     return partialViewState.join("&");
-                }
+                };
 
                 originalAjaxRequest(source, event, options);
-            }
+            };
         }
     }
 
@@ -91,7 +91,7 @@ export namespace Form {
             console.warn(`Cannot determine if ${executeIds} contains child ${name}`, e);
         }
 
-        return false;        
+        return false;
     }
 
     // Global initialization ------------------------------------------------------------------------------------------

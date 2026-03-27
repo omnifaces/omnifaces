@@ -24,9 +24,8 @@ import jakarta.faces.event.SystemEventListener;
 import jakarta.faces.validator.BeanValidator;
 
 /**
- * Overrides {@link BeanValidator#setValidationGroups(String)} for all components in the current view. This allows to
- * temporarily use different validationGroups or disabling validation if a specific {@link UICommand} or {@link UIInput}
- * has invoked the form submit.
+ * Overrides {@link BeanValidator#setValidationGroups(String)} for all components in the current view. This allows to temporarily use different validationGroups
+ * or disabling validation if a specific {@link UICommand} or {@link UIInput} has invoked the form submit.
  *
  * @author Adrian Gygax
  * @author Bauke Scholtz
@@ -36,12 +35,9 @@ public class BeanValidationEventListener implements SystemEventListener {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS =
-        "BeanValidationEventListener.originalValidationGroups";
-    private static final Logger LOGGER =
-        Logger.getLogger(BeanValidationEventListener.class.getName());
-    private static final String LOG_VALIDATION_GROUPS_OVERRIDDEN =
-        "Validation groups for component with id '%s' overriden from '%s' to '%s'";
+    private static final String ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS = "BeanValidationEventListener.originalValidationGroups";
+    private static final Logger LOGGER = Logger.getLogger(BeanValidationEventListener.class.getName());
+    private static final String LOG_VALIDATION_GROUPS_OVERRIDDEN = "Validation groups for component with id '%s' overriden from '%s' to '%s'";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
@@ -52,6 +48,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 
     /**
      * Construct an instance of bean validation event listener based on the given validation groups and disabled state.
+     * 
      * @param validationGroups The validation groups.
      * @param disabled The disabled state.
      */

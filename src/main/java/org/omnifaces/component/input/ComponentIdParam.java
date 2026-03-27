@@ -24,19 +24,17 @@ import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
- * The <code>&lt;o:componentIdParam&gt;</code> component allows to render just one or more components on a view via a GET
- * parameter.
+ * The <code>&lt;o:componentIdParam&gt;</code> component allows to render just one or more components on a view via a GET parameter.
  * <p>
- * Components can be identified via both their client id or simple component id. Via the former it's possible to
- * e.g. render only a specific row in a table. For specific cases, it's possible to render only the parent
- * component and omit any children.
+ * Components can be identified via both their client id or simple component id. Via the former it's possible to e.g. render only a specific row in a table. For
+ * specific cases, it's possible to render only the parent component and omit any children.
  * <p>
- * Among the use cases for this is creating simple mashups from various Faces based views, and scripts needing to obtain
- * markup for specific components on an initial (non-faces) request.
+ * Among the use cases for this is creating simple mashups from various Faces based views, and scripts needing to obtain markup for specific components on an
+ * initial (non-faces) request.
  * <p>
- * Note that this is a rather specialized component and for many common use cases the user is advised to investigate if the existing
- * AJAX and partial page requests in Faces don't already cover the requirements. For the moment this component only supports the
- * direct output of the original markup and does not wrap it into any "partial response" envelope.
+ * Note that this is a rather specialized component and for many common use cases the user is advised to investigate if the existing AJAX and partial page
+ * requests in Faces don't already cover the requirements. For the moment this component only supports the direct output of the original markup and does not
+ * wrap it into any "partial response" envelope.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -78,9 +76,9 @@ public class ComponentIdParam extends ViewParam {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the name of the request parameters from which the values are retrieved on an initial request that
-     * represent component ids of those components from which the markup should appear in the response (i.e. which
-     * should be rendered).
+     * Returns the name of the request parameters from which the values are retrieved on an initial request that represent component ids of those components
+     * from which the markup should appear in the response (i.e. which should be rendered).
+     * 
      * @return The component id parameter name.
      */
     public String getComponentIdName() {
@@ -88,9 +86,9 @@ public class ComponentIdParam extends ViewParam {
     }
 
     /**
-     * Sets the name of the request parameters from which the values are retrieved on an initial request that
-     * represent component ids of those components from which the markup should appear in the response (i.e. which
-     * should be rendered).
+     * Sets the name of the request parameters from which the values are retrieved on an initial request that represent component ids of those components from
+     * which the markup should appear in the response (i.e. which should be rendered).
+     * 
      * @param componentIdName The component id parameter name.
      */
     public void setComponentIdName(String componentIdName) {
@@ -98,9 +96,9 @@ public class ComponentIdParam extends ViewParam {
     }
 
     /**
-     * Returns the name of the request parameters from which the values are retrieved on an initial request that
-     * represent client ids of those components from which the markup should appear in the response (i.e. which
-     * should be rendered).
+     * Returns the name of the request parameters from which the values are retrieved on an initial request that represent client ids of those components from
+     * which the markup should appear in the response (i.e. which should be rendered).
+     * 
      * @return The client id parameter name.
      */
     public String getClientIdName() {
@@ -108,9 +106,9 @@ public class ComponentIdParam extends ViewParam {
     }
 
     /**
-     * Sets the name of the request parameters from which the values are retrieved on an initial request that
-     * represent client ids of those components from which the markup should appear in the response (i.e. which
-     * should be rendered).
+     * Sets the name of the request parameters from which the values are retrieved on an initial request that represent client ids of those components from
+     * which the markup should appear in the response (i.e. which should be rendered).
+     * 
      * @param clientIdName The client id parameter name.
      */
     public void setClientIdName(String clientIdName) {
@@ -118,8 +116,9 @@ public class ComponentIdParam extends ViewParam {
     }
 
     /**
-     * Returns whether children of the components identified by clientIdName or componentIdName are rendered in
-     * addition to the component itself. Defaults to {@code true}.
+     * Returns whether children of the components identified by clientIdName or componentIdName are rendered in addition to the component itself. Defaults to
+     * {@code true}.
+     * 
      * @return Whether children should be rendered.
      */
     public boolean isRenderChildren() {
@@ -127,8 +126,9 @@ public class ComponentIdParam extends ViewParam {
     }
 
     /**
-     * Sets whether children of the components identified by clientIdName or componentIdName are rendered in
-     * addition to the component itself. Defaults to {@code true}.
+     * Sets whether children of the components identified by clientIdName or componentIdName are rendered in addition to the component itself. Defaults to
+     * {@code true}.
+     * 
      * @param renderChildren Whether children should be rendered.
      */
     public void setRenderChildren(boolean renderChildren) {
@@ -139,6 +139,7 @@ public class ComponentIdParam extends ViewParam {
 
     /**
      * Gets the list of request values for the given request parameter name.
+     * 
      * @param context FacesContext for the request we are processing.
      * @param paramName The request parameter name for which values are returned.
      * @return All values in the request corresponding to the given parameter name.

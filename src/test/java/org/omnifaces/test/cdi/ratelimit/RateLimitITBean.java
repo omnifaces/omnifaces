@@ -41,4 +41,5 @@ public class RateLimitITBean {
     public String getExampleApiResponse() {
         return exampleApiResponse;
     }
+
 }

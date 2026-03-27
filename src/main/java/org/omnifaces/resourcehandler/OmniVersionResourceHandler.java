@@ -31,6 +31,7 @@ public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
     /**
      * Creates a new instance of this OmniFaces version resource handler which wraps the given resource handler.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public OmniVersionResourceHandler(ResourceHandler wrapped) {

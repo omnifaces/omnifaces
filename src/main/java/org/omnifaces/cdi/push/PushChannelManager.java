@@ -28,8 +28,7 @@ import jakarta.enterprise.context.SessionScoped;
 
 /**
  * <p>
- * Base class for push channel managers that hold application, session and view scoped channel identifiers.
- * The subclasses must be {@link SessionScoped}.
+ * Base class for push channel managers that hold application, session and view scoped channel identifiers. The subclasses must be {@link SessionScoped}.
  *
  * @author Bauke Scholtz
  * @see PushSessionManager
@@ -42,13 +41,11 @@ abstract class PushChannelManager implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_INVALID_SCOPE =
-        "%s 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
-            + " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
-            + " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
-    private static final String ERROR_DUPLICATE_CHANNEL =
-        "%s channel '%s' is already registered on a different scope. Choose an unique channel name for a"
-            + " different channel (or shutdown all browsers and restart the server if you were just testing).";
+    private static final String ERROR_INVALID_SCOPE = "%s 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
+        + " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
+        + " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
+    private static final String ERROR_DUPLICATE_CHANNEL = "%s channel '%s' is already registered on a different scope. Choose an unique channel name for a"
+        + " different channel (or shutdown all browsers and restart the server if you were just testing).";
 
     /** A good developer will unlikely declare multiple application scoped push channels in same application (a global JS listener is more efficient). */
     static final int ESTIMATED_CHANNELS_PER_APPLICATION = 1;
@@ -68,6 +65,7 @@ abstract class PushChannelManager implements Serializable {
     static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
     enum Scope {
+
         APPLICATION, SESSION, VIEW;
 
         static Scope of(String value, Serializable user, String componentName) {
@@ -83,6 +81,7 @@ abstract class PushChannelManager implements Serializable {
 
             throw new IllegalArgumentException(ERROR_INVALID_SCOPE.formatted(componentName, value));
         }
+
     }
 
     // Properties -----------------------------------------------------------------------------------------------------
@@ -94,11 +93,11 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Register given channel on given scope and return the channel identifier.
+     * 
      * @param channel The push channel.
-     * @param scope The push scope. Supported values are <code>application</code>, <code>session</code> and
-     * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
-     * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope
-     * may not be <code>application</code>.
+     * @param scope The push scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
+     * <code>null</code>, the default is <code>application</code>.
+     * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      * @return The push channel identifier.
      * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
      */
@@ -137,8 +136,8 @@ abstract class PushChannelManager implements Serializable {
     }
 
     /**
-     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close
-     * any open sessions associated with it. If any, also deregister session users.
+     * When current session scope is about to be destroyed, deregister all session scope channels and explicitly close any open sessions associated with it. If
+     * any, also deregister session users.
      */
     protected void deregisterSessionScope() {
         for (var sessionUser : sessionUsers.entrySet()) {
@@ -152,24 +151,28 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Returns the application scoped channels for this push transport.
+     * 
      * @return The application scoped channels.
      */
     protected abstract ConcurrentHashMap<String, String> getApplicationScope();
 
     /**
      * Returns the push session manager for this push transport.
+     * 
      * @return The push session manager.
      */
     protected abstract PushSessionManager<?> getPushSessions();
 
     /**
      * Returns the push user manager for this push transport.
+     * 
      * @return The push user manager.
      */
     protected abstract PushUserManager getPushUsers();
 
     /**
      * Returns the view scoped channels for this push transport.
+     * 
      * @param create Whether or not to auto-create the entry in Faces view scope.
      * @return View scope channel IDs.
      * @throws IllegalStateException When the Faces view scope is not available while {@code create} is {@code true}.
@@ -179,9 +182,10 @@ abstract class PushChannelManager implements Serializable {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
-     * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of
-     * push context implementations (the CDI session scope is not necessarily active during push send time).
-     * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+     * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of push context implementations (the CDI
+     * session scope is not necessarily active during push send time). This should actually be package private, but package private methods in CDI beans are
+     * subject to memory leaks.
+     * 
      * @return Session scope channel IDs.
      */
     protected Map<String, String> getSessionScopedChannels() {
@@ -189,8 +193,9 @@ abstract class PushChannelManager implements Serializable {
     }
 
     /**
-     * For internal usage only. Returns the session user mappings.
-     * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+     * For internal usage only. Returns the session user mappings. This should actually be package private, but package private methods in CDI beans are subject
+     * to memory leaks.
+     * 
      * @return Session user mappings.
      */
     protected ConcurrentHashMap<Serializable, String> getSessionUsers() {
@@ -198,15 +203,19 @@ abstract class PushChannelManager implements Serializable {
     }
 
     /**
-     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push
-     * send time in push context implementations.
+     * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push send time in push context implementations.
+     * 
      * @param channel The channel name.
      * @param applicationScope The application scope channel IDs.
      * @param sessionScope The session scope channel IDs.
      * @param viewScope The view scope channel IDs.
      * @return The channel ID, or <code>null</code> if not found.
      */
-    protected static String getChannelId(String channel, ConcurrentHashMap<String, String> applicationScope, Map<String, String> sessionScope, Map<String, String> viewScope) {
+    protected static String getChannelId(
+        String channel, ConcurrentHashMap<String, String> applicationScope, Map<String, String> sessionScope,
+        Map<String, String> viewScope
+    )
+    {
         var channelId = viewScope.get(channel);
 
         if (channelId == null) {
@@ -224,6 +233,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Serialize the push channel state for session persistence or failover.
+     * 
      * @param output The object output stream.
      * @throws IOException When an I/O error occurs.
      */
@@ -240,6 +250,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Deserialize the push channel state after session restore or failover.
+     * 
      * @param input The object input stream.
      * @throws IOException When an I/O error occurs.
      * @throws ClassNotFoundException When a serialized class is not found.

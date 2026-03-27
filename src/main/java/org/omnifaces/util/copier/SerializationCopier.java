@@ -22,8 +22,7 @@ import java.io.Serializable;
 /**
  * Copier that copies an object by serializing and subsequently deserializing it again.
  * <p>
- * As per the platform serialization rules, the object and all its non transient dependencies have
- * to implement the {@link Serializable} interface.
+ * As per the platform serialization rules, the object and all its non transient dependencies have to implement the {@link Serializable} interface.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -44,7 +43,8 @@ public class SerializationCopier implements Copier {
 
             return new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
 
-        } catch (IOException | ClassNotFoundException e) {
+        }
+        catch (IOException | ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
 

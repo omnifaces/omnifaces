@@ -30,12 +30,10 @@ import jakarta.faces.context.FacesContext;
  * <p>
  * Collection of utility methods for the Faces API with respect to working with {@link FacesMessage}.
  * <p>
- * The difference with {@link Messages} is that no one method of {@link MessagesLocal} obtains the {@link FacesContext}
- * from the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more
- * efficient in situations where multiple utility methods needs to be called at the same time. Invoking
- * {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained
- * as a {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds
- * or so.
+ * The difference with {@link Messages} is that no one method of {@link MessagesLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
+ * called at the same time. Invoking {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained as a
+ * {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds or so.
  *
  * @author Bauke Scholtz
  * @since 4.2

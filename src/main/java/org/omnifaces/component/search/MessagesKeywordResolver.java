@@ -37,9 +37,10 @@ import org.omnifaces.util.Components;
 
 /**
  * <p>
- * The <strong><code>{@literal @}messages</code></strong> search keyword resolver will automatically resolve all {@link UIMessage} and
- * {@link UIMessages} components within the current {@link UIForm}. This is particularly useful when you have a relatively large form and
- * would like to Ajax-update only the message components when submitting the form.
+ * The <strong><code>{@literal @}messages</code></strong> search keyword resolver will automatically resolve all {@link UIMessage} and {@link UIMessages}
+ * components within the current {@link UIForm}. This is particularly useful when you have a relatively large form and would like to Ajax-update only the
+ * message components when submitting the form.
+ * 
  * <pre>
  * &lt;h:form id="form"&gt;
  *     &lt;h:inputText id="input1" ... /&gt;
@@ -56,18 +57,16 @@ import org.omnifaces.util.Components;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * This has only one prerequirement: the message component must have a fixed <code>id</code> attribute set as demonstrated above. Otherwise
- * Faces won't render anything to the client side when there are no messages and ultimately JavaScript won't be able to find it when
- * processing the Faces Ajax response.
+ * This has only one prerequirement: the message component must have a fixed <code>id</code> attribute set as demonstrated above. Otherwise Faces won't render
+ * anything to the client side when there are no messages and ultimately JavaScript won't be able to find it when processing the Faces Ajax response.
  * <p>
- * This keyword resolver is already registered by OmniFaces own <code>faces-config.xml</code> and thus gets auto-initialized when the
- * OmniFaces JAR is bundled in a web application, so end-users do not need to register this keyword resolver explicitly themselves.
+ * This keyword resolver is already registered by OmniFaces own <code>faces-config.xml</code> and thus gets auto-initialized when the OmniFaces JAR is bundled
+ * in a web application, so end-users do not need to register this keyword resolver explicitly themselves.
  *
  * <h2>Compatibility</h2>
  * <p>
- * This keyword resolver is only compatible with <code>&lt;f:ajax&gt;</code> of Mojarra 2.3.4 or newer.
- * This keyword resolver is not compatible with <code>&lt;p:ajax&gt;</code> of PrimeFaces 6.x.
- * It's only compatible with a PrimeFaces version designed specifically for JSF 2.3.
+ * This keyword resolver is only compatible with <code>&lt;f:ajax&gt;</code> of Mojarra 2.3.4 or newer. This keyword resolver is not compatible with
+ * <code>&lt;p:ajax&gt;</code> of PrimeFaces 6.x. It's only compatible with a PrimeFaces version designed specifically for JSF 2.3.
  *
  * @author Bauke Scholtz
  * @since 3.1
@@ -82,6 +81,7 @@ public class MessagesKeywordResolver extends SearchKeywordResolver {
 
     /**
      * Invoked by {@link ApplicationProcessor}.
+     * 
      * @param application Involved faces application.
      */
     public static void register(Application application) {
@@ -99,9 +99,8 @@ public class MessagesKeywordResolver extends SearchKeywordResolver {
     }
 
     /**
-     * Grab the current {@link UIForm}, visit it and collect client IDs of all {@link UIMessage} and {@link UIMessages} components and
-     * finally invoke context call back with an {@link UIMessage} component whose client ID returns a space separated collection of found
-     * client IDs.
+     * Grab the current {@link UIForm}, visit it and collect client IDs of all {@link UIMessage} and {@link UIMessages} components and finally invoke context
+     * call back with an {@link UIMessage} component whose client ID returns a space separated collection of found client IDs.
      */
     @Override
     public void resolve(SearchKeywordContext context, UIComponent component, String keyword) {
@@ -114,7 +113,9 @@ public class MessagesKeywordResolver extends SearchKeywordResolver {
             form.visitTree(visitContext, (visit, child) -> {
                 if (isOneInstanceOf(child.getClass(), UIMessage.class, UIMessages.class)) {
                     if (child.getId().startsWith(UIViewRoot.UNIQUE_ID_PREFIX)) {
-                        logger.warning(String.format("@messages can only target message components with a fixed ID; auto generated ID %s encountered", child.getId()));
+                        logger.warning(
+                            String.format("@messages can only target message components with a fixed ID; auto generated ID %s encountered", child.getId())
+                        );
                     }
                     else {
                         messageClientIds.add(child.getClientId());
@@ -125,14 +126,17 @@ public class MessagesKeywordResolver extends SearchKeywordResolver {
 
             if (!messageClientIds.isEmpty()) {
                 context.invokeContextCallback(new UIMessage() {
+
                     @Override
                     public String getClientId(FacesContext context) {
                         return join(" ", messageClientIds);
                     }
+
                 });
             }
         }
 
         context.setKeywordResolved(true);
     }
+
 }

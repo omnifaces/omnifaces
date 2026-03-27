@@ -32,11 +32,11 @@ import org.omnifaces.util.Exceptions;
 
 /**
  * <p>
- * The {@link ExceptionSuppressor} will suppress all exceptions which are an instance of the types as listed in context
- * parameter {@value org.omnifaces.exceptionhandler.ExceptionSuppressor#PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS} and
- * refresh the current page by redirecting to the current URL with query string. The context parameter value must be a
- * commaseparated string of fully qualified names of exception types. Note that this also covers subclasses of specified
- * exception types.
+ * The {@link ExceptionSuppressor} will suppress all exceptions which are an instance of the types as listed in context parameter
+ * {@value org.omnifaces.exceptionhandler.ExceptionSuppressor#PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS} and refresh the current page by redirecting to the current
+ * URL with query string. The context parameter value must be a commaseparated string of fully qualified names of exception types. Note that this also covers
+ * subclasses of specified exception types.
+ * 
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS&lt;/param-name&gt;
@@ -44,24 +44,25 @@ import org.omnifaces.util.Exceptions;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * This is useful for exceptions which are technically unavoidable such as those which boil down to that the network
- * connection is abruptly closed by the client by e.g. navigating away while the page is loading, or closing the browser
- * window/tab while the page is loading, or having the physical network connection cut down, or the physical machine
- * crashed, etcetera. All which are beyond control of the server and therefore not really interesting to have logged
- * into server logs.
+ * This is useful for exceptions which are technically unavoidable such as those which boil down to that the network connection is abruptly closed by the client
+ * by e.g. navigating away while the page is loading, or closing the browser window/tab while the page is loading, or having the physical network connection cut
+ * down, or the physical machine crashed, etcetera. All which are beyond control of the server and therefore not really interesting to have logged into server
+ * logs.
  *
  * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
+ * 
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ExceptionSuppressorFactory&lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
  * <p>
- * In case there are multiple exception handlers, best is to register this handler as last one in the chain. For example,
- * when combined with {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler}
- * from taking over the handling of the to-be-suppressed exceptions.
+ * In case there are multiple exception handlers, best is to register this handler as last one in the chain. For example, when combined with
+ * {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler} from taking over the handling of the to-be-suppressed
+ * exceptions.
+ * 
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -76,17 +77,16 @@ import org.omnifaces.util.Exceptions;
 public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 
     /**
-     * The context parameter name to specify exception types to suppress by {@link ExceptionSuppressor}. The context
-     * parameter value must be a commaseparated string of fully qualified names of exception types. Note that this also
-     * covers subclasses of specified exception types.
+     * The context parameter name to specify exception types to suppress by {@link ExceptionSuppressor}. The context parameter value must be a commaseparated
+     * string of fully qualified names of exception types. Note that this also covers subclasses of specified exception types.
      */
-    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS =
-        "org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS";
+    public static final String PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS = "org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS";
 
     private Class<? extends Throwable>[] exceptionTypesToSuppress;
 
     /**
      * Construct a new exception suppressor around the given wrapped exception handler.
+     * 
      * @param wrapped The wrapped exception handler.
      */
     public ExceptionSuppressor(ExceptionHandler wrapped) {
@@ -94,8 +94,8 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Construct a new exception suppressor around the given wrapped exception handler and using the given array of
-     * exception types to suppress.
+     * Construct a new exception suppressor around the given wrapped exception handler and using the given array of exception types to suppress.
+     * 
      * @param wrapped The wrapped exception handler.
      * @param exceptionTypesToSuppress Array of exception types to suppress.
      */
@@ -108,6 +108,7 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
     /**
      * Get the exception types to suppress. This can be specified via context parameter
      * {@value org.omnifaces.exceptionhandler.ExceptionSuppressor#PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
+     * 
      * @param context The involved servlet context.
      * @return Exception types to suppress.
      */
@@ -116,9 +117,9 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Inspect all {@link #getUnhandledExceptionQueuedEvents()} if any of them is caused by one of the exception types
-     * listed in {@link #PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}.
-     * If so, then drain the {@link #getUnhandledExceptionQueuedEvents()}, and refresh the current URL with query string.
+     * Inspect all {@link #getUnhandledExceptionQueuedEvents()} if any of them is caused by one of the exception types listed in
+     * {@link #PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS}. If so, then drain the {@link #getUnhandledExceptionQueuedEvents()}, and refresh the current URL with
+     * query string.
      */
     @Override
     public void handle() {
@@ -151,8 +152,8 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
     }
 
     /**
-     * Subclasses can override this method to have finer grained control over what must happen when the given exception
-     * has been suppressed.
+     * Subclasses can override this method to have finer grained control over what must happen when the given exception has been suppressed.
+     * 
      * @param context The involved faces context.
      * @param suppressedException The suppressed exception.
      */

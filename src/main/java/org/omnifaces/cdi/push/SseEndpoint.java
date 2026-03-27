@@ -29,10 +29,9 @@ import org.omnifaces.util.Beans;
 
 /**
  * <p>
- * This SSE endpoint handles connections opened by <code>&lt;o:sse&gt;</code> and <code>&lt;o:notification&gt;</code>.
- * It is automatically registered during application startup when <code>&#64;</code>{@link Push}<code>(type=SSE)</code>
- * or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified injection points are detected by
- * {@link PushExtension}.
+ * This SSE endpoint handles connections opened by <code>&lt;o:sse&gt;</code> and <code>&lt;o:notification&gt;</code>. It is automatically registered during
+ * application startup when <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified
+ * injection points are detected by {@link PushExtension}.
  *
  * @author Bauke Scholtz
  * @see Sse
@@ -103,6 +102,7 @@ public class SseEndpoint extends HttpServlet {
                     logger.log(FINEST, "Ignoring thrown exception; can happen when the CDI context is no longer active (e.g. server shutdown).", e);
                 }
             }
+
         });
     }
 
@@ -112,4 +112,5 @@ public class SseEndpoint extends HttpServlet {
         var pathInfo = request.getPathInfo();
         return (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
     }
+
 }

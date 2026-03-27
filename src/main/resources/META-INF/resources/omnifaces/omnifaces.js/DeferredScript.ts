@@ -15,7 +15,7 @@ import { Util } from "./Util";
 
 /**
  * Deferred script loader.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.DeferredScript
  * @since 1.8
@@ -88,7 +88,15 @@ export namespace DeferredScript {
             loadDeferredScript(index + 1);
         };
 
-        Util.loadScript(deferredScript.url, deferredScript.crossorigin, deferredScript.integrity, deferredScript.begin, deferredScript.success, deferredScript.error, completeFunction);
+        Util.loadScript(
+            deferredScript.url,
+            deferredScript.crossorigin,
+            deferredScript.integrity,
+            deferredScript.begin,
+            deferredScript.success,
+            deferredScript.error,
+            completeFunction
+        );
     }
 
 }

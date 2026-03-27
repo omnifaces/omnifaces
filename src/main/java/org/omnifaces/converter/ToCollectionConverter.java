@@ -39,19 +39,20 @@ import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
- * The <code>omnifaces.ToCollectionConverter</code> is intented to convert submitted {@link String} values to a Java
- * collection based on a delimiter. Additionally, it trims any whitespace around each delimited submitted value. This is
- * useful for among others comma separated value inputs.
+ * The <code>omnifaces.ToCollectionConverter</code> is intented to convert submitted {@link String} values to a Java collection based on a delimiter.
+ * Additionally, it trims any whitespace around each delimited submitted value. This is useful for among others comma separated value inputs.
  *
  * <h2>Usage</h2>
  * <p>
- * This converter is available by converter ID <code>omnifaces.ToCollectionConverter</code>. Just specify it in the
- * <code>converter</code> attribute of the component referring the <code>Collection</code> property. For example:
+ * This converter is available by converter ID <code>omnifaces.ToCollectionConverter</code>. Just specify it in the <code>converter</code> attribute of the
+ * component referring the <code>Collection</code> property. For example:
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.commaSeparatedValues}" converter="omnifaces.ToCollectionConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toCollectionConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.commaSeparatedValues}"&gt;
  *     &lt;o:toCollectionConverter /&gt;
@@ -59,13 +60,13 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  *
  * <p>
- * The default delimiter is comma followed by space <code>, </code> and the default collection type is
- * <code>java.util.LinkedHashSet</code> for a <code>Set</code> property and <code>java.util.ArrayList</code> for anything
- * else, and the default converter for each item will in <code>getAsString()</code> be determined based on item type and
- * in <code>getAsObject()</code> be determined based on generic return type of the getter method.
+ * The default delimiter is comma followed by space <code>, </code> and the default collection type is <code>java.util.LinkedHashSet</code> for a
+ * <code>Set</code> property and <code>java.util.ArrayList</code> for anything else, and the default converter for each item will in <code>getAsString()</code>
+ * be determined based on item type and in <code>getAsObject()</code> be determined based on generic return type of the getter method.
  * <p>
- * The <code>delimiter</code> must be a <code>String</code>, the <code>collectionType</code> must be a FQN and the
- * <code>itemConverter</code> can be anything which is acceptable by {@link Faces#createConverter(Object)}.
+ * The <code>delimiter</code> must be a <code>String</code>, the <code>collectionType</code> must be a FQN and the <code>itemConverter</code> can be anything
+ * which is acceptable by {@link Faces#createConverter(Object)}.
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedNumbers}"&gt;
  *     &lt;o:toCollectionConverter delimiter=";"
@@ -80,7 +81,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  */
 @FacesConverter("omnifaces.ToCollectionConverter")
 @FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ToCollectionConverter implements Converter<Collection> {
 
     private static final String DEFAULT_DELIMITER = ",";
@@ -165,6 +166,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the delimiter to split on.
+     * 
      * @param delimiter The delimiter to split on.
      */
     public void setDelimiter(String delimiter) {
@@ -173,6 +175,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the FQN of the collection to create.
+     * 
      * @param collectionType The FQN of the collection to create.
      */
     public void setCollectionType(String collectionType) {
@@ -181,6 +184,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the converter for the item.
+     * 
      * @param itemConverter The converter for the item.
      */
     public void setItemConverter(Object itemConverter) {

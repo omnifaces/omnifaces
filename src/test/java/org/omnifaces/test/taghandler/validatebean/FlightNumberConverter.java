@@ -20,7 +20,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
-@FacesConverter(value="flightNumberConverter", forClass=FlightNumber.class)
+@FacesConverter(value = "flightNumberConverter", forClass = FlightNumber.class)
 public class FlightNumberConverter implements Converter<FlightNumber> {
 
     @Override
@@ -30,7 +30,7 @@ public class FlightNumberConverter implements Converter<FlightNumber> {
         }
 
         return ofNullable(modelValue.getAirlineDesignator()).orElse("")
-             + ofNullable(modelValue.getFlightIdentifier()).map(String::valueOf).orElse("");
+            + ofNullable(modelValue.getFlightIdentifier()).map(String::valueOf).orElse("");
     }
 
     @Override

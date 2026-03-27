@@ -57,17 +57,16 @@ import org.omnifaces.component.output.PathParam;
 import org.omnifaces.util.Utils;
 
 /**
- * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to
- * always render extensionless or if the current request is extensionless, otherwise as-is.
+ * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to always render extensionless or if the
+ * current request is extensionless, otherwise as-is.
  * <p>
- * <i>Implementation note</i>: this is installed by {@link ApplicationProcessor} during the {@link PostConstructApplicationEvent}, in
- * which it's guaranteed that Faces initialization (typically done via a {@link ServletContextListener}) has
- * been done. Setting a view handler programmatically requires the Faces {@link Application} to be present
- * which isn't the case before Faces initialization has been done.
+ * <i>Implementation note</i>: this is installed by {@link ApplicationProcessor} during the {@link PostConstructApplicationEvent}, in which it's guaranteed that
+ * Faces initialization (typically done via a {@link ServletContextListener}) has been done. Setting a view handler programmatically requires the Faces
+ * {@link Application} to be present which isn't the case before Faces initialization has been done.
  * <p>
- * Additionally, the view handler needs to be set BEFORE the first faces request is processed. Putting
- * the view handler setting code in a {@link Filter#init(jakarta.servlet.FilterConfig)} method only works
- * when all init methods are called during startup, OR when the filter filters every request.
+ * Additionally, the view handler needs to be set BEFORE the first faces request is processed. Putting the view handler setting code in a
+ * {@link Filter#init(jakarta.servlet.FilterConfig)} method only works when all init methods are called during startup, OR when the filter filters every
+ * request.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
@@ -80,14 +79,14 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
     private static final Logger logger = Logger.getLogger(FacesViewsViewHandler.class.getName());
 
-    private static final String ERROR_MULTI_VIEW_NOT_CONFIGURED =
-        "MultiViews was not configured for the view id '%s', but path parameters were defined for it.";
+    private static final String ERROR_MULTI_VIEW_NOT_CONFIGURED = "MultiViews was not configured for the view id '%s', but path parameters were defined for it.";
 
     private final boolean extensionless;
     private final boolean lowercasedRequestURI;
 
     /**
      * Construct faces views view handler.
+     * 
      * @param wrapped The view handler to be wrapped.
      */
     public FacesViewsViewHandler(ViewHandler wrapped) {
@@ -132,11 +131,11 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * An override to create bookmarkable URLs via standard outcome target components that take into account
-     * <code>&lt;o:pathParam&gt;</code> tags nested in the components. The path parameters will be rendered in the order
-     * they were declared for a view id that is defined as a multi view and if the view was not defined as a multi view
-     * then they won't be rendered at all. Additionally, declaring path parameters for a non-multi view will be logged
-     * as a warning and a faces warning message will be added for <code>Development</code> stage.
+     * An override to create bookmarkable URLs via standard outcome target components that take into account <code>&lt;o:pathParam&gt;</code> tags nested in the
+     * components. The path parameters will be rendered in the order they were declared for a view id that is defined as a multi view and if the view was not
+     * defined as a multi view then they won't be rendered at all. Additionally, declaring path parameters for a non-multi view will be logged as a warning and
+     * a faces warning message will be added for <code>Development</code> stage.
+     * 
      * @see PathParam
      */
     @Override

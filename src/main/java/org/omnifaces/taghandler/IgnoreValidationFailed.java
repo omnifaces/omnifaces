@@ -33,14 +33,14 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:ignoreValidationFailed&gt;</code> taghandler allows the developer to ignore validation failures when
- * executing an {@link UICommand} action. This taghandler must be placed inside an {@link UICommand} component and the
- * parent {@link UIForm} must be an <code>&lt;o:form&gt;</code>. When executing an ajax action, make sure that the
- * parent {@link UIForm} is also included in the <code>&lt;f:ajax execute&gt;</code>.
+ * The <code>&lt;o:ignoreValidationFailed&gt;</code> taghandler allows the developer to ignore validation failures when executing an {@link UICommand} action.
+ * This taghandler must be placed inside an {@link UICommand} component and the parent {@link UIForm} must be an <code>&lt;o:form&gt;</code>. When executing an
+ * ajax action, make sure that the parent {@link UIForm} is also included in the <code>&lt;f:ajax execute&gt;</code>.
  *
  * <h2>Usage</h2>
  * <p>
  * For example:
+ * 
  * <pre>
  * &lt;o:form&gt;
  *     ...
@@ -51,10 +51,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/o:form&gt;
  * </pre>
  * <p>
- * Note that the model values will (obviously) only be updated for components which have actually passed the validation.
- * Also the validation messages will still be displayed. If you prefer to not display them, then you'd need to exclude
- * them from rendering by <code>&lt;f:ajax render&gt;</code>, or to put a proper condition in the <code>rendered</code>
- * attribute.
+ * Note that the model values will (obviously) only be updated for components which have actually passed the validation. Also the validation messages will still
+ * be displayed. If you prefer to not display them, then you'd need to exclude them from rendering by <code>&lt;f:ajax render&gt;</code>, or to put a proper
+ * condition in the <code>rendered</code> attribute.
  *
  * @author Bauke Scholtz
  * @see Form
@@ -64,15 +63,14 @@ public class IgnoreValidationFailed extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ERROR_INVALID_PARENT =
-        "Parent component of o:ignoreValidationFailed must be an instance of UICommand.";
-    private static final String ERROR_INVALID_FORM =
-        "Parent form of o:ignoreValidationFailed must be an o:form, not h:form.";
+    private static final String ERROR_INVALID_PARENT = "Parent component of o:ignoreValidationFailed must be an instance of UICommand.";
+    private static final String ERROR_INVALID_FORM = "Parent form of o:ignoreValidationFailed must be an o:form, not h:form.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public IgnoreValidationFailed(TagConfig config) {
@@ -82,8 +80,9 @@ public class IgnoreValidationFailed extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of
-     * a postback, then delegate to {@link #processIgnoreValidationFailed(UICommand)}.
+     * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of a postback, then delegate to
+     * {@link #processIgnoreValidationFailed(UICommand)}.
+     * 
      * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
      */
     @Override
@@ -104,8 +103,9 @@ public class IgnoreValidationFailed extends TagHandler {
     }
 
     /**
-     * Check if the given command component has been invoked during the current request and if so, then instruct the
-     * parent <code>&lt;o:form&gt;</code> to ignore the validation.
+     * Check if the given command component has been invoked during the current request and if so, then instruct the parent <code>&lt;o:form&gt;</code> to
+     * ignore the validation.
+     * 
      * @param command The command component.
      * @throws IllegalStateException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
      */

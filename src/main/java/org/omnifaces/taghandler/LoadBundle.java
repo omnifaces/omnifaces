@@ -43,22 +43,20 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:loadBundle&gt;</code> taghandler basically extends the standard <code>&lt;f:loadBundle&gt;</code>
- * with a new <code>loader</code> attribute allowing you to explicitly set the desired {@link ClassLoader} where
- * the resource bundle should be looked up. Also the {@link Locale} of the bundle is obtained with better default values
- * than the default Faces implementation.
+ * The <code>&lt;o:loadBundle&gt;</code> taghandler basically extends the standard <code>&lt;f:loadBundle&gt;</code> with a new <code>loader</code> attribute
+ * allowing you to explicitly set the desired {@link ClassLoader} where the resource bundle should be looked up. Also the {@link Locale} of the bundle is
+ * obtained with better default values than the default Faces implementation.
  * <p>
- * You can use the <code>loader</code> attribute to specify an object whose class loader will be used to load the
- * resource bundle specified in the <code>basename</code> attribute. The class loader of the given object is resolved as
- * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific resource
- * bundle when there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+ * You can use the <code>loader</code> attribute to specify an object whose class loader will be used to load the resource bundle specified in the
+ * <code>basename</code> attribute. The class loader of the given object is resolved as specified in {@link Utils#getClassLoader(Object)}. In the end this
+ * should allow you to use a more specific resource bundle when there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
  * <p>
  * The locale of the resource bundle is obtained as specified in {@link Faces#getLocale()}.
  *
  * <h2>Usage</h2>
  * <p>
- * You can use it the same way as <code>&lt;f:loadBundle&gt;</code>, you only need to change <code>f:</code> into
- * <code>o:</code> to get the extra support for <code>loader</code> attribute and the improved locale resolving.
+ * You can use it the same way as <code>&lt;f:loadBundle&gt;</code>, you only need to change <code>f:</code> into <code>o:</code> to get the extra support for
+ * <code>loader</code> attribute and the improved locale resolving.
  *
  * @author Bauke Scholtz
  * @since 4.3
@@ -68,19 +66,24 @@ public class LoadBundle extends TagHandler {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    @FacesAttribute(name = "var", required = true, description = "The name of the request attribute which exposes the loaded resource bundle in the request scope.")
+    @FacesAttribute(
+        name = "var", required = true, description = "The name of the request attribute which exposes the loaded resource bundle in the request scope."
+    )
     private final String varValue;
 
     @FacesAttribute(name = "basename", required = true, description = "Base name of the resource bundle to be loaded.")
     private final TagAttribute basenameAttribute;
 
-    @FacesAttribute(name = "loader", description = "The object to be used as source of the class loader to load the resource bundle specified in basename attribute. Can be an instance of ClassLoader, Class or any object.")
+    @FacesAttribute(
+        name = "loader", description = "The object to be used as source of the class loader to load the resource bundle specified in basename attribute. Can be an instance of ClassLoader, Class or any object."
+    )
     private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public LoadBundle(TagConfig config) {
@@ -93,10 +96,9 @@ public class LoadBundle extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First obtain the resource bundle by its name as specified in the <code>basename</code> attribute with the locale
-     * which is obtained as specified in {@link Faces#getLocale()} and the class loader which is obtained as specified
-     * in {@link Utils#getClassLoader(Object)} with the <code>loader</code> attribute as argument. Finally set the
-     * resource bundle in the request scope by the name as specified in the <code>var</code> attribute.
+     * First obtain the resource bundle by its name as specified in the <code>basename</code> attribute with the locale which is obtained as specified in
+     * {@link Faces#getLocale()} and the class loader which is obtained as specified in {@link Utils#getClassLoader(Object)} with the <code>loader</code>
+     * attribute as argument. Finally set the resource bundle in the request scope by the name as specified in the <code>var</code> attribute.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -119,6 +121,7 @@ public class LoadBundle extends TagHandler {
 
     /**
      * Returns the locale associated with the given component conform {@link Faces#getLocale()}.
+     * 
      * @param context The involved facelet context.
      * @param component The component to find the locale in.
      * @return The locale associated with the given component.
@@ -140,8 +143,8 @@ public class LoadBundle extends TagHandler {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * Specific map implementation which wraps the given resource bundle in {@link Collections#unmodifiableMap(Map)} and
-     * returns {@code ???key???} in {@link BundleMap#get(Object)} method when the key doesn't exist at all.
+     * Specific map implementation which wraps the given resource bundle in {@link Collections#unmodifiableMap(Map)} and returns {@code ???key???} in
+     * {@link BundleMap#get(Object)} method when the key doesn't exist at all.
      *
      * @author Bauke Scholtz
      */

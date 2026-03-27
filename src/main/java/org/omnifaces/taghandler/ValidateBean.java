@@ -99,17 +99,15 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation on a per-{@link UICommand}
- * or {@link UIInput} component basis, as well as validating a given bean at the class level.
+ * The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation on a per-{@link UICommand} or {@link UIInput} component basis, as
+ * well as validating a given bean at the class level.
  *
  * <p>
- * The standard <code>&lt;f:validateBean&gt;</code> only allows validation control on a per-form
- * or a per-request basis (by using multiple tags and conditional EL expressions in its attributes) which may end up in
- * boilerplate code.
+ * The standard <code>&lt;f:validateBean&gt;</code> only allows validation control on a per-form or a per-request basis (by using multiple tags and conditional
+ * EL expressions in its attributes) which may end up in boilerplate code.
  *
  * <p>
- * The standard <code>&lt;f:validateBean&gt;</code> also, despite its name, does not actually have any facilities to
- * validate a bean at all.
+ * The standard <code>&lt;f:validateBean&gt;</code> also, despite its name, does not actually have any facilities to validate a bean at all.
  *
  * <h2>Usage</h2>
  * <p>
@@ -117,11 +115,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Control bean validation per component</b>
+ * 
  * <pre>
  * &lt;h:commandButton value="submit" action="#{bean.submit}"&gt;
  *     &lt;o:validateBean validationGroups="jakarta.validation.groups.Default,com.example.MyGroup" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
+ * 
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedItem}"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
@@ -132,6 +132,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Validate a bean at the class level</b>
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
@@ -141,6 +142,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Since OmniFaces 3.8, nested properties are also supported with <code>@jakarta.validation.Valid</code> cascade</b>
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
@@ -148,55 +150,59 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;o:validateBean value="#{bean}" /&gt;
  * </pre>
  * <p>
- * Whereby the <code>product</code> property looks like this:</p>
+ * Whereby the <code>product</code> property looks like this:
+ * </p>
+ * 
  * <pre>
+ * 
  * &#64;Valid
  * private Product product;
  * </pre>
  *
  * <p>
- * When using <code>&lt;o:validateBean method="validateCopy" /&gt;</code> (which is the default), then only beans, lists,
- * maps and arrays are considered as nested properties and the copied bean will be autopopulated with defaults. If this
- * fails, then consider creating a custom copier as instructed in next section.
+ * When using <code>&lt;o:validateBean method="validateCopy" /&gt;</code> (which is the default), then only beans, lists, maps and arrays are considered as
+ * nested properties and the copied bean will be autopopulated with defaults. If this fails, then consider creating a custom copier as instructed in next
+ * section.
  *
  * <h2>Class level validation details</h2>
  * <p>
- * In order to validate a bean at the class level, all values from input components should first be actually set on that bean
- * and only thereafter should the bean be validated. This however does not play well with the Faces approach where a model
- * is only updated when validation passes. But for class level validation we seemingly can not validate until the model
- * is updated. To break this tie, a <em>copy</em> of the model bean is made first, and then values are stored in this copy
- * and validated there. If validation passes, the original bean is updated.
+ * In order to validate a bean at the class level, all values from input components should first be actually set on that bean and only thereafter should the
+ * bean be validated. This however does not play well with the Faces approach where a model is only updated when validation passes. But for class level
+ * validation we seemingly can not validate until the model is updated. To break this tie, a <em>copy</em> of the model bean is made first, and then values are
+ * stored in this copy and validated there. If validation passes, the original bean is updated.
  *
  * <p>
  * A bean is copied using the following strategies (in the order indicated):
  * <ol>
- * <li> <b>Cloning</b> - Bean must implement the {@link Cloneable} interface and support cloning according to the rules of that interface. See {@link CloneCopier}
- * <li> <b>Serialization</b> - Bean must implement the {@link Serializable} interface and support serialization according to the rules of that interface. See {@link SerializationCopier}
- * <li> <b>Copy constructor</b> - Bean must have an additional constructor (next to the default constructor) taking a single argument of its own
- *      type that initializes itself with the values of that passed in type. See {@link CopyCtorCopier}
- * <li> <b>New instance</b> - Bean should have a public no arguments (default) constructor. Every official JavaBean satisfies this requirement. Note
- *      that in this case no copy is made of the original bean, but just a new instance is created. See {@link NewInstanceCopier}
+ * <li><b>Cloning</b> - Bean must implement the {@link Cloneable} interface and support cloning according to the rules of that interface. See
+ * {@link CloneCopier}
+ * <li><b>Serialization</b> - Bean must implement the {@link Serializable} interface and support serialization according to the rules of that interface. See
+ * {@link SerializationCopier}
+ * <li><b>Copy constructor</b> - Bean must have an additional constructor (next to the default constructor) taking a single argument of its own type that
+ * initializes itself with the values of that passed in type. See {@link CopyCtorCopier}
+ * <li><b>New instance</b> - Bean should have a public no arguments (default) constructor. Every official JavaBean satisfies this requirement. Note that in this
+ * case no copy is made of the original bean, but just a new instance is created. See {@link NewInstanceCopier}
  * </ol>
  *
  * <p>
- * If the above order is not ideal, or if an custom copy strategy is needed (e.g. when it's only needed to copy a few fields for the validation)
- * a strategy can be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations
- * given above, or can be a custom implementation of the {@link Copier} interface.
+ * If the above order is not ideal, or if an custom copy strategy is needed (e.g. when it's only needed to copy a few fields for the validation) a strategy can
+ * be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations given above, or
+ * can be a custom implementation of the {@link Copier} interface.
  * <p>
- * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code>
- * attribute to <code>"validateActual"</code>.
+ * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code> attribute to <code>"validateActual"</code>.
+ * 
  * <pre>
  * &lt;o:validateBean value="#{bean.product}" method="validateActual" /&gt;
  * </pre>
  * <p>
- * This will update the model values and run the validation after update model values phase instead of the validations
- * phase. The disadvantage is that the invalid values remain in the model and that the action method is anyway invoked.
- * You would need an additional check for {@link FacesContext#isValidationFailed()} in the action method to see if it
- * has failed or not.
+ * This will update the model values and run the validation after update model values phase instead of the validations phase. The disadvantage is that the
+ * invalid values remain in the model and that the action method is anyway invoked. You would need an additional check for
+ * {@link FacesContext#isValidationFailed()} in the action method to see if it has failed or not.
  *
  * <h2>Faces messages</h2>
  * <p>
  * By default, the faces message is added with client ID of the parent {@link UIForm}.
+ * 
  * <pre>
  * &lt;h:form id="formId"&gt;
  *     ...
@@ -206,6 +212,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The faces message can also be shown for all invalidated components using <code>showMessageFor="@all"</code>.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText id="foo" /&gt;
@@ -218,6 +225,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     ...
@@ -226,8 +234,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;h:messages globalOnly="true" /&gt;
  * </pre>
  * <p>
- * The faces message can also be shown for specific components referenced by a space separated collection of their
- * client IDs in <code>showMessageFor</code> attribute.
+ * The faces message can also be shown for specific components referenced by a space separated collection of their client IDs in <code>showMessageFor</code>
+ * attribute.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText id="foo" /&gt;
@@ -239,9 +248,10 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The faces message can also be shown for components which match {@link jakarta.validation.ConstraintViolation#getPropertyPath() Property
- * Path of the ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can
- * be found, the message will fallback to being added with client ID of the parent {@link UIForm}.
+ * The faces message can also be shown for components which match {@link jakarta.validation.ConstraintViolation#getPropertyPath() Property Path of the
+ * ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can be found, the message will fallback to being added
+ * with client ID of the parent {@link UIForm}.
+ * 
  * <pre>
  * &lt;h:form id="formId"&gt;
  *     ...
@@ -257,30 +267,28 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. The
- * <code>showMessageFor</code> attribute does by design not have any effect when <code>validateMethod="actual"</code>
- * is used.
+ * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. The <code>showMessageFor</code> attribute does by
+ * design not have any effect when <code>validateMethod="actual"</code> is used.
  *
  * <h3>Message format</h3>
  * <p>
- * The faces message uses a predefined message format, which corresponds to the value of {@link BeanValidator#MESSAGE_ID}
- * in the message bundle. The default message format of <code>{1}: {0}</code> prepends the labels of all the validated
- * fields. This is useful in the case of validating a single bean property, but sometimes confusing in the case of
- * validating a bean with many properties.
+ * The faces message uses a predefined message format, which corresponds to the value of {@link BeanValidator#MESSAGE_ID} in the message bundle. The default
+ * message format of <code>{1}: {0}</code> prepends the labels of all the validated fields. This is useful in the case of validating a single bean property, but
+ * sometimes confusing in the case of validating a bean with many properties.
  * <p>
- * In a form containing properties like <i>First Name</i>, <i>Last Name</i>, <i>Address</i>, <i>Zip Code</i>, and
- * <i>Phone Number</i> where at the bean level, at least one of the name fields must be non-null, overriding the message
- * format can help make a more clear error message.
+ * In a form containing properties like <i>First Name</i>, <i>Last Name</i>, <i>Address</i>, <i>Zip Code</i>, and <i>Phone Number</i> where at the bean level,
+ * at least one of the name fields must be non-null, overriding the message format can help make a more clear error message.
  * <p>
  * This can be done by overriding the {@link BeanValidator#MESSAGE_ID} line in the message bundle:
+ * 
  * <pre>
  * jakarta.faces.validator.BeanValidator.MESSAGE = Errors encountered: {0}
  * </pre>
  * <p>
- * However, this change affects all bean validation messages site-wide. In case you'd like to fine-tune the bean
- * validation message on a per-<code>&lt;o:validateBean&gt;</code>-basis, then you can since OmniFaces 3.12 use the
- * <code>messageFormat</code> attribute. Any <code>{0}</code> placeholder will be substituted with the error message
- * and any <code>{1}</code> placeholder will be substituted with the labels of all validated fields.
+ * However, this change affects all bean validation messages site-wide. In case you'd like to fine-tune the bean validation message on a
+ * per-<code>&lt;o:validateBean&gt;</code>-basis, then you can since OmniFaces 3.12 use the <code>messageFormat</code> attribute. Any <code>{0}</code>
+ * placeholder will be substituted with the error message and any <code>{1}</code> placeholder will be substituted with the labels of all validated fields.
+ * 
  * <pre>
  * &lt;!-- Displays: "First Name, Last Name, Address, Zip Code, Phone Number: First Name and Last Name cannot both be null" --&gt;
  * &lt;o:validateBean /&gt;
@@ -299,20 +307,17 @@ public class ValidateBean extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-
     private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
     private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
-    private static final String ERROR_MISSING_FORM =
-        "o:validateBean must be nested in an UIForm.";
-    private static final String ERROR_INVALID_PARENT =
-        "o:validateBean parent must be an instance of UIInput or UICommand.";
-    private static final String WARN_UNDISPLAYED_VIOLATION =
-        "o:validateBean could not display violation message '%s' for property path '%s'.";
+    private static final String ERROR_MISSING_FORM = "o:validateBean must be nested in an UIForm.";
+    private static final String ERROR_INVALID_PARENT = "o:validateBean parent must be an instance of UIInput or UICommand.";
+    private static final String WARN_UNDISPLAYED_VIOLATION = "o:validateBean could not display violation message '%s' for property path '%s'.";
 
     // Enums ----------------------------------------------------------------------------------------------------------
 
     private enum ValidateMethod {
+
         validateCopy, validateActual;
 
         public static ValidateMethod of(String name) {
@@ -322,35 +327,47 @@ public class ValidateBean extends TagHandler {
 
             return valueOf(name);
         }
+
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    @FacesAttribute(description = "If specified, then only the given bean will be validated at class level. If unspecified, then only the bean properties bound to the in the current request processed/executed input fields will be validated \"as usual\".")
+    @FacesAttribute(
+        description = "If specified, then only the given bean will be validated at class level. If unspecified, then only the bean properties bound to the in the current request processed/executed input fields will be validated \"as usual\"."
+    )
     private ValueExpression value;
 
     @FacesAttribute(description = "A boolean value enabling page level determination of whether or not this validator is enabled.")
     private boolean disabled;
 
-    @FacesAttribute(description = "Set the class level validation method, which can be either 'validateCopy' or 'validateActual'. Defaults to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified.")
+    @FacesAttribute(
+        description = "Set the class level validation method, which can be either 'validateCopy' or 'validateActual'. Defaults to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified."
+    )
     private ValidateMethod method;
 
     @FacesAttribute(description = "A comma-separated list of validation groups. A validation group is a fully-qualified class name.")
     private String validationGroups;
 
-    @FacesAttribute(description = "Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'.")
+    @FacesAttribute(
+        description = "Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'. This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'."
+    )
     private String copier;
 
-    @FacesAttribute(description = "The identifier for which this validator should show the message. Defaults to \"@form\" which is the parent UIForm. Other available values are \"@all\", \"@invalid\", \"@global\" and \"@violating\". Any other space separated value will be treated as client ID of UI input component.")
+    @FacesAttribute(
+        description = "The identifier for which this validator should show the message. Defaults to \"@form\" which is the parent UIForm. Other available values are \"@all\", \"@invalid\", \"@global\" and \"@violating\". Any other space separated value will be treated as client ID of UI input component."
+    )
     private String showMessageFor;
 
-    @FacesAttribute(description = "The faces message format. Any \"{0}\" placeholder will be substituted with the error message and any \"{1}\" placeholder will be substituted with the labels of all validated fields.")
+    @FacesAttribute(
+        description = "The faces message format. Any \"{0}\" placeholder will be substituted with the error message and any \"{1}\" placeholder will be substituted with the labels of all validated fields."
+    )
     private String messageFormat;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ValidateBean(TagConfig config) {
@@ -360,11 +377,11 @@ public class ValidateBean extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or
-     * {@link UIInput} and is new and we're in the restore view phase of a postback, then delegate to
-     * {@link #processValidateBean(FacesContext, UIComponent)}.
-     * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not
-     * an instance of {@link UICommand} or {@link UIInput}.
+     * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or {@link UIInput} and is new and we're in the
+     * restore view phase of a postback, then delegate to {@link #processValidateBean(FacesContext, UIComponent)}.
+     * 
+     * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not an instance of {@link UICommand} or
+     * {@link UIInput}.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -392,8 +409,9 @@ public class ValidateBean extends TagHandler {
     }
 
     /**
-     * Check if the given component has participated in submitting the current form or action and if so, then perform
-     * the bean validation depending on the attributes set.
+     * Check if the given component has participated in submitting the current form or action and if so, then perform the bean validation depending on the
+     * attributes set.
+     * 
      * @param context The involved faces context.
      * @param component The involved component.
      * @throws IllegalStateException When the parent form is missing.
@@ -436,10 +454,15 @@ public class ValidateBean extends TagHandler {
      * After update model values phase, validate actual bean. But don't proceed to render response on fail.
      */
     private void validateActualBean(UIForm form, Object bean) {
-        var validateActualBean = new ValidateBeanCallback() { @Override public void invoke() {
-            var context = FacesContext.getCurrentInstance();
-            validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<>(0), false);
-        }};
+        var validateActualBean = new ValidateBeanCallback() {
+
+            @Override
+            public void invoke() {
+                var context = FacesContext.getCurrentInstance();
+                validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<>(0), false);
+            }
+
+        };
 
         subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
     }
@@ -447,25 +470,38 @@ public class ValidateBean extends TagHandler {
     /**
      * Before validations phase of current request, collect all client IDs and bean properties.
      *
-     * After validations phase of current request, create a copy of the bean, set all collected properties there,
-     * then validate copied bean and proceed to render response on fail.
+     * After validations phase of current request, create a copy of the bean, set all collected properties there, then validate copied bean and proceed to
+     * render response on fail.
      */
     private void validateCopiedBean(UIForm form, Object bean) {
         var collectedClientIds = new HashSet<String>();
         var collectedProperties = new HashMap<PropertyPath, Object>();
         var knownBaseProperties = getBaseBeanPropertyPaths(bean, this::isValidAnnotationPresent);
-        var collectBeanProperties = new ValidateBeanCallback() { @Override public void invoke() {
-            var context = FacesContext.getCurrentInstance();
-            forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), input -> addCollectingValidator(input, collectedClientIds, collectedProperties, knownBaseProperties));
-        }};
+        var collectBeanProperties = new ValidateBeanCallback() {
 
-        var checkConstraints = new ValidateBeanCallback() { @Override public void invoke() {
-            var context = FacesContext.getCurrentInstance();
-            forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
-            var copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
-            setBeanProperties(copiedBean, collectedProperties);
-            validate(context, form, bean, copiedBean, collectedClientIds, true);
-        }};
+            @Override
+            public void invoke() {
+                var context = FacesContext.getCurrentInstance();
+                forEachInputWithMatchingBase(
+                    context, form, knownBaseProperties.keySet(),
+                    input -> addCollectingValidator(input, collectedClientIds, collectedProperties, knownBaseProperties)
+                );
+            }
+
+        };
+
+        var checkConstraints = new ValidateBeanCallback() {
+
+            @Override
+            public void invoke() {
+                var context = FacesContext.getCurrentInstance();
+                forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
+                var copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
+                setBeanProperties(copiedBean, collectedProperties);
+                validate(context, form, bean, copiedBean, collectedClientIds, true);
+            }
+
+        };
 
         subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
         subscribeToRequestAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
@@ -511,11 +547,16 @@ public class ValidateBean extends TagHandler {
      * Before validations phase of current request, subscribe the {@link BeanValidationEventListener} to validate the form based on groups.
      */
     private void validateForm() {
-        var validateForm = new ValidateBeanCallback() { @Override public void invoke() {
-            var listener = new BeanValidationEventListener(validationGroups, disabled);
-            subscribeToViewEvent(PreValidateEvent.class, listener);
-            subscribeToViewEvent(PostValidateEvent.class, listener);
-        }};
+        var validateForm = new ValidateBeanCallback() {
+
+            @Override
+            public void invoke() {
+                var listener = new BeanValidationEventListener(validationGroups, disabled);
+                subscribeToViewEvent(PreValidateEvent.class, listener);
+                subscribeToViewEvent(PostValidateEvent.class, listener);
+            }
+
+        };
 
         subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, validateForm);
     }
@@ -553,7 +594,7 @@ public class ValidateBean extends TagHandler {
         forEachComponent(context)
             .fromRoot(form)
             .ofTypes(UIInput.class)
-            .withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
+            .withHints(SKIP_UNRENDERED/* , SKIP_ITERATION */) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
             .<UIInput>invoke(input -> {
                 var valueExpression = input.getValueExpression(VALUE_ATTRIBUTE);
 
@@ -580,7 +621,11 @@ public class ValidateBean extends TagHandler {
         forEachInputWithMatchingBase(context, form, bases, null, callback);
     }
 
-    private static void addCollectingValidator(UIInput input, Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties, Map<Object, PropertyPath> knownBaseProperties) {
+    private static void addCollectingValidator(
+        UIInput input, Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties,
+        Map<Object, PropertyPath> knownBaseProperties
+    )
+    {
         input.addValidator(new CollectingValidator(collectedClientIds, collectedProperties, knownBaseProperties));
     }
 
@@ -620,7 +665,11 @@ public class ValidateBean extends TagHandler {
         return copier;
     }
 
-    private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, String messageFormat) {
+    private static void invalidateInputsByPropertyPathAndShowMessages(
+        FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations,
+        String messageFormat
+    )
+    {
         var undisplayed = new HashSet<>(violations);
 
         for (var violation : violations) {
@@ -649,7 +698,11 @@ public class ValidateBean extends TagHandler {
         }
     }
 
-    private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor, String messageFormat) {
+    private static void invalidateInputsByShowMessageForAndShowMessages(
+        FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations,
+        String showMessageFor, String messageFormat
+    )
+    {
         for (var forId : showMessageFor.split("\\s+")) {
             var component = form.findComponent(forId);
             context.validationFailed();
@@ -663,7 +716,11 @@ public class ValidateBean extends TagHandler {
         }
     }
 
-    private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor, String messageFormat) {
+    private static void invalidateInputsByClientIdsAndShowMessages(
+        final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations,
+        Set<String> clientIds, String showMessageFor, String messageFormat
+    )
+    {
         context.validationFailed();
         var labels = new StringBuilder();
 
@@ -682,7 +739,11 @@ public class ValidateBean extends TagHandler {
         showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor, messageFormat);
     }
 
-    private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor, String messageFormat) {
+    private static void showMessages(
+        FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels,
+        String showMessagesFor, String messageFormat
+    )
+    {
         if ("@form".equals(showMessagesFor)) {
             var formId = form.getClientId(context);
             addErrors(formId, violations, labels, messageFormat);
@@ -738,7 +799,11 @@ public class ValidateBean extends TagHandler {
         private final Map<PropertyPath, Object> collectedProperties;
         private final Map<Object, PropertyPath> knownBaseProperties;
 
-        public CollectingValidator(Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties, Map<Object, PropertyPath> knownBaseProperties) {
+        public CollectingValidator(
+            Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties,
+            Map<Object, PropertyPath> knownBaseProperties
+        )
+        {
             this.collectedClientIds = collectedClientIds;
             this.collectedProperties = collectedProperties;
             this.knownBaseProperties = knownBaseProperties;
@@ -758,6 +823,7 @@ public class ValidateBean extends TagHandler {
                 collectedProperties.put(path, value);
             }
         }
+
     }
 
     // Callbacks ------------------------------------------------------------------------------------------------------
@@ -783,6 +849,7 @@ public class ValidateBean extends TagHandler {
         }
 
         public abstract void invoke();
+
     }
 
 }

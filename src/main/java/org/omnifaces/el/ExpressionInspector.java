@@ -38,7 +38,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * <h2>Examples</h2>
  * <p>
  * Determine the bean instance and the property value behind a {@link ValueExpression}.
+ * 
  * <pre>
+ * 
  * ValueExpression valueExpression = component.getValueExpression("value");
  * ValueReference valueReference = ExpressionInspector.getValueReference(context.getELContext(), valueExpression);
  * Object bean = methodReference.getBase();
@@ -46,7 +48,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * </pre>
  * <p>
  * Determine the bean instance and the concrete getter {@link Method} behind a {@link ValueExpression}.
+ * 
  * <pre>
+ * 
  * ValueExpression valueExpression = component.getValueExpression("value");
  * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression);
  * Object bean = methodReference.getBase();
@@ -54,7 +58,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * </pre>
  * <p>
  * Determine the bean instance and the concrete action {@link Method} behind a {@link MethodExpression}.
+ * 
  * <pre>
+ * 
  * MethodExpression methodExpression = commandComponent.getActionExpression();
  * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), methodExpression);
  * Object bean = methodReference.getBase();
@@ -71,9 +77,8 @@ public final class ExpressionInspector {
     }
 
     /**
-     * Gets the ValueReference from a ValueExpression, without any checks whether the property is actually
-     * a property or if it isn't a "MethodSuffix". The property is stored as it appears in the expression,
-     * and may thus not actually exists. It's up to the caller how to interpret this.
+     * Gets the ValueReference from a ValueExpression, without any checks whether the property is actually a property or if it isn't a "MethodSuffix". The
+     * property is stored as it appears in the expression, and may thus not actually exists. It's up to the caller how to interpret this.
      *
      * @param context the context of this evaluation
      * @param valueExpression the value expression being evaluated
@@ -106,14 +111,12 @@ public final class ExpressionInspector {
     }
 
     /**
-     * Gets a MethodReference from a ValueExpression. If the ValueExpression refers to a method, this will
-     * contain the actual method. If it refers to a property, this will contain the corresponding getter method.
+     * Gets a MethodReference from a ValueExpression. If the ValueExpression refers to a method, this will contain the actual method. If it refers to a
+     * property, this will contain the corresponding getter method.
      * <p>
-     * Note that in case the expression refers to a method, the method reference contains the method with
-     * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types.
-     * Overloads with the same amount of parameters are supported, but if the actual arguments match with
-     * the types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random
-     * method will be chosen.
+     * Note that in case the expression refers to a method, the method reference contains the method with the name the expression refers to, with a matching
+     * number of arguments and <i>a</i> match of types. Overloads with the same amount of parameters are supported, but if the actual arguments match with the
+     * types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random method will be chosen.
      *
      * @param context the context of this evaluation
      * @param valueExpression the value expression being evaluated
@@ -208,25 +211,21 @@ public final class ExpressionInspector {
     }
 
     /**
-     * Due to the nature of how the EL Resolver and EL 3.0 ValueExpressions work, the final
-     * node of a resolved expression chain has to be found in two passes.
+     * Due to the nature of how the EL Resolver and EL 3.0 ValueExpressions work, the final node of a resolved expression chain has to be found in two passes.
      *
      * <p>
-     * In pass 1 the caller has to call {@link ValueExpression#getType(ELContext)} on the ValueExpression
-     * in question. The EL Resolver will then be able to find the next to last node without risk of actually
-     * invoking the final node (which is the node most likely to have an unwanted side-effect when from
-     * the user's point of view called at random).
+     * In pass 1 the caller has to call {@link ValueExpression#getType(ELContext)} on the ValueExpression in question. The EL Resolver will then be able to find
+     * the next to last node without risk of actually invoking the final node (which is the node most likely to have an unwanted side-effect when from the
+     * user's point of view called at random).
      *
      * <p>
-     * In pass 2 the caller has to call {@link ValueExpression#getValue(ELContext)} on the ValueExpression
-     * in question. Using data obtained in pass 1, the EL Resolver will be able to find the final node again
-     * without needing to actually invoke it. With the final node found, the EL resolver can capture the
-     * base and property in case the final node represented a property, or the base, method and the actual
-     * arguments for said method in case the final repesented a method.
+     * In pass 2 the caller has to call {@link ValueExpression#getValue(ELContext)} on the ValueExpression in question. Using data obtained in pass 1, the EL
+     * Resolver will be able to find the final node again without needing to actually invoke it. With the final node found, the EL resolver can capture the base
+     * and property in case the final node represented a property, or the base, method and the actual arguments for said method in case the final repesented a
+     * method.
      */
     private enum InspectorPass {
-        PASS1_FIND_NEXT_TO_LAST_NODE,
-        PASS2_FIND_FINAL_NODE
+        PASS1_FIND_NEXT_TO_LAST_NODE, PASS2_FIND_FINAL_NODE
     }
 
     /**
@@ -279,6 +278,7 @@ public final class ExpressionInspector {
     }
 
     static class FinalBaseHolder {
+
         private Object base;
 
         public FinalBaseHolder(Object base) {
@@ -288,11 +288,11 @@ public final class ExpressionInspector {
         public Object getBase() {
             return base;
         }
+
     }
 
     /**
-     * Custom EL Resolver that can be used for inspecting expressions by means of recording the calls
-     * made on this resolved by the EL implementation.
+     * Custom EL Resolver that can be used for inspecting expressions by means of recording the calls made on this resolved by the EL implementation.
      */
     static class InspectorElResolver extends ELResolverWrapper {
 
@@ -435,7 +435,8 @@ public final class ExpressionInspector {
                     // If that is not the case, then throw ISE.
                     throw new IllegalStateException(
                         "First and second pass of resolver at call #" + passTwoCallCount +
-                        " resolved to different base or property.");
+                            " resolved to different base or property."
+                    );
                 }
             }
         }

@@ -34,15 +34,15 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
- * if they don't already have an attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code>
- * and <code>rendered</code>, any literal (static) attribute value will be ignored and overridden. Only if they have
- * already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
+ * The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components, if they don't already have an attribute
+ * set. On boolean attributes like <code>disabled</code>, <code>readonly</code> and <code>rendered</code>, any literal (static) attribute value will be ignored
+ * and overridden. Only if they have already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
  * limitation specifically for boolean attributes as they don't default to <code>null</code>.
  *
  * <h2>Usage</h2>
  * <p>
  * For example, the following setup
+ * 
  * <pre>
  * &lt;o:massAttribute name="disabled" value="true"&gt;
  *     &lt;h:inputText id="input1" /&gt;
@@ -52,10 +52,12 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     &lt;h:inputText id="input5" disabled="#{false}" /&gt;
  * &lt;/o:massAttribute&gt;
  * </pre>
- * will set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and
- * <code>input3</code> as those are the only components <strong>without</strong> a value expression on the boolean attribute.
+ * 
+ * will set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and <code>input3</code> as those are the only components
+ * <strong>without</strong> a value expression on the boolean attribute.
  * <p>
  * As another general example without booleans, the following setup
+ * 
  * <pre>
  * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
  *     &lt;h:inputText id="input1" /&gt;
@@ -64,12 +66,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
  * &lt;/o:massAttribute&gt;
  * </pre>
- * will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
- * that's the only component on which the attribute is absent.
- * Do note that the specified EL expression will actually be evaluated on a per-component basis.
+ * 
+ * will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as that's the only component on which the
+ * attribute is absent. Do note that the specified EL expression will actually be evaluated on a per-component basis.
  * <p>
- * To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
- * (as that would otherwise fail in the example below because they don't have the <code>valid</code> property):
+ * To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels (as that would otherwise fail in the
+ * example below because they don't have the <code>valid</code> property):
+ * 
  * <pre>
  * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="jakarta.faces.component.UIInput"&gt;
  *     &lt;h:outputLabel for="input1" /&gt;
@@ -100,19 +103,26 @@ public class MassAttribute extends TagHandler {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    @FacesAttribute(required = true, description = "The name of the attribute to be set on all nested components. This cannot be set to id or binding as those are already evaluated during view build time and they shouldn't be shared among components anyway.")
+    @FacesAttribute(
+        required = true, description = "The name of the attribute to be set on all nested components. This cannot be set to id or binding as those are already evaluated during view build time and they shouldn't be shared among components anyway."
+    )
     private final String name;
 
-    @FacesAttribute(required = true, description = "The value of the attribute to be set on all nested components. This will be evaluated on a per-component basis. In other words, #{component} can be used here to refer the \"current\" component.")
+    @FacesAttribute(
+        required = true, description = "The value of the attribute to be set on all nested components. This will be evaluated on a per-component basis. In other words, #{component} can be used here to refer the \"current\" component."
+    )
     private final TagAttribute value;
 
-    @FacesAttribute(name = "target", description = "The FQN of the specific UIComponent (super)class for which the attribute should be set. This value can be a comma separated string of FQNs.")
+    @FacesAttribute(
+        name = "target", description = "The FQN of the specific UIComponent (super)class for which the attribute should be set. This value can be a comma separated string of FQNs."
+    )
     private Class<UIComponent>[] targetClasses;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     @SuppressWarnings("unchecked")

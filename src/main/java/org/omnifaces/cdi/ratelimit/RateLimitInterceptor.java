@@ -35,12 +35,11 @@ import org.omnifaces.util.Servlets;
  * <p>
  * CDI interceptor that enforces rate limiting on methods annotated with {@link RateLimit}.
  * <p>
- * This interceptor intercepts method invocations and checks if the rate limit has been exceeded
- * for the specified client identifier. If the rate limit is exceeded, a {@link RateLimitExceededException}
- * is thrown. Otherwise, the method execution continues normally.
+ * This interceptor intercepts method invocations and checks if the rate limit has been exceeded for the specified client identifier. If the rate limit is
+ * exceeded, a {@link RateLimitExceededException} is thrown. Otherwise, the method execution continues normally.
  * <p>
- * The interceptor automatically resolves the client identifier from the annotation configuration,
- * falling back to the client IP address from the current HTTP request if no explicit client ID is provided.
+ * The interceptor automatically resolves the client identifier from the annotation configuration, falling back to the client IP address from the current HTTP
+ * request if no explicit client ID is provided.
  *
  * @author Bauke Scholtz
  * @since 5.0
@@ -55,7 +54,7 @@ import org.omnifaces.util.Servlets;
 public class RateLimitInterceptor {
 
     private static final String ERROR_CLIENT_ID_REQUIRED = "Please specify clientId on @RateLimit;"
-            + " the fallback of HttpServletRequest isn't available in the current context.";
+        + " the fallback of HttpServletRequest isn't available in the current context.";
 
     private final RateLimiter rateLimiter;
 
@@ -102,4 +101,5 @@ public class RateLimitInterceptor {
 
         throw new IllegalArgumentException(ERROR_CLIENT_ID_REQUIRED);
     }
+
 }

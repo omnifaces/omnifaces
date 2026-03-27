@@ -19,11 +19,11 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 /**
- * This resettable buffered writer will buffer everything until the given buffer size, regardless of flush calls.
- * Only when the buffer size is exceeded, or when close is called, then the buffer will be actually flushed.
+ * This resettable buffered writer will buffer everything until the given buffer size, regardless of flush calls. Only when the buffer size is exceeded, or when
+ * close is called, then the buffer will be actually flushed.
  * <p>
- * There is a {@link #reset()} method which enables the developer to reset the buffer, as long as it's not flushed yet,
- * which can be determined by {@link #isResettable()}.
+ * There is a {@link #reset()} method which enables the developer to reset the buffer, as long as it's not flushed yet, which can be determined by
+ * {@link #isResettable()}.
  *
  * @author Bauke Scholtz
  * @see ResettableBufferedOutputStream
@@ -41,10 +41,9 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Construct a new resettable buffered writer which wraps the given writer and forcibly buffers everything until
-     * the given buffer size in bytes, regardless of flush calls. The given character encoding is used to measure the
-     * amount of already written bytes in the buffer.
-     * regardless of flush calls.
+     * Construct a new resettable buffered writer which wraps the given writer and forcibly buffers everything until the given buffer size in bytes, regardless
+     * of flush calls. The given character encoding is used to measure the amount of already written bytes in the buffer. regardless of flush calls.
+     * 
      * @param writer The wrapped writer.
      * @param bufferSize The buffer size.
      * @param characterEncoding The character encoding.

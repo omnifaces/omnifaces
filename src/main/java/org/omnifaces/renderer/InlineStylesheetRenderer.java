@@ -26,14 +26,13 @@ import jakarta.faces.render.FacesRenderer;
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
 
 /**
- * This renderer enables rendering a CSS resource inline.
- * This is internally only used by {@link CombinedResourceHandler}
+ * This renderer enables rendering a CSS resource inline. This is internally only used by {@link CombinedResourceHandler}
  *
  * @author Bauke Scholtz
  * @since 1.2
  * @see CombinedResourceHandler
  */
-@FacesRenderer(componentFamily=UIOutput.COMPONENT_FAMILY, rendererType=InlineStylesheetRenderer.RENDERER_TYPE)
+@FacesRenderer(componentFamily = UIOutput.COMPONENT_FAMILY, rendererType = InlineStylesheetRenderer.RENDERER_TYPE)
 public class InlineStylesheetRenderer extends InlineResourceRenderer {
 
     // Constants ------------------------------------------------------------------------------------------------------

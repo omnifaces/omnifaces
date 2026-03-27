@@ -25,13 +25,13 @@ import org.openqa.selenium.support.FindBy;
 
 public class CDNResourceHandlerIT extends OmniFacesIT {
 
-    @FindBy(css="head link[rel=stylesheet]")
+    @FindBy(css = "head link[rel=stylesheet]")
     private WebElement cdnStylesheet;
 
-    @FindBy(css="head script")
+    @FindBy(css = "head script")
     private WebElement cdnScript;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(CDNResourceHandlerIT.class)
             .withWebXml(withCDNResources)

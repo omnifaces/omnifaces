@@ -23,19 +23,19 @@ import org.openqa.selenium.support.FindBy;
 
 public class InputHiddenIT extends OmniFacesIT {
 
-    @FindBy(id="form1:toggle")
+    @FindBy(id = "form1:toggle")
     private WebElement toggle;
 
-    @FindBy(id="form1:submit")
+    @FindBy(id = "form1:submit")
     private WebElement submit;
 
-    @FindBy(id="form2:validate")
+    @FindBy(id = "form2:validate")
     private WebElement validate;
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(InputHiddenIT.class);
     }

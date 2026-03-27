@@ -26,9 +26,8 @@ import jakarta.inject.Qualifier;
 
 /**
  * <p>
- * This SSE event will be fired by {@link SseSessionManager} when an SSE connection has been
- * <code>&#64;</code>{@link Opened}, <code>&#64;</code>{@link Switched} or <code>&#64;</code>{@link Closed}.
- * An application scoped CDI bean can <code>&#64;</code>{@link Observes} them.
+ * This SSE event will be fired by {@link SseSessionManager} when an SSE connection has been <code>&#64;</code>{@link Opened},
+ * <code>&#64;</code>{@link Switched} or <code>&#64;</code>{@link Closed}. An application scoped CDI bean can <code>&#64;</code>{@link Observes} them.
  * <p>
  * For detailed usage instructions, see {@link Sse} javadoc.
  *
@@ -64,8 +63,11 @@ public final class SseEvent extends PushEvent {
          * The literal of {@link Opened}.
          */
         AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
     /**
@@ -88,8 +90,11 @@ public final class SseEvent extends PushEvent {
          * The literal of {@link Switched}.
          */
         AnnotationLiteral<Switched> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
     /**
@@ -112,8 +117,11 @@ public final class SseEvent extends PushEvent {
          * The literal of {@link Closed}.
          */
         AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<>() {
+
             private static final long serialVersionUID = 1L;
+
         };
+
     }
 
 }

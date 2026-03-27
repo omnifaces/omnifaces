@@ -29,7 +29,8 @@ public class ValidateBeanITEntityValidator implements ConstraintValidator<Valida
         }
 
         if (entity.getNumber1() == 2) {
-            // Specific case to test targeting a specific property node when using showMessageFor="@violating" so that the message is only shown for number1 and not for both number1 and number2.
+            // Specific case to test targeting a specific property node when using showMessageFor="@violating" so that the message is only shown for number1 and
+            // not for both number1 and number2.
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
         }

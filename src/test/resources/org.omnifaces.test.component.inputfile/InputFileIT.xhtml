@@ -38,33 +38,33 @@
         </o:form>
 
         <o:form id="uploadSingleAcceptAnyImage" enctype="multipart/form-data">
-            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 accept="image/*" acceptMessage="{0}: {1} is not {2}" />
             <h:commandButton id="submit" value="submit" action="#{inputFileITBean.uploadSingle}" />
         </o:form>
 
         <o:form id="uploadSingleAcceptSvgImage" enctype="multipart/form-data">
-            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 accept="image/svg+xml" acceptMessage="{0}: {1} is not {2}" />
             <h:commandButton id="submit" value="submit" action="#{inputFileITBean.uploadSingle}" />
         </o:form>
 
         <o:form id="uploadSingleMaxsizeClient" enctype="multipart/form-data">
-            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 maxsize="10" maxsizeMessage="{0}: {1} larger than {2}" />
             <h:message id="message" for="@previous" />
             <h:commandButton id="submit" value="submit" action="#{inputFileITBean.uploadSingleAndAddLocalMessage}" />
         </o:form>
 
         <o:form id="uploadSingleMaxsizeServer" enctype="multipart/form-data">
-            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 maxsize="#{facesContext.currentPhaseId.ordinal ne 6 ? 10 : null}" maxsizeMessage="{0}: {1} larger than {2}" />
                 <!-- Above maxsize value should skip client side validation. -->
             <h:commandButton id="submit" value="submit" action="#{inputFileITBean.uploadSingle}" />
         </o:form>
 
         <o:form id="uploadSingleAcceptAnyImageAndPdf" enctype="multipart/form-data">
-            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+            <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 accept="image/*,.pdf" acceptMessage="{0}: {1} is not {2}" />
             <h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
         </o:form>

@@ -44,22 +44,26 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:importConstants&gt;</code> taghandler allows the developer to have a mapping of all constant field
- * values of the given fully qualified name of a type in the request scope. The constant field values are those public
- * static final fields. This works for classes, interfaces and enums.
+ * The <code>&lt;o:importConstants&gt;</code> taghandler allows the developer to have a mapping of all constant field values of the given fully qualified name
+ * of a type in the request scope. The constant field values are those public static final fields. This works for classes, interfaces and enums.
  *
  * <h2>Usage</h2>
  * <p>
  * For example:
+ * 
  * <pre>
  * public class Foo {
+ * 
  *     public static final String FOO1 = "foo1";
  *     public static final String FOO2 = "foo2";
+ * 
  * }
  *
  * public interface Bar {
+ * 
  *     public String BAR1 = "bar1";
  *     public String BAR2 = "bar2";
+ * 
  * }
  *
  * public enum Baz {
@@ -70,7 +74,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     FAZ1, FAZ2;
  * }
  * </pre>
- * <p>The constant field values of the above types can be mapped into the request scope as follows:
+ * <p>
+ * The constant field values of the above types can be mapped into the request scope as follows:
+ * 
  * <pre>
  * &lt;o:importConstants type="com.example.Foo" /&gt;
  * &lt;o:importConstants type="com.example.Bar" /&gt;
@@ -83,33 +89,31 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     &lt;f:selectItems value="#{Faz.values()}" /&gt; &lt;!-- FAZ1, FAZ2, BAR1, BAR2 --&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
- * <p>The map is by default stored in the request scope by the simple name of the type as variable name. You can override
- * this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
- * the above example.
  * <p>
- * The resolved constants are by reference stored in the cache to improve retrieving performance. There is also a
- * runtime (no, not compiletime as that's just not possible in EL) check during retrieving the constant value.
- * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
+ * The map is by default stored in the request scope by the simple name of the type as variable name. You can override this by explicitly specifying the
+ * <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in the above example.
  * <p>
- * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used
- * to load the class specified in the <code>type</code> attribute. The class loader of the given object is resolved as
- * specified in {@link Utils#getClassLoader(Object)}. In the end this should allow you to use a more specific class when
- * there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+ * The resolved constants are by reference stored in the cache to improve retrieving performance. There is also a runtime (no, not compiletime as that's just
+ * not possible in EL) check during retrieving the constant value. If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be
+ * thrown.
  * <p>
- * Since version 4.6, when the class specified in the <code>type</code> attribute is an <code>enum</code>, such as
- * <code>Baz</code> or <code>Faz</code> in the above example, then you can use <code>#{Faz.members()}</code> to
- * exclusively access enum members rather than all constant field values.
+ * Since version 4.3, you can use the <code>loader</code> attribute to specify an object whose class loader will be used to load the class specified in the
+ * <code>type</code> attribute. The class loader of the given object is resolved as specified in {@link Utils#getClassLoader(Object)}. In the end this should
+ * allow you to use a more specific class when there are duplicate instances in the runtime classpath, e.g. via multiple (plugin) libraries.
+ * <p>
+ * Since version 4.6, when the class specified in the <code>type</code> attribute is an <code>enum</code>, such as <code>Baz</code> or <code>Faz</code> in the
+ * above example, then you can use <code>#{Faz.members()}</code> to exclusively access enum members rather than all constant field values.
+ * 
  * <pre>
  * &lt;h:selectOneMenu&gt;
  *     &lt;f:selectItems value="#{Faz.members()}" /&gt; &lt;!-- FAZ1, FAZ2 --&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
-
+ * 
  * <h2>JSF 2.3</h2>
  * <p>
- * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in
- * <code>&lt;f:metadata&gt;</code> which may not be appropriate when you intend to import constants only from
- * a include, tagfile or a composite component.
+ * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in <code>&lt;f:metadata&gt;</code> which may not be
+ * appropriate when you intend to import constants only from a include, tagfile or a composite component.
  *
  * @author Bauke Scholtz
  */
@@ -129,16 +133,21 @@ public class ImportConstants extends TagHandler {
     @FacesAttribute(name = "var", description = "The name of the request attribute which exposes the mapping of the constants in the request scope.")
     private final String varValue;
 
-    @FacesAttribute(name = "type", required = true, description = "The fully qualified name of the class/interface/enum to import the constant field values for.")
+    @FacesAttribute(
+        name = "type", required = true, description = "The fully qualified name of the class/interface/enum to import the constant field values for."
+    )
     private final TagAttribute typeAttribute;
 
-    @FacesAttribute(name = "loader", description = "The object to be used as source of the class loader to load the class specified in the type attribute. Can be an instance of ClassLoader, Class or any object.")
+    @FacesAttribute(
+        name = "loader", description = "The object to be used as source of the class loader to load the class specified in the type attribute. Can be an instance of ClassLoader, Class or any object."
+    )
     private final TagAttribute loaderAttribute;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ImportConstants(TagConfig config) {
@@ -151,10 +160,9 @@ public class ImportConstants extends TagHandler {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code>
-     * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
-     * them and store in cache. Finally set the constants in the request scope by the simple name of the type, or by the
-     * name as specified in the <code>var</code> attribute, if any.
+     * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code> attribute from the cache. If it hasn't been
+     * collected yet and is thus not present in the cache, then collect them and store in cache. Finally set the constants in the request scope by the simple
+     * name of the type, or by the name as specified in the <code>var</code> attribute, if any.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -182,6 +190,7 @@ public class ImportConstants extends TagHandler {
 
     /**
      * Collect constants of the given type. That are, all public static final fields of the given type.
+     * 
      * @param type The fully qualified name of the type to collect constants for.
      * @return Constants of the given type.
      */
@@ -232,6 +241,7 @@ public class ImportConstants extends TagHandler {
 
     /**
      * Returns whether the given field is a constant field, that is when it is public, static and final.
+     * 
      * @param field The field to be checked.
      * @return <code>true</code> if the given field is a constant field, otherwise <code>false</code>.
      */
@@ -243,12 +253,11 @@ public class ImportConstants extends TagHandler {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an
-     * {@link IllegalArgumentException} in {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
+     * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an {@link IllegalArgumentException} in
+     * {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
      *
      * <p>
-     * Since 4.6 this class is public instead of private in order to allow the EL implementation to see the new
-     * {@link #members()} method.
+     * Since 4.6 this class is public instead of private in order to allow the EL implementation to see the new {@link #members()} method.
      *
      * @author Bauke Scholtz
      */
@@ -274,6 +283,7 @@ public class ImportConstants extends TagHandler {
 
         /**
          * Returns Exclusively enum members in case the type is an enum.
+         * 
          * @return Exclusively enum members in case the type is an enum.
          * @throws IllegalStateException in case the type is not an enum.
          * @since 4.6

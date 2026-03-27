@@ -18,8 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * An in-memory cache implementation that's used if the user did not configure an explicit caching provider.
  * <p>
- * For the actual implementation, a {@link LruCache} is used if a maximum capacity is requested,
- * otherwise a plain {@link ConcurrentHashMap} is used.
+ * For the actual implementation, a {@link LruCache} is used if a maximum capacity is requested, otherwise a plain {@link ConcurrentHashMap} is used.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -37,7 +36,8 @@ public class DefaultCache extends TimeToLiveCache {
     private static Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
         if (maxCapacity != null) {
             return new LruCache<>(maxCapacity);
-        } else {
+        }
+        else {
             return new ConcurrentHashMap<>();
         }
     }

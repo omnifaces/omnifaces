@@ -24,19 +24,21 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly deal with flash cookies, they seem to hang around one request too long")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly deal with flash cookies, they seem to hang around one request too long"
+)
 public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 
-    @FindBy(id="form:wasViewExpired")
+    @FindBy(id = "form:wasViewExpired")
     private WebElement wasViewExpired;
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement submit;
 
-    @FindBy(id="expire")
+    @FindBy(id = "expire")
     private WebElement expire;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ViewExpiredExceptionHandlerIT.class)
             .withWebXml(distributable) // Should trigger Mojarra issue 4431 (NPE while obtaining flash scope in new session).
@@ -63,4 +65,5 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
         assertEquals("false", wasViewExpired.getText());
 
     }
+
 }

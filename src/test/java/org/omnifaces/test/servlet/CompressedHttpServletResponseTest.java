@@ -42,10 +42,26 @@ class CompressedHttpServletResponseTest {
     void testCreateOutputStreamRethrowsIOExceptionFromNewInstance() throws Exception {
         var ioe = new IOException("test");
         var brokenStream = new ServletOutputStream() {
-            @Override public void write(int b) throws IOException { throw ioe; }
-            @Override public void write(byte[] b, int off, int len) throws IOException { throw ioe; }
-            @Override public boolean isReady() { return true; }
-            @Override public void setWriteListener(WriteListener writeListener) {}
+
+            @Override
+            public void write(int b) throws IOException {
+                throw ioe;
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                throw ioe;
+            }
+
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+            }
+
         };
 
         var response = mock(HttpServletResponse.class);

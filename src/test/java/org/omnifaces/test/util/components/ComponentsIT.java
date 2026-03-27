@@ -25,32 +25,32 @@ import org.openqa.selenium.support.FindBy;
 
 public class ComponentsIT extends OmniFacesIT {
 
-    @FindBy(id="form:commandButtonAction")
+    @FindBy(id = "form:commandButtonAction")
     private WebElement commandButtonAction;
 
-    @FindBy(id="form:commandButtonActionListener")
+    @FindBy(id = "form:commandButtonActionListener")
     private WebElement commandButtonActionListener;
 
-    @FindBy(id="form:commandButtonAjaxListener")
+    @FindBy(id = "form:commandButtonAjaxListener")
     private WebElement commandButtonAjaxListener;
 
-    @FindBy(id="form:primeFacesCommandButtonAction")
+    @FindBy(id = "form:primeFacesCommandButtonAction")
     private WebElement primeFacesCommandButtonAction;
 
-    @FindBy(id="form:primeFacesCommandButtonActionListener")
+    @FindBy(id = "form:primeFacesCommandButtonActionListener")
     private WebElement primeFacesCommandButtonActionListener;
 
-    @FindBy(id="form:addScriptResource")
+    @FindBy(id = "form:addScriptResource")
     private WebElement addScriptResource;
 
-    @FindBy(id="expressions")
+    @FindBy(id = "expressions")
     private WebElement expressions;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ComponentsIT.class)
-                .withPrimeFaces()
-                .createDeployment();
+            .withPrimeFaces()
+            .createDeployment();
     }
 
     @Test

@@ -37,10 +37,10 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:highlight&gt;</code> is a helper component which highlights all invalid {@link UIInput} components
- * and the associated labels by adding an error style class to them. Additionally, it by default focuses the first
- * invalid {@link UIInput} component. The <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the
- * view, as long as there's only one of it. Preferably put it somewhere in the master template for forms.
+ * The <code>&lt;o:highlight&gt;</code> is a helper component which highlights all invalid {@link UIInput} components and the associated labels by adding an
+ * error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The <code>&lt;o:highlight /&gt;</code> component
+ * can be placed anywhere in the view, as long as there's only one of it. Preferably put it somewhere in the master template for forms.
+ * 
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
@@ -50,8 +50,8 @@ import org.omnifaces.util.State;
  * &lt;o:highlight /&gt;
  * </pre>
  * <p>
- * The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class
- * yourself. For example,
+ * The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class yourself. For example,
+ * 
  * <pre>
  * label.error {
  *     color: #f00;
@@ -62,25 +62,26 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * You can override the default error style class by the <code>styleClass</code> attribute:
+ * 
  * <pre>
  * &lt;o:highlight styleClass="invalid" /&gt;
  * </pre>
  * <p>
  * You can disable the default focus on the first invalid input element setting the <code>focus</code> attribute.
+ * 
  * <pre>
  * &lt;o:highlight styleClass="invalid" focus="false" /&gt;
  * </pre>
  * <p>
- * Since version 2.5, the error style class will be removed from the input element and its associated label when the
- * enduser starts using the input element.
+ * Since version 2.5, the error style class will be removed from the input element and its associated label when the enduser starts using the input element.
  *
  * @author Bauke Scholtz
  * @see OnloadScript
  * @see ScriptFamily
  */
 @FacesComponent(value = Highlight.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
-@ResourceDependency(library=FACES_SCRIPT_LIBRARY_NAME, name=FACES_SCRIPT_RESOURCE_NAME, target="head") // Required for faces.ajax.request.
-@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically Highlight.ts.
+@ResourceDependency(library = FACES_SCRIPT_LIBRARY_NAME, name = FACES_SCRIPT_RESOURCE_NAME, target = "head") // Required for faces.ajax.request.
+@ResourceDependency(library = OMNIFACES_LIBRARY_NAME, name = OMNIFACES_SCRIPT_NAME, target = "head") // Specifically Highlight.ts.
 public class Highlight extends OnloadScript {
 
     // Public constants -----------------------------------------------------------------------------------------------
@@ -107,15 +108,14 @@ public class Highlight extends OnloadScript {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not
-     * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
+     * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not {@link UIInput#isValid()} and finally
+     * append them to an array in JSON format and render the script.
      * <p>
-     * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
-     * whether the components associated with those client IDs are actually {@link UIInput} components which are not
-     * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegating the job to JavaScript
-     * instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we
-     * don't want the changed style class to be saved in the server side view state as it may result in potential
-     * inconsistencies because it's supposed to be an one-time change.
+     * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate whether the components associated with
+     * those client IDs are actually {@link UIInput} components which are not {@link UIInput#isValid()}. Also note that the highlighting is been done by
+     * delegating the job to JavaScript instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we don't
+     * want the changed style class to be saved in the server side view state as it may result in potential inconsistencies because it's supposed to be an
+     * one-time change.
      */
     @Override
     public void encodeChildren(FacesContext context) throws IOException {
@@ -145,8 +145,7 @@ public class Highlight extends OnloadScript {
     }
 
     /**
-     * This component is per definiton only rendered when the current request is a postback request and the
-     * validation has failed.
+     * This component is per definiton only rendered when the current request is a postback request and the validation has failed.
      */
     @Override
     public boolean isRendered() {
@@ -158,6 +157,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Returns the error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
+     * 
      * @return The error style class which is to be applied on invalid inputs.
      */
     public String getStyleClass() {
@@ -166,6 +166,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Sets the error style class which is to be applied on invalid inputs. Defaults to {@code "error"}.
+     * 
      * @param styleClass The error style class which is to be applied on invalid inputs.
      */
     public void setStyleClass(String styleClass) {
@@ -174,6 +175,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
+     * 
      * @return Whether the first error element should gain focus.
      */
     public boolean isFocus() {
@@ -182,6 +184,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Sets whether the first error element should gain focus. Defaults to {@code true}.
+     * 
      * @param focus Whether the first error element should gain focus.
      */
     public void setFocus(boolean focus) {

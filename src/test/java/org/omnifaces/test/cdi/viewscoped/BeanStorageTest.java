@@ -35,17 +35,22 @@ public class BeanStorageTest {
         var outerBean = new Contextual<>() {
 
             Contextual<Object> innerBean = new Contextual<>() {
+
                 @Override
                 public Object create(CreationalContext<Object> context) {
                     innerBeanCounter.incrementAndGet();
 
                     return new Serializable() {
+
                         private static final long serialVersionUID = 1L;
+
                     };
                 }
 
                 @Override
-                public void destroy(Object instance, CreationalContext<Object> context) {}
+                public void destroy(Object instance, CreationalContext<Object> context) {
+                }
+
             };
 
             @Override
@@ -54,20 +59,28 @@ public class BeanStorageTest {
                 beanStorage.getBean(innerBean, context);
 
                 return new Serializable() {
+
                     private static final long serialVersionUID = 1L;
+
                 };
             }
 
             @Override
-            public void destroy(Object instance, CreationalContext<Object> context) {}
+            public void destroy(Object instance, CreationalContext<Object> context) {
+            }
+
         };
 
         var context = new CreationalContext<>() {
-            @Override
-            public void push(Object incompleteInstance) {}
 
             @Override
-            public void release() {}
+            public void push(Object incompleteInstance) {
+            }
+
+            @Override
+            public void release() {
+            }
+
         };
 
         testThreadSafety(i -> beanStorage.getBean(outerBean, context));
@@ -77,4 +90,5 @@ public class BeanStorageTest {
             () -> assertEquals(1, innerBeanCounter.get())
         );
     }
+
 }

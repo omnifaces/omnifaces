@@ -18,18 +18,20 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
- * Implements lazy-initialized object primarily for final and transient fields.
- * Utilizes double-checked locking for optimization.
+ * Implements lazy-initialized object primarily for final and transient fields. Utilizes double-checked locking for optimization.
  * <p>
  * Example:
+ * 
  * <pre>
  * {@code
+ * 
  * private final Lazy<Object> lazy = new Lazy<>(Object::new);
  * Object lazyInstance = lazy.get();
  * }
  * </pre>
  * <p>
- * <a href="https://github.com/flowlogix/flowlogix/blob/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/LazyExample.java" target="_blank">Example Code (GitHub)</a>
+ * <a href="https://github.com/flowlogix/flowlogix/blob/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/LazyExample.java" target=
+ * "_blank">Example Code (GitHub)</a>
  *
  * @param <T> Type of object.
  * @author Lenny Primak
@@ -43,7 +45,8 @@ public final class Lazy<T> implements Serializable {
     private final Supplier<T> initFunction;
     private final Lock lock = new ReentrantLock();
 
-    public interface SerializableSupplier<T> extends Supplier<T>, Serializable { }
+    public interface SerializableSupplier<T> extends Supplier<T>, Serializable {
+    }
 
     public Lazy(SerializableSupplier<T> initFunction) {
         this.initFunction = initFunction;
@@ -73,4 +76,5 @@ public final class Lazy<T> implements Serializable {
 
         return delegate;
     }
+
 }

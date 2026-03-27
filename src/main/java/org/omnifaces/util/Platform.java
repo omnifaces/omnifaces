@@ -24,8 +24,7 @@ import org.omnifaces.ApplicationInitializer;
 /**
  * This class provides access to Jakarta platform services from the view point of Faces.
  * <p>
- * Note that this utility class can only be used in a Faces environment and is thus not
- * a Jakarta general way to obtain platform services.
+ * Note that this utility class can only be used in a Faces environment and is thus not a Jakarta general way to obtain platform services.
  * <p>
  * For a full list of utility methods, check the <a href="#method.summary">method summary</a>.
  *
@@ -43,11 +42,11 @@ public final class Platform {
         // Hide constructor.
     }
 
-
     // FacesServlet ---------------------------------------------------------------------------------------------------
 
     /**
      * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
+     * 
      * @param servletContext The context to get the ServletRegistration from.
      * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
      * @since 1.8
@@ -67,6 +66,7 @@ public final class Platform {
 
     /**
      * Returns the mappings associated with the {@link FacesServlet}.
+     * 
      * @param servletContext The context to get the {@link FacesServlet} from.
      * @return The mappings associated with the {@link FacesServlet}, or an empty set.
      * @since 2.5
@@ -77,12 +77,12 @@ public final class Platform {
     }
 
     /**
-     * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)}
-     * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If Faces is prefix mapped (e.g.
-     * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If Faces
-     * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>). If
-     * none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
+     * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)} and pick the first one
+     * starting with <code>*.</code> or ending with <code>/*</code>. If Faces is prefix mapped (e.g. <code>/faces/*</code>), then this returns the whole path,
+     * with a leading slash (e.g. <code>/faces</code>). If Faces is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g.
+     * <code>.xhtml</code>). If none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
      * {@link ApplicationInitializer} and cached in the {@link ServletContext}.
+     * 
      * @return The default faces servlet mapping (without the wildcard).
      * @since 3.10
      */

@@ -33,8 +33,8 @@ public class ViewScopeExtension implements Extension {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current
-     * CDI context.
+     * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current CDI context.
+     * 
      * @param event The after bean discovery event.
      */
     protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event) {

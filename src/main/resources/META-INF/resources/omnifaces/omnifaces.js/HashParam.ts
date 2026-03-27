@@ -16,7 +16,7 @@ import { Util } from "./Util";
 
 /**
  * Hash param handling.
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.HashParam
  * @since 3.2
@@ -43,7 +43,7 @@ export namespace HashParam {
         if (!!window.location.hash) {
             setHashParamValues();
         }
-        
+
         Util.addEventListener(window, "hashchange", setHashParamValues);
     }
 
@@ -57,7 +57,7 @@ export namespace HashParam {
         const location = window.location;
         let oldHashQueryString = location.hash;
 
-        if (!!oldHashQueryString && oldHashQueryString.charAt(0) == '#') {
+        if (!!oldHashQueryString && oldHashQueryString.charAt(0) == "#") {
             oldHashQueryString = oldHashQueryString.substring(1);
         }
 

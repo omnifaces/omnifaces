@@ -22,43 +22,45 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "quarkus-.*", disabledReason = "Sockets work, but sent.size() in SocketITBean is incorrect for application and session scoped sockets, it's always 1 too much? view scoped sockets work correctly")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "Sockets work, but sent.size() in SocketITBean is incorrect for application and session scoped sockets, it's always 1 too much? view scoped sockets work correctly"
+)
 public class SocketIT extends OmniFacesIT {
 
-    @FindBy(id="messages")
+    @FindBy(id = "messages")
     private WebElement messages;
 
-    @FindBy(id="newtab")
+    @FindBy(id = "newtab")
     private WebElement newtab;
 
-    @FindBy(id="clientOpenedMessages")
+    @FindBy(id = "clientOpenedMessages")
     private WebElement clientOpenedMessages;
 
-    @FindBy(id="applicationScopedServerEventMessage")
+    @FindBy(id = "applicationScopedServerEventMessage")
     private WebElement applicationScopedServerEventMessage;
 
-    @FindBy(id="push:applicationScopedServerEvent")
+    @FindBy(id = "push:applicationScopedServerEvent")
     private WebElement pushApplicationScopedServerEvent;
 
-    @FindBy(id="sessionScopedUserTargetedMessage")
+    @FindBy(id = "sessionScopedUserTargetedMessage")
     private WebElement sessionScopedUserTargetedMessage;
 
-    @FindBy(id="push:sessionScopedUserTargeted")
+    @FindBy(id = "push:sessionScopedUserTargeted")
     private WebElement pushSessionScopedUserTargeted;
 
-    @FindBy(id="viewScopedAjaxAwareMessage")
+    @FindBy(id = "viewScopedAjaxAwareMessage")
     private WebElement viewScopedAjaxAwareMessage;
 
-    @FindBy(id="push:viewScopedAjaxAware")
+    @FindBy(id = "push:viewScopedAjaxAware")
     private WebElement pushViewScopedAjaxAware;
 
-    @FindBy(id="clientClosedMessages")
+    @FindBy(id = "clientClosedMessages")
     private WebElement clientClosedMessages;
 
-    @FindBy(id="closeAllSockets")
+    @FindBy(id = "closeAllSockets")
     private WebElement closeAllSockets;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(SocketIT.class);
     }
@@ -99,7 +101,8 @@ public class SocketIT extends OmniFacesIT {
         waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
 
-        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
+        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a
+                                // MyFaces problem, it works in all other servers. Probably buggy WS impl.
             waitUntilTextContains(applicationScopedServerEventMessage, "|opened:applicationScopedServerEvent|");
             waitUntilTextContains(applicationScopedServerEventMessage, "|opened:sessionScopedUserTargeted|");
             waitUntilTextContains(applicationScopedServerEventMessage, "|opened:viewScopedAjaxAware|");
@@ -111,7 +114,8 @@ public class SocketIT extends OmniFacesIT {
         waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
         waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
 
-        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a MyFaces problem, it works in all other servers. Probably buggy WS impl.
+        if (!isLibertyUsed()) { // TODO: for unclear reason the application scoped socket dies when these messages are "too" concurrently sent. This isn't a
+                                // MyFaces problem, it works in all other servers. Probably buggy WS impl.
             waitUntilTextContains(applicationScopedServerEventMessage, "|closed:sessionScopedUserTargeted|");
             waitUntilTextContains(applicationScopedServerEventMessage, "|closed:viewScopedAjaxAware|");
         }

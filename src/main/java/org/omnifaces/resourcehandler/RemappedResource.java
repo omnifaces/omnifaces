@@ -55,6 +55,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     /**
      * Constructs a new resource which remaps the given wrapped resource to the given request path.
+     * 
      * @param resource The resource to be remapped.
      * @param requestPath The remapped request path.
      */
@@ -71,6 +72,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
     /**
      * Constructs a new resource which remaps the given requested resource and library name to the given request path.
+     * 
      * @param resourceName The requested resource name.
      * @param libraryName The requested library name.
      * @param requestPath The remapped request path.

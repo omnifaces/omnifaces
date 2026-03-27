@@ -17,13 +17,14 @@ import jakarta.el.ELResolver;
 import jakarta.faces.FacesWrapper;
 
 /**
- * <p>Provides a simple implementation of {@link ELResolver} that can
- * be sub-classed by developers wishing to provide specialized behavior
- * to an existing {@link ELResolver} instance. The default
- * implementation of all methods is to call through to the wrapped
- * {@link ELResolver}.</p>
+ * <p>
+ * Provides a simple implementation of {@link ELResolver} that can be sub-classed by developers wishing to provide specialized behavior to an existing
+ * {@link ELResolver} instance. The default implementation of all methods is to call through to the wrapped {@link ELResolver}.
+ * </p>
  *
- * <p>Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.</p>
+ * <p>
+ * Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.
+ * </p>
  *
  * @author Arjan Tijms
  */
@@ -33,6 +34,7 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
 
     /**
      * Construct EL resolver wrapper.
+     * 
      * @param wrapped The EL resolver to be wrapped.
      */
     public ELResolverWrapper(ELResolver wrapped) {

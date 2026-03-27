@@ -29,28 +29,30 @@ import org.omnifaces.config.OmniFaces;
 
 /**
  * <p>
- * The    <code>&lt;o:param&gt;</code> is a component that extends the standard {@link UIParameter} to implement {@link ValueHolder}
- * and thus support a {@link Converter} to convert the supplied value to string, if necessary.
+ * The <code>&lt;o:param&gt;</code> is a component that extends the standard {@link UIParameter} to implement {@link ValueHolder} and thus support a
+ * {@link Converter} to convert the supplied value to string, if necessary.
  * <p>
- * You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
- * <code>o:</code> to get the extra support for a {@link Converter} by usual means via the <code>converter</code>
- * attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
- * already registered for the target class via <code>@FacesConverter(forClass)</code>.
+ * You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into <code>o:</code> to get the extra support for a
+ * {@link Converter} by usual means via the <code>converter</code> attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just
+ * automatically if a converter is already registered for the target class via <code>@FacesConverter(forClass)</code>.
  * <p>
- * Also, if no value is specified, but children are present, then the encoded output of children will be returned as
- * param value. This is useful when you want to supply Faces components or HTML as parameter of an unescaped
- * <code>&lt;h:outputFormat&gt;</code>. For example,
+ * Also, if no value is specified, but children are present, then the encoded output of children will be returned as param value. This is useful when you want
+ * to supply Faces components or HTML as parameter of an unescaped <code>&lt;h:outputFormat&gt;</code>. For example,
+ * 
  * <pre>
  * &lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
  *     &lt;o:param&gt;&lt;h:link outcome="contact" value="#{bundle.contact}" /&gt;&lt;/o:param&gt;
  * &lt;/h:outputFormat&gt;
  * </pre>
- * <p>with this bundle
+ * <p>
+ * with this bundle
+ * 
  * <pre>
  * paragraph = Please {0} for more information.
  * contact = contact us
  * </pre>
- * <p>will result in the link being actually encoded as output format parameter value.
+ * <p>
+ * will result in the link being actually encoded as output format parameter value.
  *
  * @author Bauke Scholtz
  * @param <T> The type of the value.

@@ -32,20 +32,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 
-@DisabledIfSystemProperty(named = "profile.id", matches = "piranha-.*", disabledReason = "piranha returns different baseURL on getRequestURL (view-localhost instead of localhost)")
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha returns different baseURL on getRequestURL (view-localhost instead of localhost)"
+)
 public class ViewResourceHandlerIT extends OmniFacesIT {
 
     private static final String EXPECTED_CONTENT_TYPE = "text/xml;charset=UTF-8";
     private static final String EXPECTED_XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     private static final String EXPECTED_XML_BODY = ""
         + "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
-            + "<url><loc>{baseURL}entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-            + "<url><loc>{baseURL}entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-            + "<url><loc>{baseURL}entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10" + ZoneId.systemDefault().getRules().getOffset(LAST_MODIFIED.toLocalDateTime()) + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-            + "<url><loc>{baseURL}entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+        + "<url><loc>{baseURL}entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+        + "<url><loc>{baseURL}entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+        + "<url><loc>{baseURL}entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10"
+        + ZoneId.systemDefault().getRules().getOffset(LAST_MODIFIED.toLocalDateTime())
+        + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+        + "<url><loc>{baseURL}entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
         + "</urlset>";
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ViewResourceHandlerIT.class)
             .withWebXml(withViewResources)

@@ -64,41 +64,24 @@ class WebXmlImpl implements WebXml {
 
     private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
 
-    private static final String XPATH_WELCOME_FILE =
-        "welcome-file-list/welcome-file";
-    private static final String XPATH_EXCEPTION_TYPE =
-        "error-page/exception-type";
-    private static final String XPATH_LOCATION =
-        "location";
-    private static final String XPATH_ERROR_PAGE_500_LOCATION =
-        "error-page[error-code=500]/location";
-    private static final String XPATH_ERROR_PAGE_DEFAULT_LOCATION =
-        "error-page[not(error-code) and not(exception-type)]/location";
-    private static final String XPATH_FORM_LOGIN_PAGE =
-        "login-config[auth-method='FORM']/form-login-config/form-login-page";
-    private static final String XPATH_FORM_ERROR_PAGE =
-        "login-config[auth-method='FORM']/form-login-config/form-error-page";
-    private static final String XPATH_DEFAULT_FORM_LOGIN_PAGE =
-        "login-config/form-login-config/form-login-page";
-    private static final String XPATH_DEFAULT_FORM_ERROR_PAGE =
-        "login-config/form-login-config/form-error-page";
-    private static final String XPATH_SECURITY_CONSTRAINT =
-        "security-constraint";
-    private static final String XPATH_WEB_RESOURCE_URL_PATTERN =
-        "web-resource-collection/url-pattern";
-    private static final String XPATH_AUTH_CONSTRAINT =
-        "auth-constraint";
-    private static final String XPATH_AUTH_CONSTRAINT_ROLE_NAME =
-        "auth-constraint/role-name";
-    private static final String XPATH_SESSION_TIMEOUT =
-        "session-config/session-timeout";
-    private static final String XPATH_DISTRIBUTABLE =
-        "boolean(distributable)";
+    private static final String XPATH_WELCOME_FILE = "welcome-file-list/welcome-file";
+    private static final String XPATH_EXCEPTION_TYPE = "error-page/exception-type";
+    private static final String XPATH_LOCATION = "location";
+    private static final String XPATH_ERROR_PAGE_500_LOCATION = "error-page[error-code=500]/location";
+    private static final String XPATH_ERROR_PAGE_DEFAULT_LOCATION = "error-page[not(error-code) and not(exception-type)]/location";
+    private static final String XPATH_FORM_LOGIN_PAGE = "login-config[auth-method='FORM']/form-login-config/form-login-page";
+    private static final String XPATH_FORM_ERROR_PAGE = "login-config[auth-method='FORM']/form-login-config/form-error-page";
+    private static final String XPATH_DEFAULT_FORM_LOGIN_PAGE = "login-config/form-login-config/form-login-page";
+    private static final String XPATH_DEFAULT_FORM_ERROR_PAGE = "login-config/form-login-config/form-error-page";
+    private static final String XPATH_SECURITY_CONSTRAINT = "security-constraint";
+    private static final String XPATH_WEB_RESOURCE_URL_PATTERN = "web-resource-collection/url-pattern";
+    private static final String XPATH_AUTH_CONSTRAINT = "auth-constraint";
+    private static final String XPATH_AUTH_CONSTRAINT_ROLE_NAME = "auth-constraint/role-name";
+    private static final String XPATH_SESSION_TIMEOUT = "session-config/session-timeout";
+    private static final String XPATH_DISTRIBUTABLE = "boolean(distributable)";
 
-    private static final String ERROR_URL_MUST_START_WITH_SLASH =
-        "URL must start with '/': '%s'";
-    private static final String ERROR_INITIALIZATION_FAIL =
-        "WebXml failed to initialize. Perhaps your web.xml contains a typo?";
+    private static final String ERROR_URL_MUST_START_WITH_SLASH = "URL must start with '/': '%s'";
+    private static final String ERROR_INITIALIZATION_FAIL = "WebXml failed to initialize. Perhaps your web.xml contains a typo?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -270,8 +253,7 @@ class WebXmlImpl implements WebXml {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
-     * into a single {@link Document}.
+     * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath into a single {@link Document}.
      */
     private static Document loadAllWebXmls(ServletContext context) throws IOException, SAXException {
         List<URL> webXmlURLs = new ArrayList<>();
@@ -303,6 +285,7 @@ class WebXmlImpl implements WebXml {
 
     /**
      * Create and return a mapping of all error page locations by exception type found in the given document.
+     * 
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked") // For the cast on Class<Throwable>.

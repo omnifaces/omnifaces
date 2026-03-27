@@ -23,79 +23,79 @@ import org.openqa.selenium.support.FindBy;
 
 public class ExpressionInspectorIT extends OmniFacesIT {
 
-    @FindBy(id="valueReferenceBase")
+    @FindBy(id = "valueReferenceBase")
     private WebElement valueReferenceBase;
 
-    @FindBy(id="valueReferenceProperty")
+    @FindBy(id = "valueReferenceProperty")
     private WebElement valueReferenceProperty;
 
-    @FindBy(id="getterReferenceBase")
+    @FindBy(id = "getterReferenceBase")
     private WebElement getterReferenceBase;
 
-    @FindBy(id="getterReferenceMethodName")
+    @FindBy(id = "getterReferenceMethodName")
     private WebElement getterReferenceMethodName;
 
-    @FindBy(id="getterReferenceReturnType")
+    @FindBy(id = "getterReferenceReturnType")
     private WebElement getterReferenceReturnType;
 
-    @FindBy(id="getterReferenceParamTypes")
+    @FindBy(id = "getterReferenceParamTypes")
     private WebElement getterReferenceParamTypes;
 
-    @FindBy(id="getterReferenceActualParameters")
+    @FindBy(id = "getterReferenceActualParameters")
     private WebElement getterReferenceActualParameters;
 
-    @FindBy(id="methodReferenceBase")
+    @FindBy(id = "methodReferenceBase")
     private WebElement methodReferenceBase;
 
-    @FindBy(id="methodReferenceMethodName")
+    @FindBy(id = "methodReferenceMethodName")
     private WebElement methodReferenceMethodName;
 
-    @FindBy(id="methodReferenceReturnType")
+    @FindBy(id = "methodReferenceReturnType")
     private WebElement methodReferenceReturnType;
 
-    @FindBy(id="methodReferenceFirstParamType")
+    @FindBy(id = "methodReferenceFirstParamType")
     private WebElement methodReferenceFirstParamType;
 
-    @FindBy(id="methodReferenceFirstActualParameter")
+    @FindBy(id = "methodReferenceFirstActualParameter")
     private WebElement methodReferenceFirstActualParameter;
 
-    @FindBy(id="valueMethodReferenceBase")
+    @FindBy(id = "valueMethodReferenceBase")
     private WebElement valueMethodReferenceBase;
 
-    @FindBy(id="valueMethodReferenceMethodName")
+    @FindBy(id = "valueMethodReferenceMethodName")
     private WebElement valueMethodReferenceMethodName;
 
-    @FindBy(id="valueMethodReferenceReturnType")
+    @FindBy(id = "valueMethodReferenceReturnType")
     private WebElement valueMethodReferenceReturnType;
 
-    @FindBy(id="valueMethodReferenceParamTypes")
+    @FindBy(id = "valueMethodReferenceParamTypes")
     private WebElement valueMethodReferenceParamTypes;
 
-    @FindBy(id="valueMethodReferenceActualParameters")
+    @FindBy(id = "valueMethodReferenceActualParameters")
     private WebElement valueMethodReferenceActualParameters;
 
-    @FindBy(id="methodValueReferenceBase")
+    @FindBy(id = "methodValueReferenceBase")
     private WebElement methodValueReferenceBase;
 
-    @FindBy(id="methodValueReferenceProperty")
+    @FindBy(id = "methodValueReferenceProperty")
     private WebElement methodValueReferenceProperty;
 
-    @FindBy(id="methodMethodReferenceBase")
+    @FindBy(id = "methodMethodReferenceBase")
     private WebElement methodMethodReferenceBase;
 
-    @FindBy(id="methodMethodReferenceMethodName")
+    @FindBy(id = "methodMethodReferenceMethodName")
     private WebElement methodMethodReferenceMethodName;
 
-    @FindBy(id="methodMethodReferenceReturnType")
+    @FindBy(id = "methodMethodReferenceReturnType")
     private WebElement methodMethodReferenceReturnType;
 
-    @FindBy(id="methodMethodReferenceParamTypes")
+    @FindBy(id = "methodMethodReferenceParamTypes")
     private WebElement methodMethodReferenceParamTypes;
 
-    @FindBy(id="methodMethodReferenceActualParameters")
+    @FindBy(id = "methodMethodReferenceActualParameters")
     private WebElement methodMethodReferenceActualParameters;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(ExpressionInspectorIT.class);
     }
@@ -134,4 +134,3 @@ public class ExpressionInspectorIT extends OmniFacesIT {
     }
 
 }
-

@@ -40,29 +40,27 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
 /**
  * <p>
- * The {@link CompressedResponseFilter} will apply compression on HTTP responses whenever applicable. It will greatly
- * reduce the HTTP response size when applied on character based responses like HTML, CSS and JS, on average it can save
- * up to ~70% of bandwidth.
+ * The {@link CompressedResponseFilter} will apply compression on HTTP responses whenever applicable. It will greatly reduce the HTTP response size when applied
+ * on character based responses like HTML, CSS and JS, on average it can save up to ~70% of bandwidth.
  * <p>
- * While HTTP response compression is normally to be configured in the servlet container (e.g. <code>&lt;Context compression="on"&gt;</code>
- * in Tomcat, or <code>&lt;property name="compression" value="on"&gt;</code> in GlassFish), this filter allows a servlet
- * container independent way of configuring HTTP response compression and also allows enabling HTTP response compression
- * anyway on 3rd party hosts where you have no control over servlet container configuration.
+ * While HTTP response compression is normally to be configured in the servlet container (e.g. <code>&lt;Context compression="on"&gt;</code> in Tomcat, or
+ * <code>&lt;property name="compression" value="on"&gt;</code> in GlassFish), this filter allows a servlet container independent way of configuring HTTP
+ * response compression and also allows enabling HTTP response compression anyway on 3rd party hosts where you have no control over servlet container
+ * configuration.
  *
  * <h2>Compression algorithms</h2>
  * <p>
- * Currently three compression algorithms are supported: Brotli, GZIP and Deflate. When the client supports Brotli
- * compression <strong>and</strong> one of the classes specified in {@link Algorithm#BROTLI} is present in the runtime
- * classpath, then Brotli will be used. Else when the client supports GZIP compression, then GZIP will be used via the
- * standard JDK {@link GZIPOutputStream}. As last resort, when the client supports Deflate compression, then Deflate
- * will be used via the standard JDK {@link DeflaterOutputStream}.
+ * Currently three compression algorithms are supported: Brotli, GZIP and Deflate. When the client supports Brotli compression <strong>and</strong> one of the
+ * classes specified in {@link Algorithm#BROTLI} is present in the runtime classpath, then Brotli will be used. Else when the client supports GZIP compression,
+ * then GZIP will be used via the standard JDK {@link GZIPOutputStream}. As last resort, when the client supports Deflate compression, then Deflate will be used
+ * via the standard JDK {@link DeflaterOutputStream}.
  *
  * <h2>Installation</h2>
  * <p>
- * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
- * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
- * on <code>REQUEST</code> only, you might want to explicitly add the <code>ERROR</code> dispatcher to get it to run
- * on error pages as well.
+ * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the <code>&lt;servlet-name&gt;</code> of the
+ * <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched on <code>REQUEST</code> only, you might want to explicitly add the
+ * <code>ERROR</code> dispatcher to get it to run on error pages as well.
+ * 
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;compressedResponseFilter&lt;/filter-name&gt;
@@ -76,9 +74,9 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
- * Mapping on <code>/*</code> may be too global as some types of requests (comet, long polling, etc) cannot be compressed.
- * In that case, consider mapping it to the exact <code>&lt;servlet-name&gt;</code> of the {@link FacesServlet} in the
- * same <code>web.xml</code>.
+ * Mapping on <code>/*</code> may be too global as some types of requests (comet, long polling, etc) cannot be compressed. In that case, consider mapping it to
+ * the exact <code>&lt;servlet-name&gt;</code> of the {@link FacesServlet} in the same <code>web.xml</code>.
+ * 
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;compressedResponseFilter&lt;/filter-name&gt;
@@ -94,8 +92,8 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  *
  * <h2>Configuration (optional)</h2>
  * <p>
- * This filter supports three initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element
- * as follows:
+ * This filter supports three initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element as follows:
+ * 
  * <pre>
  * &lt;init-param&gt;
  *     &lt;description&gt;The preferred algorithm. Must be one of Brotli, GZIP or Deflate (case insensitive). Defaults to automatic.&lt;/description&gt;
@@ -118,21 +116,18 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * &lt;/init-param&gt;
  * </pre>
  * <p>
- * The default <code>algorithm</code> is thus automatic. It will then find the best matching algorithm depending on
- * whether the algorithm is available and the client supports it, in this order: Brotli, GZIP or Deflate. In case you
- * explicitly specify a value of <code>Brotli</code>, and it is not available, then an exception will be thrown. In case
- * you happen to have Brotli libraries (transitively) included for other purposes and you actually want to use GZIP,
- * then specify a value of <code>GZIP</code>.
+ * The default <code>algorithm</code> is thus automatic. It will then find the best matching algorithm depending on whether the algorithm is available and the
+ * client supports it, in this order: Brotli, GZIP or Deflate. In case you explicitly specify a value of <code>Brotli</code>, and it is not available, then an
+ * exception will be thrown. In case you happen to have Brotli libraries (transitively) included for other purposes and you actually want to use GZIP, then
+ * specify a value of <code>GZIP</code>.
  * <p>
- * The default <code>threshold</code> is thus 150 bytes. This means that when the response is not larger than 150 bytes,
- * then it will not be compressed. Only when it's larger than 150 bytes, then it will be compressed. A
- * threshold of between 150 and 1000 bytes is recommended due to overhead and latency of compression/decompression.
- * The value must be a number between 0 and 9999. A value larger than 2000 is not recommended.
+ * The default <code>threshold</code> is thus 150 bytes. This means that when the response is not larger than 150 bytes, then it will not be compressed. Only
+ * when it's larger than 150 bytes, then it will be compressed. A threshold of between 150 and 1000 bytes is recommended due to overhead and latency of
+ * compression/decompression. The value must be a number between 0 and 9999. A value larger than 2000 is not recommended.
  * <p>
- * The <code>mimetypes</code> represents a comma separated string of mime types which needs to be compressed. It's
- * exactly that value which appears in the <code>Content-Type</code> header of the response. The in the above example
- * mentioned mime types are already the default values. Note that HTTP response compression does not have any benefit
- * when applied on binary mimetypes like images, office documents, PDF files, etcetera. So setting it for them is not
+ * The <code>mimetypes</code> represents a comma separated string of mime types which needs to be compressed. It's exactly that value which appears in the
+ * <code>Content-Type</code> header of the response. The in the above example mentioned mime types are already the default values. Note that HTTP response
+ * compression does not have any benefit when applied on binary mimetypes like images, office documents, PDF files, etcetera. So setting it for them is not
  * recommended.
  *
  * @author Bauke Scholtz
@@ -227,13 +222,12 @@ public class CompressedResponseFilter extends HttpFilter {
     }
 
     /**
-     * Perform the filtering job. Only if the client accepts an algorithm based on the request headers, then wrap the
-     * response in a {@link CompressedHttpServletResponse} and pass it through the filter chain.
+     * Perform the filtering job. Only if the client accepts an algorithm based on the request headers, then wrap the response in a
+     * {@link CompressedHttpServletResponse} and pass it through the filter chain.
      */
     @Override
-    public void doFilter
-        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-            throws ServletException, IOException
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException
     {
         var acceptedAlgorithm = findAcceptedAlgorithm(request);
 

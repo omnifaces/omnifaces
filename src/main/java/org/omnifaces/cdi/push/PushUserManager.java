@@ -24,8 +24,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * <p>
- * Base class for push user managers that hold user-to-channel mappings.
- * The subclasses must be {@link ApplicationScoped}.
+ * Base class for push user managers that hold user-to-channel mappings. The subclasses must be {@link ApplicationScoped}.
  *
  * @author Bauke Scholtz
  * @see PushChannelManager
@@ -38,14 +37,17 @@ abstract class PushUserManager {
     /** A good developer will unlikely declare multiple user-targeted channels in same application (a global JS listener is more efficient). */
     private static final int ESTIMATED_USER_CHANNELS_PER_APPLICATION = 1;
 
-    /** A good developer will unlikely declare an user-targeted view scoped channel in same session (as this implies possibility of multiple users per session). */
+    /**
+     * A good developer will unlikely declare an user-targeted view scoped channel in same session (as this implies possibility of multiple users per session).
+     */
     private static final int ESTIMATED_USER_CHANNELS_PER_SESSION = 1;
 
     /** An average user will unlikely simultaneously login in more than two sessions (desktop/mobile). */
     private static final int ESTIMATED_SESSIONS_PER_USER = 2;
 
     /** An average user will unlikely have more than one user-targeted channel in same session. */
-    private static final int ESTIMATED_CHANNELS_IDS_PER_USER = ESTIMATED_SESSIONS_PER_USER * ESTIMATED_USER_CHANNELS_PER_APPLICATION * ESTIMATED_USER_CHANNELS_PER_SESSION;
+    private static final int ESTIMATED_CHANNELS_IDS_PER_USER = ESTIMATED_SESSIONS_PER_USER * ESTIMATED_USER_CHANNELS_PER_APPLICATION
+        * ESTIMATED_USER_CHANNELS_PER_SESSION;
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -56,6 +58,7 @@ abstract class PushUserManager {
 
     /**
      * Register application user based on given user and session based user ID.
+     * 
      * @param user The user.
      * @param userId The session based user ID.
      */
@@ -65,6 +68,7 @@ abstract class PushUserManager {
 
     /**
      * Add user channel ID associated with given session based user ID and channel name.
+     * 
      * @param userId The session based user ID.
      * @param channel The channel name.
      * @param channelId The channel identifier.
@@ -78,6 +82,7 @@ abstract class PushUserManager {
 
     /**
      * Resolve the user associated with given channel name and ID.
+     * 
      * @param channel The channel name.
      * @param channelId The channel identifier.
      * @return The user associated with given channel name and ID.
@@ -96,6 +101,7 @@ abstract class PushUserManager {
 
     /**
      * Resolve the user-specific channel IDs associated with given user and channel name.
+     * 
      * @param user The user.
      * @param channel The channel name.
      * @return The user-specific channel IDs associated with given user and channel name.
@@ -115,6 +121,7 @@ abstract class PushUserManager {
 
     /**
      * Deregister application user associated with given user and session based user ID.
+     * 
      * @param user The user.
      * @param userId The session based user ID.
      */
@@ -129,9 +136,9 @@ abstract class PushUserManager {
     // Internal -------------------------------------------------------------------------------------------------------
 
     /**
-     * For internal usage only. This makes it possible to save and restore user specific channels during server
-     * restart/failover in {@link PushChannelManager}.
+     * For internal usage only. This makes it possible to save and restore user specific channels during server restart/failover in {@link PushChannelManager}.
      * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+     * 
      * @return User specific channels.
      */
     protected ConcurrentHashMap<String, ConcurrentHashMap<String, Set<String>>> getUserChannels() {

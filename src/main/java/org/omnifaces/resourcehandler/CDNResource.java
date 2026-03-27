@@ -20,11 +20,10 @@ import jakarta.faces.application.ResourceHandler;
 import org.omnifaces.renderer.CorsAwareResourceRenderer;
 
 /**
- * This {@link Resource} implementation can be used as a marker class to signal the custom {@link ResourceHandler}
- * such as {@link CombinedResourceHandler} that the given resource actually returns a CDN URL, and offers a method to
- * return the local URL which can be used as fallback in case the CDN request errors out. Since 5.0, also the
- * {@link CorsAwareResourceRenderer} will check for it in order to decide whether to automatically generate the
- * <code>integrity</code> attribute.
+ * This {@link Resource} implementation can be used as a marker class to signal the custom {@link ResourceHandler} such as {@link CombinedResourceHandler} that
+ * the given resource actually returns a CDN URL, and offers a method to return the local URL which can be used as fallback in case the CDN request errors out.
+ * Since 5.0, also the {@link CorsAwareResourceRenderer} will check for it in order to decide whether to automatically generate the <code>integrity</code>
+ * attribute.
  *
  * @author Bauke Scholtz
  * @since 2.7
@@ -39,9 +38,9 @@ public class CDNResource extends RemappedResource {
     }
 
     /**
-     * Constructs a new CDN resource which remaps the given wrapped resource to the given CDN URL.
-     * The CDN URL is available by {@link #getRequestPath()}.
-     * The local URL is available by {@link #getLocalRequestPath()}.
+     * Constructs a new CDN resource which remaps the given wrapped resource to the given CDN URL. The CDN URL is available by {@link #getRequestPath()}. The
+     * local URL is available by {@link #getLocalRequestPath()}.
+     * 
      * @param resource The resource to be remapped.
      * @param cdnURL The CDN URL of the resource.
      */
@@ -51,6 +50,7 @@ public class CDNResource extends RemappedResource {
 
     /**
      * Returns the CDN URL. I.e. the remapped request path pointing a CDN host.
+     * 
      * @return The CDN URL.
      */
     @Override
@@ -60,6 +60,7 @@ public class CDNResource extends RemappedResource {
 
     /**
      * Returns the local URL. I.e. the original request path pointing the local host.
+     * 
      * @return The local URL.
      */
     public String getLocalRequestPath() {

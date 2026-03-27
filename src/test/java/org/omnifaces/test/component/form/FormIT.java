@@ -29,19 +29,19 @@ import org.openqa.selenium.support.FindBy;
 
 public class FormIT extends OmniFacesIT {
 
-    @FindBy(id="formDefault:submit")
+    @FindBy(id = "formDefault:submit")
     private WebElement formDefaultSubmit;
 
-    @FindBy(id="formDefault:params")
+    @FindBy(id = "formDefault:params")
     private WebElement formDefaultParams;
 
-    @FindBy(id="formDisabled:submit")
+    @FindBy(id = "formDisabled:submit")
     private WebElement formDisabledSubmit;
 
-    @FindBy(id="formDisabled:params")
+    @FindBy(id = "formDisabled:params")
     private WebElement formDisabledParams;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(FormIT.class);
     }
@@ -63,7 +63,8 @@ public class FormIT extends OmniFacesIT {
         assertTrue(params.contains(PartialViewContext.PARTIAL_RENDER_PARAM_NAME), PartialViewContext.PARTIAL_RENDER_PARAM_NAME);
     }
 
-    @Test @Disabled("Partial submit is currently integrated in Faces 5.0")
+    @Test
+    @Disabled("Partial submit is currently integrated in Faces 5.0")
     void testFormDisabledPartialSubmit() {
         guardAjax(formDisabledSubmit::click);
         var params = formDisabledParams.getText();

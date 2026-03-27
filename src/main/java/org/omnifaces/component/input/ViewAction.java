@@ -31,34 +31,32 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:viewAction&gt;</code> is a component that extends the standard <code>&lt;f:viewAction&gt;</code> and
- * changes the <code>if</code> attribute to be evaluated during <code>INVOKE_APPLICATION</code> phase instead of the
- * <code>APPLY_REQUEST_VALUES</code> phase. This allows developers to let the <code>if</code> attribute check the
- * converted and validated model values before performing the view action, which results in much more intuitive behavior.
+ * The <code>&lt;o:viewAction&gt;</code> is a component that extends the standard <code>&lt;f:viewAction&gt;</code> and changes the <code>if</code> attribute to
+ * be evaluated during <code>INVOKE_APPLICATION</code> phase instead of the <code>APPLY_REQUEST_VALUES</code> phase. This allows developers to let the
+ * <code>if</code> attribute check the converted and validated model values before performing the view action, which results in much more intuitive behavior.
  * <p>
- * In below example, the <code>FooConverter</code> may convert a non-null parameter to <code>null</code> without causing
- * a validation or conversion error, and the intent is to redirect the current page to <code>otherpage.xhtml</code> when
- * the converted result is <code>null</code>.
+ * In below example, the <code>FooConverter</code> may convert a non-null parameter to <code>null</code> without causing a validation or conversion error, and
+ * the intent is to redirect the current page to <code>otherpage.xhtml</code> when the converted result is <code>null</code>.
+ * 
  * <pre>
  * &lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
  * &lt;f:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
  * </pre>
  * <p>
- * This is however not possible with standard <code>&lt;f:viewAction&gt;</code> as it evaluates the <code>if</code>
- * attribute already before the conversion has taken place. This component solves that by postponing the evaluation of
- * the <code>if</code> attribute to the <code>INVOKE_APPLICATION</code> phase.
+ * This is however not possible with standard <code>&lt;f:viewAction&gt;</code> as it evaluates the <code>if</code> attribute already before the conversion has
+ * taken place. This component solves that by postponing the evaluation of the <code>if</code> attribute to the <code>INVOKE_APPLICATION</code> phase.
+ * 
  * <pre>
  * &lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
  * &lt;o:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
  * </pre>
  * <p>
- * Only when you set <code>immediate="true"</code>, then it will behave the same as the standard
- * <code>&lt;f:viewAction&gt;</code>.
+ * Only when you set <code>immediate="true"</code>, then it will behave the same as the standard <code>&lt;f:viewAction&gt;</code>.
  *
  * <h2>Usage</h2>
  * <p>
- * You can use it the same way as <code>&lt;f:viewAction&gt;</code>, you only need to change <code>f:</code> to
- * <code>o:</code>.
+ * You can use it the same way as <code>&lt;f:viewAction&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.
+ * 
  * <pre>
  * &lt;o:viewAction action="otherpage" if="#{bean.property eq null}" /&gt;
  * </pre>
@@ -66,12 +64,12 @@ import org.omnifaces.util.State;
  * <h2>Messaging</h2>
  * <p>
  * You can use the <code>message</code> attribute to add a global flash warning message.
+ * 
  * <pre>
  * &lt;o:viewAction ... message="Please use a valid link from within the site" /&gt;
  * </pre>
  * <p>
- * Note that the message will only be shown when the redirect has actually taken place. The support was added in
- * OmniFaces 3.2.
+ * Note that the message will only be shown when the redirect has actually taken place. The support was added in OmniFaces 3.2.
  *
  * @author Bauke Scholtz
  * @since 2.2
@@ -96,9 +94,8 @@ public class ViewAction extends UIViewAction {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * Only broadcast the action event when {@link UIViewAction#isRendered()} returns <code>true</code>. The default
-     * implementation will always broadcast. The {@link UIViewAction#isRendered()} is by default only considered during
-     * {@link #decode(jakarta.faces.context.FacesContext)}.
+     * Only broadcast the action event when {@link UIViewAction#isRendered()} returns <code>true</code>. The default implementation will always broadcast. The
+     * {@link UIViewAction#isRendered()} is by default only considered during {@link #decode(jakarta.faces.context.FacesContext)}.
      * <p>
      * If the action event performs any redirect, then add any {@link #getMessage()} as a global flash warning message.
      */
@@ -127,6 +124,7 @@ public class ViewAction extends UIViewAction {
         public FacesContext getFacesContext() {
             return new RedirectMessageFacesContext(wrapped.getFacesContext(), message);
         }
+
     }
 
     private static class RedirectMessageFacesContext extends FacesContextWrapper {
@@ -142,6 +140,7 @@ public class ViewAction extends UIViewAction {
         public ExternalContext getExternalContext() {
             return new RedirectMessageExternalContext(getWrapped().getExternalContext(), message);
         }
+
     }
 
     private static class RedirectMessageExternalContext extends ExternalContextWrapper {
@@ -158,13 +157,14 @@ public class ViewAction extends UIViewAction {
             addFlashGlobalWarn(message);
             super.redirect(url);
         }
+
     }
 
     // Getters/setters ------------------------------------------------------------------------------------------------
 
     /**
-     * Returns <code>true</code> if the <code>immediate="true"</code> attribute is <strong>not</strong> set, otherwise
-     * delegate to super, hereby maintaining the original behavior of <code>immediate="true"</code>.
+     * Returns <code>true</code> if the <code>immediate="true"</code> attribute is <strong>not</strong> set, otherwise delegate to super, hereby maintaining the
+     * original behavior of <code>immediate="true"</code>.
      */
     @Override
     public boolean isRendered() {
@@ -173,6 +173,7 @@ public class ViewAction extends UIViewAction {
 
     /**
      * Returns the global flash warning message to be shown in the redirected page.
+     * 
      * @return The global flash warning message to be shown in the redirected page.
      * @since 3.2
      */
@@ -182,6 +183,7 @@ public class ViewAction extends UIViewAction {
 
     /**
      * Sets the global flash warning message to be shown in the redirected page.
+     * 
      * @param message The global flash warning message to be shown in the redirected page.
      * @since 3.2
      */

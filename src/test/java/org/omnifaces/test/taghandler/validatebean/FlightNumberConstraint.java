@@ -29,9 +29,11 @@ import jakarta.validation.Payload;
 @Target({ TYPE, METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface FlightNumberConstraint {
+
     String message() default "Invalid flight number";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
 }

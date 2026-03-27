@@ -96,12 +96,11 @@ import org.omnifaces.cdi.config.DateProducer.TemporalDate;
  *
  * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
- * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods
- * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * This class is indeed intended for internal usage only. We won't add methods here on user request. We only add methods here once we encounter non-DRY code in
+ * OmniFaces codebase. The methods may be renamed/changed without notice.
  * <p>
- * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to
- * accept the risk that the method signatures can be changed without notice. This utility class exists because OmniFaces
- * intends to be free of 3rd party dependencies.
+ * We don't stop you from using it if you found it in the Javadoc and you think you find it useful, but you have to accept the risk that the method signatures
+ * can be changed without notice. This utility class exists because OmniFaces intends to be free of 3rd party dependencies.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -136,27 +135,27 @@ public final class Utils {
 
     private static Map<Class<?>, Object> collectPrimitiveDefaults() {
         return Map.of(
-                boolean.class, false,
-                byte.class, (byte) 0,
-                short.class, (short) 0,
-                char.class, (char) 0,
-                int.class, 0,
-                long.class, (long) 0,
-                float.class, (float) 0,
-                double.class, (double) 0
+            boolean.class, false,
+            byte.class, (byte) 0,
+            short.class, (short) 0,
+            char.class, (char) 0,
+            int.class, 0,
+            long.class, (long) 0,
+            float.class, (float) 0,
+            double.class, (double) 0
         );
     }
 
     private static Map<Class<?>, Class<?>> collectPrimitiveTypes() {
         return Map.of(
-                Boolean.class, boolean.class,
-                Byte.class, byte.class,
-                Short.class, short.class,
-                Character.class, char.class,
-                Integer.class, int.class,
-                Long.class, long.class,
-                Float.class, float.class,
-                Double.class, double.class
+            Boolean.class, boolean.class,
+            Byte.class, byte.class,
+            Short.class, short.class,
+            Character.class, char.class,
+            Integer.class, int.class,
+            Long.class, long.class,
+            Float.class, float.class,
+            Double.class, double.class
         );
     }
 
@@ -164,6 +163,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given string is null or is empty.
+     * 
      * @param string The string to be checked on emptiness.
      * @return <code>true</code> if the given string is null or is empty.
      */
@@ -173,6 +173,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given collection is null or is empty.
+     * 
      * @param collection The collection to be checked on emptiness.
      * @return <code>true</code> if the given collection is null or is empty.
      */
@@ -182,6 +183,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given map is null or is empty.
+     * 
      * @param map The map to be checked on emptiness.
      * @return <code>true</code> if the given map is null or is empty.
      */
@@ -191,6 +193,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given part is null or is empty.
+     * 
      * @param part The part to be checked on emptiness.
      * @return <code>true</code> if the given part is null or is empty.
      * @since 2.6
@@ -201,6 +204,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given object is null or an empty array or has an empty toString() result.
+     * 
      * @param value The value to be checked on emptiness.
      * @return <code>true</code> if the given object is null or an empty array or has an empty toString() result.
      */
@@ -230,6 +234,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if at least one value is empty.
+     * 
      * @param values the values to be checked on emptiness
      * @return <code>true</code> if any value is empty and <code>false</code> if no values are empty
      * @since 1.8
@@ -239,9 +244,9 @@ public final class Utils {
     }
 
     /**
-     * Returns <code>true</code> if the given string is null or is empty or contains whitespace only. In addition to
-     * {@link #isEmpty(String)}, this thus also returns <code>true</code> when <code>string.trim().isEmpty()</code>
-     * returns <code>true</code>.
+     * Returns <code>true</code> if the given string is null or is empty or contains whitespace only. In addition to {@link #isEmpty(String)}, this thus also
+     * returns <code>true</code> when <code>string.trim().isEmpty()</code> returns <code>true</code>.
+     * 
      * @param string The string to be checked on blankness.
      * @return True if the given string is null or is empty or contains whitespace only.
      * @since 1.5
@@ -251,8 +256,9 @@ public final class Utils {
     }
 
     /**
-     * Returns <code>true</code> if the given string is parseable as a number. I.e. it is not null, nor blank and contains solely
-     * digits. I.e., it won't throw a <code>NumberFormatException</code> when parsing as <code>Long</code>.
+     * Returns <code>true</code> if the given string is parseable as a number. I.e. it is not null, nor blank and contains solely digits. I.e., it won't throw a
+     * <code>NumberFormatException</code> when parsing as <code>Long</code>.
+     * 
      * @param string The string to be checked as number.
      * @return <code>true</code> if the given string is parseable as a number.
      * @since 1.5.
@@ -270,8 +276,9 @@ public final class Utils {
     }
 
     /**
-     * Returns <code>true</code> if the given string is parseable as a decimal. I.e. it is not null, nor blank and contains solely
-     * digits. I.e., it won't throw a <code>NumberFormatException</code> when parsing as <code>Double</code>.
+     * Returns <code>true</code> if the given string is parseable as a decimal. I.e. it is not null, nor blank and contains solely digits. I.e., it won't throw
+     * a <code>NumberFormatException</code> when parsing as <code>Double</code>.
+     * 
      * @param string The string to be checked as decimal.
      * @return <code>true</code> if the given string is parseable as a decimal.
      * @since 1.5.
@@ -289,12 +296,11 @@ public final class Utils {
     }
 
     /**
-     * Returns the first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
-     * element.
+     * Returns the first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such element.
+     * 
      * @param <T> The generic object type.
      * @param objects The argument list of objects to be tested for non-<code>null</code>.
-     * @return The first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
-     * element.
+     * @return The first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such element.
      */
     @SafeVarargs
     public static <T> T coalesce(T... objects) {
@@ -303,6 +309,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given object equals one of the given objects.
+     * 
      * @param <T> The generic object type.
      * @param object The object to be checked if it equals one of the given objects.
      * @param objects The argument list of objects to be tested for equality.
@@ -315,6 +322,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given string starts with one of the given prefixes.
+     * 
      * @param string The object to be checked if it starts with one of the given prefixes.
      * @param prefixes The argument list of prefixes to be checked
      * @return <code>true</code> if the given string starts with one of the given prefixes.
@@ -326,6 +334,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given string ends with one of the given suffixes.
+     * 
      * @param string The object to be checked if it ends with one of the given suffixes.
      * @param suffixes The argument list of suffixes to be checked
      * @return <code>true</code> if the given string ends with one of the given suffixes.
@@ -337,6 +346,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if an instance of the given class could also be an instance of one of the given classes.
+     * 
      * @param cls The class to be checked if it could also be an instance of one of the given classes.
      * @param classes The argument list of classes to be tested.
      * @return <code>true</code> if the given class could also be an instance of one of the given classes.
@@ -348,6 +358,7 @@ public final class Utils {
 
     /**
      * Returns <code>true</code> if the given class has at least one of the given annotations.
+     * 
      * @param cls The class to be checked if it has at least one of the given annotations.
      * @param annotations The argument list of annotations to be tested on the given class.
      * @return <code>true</code> if the given clazz would be an instance of one of the given clazzes.
@@ -359,9 +370,9 @@ public final class Utils {
     }
 
     /**
-     * Returns the default value of the given class, covering primitives.
-     * E.g. if given class is <code>int.class</code>, then it will return <code>0</code>. Autoboxing will do the rest.
-     * Non-primitives and <code>void.class</code> will return <code>null</code>.
+     * Returns the default value of the given class, covering primitives. E.g. if given class is <code>int.class</code>, then it will return <code>0</code>.
+     * Autoboxing will do the rest. Non-primitives and <code>void.class</code> will return <code>null</code>.
+     * 
      * @param cls The class to obtain the default value for.
      * @return The default value of the given class, covering primitives.
      * @since 2.4
@@ -371,9 +382,9 @@ public final class Utils {
     }
 
     /**
-     * Returns the primitive type of the given class, if any.
-     * E.g. if given class is <code>Integer.class</code>, then it will return <code>int.class</code>.
+     * Returns the primitive type of the given class, if any. E.g. if given class is <code>Integer.class</code>, then it will return <code>int.class</code>.
      * Non-primitives and <code>void.class</code> will return <code>null</code>.
+     * 
      * @param cls The class to obtain the primitive type for.
      * @return The primitive type of the given class, if any.
      * @since 2.7.2
@@ -383,11 +394,10 @@ public final class Utils {
     }
 
     /**
-     * Returns the class loader associated with given object.
-     * If the given object is {@code null}, then just return {@link Thread#getContextClassLoader()} of {@link Thread#currentThread()}.
-     * Else if the given object is an instance of {@link ClassLoader} already, return it right away.
-     * Else if the given object is an instance of {@link Class}, then return {@link Class#getClassLoader()}.
-     * Else return the {@link ClassLoader} of {@link Object#getClass()}.
+     * Returns the class loader associated with given object. If the given object is {@code null}, then just return {@link Thread#getContextClassLoader()} of
+     * {@link Thread#currentThread()}. Else if the given object is an instance of {@link ClassLoader} already, return it right away. Else if the given object is
+     * an instance of {@link Class}, then return {@link Class#getClassLoader()}. Else return the {@link ClassLoader} of {@link Object#getClass()}.
+     * 
      * @param object The object to return associated class loader for.
      * @return The class loader associated with given object.
      * @since 4.3
@@ -408,8 +418,9 @@ public final class Utils {
     }
 
     /**
-     * Split given string on given delimiter and makes sure each part is already trimmed via {@link String#trim()} and
-     * that any empty strings are already filtered.
+     * Split given string on given delimiter and makes sure each part is already trimmed via {@link String#trim()} and that any empty strings are already
+     * filtered.
+     * 
      * @param string String to split.
      * @param delimiter Delimiter to split on.
      * @return A stream of the split parts, already trimmed, will not contain empty strings.
@@ -420,8 +431,8 @@ public final class Utils {
     }
 
     /**
-     * Split given string on given delimiter until the given threshold and makes sure each part is already trimmed via
-     * {@link String#trim()}.
+     * Split given string on given delimiter until the given threshold and makes sure each part is already trimmed via {@link String#trim()}.
+     * 
      * @param string String to split.
      * @param delimiter Delimiter to split on.
      * @param limit the result threshold, as described in {@link String#split(String, int)}.
@@ -435,18 +446,19 @@ public final class Utils {
     // I/O ------------------------------------------------------------------------------------------------------------
 
     /**
-     * Stream the given input to the given output via NIO {@link Channels} and a directly allocated NIO
-     * {@link ByteBuffer}. Both the input and output streams will implicitly be closed after streaming,
-     * regardless of whether an exception is been thrown or not.
+     * Stream the given input to the given output via NIO {@link Channels} and a directly allocated NIO {@link ByteBuffer}. Both the input and output streams
+     * will implicitly be closed after streaming, regardless of whether an exception is been thrown or not.
+     * 
      * @param input The input stream.
      * @param output The output stream.
      * @return The length of the written bytes.
      * @throws IOException When an I/O error occurs.
      */
     public static long stream(InputStream input, OutputStream output) throws IOException {
-        try (var inputChannel = Channels.newChannel(input);
-            var outputChannel = Channels.newChannel(output))
-        {
+        try (
+            var inputChannel = Channels.newChannel(input);
+            var outputChannel = Channels.newChannel(output)
+        ) {
             var buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
             var size = 0L;
 
@@ -461,9 +473,10 @@ public final class Utils {
     }
 
     /**
-     * Stream a specified range of the given file to the given output via NIO {@link Channels} and a directly allocated
-     * NIO {@link ByteBuffer}. The output stream will only implicitly be closed after streaming when the specified range
-     * represents the whole file, regardless of whether an exception is been thrown or not.
+     * Stream a specified range of the given file to the given output via NIO {@link Channels} and a directly allocated NIO {@link ByteBuffer}. The output
+     * stream will only implicitly be closed after streaming when the specified range represents the whole file, regardless of whether an exception is been
+     * thrown or not.
+     * 
      * @param file The file.
      * @param output The output stream.
      * @param start The start position (offset).
@@ -505,9 +518,9 @@ public final class Utils {
     }
 
     /**
-     * Check if the given resource is not <code>null</code> and then close it, whereby any caught {@link IOException}
-     * is been returned instead of thrown, so that the caller can if necessary handle (log) or just ignore it without
-     * the need to put another try-catch.
+     * Check if the given resource is not <code>null</code> and then close it, whereby any caught {@link IOException} is been returned instead of thrown, so
+     * that the caller can if necessary handle (log) or just ignore it without the need to put another try-catch.
+     * 
      * @param resource The closeable resource to be closed.
      * @return The caught {@link IOException}, or <code>null</code> if none is been thrown.
      */
@@ -525,9 +538,10 @@ public final class Utils {
     }
 
     /**
-     * Returns <code>true</code> if the given object is guaranteed to be serializable. This does that by checking
-     * whether {@link ObjectOutputStream#writeObject(Object)} on the given object doesn't throw an exception
-     * rather than checking if the given object is an instance of {@link Serializable}.
+     * Returns <code>true</code> if the given object is guaranteed to be serializable. This does that by checking whether
+     * {@link ObjectOutputStream#writeObject(Object)} on the given object doesn't throw an exception rather than checking if the given object is an instance of
+     * {@link Serializable}.
+     * 
      * @param object The object to be tested.
      * @return <code>true</code> if the given object is guaranteed to be serializable.
      * @since 2.4
@@ -546,9 +560,9 @@ public final class Utils {
     // Collections ----------------------------------------------------------------------------------------------------
 
     /**
-     * Creates an unmodifiable set based on the given values. If one of the values is an instance of an array or a
-     * collection, then each of its values will also be merged into the set. Nested arrays or collections will result
-     * in a {@link ClassCastException}.
+     * Creates an unmodifiable set based on the given values. If one of the values is an instance of an array or a collection, then each of its values will also
+     * be merged into the set. Nested arrays or collections will result in a {@link ClassCastException}.
+     * 
      * @param <E> The expected set element type.
      * @param values The values to create an unmodifiable set for.
      * @return An unmodifiable set based on the given values.
@@ -577,8 +591,7 @@ public final class Utils {
     /**
      * Converts an iterable into a list.
      * <p>
-     * This method makes NO guarantee to whether changes to the source iterable are
-     * reflected in the returned list or not. For instance if the given iterable
+     * This method makes NO guarantee to whether changes to the source iterable are reflected in the returned list or not. For instance if the given iterable
      * already is a list, it's returned directly.
      *
      * @param <E> The generic iterable element type.
@@ -603,17 +616,15 @@ public final class Utils {
     /**
      * Converts comma separated values in a string into a list with those values.
      * <p>
-     * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code>
-     * with values:
+     * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code> with values:
      * <ul>
      * <li>"foo"</li>
      * <li>"bar"</li>
      * <li>"kaz"</li>
      * </ul>
      *
-     * Note that whitespace will be stripped. Empty entries are not supported. This method defaults to
-     * using a comma (<code>","</code>) as delimiter. See {@link Utils#csvToList(String, String)} for when
-     * a different delimiter is needed.
+     * Note that whitespace will be stripped. Empty entries are not supported. This method defaults to using a comma (<code>","</code>) as delimiter. See
+     * {@link Utils#csvToList(String, String)} for when a different delimiter is needed.
      *
      * @param values string with comma separated values
      * @return a list with all values encountered in the <code>values</code> argument, can be the empty list.
@@ -626,8 +637,7 @@ public final class Utils {
     /**
      * Converts comma separated values in a string into a list with those values.
      * <p>
-     * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code>
-     * with values:
+     * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code> with values:
      * <ul>
      * <li>"foo"</li>
      * <li>"bar"</li>
@@ -662,8 +672,7 @@ public final class Utils {
     /**
      * Returns a new map that contains the reverse of the given map.
      * <p>
-     * The reverse of a map means that every value X becomes a key X' with as corresponding
-     * value Y' the key Y that was originally associated with the value X.
+     * The reverse of a map means that every value X becomes a key X' with as corresponding value Y' the key Y that was originally associated with the value X.
      *
      * @param <T> The generic map key/value type.
      * @param source the map that is to be reversed
@@ -743,6 +752,7 @@ public final class Utils {
 
     /**
      * Returns a stream of given iterable.
+     * 
      * @param <E> The generic iterable element type.
      * @param iterable Any iterable to get a stream for.
      * @return A stream of given iterable.
@@ -754,6 +764,7 @@ public final class Utils {
 
     /**
      * Returns a stream of given map.
+     * 
      * @param <K> The generic map key type.
      * @param <V> The generic map value type.
      * @param map Any map to get a stream for.
@@ -766,6 +777,7 @@ public final class Utils {
 
     /**
      * Returns a stream of given array.
+     * 
      * @param <T> The generic array item type.
      * @param array Any array to get a stream for.
      * @return A stream of given array.
@@ -777,6 +789,7 @@ public final class Utils {
 
     /**
      * Performs an action for each element of given object which is streamed using {@link Utils#stream(Object)}.
+     * 
      * @param object Any streamable object.
      * @param action A non-interfering action to perform on each element.
      * @since 3.0
@@ -788,8 +801,9 @@ public final class Utils {
     // Dates ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Formats the given {@link Date} to a string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a>
-     * format. This format is used in HTTP headers and in JavaScript <code>Date</code> constructor.
+     * Formats the given {@link Date} to a string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format. This format is used in HTTP
+     * headers and in JavaScript <code>Date</code> constructor.
+     * 
      * @param date The <code>Date</code> to be formatted to a string in RFC 1123 format.
      * @return The formatted string.
      * @since 1.2
@@ -801,8 +815,8 @@ public final class Utils {
     }
 
     /**
-     * Parses the given string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format to a
-     * {@link Date} object.
+     * Parses the given string in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC 1123</a> format to a {@link Date} object.
+     * 
      * @param string The string in RFC 1123 format to be parsed to a <code>Date</code> object.
      * @return The parsed <code>Date</code>.
      * @throws ParseException When the given string is not in RFC 1123 format.
@@ -814,12 +828,12 @@ public final class Utils {
     }
 
     /**
-     * Obtain {@link ZoneId} from <code>D</code>.
-     * When <code>D</code> is {@code null}, {@link Date} or since 4.7 {@link Long} as epoch milli, then return {@link ZoneId#systemDefault()}.
-     * When <code>D</code> is {@link Calendar}, then return {@link TimeZone#toZoneId()} of {@link Calendar#getTimeZone()}
-     * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#OFFSET_SECONDS}, then return {@link ZoneId#from(java.time.temporal.TemporalAccessor)}.
-     * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#CLOCK_HOUR_OF_DAY}, then return {@link ZoneId#systemDefault()}.
-     * When <code>D</code> is {@link Temporal} and supports neither, then return {@link ZoneOffset#UTC}.
+     * Obtain {@link ZoneId} from <code>D</code>. When <code>D</code> is {@code null}, {@link Date} or since 4.7 {@link Long} as epoch milli, then return
+     * {@link ZoneId#systemDefault()}. When <code>D</code> is {@link Calendar}, then return {@link TimeZone#toZoneId()} of {@link Calendar#getTimeZone()} When
+     * <code>D</code> is {@link Temporal} and supports {@link ChronoField#OFFSET_SECONDS}, then return {@link ZoneId#from(java.time.temporal.TemporalAccessor)}.
+     * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#CLOCK_HOUR_OF_DAY}, then return {@link ZoneId#systemDefault()}. When
+     * <code>D</code> is {@link Temporal} and supports neither, then return {@link ZoneOffset#UTC}.
+     * 
      * @param <D> The date type, can be {@code null}, {@link Temporal}, {@link Date}, {@link Calendar} or {@link Long}.
      * @param date The <code>D</code> to obtain {@link ZoneId} from.
      * @return {@link ZoneId} obtained from <code>D</code>.
@@ -850,11 +864,10 @@ public final class Utils {
     }
 
     /**
-     * Convert <code>Z</code> to {@link ZoneId}.
-     * When <code>Z</code> is {@code null}, then return {@link ZoneId#systemDefault()}.
-     * When <code>Z</code> is {@link ZoneId}, then return it.
-     * When <code>Z</code> is {@link TimeZone}, then return {@link TimeZone#toZoneId()}.
-     * When <code>Z</code> is {@link String}, then return {@link ZoneId#of(String)}.
+     * Convert <code>Z</code> to {@link ZoneId}. When <code>Z</code> is {@code null}, then return {@link ZoneId#systemDefault()}. When <code>Z</code> is
+     * {@link ZoneId}, then return it. When <code>Z</code> is {@link TimeZone}, then return {@link TimeZone#toZoneId()}. When <code>Z</code> is {@link String},
+     * then return {@link ZoneId#of(String)}.
+     * 
      * @param <Z> The timezone type, can be {@code null}, {@link String}, {@link TimeZone} or {@link ZoneId}.
      * @param timezone The <code>Z</code> to convert to {@link ZoneId}.
      * @return {@link ZoneId} converted from <code>Z</code>.
@@ -880,8 +893,9 @@ public final class Utils {
     }
 
     /**
-     * Convert <code>D</code> to {@link ZonedDateTime}.
-     * This method is guaranteed repeatable when combined with {@link #fromZonedDateTime(ZonedDateTime, Class)}.
+     * Convert <code>D</code> to {@link ZonedDateTime}. This method is guaranteed repeatable when combined with
+     * {@link #fromZonedDateTime(ZonedDateTime, Class)}.
+     * 
      * @param <D> The date type, can be {@code null}, {@link Temporal}, {@link Date}, {@link Calendar} or since 4.7 {@link Long} as epoch milli.
      * @param date The <code>D</code> to convert to {@link ZonedDateTime}.
      * @return {@link ZonedDateTime} converted from <code>D</code>.
@@ -954,8 +968,8 @@ public final class Utils {
     }
 
     /**
-     * Convert {@link ZonedDateTime} to <code>D</code>.
-     * This method is guaranteed repeatable when combined with {@link #toZonedDateTime(Object)}.
+     * Convert {@link ZonedDateTime} to <code>D</code>. This method is guaranteed repeatable when combined with {@link #toZonedDateTime(Object)}.
+     * 
      * @param <D> The date type, can be {@code null}, {@link Temporal}, {@link Date}, {@link Calendar} or since 4.7 {@link Long} as epoch milli.
      * @param zonedDateTime The {@link ZonedDateTime} to convert to <code>D</code>.
      * @param type The type of <code>D</code>.
@@ -1040,10 +1054,10 @@ public final class Utils {
         // This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
         // There might be custom implementations supporting this as well although this is undocumented.
         // We just try our best :)
-        var converter = stream(type.getMethods()).filter(method
-            -> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
-            && method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
-            && type.isAssignableFrom(method.getReturnType())
+        var converter = stream(type.getMethods()).filter(
+            method -> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
+                && method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
+                && type.isAssignableFrom(method.getReturnType())
         ).findFirst();
 
         try {
@@ -1062,12 +1076,11 @@ public final class Utils {
     // Locale ---------------------------------------------------------------------------------------------------------
 
     /**
-     * Parses the given object representing the locale to a {@link Locale} object.
-     * If it is <code>null</code>, then return <code>null</code>.
-     * Else if it is already an instance of <code>Locale</code>, then just return it.
-     * Else if it is in pattern ISO 639 alpha-2/3, optionally followed by "_" and ISO 3166-1 alpha-2 country code, then
-     * split the language/country and construct a new <code>Locale</code> with it.
-     * Else parse it via {@link Locale#forLanguageTag(String)} and return it.
+     * Parses the given object representing the locale to a {@link Locale} object. If it is <code>null</code>, then return <code>null</code>. Else if it is
+     * already an instance of <code>Locale</code>, then just return it. Else if it is in pattern ISO 639 alpha-2/3, optionally followed by "_" and ISO 3166-1
+     * alpha-2 country code, then split the language/country and construct a new <code>Locale</code> with it. Else parse it via
+     * {@link Locale#forLanguageTag(String)} and return it.
+     * 
      * @param locale The object representing the locale.
      * @return The parsed <code>Locale</code>.
      * @since 2.3
@@ -1097,11 +1110,11 @@ public final class Utils {
     // Encoding/decoding ----------------------------------------------------------------------------------------------
 
     /**
-     * Serialize the given string to the short possible unique URL-safe representation. The current implementation will
-     * decode the given string with UTF-8 and then compress it with ZLIB using "best compression" algorithm and then
-     * Base64-encode the resulting bytes without the <code>=</code> padding, whereafter the Base64 characters
-     * <code>+</code> and <code>/</code> are been replaced by respectively <code>-</code> and <code>_</code> to make it
-     * URL-safe (so that no platform-sensitive URL-encoding needs to be done when used in URLs).
+     * Serialize the given string to the short possible unique URL-safe representation. The current implementation will decode the given string with UTF-8 and
+     * then compress it with ZLIB using "best compression" algorithm and then Base64-encode the resulting bytes without the <code>=</code> padding, whereafter
+     * the Base64 characters <code>+</code> and <code>/</code> are been replaced by respectively <code>-</code> and <code>_</code> to make it URL-safe (so that
+     * no platform-sensitive URL-encoding needs to be done when used in URLs).
+     * 
      * @param string The string to be serialized.
      * @return The serialized URL-safe string, or <code>null</code> when the given string is itself <code>null</code>.
      * @since 1.2
@@ -1125,10 +1138,10 @@ public final class Utils {
 
     /**
      * Unserialize the given serialized URL-safe string. This does the inverse of {@link #serializeURLSafe(String)}.
+     * 
      * @param string The serialized URL-safe string to be unserialized.
      * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>.
-     * @throws IllegalArgumentException When the given serialized URL-safe string is not in valid format as returned by
-     * {@link #serializeURLSafe(String)}.
+     * @throws IllegalArgumentException When the given serialized URL-safe string is not in valid format as returned by {@link #serializeURLSafe(String)}.
      * @since 1.2
      */
     public static String unserializeURLSafe(String string) {
@@ -1152,6 +1165,7 @@ public final class Utils {
 
     /**
      * URL-encode the given string using UTF-8.
+     * 
      * @param string The string to be URL-encoded using UTF-8.
      * @return The given string, URL-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
      * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -1167,6 +1181,7 @@ public final class Utils {
 
     /**
      * URL-decode the given string using UTF-8.
+     * 
      * @param string The string to be URL-decode using UTF-8.
      * @return The given string, URL-decode using UTF-8, or <code>null</code> if <code>null</code> was given.
      * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -1181,14 +1196,14 @@ public final class Utils {
     }
 
     /**
-     * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
-     * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
-     * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
-     * the space has to be %20 and some chars doesn't necessarily need to be encoded.
+     * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to URL query string parameters.
+     * {@link URLEncoder} is actually only for www (HTML) form based query string parameter values (as used when a webbrowser submits a HTML form). URI encoding
+     * has a lot in common with URL encoding, but the space has to be %20 and some chars doesn't necessarily need to be encoded.
      * <p>
-     * Since version 4.2 this method is using <a href="https://datatracker.ietf.org/doc/html/rfc3986">RFC 3986</a> rules.
-     * Previously it was using <a href="https://datatracker.ietf.org/doc/html/rfc2396">RFC 2396</a> rules. The result is
-     * therefore not per definition exactly the same, but this is supposed to be backwards compatible in modern clients.
+     * Since version 4.2 this method is using <a href="https://datatracker.ietf.org/doc/html/rfc3986">RFC 3986</a> rules. Previously it was using
+     * <a href="https://datatracker.ietf.org/doc/html/rfc2396">RFC 2396</a> rules. The result is therefore not per definition exactly the same, but this is
+     * supposed to be backwards compatible in modern clients.
+     * 
      * @param string The string to be URI-encoded using UTF-8.
      * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
      * @throws UnsupportedOperationException When this platform does not support UTF-8.
@@ -1206,9 +1221,10 @@ public final class Utils {
     }
 
     /**
-     * Format given URL with given query string. If given URL is empty, assume <code>/</code> as URL. If given query
-     * string is empty, return URL right away. If given URL contains a <code>?</code>, prepend query string with
-     * <code>&amp;</code>, else with <code>?</code>. Finally append query string to URL and return it.
+     * Format given URL with given query string. If given URL is empty, assume <code>/</code> as URL. If given query string is empty, return URL right away. If
+     * given URL contains a <code>?</code>, prepend query string with <code>&amp;</code>, else with <code>?</code>. Finally append query string to URL and
+     * return it.
+     * 
      * @param url URL to be formatted with given query string.
      * @param queryString Query string to be appended to given URL.
      * @return Formatted URL with query string.
@@ -1226,6 +1242,7 @@ public final class Utils {
 
     /**
      * Returns {@code true} when given URL contains a query string parameter with given name.
+     * 
      * @param url URL to be checked.
      * @param parameterName Parameter name to be checked.
      * @return {@code true} when given URL contains a query string parameter with given name.
@@ -1252,12 +1269,11 @@ public final class Utils {
     // Escaping/unescaping --------------------------------------------------------------------------------------------
 
     /**
-     * Escapes the given string according the JavaScript code rules. This escapes among others the special characters,
-     * the whitespace, the quotes and the unicode characters. Useful whenever you want to use a Java string variable as
-     * a JavaScript string variable.
+     * Escapes the given string according the JavaScript code rules. This escapes among others the special characters, the whitespace, the quotes and the
+     * unicode characters. Useful whenever you want to use a Java string variable as a JavaScript string variable.
+     * 
      * @param string The string to be escaped according the JavaScript code rules.
-     * @param escapeSingleQuote Whether to escape single quotes as well or not. Set to <code>false</code> if you want
-     * to escape it for usage in JSON.
+     * @param escapeSingleQuote Whether to escape single quotes as well or not. Set to <code>false</code> if you want to escape it for usage in JSON.
      * @return The escaped string according the JavaScript code rules.
      */
     public static String escapeJS(String string, boolean escapeSingleQuote) {
@@ -1290,22 +1306,22 @@ public final class Utils {
 
     private static void escapeJSControlCharacter(StringBuilder builder, char c) {
         switch (c) {
-            case '\b':
+            case '\b' :
                 builder.append('\\').append('b');
                 break;
-            case '\n':
+            case '\n' :
                 builder.append('\\').append('n');
                 break;
-            case '\t':
+            case '\t' :
                 builder.append('\\').append('t');
                 break;
-            case '\f':
+            case '\f' :
                 builder.append('\\').append('f');
                 break;
-            case '\r':
+            case '\r' :
                 builder.append('\\').append('r');
                 break;
-            default:
+            default :
                 if (c > UNICODE_1_BYTE) {
                     builder.append("\\u00").append(Integer.toHexString(c));
                 }
@@ -1319,22 +1335,22 @@ public final class Utils {
 
     private static void escapeJSASCIICharacter(StringBuilder builder, char c, boolean escapeSingleQuote) {
         switch (c) {
-            case '\'':
+            case '\'' :
                 if (escapeSingleQuote) {
                     builder.append('\\');
                 }
                 builder.append('\'');
                 break;
-            case '"':
+            case '"' :
                 builder.append('\\').append('"');
                 break;
-            case '\\':
+            case '\\' :
                 builder.append('\\').append('\\');
                 break;
-            case '/':
+            case '/' :
                 builder.append('\\').append('/');
                 break;
-            default:
+            default :
                 builder.append(c);
                 break;
         }
@@ -1344,6 +1360,7 @@ public final class Utils {
 
     /**
      * Returns connection to given resource, taking into account possibly buggy component libraries.
+     * 
      * @param context The involved faces context.
      * @param resource The resource to obtain connection from.
      * @return Connection to given resource.
@@ -1370,6 +1387,7 @@ public final class Utils {
 
     /**
      * Atomically execute the given runnable.
+     * 
      * @param lock The lock to be used for atomic execution
      * @param task The runnable to be executed atomically
      * @since 4.6
@@ -1387,6 +1405,7 @@ public final class Utils {
 
     /**
      * Atomically execute the given task and return its result.
+     * 
      * @param <R> The generic result type.
      * @param lock The {@link Lock} to be used for atomic execution
      * @param task The {@link Supplier} to be executed atomically
@@ -1403,4 +1422,5 @@ public final class Utils {
             lock.unlock();
         }
     }
+
 }

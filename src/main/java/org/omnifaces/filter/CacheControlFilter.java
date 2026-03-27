@@ -31,45 +31,40 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * This filter will control the cache-related headers of the response. Cache-related headers have a major impact on
- * performance (network bandwidth and server load) and user experience (up to date content and non-expired views).
+ * This filter will control the cache-related headers of the response. Cache-related headers have a major impact on performance (network bandwidth and server
+ * load) and user experience (up to date content and non-expired views).
  * <p>
- * By default, when no initialization parameters are specified, the filter will instruct the client (generally, the
- * webbrowser) to <strong>not</strong> cache the response. This is recommended on dynamic pages with stateful forms with
- * a <code>jakarta.faces.ViewState</code> hidden field. If such a page were cached, and the enduser navigates to it by
- * webbrowser's back button, and then re-submits it, then the enduser would face a
+ * By default, when no initialization parameters are specified, the filter will instruct the client (generally, the webbrowser) to <strong>not</strong> cache
+ * the response. This is recommended on dynamic pages with stateful forms with a <code>jakarta.faces.ViewState</code> hidden field. If such a page were cached,
+ * and the enduser navigates to it by webbrowser's back button, and then re-submits it, then the enduser would face a
  * <a href="https://stackoverflow.com/a/3642969/157882"><code>ViewExpiredException</code></a>.
  * <p>
- * However, on stateless resources, caching the response would be beneficial. Set the expire time to the same time as
- * you'd like to use as refresh interval of the resource, which can be 10 seconds (to avoid F5-madness on resources
- * which are subject to quick changes), but also minutes or even hours, days or weeks. For example, a list of links, a
- * news page, a JS/CSS/image file, etc.
+ * However, on stateless resources, caching the response would be beneficial. Set the expire time to the same time as you'd like to use as refresh interval of
+ * the resource, which can be 10 seconds (to avoid F5-madness on resources which are subject to quick changes), but also minutes or even hours, days or weeks.
+ * For example, a list of links, a news page, a JS/CSS/image file, etc.
  * <p>
  * Any sane server and client adheres the following rules as to caching:
  * <ul>
- * <li>When the enduser performs page-to-page navigation, or when the enduser selects URL in address bar and presses
- * enter key again, while the resource is cached, then the client will just load it from the cache without hitting the
- * server in any way.
+ * <li>When the enduser performs page-to-page navigation, or when the enduser selects URL in address bar and presses enter key again, while the resource is
+ * cached, then the client will just load it from the cache without hitting the server in any way.
  * <li>Or when the cache is expired, or when the enduser does a soft-refresh by pressing refresh button or F5 key, then:
  * <ul>
- * <li>When the <code>ETag</code> or <code>Last-Modified</code> header is present on cached resource, then the client
- * will perform a so-called conditional GET request with <code>If-None-Match</code> or <code>If-Modified-Since</code>
- * headers. If the server responds with HTTP status 304 ("not modified") along with the updated cache-related headers,
- * then the client will keep the resource in cache and expand its expire time based on the headers. Note:
- * <code>ETag</code> takes precedence over <code>Last-Modified</code> when both are present and consequently
- * <code>If-None-Match</code> takes precedence over <code>If-Modified-Since</code> when both are present.
+ * <li>When the <code>ETag</code> or <code>Last-Modified</code> header is present on cached resource, then the client will perform a so-called conditional GET
+ * request with <code>If-None-Match</code> or <code>If-Modified-Since</code> headers. If the server responds with HTTP status 304 ("not modified") along with
+ * the updated cache-related headers, then the client will keep the resource in cache and expand its expire time based on the headers. Note: <code>ETag</code>
+ * takes precedence over <code>Last-Modified</code> when both are present and consequently <code>If-None-Match</code> takes precedence over
+ * <code>If-Modified-Since</code> when both are present.
  * <li>When those headers are <strong>not</strong> present, then the behavior is the same as during a hard-refresh.
  * </ul>
- * <li>Or when the resource is not cached, or when the enduser does a hard-refresh by pressing <code>Ctrl</code> key
- * along with refresh button or F5, then the webbrowser will perform a fresh new request and purge any cached resource.
+ * <li>Or when the resource is not cached, or when the enduser does a hard-refresh by pressing <code>Ctrl</code> key along with refresh button or F5, then the
+ * webbrowser will perform a fresh new request and purge any cached resource.
  * </ul>
  * <p>
- * <strong>Important notice</strong>: this filter automatically skips Faces resources, such as the ones served by
- * <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>, <code>@ResourceDependency</code>, etc.
- * Their cache-related headers are namely <a href="https://stackoverflow.com/q/15057932/157882">already</a> controlled
- * by the <code>ResourceHandler</code> implementation. In Mojarra and MyFaces, the default expiration time is 1 week
- * (604800000 milliseconds), which can be configured by a <code>web.xml</code> context parameter with the following name and
- * a value in milliseconds, e.g. <code>3628800000</code> for 6 weeks:
+ * <strong>Important notice</strong>: this filter automatically skips Faces resources, such as the ones served by <code>&lt;h:outputScript&gt;</code>,
+ * <code>&lt;h:outputStylesheet&gt;</code>, <code>@ResourceDependency</code>, etc. Their cache-related headers are namely
+ * <a href="https://stackoverflow.com/q/15057932/157882">already</a> controlled by the <code>ResourceHandler</code> implementation. In Mojarra and MyFaces, the
+ * default expiration time is 1 week (604800000 milliseconds), which can be configured by a <code>web.xml</code> context parameter with the following name and a
+ * value in milliseconds, e.g. <code>3628800000</code> for 6 weeks:
  * <ul>
  * <li>Mojarra: <code>com.sun.faces.defaultResourceMaxAge</code>
  * <li>MyFaces: <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code>
@@ -79,10 +74,9 @@ import org.omnifaces.util.Servlets;
  *
  * <h2>Configuration</h2>
  * <p>
- * This filter supports the <code>expires</code> initialization parameter which must be a number between 0 and 999999999
- * with optionally the 'w', 'd', 'h', 'm' or 's' suffix standing for respectively 'week', 'day', 'hour', 'minute' and
- * 'second'. For example: '6w' is 6 weeks. The default suffix is 's'. So, when the suffix is omitted, it's treated as
- * seconds. For example: '86400' is 86400 seconds, which is effectively equal to '86400s', '1440m', '24h' and '1d'.
+ * This filter supports the <code>expires</code> initialization parameter which must be a number between 0 and 999999999 with optionally the 'w', 'd', 'h', 'm'
+ * or 's' suffix standing for respectively 'week', 'day', 'hour', 'minute' and 'second'. For example: '6w' is 6 weeks. The default suffix is 's'. So, when the
+ * suffix is omitted, it's treated as seconds. For example: '86400' is 86400 seconds, which is effectively equal to '86400s', '1440m', '24h' and '1d'.
  * <p>
  * Imagine that you've the following resources:
  * <ul>
@@ -92,6 +86,7 @@ import org.omnifaces.util.Servlets;
  * </ul>
  * <p>
  * Then you can configure the filter as follows (filter name is fully free to your choice, but keep it sensible):
+ * 
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
@@ -129,11 +124,11 @@ import org.omnifaces.util.Servlets;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
- * Note: put the more specific URL patterns in the end of filter mappings. Due to the way how filters work, there's
- * unfortunately no simple way to skip the filter on <code>/*</code> when e.g. <code>*.pdf</code> is matched. You can
- * always map the no cache filter specifically to <code>FacesServlet</code> if you intend to disable caching on
- * <strong>all</strong> Faces pages. Here's an example assuming that you've configured the <code>FacesServlet</code> with
- * a servlet name of <code>facesServlet</code>:
+ * Note: put the more specific URL patterns in the end of filter mappings. Due to the way how filters work, there's unfortunately no simple way to skip the
+ * filter on <code>/*</code> when e.g. <code>*.pdf</code> is matched. You can always map the no cache filter specifically to <code>FacesServlet</code> if you
+ * intend to disable caching on <strong>all</strong> Faces pages. Here's an example assuming that you've configured the <code>FacesServlet</code> with a servlet
+ * name of <code>facesServlet</code>:
+ * 
  * <pre>
  * &lt;filter-mapping&gt;
  *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
@@ -142,14 +137,14 @@ import org.omnifaces.util.Servlets;
  * </pre>
  *
  * <h2>Actual headers</h2>
- * <p>If the <code>expires</code> init param is set with a value which represents a time larger than 0 seconds, then the
- * following headers will be set:
+ * <p>
+ * If the <code>expires</code> init param is set with a value which represents a time larger than 0 seconds, then the following headers will be set:
  * <ul>
  * <li><code>Cache-Control: public,max-age=[expiration time in seconds],must-revalidate</code></li>
  * <li><code>Expires: [expiration date of now plus expiration time in seconds]</code></li>
  * </ul>
- * <p>If the <code>expires</code> init param is absent, or set with a value which represents a time equal to 0 seconds,
- * then the following headers will be set:
+ * <p>
+ * If the <code>expires</code> init param is absent, or set with a value which represents a time equal to 0 seconds, then the following headers will be set:
  * <ul>
  * <li><code>Cache-Control: no-cache,no-store,must-revalidate</code></li>
  * <li><code>Expires: [expiration date of 0]</code></li>
@@ -158,8 +153,9 @@ import org.omnifaces.util.Servlets;
  * </ul>
  *
  * <h2>Faces development stage</h2>
- * <p>To speed up development, caching by this filter is <strong>disabled</strong> when Faces project stage is set to
- * <code>Development</code> as per {@link Servlets#isFacesDevelopment(jakarta.servlet.ServletContext)}.
+ * <p>
+ * To speed up development, caching by this filter is <strong>disabled</strong> when Faces project stage is set to <code>Development</code> as per
+ * {@link Servlets#isFacesDevelopment(jakarta.servlet.ServletContext)}.
  *
  * @author Bauke Scholtz
  * @since 1.7
@@ -177,6 +173,7 @@ public class CacheControlFilter extends HttpFilter {
         + " seconds. For example: '86400' is 86400 seconds. Encountered an invalid value of '%s'.";
 
     private enum Unit {
+
         W(DAYS.toSeconds(DAYS_PER_WEEK)), D(DAYS.toSeconds(1)), H(HOURS.toSeconds(1)), M(MINUTES.toSeconds(1)), S(1);
 
         private long seconds;
@@ -188,6 +185,7 @@ public class CacheControlFilter extends HttpFilter {
         public long toSeconds(long value) {
             return value * seconds;
         }
+
     }
 
     // Vars -----------------------------------------------------------------------------------------------------------
@@ -228,9 +226,8 @@ public class CacheControlFilter extends HttpFilter {
      * Set the necessary response headers based on <code>expires</code> initialization parameter.
      */
     @Override
-    public void doFilter
-        (HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
-            throws ServletException, IOException
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException
     {
         if (!isFacesResourceRequest(request)) {
             setCacheHeaders(request, response, expires);

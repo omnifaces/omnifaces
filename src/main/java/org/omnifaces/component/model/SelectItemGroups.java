@@ -35,16 +35,15 @@ import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
- * The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a
- * nested collection representing groups of select items. This is basically the {@link UIComponent} counterpart of
- * <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the standard Faces API. Currently the
- * only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which
- * can end up to be quite verbose.
+ * The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a nested collection representing groups of
+ * select items. This is basically the {@link UIComponent} counterpart of <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the
+ * standard Faces API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end
+ * up to be quite verbose.
  *
  * <h2>Usage</h2>
  * <p>
- * Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a
- * <code>List&lt;Product&gt;</code>.
+ * Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a <code>List&lt;Product&gt;</code>.
+ * 
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedProduct}" converter="omnifaces.SelectItemsConverter"&gt;
  *     &lt;f:selectItem itemValue="#{null}" /&gt;
@@ -67,20 +66,25 @@ public class SelectItemGroups extends UISelectItems {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_EXPRESSION_DISALLOWED =
-        "A value expression is disallowed on 'var' attribute of SelectItemGroups.";
+    private static final String ERROR_EXPRESSION_DISALLOWED = "A value expression is disallowed on 'var' attribute of SelectItemGroups.";
 
     private enum PropertyKeys {
+
         // Cannot be uppercased. They have to exactly match the attribute names.
         VAR, itemLabel, itemValue;
-        @Override public String toString() { return this == VAR ? name().toLowerCase() : name(); }
+
+        @Override
+        public String toString() {
+            return this == VAR ? name().toLowerCase() : name();
+        }
+
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * An override which checks if this isn't been invoked on <code>var</code> attribute.
-     * Finally it delegates to the super method.
+     * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
+     * 
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -121,7 +125,12 @@ public class SelectItemGroups extends UISelectItems {
     private <S extends SelectItem> void createSelectItems(UIComponent component, Object values, Supplier<S> supplier, Consumer<S> callback) {
         Map<String, Object> attributes = component.getAttributes();
         var varName = coalesce((String) attributes.get("var"), "item");
-        forEach(values, value -> ScopedRunner.forEach(getFacesContext(), varName, value, () -> callback.accept(createSelectItem(component, getItemValue(attributes, value), supplier))));
+        forEach(
+            values, value -> ScopedRunner.forEach(
+                getFacesContext(), varName, value,
+                () -> callback.accept(createSelectItem(component, getItemValue(attributes, value), supplier))
+            )
+        );
     }
 
     private static <S extends SelectItem> S createSelectItem(UIComponent component, Object value, Supplier<S> supplier) {
@@ -150,8 +159,8 @@ public class SelectItemGroups extends UISelectItems {
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
     /**
-     * Returns the name of the EL variable which exposes the currently iterated select item group.
-     * Defaults to {@code item}.
+     * Returns the name of the EL variable which exposes the currently iterated select item group. Defaults to {@code item}.
+     * 
      * @return The name of the EL variable.
      */
     public String getVar() {
@@ -159,8 +168,8 @@ public class SelectItemGroups extends UISelectItems {
     }
 
     /**
-     * Sets the name of the EL variable which exposes the currently iterated select item group.
-     * Defaults to {@code item}.
+     * Sets the name of the EL variable which exposes the currently iterated select item group. Defaults to {@code item}.
+     * 
      * @param varName The name of the EL variable.
      */
     public void setVar(String varName) {
@@ -168,8 +177,8 @@ public class SelectItemGroups extends UISelectItems {
     }
 
     /**
-     * Returns the label of the select item group.
-     * Defaults to the String representation of {@code itemValue}.
+     * Returns the label of the select item group. Defaults to the String representation of {@code itemValue}.
+     * 
      * @return The label of the select item group.
      */
     public String getItemLabel() {
@@ -177,8 +186,8 @@ public class SelectItemGroups extends UISelectItems {
     }
 
     /**
-     * Sets the label of the select item group.
-     * Defaults to the String representation of {@code itemValue}.
+     * Sets the label of the select item group. Defaults to the String representation of {@code itemValue}.
+     * 
      * @param itemLabel The label of the select item group.
      */
     public void setItemLabel(String itemLabel) {
@@ -186,9 +195,9 @@ public class SelectItemGroups extends UISelectItems {
     }
 
     /**
-     * Returns the value of the select item group.
-     * This will be exposed to any nested UISelectItem(s) children.
-     * Defaults to the currently iterated select item group.
+     * Returns the value of the select item group. This will be exposed to any nested UISelectItem(s) children. Defaults to the currently iterated select item
+     * group.
+     * 
      * @return The value of the select item group.
      */
     public Object getItemValue() {
@@ -196,9 +205,9 @@ public class SelectItemGroups extends UISelectItems {
     }
 
     /**
-     * Sets the value of the select item group.
-     * This will be exposed to any nested UISelectItem(s) children.
-     * Defaults to the currently iterated select item group.
+     * Sets the value of the select item group. This will be exposed to any nested UISelectItem(s) children. Defaults to the currently iterated select item
+     * group.
+     * 
      * @param itemValue The value of the select item group.
      */
     public void setItemValue(Object itemValue) {

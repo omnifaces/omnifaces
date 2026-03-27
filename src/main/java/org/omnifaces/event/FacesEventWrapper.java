@@ -19,10 +19,9 @@ import jakarta.faces.event.FacesListener;
 import jakarta.faces.event.PhaseId;
 
 /**
- * Provides a simple implementation of {@link FacesEvent} that can be sub-classed by developers wishing to provide
- * specialized behavior to an existing {@link FacesEvent} instance without the need to implement/override all the
- * methods which do not necessarily need to be implemented. The default implementation of all methods expect of
- * {@link FacesEvent#getSource()} and {@link FacesEvent#getComponent()} is to call through to the wrapped
+ * Provides a simple implementation of {@link FacesEvent} that can be sub-classed by developers wishing to provide specialized behavior to an existing
+ * {@link FacesEvent} instance without the need to implement/override all the methods which do not necessarily need to be implemented. The default
+ * implementation of all methods expect of {@link FacesEvent#getSource()} and {@link FacesEvent#getComponent()} is to call through to the wrapped
  * {@link FacesEvent}.
  *
  * @author Bauke Scholtz
@@ -42,6 +41,7 @@ public abstract class FacesEventWrapper extends FacesEvent implements FacesWrapp
 
     /**
      * Construct a new faces event wrapper which wraps the given faces event for the given component.
+     * 
      * @param wrapped The faces event to be wrapped.
      * @param component The component to broadcast this event for.
      */

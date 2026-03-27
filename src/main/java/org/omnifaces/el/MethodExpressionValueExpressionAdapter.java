@@ -32,8 +32,8 @@ import jakarta.faces.validator.ValidatorException;
 /**
  * This MethodExpression wraps a ValueExpression.
  * <p>
- * With this wrapper a value expression can be used where a method expression is expected.
- * The return value of the method execution will be the value represented by the value expression.
+ * With this wrapper a value expression can be used where a method expression is expected. The return value of the method execution will be the value
+ * represented by the value expression.
  *
  * @author Arjan Tijms
  *
@@ -46,12 +46,14 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
     private static final Set<Class<? extends Throwable>> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
         MethodNotFoundException.class, // Needed for proper action listener error handling.
         ConverterException.class, // Needed for proper conversion error handling.
-        ValidatorException.class); // Needed for proper validation error handling.
+        ValidatorException.class
+    ); // Needed for proper validation error handling.
 
     private final ValueExpression valueExpression;
 
     /**
      * Construct method expression which adapts the given value expression.
+     * 
      * @param valueExpression Value expression to be adapted to method expression.
      */
     public MethodExpressionValueExpressionAdapter(ValueExpression valueExpression) {
@@ -109,6 +111,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
     /**
      * Returns the underlying value expression.
+     * 
      * @return The underlying value expression.
      */
     public ValueExpression getValueExpression() {
@@ -116,8 +119,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
     }
 
     /**
-     * Custom ELContext implementation that wraps a given ELContext to be able to provide a custom
-     * ElResolver.
+     * Custom ELContext implementation that wraps a given ELContext to be able to provide a custom ElResolver.
      *
      */
     static class ValueToInvokeElContext extends ELContextWrapper {
@@ -135,6 +137,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
         public ELResolver getELResolver() {
             return new ValueToInvokeElResolver(super.getELResolver(), callerProvidedParameters);
         }
+
     }
 
     /**
@@ -169,17 +172,21 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
             // method expression takes no parameters, but is specified with parentheses, e.g. "#{mybean.doAction()}".
             try {
                 return super.getValue(context, base, property);
-            } catch (PropertyNotFoundException ignore) {
+            }
+            catch (PropertyNotFoundException ignore) {
                 logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
 
                 try {
                     return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
-                } catch (MethodNotFoundException e) {
+                }
+                catch (MethodNotFoundException e) {
                     // Wrap into new ELException since down the call chain, ElExceptions might be caught, unwrapped one level and then wrapped in
                     // a new ELException. Without wrapping here, we'll then loose this exception.
                     throw new ELException(e.getMessage(), e);
                 }
             }
         }
+
     }
+
 }

@@ -25,21 +25,22 @@ import org.omnifaces.vdl.FacesConverterTag;
 
 /**
  * <p>
- * The <code>omnifaces.ToUpperCaseConverter</code> is intented to convert submitted {@link String} values to upper case
- * based on current {@link Locale}. Additionally, it trims any whitespace from the submitted value. This is useful for
- * among others zip code inputs.
+ * The <code>omnifaces.ToUpperCaseConverter</code> is intented to convert submitted {@link String} values to upper case based on current {@link Locale}.
+ * Additionally, it trims any whitespace from the submitted value. This is useful for among others zip code inputs.
  * <p>
  * This converter does by design no conversion in <code>getAsString()</code>.
  *
  * <h2>Usage</h2>
  * <p>
- * This converter is available by converter ID <code>omnifaces.ToUpperCaseConverter</code>. Just specify it in the
- * <code>converter</code> attribute of the component referring the <code>String</code> property. For example:
+ * This converter is available by converter ID <code>omnifaces.ToUpperCaseConverter</code>. Just specify it in the <code>converter</code> attribute of the
+ * component referring the <code>String</code> property. For example:
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.zipCode}" converter="omnifaces.ToUpperCaseConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toUpperCaseConverter&gt;</code> tag.
+ * 
  * <pre>
  * &lt;h:inputText value="#{bean.zipCode}"&gt;
  *     &lt;o:toUpperCaseConverter /&gt;

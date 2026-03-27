@@ -15,7 +15,7 @@ import { EVENT } from "./OmniFaces";
 
 /**
  * Input file client side validator (so far only maxsize is validated).
- * 
+ *
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.InputFile
  * @since 2.5
@@ -54,7 +54,7 @@ export namespace InputFile {
                 // Clear out selected files. Note: inputFile.value = null doesn't work in IE.
                 inputFile.type = "text";
                 inputFile.type = "file";
-                
+
                 const params: Record<string, string> = { fileName: fileName };
                 params[EVENT] = "validationFailed";
                 const faces = window.faces;
@@ -67,7 +67,7 @@ export namespace InputFile {
                 return false;
             }
         }
-        
+
         return true;
     }
 

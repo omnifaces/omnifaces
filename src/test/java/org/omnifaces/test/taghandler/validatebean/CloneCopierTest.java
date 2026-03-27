@@ -73,6 +73,7 @@ class CloneCopierTest {
         protected ImplementsCloneableButHasProtectedClone clone() {
             return new ImplementsCloneableButHasProtectedClone();
         }
+
     }
 
     public static class ImplementsCloneable implements Cloneable {
@@ -81,6 +82,7 @@ class CloneCopierTest {
         public ImplementsCloneable clone() {
             return new ImplementsCloneable();
         }
+
     }
 
 }

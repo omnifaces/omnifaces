@@ -23,10 +23,10 @@ import org.openqa.selenium.support.FindBy;
 
 public class ScriptErrorHandlerNoObserverIT extends OmniFacesIT {
 
-    @FindBy(id="servletRegistered")
+    @FindBy(id = "servletRegistered")
     private WebElement servletRegistered;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(ScriptErrorHandlerNoObserverIT.class);
     }

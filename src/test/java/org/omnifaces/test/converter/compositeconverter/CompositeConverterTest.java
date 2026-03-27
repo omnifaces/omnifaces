@@ -103,19 +103,51 @@ class CompositeConverterTest {
     }
 
     private static class TrimConverter implements Converter<Object> {
-        @Override public Object getAsObject(FacesContext c, UIComponent comp, String val) { return val == null ? null : val.trim(); }
-        @Override public String getAsString(FacesContext c, UIComponent comp, Object val) { return val == null ? "" : val.toString(); }
+
+        @Override
+        public Object getAsObject(FacesContext c, UIComponent comp, String val) {
+            return val == null ? null : val.trim();
+        }
+
+        @Override
+        public String getAsString(FacesContext c, UIComponent comp, Object val) {
+            return val == null ? "" : val.toString();
+        }
+
     }
 
     private static class UppercaseConverter implements Converter<Object> {
-        @Override public Object getAsObject(FacesContext c, UIComponent comp, String val) { return val == null ? null : val.toUpperCase(); }
-        @Override public String getAsString(FacesContext c, UIComponent comp, Object val) { return val == null ? "" : val.toString(); }
+
+        @Override
+        public Object getAsObject(FacesContext c, UIComponent comp, String val) {
+            return val == null ? null : val.toUpperCase();
+        }
+
+        @Override
+        public String getAsString(FacesContext c, UIComponent comp, Object val) {
+            return val == null ? "" : val.toString();
+        }
+
     }
 
     private static class WrapperConverter implements Converter<Object> {
+
         private final String tag;
-        public WrapperConverter(String tag) { this.tag = tag; }
-        @Override public Object getAsObject(FacesContext c, UIComponent comp, String val) { return tag + val; }
-        @Override public String getAsString(FacesContext c, UIComponent comp, Object val) { return tag + val; }
+
+        public WrapperConverter(String tag) {
+            this.tag = tag;
+        }
+
+        @Override
+        public Object getAsObject(FacesContext c, UIComponent comp, String val) {
+            return tag + val;
+        }
+
+        @Override
+        public String getAsString(FacesContext c, UIComponent comp, Object val) {
+            return tag + val;
+        }
+
     }
+
 }

@@ -17,7 +17,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 
-@FacesConverter(forClass=ValidateBeanITConvertedEntity.class)
+@FacesConverter(forClass = ValidateBeanITConvertedEntity.class)
 public class ValidateBeanITEntityConverter implements Converter<ValidateBeanITConvertedEntity> {
 
     @Override

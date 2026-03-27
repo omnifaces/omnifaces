@@ -17,12 +17,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This resettable buffered output stream will buffer everything until the given threshold buffer size, regardless of
- * flush calls. Only when the specified threshold buffer size is exceeded, or when {@link #close()} is called, then the
- * buffer will be actually flushed.
+ * This resettable buffered output stream will buffer everything until the given threshold buffer size, regardless of flush calls. Only when the specified
+ * threshold buffer size is exceeded, or when {@link #close()} is called, then the buffer will be actually flushed.
  * <p>
- * There is a {@link #reset()} method which enables the developer to reset the buffer, as long as it's not flushed yet,
- * which can be determined by {@link #isResettable()}.
+ * There is a {@link #reset()} method which enables the developer to reset the buffer, as long as it's not flushed yet, which can be determined by
+ * {@link #isResettable()}.
  *
  * @author Bauke Scholtz
  * @see ResettableBufferedWriter
@@ -44,9 +43,9 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Construct a new resettable buffered output stream which forcibly buffers everything until the given threshold
-     * buffer size, regardless of flush calls and calls. You need to override {@link #createOutputStream(boolean)} when
-     * using this constructor.
+     * Construct a new resettable buffered output stream which forcibly buffers everything until the given threshold buffer size, regardless of flush calls and
+     * calls. You need to override {@link #createOutputStream(boolean)} when using this constructor.
+     * 
      * @param thresholdBufferSize The threshold buffer size.
      */
     public ResettableBufferedOutputStream(int thresholdBufferSize) {
@@ -54,9 +53,9 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
     }
 
     /**
-     * Construct a new resettable buffered output stream which wraps the given output stream and forcibly buffers
-     * everything until the given threshold buffer size, regardless of flush calls. You do not need to override
-     * {@link #createOutputStream(boolean)} when using this constructor.
+     * Construct a new resettable buffered output stream which wraps the given output stream and forcibly buffers everything until the given threshold buffer
+     * size, regardless of flush calls. You do not need to override {@link #createOutputStream(boolean)} when using this constructor.
+     * 
      * @param output The wrapped output stream .
      * @param thresholdBufferSize The threshold buffer size.
      */
@@ -112,20 +111,23 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
     }
 
     /**
-     * Returns the custom implementation of the {@link OutputStream}. This will only be called when the specified
-     * threshold buffer size is exceeded, or when {@link #close()} is called.
+     * Returns the custom implementation of the {@link OutputStream}. This will only be called when the specified threshold buffer size is exceeded, or when
+     * {@link #close()} is called.
+     * 
      * @param thresholdBufferSizeExceeded Whether the threshold buffer size has exceeded.
      * @return The custom implementation of the {@link OutputStream}.
      * @throws IOException When an I/O error occurs.
      */
     protected OutputStream createOutputStream(boolean thresholdBufferSizeExceeded) throws IOException {
         throw new UnsupportedOperationException(
-            "You need to either override this method, or use the 2-arg constructor taking OutputStream instead.");
+            "You need to either override this method, or use the 2-arg constructor taking OutputStream instead."
+        );
     }
 
     /**
-     * Returns the amount of so far written bytes in the threshold buffer. This will be 0 when the threshold buffer is
-     * empty and this will be -1 when the threshold has exceeded.
+     * Returns the amount of so far written bytes in the threshold buffer. This will be 0 when the threshold buffer is empty and this will be -1 when the
+     * threshold has exceeded.
+     * 
      * @return The amount of so far written bytes in the threshold buffer.
      */
     protected int getWrittenBytes() {
@@ -171,6 +173,7 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 
     /**
      * Check if the current stream is closed and if so, then throw IO exception.
+     * 
      * @throws IOException When the current stream is closed.
      */
     private void checkClosed() throws IOException {

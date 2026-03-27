@@ -20,7 +20,7 @@ import jakarta.inject.Named;
 
 import org.omnifaces.cdi.Eager;
 
-@Eager(requestURI="/EagerIT.xhtml")
+@Eager(requestURI = "/EagerIT.xhtml")
 @Named
 @RequestScoped
 public class EagerITEagerRequestScopedBean {

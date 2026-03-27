@@ -63,4 +63,5 @@ abstract class BaseSecurityTagHandlerTest {
             test.execute();
         }
     }
+
 }

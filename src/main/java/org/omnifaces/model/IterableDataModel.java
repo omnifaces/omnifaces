@@ -27,9 +27,8 @@ import jakarta.faces.model.ListDataModel;
 /**
  * <strong>IterableDataModel</strong> is an implementation of {@link DataModel} that wraps an <code>Iterable</code>.
  * <p>
- * This can be used to encapsulate nearly every collection type, including {@link Collection} derived types such as
- * {@link List} and {@link Set}. As such this specific DataModel can be used instead of more specific DataModels like
- * {@link ListDataModel} and {@link CollectionDataModel}.
+ * This can be used to encapsulate nearly every collection type, including {@link Collection} derived types such as {@link List} and {@link Set}. As such this
+ * specific DataModel can be used instead of more specific DataModels like {@link ListDataModel} and {@link CollectionDataModel}.
  *
  * @since 1.5
  * @author Arjan.Tijms
@@ -43,6 +42,7 @@ public class IterableDataModel<E> extends DataModel<E> {
 
     /**
      * Construct the iterable data model based on the given iterable instance.
+     * 
      * @param iterable The iterable instance to construct the iterable data model for.
      */
     public IterableDataModel(Iterable<E> iterable) {
@@ -109,7 +109,8 @@ public class IterableDataModel<E> extends DataModel<E> {
             iterable = null;
             list = null;
             setRowIndex(-1);
-        } else {
+        }
+        else {
             iterable = (Iterable<E>) data;
             list = iterableToList(iterable);
             setRowIndex(0);

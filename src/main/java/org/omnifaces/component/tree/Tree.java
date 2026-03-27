@@ -46,25 +46,21 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
- * hierarchy by declaring the appropriate Faces components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
- * does namely not render any HTML markup by itself.
+ * The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree hierarchy by declaring the appropriate Faces components
+ * or HTML elements in the markup. The <code>&lt;o:tree&gt;</code> does namely not render any HTML markup by itself.
  * <p>
- * The component value must point to a tree of data objects represented by a {@link TreeModel} instance, typically
- * established via a {@link ValueExpression}. During iterative processing over the nodes of tree in the tree model,
- * the object for the current node is exposed as a request attribute under the key specified by the <code>var</code>
- * attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code>
- * attribute.
+ * The component value must point to a tree of data objects represented by a {@link TreeModel} instance, typically established via a {@link ValueExpression}.
+ * During iterative processing over the nodes of tree in the tree model, the object for the current node is exposed as a request attribute under the key
+ * specified by the <code>var</code> attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code> attribute.
  * <p>
- * The <code>&lt;o:tree&gt;</code> tag supports only child tags of type <code>&lt;o:treeNode&gt;</code>, representing
- * parent tree nodes. There can be multiple <code>&lt;o:treeNode&gt;</code> tags, each representing a separate parent
- * tree node level, so that different markup could be declared for each tree node level, if necessary. The
- * <code>&lt;o:treeNode&gt;</code> tag in turn supports child tag <code>&lt;o:treeNodeItem&gt;</code> which represents
- * each child of the current parent tree node. The <code>&lt;o:treeNodeItem&gt;</code> in turn supports child tag
- * <code>&lt;o:treeInsertChildren&gt;</code> which represents the insertion point of the grand children.
+ * The <code>&lt;o:tree&gt;</code> tag supports only child tags of type <code>&lt;o:treeNode&gt;</code>, representing parent tree nodes. There can be multiple
+ * <code>&lt;o:treeNode&gt;</code> tags, each representing a separate parent tree node level, so that different markup could be declared for each tree node
+ * level, if necessary. The <code>&lt;o:treeNode&gt;</code> tag in turn supports child tag <code>&lt;o:treeNodeItem&gt;</code> which represents each child of
+ * the current parent tree node. The <code>&lt;o:treeNodeItem&gt;</code> in turn supports child tag <code>&lt;o:treeInsertChildren&gt;</code> which represents
+ * the insertion point of the grand children.
  * <p>
- * Here is a basic usage example where each parent tree node level is treated the same way via a single
- * <code>&lt;o:treeNode&gt;</code>:
+ * Here is a basic usage example where each parent tree node level is treated the same way via a single <code>&lt;o:treeNode&gt;</code>:
+ * 
  * <pre>
  * &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
  *     &lt;o:treeNode&gt;
@@ -82,30 +78,27 @@ import org.omnifaces.util.State;
  *
  * <h2>treeNode</h2>
  * <p>
- * The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code>
- * attribute of the <code>&lt;o:tree&gt;</code> will expose the parent tree node. Each of its children is processed by
- * <code>&lt;o:treeNodeItem&gt;</code> on which the <code>var</code> attribute of the <code>&lt;o:tree&gt;</code> in
- * turn exposes each child of the parent tree node.
+ * The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code> attribute of the <code>&lt;o:tree&gt;</code>
+ * will expose the parent tree node. Each of its children is processed by <code>&lt;o:treeNodeItem&gt;</code> on which the <code>var</code> attribute of the
+ * <code>&lt;o:tree&gt;</code> in turn exposes each child of the parent tree node.
  * <p>
- * The optional <code>level</code> attribute can be used to specify for which tree node level as obtained by
- * {@link TreeModel#getLevel()} the <code>&lt;o:treeNode&gt;</code> should be rendered. The root tree node has level 0.
- * If the <code>level</code> attribute is unspecified, then the <code>&lt;o:treeNode&gt;</code> will be rendered for any
- * tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
+ * The optional <code>level</code> attribute can be used to specify for which tree node level as obtained by {@link TreeModel#getLevel()} the
+ * <code>&lt;o:treeNode&gt;</code> should be rendered. The root tree node has level 0. If the <code>level</code> attribute is unspecified, then the
+ * <code>&lt;o:treeNode&gt;</code> will be rendered for any tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
  *
  * <h2>treeNodeItem</h2>
  * <p>
- * The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by
- * <code>&lt;o:treeNode&gt;</code>. Within this component, the <code>var</code> attribute of the parent
- * <code>&lt;o:tree&gt;</code> component will expose the child tree node.
+ * The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by <code>&lt;o:treeNode&gt;</code>. Within this
+ * component, the <code>var</code> attribute of the parent <code>&lt;o:tree&gt;</code> component will expose the child tree node.
  * <p>
- * Within <code>&lt;o:treeNodeItem&gt;</code> you can use <code>&lt;o:treeInsertChildren&gt;</code> to declare the
- * place where to recursively render the <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn
- * interpreted as a parent tree node (i.e. where you'd like to insert the grand-children).
+ * Within <code>&lt;o:treeNodeItem&gt;</code> you can use <code>&lt;o:treeInsertChildren&gt;</code> to declare the place where to recursively render the
+ * <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn interpreted as a parent tree node (i.e. where you'd like to insert the
+ * grand-children).
  *
  * <h2>treeInsertChildren</h2>
  * <p>
- * The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn
- * further interpreted as <code>&lt;o:treeNode&gt;</code>.
+ * The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn further interpreted as
+ * <code>&lt;o:treeNode&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see TreeNode
@@ -128,12 +121,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String ERROR_EXPRESSION_DISALLOWED =
-        "A value expression is disallowed on 'var' and 'varNode' attributes of Tree.";
-    private static final String ERROR_INVALID_MODEL =
-        "Tree accepts only model of type TreeModel. Encountered model of type '%s'.";
-    private static final String ERROR_DUPLICATE_NODE =
-        "TreeNode with level '%s' is already declared. Choose a different level or remove it.";
+    private static final String ERROR_EXPRESSION_DISALLOWED = "A value expression is disallowed on 'var' and 'varNode' attributes of Tree.";
+    private static final String ERROR_INVALID_MODEL = "Tree accepts only model of type TreeModel. Encountered model of type '%s'.";
+    private static final String ERROR_DUPLICATE_NODE = "TreeNode with level '%s' is already declared. Choose a different level or remove it.";
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
@@ -151,6 +141,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * An override which appends the index of the current model node to the client ID chain, if any available.
+     * 
      * @see TreeModel#getIndex()
      */
     @Override
@@ -169,10 +160,9 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * An override which checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute.
-     * Finally it delegates to the super method.
-     * @throws IllegalArgumentException When this value expression is been set on <code>var</code> or
-     * <code>varNode</code> attribute.
+     * An override which checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute. Finally it delegates to the super method.
+     * 
+     * @throws IllegalArgumentException When this value expression is been set on <code>var</code> or <code>varNode</code> attribute.
      */
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
@@ -193,8 +183,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Validate the component hierarchy.
-     * @throws IllegalStateException When this component is nested in another {@link Tree}, or when there aren't any
-     * children of type {@link TreeNode}.
+     * 
+     * @throws IllegalStateException When this component is nested in another {@link Tree}, or when there aren't any children of type {@link TreeNode}.
      */
     @Override
     protected void validateHierarchy(FacesContext context) {
@@ -205,6 +195,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Set the root node as current node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      */
@@ -233,6 +224,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Set the root node as current node and delegate the call to {@link #visitTreeNode(VisitContext, VisitCallback)}.
+     * 
      * @param context The visit context to work with.
      * @param callback The visit callback to work with.
      * @return The visit result.
@@ -270,9 +262,8 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * If the given event is an instance of the specific faces event which was created during our
-     * {@link #queueEvent(FacesEvent)}, then extract the node from it and set it as current node and delegate the call
-     * to the wrapped faces event.
+     * If the given event is an instance of the specific faces event which was created during our {@link #queueEvent(FacesEvent)}, then extract the node from it
+     * and set it as current node and delegate the call to the wrapped faces event.
      */
     @Override
     public void broadcast(FacesEvent event) {
@@ -300,9 +291,10 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
-     * with the level of the current model node. If it isn't null, then process it according to the rules of the given
-     * phase ID. This method is also called by {@link TreeInsertChildren#process(FacesContext, PhaseId)}.
+     * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated with the level of the current model node.
+     * If it isn't null, then process it according to the rules of the given phase ID. This method is also called by
+     * {@link TreeInsertChildren#process(FacesContext, PhaseId)}.
+     * 
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      * @see TreeModel#isLeaf()
@@ -320,9 +312,10 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
-     * with the level of the current model node. If it isn't null, then visit it according to the given visit context
-     * and callback. This method is also called by {@link TreeInsertChildren#visitTree(VisitContext, VisitCallback)}.
+     * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated with the level of the current model node.
+     * If it isn't null, then visit it according to the given visit context and callback. This method is also called by
+     * {@link TreeInsertChildren#visitTree(VisitContext, VisitCallback)}.
+     * 
      * @param context The visit context to work with.
      * @param callback The visit callback to work with.
      * @return <code>true</code> if the visit is complete.
@@ -341,8 +334,9 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * Convenience method to handle {@link #process(FacesContext, PhaseId)},
-     * {@link #visitTree(VisitContext, VisitCallback)} and {@link #broadcast(FacesEvent)} without code duplication.
+     * Convenience method to handle {@link #process(FacesContext, PhaseId)}, {@link #visitTree(VisitContext, VisitCallback)} and {@link #broadcast(FacesEvent)}
+     * without code duplication.
+     * 
      * @param context The faces context to work with.
      * @param node The current tree model node.
      * @param callback The callback to be invoked.
@@ -365,8 +359,9 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and
-     * {@link #visitTreeNode(VisitContext, VisitCallback)} without code duplication.
+     * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and {@link #visitTreeNode(VisitContext, VisitCallback)} without code
+     * duplication.
+     * 
      * @param phaseId The current phase ID.
      * @param callback The callback to be invoked.
      * @return The callback result.
@@ -387,6 +382,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+     * 
      * @param phaseId The current phase ID.
      * @return The tree nodes.
      * @throws IllegalStateException When there are multiple {@link TreeNode} components with the same level.
@@ -409,6 +405,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the tree model associated with the <code>value</code> attribute.
+     * 
      * @param phaseId The current phase ID.
      * @return The tree model.
      * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
@@ -432,8 +429,8 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * Capture the original values of the request attributes associated with the component attributes <code>var</code>
-     * and <code>varNode</code>.
+     * Capture the original values of the request attributes associated with the component attributes <code>var</code> and <code>varNode</code>.
+     * 
      * @param context The faces context to work with.
      * @return An object array with the two values.
      */
@@ -453,6 +450,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Set the values associated with the <code>var</code> and <code>varNode</code> attributes.
+     * 
      * @param context The faces context to work with.
      * @param vars An object array with the two values.
      */
@@ -475,9 +473,9 @@ public class Tree extends TreeFamily implements NamingContainer {
     // Internal getters/setters ---------------------------------------------------------------------------------------
 
     /**
-     * Sets the current node of the tree model. Its wrapped data will be set as request attribute associated with the
-     * <code>var</code> attribute, if any. The node itself will also be set as request attribute associated with the
-     * <code>varNode</code> attribute, if any.
+     * Sets the current node of the tree model. Its wrapped data will be set as request attribute associated with the <code>var</code> attribute, if any. The
+     * node itself will also be set as request attribute associated with the <code>varNode</code> attribute, if any.
+     * 
      * @param context The faces context to work with.
      * @param currentModelNode The current node of the tree model.
      */
@@ -495,6 +493,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the current node of the tree model.
+     * 
      * @return The current node of the tree model.
      */
     protected TreeModel getCurrentModelNode() {
@@ -505,6 +504,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the tree model. Only {@link TreeModel} is allowed as value.
+     * 
      * @return The tree model.
      */
     public Object getValue() {
@@ -513,6 +513,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Sets the tree model. Only {@link TreeModel} is allowed as value.
+     * 
      * @param value The tree model.
      */
     public void setValue(Object value) {
@@ -521,6 +522,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the name of the request attribute which exposes the wrapped data of the current node of the tree model.
+     * 
      * @return The name of the request attribute which exposes the wrapped data of the current node of the tree model.
      */
     public String getVar() {
@@ -529,8 +531,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Sets the name of the request attribute which exposes the wrapped data of the current node of the tree model.
-     * @param varName The name of the request attribute which exposes the wrapped data of the current node of the tree
-     * model.
+     * 
+     * @param varName The name of the request attribute which exposes the wrapped data of the current node of the tree model.
      */
     public void setVar(String varName) {
         state.put(PropertyKeys.var, varName);
@@ -538,6 +540,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Returns the name of the request attribute which exposes the current node of the tree model.
+     * 
      * @return The name of the request attribute which exposes the current node of the tree model.
      */
     public String getVarNode() {
@@ -546,6 +549,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     /**
      * Sets the name of the request attribute which exposes the current node of the tree model.
+     * 
      * @param varNode The name of the request attribute which exposes the current node of the tree model.
      */
     public void setVarNode(String varNode) {

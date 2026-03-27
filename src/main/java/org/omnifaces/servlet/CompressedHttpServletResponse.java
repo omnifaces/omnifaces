@@ -36,8 +36,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.omnifaces.io.ResettableBufferedOutputStream;
 
 /**
- * This HTTP servlet response wrapper will compress the response with the given algorithm when the given threshold has
- * exceeded and the response content type matches one of the given mimetypes.
+ * This HTTP servlet response wrapper will compress the response with the given algorithm when the given threshold has exceeded and the response content type
+ * matches one of the given mimetypes.
  *
  * @author Bauke Scholtz
  * @since 4.5
@@ -59,7 +59,8 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
          * <li>{@code com.nixxcode.jvmbrotli.enc.BrotliOutputStream}</li>
          * </ul>
          */
-        BROTLI("br",
+        BROTLI(
+            "br",
             load("com.aayushatharva.brotli4j.Brotli4jLoader#ensureAvailability", "com.aayushatharva.brotli4j.encoder.BrotliOutputStream"),
             load("com.nixxcode.jvmbrotli.common.BrotliLoader#isBrotliAvailable", "com.nixxcode.jvmbrotli.enc.BrotliOutputStream")
         ),
@@ -83,8 +84,9 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         }
 
         /**
-         * Returns the encoding directive. This basically represents the unique identifier of the algorithm in the HTTP
-         * {@code Accept-Encoding} header as well as the HTTP {@code Content-Encoding} header.
+         * Returns the encoding directive. This basically represents the unique identifier of the algorithm in the HTTP {@code Accept-Encoding} header as well
+         * as the HTTP {@code Content-Encoding} header.
+         * 
          * @return The directive.
          */
         public String getEncodingDirective() {
@@ -93,6 +95,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns the output stream class being used.
+         * 
          * @return The output stream class being used.
          */
         public Class<? extends OutputStream> getOutputStreamClass() {
@@ -101,6 +104,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns {@code true} if this algorithm is available.
+         * 
          * @return {@code true} if this algorithm is available.
          */
         public boolean isAvailable() {
@@ -109,17 +113,19 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns {@code true} if the given request accepts this algorithm.
+         * 
          * @param request The involved HTTP servlet request.
          * @return {@code true} if the given request accepts this algorithm.
          */
         public boolean accepts(HttpServletRequest request) {
             return isAvailable() && list(request.getHeaders("Accept-Encoding")).stream()
-                    .flatMap(value -> splitAndTrim(value, ","))
-                    .anyMatch(encodingDirective::equals);
+                .flatMap(value -> splitAndTrim(value, ","))
+                .anyMatch(encodingDirective::equals);
         }
 
         /**
          * Returns an output stream which is compressed using this algorithm for the given HTTP servlet response.
+         * 
          * @param response The HTTP servlet response to be compressed with this algorithm.
          * @return An output stream which is compressed using this algorithm.
          * @throws IOException When the output stream cannot be constructed because of IO reason.
@@ -142,6 +148,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns the best algorithm matching the given HTTP servlet request.
+         * 
          * @param request The HTTP servlet request to find the best algorithm for.
          * @return The best algorithm matching the given HTTP servlet request.
          */
@@ -157,9 +164,10 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
             var loader = loaderSignature.split("#");
             return ofNullable(toClassOrNull(loader[0]))
-                    .filter(loaderClass -> invokeStaticMethod(loaderClass, loader[1]) != FALSE)
-                    .map($ -> toClassOrNull(outputStreamClassName)).orElse(null);
+                .filter(loaderClass -> invokeStaticMethod(loaderClass, loader[1]) != FALSE)
+                .map($ -> toClassOrNull(outputStreamClassName)).orElse(null);
         }
+
     }
 
     // Properties -----------------------------------------------------------------------------------------------------
@@ -177,6 +185,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
     /**
      * Construct a new compressed HTTP servlet response based on the given response, algorithm, threshold and mimetypes.
+     * 
      * @param response The HTTP servlet response.
      * @param algorithm The compression algorithm to use.
      * @param threshold The compression buffer threshold.
@@ -284,8 +293,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
     /**
      * This output stream will switch to HTTP response compression when the given threshold is exceeded.
      * <p>
-     * This is an inner class because it needs to be able to manipulate the response headers once the decision whether
-     * to compress or not has been made.
+     * This is an inner class because it needs to be able to manipulate the response headers once the decision whether to compress or not has been made.
      *
      * @author Bauke Scholtz
      */
@@ -300,10 +308,9 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         // Actions ----------------------------------------------------------------------------------------------------
 
         /**
-         * Create compressed output stream if necessary. That is, when the given <code>doCompress</code> argument is
-         * <code>true</code>, the current response does not have the <code>Cache-Control: no-transform</code> or
-         * <code>Content-Range</code> headers, the current response is not committed, the content type is not
-         * <code>null</code> and the content type matches one of the mimetypes.
+         * Create compressed output stream if necessary. That is, when the given <code>doCompress</code> argument is <code>true</code>, the current response
+         * does not have the <code>Cache-Control: no-transform</code> or <code>Content-Range</code> headers, the current response is not committed, the content
+         * type is not <code>null</code> and the content type matches one of the mimetypes.
          */
         @Override
         public OutputStream createOutputStream(boolean doCompress) throws IOException {
@@ -329,5 +336,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
             return originalResponse.getOutputStream();
         }
+
     }
+
 }

@@ -27,8 +27,8 @@ import jakarta.faces.context.FacesContext;
 import org.omnifaces.util.Servlets;
 
 /**
- * Facelets resource handler that resolves mapped resources (views) to the folders from which
- * those views were scanned (like the the special auto-scanned faces-views folder).
+ * Facelets resource handler that resolves mapped resources (views) to the folders from which those views were scanned (like the the special auto-scanned
+ * faces-views folder).
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
@@ -41,6 +41,7 @@ public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 
     /**
      * Construct faces views resource handler.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public FacesViewsResourceHandler(ResourceHandler wrapped) {

@@ -42,13 +42,14 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * The {@link MutableRequestFilter} will wrap the incoming {@link HttpServletRequest} in a {@link MutableRequest} so
- * that the developer can mutate the headers and parameters in such way that the outcome of among others
- * {@link HttpServletRequest#getHeader(String)} and {@link HttpServletRequest#getParameter(String)} are influenced.
+ * The {@link MutableRequestFilter} will wrap the incoming {@link HttpServletRequest} in a {@link MutableRequest} so that the developer can mutate the headers
+ * and parameters in such way that the outcome of among others {@link HttpServletRequest#getHeader(String)} and {@link HttpServletRequest#getParameter(String)}
+ * are influenced.
  *
  * <h2>Installation</h2>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
+ * 
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;mutableRequestFilter&lt;/filter-name&gt;
@@ -60,15 +61,13 @@ import org.omnifaces.util.Servlets;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
- * The ordering of the <code>&lt;filter-mapping&gt;</code> is significant. The {@link MutableRequest} is not available
- * in any filter which is mapped <em>before</em> the {@link MutableRequestFilter}.
+ * The ordering of the <code>&lt;filter-mapping&gt;</code> is significant. The {@link MutableRequest} is not available in any filter which is mapped
+ * <em>before</em> the {@link MutableRequestFilter}.
  *
  * <h2>Usage</h2>
  * <p>
- * When inside {@link FacesContext}, use {@link Faces#getMutableRequestHeaderMap()} or
- * {@link Faces#getMutableRequestParameterMap()}.
- * Or when having only a {@link HttpServletRequest} at hands, use
- * {@link Servlets#getMutableRequestHeaderMap(HttpServletRequest)} or
+ * When inside {@link FacesContext}, use {@link Faces#getMutableRequestHeaderMap()} or {@link Faces#getMutableRequestParameterMap()}. Or when having only a
+ * {@link HttpServletRequest} at hands, use {@link Servlets#getMutableRequestHeaderMap(HttpServletRequest)} or
  * {@link Servlets#getMutableRequestParameterMap(HttpServletRequest)}.
  *
  * @author Bauke Scholtz
@@ -104,7 +103,9 @@ public class MutableRequestFilter extends HttpFilter {
      * Creates and sets the mutable request.
      */
     @Override
-    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+        throws ServletException, IOException
+    {
         var mutableRequest = new MutableRequest(request);
         request.setAttribute(MUTABLE_REQUEST, mutableRequest);
         chain.doFilter(mutableRequest, response);
@@ -112,6 +113,7 @@ public class MutableRequestFilter extends HttpFilter {
 
     /**
      * Returns the mutable request.
+     * 
      * @return The mutable request.
      * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
      * @since 3.14
@@ -143,6 +145,7 @@ public class MutableRequestFilter extends HttpFilter {
 
         /**
          * Returns the mutable header map of the current request.
+         * 
          * @return The mutable header map of the current request.
          */
         public Map<String, List<String>> getMutableHeaderMap() {
@@ -198,6 +201,7 @@ public class MutableRequestFilter extends HttpFilter {
 
         /**
          * Returns the mutable parameter map of the current request.
+         * 
          * @return The mutable parameter map of the current request.
          */
         public Map<String, List<String>> getMutableParameterMap() {
@@ -220,8 +224,10 @@ public class MutableRequestFilter extends HttpFilter {
 
         @Override
         public Map<String, String[]> getParameterMap() {
-            return unmodifiableMap(getMutableParameterMap().entrySet().stream()
-                .collect(toMap(Entry::getKey, entry -> toArray(entry.getValue()))));
+            return unmodifiableMap(
+                getMutableParameterMap().entrySet().stream()
+                    .collect(toMap(Entry::getKey, entry -> toArray(entry.getValue())))
+            );
         }
 
         @Override

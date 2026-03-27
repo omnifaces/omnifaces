@@ -26,8 +26,7 @@ import jakarta.faces.context.FacesContext;
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Provide a context for the <code>&#64;</code>{@link ViewScoped} annotation wherein beans are managed by
- * {@link ViewScopeManager}.
+ * Provide a context for the <code>&#64;</code>{@link ViewScoped} annotation wherein beans are managed by {@link ViewScopeManager}.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -52,8 +51,8 @@ public class ViewScopeContext implements Context {
     }
 
     /**
-     * Returns <code>true</code> if there is a {@link FacesContext}, and it has a {@link UIViewRoot}, and
-     * {@link #isInitialized()} has returned <code>true</code>.
+     * Returns <code>true</code> if there is a {@link FacesContext}, and it has a {@link UIViewRoot}, and {@link #isInitialized()} has returned
+     * <code>true</code>.
      */
     @Override
     public boolean isActive() {
@@ -77,6 +76,7 @@ public class ViewScopeContext implements Context {
 
     /**
      * Check and initialize the view scope manager.
+     * 
      * @return <code>true</code> if it has been initialized.
      */
     private boolean isInitialized() {
@@ -89,6 +89,7 @@ public class ViewScopeContext implements Context {
 
     /**
      * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
+     * 
      * @throws ContextNotActiveException When context is not active.
      */
     private void checkActive() {

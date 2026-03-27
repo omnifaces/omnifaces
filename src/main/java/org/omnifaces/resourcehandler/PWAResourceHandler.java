@@ -65,22 +65,21 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * This {@link ResourceHandler} generates the <code>manifest.json</code> and also an offline-aware <code>sw.js</code>
- * based on any {@link WebAppManifest} found in the runtime classpath. Historical note: this class was introduced in 3.6
- * as <code>WebAppManifestResourceHandler</code> without any service worker related logic and since 3.7 renamed to
- * <code>PWAResourceHandler</code> after having service worker related logic added.
+ * This {@link ResourceHandler} generates the <code>manifest.json</code> and also an offline-aware <code>sw.js</code> based on any {@link WebAppManifest} found
+ * in the runtime classpath. Historical note: this class was introduced in 3.6 as <code>WebAppManifestResourceHandler</code> without any service worker related
+ * logic and since 3.7 renamed to <code>PWAResourceHandler</code> after having service worker related logic added.
  *
  * <h2>Usage</h2>
  * <ol>
  * <li>Create a class which extends {@link WebAppManifest} in your web application project.</li>
- * <li>Give it the appropriate CDI scope annotation, e.g {@link ApplicationScoped}, {@link SessionScoped} or even
- * {@link RequestScoped} (note that a {@link ViewScoped} won't work).</li>
- * <li>Override properties accordingly conform javadoc and the rules in
- * <a href="https://www.w3.org/TR/appmanifest/">the W3 spec</a>.</li>
+ * <li>Give it the appropriate CDI scope annotation, e.g {@link ApplicationScoped}, {@link SessionScoped} or even {@link RequestScoped} (note that a
+ * {@link ViewScoped} won't work).</li>
+ * <li>Override properties accordingly conform javadoc and the rules in <a href="https://www.w3.org/TR/appmanifest/">the W3 spec</a>.</li>
  * <li>Reference it as <code>#{resource['omnifaces:manifest.webmanifest']}</code> in your template.
  * </ol>
  * <p>
  * Here's a concrete example:
+ * 
  * <pre>
  * package com.example;
  *
@@ -141,29 +140,28 @@ import org.omnifaces.util.Json;
  *             RelatedApplication.of(Platform.ITUNES, "https://itunes.apple.com/app/example-app1/id123456789")
  *         );
  *     }
+ * 
  * }
  * </pre>
  * <p>
- * Reference it in your template exactly as follows, with the exact library name of <code>omnifaces</code> and
- * exact resource name of <code>manifest.webmanifest</code>. You cannot change these values.
+ * Reference it in your template exactly as follows, with the exact library name of <code>omnifaces</code> and exact resource name of
+ * <code>manifest.webmanifest</code>. You cannot change these values.
+ * 
  * <pre>
  * &lt;link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" crossorigin="use-credentials" /&gt;
  * </pre>
  * <p>
- * The <code>crossorigin</code> attribute is optional, you can drop it, but it's mandatory if you've put the
- * {@link SessionScoped} annotation on your {@link WebAppManifest} bean, else the browser won't retain the session
- * cookies while downloading the <code>manifest.json</code> and then this resource handler won't be able to maintain the
- * server side cache, see also next section.
+ * The <code>crossorigin</code> attribute is optional, you can drop it, but it's mandatory if you've put the {@link SessionScoped} annotation on your
+ * {@link WebAppManifest} bean, else the browser won't retain the session cookies while downloading the <code>manifest.json</code> and then this resource
+ * handler won't be able to maintain the server side cache, see also next section.
  * <p>
- * For backwards compatibility with earlier OmniFaces versions, the resource name of <code>manifest.json</code> is also
- * supported. The default resource name has changed fo <code>manifest.webmanifest</code> since version 4.2 in order to
- * comply the new change in <a href="https://w3c.github.io/manifest/#using-a-link-element-to-link-to-a-manifest">W3C spec</a>.
- * The resource will use the <code>application/manifest+json</code> content type. In case you face the following warning
- * in server logs or something similar,
- * <blockquote>WARNING: JSF1091: No mime type could be found for file manifest.webmanifest.
- * To resolve this, add a mime-type mapping to the applications web.xml.
- * </blockquote>
- * then take action accordingly by adding the following entry to your <code>web.xml</code>:
+ * For backwards compatibility with earlier OmniFaces versions, the resource name of <code>manifest.json</code> is also supported. The default resource name has
+ * changed fo <code>manifest.webmanifest</code> since version 4.2 in order to comply the new change in
+ * <a href="https://w3c.github.io/manifest/#using-a-link-element-to-link-to-a-manifest">W3C spec</a>. The resource will use the
+ * <code>application/manifest+json</code> content type. In case you face the following warning in server logs or something similar, <blockquote>WARNING:
+ * JSF1091: No mime type could be found for file manifest.webmanifest. To resolve this, add a mime-type mapping to the applications web.xml. </blockquote> then
+ * take action accordingly by adding the following entry to your <code>web.xml</code>:
+ * 
  * <pre>
  * &lt;mime-mapping&gt;
  *     &lt;extension&gt;webmanifest&lt;/extension&gt;
@@ -171,36 +169,35 @@ import org.omnifaces.util.Json;
  * &lt;/mime-mapping&gt;
  * </pre>
  * <p>
- * Note: you do not need to explicitly register this resource handler in your <code>faces-config.xml</code>. It's
- * already automatically registered.
+ * Note: you do not need to explicitly register this resource handler in your <code>faces-config.xml</code>. It's already automatically registered.
  *
  * <h2>Server side caching</h2>
  * <p>
- * Basically, the CDI scope annotation being used is determinative for the autogenerated <code>v=</code> query
- * parameter indicating the last modified timestamp. If you make your {@link WebAppManifest} bean {@link RequestScoped},
- * then it'll change on every request and the browser will be forced to re-download it. If you can however guarantee
- * that the properties of your {@link WebAppManifest} are static, and thus you can safely make it
- * {@link ApplicationScoped}, then the <code>v=</code> query parameter will basically represent the timestamp of
- * the first time the bean is instantiated.
+ * Basically, the CDI scope annotation being used is determinative for the autogenerated <code>v=</code> query parameter indicating the last modified timestamp.
+ * If you make your {@link WebAppManifest} bean {@link RequestScoped}, then it'll change on every request and the browser will be forced to re-download it. If
+ * you can however guarantee that the properties of your {@link WebAppManifest} are static, and thus you can safely make it {@link ApplicationScoped}, then the
+ * <code>v=</code> query parameter will basically represent the timestamp of the first time the bean is instantiated.
  *
  * <h2>Offline-aware service worker</h2>
  * <p>
- * The generated <code>sw.js</code> will by default auto-register the {@link WebAppManifest#getStartUrl()} and all
- * welcome files from <code>web.xml</code> as cacheable resources which are also available offline. You can override
- * the welcome files with {@link WebAppManifest#getCacheableViewIds()}. E.g.
+ * The generated <code>sw.js</code> will by default auto-register the {@link WebAppManifest#getStartUrl()} and all welcome files from <code>web.xml</code> as
+ * cacheable resources which are also available offline. You can override the welcome files with {@link WebAppManifest#getCacheableViewIds()}. E.g.
+ * 
  * <pre>
+ * 
  * &#64;Override
  * public Collection&lt;String&gt; getCacheableViewIds() {
  *     return Arrays.asList("/index.xhtml", "/contact.xhtml", "/support.xhtml");
  * }
  * </pre>
  * <p>
- * If this method returns an empty collection, i.e. there are no cacheable resources at all, and thus also no offline
- * resources at all, then no service worker file will be generated as it won't have any use then.
+ * If this method returns an empty collection, i.e. there are no cacheable resources at all, and thus also no offline resources at all, then no service worker
+ * file will be generated as it won't have any use then.
  * <p>
- * In case you want to show a custom page as "You are offline!" error page, then you can specify it by overriding
- * the {@link WebAppManifest#getOfflineViewId()}.
+ * In case you want to show a custom page as "You are offline!" error page, then you can specify it by overriding the {@link WebAppManifest#getOfflineViewId()}.
+ * 
  * <pre>
+ * 
  * &#64;Override
  * public String getOfflineViewId() {
  *     return "/offline.xhtml";
@@ -208,22 +205,24 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Whereby the <code>offline.xhtml</code> should contain something like this:
+ * 
  * <pre>
  * &lt;h1&gt;Whoops! You appear to be offline!&lt;/h1&gt;
  * &lt;p&gt;Please check your connection and then try refreshing this page.&lt;/p&gt;
  * </pre>
  * <p>
- * For each of those "cacheable view IDs" and "offline view IDs", the Faces view briefly will be built in in order to
- * extract all <code>&lt;x:outputStylesheet&gt;</code>,<code>&lt;x:outputScript&gt;</code> and
- * <code>&lt;x:graphicImage&gt;</code> resources and add them to cacheable resources of the service worker as well.
+ * For each of those "cacheable view IDs" and "offline view IDs", the Faces view briefly will be built in in order to extract all
+ * <code>&lt;x:outputStylesheet&gt;</code>,<code>&lt;x:outputScript&gt;</code> and <code>&lt;x:graphicImage&gt;</code> resources and add them to cacheable
+ * resources of the service worker as well.
  * <p>
- * If the {@link WebAppManifest#getCacheableViewIds()} returns an empty collection, then no <code>sw.js</code> will
- * be generated, and {@link WebAppManifest#getOfflineViewId()} will also be ignored.
+ * If the {@link WebAppManifest#getCacheableViewIds()} returns an empty collection, then no <code>sw.js</code> will be generated, and
+ * {@link WebAppManifest#getOfflineViewId()} will also be ignored.
  *
  * <h2>Client side events</h2>
  * <p>
- * In the client side, you can listen on <code>omnifaces.offline</code> and <code>omnifaces.online</code> events in the
- * <code>window</code> whether the client is currently online or offline.
+ * In the client side, you can listen on <code>omnifaces.offline</code> and <code>omnifaces.online</code> events in the <code>window</code> whether the client
+ * is currently online or offline.
+ * 
  * <pre>
  * window.addEventListener("omnifaces.online", function(event) {
  *     var url = event.detail.url;
@@ -237,6 +236,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Or when you're using jQuery:
+ * 
  * <pre>
  * $(window).on("omnifaces.online", function(event) {
  *     var url = event.detail.url;
@@ -249,10 +249,9 @@ import org.omnifaces.util.Json;
  * });
  * </pre>
  * <p>
- * This gives you the opportunity to set a global flag and/or show some sort of notification.
- * The <code>event.detail</code> will contain at least the <code>url</code> which was being requested through the
- * service worker, and in case of the <code>omnifaces.offline</code> event, there will also be an <code>error</code>
- * which represents the original network error object thrown by
+ * This gives you the opportunity to set a global flag and/or show some sort of notification. The <code>event.detail</code> will contain at least the
+ * <code>url</code> which was being requested through the service worker, and in case of the <code>omnifaces.offline</code> event, there will also be an
+ * <code>error</code> which represents the original network error object thrown by
  * <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"><code>fetch()</code></a>.
  *
  * @author Bauke Scholtz
@@ -266,12 +265,9 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     private static final Logger logger = Logger.getLogger(PWAResourceHandler.class.getName());
 
-    private static final String WARNING_NO_CACHEABLE_VIEW_IDS =
-            "%s#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
-    private static final String WARNING_INVALID_CACHEABLE_VIEW_ID =
-            "Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getCacheableViewIds() returned a typo?";
-    private static final String WARNING_INVALID_OFFLINE_VIEW_ID =
-            "Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getOfflineViewId() returned a typo?";
+    private static final String WARNING_NO_CACHEABLE_VIEW_IDS = "%s#getCacheableViewIds() returned an empty collection, so no sw.js file will be generated.";
+    private static final String WARNING_INVALID_CACHEABLE_VIEW_ID = "Cacheable view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getCacheableViewIds() returned a typo?";
+    private static final String WARNING_INVALID_OFFLINE_VIEW_ID = "Offline view ID '%s' does not seem to exist, so it will be skipped for sw.js. Perhaps the %s#getOfflineViewId() returned a typo?";
 
     /** The resource name <code>manifest.webmanifest</code>. */
     public static final String MANIFEST_RESOURCE_NAME = "manifest.webmanifest";
@@ -290,14 +286,16 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
 
-    private record CachedContents(byte[] manifestContents, byte[] serviceWorkerContents, long lastModified) {}
+    private record CachedContents(byte[] manifestContents, byte[] serviceWorkerContents, long lastModified) {
+    }
 
     private final Bean<WebAppManifest> manifestBean;
     private volatile CachedContents cachedContents;
 
     /**
-     * Creates a new instance of this web app manifest resource handler which wraps the given resource handler.
-     * This will also try to resolve the concrete implementation of {@link WebAppManifest}.
+     * Creates a new instance of this web app manifest resource handler which wraps the given resource handler. This will also try to resolve the concrete
+     * implementation of {@link WebAppManifest}.
+     * 
      * @param wrapped The resource handler to be wrapped.
      */
     public PWAResourceHandler(ResourceHandler wrapped) {
@@ -361,6 +359,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     private DynamicResource createManifestResource(String resourceName, CachedContents contents) {
         return new DynamicResource(resourceName, OMNIFACES_LIBRARY_NAME, MANIFEST_CONTENT_TYPE) {
+
             @Override
             public InputStream getInputStream() throws IOException {
                 return new ByteArrayInputStream(contents.manifestContents);
@@ -375,11 +374,13 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 var cached = cachedContents;
                 return cached != null ? cached.lastModified : 0;
             }
+
         };
     }
 
     private DynamicResource createServiceWorkerResource(CachedContents contents) {
         return new DynamicResource(SERVICEWORKER_RESOURCE_NAME, OMNIFACES_LIBRARY_NAME, "application/javascript") {
+
             @Override
             public InputStream getInputStream() throws IOException {
                 return new ByteArrayInputStream(contents.serviceWorkerContents);
@@ -401,6 +402,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 responseHeaders.put("Service-Worker-Allowed", getServiceWorkerScope(getContext()));
                 return responseHeaders;
             }
+
         };
     }
 
@@ -412,7 +414,8 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             else {
                 sb.appendCodePoint(cp);
             }
-        }, (sb1, sb2) -> {}).toString();
+        }, (sb1, sb2) -> {
+        }).toString();
     }
 
     private static String getServiceWorkerContents(WebAppManifest manifest) {
@@ -448,7 +451,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                 collectCacheableResources(context, viewId, viewHandler, viewDeclarationLanguage, cacheableResources);
             }
             else {
-                logger.warning(() -> viewId.equals(manifest.getOfflineViewId()) ? WARNING_INVALID_OFFLINE_VIEW_ID : WARNING_INVALID_CACHEABLE_VIEW_ID.formatted(viewId, manifest.getClass().getName()));
+                logger.warning(
+                    () -> viewId.equals(manifest.getOfflineViewId())
+                        ? WARNING_INVALID_OFFLINE_VIEW_ID
+                        : WARNING_INVALID_CACHEABLE_VIEW_ID.formatted(viewId, manifest.getClass().getName())
+                );
             }
         }
 
@@ -457,7 +464,11 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         return cacheableResources;
     }
 
-    private static void collectCacheableResources(FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage, Collection<String> cacheableResources) {
+    private static void collectCacheableResources(
+        FacesContext context, String viewId, ViewHandler viewHandler, ViewDeclarationLanguage viewDeclarationLanguage,
+        Collection<String> cacheableResources
+    )
+    {
         cacheableResources.add(viewHandler.getActionURL(context, viewId));
         var view = viewHandler.createView(context, viewId);
 
@@ -496,7 +507,8 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     }
 
     private static String getServiceWorkerUrl(FacesContext context) {
-        return context.getExternalContext().encodeResourceURL(FacesLocal.createResource(context, OMNIFACES_LIBRARY_NAME, SERVICEWORKER_RESOURCE_NAME).getRequestPath());
+        return context.getExternalContext()
+            .encodeResourceURL(FacesLocal.createResource(context, OMNIFACES_LIBRARY_NAME, SERVICEWORKER_RESOURCE_NAME).getRequestPath());
     }
 
     private static String getServiceWorkerScope(FacesContext context) {
@@ -510,11 +522,14 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll(""); // Strips the v= parameter indicating the cache bust version.
+        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll(""); // Strips the v= parameter
+                                                                                                                                      // indicating the cache
+                                                                                                                                      // bust version.
     }
 
     /**
      * Returns {@code true} if the {@link PWAResourceHandler} is active.
+     * 
      * @param context The involved faces context.
      * @return {@code true} if the {@link PWAResourceHandler} is active.
      * @since 5.2
@@ -525,6 +540,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the current request is triggered by a sw.js request.
+     * 
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by a sw.js request.
      * @since 4.1
@@ -535,6 +551,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the given request is triggered by a sw.js request.
+     * 
      * @param request The involved request.
      * @return <code>true</code> if the given request is triggered by a sw.js request.
      * @since 4.1

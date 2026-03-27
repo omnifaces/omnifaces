@@ -27,16 +27,16 @@ import org.openqa.selenium.support.FindBy;
 
 public class RateLimitIT extends OmniFacesIT {
 
-    @FindBy(id="form:submit")
+    @FindBy(id = "form:submit")
     private WebElement submit;
 
-    @FindBy(id="form:result")
+    @FindBy(id = "form:result")
     private WebElement result;
 
-    @FindBy(id="form:messages")
+    @FindBy(id = "form:messages")
     private WebElement messages;
 
-    @Deployment(testable=false)
+    @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(RateLimitIT.class);
     }
@@ -67,4 +67,5 @@ public class RateLimitIT extends OmniFacesIT {
         assertNotEquals(firstResult, secondResult);
         assertEquals("", messages.getText());
     }
+
 }

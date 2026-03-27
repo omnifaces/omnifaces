@@ -41,17 +41,16 @@ import org.omnifaces.vdl.FacesTagHandler;
 
 /**
  * <p>
- * The <code>&lt;o:validateUniqueColumn&gt;</code> validates if the given {@link UIInput} component in an {@link UIData}
- * component has an unique value throughout all rows, also those not visible by pagination. This validator works
- * directly on the data model and may therefore not work as expected if the data model does not represent
- * <strong>all</strong> available rows of the {@link UIData} component (e.g. when there's means of lazy loading).
+ * The <code>&lt;o:validateUniqueColumn&gt;</code> validates if the given {@link UIInput} component in an {@link UIData} component has an unique value
+ * throughout all rows, also those not visible by pagination. This validator works directly on the data model and may therefore not work as expected if the data
+ * model does not represent <strong>all</strong> available rows of the {@link UIData} component (e.g. when there's means of lazy loading).
  * <p>
- * The default message is
- * <blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
+ * The default message is <blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
  *
  * <h2>Usage</h2>
  * <p>
  * Usage example:
+ * 
  * <pre>
  * &lt;h:dataTable value="#{bean.items}" var="item"&gt;
  *     &lt;h:column&gt;
@@ -62,13 +61,12 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/h:dataTable&gt;
  * </pre>
  * <p>
- * In an invalidating case, only the first row on which the value is actually changed (i.e. the value change event has
- * been fired on the input component in the particular row) will be marked invalid and a faces message will be added
- * on the client ID of the input component in the particular row. The default message can be changed by the
- * <code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with the label of the
- * input component. Any "{1}" placeholder in the message will be substituted with the 1-based row index of the data
- * model. Note that this does not take pagination into account and that this needs if necessary to be taken care of in
- * the custom message yourself.
+ * In an invalidating case, only the first row on which the value is actually changed (i.e. the value change event has been fired on the input component in the
+ * particular row) will be marked invalid and a faces message will be added on the client ID of the input component in the particular row. The default message
+ * can be changed by the <code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with the label of the input component. Any
+ * "{1}" placeholder in the message will be substituted with the 1-based row index of the data model. Note that this does not take pagination into account and
+ * that this needs if necessary to be taken care of in the custom message yourself.
+ * 
  * <pre>
  * &lt;o:validateUniqueColumn message="Duplicate value!" /&gt;
  * </pre>
@@ -81,17 +79,16 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     // Private constants ----------------------------------------------------------------------------------------------
 
-    private static final String DEFAULT_MESSAGE =
-        "{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}";
+    private static final String DEFAULT_MESSAGE = "{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}";
 
-    private static final String ERROR_INVALID_PARENT =
-        "Parent component of o:validateUniqueColumn must be an instance of UIInput. Encountered invalid type '%s'.";
-    private static final String ERROR_INVALID_PARENT_PARENT =
-        "Parent component of o:validateUniqueColumn must be enclosed in an UIData component.";
+    private static final String ERROR_INVALID_PARENT = "Parent component of o:validateUniqueColumn must be an instance of UIInput. Encountered invalid type '%s'.";
+    private static final String ERROR_INVALID_PARENT_PARENT = "Parent component of o:validateUniqueColumn must be enclosed in an UIData component.";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    @FacesAttribute(description = "The validator message to be shown on failure. Any \"{0}\" placeholder in the message will be substituted with the label of the input component. Any \"{1}\" placeholder will be substituted with the 1-based row index of the data model.")
+    @FacesAttribute(
+        description = "The validator message to be shown on failure. Any \"{0}\" placeholder in the message will be substituted with the label of the input component. Any \"{1}\" placeholder will be substituted with the 1-based row index of the data model."
+    )
     private ValueExpression message;
 
     @FacesAttribute(description = "Whether the validation should be disabled or not. Defaults to false.")
@@ -101,6 +98,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * The tag constructor.
+     * 
      * @param config The tag config.
      */
     public ValidateUniqueColumn(TagConfig config) {
@@ -110,8 +108,8 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the component is new, check if it's an instance of {@link UIInput} and then register this tag as a value
-     * change listener on it. If the component is not new, check if there's an {@link UIData} parent.
+     * If the component is new, check if it's an instance of {@link UIInput} and then register this tag as a value change listener on it. If the component is
+     * not new, check if there's an {@link UIData} parent.
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -153,9 +151,8 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
     }
 
     /**
-     * When this tag is not disabled, the input value is changed, the input component is valid and the input component's
-     * local value is not null, then check for a duplicate value by visiting all rows of the parent {@link UIData}
-     * component.
+     * When this tag is not disabled, the input value is changed, the input component is valid and the input component's local value is not null, then check for
+     * a duplicate value by visiting all rows of the parent {@link UIData} component.
      */
     @Override
     public void processValueChange(ValueChangeEvent event) {
@@ -189,6 +186,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * Returns the runtime evaluated value of the message attribute.
+     * 
      * @return The runtime evaluated value of the message attribute.
      */
     public String getMessage() {
@@ -197,6 +195,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * Returns the runtime evaluated value of the disabled attribute.
+     * 
      * @return The runtime evaluated value of the disabled attribute.
      */
     public boolean isDisabled() {
@@ -214,13 +213,13 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
     // Helpers --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the evaluated value of the given value expression, or the given default value if the given value
-     * expression itself or its evaluated value is <code>null</code>.
-     * @param expression The value expression to return the value for.
-     * @param defaultValue The default value to return if the value expression itself or its evaluated value is
+     * Returns the evaluated value of the given value expression, or the given default value if the given value expression itself or its evaluated value is
      * <code>null</code>.
-     * @return The evaluated value of the given value expression, or the given default value if the given value
-     * expression itself or its evaluated value is <code>null</code>.
+     * 
+     * @param expression The value expression to return the value for.
+     * @param defaultValue The default value to return if the value expression itself or its evaluated value is <code>null</code>.
+     * @return The evaluated value of the given value expression, or the given default value if the given value expression itself or its evaluated value is
+     * <code>null</code>.
      */
     @SuppressWarnings("unchecked")
     private static <T> T getValue(ValueExpression expression, T defaultValue) {
@@ -239,6 +238,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * The unique column value checker as tree visit callback.
+     * 
      * @author Bauke Scholtz
      */
     private static class UniqueColumnValueChecker implements VisitCallback {
@@ -262,9 +262,10 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
             // Yes, this check does look a bit strange, but really physically the very same single UIInput component is
             // been reused in all rows of the UIData component. It's only its internal state which changes on a per-row
             // basis, as would happen during the tree visit. Those changes are reflected in the "input" reference.
-            if (target == input && rowIndex != table.getRowIndex()
-                && input.isValid() && value.equals(input.getLocalValue()))
-            {
+            if (
+                target == input && rowIndex != table.getRowIndex()
+                    && input.isValid() && value.equals(input.getLocalValue())
+            ) {
                 duplicate = true;
                 duplicateIndex = table.getRowIndex();
                 return VisitResult.COMPLETE;

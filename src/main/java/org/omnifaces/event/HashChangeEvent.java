@@ -20,9 +20,8 @@ import org.omnifaces.component.input.HashParam;
 
 /**
  * <p>
- * This event is fired by <code>&lt;o:hashParam&gt;</code> when hash parameters have been changed in the client side.
- * This is particularly useful in case you intend to (re)run some action based on the new hash parameters, before
- * rendering takes place.
+ * This event is fired by <code>&lt;o:hashParam&gt;</code> when hash parameters have been changed in the client side. This is particularly useful in case you
+ * intend to (re)run some action based on the new hash parameters, before rendering takes place.
  * <p>
  * Noted should be that the <code>&lt;o:hashParam&gt;</code> fires this as a CDI event, not as a Faces event.
  *
@@ -36,6 +35,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Constructs a new hash change event.
+     * 
      * @param context The involved faces context.
      * @param oldHashQueryString The old hash query string.
      * @param newHashQueryString The new hash query string.
@@ -48,6 +48,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the current view root.
+     * 
      * @return The current view root.
      */
     @Override
@@ -57,6 +58,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the old hash query string value.
+     * 
      * @return The old hash query string value.
      */
     @Override
@@ -66,10 +68,12 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the new hash query string value.
+     * 
      * @return The new hash query string value.
      */
     @Override
     public String getNewValue() {
         return (String) super.getNewValue();
     }
+
 }

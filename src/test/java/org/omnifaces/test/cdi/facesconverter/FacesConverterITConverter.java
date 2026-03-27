@@ -37,4 +37,5 @@ public class FacesConverterITConverter implements Converter<Object> {
     public String getAsObject(FacesContext context, UIComponent component, String value) {
         return null;
     }
+
 }
