@@ -430,7 +430,7 @@
                 <configuration>
                     <java>
                         <eclipse>
-                            <file>${project.basedir}/eclipse-formatter.xml</file>
+                            <file>${project.basedir}/src/main/eclipse-formatter.xml</file>
                         </eclipse>
                     </java>
                     <formats>
