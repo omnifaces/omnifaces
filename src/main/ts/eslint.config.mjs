@@ -3,13 +3,13 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
     {
-        files: ["src/main/resources/META-INF/resources/omnifaces/omnifaces.js/**/*.ts"],
+        files: ["**/*.ts"],
         languageOptions: {
             parser: tseslint.parser,
         },
     },
     {
-        files: ["src/main/resources/META-INF/resources/omnifaces/omnifaces.js/**/*.ts"],
+        files: ["**/*.ts"],
         plugins: {
             "@stylistic": stylistic,
         },

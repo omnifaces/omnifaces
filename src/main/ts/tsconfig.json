@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ES2021",
     "module": "commonjs",
-    "rootDir": "src/main/resources/META-INF/resources/omnifaces/omnifaces.js",
-    "outDir": "target/tsc",
+    "rootDir": "src",
+    "outDir": "../../../target/tsc",
     "removeComments": true,
     "noImplicitAny": true,
     "noImplicitUseStrict": true,
     "sourceMap": true
   },
   "files": [
-    "src/main/resources/META-INF/resources/omnifaces/omnifaces.js/OmniFaces.ts"
+    "src/OmniFaces.ts"
   ]
 }

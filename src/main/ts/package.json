@@ -9,10 +9,10 @@
   },
   "scripts": {
     "compile": "tsc",
-    "pack": "browserify target/tsc/OmniFaces.js -o target/tsc/omnifaces.unminified.js -s OmniFaces",
+    "pack": "browserify ../../../target/tsc/OmniFaces.js -o ../../../target/tsc/omnifaces.unminified.js -s OmniFaces",
     "build": "npm run compile && npm run pack",
-    "lint": "eslint src/main/resources/META-INF/resources/omnifaces/omnifaces.js/",
-    "lint:fix": "eslint --fix src/main/resources/META-INF/resources/omnifaces/omnifaces.js/"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^4.2.0",

@@ -272,6 +272,7 @@
                                     <excludes>
                                        <exclude>*.*</exclude> <!-- excludes files in root folder -->
                                        <exclude>**/.*</exclude> <!-- excludes dotfiles -->
+                                       <exclude>**/*.mjs</exclude> <!-- excludes eslint config file -->
                                     </excludes>
                                 </licenseSet>
                             </licenseSets>
@@ -288,6 +289,7 @@
                 <configuration>
                     <nodeVersion>v22.22.0</nodeVersion>
                     <installDirectory>target</installDirectory>
+                    <workingDirectory>${project.basedir}/src/main/ts</workingDirectory>
                 </configuration>
                 <executions>
                     <execution>
