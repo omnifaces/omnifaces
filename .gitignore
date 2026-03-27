@@ -1,16 +1,26 @@
-build/
-dist/
+# Maven
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
 *.jsfdia
-*.asc
 *.tern-project
-/bin
-/target
-/.settings
-/.project
-/.classpath
-rebel.xml
+
+# IntelliJ
+.idea
 *.iml
-/.idea
+*.ipr
+*.iws
+
+# Node.js
 node_modules/
+dist/
 npm-debug.log
+
+# Selenium
 phantomjsdriver.log
+
+# Env
+.env.*
