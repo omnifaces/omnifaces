@@ -268,7 +268,7 @@
                         <configuration>
                             <licenseSets>
                                 <licenseSet>
-                                    <header>license.txt</header>
+                                    <header>LICENSE.txt</header>
                                     <excludes>
                                        <exclude>*.*</exclude> <!-- excludes files in root folder -->
                                        <exclude>**/.*</exclude> <!-- excludes dotfiles -->
