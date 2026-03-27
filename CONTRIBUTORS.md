@@ -1,0 +1,58 @@
+# Contributors
+
+Thanks go to the following people for their contributions in code or otherwise:
+
+**Patrick Dobler**
+: For the inspiration for `SelectItemsIndexConverter`.
+
+**Adrian Gygax**
+: For the work on the bean validation event listener.
+
+**Radu Creanga**
+: For the CDI injection in converters and validators, the CDI view scope and his idea for the FacesViews handling of other ViewHandlers.
+
+**Oleg Varaksin**
+: For his help with addressing the JUEL method param issue to the JUEL maintainers and for the inspiration for the @Eager feature.
+
+**Howard Smith**
+: For consistently testing snapshots and reporting issues.
+
+**Juliano Marques**
+: For the work on the `<o:validateMultiple>` tag.
+
+**Michele Mariotti**
+: For the work on `FacesConfigXml` utility class and the `<o:skipValidators>` tag.
+
+**Stephan Rauh**
+: For his idea and code to cache combined resources.
+
+**Marco Janc**
+: For the inspiration for `<o:url>` tag.
+
+**Gerald Turner**
+: For his work and ideas on improving `<o:validateBean>`.
+
+**Ronald van Kuijk**
+: For his work and inspiration for `<o:form partialSubmit="true">`.
+
+**Sergey Kuntsel**
+: For his work on `<o:pathParam>`.
+
+**Adam Waldenberg**
+: For his inspiration for `<o:scriptParam>`.
+
+**Andre Wachsmuth**
+: For his work on improving `<o:validateBean>` to support nested properties.
+
+**Lenny Primak**
+: For his work on `ViewExpiredExceptionHandler` and `ExceptionSuppressor`.
+
+**Leonardo Bernardes**
+: For his work on `<sec:authorize>`, `<sec:isAuthenticated>` and `<sec:isAnonymous>` tags.
+
+**Paolo Bernardi**
+: For his work on `Components`/`ComponentsLocal` and thread safety improvements.
+
+And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
+
+If you think anyone else who is not in the list should be there, [please create an issue](https://github.com/omnifaces/omnifaces).
