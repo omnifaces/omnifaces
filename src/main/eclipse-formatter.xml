@@ -210,6 +210,9 @@
         <setting id="org.eclipse.jdt.core.formatter.wrap_before_logical_operator" value="true"/>
         <setting id="org.eclipse.jdt.core.formatter.wrap_before_shift_operator" value="true"/>
 
+        <!-- Enum constants: one per line -->
+        <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="49"/>
+
         <!-- New line at end of file -->
         <setting id="org.eclipse.jdt.core.formatter.insert_new_line_at_end_of_file_if_missing" value="insert"/>
 
