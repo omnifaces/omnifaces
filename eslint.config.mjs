@@ -1,0 +1,32 @@
+import stylistic from "@stylistic/eslint-plugin";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+    {
+        files: ["src/main/resources/META-INF/resources/omnifaces/omnifaces.js/**/*.ts"],
+        languageOptions: {
+            parser: tseslint.parser,
+        },
+    },
+    {
+        files: ["src/main/resources/META-INF/resources/omnifaces/omnifaces.js/**/*.ts"],
+        plugins: {
+            "@stylistic": stylistic,
+        },
+        rules: {
+            "@stylistic/brace-style": ["error", "stroustrup"],
+            "@stylistic/indent": ["error", 4],
+            "@stylistic/semi": ["error", "always"],
+            "@stylistic/quotes": ["error", "double", { avoidEscape: true }],
+            "@stylistic/comma-spacing": ["error", { before: false, after: true }],
+            "@stylistic/space-before-blocks": ["error", "always"],
+            "@stylistic/space-before-function-paren": ["error", "never"],
+            "@stylistic/keyword-spacing": ["error", { before: true, after: true }],
+            "@stylistic/space-infix-ops": "error",
+            "@stylistic/arrow-spacing": ["error", { before: true, after: true }],
+            "@stylistic/max-len": ["error", { code: 160, ignoreComments: true }],
+            "@stylistic/no-trailing-spaces": "error",
+            "@stylistic/eol-last": ["error", "always"],
+        },
+    },
+);

@@ -10,10 +10,14 @@
   "scripts": {
     "compile": "tsc",
     "pack": "browserify target/tsc/OmniFaces.js -o target/tsc/omnifaces.unminified.js -s OmniFaces",
-    "build": "npm run compile && npm run pack"
+    "build": "npm run compile && npm run pack",
+    "lint": "eslint src/main/resources/META-INF/resources/omnifaces/omnifaces.js/",
+    "lint:fix": "eslint --fix src/main/resources/META-INF/resources/omnifaces/omnifaces.js/"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^4.2.0",
     "browserify": "^17.0.0",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "typescript-eslint": "^8.30.0"
   }
 }

@@ -315,6 +315,15 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>npm run lint:fix</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run lint:fix</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>npm install test</id>
                         <phase>test</phase>
                         <goals>
@@ -409,6 +418,43 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+
+            <!-- Apply code formatting (Java via Eclipse JDT, XML/XHTML whitespace, TypeScript via ESLint @stylistic). -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <java>
+                        <eclipse>
+                            <file>${project.basedir}/eclipse-formatter.xml</file>
+                        </eclipse>
+                    </java>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>pom.xml</include>
+                                <include>src/**/*.xml</include>
+                                <include>src/**/*.xhtml</include>
+                            </includes>
+                            <trimTrailingWhitespace />
+                            <endWithNewline />
+                            <indent>
+                                <spaces>true</spaces>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+                        </format>
+                    </formats>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Transform the generated taglib.xml into *.old.taglib.xml files. -->
@@ -1145,11 +1191,11 @@
         </profile>
 
         <!-- Piranha - Mojarra integration test profile: mvn verify -P piranha-mojarra4 -->
-        <!-- 
+        <!--
              Note1: Piranha must be run using JDK 21, so the entire test suite should be run with JDK 21.
              There's no need to compile OmniFaces with JDK 21. JDK 17 is fine for that.
 
-             Note2: doesn't currently work: 
+             Note2: doesn't currently work:
         -->
         <profile>
             <id>piranha-mojarra</id>
