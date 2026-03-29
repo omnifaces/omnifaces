@@ -22,10 +22,10 @@ declare global {
     var OmniFaces: Record<string, unknown>;
 }
 
-export const OMNIFACES_JS = path.resolve(__dirname, "../../../target/tsc/omnifaces.unminified.js");
+export const OMNIFACES_JS = path.resolve(__dirname, "../../../target/classes/META-INF/resources/omnifaces/omnifaces.js");
 
 /**
- * Load the unminified omnifaces.js UMD bundle into jsdom.
+ * Load the omnifaces.js bundle into jsdom.
  * Call this in beforeAll().
  */
 export function loadOmniFacesJs(): void {
