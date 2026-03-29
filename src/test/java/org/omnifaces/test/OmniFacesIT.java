@@ -486,11 +486,33 @@ public abstract class OmniFacesIT {
     }
 
     public enum FacesConfig {
-        basic, withFullAjaxExceptionHandler, withCombinedResourceHandler, withMessageBundle, withCDNResourceHandler, withCustomCDNResourceHandler, withVersionedResourceHandler, withViewExpiredExceptionHandler, withViewResourceHandler, withSupportedLocales;
+        basic,
+        withFullAjaxExceptionHandler,
+        withCombinedResourceHandler,
+        withMessageBundle,
+        withCDNResourceHandler,
+        withCustomCDNResourceHandler,
+        withVersionedResourceHandler,
+        withViewExpiredExceptionHandler,
+        withViewResourceHandler,
+        withSupportedLocales;
     }
 
     public enum WebXml {
-        basic, distributable, withDevelopmentStage, withErrorPage, withFacesViews, withFacesViewsLowercasedRequestURI, withMultiViews, withThreeViewsInSession, withClientStateSaving, withCDNResources, withInterpretEmptyStringSubmittedValuesAsNull, withVersionedResourceHandler, withViewResources, withTaglib;
+        basic,
+        distributable,
+        withDevelopmentStage,
+        withErrorPage,
+        withFacesViews,
+        withFacesViewsLowercasedRequestURI,
+        withMultiViews,
+        withThreeViewsInSession,
+        withClientStateSaving,
+        withCDNResources,
+        withInterpretEmptyStringSubmittedValuesAsNull,
+        withVersionedResourceHandler,
+        withViewResources,
+        withTaglib;
     }
 
 }

@@ -47,7 +47,9 @@ public class ComponentIdParam extends ViewParam {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        componentIdName, clientIdName, renderChildren
+        componentIdName,
+        clientIdName,
+        renderChildren
     }
 
     @Override

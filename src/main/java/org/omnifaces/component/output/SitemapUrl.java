@@ -147,7 +147,12 @@ public class SitemapUrl extends OutputFamily {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        value, viewId, domain, lastModified, changeFrequency, priority
+        value,
+        viewId,
+        domain,
+        lastModified,
+        changeFrequency,
+        priority
     }
 
     // Constructors ---------------------------------------------------------------------------------------------------

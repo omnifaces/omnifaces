@@ -164,7 +164,12 @@ public class Cache extends OutputFamily {
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        key, scope, time, useBuffer, reset, disabled
+        key,
+        scope,
+        time,
+        useBuffer,
+        reset,
+        disabled
     }
 
     /**

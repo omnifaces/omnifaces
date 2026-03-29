@@ -127,7 +127,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        value, var, varNode;
+        value,
+        var,
+        varNode;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

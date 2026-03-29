@@ -51,7 +51,9 @@ public abstract class WebAppManifest {
      */
     protected enum Dir {
 
-        LTR, RTL, AUTO;
+        LTR,
+        RTL,
+        AUTO;
 
         private final String value;
 
@@ -73,7 +75,10 @@ public abstract class WebAppManifest {
      */
     protected enum Display {
 
-        FULLSCREEN, STANDALONE, MINIMAL_UI, BROWSER;
+        FULLSCREEN,
+        STANDALONE,
+        MINIMAL_UI,
+        BROWSER;
 
         private final String value;
 
@@ -95,7 +100,14 @@ public abstract class WebAppManifest {
      */
     protected enum Orientation {
 
-        ANY, NATURAL, LANDSCAPE, LANDSCAPE_PRIMARY, LANDSCAPE_SECONDARY, PORTRAIT, PORTRAIT_PRIMARY, PORTRAIT_SECONDARY;
+        ANY,
+        NATURAL,
+        LANDSCAPE,
+        LANDSCAPE_PRIMARY,
+        LANDSCAPE_SECONDARY,
+        PORTRAIT,
+        PORTRAIT_PRIMARY,
+        PORTRAIT_SECONDARY;
 
         private final String value;
 
@@ -117,7 +129,34 @@ public abstract class WebAppManifest {
      */
     protected enum Category {
 
-        BOOKS, BUSINESS, EDUCATION, ENTERTAINMENT, FINANCE, FITNESS, FOOD, GAMES, GOVERNMENT, HEALTH, KIDS, LIFESTYLE, MAGAZINES, MEDICAL, MUSIC, NAVIGATION, NEWS, PERSONALIZATION, PHOTO, POLITICS, PRODUCTIVITY, SECURITY, SHOPPING, SOCIAL, SPORTS, TRAVEL, UTILITIES, WEATHER;
+        BOOKS,
+        BUSINESS,
+        EDUCATION,
+        ENTERTAINMENT,
+        FINANCE,
+        FITNESS,
+        FOOD,
+        GAMES,
+        GOVERNMENT,
+        HEALTH,
+        KIDS,
+        LIFESTYLE,
+        MAGAZINES,
+        MEDICAL,
+        MUSIC,
+        NAVIGATION,
+        NEWS,
+        PERSONALIZATION,
+        PHOTO,
+        POLITICS,
+        PRODUCTIVITY,
+        SECURITY,
+        SHOPPING,
+        SOCIAL,
+        SPORTS,
+        TRAVEL,
+        UTILITIES,
+        WEATHER;
 
         private final String value;
 
@@ -139,7 +178,10 @@ public abstract class WebAppManifest {
      */
     protected enum Platform {
 
-        CHROME_WEB_STORE, PLAY, ITUNES, WINDOWS;
+        CHROME_WEB_STORE,
+        PLAY,
+        ITUNES,
+        WINDOWS;
 
         private final String value;
 
@@ -713,7 +755,8 @@ public abstract class WebAppManifest {
      */
     protected enum ScreenshotFormFactor {
 
-        NARROW, WIDE;
+        NARROW,
+        WIDE;
 
         private final String value;
 

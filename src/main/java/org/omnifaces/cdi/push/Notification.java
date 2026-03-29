@@ -297,7 +297,15 @@ public class Notification extends ChannelComponent {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        stacked, requireInteraction, silent, icon, onclick, onclose, onerror, onpermissionchange, onunsupported;
+        stacked,
+        requireInteraction,
+        silent,
+        icon,
+        onclick,
+        onclose,
+        onerror,
+        onpermissionchange,
+        onunsupported;
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

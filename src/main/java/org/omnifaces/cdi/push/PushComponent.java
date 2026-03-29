@@ -54,7 +54,11 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        scope, onopen, onmessage, onerror, onclose;
+        scope,
+        onopen,
+        onmessage,
+        onerror,
+        onclose;
     }
 
     // Actions --------------------------------------------------------------------------------------------------------

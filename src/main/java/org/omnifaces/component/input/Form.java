@@ -121,7 +121,9 @@ public class Form extends HtmlForm {
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        useRequestURI, includeRequestParams, partialSubmit,
+        useRequestURI,
+        includeRequestParams,
+        partialSubmit,
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

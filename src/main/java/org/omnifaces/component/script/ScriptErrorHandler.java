@@ -126,7 +126,9 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        ignoreSelector, maxRecentErrors, errorExpiry;
+        ignoreSelector,
+        maxRecentErrors,
+        errorExpiry;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

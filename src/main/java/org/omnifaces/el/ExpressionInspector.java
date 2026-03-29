@@ -225,7 +225,8 @@ public final class ExpressionInspector {
      * method.
      */
     private enum InspectorPass {
-        PASS1_FIND_NEXT_TO_LAST_NODE, PASS2_FIND_FINAL_NODE
+        PASS1_FIND_NEXT_TO_LAST_NODE,
+        PASS2_FIND_FINAL_NODE
     }
 
     /**

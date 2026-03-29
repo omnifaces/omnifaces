@@ -98,7 +98,8 @@ public class Highlight extends OnloadScript {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        styleClass, focus
+        styleClass,
+        focus
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

@@ -138,7 +138,9 @@ public class OmniMessages extends HtmlMessages {
     private enum PropertyKeys {
 
         // Cannot be uppercased. They have to exactly match the attribute names.
-        VAR, message, escape;
+        VAR,
+        message,
+        escape;
 
         @Override
         public String toString() {

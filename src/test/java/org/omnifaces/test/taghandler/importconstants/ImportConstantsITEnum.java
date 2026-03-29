@@ -14,6 +14,8 @@ package org.omnifaces.test.taghandler.importconstants;
 
 public enum ImportConstantsITEnum {
 
-    ONE, TWO, THREE;
+    ONE,
+    TWO,
+    THREE;
 
 }

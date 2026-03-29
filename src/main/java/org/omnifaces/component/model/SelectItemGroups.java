@@ -71,7 +71,9 @@ public class SelectItemGroups extends UISelectItems {
     private enum PropertyKeys {
 
         // Cannot be uppercased. They have to exactly match the attribute names.
-        VAR, itemLabel, itemValue;
+        VAR,
+        itemLabel,
+        itemValue;
 
         @Override
         public String toString() {

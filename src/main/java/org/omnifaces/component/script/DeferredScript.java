@@ -70,7 +70,12 @@ public class DeferredScript extends ScriptFamily {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.script.DeferredScript";
 
     enum PropertyKeys {
-        library, name, group, onbegin, onsuccess, onerror
+        library,
+        name,
+        group,
+        onbegin,
+        onsuccess,
+        onerror
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

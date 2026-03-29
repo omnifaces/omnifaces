@@ -57,7 +57,8 @@ public class Link extends HtmlOutcomeTargetLink {
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        includeRequestParams, fragment
+        includeRequestParams,
+        fragment
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

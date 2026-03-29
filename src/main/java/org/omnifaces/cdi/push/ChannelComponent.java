@@ -44,7 +44,8 @@ abstract class ChannelComponent extends ScriptFamily {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        channel, user;
+        channel,
+        user;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

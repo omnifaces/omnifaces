@@ -60,7 +60,9 @@ public class CriticalStylesheet extends StylesheetFamily {
     public static final String COMPONENT_TYPE = "org.omnifaces.component.stylesheet.CriticalStylesheet";
 
     enum PropertyKeys {
-        library, name, media
+        library,
+        name,
+        media
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

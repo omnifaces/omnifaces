@@ -71,7 +71,8 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
         name,
-        scope, /* for */
+        scope,
+        /* for */
     }
 
     /**
@@ -169,7 +170,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Returns name under which the component will be made available to EL.
-     * 
+     *
      * @return Name under which the component will be made available to EL.
      */
     public String getName() {
@@ -178,7 +179,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Sets name under which the component will be made available to EL, scoped to the body of the Facelets tag (default) or to the request.
-     * 
+     *
      * @param nameValue Name under which the component will be made available to EL.
      */
     @FacesAttribute(required = true)
@@ -188,7 +189,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Returns ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
-     * 
+     *
      * @return ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      */
     public String getFor() {
@@ -197,7 +198,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Sets ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
-     * 
+     *
      * @param forValue ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
      */
     @FacesAttribute(required = true)
@@ -207,7 +208,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     /**
      * Returns optional scope identifier used to set the scope in which the component reference is inserted. Default is <code>facelet</code>.
-     * 
+     *
      * @return Optional scope identifier used to set the scope in which the component reference is inserted.
      */
     public String getScope() {
@@ -219,7 +220,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
      * be used.
      * <p>
      * Values values are "facelet" (default) and "request".
-     * 
+     *
      * @param scopeValue Optional scope identifier used to set the scope in which the component reference is inserted.
      */
     public void setScope(String scopeValue) {

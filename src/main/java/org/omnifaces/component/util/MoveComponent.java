@@ -78,7 +78,11 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     private final State state = new State(getStateHelper());
 
     enum PropertyKeys {
-        /* for */ facet, destination, behaviorDefaultEvent, behaviorEvents
+        /* for */
+        facet,
+        destination,
+        behaviorDefaultEvent,
+        behaviorEvents
     }
 
     /**

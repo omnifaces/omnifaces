@@ -67,11 +67,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  * }
  *
  * public enum Baz {
- *     BAZ1, BAZ2;
+ *     BAZ1,
+ *     BAZ2;
  * }
  *
  * public enum Faz implements Bar {
- *     FAZ1, FAZ2;
+ *     FAZ1,
+ *     FAZ2;
  * }
  * </pre>
  * <p>

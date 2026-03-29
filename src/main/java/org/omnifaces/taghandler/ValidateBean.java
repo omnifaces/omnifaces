@@ -318,7 +318,8 @@ public class ValidateBean extends TagHandler {
 
     private enum ValidateMethod {
 
-        validateCopy, validateActual;
+        validateCopy,
+        validateActual;
 
         public static ValidateMethod of(String name) {
             if (isEmpty(name)) {

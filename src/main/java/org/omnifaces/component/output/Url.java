@@ -130,7 +130,12 @@ public class Url extends OutputFamily {
     private enum PropertyKeys {
 
         // Cannot be uppercased. They have to exactly match the attribute names.
-        VAR, value, viewId, domain, includeViewParams, includeRequestParams;
+        VAR,
+        value,
+        viewId,
+        domain,
+        includeViewParams,
+        includeRequestParams;
 
         @Override
         public String toString() {

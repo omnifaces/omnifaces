@@ -66,7 +66,9 @@ abstract class PushChannelManager implements Serializable {
 
     enum Scope {
 
-        APPLICATION, SESSION, VIEW;
+        APPLICATION,
+        SESSION,
+        VIEW;
 
         static Scope of(String value, Serializable user, String componentName) {
             if (value == null) {

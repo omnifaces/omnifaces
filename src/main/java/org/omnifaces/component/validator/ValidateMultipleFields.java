@@ -162,7 +162,11 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        components, invalidateAll, message, showMessageFor, disabled;
+        components,
+        invalidateAll,
+        message,
+        showMessageFor,
+        disabled;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------

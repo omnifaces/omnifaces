@@ -740,7 +740,8 @@ public class Socket extends PushComponent {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        port, connected;
+        port,
+        connected;
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
