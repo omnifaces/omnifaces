@@ -282,7 +282,10 @@ public class InputFile extends HtmlInputFile {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        directory, acceptMessage, maxsize, maxsizeMessage;
+        directory,
+        acceptMessage,
+        maxsize,
+        maxsizeMessage;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -335,9 +338,8 @@ public class InputFile extends HtmlInputFile {
             var convertedParts = new ArrayList<Part>();
 
             for (var submittedPart : (List<Part>) submittedValue) {
-                if (super.getConvertedValue(context, submittedPart) instanceof Part convertedPart && !Utils.isEmpty(convertedPart)) { // Do not import static!
-                                                                                                                                      // UIInput has an
-                                                                                                                                      // isEmpty() as well.
+                // Do not import static! UIInput has an isEmpty() as well.
+                if (super.getConvertedValue(context, submittedPart) instanceof Part convertedPart && !Utils.isEmpty(convertedPart)) {
                     convertedParts.add(convertedPart);
                 }
             }

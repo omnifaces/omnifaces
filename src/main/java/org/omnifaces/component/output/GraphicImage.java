@@ -218,7 +218,13 @@ public class GraphicImage extends HtmlGraphicImage {
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        name, library, type, fragment, lastModified, dataURI, lazy;
+        name,
+        library,
+        type,
+        fragment,
+        lastModified,
+        dataURI,
+        lazy;
     }
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -249,8 +255,8 @@ public class GraphicImage extends HtmlGraphicImage {
             writer.writeAttribute("data-lazy", "true", "lazy");
         }
         else {
-            writer.writeAttribute("src", src, "value"); // h:graphicImage uses writeURIAttribute(), but it kills URL fragment identifiers, so we use
-                                                        // writeAttribute() instead.
+            // h:graphicImage uses writeURIAttribute(), but it kills URL fragment identifiers, so we use writeAttribute() instead.
+            writer.writeAttribute("src", src, "value");
         }
 
         writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);

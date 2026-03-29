@@ -305,8 +305,8 @@ public final class ComponentsLocal {
             oncomplete(context, script);
         }
         else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
-            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(getContext(), script)); // Just to avoid it misses when view rebuilds in the
-                                                                                                         // meanwhile.
+            // Just to avoid it misses when view rebuilds in the meanwhile.
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptToBody(getContext(), script));
         }
         else {
             addScriptToBody(context, script);
@@ -319,18 +319,15 @@ public final class ComponentsLocal {
     public static void addScriptResource(FacesContext context, String libraryName, String resourceName) {
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
-                load(context, libraryName, resourceName); // Because component resources are rendered BEFORE components and thus addScriptResource would be too
-                                                          // late.
+                // Because component resources are rendered BEFORE components and thus addScriptResource would be too late.
+                load(context, libraryName, resourceName);
                 addScriptResourceToBody(context, libraryName, resourceName); // Just to register it in the component tree as we need to mark it rendered.
                 context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
                 addScriptResourceToHead(context, libraryName, resourceName);
-                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName)); // Fallback in case view
-                                                                                                                                        // rebuilds in the
-                                                                                                                                        // meanwhile. It will
-                                                                                                                                        // re-check if already
-                                                                                                                                        // added.
+                // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
+                subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName));
             }
             else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
                 addScriptResourceToHead(context, libraryName, resourceName);
@@ -542,8 +539,8 @@ public final class ComponentsLocal {
             }
         }
 
-        if (parent instanceof UIViewRoot) { // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully
-                                            // it will be deprecated one day.
+        // If still not found and parent is UIViewRoot, then it can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
+        if (parent instanceof UIViewRoot) {
             return getCurrentActionSource(context, getCurrentForm(context));
         }
 
@@ -763,8 +760,8 @@ public final class ComponentsLocal {
 
         var form = new Form();
         form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
-        form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as
-                                                           // margin/padding/border on any <form> for some reason.
+        // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
+        form.getAttributes().put("style", "display:none");
         body.get().getChildren().add(form);
     }
 

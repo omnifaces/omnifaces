@@ -265,16 +265,8 @@ public class ParamProducer {
 
         try {
             setAttribute(component, LABEL_ATTRIBUTE, paramValue.label);
-            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression(context, "#{param['" + paramValue.name + "']}", paramValue.targetType)); // This
-                                                                                                                                                    // gives any
-                                                                                                                                                    // converter
-                                                                                                                                                    // the
-                                                                                                                                                    // opportunity
-                                                                                                                                                    // to
-                                                                                                                                                    // inspect
-                                                                                                                                                    // the
-                                                                                                                                                    // target
-                                                                                                                                                    // type.
+            // This gives any converter the opportunity to inspect the target type.
+            setAttribute(component, VALUE_ATTRIBUTE, createValueExpression(context, "#{param['" + paramValue.name + "']}", paramValue.targetType));
             return callback.getAsBoolean();
         }
         finally {

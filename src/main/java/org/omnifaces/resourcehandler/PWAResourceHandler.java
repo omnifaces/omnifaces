@@ -522,9 +522,8 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll(""); // Strips the v= parameter
-                                                                                                                                      // indicating the cache
-                                                                                                                                      // bust version.
+        // Strips the v= parameter indicating the cache bust version.
+        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll("");
     }
 
     /**

@@ -255,8 +255,8 @@ public final class Validators {
     }
 
     private static Object resolvePropertyFromBean(Object base, Node node, boolean last) {
-        if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal these can be all null, this is then assumed to be
-                                                                                          // the base itself.
+        // In Apache BVal these can be all null, this is then assumed to be the base itself.
+        if (node.getIndex() != null || node.getKey() != null || node.getName() != null) {
             return resolvePropertyFromContainerElement(base, node, last);
         }
         else {
@@ -265,8 +265,8 @@ public final class Validators {
     }
 
     private static Object resolveActualProperty(Object base, Node node, boolean last) {
-        if (!last || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which
-                                                                           // has index or key).
+        // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
+        if (!last || (node.getIndex() != null || node.getKey() != null)) {
             return resolvePropertyFromContainerElement(base, node, last);
         }
         else {

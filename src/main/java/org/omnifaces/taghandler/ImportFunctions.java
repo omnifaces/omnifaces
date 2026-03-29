@@ -145,8 +145,8 @@ public class ImportFunctions extends TagHandler {
      * @param attribute The optional tag attribute to obtain the class loader from.
      * @return The class loader associated with the object specified in given tag attribute, if any.
      */
-    static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) { // Package-private so that ImportConstants and LoadBundle can also use
-                                                                                        // it.
+    // Package-private so that ImportConstants and LoadBundle can also use it.
+    static ClassLoader getClassLoader(FaceletContext context, TagAttribute attribute) {
         return Utils.getClassLoader(attribute == null ? null : attribute.getObject(context));
     }
 

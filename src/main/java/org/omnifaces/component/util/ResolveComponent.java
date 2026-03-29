@@ -70,15 +70,16 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
-        name, scope, /* for */
+        name,
+        scope, /* for */
     }
 
     /**
      * Constructs the component.
      */
     public ResolveComponent() {
-        if (!isPostback()) { // For an initial (GET) request, there's no restore
-                             // state event and we use pre-render view
+        // For an initial (GET) request, there's no restore state event and we use pre-render view.
+        if (!isPostback()) {
             subscribeToViewEvent(PreRenderViewEvent.class, this);
         }
     }

@@ -446,8 +446,8 @@ public final class Servlets {
      */
     public static String getRemoteAddr(HttpServletRequest request) {
         var forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"), request.getHeader("X-Real-IP"));
-        return isEmpty(forwardedFor) ? request.getRemoteAddr() : splitAndTrim(forwardedFor, ",", 2)[0]; // It's a comma separated string:
-                                                                                                        // client,proxy1,proxy2,...
+        // It's a comma separated string: client,proxy1,proxy2,...
+        return isEmpty(forwardedFor) ? request.getRemoteAddr() : splitAndTrim(forwardedFor, ",", 2)[0];
     }
 
     /**

@@ -145,17 +145,12 @@ public class ViewScopeManager {
             }
         }
         else if (isAjaxRequestWithPartialRendering(context)) {
-            context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME); // Otherwise MyFaces
-                                                                                                                                        // will load a new one
-                                                                                                                                        // during
-                                                                                                                                        // createViewScope()
-                                                                                                                                        // when still in same
-                                                                                                                                        // document (e.g.
-                                                                                                                                        // navigation).
+            // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
+            context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME);
         }
 
-        if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for
-                                                                                    // nothing.
+        // Avoid unnecessary session creation when accessing storageInSession for nothing.
+        if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) {
             if (beanStorageId == null) {
                 beanStorageId = storageInSession.getBeanStorageId();
             }
