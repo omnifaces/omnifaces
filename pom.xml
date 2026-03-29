@@ -365,23 +365,6 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>minify-omnifaces</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>minify</goal>
-                        </goals>
-                        <configuration>
-                            <baseSourceDir>${project.build.directory}</baseSourceDir>
-                            <sourceDir>tsc</sourceDir>
-                            <baseTargetDir>${project.build.outputDirectory}</baseTargetDir>
-                            <targetDir>META-INF/resources/omnifaces</targetDir>
-                            <includes>
-                                <include>omnifaces.unminified.js</include>
-                            </includes>
-                            <outputFilename>omnifaces.js</outputFilename>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>minify-sw</id>
                         <phase>process-resources</phase>
                         <goals>
