@@ -24,15 +24,11 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIfSystemProperty(
-    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha returns different baseURL on getRequestURL (ip6-localhost instead of localhost)"
-)
 public class PWAResourceHandlerIT extends OmniFacesIT {
 
     private static final String EXPECTED_MANIFEST = "{\"categories\":[],\"dir\":\"auto\",\"display\":\"browser\","

@@ -19,14 +19,10 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.distributable;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@DisabledIfSystemProperty(
-    named = "profile.id", matches = "piranha-.*", disabledReason = "piranha doesn't correctly deal with flash cookies, they seem to hang around one request too long"
-)
 public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 
     @FindBy(id = "form:wasViewExpired")
