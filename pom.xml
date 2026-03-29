@@ -68,14 +68,14 @@
 
         <!-- Test server versions. -->
         <test.wildfly-mojarra.version>39.0.1.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
-        <test.liberty-myfaces.version>26.0.0.3-beta</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty.beta/openliberty-runtime / https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
-        <test.glassfish-mojarra.version>8.0.0</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>11.0.18</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
-        <test.payara-mojarra.version>7.2026.2</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
-        <test.quarkus.version>3.32.3</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
+        <test.liberty-myfaces.version>26.0.0.4-beta</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
+        <test.glassfish-mojarra.version>8.0.1</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.tomcat.version>11.0.20</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+        <test.payara-mojarra.version>7.2026.3</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
+        <test.quarkus.version>3.34.1</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
-        <test.mojarra.version>4.1.6</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra.version>4.1.7</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.faces5.version>5.0.0-SNAPSHOT</test.faces5.version>
         <test.mojarra5.version>5.0.0-SNAPSHOT</test.mojarra5.version>
         <test.myfaces.version>4.1.2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
