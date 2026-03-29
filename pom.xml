@@ -352,38 +352,6 @@
                 </executions>
             </plugin>
 
-            <!-- Configure the JavaScript minifier. -->
-            <plugin>
-                <groupId>com.github.blutorange</groupId>
-                <artifactId>closure-compiler-maven-plugin</artifactId>
-                <version>2.32.0</version>
-                <configuration>
-                    <closureLanguageOut>ECMASCRIPT_2020</closureLanguageOut>
-                    <closureEmitUseStrict>false</closureEmitUseStrict>
-                    <closureCreateSourceMap>false</closureCreateSourceMap>
-                    <skipMerge>true</skipMerge>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>minify-sw</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>minify</goal>
-                        </goals>
-                        <configuration>
-                            <baseSourceDir>${project.basedir}/src/main/resources</baseSourceDir>
-                            <sourceDir>META-INF/resources/omnifaces</sourceDir>
-                            <baseTargetDir>${project.build.outputDirectory}</baseTargetDir>
-                            <targetDir>META-INF/resources/omnifaces</targetDir>
-                            <includes>
-                                <include>sw.unminified.js</include>
-                            </includes>
-                            <outputFilename>sw.js</outputFilename>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Configure the annotation processor for taglib.xml generation. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
