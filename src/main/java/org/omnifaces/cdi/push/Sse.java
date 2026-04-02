@@ -101,7 +101,7 @@ import org.omnifaces.util.Json;
  * </tr>
  * <tr>
  * <td><b>Connection limit</b></td>
- * <td>Max 6 per origin without HTTP/2</td>
+ * <td>Per origin without HTTP/2</td>
  * <td>Not affected (protocol upgrade)</td>
  * </tr>
  * <tr>
@@ -136,11 +136,11 @@ import org.omnifaces.util.Json;
  * characters, hyphens, underscores and periods.
  * <p>
  * Here's an example which refers an existing JavaScript listener function (do not include the parentheses!).
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" onmessage="sseListener" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * function sseListener(message, channel, event) {
  *     console.log(message);
@@ -148,7 +148,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Here's an example which declares an inline JavaScript listener function.
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" onmessage="function(message) { console.log(message); }" /&gt;
  * </pre>
@@ -174,9 +174,9 @@ import org.omnifaces.util.Json;
  * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}<code>(type=SSE)</code></strong> annotation on the
  * given channel name in any CDI/container managed artifact such as <code>&#64;Named</code>, <code>&#64;WebServlet</code>, etc wherever you'd like to send a
  * push message and then invoke <strong>{@link PushContext#send(Object)}</strong> with any Java object representing the push message.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = SSE)
  * private PushContext someChannel;
@@ -188,9 +188,9 @@ import org.omnifaces.util.Json;
  * <p>
  * By default the name of the channel is taken from the name of the variable into which injection takes place. The channel name can be optionally specified via
  * the <code>channel</code> attribute. The example below injects the push context for channel name <code>foo</code> into a variable named <code>bar</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = SSE, channel = "foo")
  * private PushContext bar;
@@ -210,7 +210,7 @@ import org.omnifaces.util.Json;
  * The optional <strong><code>scope</code></strong> attribute can be set to <code>session</code> to restrict the push messages to all views in the current user
  * session only. The push message can only be sent by the user itself and not by the application. This is useful for session-wide feedback triggered by user
  * itself (e.g. as result of asynchronous tasks triggered by user specific action).
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" scope="session" ... /&gt;
  * </pre>
@@ -218,7 +218,7 @@ import org.omnifaces.util.Json;
  * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current view only. The push message will not show
  * up in other views in the same session even if it's the same URL. The push message can only be sent by the user itself and not by the application. This is
  * useful for view-wide feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" scope="view" ... /&gt;
  * </pre>
@@ -231,17 +231,17 @@ import org.omnifaces.util.Json;
  * <code>user</code> attribute must at least implement {@link Serializable} and have a low memory footprint, so putting entire user entity is not recommended.
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
  * <p>
  * Or when you have a custom user entity around in EL as <code>#{someLoggedInUser}</code> which has an <code>id</code> property representing its identifier:
- * 
+ *
  * <pre>
  * &lt;o:sse channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
- * 
+ *
  * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and cannot be set to
  * <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should only be used if the logged-in user represented by
  * <code>user</code> has a shorter lifetime than the HTTP session (e.g. when your application allows changing a logged-in user during same HTTP session without
@@ -257,9 +257,9 @@ import org.omnifaces.util.Json;
  * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the application itself. This is useful for
  * user-specific feedback triggered by other users (e.g. chat, admin messages, etc) or by application's background tasks (e.g. notifications, event listeners,
  * etc).
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = SSE)
  * private PushContext someChannel;
@@ -271,9 +271,9 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Multiple users can be targeted by passing a {@link Collection} holding user identifiers to <strong>{@link PushContext#send(Object, Collection)}</strong>.
- * 
+ *
  * <pre>
- * 
+ *
  * public void sendMessage(Object message, Group recipientGroup) {
  *     Collection&lt;Long&gt; recipientUserIds = recipientGroup.getUserIds();
  *     someChannel.send(message, recipientUserIds);
@@ -288,7 +288,7 @@ import org.omnifaces.util.Json;
  * the channel name to a specific push channel scope/user combination, not to a specific Faces view. In case you intend to have multiple view scoped channels
  * for different purposes, best is to use only one view scoped channel and have a global JavaScript listener which can distinguish its task based on the
  * delivered message. E.g. by sending the message in server as below:
- * 
+ *
  * <pre>
  * Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
  * message.put("functionName", "someFunction");
@@ -297,7 +297,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Which is processed in the <code>onmessage</code> JavaScript listener function as below:
- * 
+ *
  * <pre>
  * function someSseListener(message) {
  *     window[message.functionName](message.functionData);
@@ -322,11 +322,11 @@ import org.omnifaces.util.Json;
  * <ul>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * </ul>
- * 
+ *
  * <pre>
  * &lt;o:sse ... onopen="sseOpenListener" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * function sseOpenListener(channel) {
  *     // ...
@@ -337,11 +337,11 @@ import org.omnifaces.util.Json;
  * automatically attempt to reconnect. This will be invoked when a transient connection error occurs (e.g. temporary network interruption) while the browser's
  * <code>EventSource</code> is still attempting to reconnect. This will <em>not</em> be invoked when the server has explicitly closed the connection (e.g.
  * unknown channel, or expired session or view), or when the <code>EventSource</code> API is not supported. Instead, the <code>onclose</code> will be invoked.
- * 
+ *
  * <pre>
  * &lt;o:sse ... onerror="sseErrorListener" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * function sseErrorListener(code, channel, event) {
  *     if (code == 500) {
@@ -363,11 +363,11 @@ import org.omnifaces.util.Json;
  * invoked when the <code>EventSource</code> API is not supported by the client, or when the server has explicitly closed the connection (e.g. on session or
  * view expiry, or unknown channel), or when the client has explicitly closed the connection via <code>OmniFaces.Push.close(channel)</code>. This will
  * <em>not</em> be invoked when the browser can make an auto-reconnect attempt. Instead, the <code>onerror</code> will be invoked.
- * 
+ *
  * <pre>
  * &lt;o:sse ... onclose="sseCloseListener" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * function sseCloseListener(code, channel, event) {
  *     if (code == -1) {
@@ -405,7 +405,7 @@ import org.omnifaces.util.Json;
  * <strong><code>&#64;</code>{@link Switched}</strong> qualifier. When an SSE connection has been closed, a new CDI {@link SseEvent} will be fired with
  * <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be observed and collected in an application scoped CDI bean as below. Observing in
  * a request/view/session scoped CDI bean is not possible as there's no means of a HTTP request anywhere at that moment.
- * 
+ *
  * <pre>
  * &#64;ApplicationScoped
  * public class SseObserver {
@@ -445,7 +445,7 @@ import org.omnifaces.util.Json;
  * The SSE request URL is composed of the URI prefix <strong><code>/omnifaces.sse/</code></strong>, followed by channel name. So, in case of for example
  * container managed security which has already restricted an example page <code>/user/foo.xhtml</code> to logged-in users with the example role
  * <code>USER</code> on the example URL pattern <code>/user/*</code> in <code>web.xml</code> like below,
- * 
+ *
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
@@ -460,7 +460,7 @@ import org.omnifaces.util.Json;
  * <p>
  * .. and the page <code>/user/foo.xhtml</code> in turn contains a <code>&lt;o:sse channel="foo"&gt;</code>, then you need to add a restriction on SSE
  * connection request URL pattern of <code>/omnifaces.sse/foo</code> like below.
- * 
+ *
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
@@ -486,7 +486,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In case you'd like to trigger a push from business service side to an application scoped push channel, then you could make use of CDI events. First create a
  * custom bean class representing the push event something like <code>PushEvent</code> below taking whatever you'd like to pass as push message.
- * 
+ *
  * <pre>
  * public final class PushEvent {
  *
@@ -499,14 +499,14 @@ import org.omnifaces.util.Json;
  *     public String getMessage() {
  *         return message;
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * Then use {@link jakarta.enterprise.inject.spi.BeanManager#getEvent()} to fire the CDI event.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * private BeanManager beanManager;
  *
@@ -520,9 +520,9 @@ import org.omnifaces.util.Json;
  * <p>
  * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and delegate to {@link PushContext} as
  * below.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = SSE)
  * private PushContext someChannel;
@@ -539,9 +539,9 @@ import org.omnifaces.util.Json;
  * <p>
  * In case the trigger in business service side is an asynchronous service method which is in turn initiated in WAR side, then you could make use of callbacks
  * from WAR side. Let the business service method take a callback instance as argument, e.g. the <code>java.util.function.Consumer</code> functional interface.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
  *     // ... (some long process)
@@ -550,9 +550,9 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * And invoke the asynchronous service method in WAR as below.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * private SomeService someService;
  *
@@ -577,7 +577,7 @@ import org.omnifaces.util.Json;
  * </p>
  * <p>
  * Below is an example extending on the above given business service example.
- * 
+ *
  * <pre>
  * &#64;ApplicationScoped
  * public class PushManager {
@@ -598,10 +598,10 @@ import org.omnifaces.util.Json;
  *             // Handle.
  *         }
  *     }
- * 
+ *
  * }
  * </pre>
- * 
+ *
  * <pre>
  * &#64;MessageDriven(
  *     activationConfig = {
@@ -623,14 +623,14 @@ import org.omnifaces.util.Json;
  *             // Handle.
  *         }
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * Then, in your business service, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * private BeanManager beanManager;
  *
@@ -641,9 +641,9 @@ import org.omnifaces.util.Json;
  * <p>
  * use the newly created <code>PushManager#fireEvent()</code> to fire the JMS event from one server node of the cluster, which in turn will fire the CDI event
  * in all server nodes of the cluster.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * private PushManager pushManager;
  *
@@ -657,7 +657,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside <code>&lt;o:sse&gt;</code>. Here's an
  * example:
- * 
+ *
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -671,13 +671,13 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Here, the push message simply represents the ajax event name. You can use any custom event name.
- * 
+ *
  * <pre>
  * someChannel.send("someEvent");
  * </pre>
  * <p>
  * An alternative is to combine <code>&lt;o:sse&gt;</code> with <code>&lt;h:commandScript&gt;</code>. E.g.
- * 
+ *
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -726,7 +726,7 @@ public class Sse extends PushComponent {
     /**
      * First check if the SSE endpoint is registered and the channel name and scope is valid, then register it in {@link SseChannelManager} and get the channel
      * ID, then render the <code>init()</code> script. This script will instruct the client to open an SSE connection to {@link SseEndpoint}.
-     * 
+     *
      * @throws IllegalStateException When the SSE endpoint is not registered.
      * @throws IllegalArgumentException When the channel name, scope or user is invalid. The channel name may only contain alphanumeric characters, hyphens,
      * underscores and periods. The allowed channel scope values are "application", "session" and "view", case insensitive. The channel name must be uniquely
@@ -749,7 +749,7 @@ public class Sse extends PushComponent {
 
     /**
      * Check if the SSE endpoint is registered.
-     * 
+     *
      * @param context The involved faces context.
      * @throws IllegalStateException When the SSE endpoint is not registered.
      */
@@ -761,7 +761,7 @@ public class Sse extends PushComponent {
 
     /**
      * Validate the channel, handle user switching, and register the channel in {@link SseChannelManager}.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The channel component.
      * @param scope The channel scope.
@@ -785,7 +785,7 @@ public class Sse extends PushComponent {
     /**
      * Register SSE endpoint if necessary, i.e. when {@link PushExtension} has detected at least one <code>&#64;</code>{@link Push}<code>(type=SSE)</code> or
      * <code>&#64;</code>{@link Push}<code>(type=NOTIFICATION)</code> qualified injection point.
-     * 
+     *
      * @param context The involved servlet context.
      */
     public static void registerEndpointIfNecessary(ServletContext context) {
