@@ -14,15 +14,25 @@ package org.omnifaces.test.util;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.omnifaces.util.Servlets;
 
 import com.google.common.collect.ImmutableMap;
@@ -177,6 +187,82 @@ class ServletsTest {
         assertEquals(Collections.emptyMap(), Servlets.toParameterMap("="));
         assertEquals(ImmutableMap.of("foo", asList("%")), Servlets.toParameterMap("foo=%"));
         assertEquals(ImmutableMap.of("myParam", asList("123"), "anotherParam", asList("x")), Servlets.toParameterMap("myParam=123&=&anotherParam=x"));
+    }
+
+    // facesRedirect tests --------------------------------------------------------------------------------------------
+
+    @Test
+    void testFacesRedirectNonAjaxPerformsParamSubstitution() throws Exception {
+        var request = mock(HttpServletRequest.class);
+        var response = mock(HttpServletResponse.class);
+        when(request.getContextPath()).thenReturn("/app");
+
+        Servlets.facesRedirect(request, response, "some.xhtml?foo=%s", "hello world");
+
+        verify(response).sendRedirect("/app/some.xhtml?foo=hello+world");
+    }
+
+    @Test
+    void testFacesRedirectAjaxPerformsParamSubstitution() throws Exception {
+        var request = mock(HttpServletRequest.class);
+        var response = mock(HttpServletResponse.class);
+        when(request.getContextPath()).thenReturn("/app");
+        when(request.getHeader("Faces-Request")).thenReturn("partial/ajax");
+
+        var stringWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
+
+        Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&bar=%s", "hello world", "a&b");
+
+        var xml = stringWriter.toString();
+        assertTrue(xml.contains("url=\"/app/some.xhtml?foo=hello+world&amp;bar=a%26b\""), "Expected substituted and escaped URL in XML, got: " + xml);
+    }
+
+    @Test
+    void testFacesRedirectAjaxWithAbsoluteUrl() throws Exception {
+        var request = mock(HttpServletRequest.class);
+        var response = mock(HttpServletResponse.class);
+        when(request.getHeader("Faces-Request")).thenReturn("partial/ajax");
+
+        var stringWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
+
+        Servlets.facesRedirect(request, response, "https://example.com/page");
+
+        var xml = stringWriter.toString();
+        assertTrue(xml.contains("url=\"https://example.com/page\""), "Expected absolute URL in XML, got: " + xml);
+    }
+
+    @Test
+    void testFacesRedirectNonAjaxWithRelativePath() throws Exception {
+        var request = mock(HttpServletRequest.class);
+        var response = mock(HttpServletResponse.class);
+        when(request.getContextPath()).thenReturn("/myapp");
+
+        Servlets.facesRedirect(request, response, "page.xhtml");
+
+        verify(response).sendRedirect("/myapp/page.xhtml");
+    }
+
+    // redirectPermanent tests ----------------------------------------------------------------------------------------
+
+    @Test
+    void testRedirectPermanentSetsCorrectHeaders() {
+        var response = mock(HttpServletResponse.class);
+
+        Servlets.redirectPermanent(response, "https://example.com/new");
+
+        verify(response).setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(response).setHeader(org.mockito.ArgumentMatchers.eq("Location"), captor.capture());
+        assertEquals("https://example.com/new", captor.getValue());
+        verify(response).setHeader("Connection", "close");
+    }
+
+    @Test
+    void testRedirectPermanentRejectsInvalidUrl() {
+        var response = mock(HttpServletResponse.class);
+        assertThrows(IllegalArgumentException.class, () -> Servlets.redirectPermanent(response, "://invalid"));
     }
 
 }
