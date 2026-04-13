@@ -37,6 +37,8 @@ import static org.omnifaces.util.FacesLocal.redirectPermanent;
 import static org.omnifaces.util.Platform.getDefaultFacesServletMapping;
 
 import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,6 +95,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     private static final String ERROR_NESTED_FORM_ENCOUNTERED = "Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
 
     private static final String SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS = "omnifaces.PendingViewStateRemovals";
+
+    private record PendingViewStateRemovals(String viewState, String viewId) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -248,19 +255,19 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     private static void registerPendingViewStateRemoval(FacesContext context, String viewId) {
         getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS, ConcurrentLinkedQueue::new)
-            .add(Map.entry(getRequestParameter(context, VIEW_STATE_PARAM), viewId));
+            .add(new PendingViewStateRemovals(getRequestParameter(context, VIEW_STATE_PARAM), viewId));
     }
 
     private void performPendingViewStateRemovals(FacesContext context) {
         if (hasSession(context)) {
-            Queue<Entry<String, String>> queue = getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS);
+            Queue<PendingViewStateRemovals> queue = getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS);
 
             if (queue != null) {
-                Entry<String, String> pending;
+                PendingViewStateRemovals pending;
 
                 while ((pending = queue.poll()) != null) {
-                    var viewId = pending.getValue();
-                    var viewState = pending.getKey();
+                    var viewId = pending.viewId();
+                    var viewState = pending.viewState();
                     var viewRoot = super.createView(context, viewId);
                     var manager = getRenderKit(context).getResponseStateManager();
                     var temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, viewState);
