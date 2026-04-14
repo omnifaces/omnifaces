@@ -38,6 +38,7 @@ import static org.omnifaces.util.FacesLocal.redirectPermanent;
 import static org.omnifaces.util.Platform.getDefaultFacesServletMapping;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -254,7 +255,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     private static void registerPendingViewStateRemoval(FacesContext context, String viewId) {
         getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS, ConcurrentLinkedQueue::new)
-            .add(Map.entry(getRequestParameter(context, VIEW_STATE_PARAM), viewId));
+            .add(new SimpleImmutableEntry<>(getRequestParameter(context, VIEW_STATE_PARAM), viewId)); // Map.entry is not Serializable!
     }
 
     private void performPendingViewStateRemovals(FacesContext context) {
