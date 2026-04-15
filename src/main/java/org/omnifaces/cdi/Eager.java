@@ -66,7 +66,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  *
  * <p>
  * E.g. The following bean will be instantiated during application's startup:
- * 
+ *
  * <pre>
  * &#64;Eager
  * &#64;ApplicationScoped
@@ -76,14 +76,14 @@ import org.omnifaces.cdi.eager.EagerExtension;
  *     public void init() {
  *         System.out.println("Application scoped init!");
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * <em>Note: you can also use the stereotype <code>&#64;</code>{@link Startup} for this instead.</em>
  * <p>
  * The following bean will be instantiated whenever a session is created:
- * 
+ *
  * <pre>
  * &#64;Eager
  * &#64;SessionScoped
@@ -95,13 +95,13 @@ import org.omnifaces.cdi.eager.EagerExtension;
  *     public void init() {
  *         System.out.println("Session scoped init!");
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * The following bean will be instantiated whenever the URI <code>/components/cache</code> (relatively to the application root) is requested, i.e. when an app
  * is deployed to <code>/myapp</code> at localhost this will correspond to a URL like <code>https://example.com/myapp/components/cache</code>:
- * 
+ *
  * <pre>
  * &#64;Eager(requestURI = "/components/cache")
  * &#64;RequestScoped
@@ -111,7 +111,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  *     public void init() {
  *         System.out.println("/components/cache requested");
  *     }
- * 
+ *
  * }
  * </pre>
  *

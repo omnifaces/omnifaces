@@ -26,7 +26,7 @@ import org.omnifaces.component.script.ScriptErrorHandler;
  * For detailed usage instructions, see {@link ScriptErrorHandler} javadoc.
  *
  * <h2>Usage</h2>
- * 
+ *
  * <pre>
  * &#64;ApplicationScoped
  * public class ScriptErrorObserver {
@@ -36,7 +36,7 @@ import org.omnifaces.component.script.ScriptErrorHandler;
  *     public void onScriptError(&#64;Observes ScriptError error) {
  *         logger.warning(error.toString());
  *     }
- * 
+ *
  * }
  * </pre>
  *

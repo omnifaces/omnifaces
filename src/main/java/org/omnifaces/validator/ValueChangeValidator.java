@@ -26,7 +26,7 @@ import jakarta.faces.validator.Validator;
  * calls. In such case, you'd like to perform the expensive service/DAO call only when the submitted value is really changed as compared to the model value.
  * <p>
  * This validator offers you a template to do it transparently. To use it, just change your validators from:
- * 
+ *
  * <pre>
  * public class YourValidator implements Validator&lt;YourEntity&gt; {
  *
@@ -38,7 +38,7 @@ import jakarta.faces.validator.Validator;
  * </pre>
  * <p>
  * to
- * 
+ *
  * <pre>
  * public class YourValidator extends ValueChangeValidator&lt;YourEntity&gt; {
  *
@@ -48,7 +48,7 @@ import jakarta.faces.validator.Validator;
  *
  * }
  * </pre>
- * 
+ *
  * So, essentially, just replace <code>implements Validator</code> by <code>extends ValueChangeValidator</code> and rename the method from <code>validate</code>
  * to <code>validateChangedObject</code>.
  *
@@ -81,7 +81,7 @@ public abstract class ValueChangeValidator<T> implements Validator<T> {
     /**
      * Use this method instead of {@link #validate(FacesContext, UIComponent, Object)} if you intend to perform the validation only when the submitted value is
      * really changed as compared to the model value.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The involved UI component.
      * @param submittedValue The submitted value.

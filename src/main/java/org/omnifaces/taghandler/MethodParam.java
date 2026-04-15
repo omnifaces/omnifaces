@@ -51,7 +51,7 @@ public class MethodParam extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public MethodParam(TagConfig config) {

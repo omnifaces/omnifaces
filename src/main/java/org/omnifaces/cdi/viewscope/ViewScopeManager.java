@@ -106,7 +106,7 @@ public class ViewScopeManager {
 
     /**
      * Returns the CDI view scoped managed bean from the current Faces view scope, and auto-creates one if it doesn't exist.
-     * 
+     *
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
      * @param context The CDI context to create the CDI managed bean in.
@@ -119,7 +119,7 @@ public class ViewScopeManager {
 
     /**
      * Returns the CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
-     * 
+     *
      * @param <T> The expected return type.
      * @param type The contextual type of the CDI managed bean.
      * @return The CDI view scoped managed bean from the current Faces view scope, or <code>null</code> if there is none.
@@ -226,7 +226,7 @@ public class ViewScopeManager {
 
     /**
      * Returns <code>true</code> if the current request is triggered by an unload request.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by an unload request.
      * @since 2.2
@@ -237,7 +237,7 @@ public class ViewScopeManager {
 
     /**
      * Returns <code>true</code> if the given request is triggered by an unload request.
-     * 
+     *
      * @param request The involved request.
      * @return <code>true</code> if the given request is triggered by an unload request.
      * @since 3.1

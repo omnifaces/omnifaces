@@ -53,27 +53,27 @@ import org.omnifaces.util.Utils;
  * <h3>Request parameters</h3>
  * <p>
  * The example below injects the request parameter with name <code>foo</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param
  * private String foo;
  * </pre>
  * <p>
  * By default the name of the request parameter is taken from the name of the variable into which injection takes place. The name can be optionally specified
  * via the <code>name</code> attribute. The example below injects the request parameter with name <code>foo</code> into a variable named <code>bar</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(name = "foo")
  * private String bar;
  * </pre>
  * <p>
  * The <code>name</code> attribute is only mandatory when using constructor injection in OmniFaces 3.5 or older as there is no information about constructor
  * parameter names. The example below injects the request parameter with name <code>foo</code> as a constructor parameter.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * public Bean(&#64;Param(name = "foo") String foo) {
  *     // ...
@@ -82,9 +82,9 @@ import org.omnifaces.util.Utils;
  * <p>
  * Since OmniFaces 3.6 it is not necessary anymore if the parameter has a name according to the class file as per
  * <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html#isNamePresent--"><code>Parameter#isNamePresent()</code></a>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * public Bean(&#64;Param String foo) {
  *     // ...
@@ -94,9 +94,9 @@ import org.omnifaces.util.Utils;
  * <h3>Multi-valued request parameters</h3>
  * <p>
  * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in OmniFaces 2.4.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(name = "foo")
  * private List&lt;String&gt; foos;
  *
@@ -109,9 +109,9 @@ import org.omnifaces.util.Utils;
  * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index of the path parameter. The support was
  * added in OmniFaces 2.5. On an example request <code>https://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the
  * below example injects the path parameter <code>firstname.lastname</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(pathIndex = 0)
  * private String user;
  * </pre>
@@ -122,35 +122,35 @@ import org.omnifaces.util.Utils;
  * <p>
  * Standard types for which Faces already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc or for which there's already a
  * converter registered via <code>forClass</code>, can be injected without explicitly specifying a converter.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param
  * private Long id;
  * </pre>
  * <p>
  * Other types do need a converter. The following is an example of the injection of request parameter <code>user</code> following a request such as
  * <code>https://example.com/mypage?user=42</code>:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(converter = "userConverter", validator = "priviledgedUser")
  * private User user;
  * </pre>
  * <p>
  * This also works on multi-valued parameters.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(name = "user", converter = "userConverter")
  * private List&lt;User&gt; users;
  * </pre>
  * <p>
  * This also works on path parameters. The following is an example of the injection of path parameter <code>user</code> following a request such as
  * <code>https://example.com/mypage/42</code>:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(pathIndex = 0, converter = "userConverter", validator = "priviledgedUser")
  * private User user;
  * </pre>
@@ -163,9 +163,9 @@ import org.omnifaces.util.Utils;
  * </ul>
  * <p>
  * Instead of <code>converter</code> or <code>validator</code> you can also use <code>converterClass</code> or <code>validatorClass</code>:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(converterClass = UserConverter.class, validatorClass = PriviledgedUser.class)
  * private User user;
  * </pre>
@@ -175,9 +175,9 @@ import org.omnifaces.util.Utils;
  * In case you want to specify converter or validator attributes, then you can use <code>converterAttributes</code> or <code>validatorAttributes</code>
  * respectively. They accept an array of {@link Attribute} arguments whose value can be a string literal or an EL expression such as
  * <code>value = "#{bean.property}"</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Param(
  *     converterClass = DateTimeConverter.class, converterAttributes = {
  *         &#64;Attribute(
@@ -192,9 +192,9 @@ import org.omnifaces.util.Utils;
  * In case the converted parameter value is not serializable, while the managed bean is serializable, you could inject it into a field of type
  * {@link ParamValue}, with <code>V</code> the actual type of the converted parameter. Deserialization in this case works by converting from the original
  * parameter again.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Param(converter = "someIdToInputStreamConverter")
  * private ParamValue&lt;InputStream&gt; content; // Extreme example :) Be careful with resource leaking.
@@ -208,19 +208,19 @@ import org.omnifaces.util.Utils;
  * <p>
  * By default, faces messages are attached to the client ID of the current {@link UIViewRoot}, so you can use the following {@code for} attribute to separate
  * faces messages coming from {@code @Param} from the rest:
- * 
+ *
  * <pre>
  * &lt;h:messages for="#{view.id}" /&gt;
  * </pre>
  * <p>
  * In case you wish to make it a global message, then you can since OmniFaces 4.5 set the {@code globalMessage} attribute to {@code true}:
- * 
+ *
  * <pre>
  * &#64;Param(globalMessage=true)
  * </pre>
- * 
+ *
  * So that these can only be displayed via below tag:
- * 
+ *
  * <pre>
  * &lt;h:messages globalOnly="true" /&gt;
  * </pre>
@@ -228,9 +228,9 @@ import org.omnifaces.util.Utils;
  * <h2>Historical note</h2>
  * <p>
  * Before OmniFaces 3.6, the <code>&#64;</code>{@link Param} which is not of type {@link ParamValue} also required <code>&#64;</code>{@link Inject} as in:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Param
  * private String foo;
@@ -413,7 +413,7 @@ public @interface Param {
 
     /**
      * (Optional) Whether to add the faces message as a global message instead of a message for the current {@link UIViewRoot}.
-     * 
+     *
      * @return Whether to add the faces message as a global message instead of a message for the current {@link UIViewRoot}.
      * @since 4.5
      */

@@ -52,7 +52,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
     /**
      * Returns a concrete (and usually empty) {@link Collection} instance which should hold the tree's children.
-     * 
+     *
      * @return A concrete (and usually empty) {@link Collection} instance which should hold the tree's children.
      */
     protected abstract Collection<TreeModel<T>> createChildren();

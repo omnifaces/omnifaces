@@ -68,7 +68,7 @@ public final class Xml {
     /**
      * Creates a single XML {@link Document} based on given URLs representing XML documents. All those XML documents are merged into a single root element named
      * <code>root</code>.
-     * 
+     *
      * @param urls The URLs representing XML documents.
      * @return A single XML document containing all given XML documents.
      * @throws IOException When an I/O error occurs.
@@ -85,7 +85,7 @@ public final class Xml {
     /**
      * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity references and disables external entity
      * processing (to keep it as lenient and secure as possible).
-     * 
+     *
      * @return A lenient instance of {@link DocumentBuilder}.
      */
     public static DocumentBuilder createDocumentBuilder() {
@@ -119,7 +119,7 @@ public final class Xml {
 
     /**
      * Parse the given URLs as a document using the given builder and then append all its child nodes to the given document.
-     * 
+     *
      * @param builder The document builder.
      * @param document The document.
      * @param urls The URLs representing XML documents.
@@ -152,7 +152,7 @@ public final class Xml {
 
     /**
      * Convenience method to return a node list matching given XPath expression.
-     * 
+     *
      * @param node The node to return node list matching given XPath expression for.
      * @param xpath The XPath instance.
      * @param expression The XPath expression to match node list.
@@ -166,7 +166,7 @@ public final class Xml {
     /**
      * Convenience method to return trimmed text content of given node. This uses <code>getFirstChild().getNodeValue()</code> instead of
      * <code>getTextContent()</code> to workaround some buggy JAXP implementations.
-     * 
+     *
      * @param node The node to return text content for.
      * @return Trimmed text content of given node.
      */
@@ -176,7 +176,7 @@ public final class Xml {
 
     /**
      * Convenience method to return a list of node text contents for given URL representing XML document matching given XPath expression.
-     * 
+     *
      * @param url The URL representing XML document.
      * @param expression The XPath expression to match node list whose text content has to be collected.
      * @return A list of node text contents.

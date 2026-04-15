@@ -62,7 +62,7 @@ public final class CombinedResourceInputStream extends InputStream {
     /**
      * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the {@link InputStream} will be obtained and
      * hold in an iterable collection.
-     * 
+     *
      * @param resources The resources to be read.
      * @param contentType The content type of the combined resource; must not be <code>null</code>. When this is a JavaScript type (ending in
      * <code>/javascript</code>), <code>"use strict"</code> directives will be stripped from the preamble of each resource to prevent them from ending up in the
@@ -204,7 +204,7 @@ public final class CombinedResourceInputStream extends InputStream {
     /**
      * Advances to the next stream in the iterator. When advancing to a JS resource stream (not a CRLF separator), enables preamble scanning mode for
      * <code>"use strict"</code> directive stripping.
-     * 
+     *
      * @return <code>true</code> if there was a next stream to advance to, <code>false</code> otherwise.
      */
     private boolean advanceStream() {
@@ -226,7 +226,7 @@ public final class CombinedResourceInputStream extends InputStream {
      * Scans the preamble of a JS resource stream for a <code>"use strict"</code> directive and strips it if found. Non-quote bytes (whitespace, comment
      * characters) pass through directly. When a quote is found, the content up to the matching close quote is buffered and checked. If it's
      * <code>"use strict"</code>, the directive and the rest of the line are consumed. Otherwise, the buffered content is queued as pending output.
-     * 
+     *
      * @return The next byte to output, or <code>-1</code> if the stream is exhausted.
      * @throws IOException If something fails at I/O level.
      */

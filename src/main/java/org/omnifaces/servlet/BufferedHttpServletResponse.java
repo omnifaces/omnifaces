@@ -37,7 +37,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 
     /**
      * Construct a buffered HTTP servlet response which wraps the given response.
-     * 
+     *
      * @param response The response to be wrapped.
      */
     public BufferedHttpServletResponse(HttpServletResponse response) {
@@ -54,7 +54,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 
     /**
      * Flushes and returns the buffered response.
-     * 
+     *
      * @return The buffered response.
      * @throws IOException When an I/O error occurs.
      */
@@ -65,7 +65,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 
     /**
      * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by {@link #getCharacterEncoding()}.
-     * 
+     *
      * @return The buffered response as string.
      * @throws IOException When an I/O error occurs.
      */

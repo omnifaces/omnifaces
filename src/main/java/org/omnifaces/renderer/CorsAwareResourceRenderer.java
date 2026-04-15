@@ -66,7 +66,7 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
  * <p>
  * Eveything is automatic. In case you wish to override the default/configured outcome of one of the attributes on a specific resource component, then simply
  * explicitly set it as a passthrough attribute yourself. For example,
- * 
+ *
  * <pre>
  * &lt;... xmlns:h="jakarta.faces.html" xmlns:a="jakarta.faces.passthrough"&gt;
  * &lt;h:outputScript name="..." a:crossorigin="use-credentials" /&gt;
@@ -106,7 +106,7 @@ public class CorsAwareResourceRenderer extends RendererWrapper implements Compon
 
     /**
      * Creates a new instance of this CORS resource renderer which wraps the given resource renderer.
-     * 
+     *
      * @param wrapped The resource renderer to be wrapped.
      */
     public CorsAwareResourceRenderer(Renderer<?> wrapped) {
@@ -151,7 +151,7 @@ public class CorsAwareResourceRenderer extends RendererWrapper implements Compon
 
     /**
      * Returns the configured crossorigin. Defaults to {@value CorsAwareResourceRenderer#DEFAULT_CROSSORIGIN}.
-     * 
+     *
      * @param context The involved faces context.
      * @return The configured crossorigin.
      */
@@ -165,7 +165,7 @@ public class CorsAwareResourceRenderer extends RendererWrapper implements Compon
 
     /**
      * Returns whether the integrity is needed. Defaults to {@code true}.
-     * 
+     *
      * @param context The involved faces context.
      * @return Whether the integrity is needed.
      */
@@ -180,7 +180,7 @@ public class CorsAwareResourceRenderer extends RendererWrapper implements Compon
     /**
      * Returns the integrity of the given resource if necessary. It will only return a base64 encoded sha384 hash when the given resource is an instance of
      * {@link CDNResource} and the {@link #getCrossorigin(FacesContext)} equals to {@value CorsAwareResourceRenderer#DEFAULT_CROSSORIGIN}.
-     * 
+     *
      * @param context The involved faces context.
      * @param resource The resource to get integrity for.
      * @return The integrity of the given resource if necessary.

@@ -62,7 +62,7 @@ public class SseChannelManager extends PushChannelManager {
 
     /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
-     * 
+     *
      * @param channel The SSE channel.
      * @param scope The SSE scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
      * <code>null</code>, the default is <code>application</code>.
@@ -130,7 +130,7 @@ public class SseChannelManager extends PushChannelManager {
      * This helps the SSE channel manager to hold view scoped SSE channel identifiers registered by <code>&lt;o:sse&gt;</code>.
      * <p>
      * Since this class is {@code public} it can be externally registered into environment-specific CDI bean management facility.
-     * 
+     *
      * @author Bauke Scholtz
      * @see SseChannelManager
      * @since 5.2
@@ -144,7 +144,7 @@ public class SseChannelManager extends PushChannelManager {
 
         /**
          * Returns the view scoped channels.
-         * 
+         *
          * @return The view scoped channels.
          */
         protected Map<String, String> getChannels() {

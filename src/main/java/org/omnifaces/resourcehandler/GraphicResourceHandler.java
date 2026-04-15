@@ -36,7 +36,7 @@ public class GraphicResourceHandler extends DefaultResourceHandler {
 
     /**
      * Creates a new instance of this graphic resource handler which wraps the given resource handler.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public GraphicResourceHandler(ResourceHandler wrapped) {

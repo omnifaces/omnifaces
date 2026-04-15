@@ -50,7 +50,7 @@ public final class Renderers {
 
     /**
      * Write the given text either HTML-escaped or unescaped. Beware of potential XSS attack holes when user-controlled input is written unescaped!
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param text The text to be written.
@@ -73,7 +73,7 @@ public final class Renderers {
     /**
      * Write component attribute of the given name, if it's not empty. Both HTML attribute name and component property name defaults to the given component
      * attribute name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param name The component attribute name whose value should be written.
@@ -87,7 +87,7 @@ public final class Renderers {
     /**
      * Write component attribute of the given name, if it's not empty, as given HTML attribute name. Component property name defaults to the given component
      * attribute name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param name The component attribute name whose value should be written.
@@ -103,7 +103,7 @@ public final class Renderers {
 
     /**
      * Write component attribute of the given name, if it's not empty, as given HTML attribute name associated with given component property name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param name The component attribute name whose value should be written.
@@ -120,7 +120,7 @@ public final class Renderers {
 
     /**
      * Write given attribute value, if it's not empty, as given HTML attribute name. Component property name defaults to given HTML attribute name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param html The HTML attribute name to be written.
      * @param value The HTML attribute value to be written.
@@ -133,7 +133,7 @@ public final class Renderers {
 
     /**
      * Write given attribute value, if it's not empty, as given HTML attribute name associated with given component property name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param html The HTML attribute name to be written.
      * @param value The HTML attribute value to be written.
@@ -152,7 +152,7 @@ public final class Renderers {
     /**
      * Write component attributes of the given names, if it's not empty. Both HTML attribute name and component property name defaults to the given component
      * attribute name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param names The names of the attributes to be written.
@@ -170,7 +170,7 @@ public final class Renderers {
     /**
      * Write component attributes of the given property-HTML mapping of names, if it's not empty. Map key will be used as component property name and map value
      * will be used as HTML attribute name.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component, usually the parent component.
      * @param names Mapping of component property-HTML attribute names of the attributes to be written.
@@ -189,7 +189,7 @@ public final class Renderers {
 
     /**
      * Write ID of component if necessary. That is, when it's explicitly set or the component has client behaviors.
-     * 
+     *
      * @param writer The involved response writer.
      * @param component The associated UI component.
      * @throws IOException When an I/O error occurs.

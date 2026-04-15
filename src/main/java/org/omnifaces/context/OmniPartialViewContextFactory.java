@@ -29,7 +29,7 @@ public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 
     /**
      * Construct a new OmniFaces partial view context factory around the given wrapped factory.
-     * 
+     *
      * @param wrapped The wrapped factory.
      */
     public OmniPartialViewContextFactory(PartialViewContextFactory wrapped) {

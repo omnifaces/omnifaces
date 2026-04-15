@@ -35,7 +35,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Constructs a new hash change event.
-     * 
+     *
      * @param context The involved faces context.
      * @param oldHashQueryString The old hash query string.
      * @param newHashQueryString The new hash query string.
@@ -48,7 +48,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the current view root.
-     * 
+     *
      * @return The current view root.
      */
     @Override
@@ -58,7 +58,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the old hash query string value.
-     * 
+     *
      * @return The old hash query string value.
      */
     @Override
@@ -68,7 +68,7 @@ public class HashChangeEvent extends ValueChangeEvent {
 
     /**
      * Returns the new hash query string value.
-     * 
+     *
      * @return The new hash query string value.
      */
     @Override

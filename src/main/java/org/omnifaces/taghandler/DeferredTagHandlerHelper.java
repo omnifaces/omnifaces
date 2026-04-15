@@ -63,7 +63,7 @@ final class DeferredTagHandlerHelper {
 
     /**
      * Create the tag instance based on the <code>binding</code> and/or <code>instanceId</code> attribute.
-     * 
+     *
      * @param context The involved EL context.
      * @param binding The involved binding attribute.
      * @param id The involved id attribute.
@@ -108,7 +108,7 @@ final class DeferredTagHandlerHelper {
     /**
      * Collect the deferred attributes of the given object. If the property is a literal text (i.e. no EL expression), then it will just be set directly on the
      * given object, else it will be collected as {@link ValueExpression} and setter method pairs and returned.
-     * 
+     *
      * @param context The involved facelet context.
      * @param instance The instance to collect EL properties for.
      * @return The deferred attributes of the given object.
@@ -143,7 +143,7 @@ final class DeferredTagHandlerHelper {
 
     /**
      * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is no such attribute.
-     * 
+     *
      * @param context The involved facelet context.
      * @param name The attribute name to return the value expression for.
      * @param type The type of the value expression.
@@ -167,7 +167,7 @@ final class DeferredTagHandlerHelper {
         /**
          * Just return TagHandler#getAttribute() via a public method (it's by default protected and otherwise thus unavailable inside
          * collectDeferredAttributes().
-         * 
+         *
          * @param name The attribute name.
          * @return The tag attribute associated with given attribute name.
          */

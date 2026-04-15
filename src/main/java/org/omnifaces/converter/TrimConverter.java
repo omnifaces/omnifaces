@@ -34,13 +34,13 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.TrimConverter</code>. Just specify it in the <code>converter</code> attribute of the component
  * referring the <code>String</code> property. For example:
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.username}" converter="omnifaces.TrimConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:trimConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.username}"&gt;
  *     &lt;o:trimConverter /&gt;
@@ -48,7 +48,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * You can also configure it application wide via below entry in <code>faces-config.xml</code> without the need to specify it in every single input component:
- * 
+ *
  * <pre>
  * &lt;converter&gt;
  *     &lt;converter-for-class&gt;java.lang.String&lt;/converter-for-class&gt;

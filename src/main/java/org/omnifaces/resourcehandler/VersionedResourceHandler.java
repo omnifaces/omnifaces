@@ -32,7 +32,7 @@ import org.omnifaces.util.Utils;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
- * 
+ *
  * <pre>
  * {@code
  * <application>
@@ -42,7 +42,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * And the version parameter needs to be configured as follows in <code>web.xml</code>:
- * 
+ *
  * <pre>
  * {@code
  * <context-param>
@@ -71,7 +71,7 @@ public class VersionedResourceHandler extends DefaultResourceHandler {
     /**
      * Creates a new instance of this versioned resource handler which wraps the given resource handler. This will also initialize the version based on the
      * context parameter.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public VersionedResourceHandler(ResourceHandler wrapped) {

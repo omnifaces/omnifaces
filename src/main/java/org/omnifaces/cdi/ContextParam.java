@@ -32,9 +32,9 @@ import org.omnifaces.cdi.contextparam.ContextParamProducer;
  * <p>
  * By default the name of the context parameter is taken from the name of the variable into which injection takes place. The example below injects the context
  * parameter with name <code>foo</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;ContextParam
  * private String foo;
@@ -43,9 +43,9 @@ import org.omnifaces.cdi.contextparam.ContextParamProducer;
  * The name can be optionally specified via the <code>name</code> attribute, which shall more often be used as context parameters may have a.o. periods and/or
  * hyphens in the name, which are illegal in variable names. The example below injects the context parameter with name <code>foo.bar</code> into a variable
  * named <code>bar</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;ContextParm(name = "foo.bar")
  * private String bar;

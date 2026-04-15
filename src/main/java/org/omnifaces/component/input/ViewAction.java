@@ -37,7 +37,7 @@ import org.omnifaces.util.State;
  * <p>
  * In below example, the <code>FooConverter</code> may convert a non-null parameter to <code>null</code> without causing a validation or conversion error, and
  * the intent is to redirect the current page to <code>otherpage.xhtml</code> when the converted result is <code>null</code>.
- * 
+ *
  * <pre>
  * &lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
  * &lt;f:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
@@ -45,7 +45,7 @@ import org.omnifaces.util.State;
  * <p>
  * This is however not possible with standard <code>&lt;f:viewAction&gt;</code> as it evaluates the <code>if</code> attribute already before the conversion has
  * taken place. This component solves that by postponing the evaluation of the <code>if</code> attribute to the <code>INVOKE_APPLICATION</code> phase.
- * 
+ *
  * <pre>
  * &lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
  * &lt;o:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
@@ -56,7 +56,7 @@ import org.omnifaces.util.State;
  * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;f:viewAction&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.
- * 
+ *
  * <pre>
  * &lt;o:viewAction action="otherpage" if="#{bean.property eq null}" /&gt;
  * </pre>
@@ -64,7 +64,7 @@ import org.omnifaces.util.State;
  * <h2>Messaging</h2>
  * <p>
  * You can use the <code>message</code> attribute to add a global flash warning message.
- * 
+ *
  * <pre>
  * &lt;o:viewAction ... message="Please use a valid link from within the site" /&gt;
  * </pre>
@@ -173,7 +173,7 @@ public class ViewAction extends UIViewAction {
 
     /**
      * Returns the global flash warning message to be shown in the redirected page.
-     * 
+     *
      * @return The global flash warning message to be shown in the redirected page.
      * @since 3.2
      */
@@ -183,7 +183,7 @@ public class ViewAction extends UIViewAction {
 
     /**
      * Sets the global flash warning message to be shown in the redirected page.
-     * 
+     *
      * @param message The global flash warning message to be shown in the redirected page.
      * @since 3.2
      */

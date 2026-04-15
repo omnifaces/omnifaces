@@ -53,7 +53,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     /**
      * Construct LRU cache with given maximum capacity.
-     * 
+     *
      * @param maximumCapacity The maximum capacity.
      * @throws IllegalArgumentException when maximum capacity is less than 2.
      */
@@ -64,7 +64,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     /**
      * Construct LRU cache with given maximum capacity and eviction listener.
-     * 
+     *
      * @param maximumCapacity The maximum capacity.
      * @param evictionListener The eviction listener.
      * @throws IllegalArgumentException when maximum capacity is less than 2.

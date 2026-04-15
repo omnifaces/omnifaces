@@ -43,7 +43,7 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
     /**
      * Construct a new resettable buffered writer which wraps the given writer and forcibly buffers everything until the given buffer size in bytes, regardless
      * of flush calls. The given character encoding is used to measure the amount of already written bytes in the buffer. regardless of flush calls.
-     * 
+     *
      * @param writer The wrapped writer.
      * @param bufferSize The buffer size.
      * @param characterEncoding The character encoding.

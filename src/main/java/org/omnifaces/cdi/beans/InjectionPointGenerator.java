@@ -39,7 +39,7 @@ public class InjectionPointGenerator {
 
     /**
      * Returns injection point.
-     * 
+     *
      * @return Injection point.
      */
     public InjectionPoint getInjectionPoint() {

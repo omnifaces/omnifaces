@@ -34,7 +34,7 @@ import jakarta.faces.application.ResourceHandler;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;
@@ -49,7 +49,7 @@ import jakarta.faces.application.ResourceHandler;
  * resource handler, so you need to make absolutely sure yourself that it is valid.
  * <p>
  * Here is an example configuration:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
@@ -63,7 +63,7 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>
  * With the above configuration, the following resources:
- * 
+ *
  * <pre>
  * &lt;h:outputScript name="js/script1.js" /&gt;
  * &lt;h:outputScript library="somelib" name="js/script2.js" /&gt;
@@ -72,7 +72,7 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>
  * Will be rendered as:
- * 
+ *
  * <pre>
  * &lt;script src="https://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
  * &lt;script src="https://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
@@ -81,7 +81,7 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>
  * Here is a real world example with Bootstrap:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
@@ -93,14 +93,14 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>
  * With the above configuration, the following resources:
- * 
+ *
  * <pre>
  * &lt;h:outputStylesheet library="cdn" name="bootstrap.css" /&gt;
  * &lt;h:outputScript library="cdn" name="bootstrap.js" /&gt;
  * </pre>
  * <p>
  * Will be rendered as:
- * 
+ *
  * <pre>
  * &lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /&gt;
  * &lt;script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
@@ -110,23 +110,23 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * You can also use the wildcard syntax to map every single resource of a specific library to a common CDN URL. To achieve that, just use <code>*</code> as the
  * sole resource name and make sure that the CDN URL ends with <code>/*</code>. Here's an example:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
  *     &lt;param-value&gt;jquery-cdn:*=https://code.jquery.com/*&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
- * 
+ *
  * With the above configuration, the following resources:
- * 
+ *
  * <pre>
  * &lt;h:outputScript library="jquery-cdn" name="jquery-1.9.1.js" /&gt;
  * &lt;h:outputScript library="jquery-cdn" name="ui/1.10.3/jquery-ui.js" /&gt;
  * </pre>
  * <p>
  * Will be rendered as:
- * 
+ *
  * <pre>
  * &lt;script src="https://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
  * &lt;script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
@@ -136,7 +136,7 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * The CDN resource handler supports evaluating EL expessions in the CDN URL. Here's an example:
  * </p>
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
@@ -151,7 +151,7 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * If you'd like to supply a context parameter which conditionally disables the CDN resource handler, then set the context parameter
  * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DISABLED} accordingly.
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
@@ -209,7 +209,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
     /**
      * Creates a new instance of this CDN resource handler which wraps the given resource handler. The CDN resources will be initialized based on the
      * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      * @throws IllegalArgumentException When the context parameter is missing or is in invalid format.
      */
@@ -268,7 +268,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
     /**
      * Initialize the CDN resources.
-     * 
+     *
      * @return The CDN resources, or <code>null</code> if the context parameter has not been set.
      * @throws IllegalArgumentException When the context parameter value is in invalid format.
      */

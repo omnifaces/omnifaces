@@ -50,20 +50,20 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * For example:
- * 
+ *
  * <pre>
  * public class Foo {
- * 
+ *
  *     public static final String FOO1 = "foo1";
  *     public static final String FOO2 = "foo2";
- * 
+ *
  * }
  *
  * public interface Bar {
- * 
+ *
  *     public String BAR1 = "bar1";
  *     public String BAR2 = "bar2";
- * 
+ *
  * }
  *
  * public enum Baz {
@@ -78,7 +78,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The constant field values of the above types can be mapped into the request scope as follows:
- * 
+ *
  * <pre>
  * &lt;o:importConstants type="com.example.Foo" /&gt;
  * &lt;o:importConstants type="com.example.Bar" /&gt;
@@ -105,13 +105,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * Since version 4.6, when the class specified in the <code>type</code> attribute is an <code>enum</code>, such as <code>Baz</code> or <code>Faz</code> in the
  * above example, then you can use <code>#{Faz.members()}</code> to exclusively access enum members rather than all constant field values.
- * 
+ *
  * <pre>
  * &lt;h:selectOneMenu&gt;
  *     &lt;f:selectItems value="#{Faz.members()}" /&gt; &lt;!-- FAZ1, FAZ2 --&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
- * 
+ *
  * <h2>JSF 2.3</h2>
  * <p>
  * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in <code>&lt;f:metadata&gt;</code> which may not be
@@ -149,7 +149,7 @@ public class ImportConstants extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ImportConstants(TagConfig config) {
@@ -192,7 +192,7 @@ public class ImportConstants extends TagHandler {
 
     /**
      * Collect constants of the given type. That are, all public static final fields of the given type.
-     * 
+     *
      * @param type The fully qualified name of the type to collect constants for.
      * @return Constants of the given type.
      */
@@ -243,7 +243,7 @@ public class ImportConstants extends TagHandler {
 
     /**
      * Returns whether the given field is a constant field, that is when it is public, static and final.
-     * 
+     *
      * @param field The field to be checked.
      * @return <code>true</code> if the given field is a constant field, otherwise <code>false</code>.
      */
@@ -285,7 +285,7 @@ public class ImportConstants extends TagHandler {
 
         /**
          * Returns Exclusively enum members in case the type is an enum.
-         * 
+         *
          * @return Exclusively enum members in case the type is an enum.
          * @throws IllegalStateException in case the type is not an enum.
          * @since 4.6

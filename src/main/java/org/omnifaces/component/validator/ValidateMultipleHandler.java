@@ -47,7 +47,7 @@ public class ValidateMultipleHandler extends ComponentHandler {
 
     /**
      * Construct the tag handler for {@link ValidateMultiple} component.
-     * 
+     *
      * @param config The component config.
      */
     public ValidateMultipleHandler(ComponentConfig config) {

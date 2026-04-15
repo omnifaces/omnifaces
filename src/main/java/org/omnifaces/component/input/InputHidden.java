@@ -51,7 +51,7 @@ import org.omnifaces.util.State;
  * <p>
  * You can use it the same way as <code>&lt;h:inputHidden&gt;</code>, you only need to change <code>h:</code> into <code>o:</code> to get the "immediate v2.0"
  * behavior.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;o:inputHidden value="#{bean.hidden}" /&gt;
@@ -124,7 +124,7 @@ public class InputHidden extends HtmlInputHidden {
      * Returns whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the submitted value will be ignored and the
      * model value will be used as submitted value. All associated validators will still be invoked based on the model value, not on the submitted value. Also
      * the setter won't be invoked.
-     * 
+     *
      * @return Whether this component is readonly.
      * @since 4.1
      */
@@ -136,7 +136,7 @@ public class InputHidden extends HtmlInputHidden {
      * Sets whether this component is readonly. Defaults to <code>false</code>. When set to <code>true</code>, the submitted value will be ignored and the model
      * value will be used as submitted value. All associated validators will still be invoked based on the model value, not on the submitted value. Also the
      * setter won't be invoked.
-     * 
+     *
      * @param readonly Whether this component is readonly.
      * @since 4.1
      */

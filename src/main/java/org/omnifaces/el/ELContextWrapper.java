@@ -38,7 +38,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
     /**
      * Construct EL context wrapper.
-     * 
+     *
      * @param wrapped The EL context to be wrapped.
      */
     public ELContextWrapper(ELContext wrapped) {

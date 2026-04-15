@@ -40,7 +40,7 @@ import org.omnifaces.util.Components;
  * The <strong><code>{@literal @}messages</code></strong> search keyword resolver will automatically resolve all {@link UIMessage} and {@link UIMessages}
  * components within the current {@link UIForm}. This is particularly useful when you have a relatively large form and would like to Ajax-update only the
  * message components when submitting the form.
- * 
+ *
  * <pre>
  * &lt;h:form id="form"&gt;
  *     &lt;h:inputText id="input1" ... /&gt;
@@ -81,7 +81,7 @@ public class MessagesKeywordResolver extends SearchKeywordResolver {
 
     /**
      * Invoked by {@link ApplicationProcessor}.
-     * 
+     *
      * @param application Involved faces application.
      */
     public static void register(Application application) {

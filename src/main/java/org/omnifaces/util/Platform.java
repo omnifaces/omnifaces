@@ -46,7 +46,7 @@ public final class Platform {
 
     /**
      * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
-     * 
+     *
      * @param servletContext The context to get the ServletRegistration from.
      * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
      * @since 1.8
@@ -66,7 +66,7 @@ public final class Platform {
 
     /**
      * Returns the mappings associated with the {@link FacesServlet}.
-     * 
+     *
      * @param servletContext The context to get the {@link FacesServlet} from.
      * @return The mappings associated with the {@link FacesServlet}, or an empty set.
      * @since 2.5
@@ -82,7 +82,7 @@ public final class Platform {
      * with a leading slash (e.g. <code>/faces</code>). If Faces is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g.
      * <code>.xhtml</code>). If none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
      * {@link ApplicationInitializer} and cached in the {@link ServletContext}.
-     * 
+     *
      * @return The default faces servlet mapping (without the wildcard).
      * @since 3.10
      */

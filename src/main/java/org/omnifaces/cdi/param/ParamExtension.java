@@ -60,7 +60,7 @@ public class ParamExtension implements Extension {
 
     /**
      * Collect fields annotated with {@link Param}.
-     * 
+     *
      * @param <T> The generic injection target type.
      * @param event The process injection target event.
      */
@@ -102,7 +102,7 @@ public class ParamExtension implements Extension {
 
     /**
      * Process {@link Param} fields annotated with {@link Inject}.
-     * 
+     *
      * @param event The after bean discovery event.
      */
     public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
@@ -113,7 +113,7 @@ public class ParamExtension implements Extension {
 
     /**
      * /** Process {@link Param} fields without {@link Inject} annotation.
-     * 
+     *
      * @param <T> The generic injection target type.
      * @param event The process injection target event.
      * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.

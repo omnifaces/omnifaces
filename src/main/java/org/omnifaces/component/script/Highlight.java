@@ -40,7 +40,7 @@ import org.omnifaces.util.State;
  * The <code>&lt;o:highlight&gt;</code> is a helper component which highlights all invalid {@link UIInput} components and the associated labels by adding an
  * error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The <code>&lt;o:highlight /&gt;</code> component
  * can be placed anywhere in the view, as long as there's only one of it. Preferably put it somewhere in the master template for forms.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
@@ -51,7 +51,7 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class yourself. For example,
- * 
+ *
  * <pre>
  * label.error {
  *     color: #f00;
@@ -62,13 +62,13 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * You can override the default error style class by the <code>styleClass</code> attribute:
- * 
+ *
  * <pre>
  * &lt;o:highlight styleClass="invalid" /&gt;
  * </pre>
  * <p>
  * You can disable the default focus on the first invalid input element setting the <code>focus</code> attribute.
- * 
+ *
  * <pre>
  * &lt;o:highlight styleClass="invalid" focus="false" /&gt;
  * </pre>
@@ -158,7 +158,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Returns the error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
-     * 
+     *
      * @return The error style class which is to be applied on invalid inputs.
      */
     public String getStyleClass() {
@@ -167,7 +167,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Sets the error style class which is to be applied on invalid inputs. Defaults to {@code "error"}.
-     * 
+     *
      * @param styleClass The error style class which is to be applied on invalid inputs.
      */
     public void setStyleClass(String styleClass) {
@@ -176,7 +176,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
-     * 
+     *
      * @return Whether the first error element should gain focus.
      */
     public boolean isFocus() {
@@ -185,7 +185,7 @@ public class Highlight extends OnloadScript {
 
     /**
      * Sets whether the first error element should gain focus. Defaults to {@code true}.
-     * 
+     *
      * @param focus Whether the first error element should gain focus.
      */
     public void setFocus(boolean focus) {

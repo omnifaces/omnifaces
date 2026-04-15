@@ -44,7 +44,7 @@ import org.omnifaces.cdi.ratelimit.RateLimiter;
  * <h2>Usage</h2>
  * <p>
  * Here's an example of rate limiting an API endpoint to 10 requests per minute per client IP:
- * 
+ *
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -54,12 +54,12 @@ import org.omnifaces.cdi.ratelimit.RateLimiter;
  *     public void processApiRequest() {
  *         // Process API request ...
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * Here's an example of rate limiting based on a custom client identifier:
- * 
+ *
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -69,7 +69,7 @@ import org.omnifaces.cdi.ratelimit.RateLimiter;
  *     public void processFooAPIRequest() {
  *         // Process Foo API request ...
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
@@ -99,7 +99,7 @@ public @interface RateLimit {
      * <p>
      * Note thus that when you cannot guarantee that a {@link HttpServletRequest} is available in the context of the annotated method, then you'll definitely
      * need to explicitly provide a client ID, otherwise the {@link RateLimitInterceptor} will throw an {@link IllegalArgumentException}.
-     * 
+     *
      * @return The client identifier to check, whether client IP, user ID, API key, etc.
      */
     @Nonbinding
@@ -107,7 +107,7 @@ public @interface RateLimit {
 
     /**
      * (Optional) The maximum number of requests allowed within the time window. Defaults to {@value #DEFAULT_MAX_REQUESTS_PER_TIME_WINDOW}.
-     * 
+     *
      * @return The maximum number of requests allowed within the time window.
      */
     @Nonbinding
@@ -115,7 +115,7 @@ public @interface RateLimit {
 
     /**
      * (Optional) The time window duration in seconds. Defaults to {@value #DEFAULT_TIME_WINDOW_IN_SECONDS}.
-     * 
+     *
      * @return The time window duration in seconds.
      */
     @Nonbinding
@@ -124,7 +124,7 @@ public @interface RateLimit {
     /**
      * (Optional) The maximum number of retries when rate limit is exceeded. Defaults to {@value #DEFAULT_MAX_RETRIES} (no retries - fail immediately). Set to a
      * positive value to enable automatic retries with calculated delays.
-     * 
+     *
      * @return The maximum number of retries.
      */
     @Nonbinding

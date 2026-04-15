@@ -60,7 +60,7 @@ public final class Json {
      * a javabean whereby the public properties (with public getters) will be encoded as a JS object. It also supports {@link Collection}s, {@link Map}s and
      * arrays of them, even nested ones. The {@link Date} and {@link Temporal} are formatted in <a href="https://datatracker.ietf.org/doc/html/rfc1123">RFC
      * 1123</a> format, so you can if necessary just pass it straight to <code>new Date()</code> in JavaScript.
-     * 
+     *
      * @param object The object to be encoded as JSON.
      * @return The JSON-encoded representation of the given object.
      * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
@@ -71,7 +71,7 @@ public final class Json {
 
     /**
      * Does the same as {@link #encode(Object)} but then with a custom property name formatter.
-     * 
+     *
      * @param object The object to be encoded as JSON.
      * @param propertyNameFormatter The property name formatter. When this is null, then the property names are not adjusted.
      * @return The JSON-encoded representation of the given object.

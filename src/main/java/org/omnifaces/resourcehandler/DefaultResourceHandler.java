@@ -36,7 +36,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 
     /**
      * Creates a new instance of this default resource handler which wraps the given resource handler.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     protected DefaultResourceHandler(ResourceHandler wrapped) {
@@ -94,7 +94,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * with result of the call from the wrapped resource handler.
      * <p>
      * The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The library name on which this resource handler implementation should listen.
      */
     public String getLibraryName() {
@@ -105,7 +105,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * Returns the library-specific resource in case a resource from specifically the library name as identified by {@link #getLibraryName()} is requested.
      * <p>
      * The default implementation returns <code>null</code>.
-     * 
+     *
      * @param resourceName The resource name.
      * @param contentType The content type.
      * @return The library-specific resource.
@@ -118,7 +118,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * Decorate the given resource. This will only be called if no library-specific resource has been requested.
      * <p>
      * The default implementation delegates to {@link #decorateResource(Resource)}.
-     * 
+     *
      * @param resource The resource to be decorated.
      * @param resourceName The resource name.
      * @param libraryName The library name.
@@ -133,7 +133,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
      * Decorate the given resource. This will only be called if no library-specific resource has been requested.
      * <p>
      * The default implementation just returns the given resource unmodified.
-     * 
+     *
      * @param resource The resource to be decorated.
      * @return The decorated resource.
      */

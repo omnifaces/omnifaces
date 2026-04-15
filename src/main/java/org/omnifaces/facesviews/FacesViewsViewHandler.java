@@ -86,7 +86,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
     /**
      * Construct faces views view handler.
-     * 
+     *
      * @param wrapped The view handler to be wrapped.
      */
     public FacesViewsViewHandler(ViewHandler wrapped) {
@@ -135,7 +135,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
      * components. The path parameters will be rendered in the order they were declared for a view id that is defined as a multi view and if the view was not
      * defined as a multi view then they won't be rendered at all. Additionally, declaring path parameters for a non-multi view will be logged as a warning and
      * a faces warning message will be added for <code>Development</code> stage.
-     * 
+     *
      * @see PathParam
      */
     @Override

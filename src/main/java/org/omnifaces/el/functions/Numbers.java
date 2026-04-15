@@ -61,7 +61,7 @@ public final class Numbers {
      * <li>1048576 bytes will appear as 1.0 MiB
      * </ul>
      * The default locale is the one as obtained by {@link Faces#getLocale()}.
-     * 
+     *
      * @param bytes The bytes to be formatted in the default pattern of the default locale.
      * @return The formatted bytes.
      */
@@ -79,7 +79,7 @@ public final class Numbers {
      * <li>1048576 bytes will appear as 1.0 MiB
      * </ul>
      * The given locale can be a {@link Locale} object or a string representation.
-     * 
+     *
      * @param bytes The bytes to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The formatted bytes.
@@ -93,7 +93,7 @@ public final class Numbers {
      * Format the given number as currency with the given symbol in the default pattern of the default locale. This is useful when you want to format numbers as
      * currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you
      * can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
-     * 
+     *
      * @param number The number to be formatted as currency in the default pattern of the default locale.
      * @param currencySymbol The currency symbol to be used.
      * @return The number which is formatted as currency with the given symbol.
@@ -107,7 +107,7 @@ public final class Numbers {
      * Format the given number as currency with the given symbol in the default pattern of the given locale. This is useful when you want to format numbers as
      * currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you
      * can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string representation.
-     * 
+     *
      * @param number The number to be formatted as currency in the default pattern of the given locale.
      * @param currencySymbol The currency symbol to be used.
      * @param locale The locale to obtain the default pattern from.
@@ -131,7 +131,7 @@ public final class Numbers {
      * Format the given number in the given pattern. This is useful when you want to format numbers in for example the <code>title</code> attribute of an UI
      * component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
      * locale will be set to the one as obtained by {@link Faces#getLocale()}.
-     * 
+     *
      * @param number The number to be formatted in the given pattern.
      * @param pattern The pattern to format the given number in.
      * @return The number which is formatted in the given pattern.
@@ -151,7 +151,7 @@ public final class Numbers {
      * Format the given number in the default pattern of the default locale. This is useful when you want to format numbers in for example the
      * <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
      * <code>&lt;f:convertNumber&gt;</code> tag. The default locale is the one as obtained by {@link Faces#getLocale()}.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the default locale.
      * @return The number which is formatted in the default pattern of the default locale.
      * @since 1.3
@@ -164,7 +164,7 @@ public final class Numbers {
      * Format the given number in the default pattern of the given locale. This is useful when you want to format numbers in for example the <code>title</code>
      * attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code>
      * tag. The given locale can be a {@link Locale} object or a string representation.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The number which is formatted in the default pattern of the given locale.
@@ -182,7 +182,7 @@ public final class Numbers {
      * Format the given number as percentage in the default pattern of the default locale. This is useful when you want to format numbers as percentage in for
      * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
      * <code>&lt;f:convertNumber&gt;</code> tag. The default locale is the one as obtained by {@link Faces#getLocale()}.
-     * 
+     *
      * @param number The number to be formatted as percentage in the default pattern of the default locale.
      * @return The number which is formatted as percentage.
      * @since 1.6
@@ -195,7 +195,7 @@ public final class Numbers {
      * Format the given number as percentage in the default pattern of the given locale. This is useful when you want to format numbers as percentage in for
      * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or wherever you can't use the
      * <code>&lt;f:convertNumber&gt;</code> tag. The given locale can be a {@link Locale} object or a string representation.
-     * 
+     *
      * @param number The number to be formatted as percentage in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The number which is formatted as percentage.
@@ -231,7 +231,7 @@ public final class Numbers {
      * </ul>
      * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
      * return <code>null</code>.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the default locale.
      * @return The formatted number.
      * @since 2.3
@@ -262,7 +262,7 @@ public final class Numbers {
      * </ul>
      * The given locale can be a {@link Locale} object or a string representation. If the value is <code>null</code>, <code>NaN</code> or infinity, then this
      * will return <code>null</code>.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param locale The locale to obtain the default pattern from.
      * @return The formatted number.
@@ -294,7 +294,7 @@ public final class Numbers {
      * </ul>
      * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
      * return <code>null</code>.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the default locale.
      * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit is <code>null</code>, then this method
      * will behave exactly as described in {@link #formatThousands(Number)}.
@@ -327,7 +327,7 @@ public final class Numbers {
      * </ul>
      * The given locale can be a {@link Locale} object or a string representation. If the value is <code>null</code>, <code>NaN</code> or infinity, then this
      * will return <code>null</code>.
-     * 
+     *
      * @param number The number to be formatted in the default pattern of the given locale.
      * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit
      * @param locale The locale to obtain the default pattern from. is <code>null</code>, then this method will behave exactly as described in

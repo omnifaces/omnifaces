@@ -25,7 +25,7 @@ import jakarta.servlet.ServletException;
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
  * // Check if the caught exception has a ConstraintViolationException in its hierarchy.
  * catch (PersistenceException e) {
@@ -34,7 +34,7 @@ import jakarta.servlet.ServletException;
  *     }
  * }
  * </pre>
- * 
+ *
  * <pre>
  * // Unwrap the caught FacesException until a non-FacesException is found.
  * catch (FacesException e) {
@@ -62,7 +62,7 @@ public final class Exceptions {
      * already not an instance of the given types, then it will directly be returned. Or if the exception, unwrapped or not, does not have a nested cause
      * anymore, then it will be returned. This is particularly useful if you want to unwrap the real root cause out of a nested hierarchy of
      * {@link ServletException} or {@link FacesException}.
-     * 
+     *
      * @param exception The exception to be unwrapped.
      * @param types The types which need to be unwrapped.
      * @return The unwrapped root cause.
@@ -82,7 +82,7 @@ public final class Exceptions {
      * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException} (Mojarra) or {@link ELException} (MyFaces)
      * and then return it. If the given exception is already not an instance of the mentioned types, then it will directly be returned. Or if the exception,
      * unwrapped or not, does not have a nested cause anymore, then it will be returned.
-     * 
+     *
      * @param exception The exception to be unwrapped from {@link FacesException} and {@link ELException}.
      * @return The unwrapped root cause.
      * @since 1.4
@@ -93,7 +93,7 @@ public final class Exceptions {
 
     /**
      * Returns <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
-     * 
+     *
      * @param <T> The generic throwable type.
      * @param exception The exception to be checked.
      * @param type The type to be compared to.
@@ -105,7 +105,7 @@ public final class Exceptions {
 
     /**
      * Returns the first encountered exception of the given type while cascading into the given exception, or <code>null</code> if no such exception is found.
-     * 
+     *
      * @param <T> The generic throwable type.
      * @param exception The exception to be checked.
      * @param type The type to be extracted.

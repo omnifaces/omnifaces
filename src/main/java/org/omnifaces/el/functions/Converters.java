@@ -76,7 +76,7 @@ public final class Converters {
 
     /**
      * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>.
-     * 
+     *
      * @param <E> The generic set element type.
      * @param set The set to be converted to list of its entries.
      * @return The converted list.
@@ -92,7 +92,7 @@ public final class Converters {
     /**
      * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Each of the entries has the usual <code>getKey()</code> and
      * <code>getValue()</code> methods.
-     * 
+     *
      * @param <K> The generic map key type.
      * @param <V> The generic map value type.
      * @param map The map to be converted to list of its entries.
@@ -149,7 +149,7 @@ public final class Converters {
 
     /**
      * Joins all elements of the given array to a single string, separated by the given separator.
-     * 
+     *
      * @param array The array to be joined.
      * @param separator The separator to be used. If null, then it defaults to empty string.
      * @return All elements of the given array as a single string, separated by the given separator.
@@ -180,7 +180,7 @@ public final class Converters {
 
     /**
      * Joins all elements of the given collection to a single string, separated by the given separator.
-     * 
+     *
      * @param <E> The generic collection element type.
      * @param collection The collection to be joined.
      * @param separator The separator to be used. If null, then it defaults to empty string.
@@ -208,7 +208,7 @@ public final class Converters {
 
     /**
      * Joins all elements of the given map to a single string, separated by the given key-value pair separator and entry separator.
-     * 
+     *
      * @param <K> The generic map key type.
      * @param <V> The generic map value type.
      * @param map The map to be joined.
@@ -245,7 +245,7 @@ public final class Converters {
     /**
      * Splits the given array into an array of subarrays of the given fragment size. This is useful for creating nested <code>&lt;ui:repeat&gt;</code>
      * structures, for example, when positioning a list of items into a grid based layout system such as Twitter Bootstrap.
-     * 
+     *
      * @param array The array to be split.
      * @param fragmentSize The size of each subarray.
      * @return A new array consisting of subarrays of the given array.
@@ -279,7 +279,7 @@ public final class Converters {
     /**
      * Splits the given list into a list of sublists of the given fragment size. This is useful for creating nested <code>&lt;ui:repeat&gt;</code> structures,
      * for example, when positioning a list of items into a grid based layout system such as Twitter Bootstrap.
-     * 
+     *
      * @param <E> The generic list element type.
      * @param list The list to be split.
      * @param fragmentSize The size of each sublist.
@@ -308,7 +308,7 @@ public final class Converters {
 
     /**
      * Encode given object as JSON. Currently, this delegates directly to {@link Json#encode(Object)}.
-     * 
+     *
      * @param object Object to be encoded as JSON.
      * @return The encoded JSON string.
      * @see Json#encode(Object)
@@ -320,7 +320,7 @@ public final class Converters {
 
     /**
      * Print the stack trace of the given exception.
-     * 
+     *
      * @param exception The exception to print the stack trace for.
      * @return The printed stack trace.
      */
@@ -337,7 +337,7 @@ public final class Converters {
     /**
      * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter identified by the given converter
      * ID, invoked with {@link FacesContext#getCurrentInstance()}, {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
-     * 
+     *
      * @param converterId The converter ID of the desired converter instance.
      * @param object The object to be converted to {@link String} by the converter identified by given converter ID.
      * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter identified by the given converter ID, invoked

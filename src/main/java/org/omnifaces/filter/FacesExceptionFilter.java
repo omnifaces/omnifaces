@@ -59,7 +59,7 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, map this filter on an <code>&lt;url-pattern&gt;</code> of <code>/*</code> in <code>web.xml</code>.
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;facesExceptionFilter&lt;/filter-name&gt;
@@ -156,7 +156,7 @@ public class FacesExceptionFilter extends HttpFilter {
      * implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is not an instance of any type specified in context
      * parameter {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}. The log message will be
      * prepended with the UUID and IP address. The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
-     * 
+     *
      * @param request The involved servlet request.
      * @param exception The exception to log.
      * @param location The error page location.

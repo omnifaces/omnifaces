@@ -45,7 +45,7 @@ import org.omnifaces.util.State;
  * <p>
  * Just put the component in the <code>&lt;h:head&gt;</code> of the master template. It will automatically move itself to <code>head</code> even when placed
  * elsewhere, but placing it in <code>&lt;h:head&gt;</code> makes the intent explicit.
- * 
+ *
  * <pre>
  * &lt;h:head&gt;
  *     &lt;o:scriptErrorHandler /&gt;
@@ -55,7 +55,7 @@ import org.omnifaces.util.State;
  * This will register <code>window.onerror</code> and <code>unhandledrejection</code> event listeners which report any uncaught client-side errors to the
  * server. You can optionally specify a CSS selector via <code>ignoreSelector</code> to suppress error reporting when a matching element exists in the document
  * (e.g. on error pages where errors are expected).
- * 
+ *
  * <pre>
  * &lt;o:scriptErrorHandler ignoreSelector="body.errorPage" /&gt;
  * </pre>
@@ -64,7 +64,7 @@ import org.omnifaces.util.State;
  * <h2 id="usage-server"><a href="#usage-server">Usage (server)</a></h2>
  * <p>
  * Create a CDI bean (typically application scoped) that observes the {@link ScriptError} event.
- * 
+ *
  * <pre>
  * &#64;ApplicationScoped
  * public class ScriptErrorObserver {
@@ -74,7 +74,7 @@ import org.omnifaces.util.State;
  *     public void onScriptError(&#64;Observes ScriptError error) {
  *         logger.warning(error.toString());
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
@@ -141,7 +141,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Move this component to head, so that error handlers are registered as early as possible.
-     * 
+     *
      * @throws IllegalArgumentException When the {@link ScriptErrorServlet} is not registered because no CDI observer for {@link ScriptError} was found.
      */
     @Override
@@ -179,7 +179,7 @@ public class ScriptErrorHandler extends ScriptFamily {
      * Returns the CSS selector for elements whose presence suppresses error reporting. When an element matching this selector exists in the document, errors
      * will not be sent to the server. For example, <code>body.errorPage</code> to suppress reporting on error pages having
      * <code>&lt;h:body styleClass="errorPage"&gt;</code>.
-     * 
+     *
      * @return The CSS selector, or <code>null</code>.
      */
     public String getIgnoreSelector() {
@@ -189,7 +189,7 @@ public class ScriptErrorHandler extends ScriptFamily {
     /**
      * Sets the CSS selector for elements whose presence suppresses error reporting. When an element matching this selector exists in the document, errors will
      * not be sent to the server.
-     * 
+     *
      * @param ignoreSelector The CSS selector.
      */
     public void setIgnoreSelector(String ignoreSelector) {
@@ -198,7 +198,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Returns the maximum number of recent errors to keep for deduplication. Defaults to {@value #DEFAULT_MAX_RECENT_ERRORS}.
-     * 
+     *
      * @return The maximum number of recent errors.
      */
     public int getMaxRecentErrors() {
@@ -207,7 +207,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Sets the maximum number of recent errors to keep for deduplication. Defaults to {@value #DEFAULT_MAX_RECENT_ERRORS}.
-     * 
+     *
      * @param maxRecentErrors The maximum number of recent errors.
      */
     public void setMaxRecentErrors(int maxRecentErrors) {
@@ -216,7 +216,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Returns the time in milliseconds after which a recent error entry expires. Defaults to {@value #DEFAULT_ERROR_EXPIRY} (1 minute).
-     * 
+     *
      * @return The error expiry time in milliseconds.
      */
     public int getErrorExpiry() {
@@ -225,7 +225,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Sets the time in milliseconds after which a recent error entry expires for deduplication. Defaults to {@value #DEFAULT_ERROR_EXPIRY} (1 minute).
-     * 
+     *
      * @param errorExpiry The error expiry time in milliseconds.
      */
     public void setErrorExpiry(int errorExpiry) {
@@ -246,7 +246,7 @@ public class ScriptErrorHandler extends ScriptFamily {
 
     /**
      * Register the script error handler servlet if it has not already been registered and there is at least one CDI observer for {@link ScriptError}.
-     * 
+     *
      * @param servletContext The involved servlet context.
      */
     public static void registerServletIfNecessary(ServletContext servletContext) {

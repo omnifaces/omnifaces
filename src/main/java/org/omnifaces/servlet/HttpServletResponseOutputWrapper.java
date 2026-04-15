@@ -57,7 +57,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Construct a new {@link HttpServletResponseOutputWrapper} which wraps the given response.
-     * 
+     *
      * @param wrappedResponse The wrapped response.
      */
     protected HttpServletResponseOutputWrapper(HttpServletResponse wrappedResponse) {
@@ -68,7 +68,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Returns the custom implementation of the servlet response {@link OutputStream}.
-     * 
+     *
      * @return The custom implementation of the servlet response {@link OutputStream}.
      */
     protected abstract OutputStream createOutputStream();
@@ -132,7 +132,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Close the response body. This closes any created writer or output stream.
-     * 
+     *
      * @throws IOException When an I/O error occurs.
      */
     public void close() throws IOException {
@@ -157,7 +157,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Returns whether the response is committed or not. The response is also considered committed when the resettable buffer has been flushed.
-     * 
+     *
      * @return <code>true</code> if the response is committed, otherwise <code>false</code>.
      */
     @Override
@@ -167,7 +167,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-     * 
+     *
      * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream}, otherwise <code>false</code>.
      */
     public boolean isPassThrough() {
@@ -176,7 +176,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
     /**
      * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
-     * 
+     *
      * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped {@link ServletOutputStream}.
      */
     public void setPassThrough(boolean passThrough) {

@@ -42,7 +42,7 @@ public class RequestCookieProducer {
 
     /**
      * Returns cookie value associated with cookie name derived from given injection point.
-     * 
+     *
      * @param injectionPoint Injection point to derive cookie name from.
      * @return Cookie value associated with cookie name derived from given injection point.
      */

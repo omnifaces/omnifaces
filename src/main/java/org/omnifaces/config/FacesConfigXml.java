@@ -31,23 +31,23 @@ import jakarta.faces.context.FacesContext;
  * <h2>Usage</h2>
  * <p>
  * Some examples:
- * 
+ *
  * <pre>
- * 
+ *
  * // Get a mapping of all &lt;resource-bundle&gt; vars and base names.
  * Map&lt;String, String&gt; resourceBundles = FacesConfigXml.instance().getResourceBundles();
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * // Get an ordered list of all &lt;supported-locale&gt; values with &lt;default-locale&gt; as first item.
  * List&lt;Locale&gt; supportedLocales = FacesConfigXml.instance().getSupportedLocales();
  * </pre>
  * <p>
  * Since OmniFaces 3.1, you can if necessary even inject it.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * private FacesConfigXml facesConfigXml;
  * </pre>
@@ -67,7 +67,7 @@ public interface FacesConfigXml {
      * <li>Since OmniFaces 3.1, this returned an "enum singleton" via a (mockable) interface as per #441.</li>
      * <li>Since OmniFaces 4.7, this returns an "application scoped bean" as per #910.</li>
      * </ul>
-     * 
+     *
      * @return The concrete {@link FacesConfigXml} instance.
      */
     static FacesConfigXml instance() {
@@ -78,7 +78,7 @@ public interface FacesConfigXml {
 
     /**
      * Returns a mapping of all resource bundle base names by var.
-     * 
+     *
      * @return A mapping of all resource bundle base names by var.
      */
     Map<String, String> getResourceBundles();
@@ -86,7 +86,7 @@ public interface FacesConfigXml {
     /**
      * Returns an ordered list of all supported locales on this application, with the default locale as the first item, if any. This will return an empty list
      * if there are no locales definied in <code>faces-config.xml</code>.
-     * 
+     *
      * @return An ordered list of all supported locales on this application, with the default locale as the first item, if any.
      * @see Application#getDefaultLocale()
      * @see Application#getSupportedLocales()
@@ -97,7 +97,7 @@ public interface FacesConfigXml {
     /**
      * Returns an ordered list of all resource handlers registered on this application. This will return an empty list if there are no resource handlers
      * definied in <code>faces-config.xml</code>.
-     * 
+     *
      * @return An ordered list of all resource handlers registered on this application.
      * @see Application#getResourceHandler()
      * @since 3.10
@@ -107,7 +107,7 @@ public interface FacesConfigXml {
     /**
      * Returns an ordered list of all exception handler factories registered on this application. This will return an empty list if there are no exception
      * handler factories definied in <code>faces-config.xml</code>.
-     * 
+     *
      * @return An ordered list of all exception handler factories registered on this application.
      * @see FacesContext#getExceptionHandler()
      * @since 4.5

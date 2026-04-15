@@ -51,7 +51,7 @@ import javax.naming.NamingException;
  * </ul>
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * {@code
  * locator = JNDIObjectLocator.builder().build();
@@ -72,7 +72,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * Returns the builder of the {@link JNDIObjectLocator}.
-     * 
+     *
      * @return The builder of the {@link JNDIObjectLocator}.
      */
     public static JNDIObjectLocatorBuilder builder() {
@@ -92,7 +92,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Specifies the environment to be passed into {@link InitialContext}. The default is <code>null</code>.
-         * 
+         *
          * @param environment The environment.
          * @return This builder.
          * @throws NullPointerException When given environment is null.
@@ -111,7 +111,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Adds an environment property.
-         * 
+         *
          * @param key The key of the new environment property.
          * @param value The value of the new environment property.
          * @return This builder.
@@ -135,7 +135,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Adds initial host environment property.
-         * 
+         *
          * @param initialHost The initial host environment property.
          * @return This builder.
          * @throws IllegalStateException When initial host is already set in this builder or when this builder is already build.
@@ -147,7 +147,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Adds initial port environment property.
-         * 
+         *
          * @param initialPort The initial port environment property.
          * @return This builder.
          * @throws IllegalStateException When initial port is already set in this builder or when this builder is already build.
@@ -158,7 +158,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Specifies the default namespace to be used in construction of portable JNDI names. The default is <code>java:module</code>.
-         * 
+         *
          * @param namespace The namespace.
          * @return This builder.
          * @throws IllegalStateException When namespace is already set in this builder or when this builder is already build.
@@ -178,7 +178,7 @@ public class JNDIObjectLocator implements Serializable {
         /**
          * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:global</code> instead of
          * <code>java:module</code>.
-         * 
+         *
          * @return This builder.
          * @throws IllegalStateException When namespace is already set in this builder.
          */
@@ -189,7 +189,7 @@ public class JNDIObjectLocator implements Serializable {
         /**
          * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:app</code> instead of
          * <code>java:module</code>.
-         * 
+         *
          * @return This builder.
          * @throws IllegalStateException When namespace is already set in this builder.
          */
@@ -199,7 +199,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Specifies to disable cache. The default is <code>false</code>.
-         * 
+         *
          * @return This builder.
          * @throws IllegalStateException When noCaching is already set in this builder or when this builder is already build.
          */
@@ -214,7 +214,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Specifies to cache remote enterprise beans. The default is <code>false</code>.
-         * 
+         *
          * @return This builder.
          * @throws IllegalStateException When cacheRemote is already set in this builder or when this builder is already build.
          */
@@ -229,7 +229,7 @@ public class JNDIObjectLocator implements Serializable {
 
         /**
          * Builds the {@link JNDIObjectLocator}.
-         * 
+         *
          * @return The {@link JNDIObjectLocator}.
          * @throws IllegalStateException When this builder is already build.
          */
@@ -273,7 +273,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * Same as {@link JNDI#getEnvEntry(String)}, except that this is cached.
-     * 
+     *
      * @param <T> The expected return type.
      * @param name the environment entry name relative to "java:comp/env".
      * @return The environment entry value associated with the given name, or <code>null</code> if there is none.
@@ -286,7 +286,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * Returns an object from JNDI based on beanClass. Uses portable object names and convention to derive appropriate JNDI name.
-     * 
+     *
      * @param <T> Object type.
      * @param beanClass Type of object to look up in JNDI.
      * @return Resulting object, or <code>null</code> if there is none.
@@ -299,7 +299,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * Returns an object based on JNDI name.
-     * 
+     *
      * @param <T> The expected return type.
      * @param jndiName The JNDI name of the object to be retrieved.
      * @return The named object, or <code>null</code> if there is none.
@@ -311,7 +311,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * Return an object based on JNDI name, bypassing the cache.
-     * 
+     *
      * @param <T> The expected return type.
      * @param jndiName The JNDI name of the object to be retrieved.
      * @return The named object, or <code>null</code> if there is none.
@@ -331,7 +331,7 @@ public class JNDIObjectLocator implements Serializable {
     /**
      * Utility method used in matching fields to EJB injection points to try to find appropriate JNDI object to use for injection. It prepends the given field
      * name with this locator's namespace when the given field name does not already start with {@link JNDI#JNDI_NAMESPACE_PREFIX}.
-     * 
+     *
      * @param fieldName The field name to prepend with this locator's name space if necessary.
      * @return The given field name, prepended with this locator's name space if necessary.
      */
@@ -341,7 +341,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * This should be used in unit tests only.
-     * 
+     *
      * @return Current JNDI cache.
      */
     Map<String, Object> getJNDIObjectCache() {

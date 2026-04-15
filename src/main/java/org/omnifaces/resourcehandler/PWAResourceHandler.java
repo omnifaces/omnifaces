@@ -79,7 +79,7 @@ import org.omnifaces.util.Json;
  * </ol>
  * <p>
  * Here's a concrete example:
- * 
+ *
  * <pre>
  * package com.example;
  *
@@ -140,13 +140,13 @@ import org.omnifaces.util.Json;
  *             RelatedApplication.of(Platform.ITUNES, "https://itunes.apple.com/app/example-app1/id123456789")
  *         );
  *     }
- * 
+ *
  * }
  * </pre>
  * <p>
  * Reference it in your template exactly as follows, with the exact library name of <code>omnifaces</code> and exact resource name of
  * <code>manifest.webmanifest</code>. You cannot change these values.
- * 
+ *
  * <pre>
  * &lt;link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" crossorigin="use-credentials" /&gt;
  * </pre>
@@ -161,7 +161,7 @@ import org.omnifaces.util.Json;
  * <code>application/manifest+json</code> content type. In case you face the following warning in server logs or something similar, <blockquote>WARNING:
  * JSF1091: No mime type could be found for file manifest.webmanifest. To resolve this, add a mime-type mapping to the applications web.xml. </blockquote> then
  * take action accordingly by adding the following entry to your <code>web.xml</code>:
- * 
+ *
  * <pre>
  * &lt;mime-mapping&gt;
  *     &lt;extension&gt;webmanifest&lt;/extension&gt;
@@ -182,9 +182,9 @@ import org.omnifaces.util.Json;
  * <p>
  * The generated <code>sw.js</code> will by default auto-register the {@link WebAppManifest#getStartUrl()} and all welcome files from <code>web.xml</code> as
  * cacheable resources which are also available offline. You can override the welcome files with {@link WebAppManifest#getCacheableViewIds()}. E.g.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Override
  * public Collection&lt;String&gt; getCacheableViewIds() {
  *     return Arrays.asList("/index.xhtml", "/contact.xhtml", "/support.xhtml");
@@ -195,9 +195,9 @@ import org.omnifaces.util.Json;
  * file will be generated as it won't have any use then.
  * <p>
  * In case you want to show a custom page as "You are offline!" error page, then you can specify it by overriding the {@link WebAppManifest#getOfflineViewId()}.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Override
  * public String getOfflineViewId() {
  *     return "/offline.xhtml";
@@ -205,7 +205,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Whereby the <code>offline.xhtml</code> should contain something like this:
- * 
+ *
  * <pre>
  * &lt;h1&gt;Whoops! You appear to be offline!&lt;/h1&gt;
  * &lt;p&gt;Please check your connection and then try refreshing this page.&lt;/p&gt;
@@ -222,7 +222,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In the client side, you can listen on <code>omnifaces.offline</code> and <code>omnifaces.online</code> events in the <code>window</code> whether the client
  * is currently online or offline.
- * 
+ *
  * <pre>
  * window.addEventListener("omnifaces.online", function(event) {
  *     var url = event.detail.url;
@@ -236,7 +236,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Or when you're using jQuery:
- * 
+ *
  * <pre>
  * $(window).on("omnifaces.online", function(event) {
  *     var url = event.detail.url;
@@ -295,7 +295,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     /**
      * Creates a new instance of this web app manifest resource handler which wraps the given resource handler. This will also try to resolve the concrete
      * implementation of {@link WebAppManifest}.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public PWAResourceHandler(ResourceHandler wrapped) {
@@ -528,7 +528,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns {@code true} if the {@link PWAResourceHandler} is active.
-     * 
+     *
      * @param context The involved faces context.
      * @return {@code true} if the {@link PWAResourceHandler} is active.
      * @since 5.2
@@ -539,7 +539,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the current request is triggered by a sw.js request.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by a sw.js request.
      * @since 4.1
@@ -550,7 +550,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the given request is triggered by a sw.js request.
-     * 
+     *
      * @param request The involved request.
      * @return <code>true</code> if the given request is triggered by a sw.js request.
      * @since 4.1

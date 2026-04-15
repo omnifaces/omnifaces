@@ -86,7 +86,7 @@ import org.omnifaces.util.Servlets;
  * </ul>
  * <p>
  * Then you can configure the filter as follows (filter name is fully free to your choice, but keep it sensible):
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
@@ -128,7 +128,7 @@ import org.omnifaces.util.Servlets;
  * filter on <code>/*</code> when e.g. <code>*.pdf</code> is matched. You can always map the no cache filter specifically to <code>FacesServlet</code> if you
  * intend to disable caching on <strong>all</strong> Faces pages. Here's an example assuming that you've configured the <code>FacesServlet</code> with a servlet
  * name of <code>facesServlet</code>:
- * 
+ *
  * <pre>
  * &lt;filter-mapping&gt;
  *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;

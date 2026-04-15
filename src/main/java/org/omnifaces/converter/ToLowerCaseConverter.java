@@ -34,13 +34,13 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.ToLowerCaseConverter</code>. Just specify it in the <code>converter</code> attribute of the
  * component referring the <code>String</code> property. For example:
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.email}" converter="omnifaces.ToLowerCaseConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toLowerCaseConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.email}"&gt;
  *     &lt;o:toLowerCaseConverter /&gt;

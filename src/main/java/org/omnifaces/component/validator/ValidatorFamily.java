@@ -88,7 +88,7 @@ public abstract class ValidatorFamily extends UIComponentBase {
 
     /**
      * Validate our own component hierarchy.
-     * 
+     *
      * @param context The faces context to work with.
      * @throws IllegalStateException When component hierarchy is wrong.
      * @since 4.6
@@ -97,7 +97,7 @@ public abstract class ValidatorFamily extends UIComponentBase {
 
     /**
      * Perform the actual validation.
-     * 
+     *
      * @param context The faces context to work with.
      */
     protected abstract void validateComponents(FacesContext context);

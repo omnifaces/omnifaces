@@ -54,7 +54,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by <code>validatorId="jakarta.faces.LongRange"</code>, then you'll be able
  * to use all its attributes such as <code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply deferred
  * value expressions.
- * 
+ *
  * <pre>
  * &lt;o:validator validatorId="jakarta.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
  * </pre>
@@ -66,7 +66,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * It is also possible to specify the validator message on a per-validator basis using the <code>message</code> attribute. Any "{0}" placeholder in the message
  * will be substituted with the label of the referenced input component. Note that this attribute is ignored when the parent component has already
  * <code>validatorMessage</code> specified.
- * 
+ *
  * <pre>
  * &lt;o:validator validatorId="jakarta.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
  *     message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
@@ -112,7 +112,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
     /**
      * The constructor.
-     * 
+     *
      * @param config The validator config.
      */
     public Validator(ValidatorConfig config) {
@@ -131,7 +131,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
      * <code>&lt;f:validator&gt;</code> implementation and collect the render time attributes. Then create an anonymous <code>Validator</code> implementation
      * which wraps the created <code>Validator</code> and delegates the methods to it after setting the render time attributes only and only if the
      * <code>disabled</code> attribute evaluates <code>true</code> for the current request. Finally set the anonymous implementation on the parent component.
-     * 
+     *
      * @param context The involved facelet context.
      * @param parent The parent component to add the <code>Validator</code> to.
      * @throws IOException If something fails at I/O level.
@@ -206,7 +206,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
         /**
          * Construct the deferred validator.
-         * 
+         *
          * @param validator The wrapped validator.
          * @param binding The binding expression.
          * @param id The ID expression.

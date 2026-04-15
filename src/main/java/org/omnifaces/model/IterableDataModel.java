@@ -42,7 +42,7 @@ public class IterableDataModel<E> extends DataModel<E> {
 
     /**
      * Construct the iterable data model based on the given iterable instance.
-     * 
+     *
      * @param iterable The iterable instance to construct the iterable data model for.
      */
     public IterableDataModel(Iterable<E> iterable) {

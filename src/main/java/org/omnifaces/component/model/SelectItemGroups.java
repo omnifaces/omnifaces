@@ -43,7 +43,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a <code>List&lt;Product&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedProduct}" converter="omnifaces.SelectItemsConverter"&gt;
  *     &lt;f:selectItem itemValue="#{null}" /&gt;
@@ -86,7 +86,7 @@ public class SelectItemGroups extends UISelectItems {
 
     /**
      * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -162,7 +162,7 @@ public class SelectItemGroups extends UISelectItems {
 
     /**
      * Returns the name of the EL variable which exposes the currently iterated select item group. Defaults to {@code item}.
-     * 
+     *
      * @return The name of the EL variable.
      */
     public String getVar() {
@@ -171,7 +171,7 @@ public class SelectItemGroups extends UISelectItems {
 
     /**
      * Sets the name of the EL variable which exposes the currently iterated select item group. Defaults to {@code item}.
-     * 
+     *
      * @param varName The name of the EL variable.
      */
     public void setVar(String varName) {
@@ -180,7 +180,7 @@ public class SelectItemGroups extends UISelectItems {
 
     /**
      * Returns the label of the select item group. Defaults to the String representation of {@code itemValue}.
-     * 
+     *
      * @return The label of the select item group.
      */
     public String getItemLabel() {
@@ -189,7 +189,7 @@ public class SelectItemGroups extends UISelectItems {
 
     /**
      * Sets the label of the select item group. Defaults to the String representation of {@code itemValue}.
-     * 
+     *
      * @param itemLabel The label of the select item group.
      */
     public void setItemLabel(String itemLabel) {
@@ -199,7 +199,7 @@ public class SelectItemGroups extends UISelectItems {
     /**
      * Returns the value of the select item group. This will be exposed to any nested UISelectItem(s) children. Defaults to the currently iterated select item
      * group.
-     * 
+     *
      * @return The value of the select item group.
      */
     public Object getItemValue() {
@@ -209,7 +209,7 @@ public class SelectItemGroups extends UISelectItems {
     /**
      * Sets the value of the select item group. This will be exposed to any nested UISelectItem(s) children. Defaults to the currently iterated select item
      * group.
-     * 
+     *
      * @param itemValue The value of the select item group.
      */
     public void setItemValue(Object itemValue) {

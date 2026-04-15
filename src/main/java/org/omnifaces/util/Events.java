@@ -42,21 +42,21 @@ import org.omnifaces.util.FunctionalInterfaces.SerializableRunnable;
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
  * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -&gt; {
  *     // ...
  * });
  * </pre>
- * 
+ *
  * <pre>
  * // Add a callback to the current request which should run during before phase of the render response on current request.
  * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, () -&gt; {
  *     // ...
  * });
  * </pre>
- * 
+ *
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
  * Events.subscribeToViewEvent(PreRenderViewEvent.class, () -&gt; {
@@ -87,7 +87,7 @@ public final class Events {
     /**
      * Subscribe the given system event listener to the current application that get invoked every time when the given system event type is published in the
      * current application.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param listener The system event listener to be subscribed.
      * @since 2.0
@@ -100,7 +100,7 @@ public final class Events {
     /**
      * Subscribe the given callback to the current application that get invoked every time when the given system event type is published in the current
      * application.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -113,7 +113,7 @@ public final class Events {
     /**
      * Subscribe the given callback to the current application that get invoked every time when the given system event type is published in the current
      * application.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -128,7 +128,7 @@ public final class Events {
     /**
      * Subscribe the given system event listener to the current view that get invoked every time when the given system event type is published on the current
      * view.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param listener The system event listener to be subscribed.
      * @since 1.2
@@ -140,7 +140,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback to the current view that get invoked every time when the given system event type is published on the current view.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param callback The callback to be invoked.
      * @since 1.2
@@ -152,7 +152,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback to the current view that get invoked every time when the given system event type is published on the current view.
-     * 
+     *
      * @param type The system event type to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -167,7 +167,7 @@ public final class Events {
     /**
      * Adds the given phase listener to the current view. The difference with {@link #addRequestPhaseListener(PhaseListener)} is that the given phase listener
      * is invoked during every (postback) request on the same view instead of only during the current request.
-     * 
+     *
      * @param listener The phase listener to be added to the current view.
      * @since 2.0
      * @see UIViewRoot#addPhaseListener(PhaseListener)
@@ -178,7 +178,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current view that get invoked every time before given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -190,7 +190,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current view that get invoked every time before given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -202,7 +202,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current view that get invoked every time after given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -214,7 +214,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current view that get invoked every time after given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -230,7 +230,7 @@ public final class Events {
      * Subscribe the given callback instance to the given component that get invoked only in the current request when the given component system event type is
      * published on the given component. The difference with {@link UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)} is that this listener is
      * request scoped instead of view scoped as component system event listeners are by default saved in Faces state and thus inherently view scoped.
-     * 
+     *
      * @param component The component to subscribe the given callback instance to.
      * @param type The system event type to be observed.
      * @param callback The callback to be invoked.
@@ -259,7 +259,7 @@ public final class Events {
     /**
      * Adds the given phase listener to the current request. The difference with {@link #addViewPhaseListener(PhaseListener)} is that the given phase listener
      * is invoked only during the current request instead of during every (postback) request on the same view.
-     * 
+     *
      * @param listener The phase listener to be added to the current request.
      * @since 2.0
      * @see CallbackPhaseListener
@@ -270,7 +270,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current request that get invoked before given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -282,7 +282,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current request that get invoked before given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -294,7 +294,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current request that get invoked after given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -306,7 +306,7 @@ public final class Events {
 
     /**
      * Subscribe the given callback instance to the current request that get invoked after given phase ID.
-     * 
+     *
      * @param phaseId The phase ID to be observed.
      * @param callback The callback to be invoked.
      * @since 2.0
@@ -324,7 +324,7 @@ public final class Events {
      * {@link ComponentSystemEventListener#processEvent(jakarta.faces.event.ComponentSystemEvent)}, as it would otherwise end up in a
      * <code>ConcurrentModificationException</code> while Faces is iterating over all system event listeners. The trick is to perform the unsubscribe during the
      * after phase of the current request phase {@link #subscribeToRequestAfterPhase(PhaseId, Runnable)}.
-     * 
+     *
      * @param component The component to unsubscribe the given event listener from.
      * @param event The event associated with the given event listener.
      * @param listener The event listener to be unsubscribed from the given component.

@@ -31,7 +31,7 @@ import org.omnifaces.util.State;
  * <p>
  * You can use it the same way as <code>&lt;h:outputFormat&gt;</code>, you only need to change <code>h:</code> into <code>o:</code> to get the extra support for
  * <code>var</code> attribute. Here's are some usage examples:
- * 
+ *
  * <pre>
  * &lt;o:outputFormat value="#{i18n['link.title']}" var="_link_title"&gt;
  *     &lt;f:param value="#{bean.foo}" /&gt;
@@ -39,7 +39,7 @@ import org.omnifaces.util.State;
  * &lt;/o:outputFormat&gt;
  * &lt;h:commandLink value="#{i18n['link.value']}" title="#{_link_title}" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;o:outputFormat value="#{bean.number}" var="_percentage"&gt;
  *     &lt;f:convertNumber type="percent" /&gt;
@@ -84,7 +84,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
     /**
      * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -132,7 +132,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
     /**
      * Returns the variable name which exposes the captured output into the request scope.
-     * 
+     *
      * @return The variable name which exposes the captured output into the request scope.
      */
     public String getVar() {
@@ -141,7 +141,7 @@ public class OutputFormat extends HtmlOutputFormat {
 
     /**
      * Sets the variable name which exposes the captured output into the request scope.
-     * 
+     *
      * @param varName The variable name which exposes the captured output into the request scope.
      */
     public void setVar(String varName) {

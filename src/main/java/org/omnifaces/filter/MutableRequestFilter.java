@@ -49,7 +49,7 @@ import org.omnifaces.util.Servlets;
  * <h2>Installation</h2>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;mutableRequestFilter&lt;/filter-name&gt;
@@ -113,7 +113,7 @@ public class MutableRequestFilter extends HttpFilter {
 
     /**
      * Returns the mutable request.
-     * 
+     *
      * @return The mutable request.
      * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
      * @since 3.14
@@ -145,7 +145,7 @@ public class MutableRequestFilter extends HttpFilter {
 
         /**
          * Returns the mutable header map of the current request.
-         * 
+         *
          * @return The mutable header map of the current request.
          */
         public Map<String, List<String>> getMutableHeaderMap() {
@@ -201,7 +201,7 @@ public class MutableRequestFilter extends HttpFilter {
 
         /**
          * Returns the mutable parameter map of the current request.
-         * 
+         *
          * @return The mutable parameter map of the current request.
          */
         public Map<String, List<String>> getMutableParameterMap() {

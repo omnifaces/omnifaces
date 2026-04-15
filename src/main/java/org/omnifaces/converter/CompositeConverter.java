@@ -35,7 +35,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <h2>Usage</h2>
  * <p>
  * This converter is available by <code>&lt;o:compositeConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.value}"&gt;
  *     &lt;o:compositeConverter converterIds="trimConverter, sanitizeConverter, entityConverter" /&gt;
@@ -109,7 +109,7 @@ public class CompositeConverter implements Converter<Object> {
 
     /**
      * Sets the comma-separated string of converter IDs.
-     * 
+     *
      * @param converterIds The comma-separated string of converter IDs.
      */
     @FacesAttribute(required = true)

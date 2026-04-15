@@ -32,7 +32,7 @@ public class ScopedRunner {
 
     /**
      * Construct a scoped runner.
-     * 
+     *
      * @param context The involved faces context.
      */
     public ScopedRunner(FacesContext context) {
@@ -41,7 +41,7 @@ public class ScopedRunner {
 
     /**
      * Construct a scoped runner.
-     * 
+     *
      * @param context The involved faces context.
      * @param scopedVariables Initial scoped variables.
      */
@@ -64,7 +64,7 @@ public class ScopedRunner {
 
     /**
      * Invokes the callback within the scope of the variables being given in the constructor.
-     * 
+     *
      * @param callback The callback.
      */
     public void invoke(Runnable callback) {
@@ -109,7 +109,7 @@ public class ScopedRunner {
 
     /**
      * Invokes the callback within the scope of the given variable.
-     * 
+     *
      * @param context The involved faces context.
      * @param key the key name of the variable
      * @param value the value of the variable

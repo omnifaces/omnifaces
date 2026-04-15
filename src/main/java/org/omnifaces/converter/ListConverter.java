@@ -40,7 +40,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * order to be able to pass the {@link List} source to it, which it can use for conversion. Here's a basic usage example with PrimeFaces
  * <code>&lt;p:pickList&gt;</code>, which is one of the few select components which doesn't use {@link SelectItem}s as the source, but work directly via a
  * {@link List}.
- * 
+ *
  * <pre>
  * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
  *     &lt;o:converter converterId="omnifaces.ListConverter" list="#{bean.dualListModel.source}" /&gt;
@@ -48,7 +48,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:listConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
  *     &lt;o:listConverter" list="#{bean.dualListModel.source}" /&gt;
@@ -92,7 +92,7 @@ public class ListConverter implements Converter<Object> {
 
     /**
      * Sets the list of available items.
-     * 
+     *
      * @param list The list of available items.
      */
     @FacesAttribute(required = true)

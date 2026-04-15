@@ -52,7 +52,7 @@ public class OmniApplication extends ApplicationWrapper {
 
     /**
      * Construct a new OmniFaces application around the given wrapped application.
-     * 
+     *
      * @param wrapped The wrapped application.
      */
     public OmniApplication(Application wrapped) {

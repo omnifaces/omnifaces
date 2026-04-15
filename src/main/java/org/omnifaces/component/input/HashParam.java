@@ -37,7 +37,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <p>
  * The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format as a regular request query string (the part
  * in URL after the <code>?</code>). An example:
- * 
+ *
  * <pre>
  * https://example.com/page.xhtml#foo=baz&amp;bar=kaz
  * </pre>
@@ -49,7 +49,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * It's very similar to the <code>&lt;o:viewParam&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
@@ -58,7 +58,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * You can use the <code>render</code> attribute to declare which components should be updated when a hash parameter value is present.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:hashParam name="foo" value="#{bean.foo}" render="fooResult" /&gt;
@@ -79,7 +79,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <p>
  * You can use the <code>default</code> attribute to declare a non-null value which should be interpreted as the default value. In other words, when the current
  * model value matches the default value, then the hash parameter will be removed.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
@@ -97,9 +97,9 @@ import org.omnifaces.vdl.FacesAttribute;
  * <p>
  * When the hash query string is changed by the client side, e.g. by following a <code>#foo=baz&amp;bar=kaz</code> link, or by manually manipulating the URL,
  * then a CDI {@link HashChangeEvent} will be fired which can be observed in any CDI managed bean as below:
- * 
+ *
  * <pre>
- * 
+ *
  * public void onHashChange(&#64;Observes HashChangeEvent event) {
  *     String oldHashString = event.getOldValue();
  *     String newHashString = event.getNewValue();
@@ -183,7 +183,7 @@ public class HashParam extends OnloadParam {
     /**
      * Convert the value to string using any converter and ensure that an empty string is returned when the component is invalid or the resulting string is null
      * or represents the default value.
-     * 
+     *
      * @param context The involved faces context.
      * @return The rendered value.
      */
@@ -214,7 +214,7 @@ public class HashParam extends OnloadParam {
 
     /**
      * Returns the default value in case the actual hash parameter is <code>null</code> or empty.
-     * 
+     *
      * @return The default value in case the actual hash parameter is <code>null</code> or empty.
      */
     public String getDefault() {
@@ -223,7 +223,7 @@ public class HashParam extends OnloadParam {
 
     /**
      * Sets the default value in case the actual hash parameter is <code>null</code> or empty.
-     * 
+     *
      * @param defaultValue The default value in case the actual hash parameter is <code>null</code> or empty.
      */
     public void setDefault(String defaultValue) {
@@ -236,7 +236,7 @@ public class HashParam extends OnloadParam {
      * Returns <code>true</code> if the current request is triggered by a hash param request. I.e. if it is initiated by
      * <code>OmniFaces.HashParam.setHashParamValues()</code> script which runs on page load when the <code>window.location.hash</code> is present, and on every
      * <code>window.onhashchange</code> event.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by a hash param request.
      */

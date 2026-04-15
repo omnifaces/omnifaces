@@ -37,27 +37,27 @@ import org.omnifaces.cdi.Startup;
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
  * // In a validator.
  * Messages.throwValidatorException("Invalid input.");
  * </pre>
- * 
+ *
  * <pre>
  * // In a converter.
  * throw Messages.asConverterException("Unknown input.");
  * </pre>
- * 
+ *
  * <pre>
  * // In a validator, as extra message on another component.
  * Messages.addError("someFormId:someInputId", "This is also invalid.");
  * </pre>
- * 
+ *
  * <pre>
  * // In a managed bean action method.
  * Messages.addGlobalError("Unknown login, please try again.");
  * </pre>
- * 
+ *
  * <pre>
  * // In a managed bean action method which uses Post-Redirect-Get.
  * Messages.addFlashGlobalInfo("New item with id {0} is successfully added.", item.getId());
@@ -65,22 +65,22 @@ import org.omnifaces.cdi.Startup;
  * </pre>
  * <p>
  * There is also a builder which also allows you to set the message detail. Some examples:
- * 
+ *
  * <pre>
  * // In a validator.
  * Messages.create("Invalid input.").detail("Value {0} is not expected.", value).throwValidatorException();
  * </pre>
- * 
+ *
  * <pre>
  * // In a validator, as extra message on another component.
  * Messages.create("This is also invalid.").error().add("someFormId:someInputId");
  * </pre>
- * 
+ *
  * <pre>
  * // In a managed bean action method.
  * Messages.create("Unknown login, please try again.").error().add();
  * </pre>
- * 
+ *
  * <pre>
  * // In a managed bean action method which uses Post-Redirect-Get.
  * Messages.create("New item with id {0} is successfully added.", item.getId()).flash().add();
@@ -93,12 +93,12 @@ import org.omnifaces.cdi.Startup;
  * <p>
  * It also offers the possibility to set a custom message resolver so that you can control the way how messages are been resolved. You can for example supply an
  * implementation wherein the message is been treated as for example a resource bundle key. Here's an example:
- * 
+ *
  * <pre>
  * Messages.setResolver(new Messages.Resolver() {
- * 
+ *
  *     private static final String BASE_NAME = "com.example.i18n.messages";
- * 
+ *
  *     public String getMessage(String message, Object... params) {
  *         ResourceBundle bundle = ResourceBundle.getBundle(BASE_NAME, Faces.getLocale());
  *         if (bundle.containsKey(message)) {
@@ -106,7 +106,7 @@ import org.omnifaces.cdi.Startup;
  *         }
  *         return params.length &gt; 0 ? MessageFormat.format(message, params) : message;
  *     }
- * 
+ *
  * });
  * </pre>
  * <p>
@@ -153,7 +153,7 @@ public final class Messages {
 
         /**
          * Returns the resolved message based on the given message and parameters.
-         * 
+         *
          * @param message The message which can be treated as for example a resource bundle key.
          * @param params The message format parameters, if any.
          * @return The resolved message.
@@ -176,7 +176,7 @@ public final class Messages {
      * Set the custom message resolver. It can be set only once. It's recommend to do it early during webapp's startup, for example with a
      * {@link ServletContextListener} as {@link WebListener}, or a {@link ServletContainerInitializer} in custom JAR, or a {@link ApplicationScoped} bean, or an
      * eagerly initialized {@link Startup} bean.
-     * 
+     *
      * @param resolver The custom message resolver.
      * @throws IllegalStateException When the resolver has already been set.
      */
@@ -202,7 +202,7 @@ public final class Messages {
      * the detail message, use {@link Message#detail(String, Object...)}. To change the default INFO severity, use {@link Message#warn()},
      * {@link Message#error()}, or {@link Message#fatal()}. To make it a flash message, use {@link Message#flash()}. To finally add it to the faces context, use
      * either {@link Message#add(String)} to add it for a specific client ID, or {@link Message#add()} to add it as a global message.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return The {@link Message} builder.
@@ -230,7 +230,7 @@ public final class Messages {
 
         /**
          * Set the detail message of the current message.
-         * 
+         *
          * @param detail The detail message to be set on the current message.
          * @param params The detail message format parameters, if any.
          * @return The current {@link Message} instance for further building.
@@ -243,7 +243,7 @@ public final class Messages {
 
         /**
          * Set the severity of the current message to WARN. Note: it defaults to INFO already.
-         * 
+         *
          * @return The current {@link Message} instance for further building.
          * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
          */
@@ -254,7 +254,7 @@ public final class Messages {
 
         /**
          * Set the severity of the current message to ERROR. Note: it defaults to INFO already.
-         * 
+         *
          * @return The current {@link Message} instance for further building.
          * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
          */
@@ -265,7 +265,7 @@ public final class Messages {
 
         /**
          * Set the severity of the current message to FATAL. Note: it defaults to INFO already.
-         * 
+         *
          * @return The current {@link Message} instance for further building.
          * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
          */
@@ -276,7 +276,7 @@ public final class Messages {
 
         /**
          * Make the current message a flash message. Use this when you need to display the message after a redirect.
-         * 
+         *
          * @return The current {@link Message} instance for further building.
          * @see Flash#setKeepMessages(boolean)
          */
@@ -287,7 +287,7 @@ public final class Messages {
 
         /**
          * Add the current message for the given client ID.
-         * 
+         *
          * @param clientId The client ID to add the current message for.
          * @see FacesContext#addMessage(String, FacesMessage)
          */
@@ -297,7 +297,7 @@ public final class Messages {
 
         /**
          * Add the current message as a global message.
-         * 
+         *
          * @see FacesContext#addMessage(String, FacesMessage)
          */
         public void add() {
@@ -306,7 +306,7 @@ public final class Messages {
 
         /**
          * Returns the so far built message.
-         * 
+         *
          * @return The so far built message.
          */
         public FacesMessage get() {
@@ -315,7 +315,7 @@ public final class Messages {
 
         /**
          * Returns the so far built message as a {@link ConverterException}.
-         * 
+         *
          * @return The so far built message as a {@link ConverterException}.
          * @since 3.8
          */
@@ -325,7 +325,7 @@ public final class Messages {
 
         /**
          * Returns the so far built message as a {@link ValidatorException}.
-         * 
+         *
          * @return The so far built message as a {@link ValidatorException}.
          * @since 3.8
          */
@@ -335,7 +335,7 @@ public final class Messages {
 
         /**
          * Throws the so far built message as a {@link ConverterException}.
-         * 
+         *
          * @throws ConverterException The so far built message as a {@link ConverterException}.
          * @since 3.5
          */
@@ -345,7 +345,7 @@ public final class Messages {
 
         /**
          * Throws the so far built message as a {@link ValidatorException}.
-         * 
+         *
          * @throws ValidatorException The so far built message as a {@link ValidatorException}.
          * @since 3.5
          */
@@ -360,7 +360,7 @@ public final class Messages {
     /**
      * Create a faces message of the given severity with the given message body which is formatted with the given parameters. Useful when a faces message is
      * needed to construct a {@link ConverterException} or a {@link ValidatorException}.
-     * 
+     *
      * @param severity The severity of the faces message.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -373,7 +373,7 @@ public final class Messages {
 
     /**
      * Create an INFO faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return A new INFO faces message with the given message body which is formatted with the given parameters.
@@ -385,7 +385,7 @@ public final class Messages {
 
     /**
      * Create a WARN faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return A new WARN faces message with the given message body which is formatted with the given parameters.
@@ -397,7 +397,7 @@ public final class Messages {
 
     /**
      * Create an ERROR faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return A new ERROR faces message with the given message body which is formatted with the given parameters.
@@ -409,7 +409,7 @@ public final class Messages {
 
     /**
      * Create a FATAL faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return A new FATAL faces message with the given message body which is formatted with the given parameters.
@@ -423,7 +423,7 @@ public final class Messages {
 
     /**
      * Returns a {@link ConverterException} with an ERROR faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return ConverterException
@@ -436,7 +436,7 @@ public final class Messages {
 
     /**
      * Returns a {@link ValidatorException} with an ERROR faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @return ValidatorException
@@ -449,7 +449,7 @@ public final class Messages {
 
     /**
      * Throw a {@link ConverterException} with an ERROR faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @throws ConverterException The so far built message as a {@link ConverterException}.
@@ -462,7 +462,7 @@ public final class Messages {
 
     /**
      * Throw a {@link ValidatorException} with an ERROR faces message with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @throws ValidatorException The so far built message as a {@link ValidatorException}.
@@ -478,7 +478,7 @@ public final class Messages {
     /**
      * Add the given faces message to the given client ID. When the client ID is <code>null</code>, it becomes a global faces message. This can be filtered in a
      * <code>&lt;h:messages globalOnly="true"&gt;</code>.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The faces message.
      * @see FacesContext#addMessage(String, FacesMessage)
@@ -489,7 +489,7 @@ public final class Messages {
 
     /**
      * Add a faces message of the given severity to the given client ID, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param severity The severity of the faces message.
      * @param message The message body.
@@ -503,7 +503,7 @@ public final class Messages {
 
     /**
      * Add an INFO faces message to the given client ID, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -516,7 +516,7 @@ public final class Messages {
 
     /**
      * Add a WARN faces message to the given client ID, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -529,7 +529,7 @@ public final class Messages {
 
     /**
      * Add an ERROR faces message to the given client ID, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -542,7 +542,7 @@ public final class Messages {
 
     /**
      * Add a FATAL faces message to the given client ID, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -557,7 +557,7 @@ public final class Messages {
 
     /**
      * Add a global faces message. This adds a faces message to a client ID of <code>null</code>.
-     * 
+     *
      * @param message The global faces message.
      * @see #add(String, FacesMessage)
      */
@@ -567,7 +567,7 @@ public final class Messages {
 
     /**
      * Add a global faces message of the given severity, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param severity The severity of the global faces message.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -580,7 +580,7 @@ public final class Messages {
 
     /**
      * Add a global INFO faces message, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createInfo(String, Object...)
@@ -592,7 +592,7 @@ public final class Messages {
 
     /**
      * Add a global WARN faces message, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createWarn(String, Object...)
@@ -604,7 +604,7 @@ public final class Messages {
 
     /**
      * Add a global ERROR faces message, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createError(String, Object...)
@@ -616,7 +616,7 @@ public final class Messages {
 
     /**
      * Add a global FATAL faces message, with the given message body which is formatted with the given parameters.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createFatal(String, Object...)
@@ -634,7 +634,7 @@ public final class Messages {
      * NOTE: the flash scope has in early Mojarra versions however some pretty peculiar problems. In older versions, the messages are remembered too long, or
      * they are only displayed after refresh, or they are not displayed when the next request is on a different path. Only since Mojarra 2.1.14, all known flash
      * scope problems are solved.
-     * 
+     *
      * @param clientId The client ID to add the flash scoped faces message for.
      * @param message The faces message.
      * @see Flash#setKeepMessages(boolean)
@@ -647,7 +647,7 @@ public final class Messages {
     /**
      * Add a flash scoped faces message of the given severity to the given client ID, with the given message body which is formatted with the given parameters.
      * Use this when you need to display the message after a redirect.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param severity The severity of the faces message.
      * @param message The message body.
@@ -662,7 +662,7 @@ public final class Messages {
     /**
      * Add a flash scoped INFO faces message to the given client ID, with the given message body which is formatted with the given parameters. Use this when you
      * need to display the message after a redirect.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -676,7 +676,7 @@ public final class Messages {
     /**
      * Add a flash scoped WARN faces message to the given client ID, with the given message body which is formatted with the given parameters. Use this when you
      * need to display the message after a redirect.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -690,7 +690,7 @@ public final class Messages {
     /**
      * Add a flash scoped ERROR faces message to the given client ID, with the given message body which is formatted with the given parameters. Use this when
      * you need to display the message after a redirect.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -704,7 +704,7 @@ public final class Messages {
     /**
      * Add a flash scoped FATAL faces message to the given client ID, with the given message body which is formatted with the given parameters. Use this when
      * you need to display the message after a redirect.
-     * 
+     *
      * @param clientId The client ID to add the faces message for.
      * @param message The message body.
      * @param params The message format parameters, if any.
@@ -720,7 +720,7 @@ public final class Messages {
     /**
      * Add a flash scoped global faces message. This adds a faces message to a client ID of <code>null</code>. Use this when you need to display the message
      * after a redirect.
-     * 
+     *
      * @param message The global faces message.
      * @see #addFlash(String, FacesMessage)
      */
@@ -731,7 +731,7 @@ public final class Messages {
     /**
      * Add a flash scoped global INFO faces message, with the given message body which is formatted with the given parameters. Use this when you need to display
      * the message after a redirect.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createInfo(String, Object...)
@@ -744,7 +744,7 @@ public final class Messages {
     /**
      * Add a flash scoped global WARN faces message, with the given message body which is formatted with the given parameters. Use this when you need to display
      * the message after a redirect.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createWarn(String, Object...)
@@ -757,7 +757,7 @@ public final class Messages {
     /**
      * Add a flash scoped global ERROR faces message, with the given message body which is formatted with the given parameters. Use this when you need to
      * display the message after a redirect.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createError(String, Object...)
@@ -770,7 +770,7 @@ public final class Messages {
     /**
      * Add a flash scoped global FATAL faces message, with the given message body which is formatted with the given parameters. Use this when you need to
      * display the message after a redirect.
-     * 
+     *
      * @param message The message body.
      * @param params The message format parameters, if any.
      * @see #createFatal(String, Object...)
@@ -784,7 +784,7 @@ public final class Messages {
 
     /**
      * Returns <code>true</code> if there are no faces messages, otherwise <code>false</code>.
-     * 
+     *
      * @return <code>true</code> if there are no faces messages, otherwise <code>false</code>.
      * @see FacesContext#getMessageList()
      * @since 2.2
@@ -795,7 +795,7 @@ public final class Messages {
 
     /**
      * Returns <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
-     * 
+     *
      * @return <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
      * @param clientId The client ID to check the messages for.
      * @see FacesContext#getMessageList(String)
@@ -807,7 +807,7 @@ public final class Messages {
 
     /**
      * Returns <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
-     * 
+     *
      * @return <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
      * @see FacesContext#getMessageList(String)
      * @since 2.2
@@ -820,7 +820,7 @@ public final class Messages {
 
     /**
      * Clears faces messages of the given severity associated with the given client IDs.
-     * 
+     *
      * @param severity The severity to clear faces message for. If this is null, then all severities are matched.
      * @param clientIds The client IDs to clear faces messages for. If this is null or empty, then all faces messages are cleared. If this contains null, then
      * all global faces messages are cleared.
@@ -835,7 +835,7 @@ public final class Messages {
 
     /**
      * Clears faces messages associated with the given client IDs.
-     * 
+     *
      * @param clientIds The client IDs to clear faces messages for. If this is empty, then all faces messages are cleared. If this contains null, then all
      * global faces messages are cleared.
      * @return <code>true</code> if at least one faces message associated with the given client IDs was cleared.
@@ -848,7 +848,7 @@ public final class Messages {
 
     /**
      * Clears INFO faces messages associated with the given client IDs.
-     * 
+     *
      * @param clientIds The client IDs to clear INFO faces messages for. If this is empty, then all INFO faces messages are cleared. If this contains null, then
      * all global INFO faces messages are cleared.
      * @return <code>true</code> if at least one INFO faces message associated with the given client IDs was cleared.
@@ -861,7 +861,7 @@ public final class Messages {
 
     /**
      * Clears WARN faces messages associated with the given client IDs.
-     * 
+     *
      * @param clientIds The client IDs to clear WARN faces messages for. If this is empty, then all WARN faces messages are cleared. If this contains null, then
      * all global WARN faces messages are cleared.
      * @return <code>true</code> if at least one WARN faces message associated with the given client IDs was cleared.
@@ -874,7 +874,7 @@ public final class Messages {
 
     /**
      * Clears ERROR faces messages associated with the given client IDs.
-     * 
+     *
      * @param clientIds The client IDs to clear ERROR faces messages for. If this is empty, then all ERROR faces messages are cleared. If this contains null,
      * then all global ERROR faces messages are cleared.
      * @return <code>true</code> if at least one ERROR faces message associated with the given client IDs was cleared.
@@ -887,7 +887,7 @@ public final class Messages {
 
     /**
      * Clears FATAL faces messages associated with the given client IDs.
-     * 
+     *
      * @param clientIds The client IDs to clear FATAL faces messages for. If this is empty, then all FATAL face messages are cleared. If this contains null,
      * then all global FATAL faces messages are cleared.
      * @return <code>true</code> if at least one FATAL faces message associated with the given client IDs was cleared.
@@ -900,7 +900,7 @@ public final class Messages {
 
     /**
      * Clears global faces messages of given severity.
-     * 
+     *
      * @param severity The severity of the faces message. If this is null, then all severities are matched.
      * @return <code>true</code> if at least one global faces message of given severity was cleared.
      * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
@@ -912,7 +912,7 @@ public final class Messages {
 
     /**
      * Clears global faces messages of all severities.
-     * 
+     *
      * @return <code>true</code> if at least one global faces message was cleared.
      * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
      * @since 3.5
@@ -923,7 +923,7 @@ public final class Messages {
 
     /**
      * Clears global INFO faces messages.
-     * 
+     *
      * @return <code>true</code> if at least one global INFO faces message was cleared.
      * @see #clearInfo(String...)
      * @since 3.5
@@ -934,7 +934,7 @@ public final class Messages {
 
     /**
      * Clears global WARN faces messages.
-     * 
+     *
      * @return <code>true</code> if at least one global WARN faces message was cleared.
      * @see #clearWarn(String...)
      * @since 3.5
@@ -945,7 +945,7 @@ public final class Messages {
 
     /**
      * Clears global ERROR faces messages.
-     * 
+     *
      * @return <code>true</code> if at least one global ERROR faces message was cleared.
      * @see #clearError(String...)
      * @since 3.5
@@ -956,7 +956,7 @@ public final class Messages {
 
     /**
      * Clears global FATAL faces messages.
-     * 
+     *
      * @return <code>true</code> if at least one global FATAL faces message was cleared.
      * @see #clearFatal(String...)
      * @since 3.5

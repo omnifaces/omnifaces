@@ -106,7 +106,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
     /**
      * Collect all messages associated with components identified by <code>for</code> attribute and return it. An empty list will be returned when there are no
      * messages.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The messages component.
      * @return All messages associated with components identified by <code>for</code> attribute.
@@ -141,7 +141,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
     /**
      * Encode the case when the <code>var</code> attribute is specified. This will render without any HTML markup and put the current message in the request
      * scope as identified by the <code>var</code> attribute. Note: the iteration is by design completely stateless.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The messages component.
      * @param messages The queued faces messages.
@@ -181,7 +181,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode the case when there are no messages. This will render a div when the ID is specified.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The messages component.
      * @throws IOException When an I/O error occurs.
@@ -200,7 +200,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode the case when the faces messages are to be rendered as either a HTML table or a HTML list.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The messages component.
      * @param messages The queued faces messages.
@@ -228,7 +228,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
     /**
      * Encode a single faces message.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The messages component.
      * @param message The queued faces message.

@@ -63,7 +63,7 @@ public final class OmniFaces {
      * The boolean context parameter name to skip any OmniFaces deployment exception. If this is set to <code>true</code>, then any exception thrown by
      * {@link ApplicationInitializer}, {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't anymore block the deployment of
      * the web application.
-     * 
+     *
      * @since 3.14
      */
     public static final String PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION = "org.omnifaces.SKIP_DEPLOYMENT_EXCEPTION";
@@ -87,7 +87,7 @@ public final class OmniFaces {
      * Returns OmniFaces version. This is extracted from Implementation-Version field of /META-INF/MANIFEST.MF file of omnifaces.jar file. Release versions will
      * return version in format <code>3.4.2</code>. Snapshot versions will return version in format <code>3.4.2-SNAPSHOT</code>. Local development versions
      * (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
-     * 
+     *
      * @return OmniFaces version.
      */
     public static String getVersion() {
@@ -96,7 +96,7 @@ public final class OmniFaces {
 
     /**
      * Returns whether current OmniFaces version is a SNAPSHOT or RC version.
-     * 
+     *
      * @return Whether current OmniFaces version is a SNAPSHOT or RC version.
      */
     public static boolean isSnapshot() {
@@ -105,7 +105,7 @@ public final class OmniFaces {
 
     /**
      * Returns startup time in Epoch milli.
-     * 
+     *
      * @return Startup time in Epoch milli.
      */
     public static long getStartupTime() {
@@ -115,7 +115,7 @@ public final class OmniFaces {
     /**
      * Returns resource bundle message associated with given key from application message bundle as identified by <code>&lt;message-bundle&gt;</code> in
      * <code>faces-config.xml</code>, or if it is absent, then return it from OmniFaces internal <code>org.omnifaces.messages</code> bundle.
-     * 
+     *
      * @param key The message bundle key.
      * @return Resource bundle message associated with given key.
      */
@@ -133,7 +133,7 @@ public final class OmniFaces {
      * Returns whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>. If this is set to <code>true</code>,
      * then any exception thrown by {@link ApplicationInitializer}, {@link ApplicationListener} and {@link ApplicationProcessor} will be suppressed and won't
      * anymore block the deployment of the web application.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @return whether the context parameter {@value #PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION} is set to <code>true</code>.
      * @since 3.14

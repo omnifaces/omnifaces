@@ -36,7 +36,7 @@ public class MethodReference extends MethodInfo {
 
     /**
      * Construct a method reference.
-     * 
+     *
      * @param base The base of the EL method expression.
      * @param method The concrete {@link Method} instance of the EL method expression.
      */
@@ -48,7 +48,7 @@ public class MethodReference extends MethodInfo {
 
     /**
      * Construct a method reference.
-     * 
+     *
      * @param base The base of the EL method expression.
      * @param method The concrete {@link Method} instance of the EL method expression.
      * @param actualParameters The actual (evaluated) parameters of the method call.
@@ -62,7 +62,7 @@ public class MethodReference extends MethodInfo {
 
     /**
      * Returns the base of the EL method expression. Usually, this is the backing bean on which the method behind {@link #getMethod()} should be invoked.
-     * 
+     *
      * @return The base of the EL method expression.
      */
     public Object getBase() {
@@ -71,7 +71,7 @@ public class MethodReference extends MethodInfo {
 
     /**
      * Returns the concrete {@link Method} instance of the EL method expression. Usually, this is a method of the class behind {@link #getBase()}.
-     * 
+     *
      * @return The concrete {@link Method} instance of the EL method expression.
      */
     public Method getMethod() {
@@ -81,7 +81,7 @@ public class MethodReference extends MethodInfo {
     /**
      * Returns the actual (evaluated) parameters of the method call. If there are no params, then this returns an empty array, never <code>null</code>. Those
      * should be passed to {@link Method#invoke(Object, Object...)}.
-     * 
+     *
      * @return The actual (evaluated) parameters of the method call.
      */
     public Object[] getActualParameters() {
@@ -90,7 +90,7 @@ public class MethodReference extends MethodInfo {
 
     /**
      * Returns <code>true</code> if this method reference is from an actual method call and not from a getter of a property.
-     * 
+     *
      * @return <code>true</code> if this method reference is from an actual method call and not from a getter of a property.
      */
     public boolean isFromMethod() {

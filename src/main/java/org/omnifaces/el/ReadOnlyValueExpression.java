@@ -37,7 +37,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     /**
      * Construct a read only value expression.
-     * 
+     *
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      * @param callback The functional interface that will be called when the value expression is resolved.
      */
@@ -48,7 +48,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
     /**
      * Construct a read only value expression.
-     * 
+     *
      * @param expectedType The type the result of the expression will be coerced to after evaluation.
      */
     public ReadOnlyValueExpression(Class<?> expectedType) {

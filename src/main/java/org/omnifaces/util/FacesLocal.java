@@ -105,23 +105,23 @@ import org.omnifaces.util.FunctionalInterfaces.ThrowingConsumer;
  * Note that methods which are <strong>directly</strong> available on {@link FacesContext} instance itself, such as {@link FacesContext#getExternalContext()},
  * {@link FacesContext#getViewRoot()}, {@link FacesContext#isValidationFailed()}, etc are not delegated by the this utility class, because it would design
  * technically not make any sense to delegate a single-depth method call like follows:
- * 
+ *
  * <pre>
- * 
+ *
  * ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);
  * </pre>
  * <p>
  * instead of just calling it directly like follows:
- * 
+ *
  * <pre>
- * 
+ *
  * ExternalContext externalContext = facesContext.getExternalContext();
  * </pre>
  *
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
  * FacesContext context = Faces.getContext();
  * User user = FacesLocal.getSessionAttribute(context, "user");
@@ -1938,7 +1938,7 @@ public final class FacesLocal {
 
     /**
      * Internal global method to send the given input stream to the response.
-     * 
+     *
      * @param input The file content as input stream.
      * @param filename The file name which should appear in content disposition header.
      * @param contentLength The content length, or -1 if it is unknown.

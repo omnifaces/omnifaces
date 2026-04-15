@@ -48,7 +48,7 @@ public class ComponentExtraHandler extends ComponentHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ComponentExtraHandler(ComponentConfig config) {

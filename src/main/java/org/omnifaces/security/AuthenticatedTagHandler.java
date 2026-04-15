@@ -31,7 +31,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="usage"><a href="#usage">Usage</a></h2>
  * <p>
  * To use the security taglib, declare the <code>omnifaces.security</code> namespace in your Facelets view:
- * 
+ *
  * <pre>
  * &lt;html xmlns:sec="omnifaces.security"&gt;
  * </pre>
@@ -42,7 +42,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-welcome"><a href="#example-welcome">Example: Welcome message for authenticated users</a></h2>
  * <p>
  * Display a personalized welcome message only when the user is authenticated:
- * 
+ *
  * <pre>
  * &lt;sec:isAuthenticated&gt;
  *     &lt;h:outputText value="Welcome back, #{request.remoteUser}!" /&gt;
@@ -53,7 +53,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-logout"><a href="#example-logout">Example: Logout button for authenticated users</a></h2>
  * <p>
  * Show a logout button only when the user is authenticated:
- * 
+ *
  * <pre>
  * &lt;sec:isAuthenticated&gt;
  *     &lt;h:form&gt;
@@ -66,7 +66,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-navigation"><a href="#example-navigation">Example: User-specific navigation</a></h2>
  * <p>
  * Display navigation links that are only available to authenticated users:
- * 
+ *
  * <pre>
  * &lt;sec:isAuthenticated&gt;
  *     &lt;ul&gt;
@@ -81,7 +81,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-combined"><a href="#example-combined">Example: Combined with isAnonymous</a></h2>
  * <p>
  * Use together with <code>&lt;sec:isAnonymous&gt;</code> to show different navigation based on authentication status:
- * 
+ *
  * <pre>
  * &lt;sec:isAnonymous&gt;
  *     &lt;h:link value="Login" outcome="/login" /&gt;
@@ -100,7 +100,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-authorization"><a href="#example-authorization">Example: Combined with authorize</a></h2>
  * <p>
  * Use together with <code>&lt;sec:authorize&gt;</code> to combine authentication and role-based authorization:
- * 
+ *
  * <pre>
  * &lt;sec:isAuthenticated&gt;
  *     &lt;h:link value="Dashboard" outcome="/dashboard" /&gt;

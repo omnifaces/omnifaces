@@ -53,7 +53,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
     /**
      * Construct method expression which adapts the given value expression.
-     * 
+     *
      * @param valueExpression Value expression to be adapted to method expression.
      */
     public MethodExpressionValueExpressionAdapter(ValueExpression valueExpression) {
@@ -111,7 +111,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
     /**
      * Returns the underlying value expression.
-     * 
+     *
      * @return The underlying value expression.
      */
     public ValueExpression getValueExpression() {

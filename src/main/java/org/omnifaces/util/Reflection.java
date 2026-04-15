@@ -106,7 +106,7 @@ public final class Reflection {
 
         /**
          * Create a new property path composed of given nodes.
-         * 
+         *
          * @param nodes Nodes of property path.
          * @return A new property path composed of given nodes.
          * @throws NullPointerException When one of the nodes is null.
@@ -130,7 +130,7 @@ public final class Reflection {
          * "person" and the given node is "name", then this returns a new property path representing "person.name". Or, if the current property path is "list"
          * and the given node is "0", then this returns a new property path representing "list[0]". Or, if the current property path is "persons[0]" and the
          * given node is "name", then this returns a new property path representing "persons[0].name"
-         * 
+         *
          * @param node Node to extend the current property path with.
          * @return A new property path composed of the nodes of the current property path added with the given node.
          * @throws NullPointerException When node is null.
@@ -291,7 +291,7 @@ public final class Reflection {
 
     /**
      * Recursively set given properties on given bean. It will automatically prepopulate nested lists, maps, arrays and beans where necessary.
-     * 
+     *
      * @param bean Bean to recursively set properties on.
      * @param properties Properties to recursively set on bean. The map key represents the property path and the map value represents the property value.
      * @since 3.8
@@ -366,7 +366,7 @@ public final class Reflection {
 
     /**
      * Obtain given property from given bean.
-     * 
+     *
      * @param bean Bean to obtain property from.
      * @param property Property name.
      * @return Value of given property of given bean.
@@ -466,7 +466,7 @@ public final class Reflection {
      * Recursively collect all base bean property paths from the given bean which resolve to non-null bases. A "base" is represented by the bean itself and all
      * of its nested lists, maps, arrays and beans. This does not include the non-nested properties of any base. E.g. "person.address.street" will return a map
      * with actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it does not represent a base.
-     * 
+     *
      * @param bean The given bean.
      * @return All base bean property paths which resolve to non-null values, mapped by the base.
      * @since 3.8
@@ -480,7 +480,7 @@ public final class Reflection {
      * bean itself and all of its nested lists, maps, arrays and beans. This does not include the non-nested properties of any base. E.g.
      * "person.address.street" will return a map with actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it
      * does not represent a base.
-     * 
+     *
      * @param bean The given bean.
      * @param recursableGetter Whether the given getter method is recursable.
      * @return All base bean property paths which resolve to non-null values, mapped by the base.
@@ -702,7 +702,7 @@ public final class Reflection {
 
     /**
      * Finds methods having the given annotation.
-     * 
+     *
      * @param base The object in which the methods are to be found.
      * @param annotation Annotation of the method to be found.
      * @return List of matching methods.
@@ -728,7 +728,7 @@ public final class Reflection {
     /**
      * Returns true if given source is assignable to target type, taking into account autoboxing. Java returns namely false on
      * int.class.isAssignableFrom(Integer.class).
-     * 
+     *
      * @param source The source to be checked.
      * @param targetType The target type to be checked.
      * @return True if the given source is assignable to the given target type.
@@ -747,7 +747,7 @@ public final class Reflection {
     /**
      * Returns the class object associated with the given class name, using the context class loader and if that fails the defining class loader of the current
      * class.
-     * 
+     *
      * @param <T> The expected class type.
      * @param className Fully qualified class name of the class for which a class object needs to be created.
      * @return The class object associated with the given class name.
@@ -775,7 +775,7 @@ public final class Reflection {
     /**
      * Returns the class object associated with the given class name, using the context class loader and if that fails the defining class loader of the current
      * class. If the class cannot be loaded, then return null instead of throwing illegal state exception.
-     * 
+     *
      * @param <T> The expected class type.
      * @param className Fully qualified class name of the class for which a class object needs to be created.
      * @return The class object associated with the given class name.
@@ -794,7 +794,7 @@ public final class Reflection {
 
     /**
      * Finds a constructor based on the given parameter types and returns <code>null</code> is none is found.
-     * 
+     *
      * @param clazz The class object for which the constructor is to be found.
      * @param parameterTypes The desired method parameter types.
      * @return A constructor if one is found, null otherwise.
@@ -812,7 +812,7 @@ public final class Reflection {
 
     /**
      * Returns a new instance of the given class name using the default constructor.
-     * 
+     *
      * @param <T> The expected return type.
      * @param className Fully qualified class name of the class for which an instance needs to be created.
      * @return A new instance of the given class name using the default constructor.
@@ -826,7 +826,7 @@ public final class Reflection {
 
     /**
      * Returns a new instance of the given class object using the default constructor.
-     * 
+     *
      * @param <T> The generic object type.
      * @param clazz The class object for which an instance needs to be created.
      * @return A new instance of the given class object using the default constructor.
@@ -845,7 +845,7 @@ public final class Reflection {
 
     /**
      * Returns the value of the field of the given instance on the given field name.
-     * 
+     *
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param fieldName The name of the field to be accessed on the given instance.
@@ -869,7 +869,7 @@ public final class Reflection {
     /**
      * Returns the value of the field of the given instance on the given field type. Note that this returns only the first encountered field of the given type
      * and thus the result is undetermined when there are multiple fields of the given type.
-     * 
+     *
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param fieldType The type of the field to be accessed on the given instance.
@@ -887,7 +887,7 @@ public final class Reflection {
      * field of the given type and thus the result is undetermined when there are multiple fields of the given type. The difference with
      * {@link #accessField(Object, Class)} is that any subclass of the given class type are not searched in might the given instance being such one subclass
      * with its own field.
-     * 
+     *
      * @param <T> The expected return type.
      * @param instance The instance to access the given field on.
      * @param classType The type of the class to find the given field in.
@@ -918,7 +918,7 @@ public final class Reflection {
 
     /**
      * Modifies the value of the field of the given instance on the given field name with the given value.
-     * 
+     *
      * @param <T> The field type.
      * @param instance The instance to access the given field on.
      * @param fieldName The name of the field to be accessed on the given instance.
@@ -939,7 +939,7 @@ public final class Reflection {
 
     /**
      * Modifies the value of the given field of the given instance with the given value.
-     * 
+     *
      * @param <T> The field type.
      * @param instance The instance to access the given field on.
      * @param field The field to be accessed on the given instance.
@@ -969,7 +969,7 @@ public final class Reflection {
      * <p>
      * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of them is still null, a NullPointerException
      * will be thrown.
-     * 
+     *
      * @param <T> The expected return type.
      * @param instance The instance to invoke the given method on.
      * @param methodName The name of the method to be invoked on the given instance.
@@ -999,7 +999,7 @@ public final class Reflection {
 
     /**
      * Invoke given method of the given instance with the given parameters and return the result.
-     * 
+     *
      * @param <T> The expected return type.
      * @param instance The instance to invoke the given method on.
      * @param method The method to be invoked on the given instance.
@@ -1027,7 +1027,7 @@ public final class Reflection {
 
     /**
      * Invoke methods of the given instance having the given annotation.
-     * 
+     *
      * @param instance The instance to invoke the methods having the given annotation on.
      * @param annotation Annotation of the methods to be invoked.
      * @throws IllegalStateException If the method cannot be invoked.
@@ -1051,7 +1051,7 @@ public final class Reflection {
      * <p>
      * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of them is still null, a NullPointerException
      * will be thrown.
-     * 
+     *
      * @param <T> The expected return type.
      * @param type The type to invoke the given static method on.
      * @param methodName The name of the static method to be invoked on the given type.

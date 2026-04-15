@@ -48,7 +48,7 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
     /**
      * Construct conditional response writer.
-     * 
+     *
      * @param responseWriter Response writer to be wrapped.
      * @param facesContext Involved faces context.
      * @param componentIds Component IDs.

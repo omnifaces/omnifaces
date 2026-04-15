@@ -48,7 +48,7 @@ public final class ResourcePaths {
     /**
      * Checks if the given resource path obtained from {@link ServletContext#getResourcePaths(String)} represents a directory. That is, if it ends with
      * {@value #PATH_SEPARATOR}.
-     * 
+     *
      * @param resourcePath The resource path to check.
      * @return <code>true</code> if the resource path represents a directory, false otherwise.
      */
@@ -58,7 +58,7 @@ public final class ResourcePaths {
 
     /**
      * Strips the given prefix from the given resource path if any.
-     * 
+     *
      * @param prefix The prefix to be stripped.
      * @param resourcePath The resource path to strip the prefix from.
      * @return The resource without the prefix path, or as-is if it didn't start with this prefix.
@@ -69,7 +69,7 @@ public final class ResourcePaths {
 
     /**
      * Strips the trailing slash(es) from the given resource path if any.
-     * 
+     *
      * @param resourcePath The resource path to strip the trailing slash from.
      * @return The resource without the trailing slash, or as-is if it didn't have a trailing slash.
      * @since 2.6
@@ -81,7 +81,7 @@ public final class ResourcePaths {
     /**
      * Strips the extension from the given resource path if any. This extension is defined as everything after the last occurrence of a period, including the
      * period itself. E.g. input "index.xhtml" will return "index".
-     * 
+     *
      * @param resourcePath The resource path to strip the extension from.
      * @return The resource path without its extension, of as-is if it doesn't have an extension.
      */
@@ -92,7 +92,7 @@ public final class ResourcePaths {
     /**
      * Gets the extension of given resource path if any. This extension is defined as everything after the last occurrence of a period, including the period
      * itself. E.g. input "index.xhtml" will return ".xhtml'.
-     * 
+     *
      * @param resourcePath The resource path to get the extension from.
      * @return the extension of the resource path, or null if it doesn't have an extension.
      */
@@ -102,7 +102,7 @@ public final class ResourcePaths {
 
     /**
      * Checks if given resource path is extensionless.
-     * 
+     *
      * @param resourcePath The resource path to check.
      * @return <code>true</code> if the resource path is extensionless, false otherwise.
      */
@@ -112,7 +112,7 @@ public final class ResourcePaths {
 
     /**
      * Filters away every resource path in the given set that has an extension.
-     * 
+     *
      * @param resourcePaths A set of resource paths to be filtered
      * @return A set where no resource path has an extension. May be empty, but never null.
      */
@@ -122,7 +122,7 @@ public final class ResourcePaths {
 
     /**
      * Checks if the given resource path represents the root. That is, if it equals {@value #PATH_SEPARATOR}.
-     * 
+     *
      * @param resourcePath The resource path to check.
      * @return <code>true</code> if the resource path represents the root, false otherwise.
      * @since 3.0
@@ -133,7 +133,7 @@ public final class ResourcePaths {
 
     /**
      * Add leading slash to given resource path if necessary.
-     * 
+     *
      * @param resourcePath The resource paths to add leading slash to.
      * @return Resource path with leading slash.
      * @since 3.0
@@ -144,7 +144,7 @@ public final class ResourcePaths {
 
     /**
      * Add trailing slash to given resource path if necessary.
-     * 
+     *
      * @param resourcePath The resource paths to add trailing slash to.
      * @return Resource path with trailing slash.
      * @since 3.0
@@ -155,7 +155,7 @@ public final class ResourcePaths {
 
     /**
      * Concat given resource paths with the path separator.
-     * 
+     *
      * @param resourcePaths The resource paths to concat.
      * @return Concatenated resource paths.
      * @since 3.0

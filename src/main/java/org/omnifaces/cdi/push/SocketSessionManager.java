@@ -72,7 +72,7 @@ public class SocketSessionManager extends PushSessionManager<Session> {
     /**
      * On open, add given web socket session to the mapping associated with its channel identifier and returns <code>true</code> if it's accepted (i.e. the
      * channel identifier is known) and the same session hasn't been added before, otherwise <code>false</code>.
-     * 
+     *
      * @param session The opened web socket session.
      * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
      */
@@ -95,7 +95,7 @@ public class SocketSessionManager extends PushSessionManager<Session> {
 
     /**
      * On close, remove given web socket session from the mapping.
-     * 
+     *
      * @param session The closed web socket session.
      * @param reason The close reason.
      */

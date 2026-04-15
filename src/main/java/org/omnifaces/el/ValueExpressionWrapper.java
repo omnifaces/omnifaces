@@ -37,7 +37,7 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
 
     /**
      * Construct the value expression wrapper.
-     * 
+     *
      * @param wrapped The value expression to be wrapped.
      */
     public ValueExpressionWrapper(ValueExpression wrapped) {

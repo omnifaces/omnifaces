@@ -51,7 +51,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by <code>converterId="jakarta.faces.DateTime"</code>, then you'll be able to
  * use all its attributes such as <code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply deferred value
  * expressions.
- * 
+ *
  * <pre>
  * &lt;o:converter converterId="jakarta.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
  * </pre>
@@ -90,7 +90,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 
     /**
      * The constructor.
-     * 
+     *
      * @param config The converter config.
      */
     public Converter(ConverterConfig config) {
@@ -107,7 +107,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
      * <code>&lt;f:converter&gt;</code> implementation and collect the render time attributes. Then create an anonymous <code>Converter</code> implementation
      * which wraps the created <code>Converter</code> and delegates the methods to it after setting the render time attributes. Finally set the anonymous
      * implementation on the parent component.
-     * 
+     *
      * @param context The involved facelet context.
      * @param parent The parent component to set the <code>Converter</code> on.
      * @throws IOException If something fails at I/O level.
@@ -178,7 +178,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 
         /**
          * Construct the deferred converter.
-         * 
+         *
          * @param converter The wrapped converter.
          * @param binding The binding expression.
          * @param id The ID expression.

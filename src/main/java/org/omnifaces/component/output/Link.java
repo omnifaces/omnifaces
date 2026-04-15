@@ -38,7 +38,7 @@ import org.omnifaces.util.State;
  * <p>
  * When you want to include request query string parameters of the current URL into the link's target URL, set the <code>includeRequestParams</code> attribute
  * to <code>true</code>.
- * 
+ *
  * <pre>
  * &lt;o:link value="Go to some page with same query string" outcome="some-page" includeRequestParams="true"&gt;
  * </pre>
@@ -76,7 +76,7 @@ public class Link extends HtmlOutcomeTargetLink {
 
     /**
      * Returns whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
-     * 
+     *
      * @return Whether or not the request parameters should be encoded into the target URL.
      */
     public boolean isIncludeRequestParams() {
@@ -85,7 +85,7 @@ public class Link extends HtmlOutcomeTargetLink {
 
     /**
      * Sets whether or not the request parameters should be encoded into the target URL. Defaults to {@code false}.
-     * 
+     *
      * @param includeRequestParams Whether or not the request parameters should be encoded into the target URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {
@@ -95,7 +95,7 @@ public class Link extends HtmlOutcomeTargetLink {
     /**
      * Returns the identifier of the page fragment which should be brought into focus when the target page is rendered. The value of this attribute is appended
      * to the end of target URL following a hash (#) mark. This notation is part of the standard URL syntax.
-     * 
+     *
      * @return The page fragment identifier.
      */
     public String getFragment() {
@@ -105,7 +105,7 @@ public class Link extends HtmlOutcomeTargetLink {
     /**
      * Sets the identifier of the page fragment which should be brought into focus when the target page is rendered. The value of this attribute is appended to
      * the end of target URL following a hash (#) mark. This notation is part of the standard URL syntax.
-     * 
+     *
      * @param fragment The page fragment identifier.
      */
     public void setFragment(String fragment) {

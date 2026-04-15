@@ -47,7 +47,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.ViewResourceHandler&lt;/resource-handler&gt;
@@ -58,7 +58,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * provided wherein the view resources are specified as a comma separated string of context-relative URIs.
  * <p>
  * Here is an example configuration:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.VIEW_RESOURCE_HANDLER_URIS&lt;/param-name&gt;
@@ -103,7 +103,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
     /**
      * This will map the {@link FacesServlet} to the URIs specified in {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
      * context parameter. This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @throws MalformedURLException When one of the URIs specified in context parameter is malformed.
      */
@@ -139,7 +139,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
     /**
      * Returns <code>true</code> if the current HTTP request is requesting for a view resource managed by this resource handler.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current HTTP request is requesting for a view resource managed by this resource handler.
      */
@@ -152,7 +152,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
     /**
      * Creates a new instance of this view resource handler which wraps the given resource handler.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public ViewResourceHandler(ResourceHandler wrapped) {

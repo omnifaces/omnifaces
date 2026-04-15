@@ -38,9 +38,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * <h2>Examples</h2>
  * <p>
  * Determine the bean instance and the property value behind a {@link ValueExpression}.
- * 
+ *
  * <pre>
- * 
+ *
  * ValueExpression valueExpression = component.getValueExpression("value");
  * ValueReference valueReference = ExpressionInspector.getValueReference(context.getELContext(), valueExpression);
  * Object bean = methodReference.getBase();
@@ -48,9 +48,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * </pre>
  * <p>
  * Determine the bean instance and the concrete getter {@link Method} behind a {@link ValueExpression}.
- * 
+ *
  * <pre>
- * 
+ *
  * ValueExpression valueExpression = component.getValueExpression("value");
  * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression);
  * Object bean = methodReference.getBase();
@@ -58,9 +58,9 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * </pre>
  * <p>
  * Determine the bean instance and the concrete action {@link Method} behind a {@link MethodExpression}.
- * 
+ *
  * <pre>
- * 
+ *
  * MethodExpression methodExpression = commandComponent.getActionExpression();
  * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), methodExpression);
  * Object bean = methodReference.getBase();

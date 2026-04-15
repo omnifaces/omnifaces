@@ -70,16 +70,16 @@ import org.omnifaces.util.Utils;
  * <h3>Single file selection</h3>
  * <p>
  * It is basically not different from <code>&lt;h:inputFile&gt;</code>. You might as good use it instead.
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile value="#{bean.file}" /&gt;
  *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * private Part file; // +getter+setter
  *
  * public void upload() {
@@ -101,16 +101,16 @@ import org.omnifaces.util.Utils;
  * The <code>multiple</code> attribute can be set to <code>true</code> to enable multiple file selection. With this setting the enduser can use
  * control/command/shift keys to select multiple files. It is basically also not different from <code>&lt;h:inputFile&gt;</code>. You might as good use it
  * instead.
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile value="#{bean.files}" multiple="true" /&gt;
  *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * private List&lt;Part&gt; files; // +getter+setter
  *
  * public void upload() {
@@ -130,16 +130,16 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>directory</code> attribute can be set to <code>true</code> to enable folder selection. This implicitly also sets <code>multiple</code> attribute to
  * <code>true</code> and renders an additional <code>webkitdirectory</code> attribute to HTML for better browser compatibility.
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile value="#{bean.files}" directory="true" /&gt;
  *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * private List&lt;Part&gt; files; // +getter+setter
  *
  * public void upload() {
@@ -161,7 +161,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>accept</code> attribute can be set with a comma separated string of media types of files to filter in browse dialog. An overview of all registered
  * media types can be found at <a href="https://www.iana.org/assignments/media-types">IANA</a>.
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.losslessImageFile}" accept="image/png,image/gif" /&gt;
@@ -169,7 +169,7 @@ import org.omnifaces.util.Utils;
  *     &lt;h:message for="file" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.anyImageFile}" accept="image/*" /&gt;
@@ -177,7 +177,7 @@ import org.omnifaces.util.Utils;
  *     &lt;h:message for="file" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.anyMediaFile}" accept="audio/*,image/*,video/*" /&gt;
@@ -198,7 +198,7 @@ import org.omnifaces.util.Utils;
  * attribute.
  * <p>
  * You can override the default message by the <code>acceptMessage</code> attribute:
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.anyImageFile}" accept="image/*" acceptMessage="File {1} is unacceptable!" /&gt;
@@ -209,7 +209,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Or by the custom message bundle file as identified by <code>&lt;application&gt;&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>. The message
  * key is <code>org.omnifaces.component.input.InputFile.accept</code>.
- * 
+ *
  * <pre>
  * org.omnifaces.component.input.InputFile.accept = File {1} is unacceptable!
  * </pre>
@@ -219,7 +219,7 @@ import org.omnifaces.util.Utils;
  * The <code>maxsize</code> attribute can be set with the maximum file size in bytes which will be validated on each selected file in the client side if the
  * client supports HTML5 File API. This validation will be performed by custom JavaScript in client side instead of by Faces in server side. This only requires
  * that there is a <code>&lt;h:message&gt;</code> or <code>&lt;h:messages&gt;</code> component and that it has its <code>id</code> set.
- * 
+ *
  * <pre>
  * &lt;o:inputFile id="file" ... /&gt;
  * &lt;h:message id="messageForFile" for="file" /&gt; &lt;!-- This must have 'id' attribute set! --&gt;
@@ -227,7 +227,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * This way the client side can trigger Faces via an ajax request to update the message component with the client side validation message. Noted should be that
  * the file(s) will <strong>not</strong> be sent, hereby saving network bandwidth.
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.file}" maxsize="#{10 * 1024 * 1024}" /&gt; &lt;!-- 10MiB --&gt;
@@ -245,7 +245,7 @@ import org.omnifaces.util.Utils;
  * attribute.
  * <p>
  * You can override the default message by the <code>maxsizeMessage</code> attribute:
- * 
+ *
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.file}" maxsize="#{10 * 1024 * 1024}" maxsizeMessage="File {1} is too big!" /&gt;
@@ -256,7 +256,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Or by the custom message bundle file as identified by <code>&lt;application&gt;&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>. The message
  * key is <code>org.omnifaces.component.input.InputFile.maxsize</code>.
- * 
+ *
  * <pre>
  * org.omnifaces.component.input.InputFile.maxsize = File {1} is too big!
  * </pre>
@@ -416,7 +416,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
-     * 
+     *
      * @throws IllegalStateException When component hierarchy is wrong.
      */
     protected void validateHierarchy(FacesContext context) {
@@ -447,7 +447,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Returns whether or not to enable directory selection.
-     * 
+     *
      * @return Whether or not to enable directory selection.
      */
     public boolean isDirectory() {
@@ -457,7 +457,7 @@ public class InputFile extends HtmlInputFile {
     /**
      * Sets whether or not to enable directory selection. When <code>true</code>, this implicitly defaults the <code>multiple</code> attribute to
      * <code>true</code>.
-     * 
+     *
      * @param directory Whether or not to enable directory selection.
      */
     public void setDirectory(boolean directory) {
@@ -466,7 +466,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Returns validation message to be displayed when the condition in <code>accept</code> attribute is violated.
-     * 
+     *
      * @return Validation message to be displayed when the condition in <code>accept</code> attribute is violated.
      */
     public String getAcceptMessage() {
@@ -475,7 +475,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Sets validation message to be displayed when the condition in <code>accept</code> attribute is violated.
-     * 
+     *
      * @param acceptMessage Validation message to be displayed when the condition in <code>accept</code> attribute is violated.
      */
     public void setAcceptMessage(String acceptMessage) {
@@ -484,7 +484,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Returns maximum size in bytes for each selected file. This is validated in both client and server side.
-     * 
+     *
      * @return Maximum size in bytes for each selected file.
      */
     public Long getMaxsize() {
@@ -493,7 +493,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Sets maximum size in bytes for each selected file.
-     * 
+     *
      * @param maxsize Maximum size in bytes for each selected file.
      */
     public void setMaxsize(Long maxsize) {
@@ -502,7 +502,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Returns validation message to be displayed when the condition in <code>maxsize</code> attribute is violated.
-     * 
+     *
      * @return Validation message to be displayed when the condition in <code>maxsize</code> attribute is violated.
      */
     public String getMaxsizeMessage() {
@@ -511,7 +511,7 @@ public class InputFile extends HtmlInputFile {
 
     /**
      * Sets validation message to be displayed when the condition in <code>maxsize</code> attribute is violated.
-     * 
+     *
      * @param maxsizeMessage Validation message to be displayed when the condition in <code>maxsize</code> attribute is violated.
      */
     public void setMaxsizeMessage(String maxsizeMessage) {

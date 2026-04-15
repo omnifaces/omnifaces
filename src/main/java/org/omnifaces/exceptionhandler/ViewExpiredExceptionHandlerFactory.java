@@ -17,7 +17,7 @@ import jakarta.faces.context.ExceptionHandlerFactory;
 
 /**
  * This exception handler factory needs to be registered as follows in <code>faces-config.xml</code> to get the {@link ViewExpiredExceptionHandler} to run:
- * 
+ *
  * <pre>
  * &lt;factory&gt;
  *   &lt;exception-handler-factory&gt;
@@ -34,7 +34,7 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
 
     /**
      * Construct a new view expired exception handler factory around the given wrapped factory.
-     * 
+     *
      * @param wrapped The wrapped factory.
      */
     public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {

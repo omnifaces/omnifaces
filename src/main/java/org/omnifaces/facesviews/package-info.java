@@ -141,7 +141,7 @@
  * how they are injected in the managed bean associated with /page1.xhtml.
  *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Param(pathIndex = 0)
  * private String foo;

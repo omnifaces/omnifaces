@@ -117,7 +117,7 @@ import org.omnifaces.el.ScopedRunner;
  * {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient in situations where multiple utility methods needs to be
  * called at the same time. Invoking {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained as a
  * {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds or so.
- * 
+ *
  * @since 4.6
  * @author Bauke Scholtz
  * @see Components

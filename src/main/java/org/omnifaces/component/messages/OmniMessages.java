@@ -31,7 +31,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <p>
  * Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below would only display messages for
  * <code>input1</code> and <code>input3</code>:
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;o:messages for="input1 input3" /&gt;
@@ -44,7 +44,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <p>
  * It can even refer non-input components which in turn contains input components. The example below would only display messages for <code>input1</code> and
  * <code>input2</code>:
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;o:messages for="inputs" /&gt;
@@ -58,7 +58,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * </pre>
  * <p>
  * You can even combine them. The example below would only display messages for <code>input1</code>, <code>input2</code> and <code>input4</code>.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;o:messages for="inputs input4" /&gt;
@@ -75,7 +75,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <p>
  * Show a single custom message whenever the component has received any faces message. This is particularly useful when you want to display a global message in
  * case any of the in <code>for</code> specified components has a faces message. For example:
- * 
+ *
  * <pre>
  * &lt;o:messages for="form" message="There are validation errors. Please fix them." /&gt;
  * &lt;h:form id="form"&gt;
@@ -88,7 +88,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <h2>HTML escaping</h2>
  * <p>
  * Control HTML escaping by the <code>escape</code> attribute.
- * 
+ *
  * <pre>
  * &lt;o:messages escape="false" /&gt;
  * </pre>
@@ -99,7 +99,7 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <p>
  * Control iteration markup fully by the <code>var</code> attribute which sets the current {@link FacesMessage} in the request scope and disables the default
  * table/list rendering. For example,
- * 
+ *
  * <pre>
  * &lt;dl&gt;
  *     &lt;o:messages var="message"&gt;
@@ -166,7 +166,7 @@ public class OmniMessages extends HtmlMessages {
 
     /**
      * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -183,7 +183,7 @@ public class OmniMessages extends HtmlMessages {
     /**
      * Returns the name of the request attribute which exposes the current faces message in the request scope. This will trigger rendering of markup per faces
      * message instead of per component.
-     * 
+     *
      * @return The name of the request attribute which exposes the current faces message.
      */
     public String getVar() {
@@ -193,7 +193,7 @@ public class OmniMessages extends HtmlMessages {
     /**
      * Sets the name of the request attribute which exposes the current faces message in the request scope. This will trigger rendering of markup per faces
      * message instead of per component.
-     * 
+     *
      * @param varName The name of the request attribute which exposes the current faces message.
      */
     public void setVar(String varName) {
@@ -202,7 +202,7 @@ public class OmniMessages extends HtmlMessages {
 
     /**
      * Returns the single INFO message to be shown instead when this component has any faces message.
-     * 
+     *
      * @return The single INFO message to be shown instead when this component has any faces message.
      * @since 1.6
      */
@@ -212,7 +212,7 @@ public class OmniMessages extends HtmlMessages {
 
     /**
      * Sets the single INFO message to be shown instead when this component has any faces message.
-     * 
+     *
      * @param message The single INFO message to be shown instead when this component has any faces message.
      * @since 1.6
      */
@@ -222,7 +222,7 @@ public class OmniMessages extends HtmlMessages {
 
     /**
      * Returns whether the message detail and summary should be HTML-escaped. Defaults to <code>true</code>.
-     * 
+     *
      * @return Whether the message detail and summary should be HTML-escaped.
      */
     public boolean isEscape() {
@@ -231,7 +231,7 @@ public class OmniMessages extends HtmlMessages {
 
     /**
      * Sets whether the message detail and summary should be HTML-escaped. Defaults to {@code true}.
-     * 
+     *
      * @param escape Whether the message detail and summary should be HTML-escaped.
      */
     public void setEscape(boolean escape) {

@@ -59,7 +59,7 @@ import org.omnifaces.util.State;
  * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using <code>&lt;o:form&gt;</code> will already
  * submit to the exact request URI with query string as seen in browser's address bar. In order to turn off this behavior, set <code>useRequestURI</code>
  * attribute to <code>false</code>.
- * 
+ *
  * <pre>
  * &lt;o:form useRequestURI="false"&gt;
  * </pre>
@@ -68,7 +68,7 @@ import org.omnifaces.util.State;
  * <p>
  * When you want to include request parameters only instead of the entire request URI with query string, set the <code>includeRequestParams</code> attribute to
  * <code>true</code>. This will implicitly set <code>useRequestURI</code> attribute to <code>false</code>.
- * 
+ *
  * <pre>
  * &lt;o:form includeRequestParams="true"&gt;
  * </pre>
@@ -77,7 +77,7 @@ import org.omnifaces.util.State;
  * <p>
  * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the <code>&lt;f:ajax&gt;</code> to send only the form data which
  * actually need to be processed. In order to turn off this behavior, set <code>partialSubmit</code> attribute to <code>false</code>.
- * 
+ *
  * <pre>
  * &lt;o:form partialSubmit="false"&gt;
  * </pre>
@@ -86,7 +86,7 @@ import org.omnifaces.util.State;
  * <p>
  * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers this possibility via nested
  * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;o:form&gt;
  *     &lt;f:param name="somename" value="somevalue" /&gt;
@@ -166,7 +166,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether or not the request parameters should be encoded into the form's action URL.
-     * 
+     *
      * @return Whether or not the request parameters should be encoded into the form's action URL.
      * @since 1.5
      */
@@ -176,7 +176,7 @@ public class Form extends HtmlForm {
 
     /**
      * Sets whether or not the request parameters should be encoded into the form's action URL. Defaults to {@code false}.
-     * 
+     *
      * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
      * @since 1.5
      */
@@ -187,7 +187,7 @@ public class Form extends HtmlForm {
     /**
      * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>. This setting is ignored when
      * <code>includeRequestParams</code> is set to <code>true</code>.
-     * 
+     *
      * @return Whether the request URI should be used as form's action URL.
      * @since 1.6
      */
@@ -198,7 +198,7 @@ public class Form extends HtmlForm {
     /**
      * Sets whether the request URI should be used as form's action URL. Defaults to {@code true}. This setting is ignored when {@code includeRequestParams} is
      * set to {@code true}.
-     * 
+     *
      * @param useRequestURI Whether the request URI should be used as form's action URL.
      * @since 1.6
      */
@@ -208,7 +208,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether or not the form should ignore validation fail (and thus proceed to update model/invoke action).
-     * 
+     *
      * @return Whether or not the form should ignore validation fail.
      * @since 2.1
      */
@@ -218,7 +218,7 @@ public class Form extends HtmlForm {
 
     /**
      * Sets whether the form should ignore validation fail (and thus proceed to update model/invoke action).
-     * 
+     *
      * @param ignoreValidationFailed Whether the form should ignore validation fail.
      * @since 2.1
      */
@@ -228,7 +228,7 @@ public class Form extends HtmlForm {
 
     /**
      * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
-     * 
+     *
      * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
      * @since 3.0
      */
@@ -238,7 +238,7 @@ public class Form extends HtmlForm {
 
     /**
      * Sets whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to {@code true}.
-     * 
+     *
      * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
      * @since 3.0
      */

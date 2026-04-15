@@ -51,7 +51,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * For example, when adding a new row to the data table, you'd like to not immediately validate all empty rows.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:dataTable value="#{bean.items}" var="item"&gt;
@@ -87,7 +87,7 @@ public class SkipValidators extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public SkipValidators(TagConfig config) {
@@ -99,7 +99,7 @@ public class SkipValidators extends TagHandler {
     /**
      * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and we're in the restore view phase of a
      * postback, then delegate to {@link #processSkipValidators(UIComponent)}.
-     * 
+     *
      * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or {@link ClientBehaviorHolder}.
      */
     @Override
@@ -122,7 +122,7 @@ public class SkipValidators extends TagHandler {
     /**
      * Check if the given component has been invoked during the current request and if so, then register the skip validators event listener which removes the
      * validators during {@link PreValidateEvent} and restores them during {@link PostValidateEvent}.
-     * 
+     *
      * @param parent The parent component of this tag.
      */
     protected void processSkipValidators(UIComponent parent) {

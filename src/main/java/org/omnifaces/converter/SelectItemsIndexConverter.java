@@ -42,7 +42,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Just specify it in the <code>converter</code> attribute of the
  * selection component holding <code>&lt;f:selectItems&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsIndexConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
@@ -50,7 +50,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:selectItemsIndexConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedItem}"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;

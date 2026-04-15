@@ -227,7 +227,7 @@ public final class SelectItemsCollector {
 
     /**
      * Gets the name boolean attribute. It defaults to <code>false</code> if not specified.
-     * 
+     *
      * @param attributes the attributes from which the attribute is fetched.
      * @param key name of the attribute
      * @return the boolean represented by the attribute or false if there's no such attribute

@@ -47,7 +47,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <h2>Usage</h2>
  * <p>
  * To enable the restorable view, just add the <code>&lt;enableRestorableView&gt;</code> to the view metadata.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:enableRestorableView/&gt;
@@ -58,7 +58,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>, it's possible to enable a stateless mode on
  * the view by simply setting its <code>transient</code> attribute to <code>true</code>:
- * 
+ *
  * <pre>
  * &lt;f:view transient="true"&gt;
  *     ...
@@ -85,7 +85,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public EnableRestorableView(TagConfig config) {
@@ -97,7 +97,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * Enable the current view to be restorable. This basically sets a specific view attribute which the {@link OmniViewHandler} could intercept on.
-     * 
+     *
      * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
      */
     @Override
@@ -119,7 +119,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
-     * 
+     *
      * @param context The involved faces context.
      * @param view The involved view.
      * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
@@ -132,7 +132,7 @@ public class EnableRestorableView extends TagHandler {
 
     /**
      * Returns true if given view indeed contains {@link EnableRestorableView}.
-     * 
+     *
      * @param view The involved view.
      * @return true if given view indeed contains {@link EnableRestorableView}.
      */

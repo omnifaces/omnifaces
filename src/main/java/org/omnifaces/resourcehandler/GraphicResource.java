@@ -115,7 +115,7 @@ public class GraphicResource extends DynamicResource {
     /**
      * Construct a new graphic resource which uses the given content as data URI. This constructor is called during render time of
      * <code>&lt;o:graphicImage ... dataURI="true"&gt;</code>.
-     * 
+     *
      * @param content The graphic resource content, to be represented as data URI.
      * @param contentType The graphic resource content type. If this is <code>null</code>, then it will be guessed based on the content type signature in the
      * content header. So far, WEBP, JPEG, PNG, GIF, ICO, SVG, BMP and TIFF are recognized. Else if this represents the file extension, then it will be resolved
@@ -137,7 +137,7 @@ public class GraphicResource extends DynamicResource {
      * Construct a new graphic resource based on the given name, EL method parameters converted as string, and the "last modified" representation. This
      * constructor is called during render time of <code>&lt;o:graphicImage value="..." dataURI="false"&gt;</code> and during handling the resource request by
      * {@link GraphicResourceHandler}.
-     * 
+     *
      * @param name The graphic resource name, usually representing the base and method of EL method expression.
      * @param params The graphic resource method parameters.
      * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or {@link Date}, or otherwise an attempt will be made
@@ -164,7 +164,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * Create a new graphic resource based on the given value expression.
-     * 
+     *
      * @param context The involved faces context.
      * @param value The value expression representing content to create a new graphic resource for.
      * @param type The image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
@@ -274,7 +274,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * Register graphic image scoped beans discovered so far.
-     * 
+     *
      * @throws IllegalArgumentException When bean method is missing.
      */
     public static void registerGraphicImageBeans() {
@@ -314,7 +314,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * This must extract the content type from the resource name, if any, else return the default content type.
-     * 
+     *
      * @throws IllegalArgumentException When given type is unrecognized.
      */
     private static String getContentType(String resourceName) {
@@ -346,7 +346,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * Convert the given resource content to base64 encoded string.
-     * 
+     *
      * @throws IllegalArgumentException When given content is unrecognized.
      */
     private static String convertToBase64(Object content) {
@@ -372,7 +372,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * Convert the given objects to strings using converters registered on given types.
-     * 
+     *
      * @throws IllegalArgumentException When the length of given params doesn't match those of given types.
      */
     private static String[] convertToStrings(FacesContext context, Object[] values, Class<?>[] types) {
@@ -393,7 +393,7 @@ public class GraphicResource extends DynamicResource {
 
     /**
      * Convert the given strings to objects using converters registered on given types.
-     * 
+     *
      * @throws IllegalArgumentException When the length of given params doesn't match those of given types.
      */
     private static Object[] convertToObjects(FacesContext context, String[] values, Class<?>[] types) {

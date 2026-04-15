@@ -54,7 +54,7 @@ public class TreeNodeItem extends TreeFamily {
 
     /**
      * Validate the component hierarchy.
-     * 
+     *
      * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is nested in another {@link TreeNodeItem}.
      */
     @Override
@@ -75,7 +75,7 @@ public class TreeNodeItem extends TreeFamily {
     /**
      * Loop over children of the current model node, set the child as the current model node and continue processing this component according to the rules of
      * the given phase ID.
-     * 
+     *
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
@@ -105,7 +105,7 @@ public class TreeNodeItem extends TreeFamily {
     /**
      * Loop over children of the current model node, set the child as the current model node and continue visiting this component according to the given visit
      * context and callback.
-     * 
+     *
      * @param context The visit context to work with.
      * @param callback The visit callback to work with.
      * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
@@ -138,7 +138,7 @@ public class TreeNodeItem extends TreeFamily {
 
     /**
      * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
-     * 
+     *
      * @param context The faces context to work with.
      * @param phaseId The current phase ID (not used so far in this implementation).
      * @param callback The callback to be invoked.

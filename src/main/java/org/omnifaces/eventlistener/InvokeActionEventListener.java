@@ -123,7 +123,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
     /**
      * If {@link UIComponent#getListenersForEventClass(Class)} returns a non-<code>null</code> and non-empty collection, then add the component to the set of
      * components associated with the given event type.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The component to be checked.
      * @param type The event type.
@@ -144,7 +144,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 
     /**
      * Obtain the set of components associated with the given event type and publish the event on each of them.
-     * 
+     *
      * @param context The involved faces context.
      * @param type The event type.
      */

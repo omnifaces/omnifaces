@@ -34,13 +34,13 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.ToUpperCaseConverter</code>. Just specify it in the <code>converter</code> attribute of the
  * component referring the <code>String</code> property. For example:
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.zipCode}" converter="omnifaces.ToUpperCaseConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toUpperCaseConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.zipCode}"&gt;
  *     &lt;o:toUpperCaseConverter /&gt;

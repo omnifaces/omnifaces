@@ -133,7 +133,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
     /**
      * Returns the ordering type to be used.
-     * 
+     *
      * @return The ordering type to be used.
      */
     public String getType() {
@@ -142,7 +142,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
     /**
      * Sets the ordering type to be used.
-     * 
+     *
      * @param type The ordering type to be used.
      */
     public void setType(String type) {

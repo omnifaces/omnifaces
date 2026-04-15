@@ -46,13 +46,13 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.ToCollectionConverter</code>. Just specify it in the <code>converter</code> attribute of the
  * component referring the <code>Collection</code> property. For example:
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.commaSeparatedValues}" converter="omnifaces.ToCollectionConverter" /&gt;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:toCollectionConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.commaSeparatedValues}"&gt;
  *     &lt;o:toCollectionConverter /&gt;
@@ -66,7 +66,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * The <code>delimiter</code> must be a <code>String</code>, the <code>collectionType</code> must be a FQN and the <code>itemConverter</code> can be anything
  * which is acceptable by {@link Faces#createConverter(Object)}.
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedNumbers}"&gt;
  *     &lt;o:toCollectionConverter delimiter=";"
@@ -166,7 +166,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the delimiter to split on.
-     * 
+     *
      * @param delimiter The delimiter to split on.
      */
     public void setDelimiter(String delimiter) {
@@ -175,7 +175,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the FQN of the collection to create.
-     * 
+     *
      * @param collectionType The FQN of the collection to create.
      */
     public void setCollectionType(String collectionType) {
@@ -184,7 +184,7 @@ public class ToCollectionConverter implements Converter<Collection> {
 
     /**
      * Sets the converter for the item.
-     * 
+     *
      * @param itemConverter The converter for the item.
      */
     public void setItemConverter(Object itemConverter) {

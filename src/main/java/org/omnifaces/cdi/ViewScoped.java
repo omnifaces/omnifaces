@@ -72,7 +72,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <h2>Usage</h2>
  * <p>
  * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't accidentally import standard Faces own one.
- * 
+ *
  * <pre>
  * import jakarta.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
@@ -92,7 +92,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * In case you are using client side state saving by having the <code>jakarta.faces.STATE_SAVING_METHOD</code> context parameter set to <code>true</code> along
  * with a valid <code>faces/ClientSideSecretKey</code> in <code>web.xml</code> as below,
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;jakarta.faces.STATE_SAVING_METHOD&lt;/param-name&gt;
@@ -107,7 +107,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * And you explicitly want to store the whole view scoped bean instance in the Faces view state, then set the annotation's <code>saveInViewState</code>
  * attribute to <code>true</code>.
- * 
+ *
  * <pre>
  * import jakarta.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
@@ -155,7 +155,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Below is a kickoff example how to properly register it, assuming jQuery is available, and that "stateless" forms and inputs (for which you don't want to
  * trigger the unsaved data warning) have the class <code>stateless</code> set:
- * 
+ *
  * <pre>
  * $(document).on("change", "form:not(.stateless) :input:not(.stateless)", function() {
  *     $("body").data("unsavedchanges", true);
@@ -172,21 +172,21 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * If you have a synchronous download link as in <code>&lt;a href="/path/to/file.ext"&gt;</code>, then the unload will also be triggered. For HTML5-capable
  * browsers it's sufficient to add the <code>download</code> attribute representing the file name you'd like to use in the client specific "Save As" dialogue.
- * 
+ *
  * <pre>
  * &lt;a href="/path/to/file.ext" download="file.ext"&gt;download&lt;/a&gt;
  * </pre>
  * <p>
  * When this attribute is present, then the browser won't anymore trigger the unload event. In case your target browser does not
  * <a href="https://caniuse.com/#feat=download">support</a> it, then you'd need to explicitly disable the OmniFaces unload event as follows:
- * 
+ *
  * <pre>
  * &lt;a href="/path/to/file.ext" onclick="OmniFaces.Unload.disable();"&gt;download&lt;/a&gt;
  * </pre>
  * <p>
  * An alternative is to explicitly open the download in a new tab/window. Decent browsers, even these not supporting the <code>download</code> attribute, will
  * usually automatically close the newly opened tab/window when a response with <code>Content-Disposition: attachment</code> is received.
- * 
+ *
  * <pre>
  * &lt;a href="/path/to/file.ext" target="_blank"&gt;download&lt;/a&gt;
  * </pre>
@@ -199,7 +199,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * ensure that the flow just continues for them, else the unload requests won't be able to do their work of explicitly destroying the bean and state.
  * <p>
  * Here is an example assuming that you're in a servlet filter:
- * 
+ *
  * <pre>
  * if (!ViewScopeManager.isUnloadRequest(request)) {
  *     // Do actual job here.

@@ -382,6 +382,7 @@
                         <eclipse>
                             <file>${project.basedir}/src/main/eclipse-formatter.xml</file>
                         </eclipse>
+                        <trimTrailingWhitespace />
                     </java>
                     <formats>
                         <format>

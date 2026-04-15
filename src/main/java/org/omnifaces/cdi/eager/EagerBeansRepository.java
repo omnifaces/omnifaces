@@ -59,7 +59,7 @@ public class EagerBeansRepository {
 
     /**
      * Awkward workaround for it being unavailable via {@link Inject} in listeners in Tomcat+OWB and Jetty.
-     * 
+     *
      * @return Current instance of {@link EagerBeansRepository}.
      */
     public static EagerBeansRepository getInstance() {
@@ -72,7 +72,7 @@ public class EagerBeansRepository {
 
     /**
      * Sets the collected eager beans. This is invoked by {@link EagerExtension#load(jakarta.enterprise.inject.spi.AfterDeploymentValidation, BeanManager)}.
-     * 
+     *
      * @param eagerBeans The collected eager beans.
      */
     protected void setEagerBeans(EagerBeans eagerBeans) {
@@ -81,7 +81,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate application scoped eager beans and register {@link EagerBeansWebListener} if necessary.
-     * 
+     *
      * @param servletContext The involved servlet context.
      */
     public static void instantiateApplicationScopedAndRegisterListenerIfNecessary(ServletContext servletContext) {
@@ -102,7 +102,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any application scoped eager beans.
-     * 
+     *
      * @return <code>true</code> if there are any application scoped eager beans.
      */
     protected boolean hasAnyApplicationScopedBeans() {
@@ -111,7 +111,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
-     * 
+     *
      * @return <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
      */
     protected boolean hasAnySessionOrRequestURIBeans() {
@@ -120,7 +120,7 @@ public class EagerBeansRepository {
 
     /**
      * Returns <code>true</code> if there are any eager beans by view ID.
-     * 
+     *
      * @return <code>true</code> if there are any eager beans by view ID.
      */
     protected boolean hasAnyViewIdBeans() {
@@ -129,7 +129,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate application scoped eager beans.
-     * 
+     *
      * @return <code>true</code> if there were any application scoped eager beans.
      */
     public boolean instantiateApplicationScoped() {
@@ -138,7 +138,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate session scoped eager beans.
-     * 
+     *
      * @return <code>true</code> if there were any session scoped eager beans.
      */
     public boolean instantiateSessionScoped() {
@@ -147,7 +147,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate eager beans by request URI.
-     * 
+     *
      * @param relativeRequestURI The context-relative request URI;
      * @return <code>true</code> if there were any eager beans by request URI.
      */
@@ -157,7 +157,7 @@ public class EagerBeansRepository {
 
     /**
      * Instantiate eager beans by view ID.
-     * 
+     *
      * @param viewId The view ID;
      * @return <code>true</code> if there were any eager beans by view URI.
      */

@@ -47,22 +47,22 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
  * // Update specific component on complete of ajax.
  * Ajax.update("formId:someId");
  * </pre>
- * 
+ *
  * <pre>
  * // Load script resource on complete of ajax.
  * Ajax.load("libraryName", "js/resourceName.js");
  * </pre>
- * 
+ *
  * <pre>
  * // Add variables to JavaScript scope.
  * Ajax.data("foo", foo); // It will be available as OmniFaces.Ajax.data.foo in JavaScript.
  * </pre>
- * 
+ *
  * <pre>
  * // Execute script on complete of ajax.
  * Ajax.oncomplete("alert(OmniFaces.Ajax.data.foo)");
@@ -92,7 +92,7 @@ public final class Ajax {
      * <p>
      * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to submit a feature request to OmniFaces in
      * order to add a new utility method which performs exactly this general task.</i>
-     * 
+     *
      * @return The current partial view context.
      * @see FacesContext#getPartialViewContext()
      */
@@ -106,7 +106,7 @@ public final class Ajax {
      * the entire view, the currently submitted form as obtained by {@link Components#getCurrentForm()} and the currently processed component as obtained by
      * {@link UIComponent#getCurrentComponent(FacesContext)}. Any other client ID starting with <code>@</code> is by design ignored, including
      * <code>@none</code>.
-     * 
+     *
      * @param clientIds The client IDs to be updated in the current ajax response.
      * @see PartialViewContext#getRenderIds()
      */
@@ -116,7 +116,7 @@ public final class Ajax {
 
     /**
      * Update the entire view.
-     * 
+     *
      * @see PartialViewContext#setRenderAll(boolean)
      * @since 1.5
      */
@@ -131,7 +131,7 @@ public final class Ajax {
      * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders a concrete HTML element to the output,
      * so that JS/ajax can update it. So if you have due to design restrictions for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID,
      * then you should give it an ID. This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
-     * 
+     *
      * @param table The {@link UIData} component.
      * @param index The zero-based index of the row to be updated.
      * @since 1.3
@@ -148,7 +148,7 @@ public final class Ajax {
      * Note that the to-be-updated direct child of {@link UIColumn} must be a fullworthy Faces UI component which renders a concrete HTML element to the output,
      * so that JS/ajax can update it. So if you have due to design restrictions for example a <code>&lt;h:panelGroup rendered="..."&gt;</code> without an ID,
      * then you should give it an ID. This way it will render a <code>&lt;span id="..."&gt;</code> which is updateable by JS/ajax.
-     * 
+     *
      * @param table The {@link UIData} component.
      * @param index The zero-based index of the column to be updated.
      * @since 1.3
@@ -160,7 +160,7 @@ public final class Ajax {
     /**
      * Load given script resource on complete of the current ajax response. Basically, it loads the script resource as a {@link String} and then delegates it to
      * {@link #oncomplete(String...)}.
-     * 
+     *
      * @param libraryName Library name of the JavaScript resource.
      * @param resourceName Resource name of the JavaScript resource.
      * @throws IllegalArgumentException When given script resource cannot be found.
@@ -174,7 +174,7 @@ public final class Ajax {
 
     /**
      * Execute the given scripts on complete of the current ajax response.
-     * 
+     *
      * @param scripts The scripts to be executed.
      * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use {@link Components#addScript(String)}
      * instead.
@@ -186,7 +186,7 @@ public final class Ajax {
 
     /**
      * Add the given data argument to the current ajax response. They are as JSON object available by <code>OmniFaces.Ajax.data</code>.
-     * 
+     *
      * @param name The argument name.
      * @param value The argument value.
      * @see OmniPartialViewContext#addArgument(String, Object)
@@ -198,7 +198,7 @@ public final class Ajax {
     /**
      * Add the given data arguments to the current ajax response. The arguments length must be even. Every first and second argument is considered the name and
      * value pair. The name must always be a {@link String}. They are as JSON object available by <code>OmniFaces.Ajax.data</code>.
-     * 
+     *
      * @param namesValues The argument names and values.
      * @throws IllegalArgumentException When the arguments length is not even, or when a name is not a string.
      * @see OmniPartialViewContext#addArgument(String, Object)
@@ -209,7 +209,7 @@ public final class Ajax {
 
     /**
      * Add the given mapping of data arguments to the current ajax response. They are as JSON object available by <code>OmniFaces.Ajax.data</code>.
-     * 
+     *
      * @param data The mapping of data arguments.
      * @see OmniPartialViewContext#addArgument(String, Object)
      */
@@ -219,7 +219,7 @@ public final class Ajax {
 
     /**
      * Returns <code>true</code> if the given client ID was executed in the current ajax request.
-     * 
+     *
      * @param clientId The client ID to be checked.
      * @return <code>true</code> if the given client ID was executed in the current ajax request.
      * @since 3.6

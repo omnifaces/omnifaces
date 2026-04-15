@@ -42,14 +42,14 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
  * faces warning message will be added for any stage different from <code>Production</code>.
  * <p>
  * In the following example the link to the multi view page will be rendered with two path parameters:
- * 
+ *
  * <pre>
  * &lt;h:link value="Link" outcome="multiview-supported-path"&gt;
  *     &lt;o:pathParam value="first" /&gt;
  *     &lt;o:pathParam value="second" /&gt;
  * &lt;/h:link&gt;
  * </pre>
- * 
+ *
  * The code above will be rendered as: <code>&lt;a id="..." name="..." href="/context-path/multiview-supported-path/first/second"&gt;Link&lt;/a&gt;</code>. The
  * path parameters will be available via <code>@Inject @Param(pathIndex=0) private String first;</code> and
  * <code>@Inject @Param(pathIndex=1) private String second;</code> the usual way.

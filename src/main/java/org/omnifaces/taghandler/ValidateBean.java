@@ -115,13 +115,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Control bean validation per component</b>
- * 
+ *
  * <pre>
  * &lt;h:commandButton value="submit" action="#{bean.submit}"&gt;
  *     &lt;o:validateBean validationGroups="jakarta.validation.groups.Default,com.example.MyGroup" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedItem}"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
@@ -132,7 +132,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Validate a bean at the class level</b>
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
@@ -142,7 +142,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  *
  * <p>
  * <b>Since OmniFaces 3.8, nested properties are also supported with <code>@jakarta.validation.Valid</code> cascade</b>
- * 
+ *
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
@@ -152,9 +152,9 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * Whereby the <code>product</code> property looks like this:
  * </p>
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Valid
  * private Product product;
  * </pre>
@@ -190,7 +190,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * can be a custom implementation of the {@link Copier} interface.
  * <p>
  * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code> attribute to <code>"validateActual"</code>.
- * 
+ *
  * <pre>
  * &lt;o:validateBean value="#{bean.product}" method="validateActual" /&gt;
  * </pre>
@@ -202,7 +202,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Faces messages</h2>
  * <p>
  * By default, the faces message is added with client ID of the parent {@link UIForm}.
- * 
+ *
  * <pre>
  * &lt;h:form id="formId"&gt;
  *     ...
@@ -212,7 +212,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The faces message can also be shown for all invalidated components using <code>showMessageFor="@all"</code>.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText id="foo" /&gt;
@@ -225,7 +225,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     ...
@@ -236,7 +236,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * The faces message can also be shown for specific components referenced by a space separated collection of their client IDs in <code>showMessageFor</code>
  * attribute.
- * 
+ *
  * <pre>
  * &lt;h:form&gt;
  *     &lt;h:inputText id="foo" /&gt;
@@ -251,7 +251,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * The faces message can also be shown for components which match {@link jakarta.validation.ConstraintViolation#getPropertyPath() Property Path of the
  * ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can be found, the message will fallback to being added
  * with client ID of the parent {@link UIForm}.
- * 
+ *
  * <pre>
  * &lt;h:form id="formId"&gt;
  *     ...
@@ -280,7 +280,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * at least one of the name fields must be non-null, overriding the message format can help make a more clear error message.
  * <p>
  * This can be done by overriding the {@link BeanValidator#MESSAGE_ID} line in the message bundle:
- * 
+ *
  * <pre>
  * jakarta.faces.validator.BeanValidator.MESSAGE = Errors encountered: {0}
  * </pre>
@@ -288,7 +288,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * However, this change affects all bean validation messages site-wide. In case you'd like to fine-tune the bean validation message on a
  * per-<code>&lt;o:validateBean&gt;</code>-basis, then you can since OmniFaces 3.12 use the <code>messageFormat</code> attribute. Any <code>{0}</code>
  * placeholder will be substituted with the error message and any <code>{1}</code> placeholder will be substituted with the labels of all validated fields.
- * 
+ *
  * <pre>
  * &lt;!-- Displays: "First Name, Last Name, Address, Zip Code, Phone Number: First Name and Last Name cannot both be null" --&gt;
  * &lt;o:validateBean /&gt;
@@ -368,7 +368,7 @@ public class ValidateBean extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ValidateBean(TagConfig config) {
@@ -380,7 +380,7 @@ public class ValidateBean extends TagHandler {
     /**
      * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or {@link UIInput} and is new and we're in the
      * restore view phase of a postback, then delegate to {@link #processValidateBean(FacesContext, UIComponent)}.
-     * 
+     *
      * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not an instance of {@link UICommand} or
      * {@link UIInput}.
      */
@@ -412,7 +412,7 @@ public class ValidateBean extends TagHandler {
     /**
      * Check if the given component has participated in submitting the current form or action and if so, then perform the bean validation depending on the
      * attributes set.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The involved component.
      * @throws IllegalStateException When the parent form is missing.

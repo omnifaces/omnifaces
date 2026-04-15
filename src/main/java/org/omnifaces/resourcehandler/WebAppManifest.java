@@ -46,7 +46,7 @@ public abstract class WebAppManifest {
 
     /**
      * Enumeration of text direction types, to be used in {@link WebAppManifest#getDir()}.
-     * 
+     *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/dir">https://developer.mozilla.org/en-US/docs/Web/Manifest/dir</a>
      */
     protected enum Dir {
@@ -70,7 +70,7 @@ public abstract class WebAppManifest {
 
     /**
      * Enumeration of display modes, to be used in {@link WebAppManifest#getDisplay()}.
-     * 
+     *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/display">https://developer.mozilla.org/en-US/docs/Web/Manifest/display</a>
      */
     protected enum Display {
@@ -95,7 +95,7 @@ public abstract class WebAppManifest {
 
     /**
      * Enumeration of orientation modes, to be used in {@link WebAppManifest#getOrientation()}.
-     * 
+     *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation</a>
      */
     protected enum Orientation {
@@ -124,7 +124,7 @@ public abstract class WebAppManifest {
 
     /**
      * Enumeration of categories, to be used in {@link WebAppManifest#getCategories()}.
-     * 
+     *
      * @see <a href="https://github.com/w3c/manifest/wiki/Categories">https://github.com/w3c/manifest/wiki/Categories</a>
      */
     protected enum Category {
@@ -173,7 +173,7 @@ public abstract class WebAppManifest {
 
     /**
      * Enumeration of related application platforms, to be used in {@link RelatedApplication#getPlatform()}.
-     * 
+     *
      * @see <a href="https://github.com/w3c/manifest/wiki/Platforms">https://github.com/w3c/manifest/wiki/Platforms</a>
      */
     protected enum Platform {
@@ -204,7 +204,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the name of your web application.
-     * 
+     *
      * @return The name of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/name">https://developer.mozilla.org/en-US/docs/Web/Manifest/name</a>
      */
@@ -212,7 +212,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the icons of your web application.
-     * 
+     *
      * @return The icons of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/icons">https://developer.mozilla.org/en-US/docs/Web/Manifest/icons</a>
      */
@@ -223,7 +223,7 @@ public abstract class WebAppManifest {
     /**
      * Returns the default language of your web application. The default implementation returns {@link Faces#getDefaultLocale()} with a fallback of
      * {@link Locale#getDefault()}.
-     * 
+     *
      * @return The default language of your web application.
      */
     public String getLang() {
@@ -232,7 +232,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the default text direction type of your web application. The default implementation returns {@link Dir#AUTO}.
-     * 
+     *
      * @return The default text direction type of your web application.
      */
     public Dir getDir() {
@@ -241,7 +241,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the default display mode of your web application. The default implementation returns {@link Display#BROWSER}.
-     * 
+     *
      * @return The default display mode of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/display">https://developer.mozilla.org/en-US/docs/Web/Manifest/display</a>
      */
@@ -253,7 +253,7 @@ public abstract class WebAppManifest {
      * Returns the default orientation mode of your web application. The default implementation returns {@code null} to let the device handle the orientation
      * based on the combination of device orientation and user auto-orientation setting. Since OmniFaces 4.5, the default implementation returns {@code null}.
      * The previous default value was {@link Orientation#ANY}.
-     * 
+     *
      * @return The default orientation mode of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation</a>
      */
@@ -263,7 +263,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the default home URL of your web application. The default implementation returns {@link Faces#getRequestBaseURL()}.
-     * 
+     *
      * @return The default home URL of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/start_url">https://developer.mozilla.org/en-US/docs/Web/Manifest/start_url</a>
      */
@@ -275,7 +275,7 @@ public abstract class WebAppManifest {
      * Returns a collection of Faces view IDs which should be cached via the service worker so that they are available offline. The default implementation
      * returns Faces view IDs derived from {@link WebXml#getWelcomeFiles()}. If this method returns an empty collection, then no service worker will be
      * generated.
-     * 
+     *
      * @return A collection of Faces view IDs which should be cached via the service worker so that they are available offline.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
@@ -300,7 +300,7 @@ public abstract class WebAppManifest {
     /**
      * Returns the Faces view ID which should represent the "You're offline!" error page. The default implementation returns <code>null</code>, meaning that
      * there is no such one. If {@link #getCacheableViewIds()} returns an empty collection, then this method will be ignored.
-     * 
+     *
      * @return the Faces view ID which should represent the "You're offline!" error page.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
@@ -313,7 +313,7 @@ public abstract class WebAppManifest {
     /**
      * A collection of screenshots of your application with different sizes and formats that the browser will show in the installation wizard popup. These
      * images are intended to be also used by progressive web app stores.
-     * 
+     *
      * @return A collection of screenshots of your application with different sizes and formats.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots">https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots</a>
      * @since 4.5
@@ -326,7 +326,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the scope of this manifest. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The scope of this manifest.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/scope">https://developer.mozilla.org/en-US/docs/Web/Manifest/scope</a>
      */
@@ -336,7 +336,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the short name of your web application. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The short name of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/short_name">https://developer.mozilla.org/en-US/docs/Web/Manifest/short_name</a>
      */
@@ -346,7 +346,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the description of your web application. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The description of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/description">https://developer.mozilla.org/en-US/docs/Web/Manifest/description</a>
      */
@@ -356,7 +356,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the theme color of your web application. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The theme color of your web application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/theme_color">https://developer.mozilla.org/en-US/docs/Web/Manifest/theme_color</a>
      */
@@ -366,7 +366,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the placeholder background color of your web application. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The placeholder background color of your web application.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Manifest/background_color">https://developer.mozilla.org/en-US/docs/Web/Manifest/background_color</a>
@@ -377,7 +377,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns a collection of categories where your web application supposedly belongs to. The default implementation returns an empty set.
-     * 
+     *
      * @return A collection of categories where your web application supposedly belongs to.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/categories">https://developer.mozilla.org/en-US/docs/Web/Manifest/categories</a>
      */
@@ -387,7 +387,7 @@ public abstract class WebAppManifest {
 
     /**
      * Returns the IARC rating ID of your web application. The default implementation returns <code>null</code>.
-     * 
+     *
      * @return The IARC rating ID of your web application.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Manifest/iarc_rating_id">https://developer.mozilla.org/en-US/docs/Web/Manifest/iarc_rating_id</a>
@@ -399,7 +399,7 @@ public abstract class WebAppManifest {
     /**
      * Returns a collection of related (native) applications that provide similar/equivalent functionality as your web application. The default implementation
      * returns an empty set.
-     * 
+     *
      * @return A collection of related (native) applications that provide similar/equivalent functionality as your web application.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Manifest/related_applications">https://developer.mozilla.org/en-US/docs/Web/Manifest/related_applications</a>
@@ -411,7 +411,7 @@ public abstract class WebAppManifest {
     /**
      * Returns whether the applications listed in {@link #getRelatedApplications()} should be preferred over the web application. The default implementation
      * returns <code>false</code>.
-     * 
+     *
      * @return Whether the applications listed in {@link #getRelatedApplications()} should be preferred over the web application.
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Manifest/prefer_related_applications">https://developer.mozilla.org/en-US/docs/Web/Manifest/prefer_related_applications</a>
@@ -422,7 +422,7 @@ public abstract class WebAppManifest {
 
     /**
      * A collection of shortcut action link that the mobile operating system will render as a context action menu for the application.
-     * 
+     *
      * @return A collection of shortcut action link that the mobile operating system will render as a context action menu for the application.
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts">https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts</a>
      * @since 4.5
@@ -468,7 +468,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates image resource of given resource identifier and sizes.
-         * 
+         *
          * @param resourceIdentifier The Faces resource identifier. E.g. <code>library:path/name.png</code>
          * @param sizes The supported sizes of this image resource.
          * @return Image resource of given resource identifier and sizes.
@@ -481,7 +481,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the source of this image resource.
-         * 
+         *
          * @return The source of this image resource.
          */
         public String getSrc() {
@@ -490,7 +490,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the supported sizes of this image resource.
-         * 
+         *
          * @return The supported sizes of this image resource.
          */
         public String getSizes() {
@@ -499,7 +499,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the content type of this image resource.
-         * 
+         *
          * @return The content type of this image resource.
          */
         public String getType() {
@@ -591,7 +591,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a size having same width and height of given value.
-         * 
+         *
          * @param value The value.
          * @return A size having same width and height of given value.
          * @throws IllegalArgumentException When value is 0 or less.
@@ -605,7 +605,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a size of given width and height.
-         * 
+         *
          * @param width The width.
          * @param height The height.
          * @return A size of given width and height.
@@ -623,7 +623,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the value of this size.
-         * 
+         *
          * @return The value of this size.
          */
         public String getValue() {
@@ -672,7 +672,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a related application of given platform and URL.
-         * 
+         *
          * @param platform The platform on which the application can be found.
          * @param url The URL at which the application can be found.
          * @return A related application of given platform and URL.
@@ -684,7 +684,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a related application of given platform and URL and ID.
-         * 
+         *
          * @param platform The platform on which the application can be found.
          * @param url The URL at which the application can be found.
          * @param id The ID used to represent the application on the specified platform.
@@ -697,7 +697,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the platform on which the application can be found.
-         * 
+         *
          * @return The platform on which the application can be found.
          */
         public Platform getPlatform() {
@@ -706,7 +706,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the URL at which the application can be found.
-         * 
+         *
          * @return The URL at which the application can be found.
          */
         public String getUrl() {
@@ -715,7 +715,7 @@ public abstract class WebAppManifest {
 
         /**
          * Returns the ID used to represent the application on the specified platform.
-         * 
+         *
          * @return The ID used to represent the application on the specified platform.
          */
         public String getId() {
@@ -748,7 +748,7 @@ public abstract class WebAppManifest {
 
     /**
      * A {@link Screenshot} form factor
-     * 
+     *
      * @see <a href=
      * "https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor">https://developer.mozilla.org/en-US/docs/Web/Manifest/screenshots#form_factor</a>
      * @version 4.5
@@ -773,7 +773,7 @@ public abstract class WebAppManifest {
 
     /**
      * To be used in {@link WebAppManifest#getScreenshots()}
-     * 
+     *
      * @version 4.5
      */
     protected static final class Screenshot {
@@ -804,7 +804,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a screenshot image resource of given resource identifier and sizes.
-         * 
+         *
          * @param resourceIdentifier The Faces resource identifier. E.g. <code>library:path/name.png</code>
          * @param formFactor The supported {@link ScreenshotFormFactor} (wide or narrow).
          * @return Screenshot resource of given resource identifier and sizes.
@@ -839,7 +839,7 @@ public abstract class WebAppManifest {
 
     /**
      * to be used {@link WebAppManifest#getShortcuts()}
-     * 
+     *
      * @version 4.5
      */
     protected static final class Shortcut {
@@ -860,7 +860,7 @@ public abstract class WebAppManifest {
 
         /**
          * Creates a Shortcut action link with the given attributes.
-         * 
+         *
          * @param name the name of the shortcut action
          * @param shortName a short name for the shortcut action
          * @param description a description of the shortcut action

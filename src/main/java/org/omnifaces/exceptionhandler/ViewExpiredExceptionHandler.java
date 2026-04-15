@@ -31,7 +31,7 @@ import org.omnifaces.util.Faces;
  * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
- * 
+ *
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -41,7 +41,7 @@ import org.omnifaces.util.Faces;
  * In case there are multiple exception handlers, best is to register this handler as last one in the chain. For example, when combined with
  * {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler} from taking over the handling of the
  * {@link ViewExpiredException}.
- * 
+ *
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -73,7 +73,7 @@ public class ViewExpiredExceptionHandler extends ExceptionSuppressor {
 
     /**
      * Construct a new view expired exception handler around the given wrapped exception handler.
-     * 
+     *
      * @param wrapped The wrapped exception handler.
      */
     public ViewExpiredExceptionHandler(ExceptionHandler wrapped) {
@@ -90,7 +90,7 @@ public class ViewExpiredExceptionHandler extends ExceptionSuppressor {
 
     /**
      * Returns <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this exception handler.
-     * 
+     *
      * @return <code>true</code> if the previous request threw a {@link ViewExpiredException} which was handled by this exception handler.
      */
     public static boolean wasViewExpired() {

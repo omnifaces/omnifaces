@@ -69,7 +69,7 @@ import org.omnifaces.util.cache.Cache;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
@@ -82,7 +82,7 @@ import org.omnifaces.util.cache.Cache;
  * <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its
  * <code>target</code> attribute to <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design limitation. This
  * is not necessary for <code>&lt;o:criticalStylesheet&gt;</code> nor <code>&lt;o:deferredScript&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;h:head&gt;
  *     ...
@@ -96,7 +96,7 @@ import org.omnifaces.util.cache.Cache;
  * If you want them to appear <em>after</em> any auto-included resources of standard Faces implementation or Faces component libraries, then move the
  * declarations to top of the <code>&lt;h:body&gt;</code>. This is not necessary for <code>&lt;o:criticalStylesheet&gt;</code> nor
  * <code>&lt;o:deferredScript&gt;</code> as they already auto-relocate by themselves.
- * 
+ *
  * <pre>
  * &lt;h:body&gt;
  *     &lt;h:outputStylesheet name="style.css" /&gt;
@@ -114,7 +114,7 @@ import org.omnifaces.util.cache.Cache;
  * <p>
  * Optionally you can activate server-side caching of the combined resource content by specifying the below context parameter in <code>web.xml</code> with the
  * amount of seconds to cache the combined resource content.
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL&lt;/param-name&gt;
@@ -174,7 +174,7 @@ import org.omnifaces.util.cache.Cache;
  * <p>
  * If you'd like to supply a context parameter which conditionally disables the combined resource handler, then set the context parameter
  * {@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_DISABLED} accordingly.
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
@@ -273,7 +273,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
     /**
      * Creates a new instance of this combined resource handler which wraps the given resource handler. This will also register this resource handler as a pre
      * render view event listener, so that it can do the job of removing the CSS/JS resources and adding combined ones.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public CombinedResourceHandler(ResourceHandler wrapped) {
@@ -359,7 +359,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
     /**
      * Generic method to initialize set of resources based on given application initialization parameter name.
-     * 
+     *
      * @param name The application initialization parameter name.
      * @return The set of resources which are set by the given application initialization parameter name, or an empty set if the parameter is not been set.
      */
@@ -376,7 +376,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
     /**
      * Initialize the set of CDN resources based on {@link CDNResourceHandler} configuration.
-     * 
+     *
      * @return The set of CDN resources.
      */
     private static Set<ResourceIdentifier> initCDNResources() {

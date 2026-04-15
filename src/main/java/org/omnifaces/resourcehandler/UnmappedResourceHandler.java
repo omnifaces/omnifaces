@@ -46,7 +46,7 @@ import org.omnifaces.util.Hacks;
  * anymore in order to properly reference relative URLs to images in CSS files.
  * <p>
  * So, given the following folder structure,
- * 
+ *
  * <pre>
  * WebContent
  *  `-- resources
@@ -58,24 +58,24 @@ import org.omnifaces.util.Hacks;
  * <p>
  * And the following CSS file reference (note: the <code>library</code> is <strong>not</strong> supported by the <code>UnmappedResourceHandler</code>! this is a
  * technical limitation, just exclusively use <code>name</code>):
- * 
+ *
  * <pre>
  * &lt;h:outputStylesheet name="css/style.css" /&gt;
  * </pre>
  * <p>
  * you can in <code>css/style.css</code> just use:
- * 
+ *
  * <pre>
- * 
+ *
  * body {
  *     background : url("images/background.png");
  * }
  * </pre>
  * <p>
  * instead of
- * 
+ *
  * <pre>
- * 
+ *
  * body {
  *     background : url("#{resource['css/images/background.png']}");
  * }
@@ -87,7 +87,7 @@ import org.omnifaces.util.Hacks;
  * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.UnmappedResourceHandler&lt;/resource-handler&gt;
@@ -97,7 +97,7 @@ import org.omnifaces.util.Hacks;
  * And the {@link FacesServlet} needs to have an additional mapping <code>/jakarta.faces.resource/*</code> in <code>web.xml</code>. You can just add it as a new
  * <code>&lt;url-pattern&gt;</code> entry to the existing mapping of the {@link FacesServlet}. For example, assuming that you've already a mapping on
  * <code>*.xhtml</code>:
- * 
+ *
  * <pre>
  * &lt;servlet-mapping&gt;
  *     ...
@@ -110,7 +110,7 @@ import org.omnifaces.util.Hacks;
  * <p>
  * If you're also using the {@link CombinedResourceHandler} or any other custom resource handler, then you need to ensure that this is in
  * <code>faces-config.xml</code> declared <strong>before</strong> the <code>UnmappedResourceHandler</code>. Thus, like so:
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
@@ -135,7 +135,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 
     /**
      * Creates a new instance of this unmapped resource handler which wraps the given resource handler.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public UnmappedResourceHandler(ResourceHandler wrapped) {

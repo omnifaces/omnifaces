@@ -17,7 +17,7 @@ import jakarta.faces.context.ExceptionHandlerFactory;
 
 /**
  * This exception handler factory needs to be registered as follows in <code>faces-config.xml</code> to get the {@link FacesMessageExceptionHandler} to run:
- * 
+ *
  * <pre>
  * &lt;factory&gt;
  *   &lt;exception-handler-factory&gt;
@@ -36,7 +36,7 @@ public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory
 
     /**
      * Construct a new full ajax exception handler factory around the given wrapped factory.
-     * 
+     *
      * @param wrapped The wrapped factory.
      */
     public FacesMessageExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {

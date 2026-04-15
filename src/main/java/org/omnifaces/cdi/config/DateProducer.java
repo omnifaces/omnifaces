@@ -66,7 +66,7 @@ public class DateProducer {
 
     /**
      * This makes an instance of {@link Temporal} as startup datetime available by <code>#{startup}</code>.
-     * 
+     *
      * @return Startup datetime.
      */
     @Produces
@@ -79,7 +79,7 @@ public class DateProducer {
 
     /**
      * This makes an instance of {@link Temporal} as current datetime available by <code>#{now}</code>.
-     * 
+     *
      * @return Current datetime.
      */
     @Produces
@@ -113,7 +113,7 @@ public class DateProducer {
 
         /**
          * Constructs a new proxyable temporal date which is initialized with given {@link ZonedDateTime}.
-         * 
+         *
          * @param zonedDateTime ZonedDateTime to initialize with.
          * @throws NullPointerException when given ZonedDateTime is {@code null}.
          */
@@ -124,7 +124,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link ZonedDateTime}.
-         * 
+         *
          * @return This as {@link ZonedDateTime}.
          */
         public ZonedDateTime getZonedDateTime() {
@@ -133,7 +133,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalDateTime}.
-         * 
+         *
          * @return This as {@link LocalDateTime}.
          * @since 4.7
          */
@@ -143,7 +143,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalDate}.
-         * 
+         *
          * @return This as {@link LocalDateTime}.
          * @since 4.7
          */
@@ -153,7 +153,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link LocalTime}.
-         * 
+         *
          * @return This as {@link LocalTime}.
          * @since 4.7
          */
@@ -163,7 +163,7 @@ public class DateProducer {
 
         /**
          * Convenience method to return this temporal date as {@link Instant} at {@link ZoneOffset#UTC}.
-         * 
+         *
          * @return This as {@link Instant} at {@link ZoneOffset#UTC}.
          */
         public Instant getInstant() {
@@ -172,7 +172,7 @@ public class DateProducer {
 
         /**
          * Has the same signature as {@link Date#getTime()}. This ensures that <code>#{now.time}</code> and <code>#{startup.time}</code> keep working.
-         * 
+         *
          * @return The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this temporal date.
          */
         public long getTime() {

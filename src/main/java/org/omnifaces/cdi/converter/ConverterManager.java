@@ -110,7 +110,7 @@ public class ConverterManager {
 
     /**
      * Returns the converter instance associated with the given converter ID, or <code>null</code> if there is none.
-     * 
+     *
      * @param application The involved Faces application.
      * @param converterId The converter ID of the desired converter instance.
      * @return the converter instance associated with the given converter ID, or <code>null</code> if there is none.
@@ -141,7 +141,7 @@ public class ConverterManager {
 
     /**
      * Returns the converter instance associated with the given converter for-class, or <code>null</code> if there is none.
-     * 
+     *
      * @param application The involved Faces application.
      * @param converterForClass The converter for-class of the desired converter instance.
      * @return the converter instance associated with the given converter for-class, or <code>null</code> if there is none.

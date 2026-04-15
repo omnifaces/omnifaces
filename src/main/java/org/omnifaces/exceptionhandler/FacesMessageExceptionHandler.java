@@ -30,7 +30,7 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
- * 
+ *
  * <pre>
  * &lt;factory&gt;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FacesMessageExceptionHandlerFactory&lt;/exception-handler-factory&gt;
@@ -62,7 +62,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
     /**
      * Construct a new faces message exception handler around the given wrapped exception handler.
-     * 
+     *
      * @param wrapped The wrapped exception handler.
      */
     public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
@@ -87,7 +87,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
     /**
      * Create fatal message based on given exception which will in turn be passed to
      * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}. The default implementation returns {@link Throwable#toString()}.
-     * 
+     *
      * @param exception The exception to create fatal message for.
      * @return The fatal message created based on the given exception.
      */

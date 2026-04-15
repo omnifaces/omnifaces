@@ -48,18 +48,18 @@ import org.omnifaces.vdl.FacesConverterTag;
  * This can be solved by using a <code>E[]</code> property instead of <code>List&lt;E&gt;</code> (e.g. <code>Role[]</code> in case of a <code>Role</code> enum).
  * If this is however is not an option due to some design restrictions (e.g. JPA <code>@ElementCollection</code>, etc), then you'd need to create an explicit
  * converter for the enum type like follows:
- * 
+ *
  * <pre>
  * &#64;FacesConverter("roleConverter")
  * public class RoleConverter extends EnumConverter {
- * 
+ *
  *     public RoleConverter() {
  *         super(Role.class);
  *     }
- * 
+ *
  * }
  * </pre>
- * 
+ *
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedRoles}" converter="roleConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableRoles}" /&gt;
@@ -73,7 +73,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Just specify it in the <code>converter</code> attribute of the
  * multi-selection component holding <code>&lt;f:selectItems&gt;</code>. example:
- * 
+ *
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}" converter="omnifaces.GenericEnumConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
@@ -81,7 +81,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:genericEnumConverter&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
@@ -96,7 +96,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <h2>JSF 2.3</h2>
  * <p>
  * This converter is not necessary anymore since JSF 2.3 thanks to the fixes in <a href="https://github.com/jakartaee/faces/issues/1422">issue 1422</a>.
- * 
+ *
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
@@ -105,7 +105,7 @@ import org.omnifaces.vdl.FacesConverterTag;
  * <p>
  * However, when you're having an input component without a value attribute, and thus the exact type cannot be automatically determined by simply inspecting the
  * return type of the associated getter method, then this converter may be still useful.
- * 
+ *
  * <pre>
  * &lt;h:selectManyCheckbox converter="omnifaces.GenericEnumConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;

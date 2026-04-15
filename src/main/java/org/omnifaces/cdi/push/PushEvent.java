@@ -32,7 +32,7 @@ abstract class PushEvent implements Serializable {
 
     /**
      * Creates a push event for the given channel and user.
-     * 
+     *
      * @param channel The channel name.
      * @param user The current user identifier, if any.
      * @param previousUser The previous user identifier, if any.
@@ -45,7 +45,7 @@ abstract class PushEvent implements Serializable {
 
     /**
      * Returns the push channel name.
-     * 
+     *
      * @return The push channel name.
      */
     public String getChannel() {
@@ -54,7 +54,7 @@ abstract class PushEvent implements Serializable {
 
     /**
      * Returns the current user identifier, if any.
-     * 
+     *
      * @param <S> The generic type of the user identifier.
      * @return The current user identifier, if any.
      * @throws ClassCastException When <code>S</code> is of wrong type.
@@ -66,7 +66,7 @@ abstract class PushEvent implements Serializable {
 
     /**
      * Returns the previous user identifier, if any.
-     * 
+     *
      * @param <S> The generic type of the user identifier.
      * @return The previous user identifier, if any.
      * @throws ClassCastException When <code>S</code> is of wrong type.

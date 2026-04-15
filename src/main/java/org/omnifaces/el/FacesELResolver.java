@@ -33,7 +33,7 @@ import org.omnifaces.util.Faces;
  * All methods of {@link Faces} utility class which start with "get" or "is", and take no parameters, and return either <code>String</code> or
  * <code>boolean</code>, and are not related to response nor to session or flash (for which already implicit EL objects <code>#{session}</code> and
  * <code>#{flash}</code> exist), will be available as properties of the implicit object <code>#{faces}</code>. Examples are:
- * 
+ *
  * <pre>
  * #{faces.development}
  * #{faces.serverInfo}

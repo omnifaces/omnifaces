@@ -45,7 +45,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputScript&gt;</code>, with a <code>library</code> and <code>name</code>.
- * 
+ *
  * <pre>
  * &lt;o:deferredScript library="yourlibrary" name="scripts/filename.js" /&gt;
  * </pre>
@@ -109,7 +109,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Returns the "library name" part of the resource identifier.
-     * 
+     *
      * @return The library name.
      */
     public String getLibrary() {
@@ -118,7 +118,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Sets the "library name" part of the resource identifier.
-     * 
+     *
      * @param library The library name.
      */
     public void setLibrary(String library) {
@@ -127,7 +127,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Returns the "resource name" part of the resource identifier.
-     * 
+     *
      * @return The resource name.
      */
     public String getName() {
@@ -136,7 +136,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Sets the "resource name" part of the resource identifier.
-     * 
+     *
      * @param name The resource name.
      */
     @FacesAttribute(required = true)
@@ -147,7 +147,7 @@ public class DeferredScript extends ScriptFamily {
     /**
      * Returns the group name on which the deferred script resources should be combined by CombinedResourceHandler. All deferred scripts resources having the
      * same combined group name will be combined into a single deferred script in the place where the first member of the group occurs in the component tree.
-     * 
+     *
      * @return The group name.
      */
     public String getGroup() {
@@ -157,7 +157,7 @@ public class DeferredScript extends ScriptFamily {
     /**
      * Sets the group name on which the deferred script resources should be combined by CombinedResourceHandler. All deferred scripts resources having the same
      * combined group name will be combined into a single deferred script in the place where the first member of the group occurs in the component tree.
-     * 
+     *
      * @param group The group name.
      */
     public void setGroup(String group) {
@@ -166,7 +166,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Returns the JavaScript code to execute right before the script loading begins.
-     * 
+     *
      * @return The onbegin script.
      */
     public String getOnbegin() {
@@ -175,7 +175,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Sets the JavaScript code to execute right before the script loading begins.
-     * 
+     *
      * @param onbegin The onbegin script.
      */
     public void setOnbegin(String onbegin) {
@@ -184,7 +184,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Returns the JavaScript code to execute when the script loading is successfully completed.
-     * 
+     *
      * @return The onsuccess script.
      */
     public String getOnsuccess() {
@@ -193,7 +193,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Sets the JavaScript code to execute when the script loading is successfully completed.
-     * 
+     *
      * @param onsuccess The onsuccess script.
      */
     public void setOnsuccess(String onsuccess) {
@@ -202,7 +202,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Returns the JavaScript code to execute when the script loading has failed.
-     * 
+     *
      * @return The onerror script.
      */
     public String getOnerror() {
@@ -211,7 +211,7 @@ public class DeferredScript extends ScriptFamily {
 
     /**
      * Sets the JavaScript code to execute when the script loading has failed.
-     * 
+     *
      * @param onerror The onerror script.
      */
     public void setOnerror(String onerror) {

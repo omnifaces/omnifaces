@@ -40,7 +40,7 @@ public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 
     /**
      * Initializes the wrapper with its wrapped map.
-     * 
+     *
      * @param map the map to wrap.
      */
     public MapWrapper(Map<K, V> map) {

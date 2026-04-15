@@ -50,7 +50,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
     /**
      * Construct dynamic param value producer for given type.
-     * 
+     *
      * @param type Type to construct dynamic param value producer for.
      */
     public DynamicParamValueProducer(Type type) {

@@ -76,7 +76,7 @@ public class ViewScopeContext implements Context {
 
     /**
      * Check and initialize the view scope manager.
-     * 
+     *
      * @return <code>true</code> if it has been initialized.
      */
     private boolean isInitialized() {
@@ -89,7 +89,7 @@ public class ViewScopeContext implements Context {
 
     /**
      * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
-     * 
+     *
      * @throws ContextNotActiveException When context is not active.
      */
     private void checkActive() {

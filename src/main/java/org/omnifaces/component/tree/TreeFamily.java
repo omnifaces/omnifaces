@@ -101,7 +101,7 @@ public abstract class TreeFamily extends UIComponentBase {
 
     /**
      * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
-     * 
+     *
      * @param context The faces context to work with.
      * @throws IllegalStateException When component hierarchy is wrong.
      * @since 4.6
@@ -110,7 +110,7 @@ public abstract class TreeFamily extends UIComponentBase {
 
     /**
      * Process the component according to the rules of the given phase ID.
-     * 
+     *
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      */
@@ -118,7 +118,7 @@ public abstract class TreeFamily extends UIComponentBase {
 
     /**
      * Helper method to delegate the processing further to the {@link UIComponentBase} superclass which will handle all children.
-     * 
+     *
      * @param context The faces context to work with.
      * @param phaseId The current phase ID.
      */

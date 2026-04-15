@@ -32,9 +32,9 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
  * <p>
  * By default the name of the cookie is taken from the name of the variable into which injection takes place. The example below injects the cookie with name
  * <code>foo</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Cookie
  * private String foo;
@@ -42,9 +42,9 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
  * <p>
  * The name can be optionally specified via the <code>name</code> attribute. The example below injects the cookie with name <code>foo</code> into a variable
  * named <code>bar</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Cookie(name = "foo")
  * private String bar;

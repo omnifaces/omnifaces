@@ -95,7 +95,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Register given channel on given scope and return the channel identifier.
-     * 
+     *
      * @param channel The push channel.
      * @param scope The push scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
      * <code>null</code>, the default is <code>application</code>.
@@ -153,28 +153,28 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Returns the application scoped channels for this push transport.
-     * 
+     *
      * @return The application scoped channels.
      */
     protected abstract ConcurrentHashMap<String, String> getApplicationScope();
 
     /**
      * Returns the push session manager for this push transport.
-     * 
+     *
      * @return The push session manager.
      */
     protected abstract PushSessionManager<?> getPushSessions();
 
     /**
      * Returns the push user manager for this push transport.
-     * 
+     *
      * @return The push user manager.
      */
     protected abstract PushUserManager getPushUsers();
 
     /**
      * Returns the view scoped channels for this push transport.
-     * 
+     *
      * @param create Whether or not to auto-create the entry in Faces view scope.
      * @return View scope channel IDs.
      * @throws IllegalStateException When the Faces view scope is not available while {@code create} is {@code true}.
@@ -187,7 +187,7 @@ abstract class PushChannelManager implements Serializable {
      * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of push context implementations (the CDI
      * session scope is not necessarily active during push send time). This should actually be package private, but package private methods in CDI beans are
      * subject to memory leaks.
-     * 
+     *
      * @return Session scope channel IDs.
      */
     protected Map<String, String> getSessionScopedChannels() {
@@ -197,7 +197,7 @@ abstract class PushChannelManager implements Serializable {
     /**
      * For internal usage only. Returns the session user mappings. This should actually be package private, but package private methods in CDI beans are subject
      * to memory leaks.
-     * 
+     *
      * @return Session user mappings.
      */
     protected ConcurrentHashMap<Serializable, String> getSessionUsers() {
@@ -206,7 +206,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push send time in push context implementations.
-     * 
+     *
      * @param channel The channel name.
      * @param applicationScope The application scope channel IDs.
      * @param sessionScope The session scope channel IDs.
@@ -235,7 +235,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Serialize the push channel state for session persistence or failover.
-     * 
+     *
      * @param output The object output stream.
      * @throws IOException When an I/O error occurs.
      */
@@ -252,7 +252,7 @@ abstract class PushChannelManager implements Serializable {
 
     /**
      * Deserialize the push channel state after session restore or failover.
-     * 
+     *
      * @param input The object input stream.
      * @throws IOException When an I/O error occurs.
      * @throws ClassNotFoundException When a serialized class is not found.

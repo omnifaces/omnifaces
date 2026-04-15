@@ -71,7 +71,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
     /**
      * Adds the given phase listener to the current request scope.
-     * 
+     *
      * @param phaseListener The phase listener to be added to the current request scope.
      */
     public static void add(PhaseListener phaseListener) {
@@ -80,7 +80,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
     /**
      * Removes the given phase listener from the current request scope.
-     * 
+     *
      * @param phaseListener The phase listener to be removed from the current request scope.
      * @return <code>true</code> if the current request scope indeed contained the given phase listener.
      */

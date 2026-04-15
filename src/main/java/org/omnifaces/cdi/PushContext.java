@@ -28,27 +28,27 @@ import org.omnifaces.util.Json;
  * <p>
  * CDI interface to send a message object to the push channel as identified by <code>&#64;</code>{@link Push}. This can be injected via
  * <code>&#64;</code>{@link Push} in any container managed artifact in WAR (not in EAR/EJB!).
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push
  * private PushContext channelName;
  * </pre>
  * <p>
  * By default this uses Web Socket as transport. To use Server-Sent Events (SSE) instead, set {@link Push#type()} to {@link Push.Type#SSE}:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = SSE)
  * private PushContext channelName;
  * </pre>
  * <p>
  * To use browser notifications via SSE, set {@link Push#type()} to {@link Push.Type#NOTIFICATION}:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Push(type = NOTIFICATION)
  * private PushContext channelName;
@@ -75,7 +75,7 @@ public interface PushContext extends Serializable {
 
     /**
      * The context-relative web socket URI prefix where the endpoint should listen on.
-     * 
+     *
      * @deprecated Use SOCKET_URI_PREFIX instead.
      */
     @Deprecated(since = "5.2", forRemoval = true)
@@ -87,7 +87,7 @@ public interface PushContext extends Serializable {
      * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}. The message object will be encoded as JSON and be
      * available as first argument of the JavaScript listener function declared in <code>&lt;o:socket onmessage&gt;</code> or
      * <code>&lt;o:sse onmessage&gt;</code>.
-     * 
+     *
      * @param message The push message object.
      * @return The results of the send operation. If it returns an empty set, then there was no open session associated with given push channel. The returned
      * futures will return <code>null</code> on {@link Future#get()} if the message was successfully delivered and otherwise throw {@link ExecutionException}.
@@ -100,7 +100,7 @@ public interface PushContext extends Serializable {
      * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}, targeted to the given user as identified by
      * <code>&lt;o:socket user&gt;</code> or <code>&lt;o:sse user&gt;</code>. The message object will be encoded as JSON and be available as first argument of
      * the JavaScript listener function declared in <code>&lt;o:socket onmessage&gt;</code> or <code>&lt;o:sse onmessage&gt;</code>.
-     * 
+     *
      * @param <S> The generic type of the user identifier.
      * @param message The push message object.
      * @param user The user to which the push message object must be delivered to.
@@ -116,7 +116,7 @@ public interface PushContext extends Serializable {
      * Send given message object to the push channel as identified by <code>&#64;</code>{@link Push}, targeted to the given users as identified by
      * <code>&lt;o:socket user&gt;</code> or <code>&lt;o:sse user&gt;</code>. The message object will be encoded as JSON and be available as first argument of
      * the JavaScript listener function declared in <code>&lt;o:socket onmessage&gt;</code> or <code>&lt;o:sse onmessage&gt;</code>.
-     * 
+     *
      * @param <S> The generic type of the user identifier.
      * @param message The push message object.
      * @param users The users to which the push message object must be delivered to.

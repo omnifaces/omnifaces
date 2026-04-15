@@ -26,7 +26,7 @@ import jakarta.enterprise.inject.Stereotype;
  * <p>
  * Stereo type that designates a bean as an eagerly instantiated bean with application scope. Watch out with IDE autocomplete on import that you don't
  * accidentally import EJB's one.
- * 
+ *
  * <pre>
  * import org.omnifaces.cdi.Startup;
  *
@@ -36,7 +36,7 @@ import jakarta.enterprise.inject.Stereotype;
  * </pre>
  * <p>
  * In effect, this annotation does exactly the same as:
- * 
+ *
  * <pre>
  * import jakarta.enterprise.context.ApplicationScoped;
  * import org.omnifaces.cdi.Eager;

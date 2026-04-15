@@ -83,7 +83,7 @@ public class LoadBundle extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public LoadBundle(TagConfig config) {
@@ -121,7 +121,7 @@ public class LoadBundle extends TagHandler {
 
     /**
      * Returns the locale associated with the given component conform {@link Faces#getLocale()}.
-     * 
+     *
      * @param context The involved facelet context.
      * @param component The component to find the locale in.
      * @return The locale associated with the given component.

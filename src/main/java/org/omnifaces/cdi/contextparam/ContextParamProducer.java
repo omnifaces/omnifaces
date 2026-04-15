@@ -41,7 +41,7 @@ public class ContextParamProducer {
 
     /**
      * Returns context parameter value associated with context parameter name derived from given injection point.
-     * 
+     *
      * @param injectionPoint Injection point to derive context parameter name from.
      * @return Context parameter value associated with context parameter name derived from given injection point.
      */

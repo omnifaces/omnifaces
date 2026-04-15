@@ -65,7 +65,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * An override which additionally checks if this isn't been invoked on <code>scope</code> attribute. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> or <code>scope</code> attribute, or when the
      * <code>user</code> attribute is not <code>Serializable</code>.
      */
@@ -110,7 +110,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Build the client behavior scripts map as a JavaScript object literal.
-     * 
+     *
      * @return The client behavior scripts as a JavaScript object literal string.
      */
     String getBehaviorScripts() {
@@ -144,7 +144,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Returns the scope of the push channel.
-     * 
+     *
      * @return The scope of the push channel.
      */
     public String getScope() {
@@ -157,7 +157,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
      * receive the same push message. When the value is <code>session</code>, then only the channels with the same name in the current user session will receive
      * the same push message. When the value is <code>view</code>, then only the channel in the current view will receive the push message. The default scope is
      * <code>application</code>. When the <code>user</code> attribute is specified, then the default scope is <code>session</code>.
-     * 
+     *
      * @param scope The scope of the push channel.
      */
     public void setScope(String scope) {
@@ -166,7 +166,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Returns the JavaScript event handler function that is invoked when the push connection is opened.
-     * 
+     *
      * @return The JavaScript event handler function that is invoked when the push connection is opened.
      */
     public String getOnopen() {
@@ -176,7 +176,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
     /**
      * Sets the JavaScript event handler function that is invoked when the push connection is opened. The function will be invoked with one argument: the
      * channel name.
-     * 
+     *
      * @param onopen The JavaScript event handler function that is invoked when the push connection is opened.
      */
     public void setOnopen(String onopen) {
@@ -185,7 +185,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Returns the JavaScript event handler function that is invoked when a push message is received from the server.
-     * 
+     *
      * @return The JavaScript event handler function that is invoked when a push message is received from the server.
      */
     public String getOnmessage() {
@@ -195,7 +195,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
     /**
      * Sets the JavaScript event handler function that is invoked when a push message is received from the server. The function will be invoked with three
      * arguments: the push message, the channel name and the raw {@code MessageEvent} itself.
-     * 
+     *
      * @param onmessage The JavaScript event handler function that is invoked when a push message is received from the server.
      */
     @FacesAttribute(required = true)
@@ -205,7 +205,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Returns the JavaScript event handler function that is invoked when a connection error has occurred.
-     * 
+     *
      * @return The JavaScript event handler function that is invoked when a connection error has occurred.
      */
     public String getOnerror() {
@@ -214,7 +214,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Sets the JavaScript event handler function that is invoked when a connection error has occurred.
-     * 
+     *
      * @param onerror The JavaScript event handler function that is invoked when a connection error has occurred.
      */
     public void setOnerror(String onerror) {
@@ -223,7 +223,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Returns the JavaScript event handler function that is invoked when the push connection is closed.
-     * 
+     *
      * @return The JavaScript event handler function that is invoked when the push connection is closed.
      */
     public String getOnclose() {
@@ -232,7 +232,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
 
     /**
      * Sets the JavaScript event handler function that is invoked when the push connection is closed.
-     * 
+     *
      * @param onclose The JavaScript event handler function that is invoked when the push connection is closed.
      */
     public void setOnclose(String onclose) {

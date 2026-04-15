@@ -70,7 +70,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Examples</h2>
  * <p>
  * In the example below the client will be presented an HTTP 400 error when at least one view param is absent.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true" /&gt;
@@ -82,7 +82,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * In the example below the client will be redirected to "login.xhtml" when the "foo" parameter is absent, regardless of the "bar" parameter. When the "foo"
  * parameter is present, but the "bar" parameter is absent, nothing new will happen. The process will proceed "as usual". I.e. the validation error will end up
  * as a faces message in the current view the usual way.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -94,7 +94,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * In the example below the client will be presented an HTTP 401 error when the "foo" parameter is absent, regardless of the "bar" or "baz" parameters. When the
  * "foo" parameter is present, but either the "bar" or "baz" parameter is absent, the client will be redirected to "search.xhtml".
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -118,7 +118,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * You can override this message by explicitly specifying the <code>message</code> attribute. This is applicable for both <code>sendRedirect</code> and
  * <code>sendError</code>.
- * 
+ *
  * <pre>
  * &lt;o:viewParamValidationFailed sendRedirect="search.xhtml" message="You need to perform a search." /&gt;
  * ...
@@ -175,7 +175,7 @@ public class ViewParamValidationFailed extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ViewParamValidationFailed(TagConfig config) {
@@ -188,7 +188,7 @@ public class ViewParamValidationFailed extends TagHandler {
      * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the current request is <strong>not</strong> a
      * postback, and <strong>not</strong> in render response, and all required attributes are set, then subscribe the parent component to the
      * {@link PostValidateEvent}. This will invoke the {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
-     * 
+     *
      * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or {@link UIViewParameter}, or when there's already
      * another <code>&lt;o:viewParamValidationFailed&gt;</code> tag registered on the same parent.
      * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are missing or simultaneously specified.
@@ -223,7 +223,7 @@ public class ViewParamValidationFailed extends TagHandler {
      * If the current request is <strong>not</strong> a postback and the current response is <strong>not</strong> already completed, and validation on the
      * parent component has failed (for {@link UIViewRoot} this is checked by {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is
      * checked by {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
-     * 
+     *
      * @param event The component system event.
      * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit HTTP status code.
      */

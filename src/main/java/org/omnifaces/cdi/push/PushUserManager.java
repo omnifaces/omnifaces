@@ -58,7 +58,7 @@ abstract class PushUserManager {
 
     /**
      * Register application user based on given user and session based user ID.
-     * 
+     *
      * @param user The user.
      * @param userId The session based user ID.
      */
@@ -68,7 +68,7 @@ abstract class PushUserManager {
 
     /**
      * Add user channel ID associated with given session based user ID and channel name.
-     * 
+     *
      * @param userId The session based user ID.
      * @param channel The channel name.
      * @param channelId The channel identifier.
@@ -82,7 +82,7 @@ abstract class PushUserManager {
 
     /**
      * Resolve the user associated with given channel name and ID.
-     * 
+     *
      * @param channel The channel name.
      * @param channelId The channel identifier.
      * @return The user associated with given channel name and ID.
@@ -101,7 +101,7 @@ abstract class PushUserManager {
 
     /**
      * Resolve the user-specific channel IDs associated with given user and channel name.
-     * 
+     *
      * @param user The user.
      * @param channel The channel name.
      * @return The user-specific channel IDs associated with given user and channel name.
@@ -121,7 +121,7 @@ abstract class PushUserManager {
 
     /**
      * Deregister application user associated with given user and session based user ID.
-     * 
+     *
      * @param user The user.
      * @param userId The session based user ID.
      */
@@ -138,7 +138,7 @@ abstract class PushUserManager {
     /**
      * For internal usage only. This makes it possible to save and restore user specific channels during server restart/failover in {@link PushChannelManager}.
      * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
-     * 
+     *
      * @return User specific channels.
      */
     protected ConcurrentHashMap<String, ConcurrentHashMap<String, Set<String>>> getUserChannels() {

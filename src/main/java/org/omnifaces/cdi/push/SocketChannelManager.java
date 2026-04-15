@@ -62,7 +62,7 @@ public class SocketChannelManager extends PushChannelManager {
 
     /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
-     * 
+     *
      * @param channel The web socket channel.
      * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
      * <code>null</code>, the default is <code>application</code>.
@@ -131,7 +131,7 @@ public class SocketChannelManager extends PushChannelManager {
      * <p>
      * Since OmniFaces 4.6 this class is {@code public} instead of {@code protected} so it can be externally registered into environment-specific CDI bean
      * management facility.
-     * 
+     *
      * @author Bauke Scholtz
      * @see SocketChannelManager
      * @since 2.3
@@ -145,7 +145,7 @@ public class SocketChannelManager extends PushChannelManager {
 
         /**
          * Returns the view scoped channels.
-         * 
+         *
          * @return The view scoped channels.
          */
         protected Map<String, String> getChannels() {

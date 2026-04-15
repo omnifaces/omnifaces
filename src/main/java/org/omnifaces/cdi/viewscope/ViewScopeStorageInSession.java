@@ -96,7 +96,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     /**
      * Destroys all beans associated with given bean storage identifier.
-     * 
+     *
      * @param context The involved faces context.
      * @param beanStorageId The bean storage identifier.
      */
@@ -115,7 +115,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     /**
      * Returns {@code true} if given faces context is recently unloaded.
-     * 
+     *
      * @param context The involved faces context.
      * @return {@code true} if given faces context is recently unloaded.
      * @since 2.7.27

@@ -29,7 +29,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * The <code>&lt;o:conditionalComment&gt;</code> component renders a conditional comment. Conditional comments are an IE specific feature which enables the
  * developer to (out)comment blocks of HTML depending on whether the client is using IE and if so even which version. They are often seen in combination with
  * CSS stylesheets like so:
- * 
+ *
  * <pre>
  * &lt;!--[if lte IE 7]&gt;
  *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
@@ -37,7 +37,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * However, Facelets renders the comment's contents HTML-escaped which makes it unusable.
- * 
+ *
  * <pre>
  * &lt;!--[if lte IE 7]&amp;gt;
  *     &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;
@@ -46,7 +46,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <p>
  * Also, if <code>jakarta.faces.FACELETS_SKIP_COMMENTS</code> context param is set to <code>true</code> then it will even not be rendered at all. You would need
  * to workaround this with an ugly <code>&lt;h:outputText escape="false"&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;h:outputText
  *     value="&amp;lt;!--[if lte IE 7]&amp;gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;&amp;lt;![endif]--&amp;gt;"
@@ -54,7 +54,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * This component is designed to solve this problem.
- * 
+ *
  * <pre>
  * &lt;o:conditionalComment if="lte IE 7"&gt;
  *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
@@ -123,7 +123,7 @@ public class ConditionalComment extends OutputFamily {
 
     /**
      * Returns the {@code if} condition of the conditional comment. This is exactly the value you would use in {@code <!--[if ...]>}.
-     * 
+     *
      * @return The {@code if} condition.
      */
     public String getIf() {
@@ -132,7 +132,7 @@ public class ConditionalComment extends OutputFamily {
 
     /**
      * Sets the {@code if} condition of the conditional comment. This is exactly the value you would use in {@code <!--[if ...]>}.
-     * 
+     *
      * @param condition The {@code if} condition.
      */
     @FacesAttribute(required = true)

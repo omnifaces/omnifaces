@@ -80,7 +80,7 @@ import org.omnifaces.util.State;
  * <h2>Usage</h2>
  * <p>
  * Some examples:
- * 
+ *
  * <pre>
  * &lt;p&gt;Full URL of current page is: &lt;o:url /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of another page is: &lt;o:url viewId="/another.xhtml" /&gt;&lt;/p&gt;
@@ -94,14 +94,14 @@ import org.omnifaces.util.State;
  *     &lt;o:param name="q" value="#{bean.search}" /&gt;
  * &lt;/url&gt;&lt;/p&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;o:url var="_linkCanonical"&gt;
  *     &lt;o:param name="foo" value="#{bean.foo}" /&gt;
  * &lt;/o:url&gt;
  * &lt;link rel="canonical" href="#{_linkCanonical}" /&gt;
  * </pre>
- * 
+ *
  * <pre>
  * &lt;o:url var="_linkNext" includeViewParams="true"&gt;
  *     &lt;f:param name="page" value="#{bean.pageIndex + 1}" /&gt;
@@ -152,7 +152,7 @@ public class Url extends OutputFamily {
 
     /**
      * An override which checks if this isn't been invoked on <code>var</code> attribute. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
      */
     @Override
@@ -219,7 +219,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the variable name which exposes the URL into the request scope.
-     * 
+     *
      * @return The variable name which exposes the URL into the request scope.
      */
     public String getVar() {
@@ -228,7 +228,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the variable name which exposes the URL into the request scope.
-     * 
+     *
      * @param varName The variable name which exposes the URL into the request scope.
      */
     public void setVar(String varName) {
@@ -237,7 +237,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
-     * 
+     *
      * @return The target URL.
      */
     public String getValue() {
@@ -246,7 +246,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the target URL to encode. When specified, the {@code domain} and {@code viewId} attributes are ignored.
-     * 
+     *
      * @param value The target URL.
      */
     public void setValue(String value) {
@@ -255,7 +255,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value} attribute is specified.
-     * 
+     *
      * @return The view ID to create URL for.
      */
     public String getViewId() {
@@ -264,7 +264,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the view ID to create URL for. Defaults to current view ID. This is ignored when {@code value} attribute is specified.
-     * 
+     *
      * @param viewId The view ID to create URL for.
      */
     public void setViewId(String viewId) {
@@ -273,7 +273,7 @@ public class Url extends OutputFamily {
 
     /**
      * Returns the domain of the URL. Defaults to current domain.
-     * 
+     *
      * @return The domain of the URL.
      */
     public String getDomain() {
@@ -282,7 +282,7 @@ public class Url extends OutputFamily {
 
     /**
      * Sets the domain of the URL. Defaults to current domain.
-     * 
+     *
      * @param domain The domain of the URL.
      */
     public void setDomain(String domain) {
@@ -292,7 +292,7 @@ public class Url extends OutputFamily {
     /**
      * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>. This setting is ignored when
      * <code>includeRequestParams</code> is set to <code>true</code>.
-     * 
+     *
      * @return Whether or not the view parameters should be encoded into the URL.
      */
     public boolean isIncludeViewParams() {
@@ -302,7 +302,7 @@ public class Url extends OutputFamily {
     /**
      * Sets whether or not the view parameters should be encoded into the URL. Defaults to {@code false}. This setting is ignored when
      * {@code includeRequestParams} is set to {@code true}.
-     * 
+     *
      * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
      */
     public void setIncludeViewParams(boolean includeViewParams) {
@@ -312,7 +312,7 @@ public class Url extends OutputFamily {
     /**
      * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>. When set to <code>true</code>,
      * then this will override the <code>includeViewParams</code> setting.
-     * 
+     *
      * @return Whether or not the request query string parameters should be encoded into the URL.
      */
     public boolean isIncludeRequestParams() {
@@ -322,7 +322,7 @@ public class Url extends OutputFamily {
     /**
      * Sets whether or not the request query string parameters should be encoded into the URL. Defaults to {@code false}. When set to {@code true}, then this
      * will override the {@code includeViewParams} setting.
-     * 
+     *
      * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
      */
     public void setIncludeRequestParams(boolean includeRequestParams) {

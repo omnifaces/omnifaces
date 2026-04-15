@@ -95,7 +95,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * Below is the minimal <code>web.xml</code> configuration to make all Facelets source files found in the root folder and all subdirectories of the public web
  * content (excluding <code>/WEB-INF</code>, <code>/META-INF</code> and <code>/resources</code>) available as extensionless URLs:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
@@ -112,7 +112,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * Enabling MultiViews is a matter of suffixing the path pattern with <code>/*</code>. The support was added in OmniFaces 2.5. Below is the <code>web.xml</code>
  * configuration which extends the above minimal configuration with MultiViews support:
- * 
+ *
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
@@ -123,9 +123,9 @@ import org.omnifaces.util.Servlets;
  * On an example URL of <code>https://example.com/context/foo/bar/baz</code> when neither <code>/foo/bar/baz.xhtml</code> nor <code>/foo/bar.xhtml</code> exist,
  * but <code>/foo.xhtml</code> does exist, then the request will forward to <code>/foo.xhtml</code> and make the values <code>bar</code> and <code>baz</code>
  * available as injectable path parameters via <code>&#64;</code>{@link Param} in the managed bean associated with <code>/foo.xhtml</code>.
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Inject
  * &#64;Param(pathIndex = 0)
  * private String bar;
@@ -191,7 +191,7 @@ public final class FacesViews {
     /**
      * The name of the enum context parameter that determines the action that is performed whenever a resource is requested WITH extension that's also available
      * without an extension. See {@link ExtensionAction}
-     * 
+     *
      * @see ExtensionAction
      */
     public static final String FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_EXTENSION_ACTION";
@@ -199,7 +199,7 @@ public final class FacesViews {
     /**
      * The name of the enum context parameter that determines the action that is performed whenever a resource is requested in a public path that has been used
      * for scanning views by faces views. See {@link PathAction}
-     * 
+     *
      * @see PathAction
      */
     public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
@@ -214,7 +214,7 @@ public final class FacesViews {
      * The name of the boolean context parameter via which the user can set whether the request URI should only match the lowercased form of the file name. By
      * default, a scanned view of for example <code>/TitleCasedFileName.xhtml</code> will listen to a request URI of <code>/TitleCasedFileName</code>, but when
      * this setting is set to true, then it will instead listen to a lowercased request URI of <code>/titlecasedfilename</code>.
-     * 
+     *
      * @since 3.14
      */
     public static final String FACES_VIEWS_LOWERCASED_REQUEST_URI_PARAM_NAME = "org.omnifaces.FACES_VIEWS_LOWERCASED_REQUEST_URI";
@@ -261,7 +261,7 @@ public final class FacesViews {
 
     /**
      * This will register the {@link FacesViewsForwardingFilter}. This is invoked by {@link ApplicationInitializer}.
-     * 
+     *
      * @param servletContext The involved servlet context.
      */
     public static void registerForwardingFilter(ServletContext servletContext) {
@@ -314,7 +314,7 @@ public final class FacesViews {
     /**
      * This will map the {@link FacesServlet} to extensions found during scanning in {@link ApplicationInitializer}. This is invoked by
      * {@link ApplicationListener}, because the {@link FacesServlet} has to be available.
-     * 
+     *
      * @param servletContext The involved servlet context.
      */
     public static void addFacesServletMappings(ServletContext servletContext) {
@@ -348,7 +348,7 @@ public final class FacesViews {
     /**
      * Register a view handler that transforms a view id with extension back to an extensionless one. This is invoked by {@link ApplicationProcessor}, because
      * the {@link Application} has to be available.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @param application The involved faces application.
      */
@@ -809,7 +809,7 @@ public final class FacesViews {
     /**
      * Returns whether FacesViews feature is enabled. That is, when the <code>org.omnifaces.FACES_VIEWS_ENABLED</code> context parameter value does not equal
      * <code>false</code>.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @return Whether FacesViews feature is enabled.
      * @since 2.5
@@ -825,7 +825,7 @@ public final class FacesViews {
     /**
      * Returns whether MultiViews feature is enabled. This is implicitly enabled when <code>org.omnifaces.FACES_VIEWS_SCAN_PATHS</code> context parameter value
      * is suffixed with <code>/*</code>.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @return Whether MultiViews feature is enabled.
      * @since 2.5
@@ -840,7 +840,7 @@ public final class FacesViews {
 
     /**
      * Returns whether MultiViews feature is enabled on given request.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return Whether MultiViews feature is enabled on given request.
      * @since 2.6
@@ -857,7 +857,7 @@ public final class FacesViews {
 
     /**
      * Returns whether MultiViews feature is enabled on the given resource.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @param resource The resource.
      * @return Whether MultiViews feature is enabled on the given resource.
@@ -896,7 +896,7 @@ public final class FacesViews {
 
     /**
      * Strips any mapped welcome file prefix path from the given resource.
-     * 
+     *
      * @param servletContext The involved servlet context.
      * @param resource The resource.
      * @return The resource without the welcome file prefix path, or as-is if it didn't start with this prefix.
@@ -914,7 +914,7 @@ public final class FacesViews {
 
     /**
      * Strips any special '/WEB-INF/faces-views' prefix path from the given resource.
-     * 
+     *
      * @param resource The resource.
      * @return The resource without the special prefix path, or as-is if it didn't start with this prefix.
      */

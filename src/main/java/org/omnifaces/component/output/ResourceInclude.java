@@ -91,7 +91,7 @@ public class ResourceInclude extends OutputFamily {
 
     /**
      * Returns the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to the current context root.
-     * 
+     *
      * @return The pathname to the resource.
      */
     public String getPath() {
@@ -100,7 +100,7 @@ public class ResourceInclude extends OutputFamily {
 
     /**
      * Sets the pathname to the resource. The pathname must begin with a "/" and is interpreted as relative to the current context root.
-     * 
+     *
      * @param path The pathname to the resource.
      */
     @FacesAttribute(required = true)

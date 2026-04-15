@@ -38,7 +38,7 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 
     /**
      * Construct the caching value expression.
-     * 
+     *
      * @param name The cache name.
      * @param valueExpression The value expression to be wrapped.
      * @param cache The cache itself.

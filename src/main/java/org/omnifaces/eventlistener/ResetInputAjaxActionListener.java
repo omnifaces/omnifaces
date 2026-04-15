@@ -63,30 +63,30 @@ import jakarta.faces.event.SystemEventListener;
  * <p>
  * Register it as <code>&lt;phase-listener&gt;</code> in <code>faces-config.xml</code>. It'll be applied to <strong>every single</strong> ajax action throughout
  * the webapp, on both <code>UIInput</code> and <code>UICommand</code> components.
- * 
+ *
  * <pre>
  * &lt;lifecycle&gt;
  *     &lt;phase-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/phase-listener&gt;
  * &lt;/lifecycle&gt;
  * </pre>
- * 
+ *
  * <li>
  * <p>
  * <i>Or</i> register it as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>. It'll <strong>only</strong> be applied to ajax actions which
  * are invoked by an <code>UICommand</code> component such as <code>&lt;h:commandButton&gt;</code> and <code>&lt;h:commandLink&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;application&gt;
  *     &lt;action-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/action-listener&gt;
  * &lt;/application&gt;
  * </pre>
- * 
+ *
  * <li>
  * <p>
  * <i>Or</i> register it as <code>&lt;f:actionListener&gt;</code> on the invidivual <code>UICommand</code> components where this action listener is absolutely
  * necessary to solve the concrete problem. Note that it isn't possible to register it on the individual <code>UIInput</code> components using the standard
  * Faces tags.
- * 
+ *
  * <pre>
  * &lt;h:commandButton value="Update" action="#{bean.updateOtherInputs}"&gt;
  *     &lt;f:ajax execute="currentInputs" render="otherInputs" /&gt;
@@ -148,7 +148,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
     /**
      * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor will be used when registering as
      * <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>.
-     * 
+     *
      * @param wrapped The wrapped action listener.
      */
     public ResetInputAjaxActionListener(ActionListener wrapped) {
@@ -161,7 +161,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
     /**
      * Delegate to the {@link #processAction(ActionEvent)} method when this action listener is been registered as a phase listener so that it get applied on
      * <strong>all</strong> ajax requests.
-     * 
+     *
      * @see #processAction(ActionEvent)
      */
     @Override
@@ -174,7 +174,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
      * not return an empty collection nor is the same as {@link PartialViewContext#getExecuteIds()}: find all {@link EditableValueHolder} components based on
      * {@link PartialViewContext#getRenderIds()} and if the component is not covered by {@link PartialViewContext#getExecuteIds()}, then invoke
      * {@link EditableValueHolder#resetValue()} on the component.
-     * 
+     *
      * @throws IllegalArgumentException When one of the client IDs resolved to a <code>null</code> component. This would however indicate a bug in the concrete
      * {@link PartialViewContext} implementation which is been used.
      */

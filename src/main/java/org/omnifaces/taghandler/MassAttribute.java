@@ -42,7 +42,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * For example, the following setup
- * 
+ *
  * <pre>
  * &lt;o:massAttribute name="disabled" value="true"&gt;
  *     &lt;h:inputText id="input1" /&gt;
@@ -52,12 +52,12 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     &lt;h:inputText id="input5" disabled="#{false}" /&gt;
  * &lt;/o:massAttribute&gt;
  * </pre>
- * 
+ *
  * will set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and <code>input3</code> as those are the only components
  * <strong>without</strong> a value expression on the boolean attribute.
  * <p>
  * As another general example without booleans, the following setup
- * 
+ *
  * <pre>
  * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
  *     &lt;h:inputText id="input1" /&gt;
@@ -66,13 +66,13 @@ import org.omnifaces.vdl.FacesTagHandler;
  *     &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
  * &lt;/o:massAttribute&gt;
  * </pre>
- * 
+ *
  * will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as that's the only component on which the
  * attribute is absent. Do note that the specified EL expression will actually be evaluated on a per-component basis.
  * <p>
  * To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels (as that would otherwise fail in the
  * example below because they don't have the <code>valid</code> property):
- * 
+ *
  * <pre>
  * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="jakarta.faces.component.UIInput"&gt;
  *     &lt;h:outputLabel for="input1" /&gt;
@@ -122,7 +122,7 @@ public class MassAttribute extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     @SuppressWarnings("unchecked")

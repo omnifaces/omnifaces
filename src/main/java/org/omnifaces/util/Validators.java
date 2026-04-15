@@ -46,27 +46,27 @@ import jakarta.validation.ValidatorFactory;
  * <h2>Usage</h2>
  * <p>
  * Here are <strong>some</strong> examples:
- * 
+ *
  * <pre>
- * 
+ *
  * // Check if Bean Validation is available.
  * boolean available = Validators.isBeanValidationAvailable();
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * // Check if Bean Validation is available.
  * boolean available = Validators.isBeanValidationAvailable();
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * // Validate whole bean with Bean Validation.
  * Set&lt;ConstraintViolation&lt;?&gt;&gt; violations = Validators.validateBean(bean);
  * </pre>
- * 
+ *
  * <pre>
- * 
+ *
  * // Validate only a bean property with Bean Validation.
  * Set&lt;ConstraintViolation&lt;?&gt;&gt; violations = Validators.validateBeanProperty(bean, "propertyName", propertyValue);
  * </pre>
@@ -98,7 +98,7 @@ public final class Validators {
 
     /**
      * Returns <code>true</code> if Bean Validation is available. This is remembered in the application scope.
-     * 
+     *
      * @return <code>true</code> if Bean Validation is available.
      */
     public static boolean isBeanValidationAvailable() {
@@ -117,7 +117,7 @@ public final class Validators {
 
     /**
      * Returns the default bean validator factory. This is remembered in the application scope.
-     * 
+     *
      * @return The default bean validator factory.
      */
     public static ValidatorFactory getBeanValidatorFactory() {
@@ -126,7 +126,7 @@ public final class Validators {
 
     /**
      * Returns the bean validator which is aware of the Faces locale.
-     * 
+     *
      * @return The bean validator which is aware of the Faces locale.
      * @see Faces#getLocale()
      */
@@ -139,7 +139,7 @@ public final class Validators {
 
     /**
      * Validate given bean on given group classes.
-     * 
+     *
      * @param bean Bean to be validated.
      * @param groups Bean validation groups, if any.
      * @return Constraint violations.
@@ -152,7 +152,7 @@ public final class Validators {
 
     /**
      * Validate given value as if it were a property of the given bean type.
-     * 
+     *
      * @param beanType Type of target bean.
      * @param propertyName Name of property on target bean.
      * @param value Value to be validated.
@@ -167,7 +167,7 @@ public final class Validators {
 
     /**
      * Resolve violated base from given bean based on given violation.
-     * 
+     *
      * @param bean Bean to resolve violated base on.
      * @param violation Constraint violation to resolve violated base from.
      * @return Violated base from given bean based on given violation.
@@ -179,7 +179,7 @@ public final class Validators {
 
     /**
      * Resolve violated bases and properties from given bean based on given violation in reverse order.
-     * 
+     *
      * @param bean Bean to resolve violated base on.
      * @param violation Constraint violation to resolve violated base from.
      * @return Violated bases and properties from given bean based on given violation in reverse order.
@@ -222,7 +222,7 @@ public final class Validators {
 
     /**
      * Resolve violated property from given violation.
-     * 
+     *
      * @param violation Constraint violation to resolve violated property from.
      * @return Violated property from given violation.
      */
@@ -233,7 +233,7 @@ public final class Validators {
 
     /**
      * Returns a list of property path nodes from the given constraint violation.
-     * 
+     *
      * @param violation The constraint violation to return a list of property path nodes from.
      * @return A list of property path nodes from the given constraint violation.
      */

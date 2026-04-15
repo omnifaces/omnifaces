@@ -47,7 +47,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
     /**
      * Construct a new OmniFaces external context around the given wrapped external context.
-     * 
+     *
      * @param wrapped The wrapped external context.
      */
     public OmniExternalContext(ExternalContext wrapped) {

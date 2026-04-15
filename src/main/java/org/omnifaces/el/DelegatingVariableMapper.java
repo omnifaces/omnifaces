@@ -33,7 +33,7 @@ public class DelegatingVariableMapper extends VariableMapper {
 
     /**
      * Construct delegating variable mapper.
-     * 
+     *
      * @param wrapped The variable mapper to be wrapped.
      */
     public DelegatingVariableMapper(VariableMapper wrapped) {
@@ -55,7 +55,7 @@ public class DelegatingVariableMapper extends VariableMapper {
 
     /**
      * Resolve wrapped variable of given name.
-     * 
+     *
      * @param name Name of wrapped variable.
      * @return Resolved wrapped variable.
      */
@@ -83,7 +83,7 @@ public class DelegatingVariableMapper extends VariableMapper {
 
     /**
      * Sets wrapped variable of given name with given value expression.
-     * 
+     *
      * @param name Name of wrapped variable.
      * @param expression Value expression of wrapped variable.
      * @return The wrapped variable.

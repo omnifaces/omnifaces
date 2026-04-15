@@ -46,7 +46,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * For example:
- * 
+ *
  * <pre>
  * &lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
  * ...
@@ -111,7 +111,7 @@ public class ImportFunctions extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ImportFunctions(TagConfig config) {
@@ -140,7 +140,7 @@ public class ImportFunctions extends TagHandler {
 
     /**
      * Returns the class loader associated with the object specified in given tag attribute, if any.
-     * 
+     *
      * @param context The involved facelet context.
      * @param attribute The optional tag attribute to obtain the class loader from.
      * @return The class loader associated with the object specified in given tag attribute, if any.
@@ -152,7 +152,7 @@ public class ImportFunctions extends TagHandler {
 
     /**
      * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
-     * 
+     *
      * @param type The fully qualified name of the class.
      * @return The concrete {@link Class} instance.
      * @throws IllegalArgumentException When it is missing in the classpath.
@@ -222,7 +222,7 @@ public class ImportFunctions extends TagHandler {
 
         /**
          * Collect all public static methods of the given name in the given class, sort them by the amount of parameters and return the first one.
-         * 
+         *
          * @param cls The class to find the method in.
          * @param name The method name.
          * @return The found method, or <code>null</code> if none is found.
@@ -241,7 +241,7 @@ public class ImportFunctions extends TagHandler {
 
         /**
          * Returns whether the given method is an utility method, that is when it is public and static and returns a non-void type.
-         * 
+         *
          * @param method The method to be checked.
          * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
          */

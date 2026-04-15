@@ -80,7 +80,7 @@ import org.omnifaces.util.State;
  * <h2>Usage</h2>
  * <p>
  * Usage example of <code>/sitemap.xml</code> as a Faces view:
- * 
+ *
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;urlset
@@ -159,7 +159,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Constructs the {@link SitemapUrl} component.
-     * 
+     *
      * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and the current request is not for the
      * {@link ViewResourceHandler} at all.
      */
@@ -210,7 +210,7 @@ public class SitemapUrl extends OutputFamily {
     /**
      * Renders the <code>&lt;loc&gt;</code> child element with either the value of {@link #getValue()}, or the value of {@link #getViewId()} and
      * {@link #getDomain()} combined.
-     * 
+     *
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      * @throws IllegalArgumentException When the {@link #getDomain()} does not represent a valid domain.
@@ -243,7 +243,7 @@ public class SitemapUrl extends OutputFamily {
     /**
      * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any. It may only encode formats specified in
      * https://www.w3.org/TR/NOTE-datetime
-     * 
+     *
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      */
@@ -268,7 +268,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Renders the <code>&lt;changefreq&gt;</code> child element with the value of {@link #getChangeFrequency()}, if any.
-     * 
+     *
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      */
@@ -285,7 +285,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Renders the <code>&lt;priority&gt;</code> child element with the value of {@link #getPriority()}, if any.
-     * 
+     *
      * @param context The involved faces context.
      * @throws IOException When an I/O error occurs.
      * @throws IllegalArgumentException When the {@link #getPriority()} is not between 0.0 and 1.0 (inclusive).
@@ -309,7 +309,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "loc" element of the sitemap URL. Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
-     * 
+     *
      * @return The value of the "loc" element of the sitemap URL.
      */
     public String getValue() {
@@ -318,7 +318,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "loc" element of the sitemap URL. Note: when specified, then {@link #getViewId()} and {@link #getDomain()} are ignored.
-     * 
+     *
      * @param value The value of the "loc" element of the sitemap URL.
      */
     public void setValue(String value) {
@@ -327,7 +327,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the view ID to create the URI part of the "loc" element of the sitemap URL for. Note: this is ignored when {@link #getValue()} is specified.
-     * 
+     *
      * @return The view ID to create the URI part of the "loc" element of the sitemap URL for.
      */
     public String getViewId() {
@@ -336,7 +336,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the view ID to create the URI part of the "loc" element of the sitemap URL for. Note: this is ignored when {@link #getValue()} is specified.
-     * 
+     *
      * @param viewId The view ID to create the URI part of the "loc" element of the sitemap URL for.
      */
     public void setViewId(String viewId) {
@@ -345,7 +345,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the domain of the "loc" element of the sitemap URL. Note: this is ignored when {@link #getValue()} is specified.
-     * 
+     *
      * @return The domain of the "loc" element of the sitemap URL for.
      */
     public String getDomain() {
@@ -354,7 +354,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the domain of the "loc" element of the sitemap URL. Note: this is ignored when {@link #getValue()} is specified.
-     * 
+     *
      * @param domain The domain of the "loc" element of the sitemap URL for.
      */
     public void setDomain(String domain) {
@@ -363,7 +363,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "lastmod" element of the sitemap URL.
-     * 
+     *
      * @return The value of the "lastmod" element of the sitemap URL.
      */
     public Temporal getLastModified() {
@@ -372,7 +372,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "lastmod" element of the sitemap URL.
-     * 
+     *
      * @param lastModified The value of the "lastmod" element of the sitemap URL.
      */
     public void setLastModified(Temporal lastModified) {
@@ -381,7 +381,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "changefreq" element of the sitemap URL.
-     * 
+     *
      * @return The value of the "changefreq" element of the sitemap URL.
      */
     public ChangeFrequency getChangeFrequency() {
@@ -390,7 +390,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "changefreq" element of the sitemap URL.
-     * 
+     *
      * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
      */
     public void setChangeFrequency(ChangeFrequency changeFrequency) {
@@ -399,7 +399,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Returns the value of the "priority" element of the sitemap URL.
-     * 
+     *
      * @return The value of the "priority" element of the sitemap URL.
      */
     public BigDecimal getPriority() {
@@ -408,7 +408,7 @@ public class SitemapUrl extends OutputFamily {
 
     /**
      * Sets the value of the "priority" element of the sitemap URL.
-     * 
+     *
      * @param priority The value of the "priority" element of the sitemap URL.
      */
     public void setPriority(BigDecimal priority) {

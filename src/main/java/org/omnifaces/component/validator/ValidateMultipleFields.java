@@ -57,7 +57,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * this validator will not be exeucted. It is not recommended to put this validator somewhere in between the referenced components as the resulting behaviour
  * may be confusing, for example because only the values of preceding components are converted and the values of following components are not converted. Put
  * this validator either before or after all of the components, depending on how you would like to prioritize the validation.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
  * &lt;h:message for="myId" /&gt;
@@ -73,7 +73,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will be added on the client ID of this
  * validator component. The default message can be changed by the <code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with
  * a comma separated string of labels of the referenced input components.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
  * </pre>
@@ -82,20 +82,20 @@ import org.omnifaces.vdl.FacesAttribute;
  * <code>faces-config.xml</code>. The message key is just the component type as identified by <code>COMPONENT_TYPE</code> constant of the validator component.
  * For example, {@link ValidateAll} has a {@link ValidateAll#COMPONENT_TYPE} value of <code>org.omnifaces.component.validator.ValidateAll</code>. Use exactly
  * this value as message bundle key:
- * 
+ *
  * <pre>
  * org.omnifaces.component.validator.ValidateAll = {0} are wrong!
  * </pre>
  * <p>
  * You can use <code>invalidateAll="false"</code> to mark only those components which are actually invalid as invalid. In case of for example "input all" or
  * "input all or none" validation, that would be only the fields which are left empty.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" invalidateAll="false" /&gt;
  * </pre>
  * <p>
  * The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
  * &lt;h:inputText id="foo" /&gt;
@@ -107,20 +107,20 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * The faces message can also be shown for only the invalidated components using <code>showMessageFor="@invalid"</code>.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
  * </pre>
  * <p>
  * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@global" /&gt;
  * </pre>
  * <p>
  * The faces message can also be shown for specific components referenced by a space separated collection of their client IDs in <code>showMessageFor</code>
  * attribute.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
  * </pre>
@@ -128,13 +128,13 @@ import org.omnifaces.vdl.FacesAttribute;
  * The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
  * <p>
  * The validator can be disabled by the <code>disabled</code> attribute. It accepts a request based EL expression.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
  * </pre>
  * <p>
  * There is a read-only <code>validationFailed</code> attribute which can be used to determine if the validation by this component has failed.
- * 
+ *
  * <pre>
  * &lt;o:validateMultipleFields id="myId" binding="#{myId}" components="foo bar baz" /&gt;
  * &lt;h:panelGroup rendered="#{myId.validationFailed}"&gt;
@@ -192,7 +192,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Validate our component hierarchy.
-     * 
+     *
      * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
      */
     @Override
@@ -244,7 +244,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     /**
      * Collect the input components. Only those which are an instance of {@link UIInput} will be returned. If at least one of them has already been validated
      * and is been marked invalid, then an empty collection will be returned.
-     * 
+     *
      * @return The input components.
      * @throws IllegalArgumentException When the <code>components</code> attribute is missing, or when it references an non-existing component, or when it
      * references a non-input component.
@@ -274,7 +274,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Collect the values of the given input components.
-     * 
+     *
      * @param inputs The input components to collect values from.
      * @return The values of the given input components.
      */
@@ -298,7 +298,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * Returns whether in in an invalidating case the given input component should be marked invalid. The default implementation returns <code>true</code>,
      * meaning that <strong>all</strong> input components should be invalidated in an invalidating case. The overriding implementation may choose to return
      * <code>false</code> for example when the value is empty, such as {@link ValidateAllOrNone}.
-     * 
+     *
      * @param context The faces context to work with.
      * @param input The input component which may need to be invalidated.
      * @param value The value of the input component.
@@ -316,7 +316,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * <li><code>@all</code>: message will be added to all components as specified in <code>components</code> attribute.
      * <li>Any other value in a space separated collection will be treated as client ID of {@link UIInput} component.
      * </ul>
-     * 
+     *
      * @param context The faces context to work with.
      * @param inputs The validated input components.
      */
@@ -401,7 +401,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Returns the space separated collection of client IDs of UI input components to be validated.
-     * 
+     *
      * @return The space separated collection of client IDs of UI input components to be validated.
      */
     public String getComponents() {
@@ -410,7 +410,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Sets the space separated collection of client IDs of UI input components to be validated.
-     * 
+     *
      * @param components The space separated collection of client IDs of UI input components to be validated.
      */
     @FacesAttribute(required = true)
@@ -420,7 +420,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Returns whether to invalidate all fields or only those which are actually invalid as per {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
-     * 
+     *
      * @return Whether to invalidate all fields or only those which are actually invalid.
      * @since 1.7
      */
@@ -430,7 +430,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Sets whether to invalidate all fields or only those which are actually invalid as per {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
-     * 
+     *
      * @param invalidateAll Whether to invalidate all fields or only those which are actually invalid.
      * @since 1.7
      */
@@ -441,7 +441,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     /**
      * Returns the validation message to be shown on failure. Any "{0}" placeholder in the message will be substituted with a comma separated collection of
      * labels of the input fields.
-     * 
+     *
      * @return The validation message to be shown on failure.
      */
     public String getMessage() {
@@ -451,7 +451,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
     /**
      * Sets the validation message to be shown on failure. Any "{0}" placeholder in the message will be substituted with a comma separated collection of labels
      * of the input fields.
-     * 
+     *
      * @param message The validation message to be shown on failure.
      */
     public void setMessage(String message) {
@@ -462,7 +462,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * Returns the identifier for which this validator should show the message. Defaults to {@code "@this"} which is the validator component itself. Other
      * available values are {@code "@all"}, {@code "@invalid"}, {@code "@global"} and {@code "@violating"}. Any other space separated value will be treated as
      * client ID of UI input component.
-     * 
+     *
      * @return The identifier for which this validator should show the message.
      */
     public String getShowMessageFor() {
@@ -473,7 +473,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
      * Sets the identifier for which this validator should show the message. Defaults to {@code "@this"} which is the validator component itself. Other
      * available values are {@code "@all"}, {@code "@invalid"}, {@code "@global"} and {@code "@violating"}. Any other space separated value will be treated as
      * client ID of UI input component.
-     * 
+     *
      * @param showMessageFor The identifier for which this validator should show the message.
      */
     public void setShowMessageFor(String showMessageFor) {
@@ -482,7 +482,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Returns whether the validation should be disabled or not.
-     * 
+     *
      * @return Whether the validation should be disabled or not.
      */
     public boolean isDisabled() {
@@ -491,7 +491,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Sets whether the validation should be disabled or not.
-     * 
+     *
      * @param disabled Whether the validation should be disabled or not.
      */
     public void setDisabled(boolean disabled) {
@@ -500,7 +500,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     /**
      * Returns whether the validation has failed or not.
-     * 
+     *
      * @return Whether the validation has failed or not.
      * @since 1.3
      */

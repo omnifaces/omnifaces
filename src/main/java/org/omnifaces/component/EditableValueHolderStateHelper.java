@@ -41,7 +41,7 @@ public final class EditableValueHolderStateHelper {
 
     /**
      * Save the state of the given {@link EditableValueHolder}.
-     * 
+     *
      * @param holder The {@link EditableValueHolder} to save the state for.
      */
     public void save(EditableValueHolder holder) {
@@ -53,7 +53,7 @@ public final class EditableValueHolderStateHelper {
 
     /**
      * Restore the state of the given {@link EditableValueHolder}.
-     * 
+     *
      * @param holder The {@link EditableValueHolder} to restore the state for.
      */
     public void restore(EditableValueHolder holder) {
@@ -67,7 +67,7 @@ public final class EditableValueHolderStateHelper {
 
     /**
      * Save state of any {@link EditableValueHolder} children.
-     * 
+     *
      * @param context The faces context to work with.
      * @param stateHelper The state helper of the parent component.
      * @param children An iterator with all child facets and components of the parent component as obtained by {@link UIComponentBase#getFacetsAndChildren()}.
@@ -88,7 +88,7 @@ public final class EditableValueHolderStateHelper {
 
     /**
      * Restore state of any {@link EditableValueHolder} children.
-     * 
+     *
      * @param context The faces context to work with.
      * @param stateHelper The state helper of the parent component.
      * @param children An iterator with all child facets and components of the parent component as obtained by {@link UIComponentBase#getFacetsAndChildren()}.
@@ -110,7 +110,7 @@ public final class EditableValueHolderStateHelper {
 
     /**
      * Returns the state helper of the {@link EditableValueHolder} child associated with the given client ID.
-     * 
+     *
      * @param stateHelper The state helper of the parent component.
      * @param clientId The client ID of the {@link EditableValueHolder} child to return the state helper for.
      * @return The state helper of the {@link EditableValueHolder} child associated with the given client ID.

@@ -32,14 +32,14 @@ public interface ParamHolder<T> extends ValueHolder {
 
     /**
      * Returns the name of the parameter.
-     * 
+     *
      * @return The name of the parameter.
      */
     String getName();
 
     /**
      * Returns the original, unconverted value of the parameter.
-     * 
+     *
      * @return The original, unconverted value of the parameter.
      */
     @Override
@@ -47,7 +47,7 @@ public interface ParamHolder<T> extends ValueHolder {
 
     /**
      * Returns the converter, if any.
-     * 
+     *
      * @return The converter, if any.
      */
     @Override
@@ -58,7 +58,7 @@ public interface ParamHolder<T> extends ValueHolder {
      * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
      * {@link Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)}, otherwise return the
      * {@link Object#toString()} of the value.
-     * 
+     *
      * @return The value of the parameter as {@link String}.
      * @see Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)
      */

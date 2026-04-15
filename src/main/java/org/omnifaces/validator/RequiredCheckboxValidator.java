@@ -43,7 +43,7 @@ import org.omnifaces.vdl.FacesValidatorTag;
  * <p>
  * This validator is available by validator ID <code>omnifaces.RequiredCheckboxValidator</code>. Just specify it as <code>&lt;f:validator&gt;</code> of the
  * boolean selection component:
- * 
+ *
  * <pre>
  * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
  *     &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;
@@ -51,7 +51,7 @@ import org.omnifaces.vdl.FacesValidatorTag;
  * </pre>
  * <p>
  * Since OmniFaces 4.5 it's also available by <code>&lt;o:requiredCheckboxValidator&gt;</code> tag.
- * 
+ *
  * <pre>
  * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
  *     &lt;o:requiredCheckboxValidator" /&gt;

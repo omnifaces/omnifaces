@@ -73,7 +73,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.
- * 
+ *
  * <pre>
  * &lt;o:viewParam name="foo" value="#{bean.foo}" /&gt;
  * </pre>
@@ -135,7 +135,7 @@ public class ViewParam extends UIViewParameter {
     /**
      * When there's a value expression and the evaluated model value is <code>null</code>, then just return <code>null</code> instead of delegating to default
      * implementation which would return an empty string when a converter is attached.
-     * 
+     *
      * @since 1.8
      */
     @Override
@@ -163,7 +163,7 @@ public class ViewParam extends UIViewParameter {
 
     /**
      * Returns the default value in case the actual request parameter is <code>null</code> or empty.
-     * 
+     *
      * @return The default value in case the actual request parameter is <code>null</code> or empty.
      * @since 2.2
      */
@@ -173,7 +173,7 @@ public class ViewParam extends UIViewParameter {
 
     /**
      * Sets the default value in case the actual request parameter is <code>null</code> or empty.
-     * 
+     *
      * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
      * @since 2.2
      */

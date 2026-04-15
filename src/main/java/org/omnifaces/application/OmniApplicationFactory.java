@@ -34,7 +34,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
     /**
      * Construct a new OmniFaces application factory around the given wrapped factory.
-     * 
+     *
      * @param wrapped The wrapped factory.
      */
     public OmniApplicationFactory(ApplicationFactory wrapped) {

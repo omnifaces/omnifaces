@@ -86,7 +86,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         /**
          * Returns the encoding directive. This basically represents the unique identifier of the algorithm in the HTTP {@code Accept-Encoding} header as well
          * as the HTTP {@code Content-Encoding} header.
-         * 
+         *
          * @return The directive.
          */
         public String getEncodingDirective() {
@@ -95,7 +95,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns the output stream class being used.
-         * 
+         *
          * @return The output stream class being used.
          */
         public Class<? extends OutputStream> getOutputStreamClass() {
@@ -104,7 +104,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns {@code true} if this algorithm is available.
-         * 
+         *
          * @return {@code true} if this algorithm is available.
          */
         public boolean isAvailable() {
@@ -113,7 +113,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns {@code true} if the given request accepts this algorithm.
-         * 
+         *
          * @param request The involved HTTP servlet request.
          * @return {@code true} if the given request accepts this algorithm.
          */
@@ -125,7 +125,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns an output stream which is compressed using this algorithm for the given HTTP servlet response.
-         * 
+         *
          * @param response The HTTP servlet response to be compressed with this algorithm.
          * @return An output stream which is compressed using this algorithm.
          * @throws IOException When the output stream cannot be constructed because of IO reason.
@@ -148,7 +148,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         /**
          * Returns the best algorithm matching the given HTTP servlet request.
-         * 
+         *
          * @param request The HTTP servlet request to find the best algorithm for.
          * @return The best algorithm matching the given HTTP servlet request.
          */
@@ -185,7 +185,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
     /**
      * Construct a new compressed HTTP servlet response based on the given response, algorithm, threshold and mimetypes.
-     * 
+     *
      * @param response The HTTP servlet response.
      * @param algorithm The compression algorithm to use.
      * @param threshold The compression buffer threshold.

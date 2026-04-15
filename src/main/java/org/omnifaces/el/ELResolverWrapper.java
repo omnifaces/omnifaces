@@ -34,7 +34,7 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
 
     /**
      * Construct EL resolver wrapper.
-     * 
+     *
      * @param wrapped The EL resolver to be wrapped.
      */
     public ELResolverWrapper(ELResolver wrapped) {

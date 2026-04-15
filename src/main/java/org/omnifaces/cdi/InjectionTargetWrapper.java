@@ -37,7 +37,7 @@ public class InjectionTargetWrapper<T> implements InjectionTarget<T>, FacesWrapp
 
     /**
      * Construct a injection target wrapper which wraps the given injection target.
-     * 
+     *
      * @param wrapped The injection target to be wrapped.
      */
     public InjectionTargetWrapper(InjectionTarget<T> wrapped) {

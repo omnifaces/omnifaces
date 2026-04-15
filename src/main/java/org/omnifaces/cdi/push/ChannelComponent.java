@@ -57,7 +57,7 @@ abstract class ChannelComponent extends ScriptFamily {
     /**
      * An override which checks if this isn't been invoked on <code>channel</code> attribute, and if the <code>user</code> attribute is
      * <code>Serializable</code>. Finally it delegates to the super method.
-     * 
+     *
      * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> attribute, or when the <code>user</code> attribute is not
      * <code>Serializable</code>.
      */
@@ -84,7 +84,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Validate the channel name and check that it is not already used by a different component type on the current view.
-     * 
+     *
      * @param context The involved faces context.
      * @param channel The channel name to validate.
      * @throws IllegalArgumentException When the channel name is invalid or already used by a different component type.
@@ -116,7 +116,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Returns the name of the push channel.
-     * 
+     *
      * @return The name of the push channel.
      */
     public String getChannel() {
@@ -126,7 +126,7 @@ abstract class ChannelComponent extends ScriptFamily {
     /**
      * Sets the name of the push channel. It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods. All
      * open connections on the same channel will receive the same push message from the server.
-     * 
+     *
      * @param channel The name of the push channel.
      */
     @FacesAttribute(required = true)
@@ -136,7 +136,7 @@ abstract class ChannelComponent extends ScriptFamily {
 
     /**
      * Returns the user identifier of the push channel.
-     * 
+     *
      * @return The user identifier of the push channel.
      */
     public Serializable getUser() {
@@ -147,7 +147,7 @@ abstract class ChannelComponent extends ScriptFamily {
      * Sets the user identifier of the push channel, so that user-targeted push messages can be sent. All open connections on the same channel and user will
      * receive the same push message from the server. It must implement <code>Serializable</code> and preferably have low memory footprint. Suggestion: use
      * <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
-     * 
+     *
      * @param user The user identifier of the push channel.
      */
     public void setUser(Serializable user) {

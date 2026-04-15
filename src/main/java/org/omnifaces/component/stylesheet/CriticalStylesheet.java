@@ -33,13 +33,13 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputStylesheet&gt;</code>, with a <code>library</code> and <code>name</code>.
- * 
+ *
  * <pre>
  * &lt;o:criticalStylesheet library="yourlibrary" name="scripts/filename.js" /&gt;
  * </pre>
  * <p>
  * You can even explicitly configure third-party stylesheet resources to be loaded this way, such as PrimeFaces stylesheets.
- * 
+ *
  * <pre>
  * &lt;o:criticalStylesheet library="primefaces" name="components.css" /&gt;
  * &lt;o:criticalStylesheet library="primefaces" name="layout.css" /&gt;
@@ -95,7 +95,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the "library name" part of the resource identifier.
-     * 
+     *
      * @return The library name.
      */
     public String getLibrary() {
@@ -104,7 +104,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the "library name" part of the resource identifier.
-     * 
+     *
      * @param library The library name.
      */
     public void setLibrary(String library) {
@@ -113,7 +113,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the "resource name" part of the resource identifier.
-     * 
+     *
      * @return The resource name.
      */
     public String getName() {
@@ -122,7 +122,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the "resource name" part of the resource identifier.
-     * 
+     *
      * @param name The resource name.
      */
     @FacesAttribute(required = true)
@@ -132,7 +132,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Returns the media that the stylesheet applies to.
-     * 
+     *
      * @return The media type.
      */
     public String getMedia() {
@@ -141,7 +141,7 @@ public class CriticalStylesheet extends StylesheetFamily {
 
     /**
      * Sets the media that the stylesheet applies to.
-     * 
+     *
      * @param media The media type.
      */
     public void setMedia(String media) {

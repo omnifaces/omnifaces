@@ -48,7 +48,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 
     /**
      * Construct an instance of bean validation event listener based on the given validation groups and disabled state.
-     * 
+     *
      * @param validationGroups The validation groups.
      * @param disabled The disabled state.
      */

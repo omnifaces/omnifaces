@@ -57,7 +57,7 @@ public class EagerExtension implements Extension {
 
     /**
      * Collect beans annotated with {@link Eager} into {@link EagerBeans}.
-     * 
+     *
      * @param <T> The generic bean type.
      * @param event The process bean event.
      * @param beanManager The involved bean manager.
@@ -92,7 +92,7 @@ public class EagerExtension implements Extension {
     /**
      * Load collected beans annotated with {@link Eager} into {@link EagerBeansRepository} via
      * {@link EagerBeansRepository#setEagerBeans(org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans)}.
-     * 
+     *
      * @param event The after deployment validation event.
      * @param beanManager The involved bean manager.
      */

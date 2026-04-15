@@ -50,7 +50,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * Usage example:
- * 
+ *
  * <pre>
  * &lt;h:dataTable value="#{bean.items}" var="item"&gt;
  *     &lt;h:column&gt;
@@ -66,7 +66,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * can be changed by the <code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with the label of the input component. Any
  * "{1}" placeholder in the message will be substituted with the 1-based row index of the data model. Note that this does not take pagination into account and
  * that this needs if necessary to be taken care of in the custom message yourself.
- * 
+ *
  * <pre>
  * &lt;o:validateUniqueColumn message="Duplicate value!" /&gt;
  * </pre>
@@ -98,7 +98,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public ValidateUniqueColumn(TagConfig config) {
@@ -186,7 +186,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * Returns the runtime evaluated value of the message attribute.
-     * 
+     *
      * @return The runtime evaluated value of the message attribute.
      */
     public String getMessage() {
@@ -195,7 +195,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * Returns the runtime evaluated value of the disabled attribute.
-     * 
+     *
      * @return The runtime evaluated value of the disabled attribute.
      */
     public boolean isDisabled() {
@@ -215,7 +215,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
     /**
      * Returns the evaluated value of the given value expression, or the given default value if the given value expression itself or its evaluated value is
      * <code>null</code>.
-     * 
+     *
      * @param expression The value expression to return the value for.
      * @param defaultValue The default value to return if the value expression itself or its evaluated value is <code>null</code>.
      * @return The evaluated value of the given value expression, or the given default value if the given value expression itself or its evaluated value is
@@ -238,7 +238,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
     /**
      * The unique column value checker as tree visit callback.
-     * 
+     *
      * @author Bauke Scholtz
      */
     private static class UniqueColumnValueChecker implements VisitCallback {

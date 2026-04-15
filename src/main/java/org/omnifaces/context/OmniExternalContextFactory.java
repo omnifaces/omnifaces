@@ -28,7 +28,7 @@ public class OmniExternalContextFactory extends ExternalContextFactory {
 
     /**
      * Construct a new OmniFaces external context factory around the given wrapped factory.
-     * 
+     *
      * @param wrapped The wrapped factory.
      */
     public OmniExternalContextFactory(ExternalContextFactory wrapped) {

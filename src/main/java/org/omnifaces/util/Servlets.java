@@ -133,7 +133,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request hostname. This is the entire domain, without any scheme and slashes. Noted should be that this value is extracted from the
      * request URL, not from {@link HttpServletRequest#getServerName()} as its outcome can be influenced by proxies.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request hostname.
      * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would otherwise not have hit the server at all.
@@ -150,7 +150,7 @@ public final class Servlets {
 
     /**
      * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request domain URL.
      * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would otherwise not have hit the server at all.
@@ -170,7 +170,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including the trailing slash. This is the value you
      * could use in HTML <code>&lt;base&gt;</code> tag.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request base URL.
      * @see HttpServletRequest#getRequestURL()
@@ -184,7 +184,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request URI, regardless of any forward or error dispatch. This is the part after the domain in the request URL, including the leading
      * slash.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URI, regardless of any forward or error dispatch.
      * @since 2.4
@@ -200,7 +200,7 @@ public final class Servlets {
      * Returns the HTTP request path info, taking into account whether FacesViews is used with MultiViews enabled. If the resource is prefix mapped (e.g.
      * <code>/faces/*</code>), then this returns the whole part after the prefix mapping, with a leading slash. If the resource is suffix mapped (e.g.
      * <code>*.xhtml</code>), then this returns <code>null</code>.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request path info.
      * @since 2.5
@@ -213,7 +213,7 @@ public final class Servlets {
 
     /**
      * Returns the HTTP request query string, regardless of any forward.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request query string, regardless of any forward.
      * @since 2.4
@@ -228,7 +228,7 @@ public final class Servlets {
      * Returns the HTTP request query string as parameter values map. Note this method returns <strong>only</strong> the request URL (GET) parameters, as
      * opposed to {@link HttpServletRequest#getParameterMap()}, which contains both the request URL (GET) parameters and and the request body (POST) parameters.
      * The map entries are in the same order as they appear in the query string.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request query string as parameter values map.
      */
@@ -246,7 +246,7 @@ public final class Servlets {
      * Returns the HTTP request parameter map. Note this method returns the values as a <code>List&lt;String&gt;</code>, as opposed to
      * {@link HttpServletRequest#getParameterMap()}, which returns the values as <code>String[]</code>. The map entries are not per definition ordered, but the
      * values are.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request parameter map.
      * @since 2.6
@@ -259,7 +259,7 @@ public final class Servlets {
 
     /**
      * Returns the mutable request parameter map. This requires installation of {@link MutableRequestFilter}.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The mutable request parameter map.
      * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
@@ -274,7 +274,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request URI with query string, regardless of any forward. This is the part after the domain in the request URL, including the leading
      * slash and the request query string.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URI with query string.
      * @see #getRequestURI(HttpServletRequest)
@@ -289,7 +289,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request URI relative to the context root, regardless of any forward. This is the request URI minus the context path. Note that this
      * includes path parameters.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URI relative to the context root.
      * @since 1.8
@@ -301,7 +301,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request URI relative to the context root without path parameters, regardless of any forward. This is the request URI minus the context
      * path and path parameters.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URI relative to the context root without path parameters.
      * @since 1.8
@@ -313,7 +313,7 @@ public final class Servlets {
     /**
      * Returns the HTTP request URL with query string, regardless of any forward. This is the full request URL without query string as the enduser sees in
      * browser address bar.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URL without query string, regardless of any forward.
      * @since 2.4
@@ -325,7 +325,7 @@ public final class Servlets {
 
     /**
      * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser sees in browser address bar.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The HTTP request URL with query string, regardless of any forward.
      * @see HttpServletRequest#getRequestURL()
@@ -337,7 +337,7 @@ public final class Servlets {
 
     /**
      * Converts the given request query string to request parameter values map.
-     * 
+     *
      * @param queryString The request query string.
      * @return The request query string as request parameter values map.
      * @since 1.7
@@ -374,7 +374,7 @@ public final class Servlets {
 
     /**
      * Converts the given request parameter values map to request query string. Empty names and null values will be skipped.
-     * 
+     *
      * @param parameterMap The request parameter values map.
      * @return The request parameter values map as request query string.
      * @since 2.0
@@ -407,7 +407,7 @@ public final class Servlets {
 
     /**
      * Converts the given parameter values list to request query string. Empty names and null values will be skipped.
-     * 
+     *
      * @param params The parameter values list.
      * @return The parameter values list as request query string.
      * @since 2.2
@@ -438,7 +438,7 @@ public final class Servlets {
      * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the request headers <code>Forwarded</code>,
      * <code>X-Forwarded-For</code> and <code>X-Real-IP</code> (since OmniFaces 4.7) and if any is present, then return its first IP address, else just return
      * {@link HttpServletRequest#getRemoteAddr()} unmodified.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The IP address of the client.
      * @see HttpServletRequest#getRemoteAddr()
@@ -453,7 +453,7 @@ public final class Servlets {
     /**
      * Returns <code>true</code> if request is proxied, <code>false</code> otherwise. In other words, returns <code>true</code> when either
      * <code>Forwarded</code> or <code>X-Forwarded-For</code> request headers is present.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return <code>true</code> if request is proxied, <code>false</code> otherwise.
      * @see HttpServletRequest#getHeader(String)
@@ -465,7 +465,7 @@ public final class Servlets {
 
     /**
      * Returns the User-Agent string of the client.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The User-Agent string of the client.
      * @see HttpServletRequest#getHeader(String)
@@ -477,7 +477,7 @@ public final class Servlets {
 
     /**
      * Returns the referrer of the request.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The referrer of the request.
      * @see HttpServletRequest#getHeader(String)
@@ -490,7 +490,7 @@ public final class Servlets {
     /**
      * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if {@link HttpServletRequest#isSecure()}
      * returns <code>true</code>, and if not <code>true</code>, check if the <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return <code>true</code> if connection is secure, <code>false</code> otherwise.
      * @see HttpServletRequest#isSecure()
@@ -504,7 +504,7 @@ public final class Servlets {
      * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers are known to incorrectly include the client
      * side path along with it. Since version 2.6.7, <a href="https://datatracker.ietf.org/doc/html/rfc2231">RFC
      * 2231</a>/<a href="https://datatracker.ietf.org/doc/html/rfc5987">5987</a> encoded file names are also supported.
-     * 
+     *
      * @param part The part of a multipart/form-data request.
      * @return The submitted file name of the given part, or null if there is none.
      * @since 2.5
@@ -545,7 +545,7 @@ public final class Servlets {
 
     /**
      * Returns a mapping of given semicolon-separated request header. The returned map is unordered and unmodifiable.
-     * 
+     *
      * @param header Any semicolon-separated request header, e.g. <code>Content-Disposition</code>.
      * @return A mapping of given semicolon-separated request header.
      * @since 3.0
@@ -586,7 +586,7 @@ public final class Servlets {
 
     /**
      * Returns the mutable request header map. This requires installation of {@link MutableRequestFilter}.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The mutable request header map.
      * @throws IllegalStateException When the {@link MutableRequestFilter} is not installed or not invoked yet.
@@ -609,7 +609,7 @@ public final class Servlets {
      * </ul>
      * <p>
      * Else the method will delegate to {@link #setNoCacheHeaders(HttpServletRequest, HttpServletResponse)}.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The HTTP servlet response to set the headers on.
      * @param expires The expire time in seconds (not milliseconds!).
@@ -638,7 +638,7 @@ public final class Servlets {
      * <p>
      * Since 2.7.28, on non-ajax requests, a cookie with name "BFCache-Buster" will be set with a random value and an expiration time of 1 second in order to
      * prevent Chrome from saving the page in so-called Back/Forward Cache.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The HTTP servlet response to set the headers on.
      * @since 2.2
@@ -656,7 +656,7 @@ public final class Servlets {
     /**
      * <p>
      * Format an UTF-8 compatible content disposition header for the given filename and whether it's an attachment.
-     * 
+     *
      * @param filename The filename to appear in "Save As" dialogue.
      * @param attachment Whether the content should be provided as an attachment or inline.
      * @return An UTF-8 compatible content disposition header.
@@ -668,7 +668,7 @@ public final class Servlets {
 
     /**
      * Sends a permanent (301) redirect to the given URL.
-     * 
+     *
      * @param response The involved HTTP servlet response.
      * @param url The URL to permanently redirect the current response to.
      * @throws IllegalArgumentException When given URL is invalid.
@@ -685,7 +685,7 @@ public final class Servlets {
     /**
      * Resets the HTTP response. This basically clears out any uncommitted data written to headers/body, and sets the content type and character encoding to
      * originally set values, with fall back to "text/html" and "UTF-8".
-     * 
+     *
      * @param response The involved HTTP servlet response.
      * @throws IllegalStateException When the response has already been committed.
      * @see HttpServletResponse#getContentType()
@@ -707,7 +707,7 @@ public final class Servlets {
 
     /**
      * Returns the value of the HTTP request cookie associated with the given name. The value is implicitly URL-decoded with a charset of UTF-8.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param name The HTTP request cookie name.
      * @return The value of the HTTP request cookie associated with the given name.
@@ -734,7 +734,7 @@ public final class Servlets {
      * characters can be stored. The cookie will implicitly be set in the domain and path of the current request URL. The cookie will implicitly be set to
      * HttpOnly as JavaScript is not supposed to manipulate server-created cookies. The cookie will implicitly be set to secure when the current request is a
      * HTTPS request.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @param name The cookie name.
@@ -754,7 +754,7 @@ public final class Servlets {
      * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be URL-encoded with UTF-8 so that any special
      * characters can be stored. The cookie will implicitly be set in the domain of the current request URL. The cookie will implicitly be set to HttpOnly as
      * JavaScript is not supposed to manipulate server-created cookies. The cookie will implicitly be set to secure when the current request is a HTTPS request.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @param name The cookie name.
@@ -776,7 +776,7 @@ public final class Servlets {
      * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will implicitly be URL-encoded with UTF-8 so that any
      * special characters can be stored. The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies. The
      * cookie will implicitly be set to secure when the current request is a HTTPS request.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @param name The cookie name.
@@ -817,7 +817,7 @@ public final class Servlets {
     /**
      * Remove the cookie with given name and path from the HTTP response. Note that the name and path must be exactly the same as it was when the cookie was
      * created.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @param name The cookie name.
@@ -834,7 +834,7 @@ public final class Servlets {
     /**
      * Returns the servlet context. If the Faces context is available, then return it from there. Else if the CDI bean manager is available, then return it from
      * there.
-     * 
+     *
      * @return The servlet context.
      * @since 3.10
      * @see Faces#getServletContext()
@@ -865,7 +865,7 @@ public final class Servlets {
 
     /**
      * Returns the application scope attribute value associated with the given name.
-     * 
+     *
      * @param <T> The expected return type.
      * @param context The servlet context used for looking up the attribute.
      * @param name The application scope attribute name.
@@ -882,7 +882,7 @@ public final class Servlets {
 
     /**
      * Returns The {@link Lifecycle} associated with current Faces application.
-     * 
+     *
      * @param context The involved servlet context.
      * @return The {@link Lifecycle} associated with current Faces application.
      * @see LifecycleFactory#getLifecycle(String)
@@ -897,7 +897,7 @@ public final class Servlets {
      * Returns <code>true</code> if the given HTTP servlet request is a Faces ajax request. This does exactly the same as {@link Faces#isAjaxRequest()}, but
      * then without the need for a {@link FacesContext}. The major advantage is that you can perform the job inside a servlet filter, where the
      * {@link FacesContext} is normally not available.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return <code>true</code> if the given HTTP servlet request is a Faces ajax request.
      * @since 2.0
@@ -909,7 +909,7 @@ public final class Servlets {
     /**
      * Returns <code>true</code> if the given HTTP servlet request is a Faces resource request. I.e. this request will trigger the Faces {@link ResourceHandler}
      * for among others CSS/JS/image resources.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return <code>true</code> if the given HTTP servlet request is a Faces resource request.
      * @since 2.0
@@ -922,7 +922,7 @@ public final class Servlets {
     /**
      * Returns <code>true</code> if we're in Faces development stage. This will be the case when the <code>jakarta.faces.PROJECT_STAGE</code> context parameter
      * in <code>web.xml</code> is set to <code>Development</code>.
-     * 
+     *
      * @param context The involved servlet context.
      * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
      * @since 2.1
@@ -959,18 +959,18 @@ public final class Servlets {
      * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be
      * prepended, otherwise it will be the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the full
      * path from the context root on (which in turn does not need to start with <code>/</code>).
-     * 
+     *
      * <pre>
      * Servlets.facesRedirect(request, response, "some.xhtml");
      * </pre>
      * <p>
      * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent placeholders for any request parameter
      * values which needs to be URL-encoded. Here's a concrete example:
-     * 
+     *
      * <pre>
      * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&amp;bar=%s", foo, bar);
      * </pre>
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @param url The URL to redirect the current response to.
@@ -1002,7 +1002,7 @@ public final class Servlets {
 
     /**
      * Returns URL of <code>web.xml</code> file used in current application. This also takes into account the Quarkus location in <code>META-INF</code> folder.
-     * 
+     *
      * @param context The involved servlet context.
      * @return URL of <code>web.xml</code> file used in current application.
      * @since 3.14

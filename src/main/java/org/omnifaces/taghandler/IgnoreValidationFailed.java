@@ -40,7 +40,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>Usage</h2>
  * <p>
  * For example:
- * 
+ *
  * <pre>
  * &lt;o:form&gt;
  *     ...
@@ -70,7 +70,7 @@ public class IgnoreValidationFailed extends TagHandler {
 
     /**
      * The tag constructor.
-     * 
+     *
      * @param config The tag config.
      */
     public IgnoreValidationFailed(TagConfig config) {
@@ -82,7 +82,7 @@ public class IgnoreValidationFailed extends TagHandler {
     /**
      * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of a postback, then delegate to
      * {@link #processIgnoreValidationFailed(UICommand)}.
-     * 
+     *
      * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
      */
     @Override
@@ -105,7 +105,7 @@ public class IgnoreValidationFailed extends TagHandler {
     /**
      * Check if the given command component has been invoked during the current request and if so, then instruct the parent <code>&lt;o:form&gt;</code> to
      * ignore the validation.
-     * 
+     *
      * @param command The command component.
      * @throws IllegalStateException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
      */

@@ -64,7 +64,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Creates an instance of combined resource info based on the given ID and ordered set of resource identifiers.
-     * 
+     *
      * @param resourceIdentifiers Ordered set of resource identifiers, which are to be combined in a single resource.
      */
     private CombinedResourceInfo(String id, Set<ResourceIdentifier> resourceIdentifiers) {
@@ -74,7 +74,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Use this builder to create an instance of combined resource info and put it in the cache if absent.
-     * 
+     *
      * @author Bauke Scholtz
      */
     public static final class Builder {
@@ -92,7 +92,7 @@ public final class CombinedResourceInfo {
         /**
          * Add the resource represented by the given resource identifier resources of this combined resource info. The insertion order is maintained and
          * duplicates are filtered.
-         * 
+         *
          * @param resourceIdentifier The resource identifier of the resource to be added.
          * @return This builder.
          */
@@ -103,7 +103,7 @@ public final class CombinedResourceInfo {
 
         /**
          * Returns true if there are no resources been added. Use this method before {@link #create()} if it's unknown if there are any resources been added.
-         * 
+         *
          * @return True if there are no resources been added, otherwise false.
          */
         public boolean isEmpty() {
@@ -112,7 +112,7 @@ public final class CombinedResourceInfo {
 
         /**
          * Creates the CombinedResourceInfo instance in cache if absent and return its ID.
-         * 
+         *
          * @return The ID of the CombinedResourceInfo instance.
          * @throws IllegalStateException If there are no resources been added. So, to prevent it beforehand, use the {@link #isEmpty()} method to check if there
          * are any resources been added.
@@ -135,7 +135,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the combined resource info identified by the given ID from the cache. A new one will be created based on the given ID if absent in cache.
-     * 
+     *
      * @param id The ID of the combined resource info to be returned from the cache.
      * @return The combined resource info identified by the given ID from the cache.
      */
@@ -155,7 +155,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Create new combined resource info identified by given ID in the cache.
-     * 
+     *
      * @param id The ID of the combined resource info to be created in the cache.
      * @param resourceIdentifiers The set of resource identifiers to create combined resource info for.
      * @return New combined resource info identified by given ID.
@@ -233,11 +233,11 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the string representation of this combined resource info in the format of
-     * 
+     *
      * <pre>
      * CombinedResourceInfo[id,resourceIdentifiers]
      * </pre>
-     * 
+     *
      * Where <code>id</code> is the unique ID and <code>resourceIdentifiers</code> is the ordered set of all resource identifiers as is been created with the
      * builder.
      */
@@ -250,7 +250,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the ordered set of resource identifiers of this combined resource info.
-     * 
+     *
      * @return the ordered set of resource identifiers of this combined resource info.
      */
     public Set<ResourceIdentifier> getResourceIdentifiers() {
@@ -259,7 +259,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the ordered set of resources of this combined resource info.
-     * 
+     *
      * @return The ordered set of resources of this combined resource info.
      */
     public Set<Resource> getResources() {
@@ -269,7 +269,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the content length in bytes of this combined resource info.
-     * 
+     *
      * @return The content length in bytes of this combined resource info.
      */
     public int getContentLength() {
@@ -279,7 +279,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Returns the last modified timestamp in milliseconds of this combined resource info.
-     * 
+     *
      * @return The last modified timestamp in milliseconds of this combined resource info.
      */
     public long getLastModified() {
@@ -292,7 +292,7 @@ public final class CombinedResourceInfo {
     /**
      * Create an unique ID based on the given set of resource identifiers. The current implementation converts the set to a <code>|</code>-delimited string
      * which is serialized using {@link Utils#serialize(String)}.
-     * 
+     *
      * @param resourceIdentifiers The set of resource identifiers to create an unique ID for.
      * @return The unique ID of the given set of resource identifiers.
      */
@@ -302,7 +302,7 @@ public final class CombinedResourceInfo {
 
     /**
      * Create an ordered set of resource identifiers based on the given unique ID. This does the reverse of {@link #toUniqueId(Map)}.
-     * 
+     *
      * @param id The unique ID of the set of resource identifiers.
      * @return The set of resource identifiers based on the given unique ID, or <code>null</code> if the ID is not valid.
      */

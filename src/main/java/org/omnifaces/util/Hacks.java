@@ -123,7 +123,7 @@ public final class Hacks {
 
     /**
      * Returns true if Mojarra is used. That is, when the FacesContext instance is from the Mojarra specific package.
-     * 
+     *
      * @return Whether Mojarra is used.
      * @since 3.9
      */
@@ -144,7 +144,7 @@ public final class Hacks {
 
     /**
      * Returns true if MyFaces is used. That is, when the FacesContext instance is from the MyFaces specific package.
-     * 
+     *
      * @return Whether MyFaces is used.
      * @since 1.8
      */
@@ -167,7 +167,7 @@ public final class Hacks {
 
     /**
      * Returns the default resource maximum age in milliseconds.
-     * 
+     *
      * @return The default resource maximum age in milliseconds.
      */
     public static long getDefaultResourceMaxAge() {
@@ -201,7 +201,7 @@ public final class Hacks {
 
     /**
      * Remove the resource dependency processing related attributes from the given faces context.
-     * 
+     *
      * @param context The involved faces context.
      */
     public static void removeResourceDependencyState(FacesContext context) {
@@ -222,7 +222,7 @@ public final class Hacks {
 
     /**
      * Set the unique ID of the component resource, taking into account MyFaces-specific way of generating a resource specific unique ID.
-     * 
+     *
      * @param context The involved faces context.
      * @param resource The involved component resource.
      * @since 2.6.1
@@ -247,7 +247,7 @@ public final class Hacks {
     /**
      * Clear the cached faces servlet mapping as interpreted by either Mojarra or MyFaces. This is useful if you want to force the impl to recalculate the faces
      * servlet mapping.
-     * 
+     *
      * @param context The involved faces context.
      * @since 3.10
      */
@@ -259,7 +259,7 @@ public final class Hacks {
 
     /**
      * Remove server side Faces view state (and view scoped beans) associated with current request.
-     * 
+     *
      * @param context The involved faces context.
      * @param manager The involved response state manager.
      * @param viewId The view ID of the involved view.
@@ -349,7 +349,7 @@ public final class Hacks {
 
     /**
      * Expose protected state helper into public.
-     * 
+     *
      * @param component The component to obtain state helper for.
      * @return The state helper of the given component.
      * @since 2.3
@@ -362,7 +362,7 @@ public final class Hacks {
 
     /**
      * Returns f:metadata facet from UIViewRoot. MyFaces 3.x unexpectedly doesn't use {@link UIViewRoot#METADATA_FACET_NAME} anymore to identify the facet.
-     * 
+     *
      * @param viewRoot The UIViewRoot to obtain f:metadata facet from.
      * @return f:metadata facet from UIViewRoot.
      * @since 4.0
@@ -381,7 +381,7 @@ public final class Hacks {
 
     /**
      * Finds the wrapped variable mapper of the given variable mapper.
-     * 
+     *
      * @param mapper The variable mapper to find wrapped variable mapper for.
      * @return The wrapped variable mapper of the given variable mapper.
      * @since 3.14.4
@@ -399,7 +399,7 @@ public final class Hacks {
 
     /**
      * Returns true if the current request is a PrimeFaces dynamic resource request.
-     * 
+     *
      * @param context The involved faces context.
      * @return Whether the current request is a PrimeFaces dynamic resource request.
      * @since 1.8
@@ -411,7 +411,7 @@ public final class Hacks {
 
     /**
      * Returns true if the current request is a PrimeFaces ajax request.
-     * 
+     *
      * @param context The involved faces context.
      * @return Whether the current request is a PrimeFaces ajax request.
      * @since 2.7.12
@@ -451,7 +451,7 @@ public final class Hacks {
 
     /**
      * Returns true if the given components are nested in (same) PrimeFaces dialog.
-     * 
+     *
      * @param components The components to be checked.
      * @return Whether the given components are nested in (same) PrimeFaces dialog.
      * @since 2.6
@@ -470,7 +470,7 @@ public final class Hacks {
     /**
      * Returns true if the given WS session is from Tomcat and given illegal state exception is caused by a push bomb which Tomcat couldn't handle. See also
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=56026 and https://github.com/omnifaces/omnifaces/issues/234
-     * 
+     *
      * @param session The WS session.
      * @param illegalStateException The illegal state exception.
      * @return Whether it was Tomcat who couldn't handle the push bomb.

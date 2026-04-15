@@ -93,7 +93,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns script which should be executed upon initialization of a new view.
-     * 
+     *
      * @param context The involved faces context.
      * @return Script which should be executed upon initialization of a new view.
      */
@@ -103,7 +103,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns script which should be exeucted upon ajax update of the current view.
-     * 
+     *
      * @param context The involved faces context.
      * @return Script which should be exeucted upon ajax update of the current view.
      */
@@ -115,7 +115,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns the value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
-     * 
+     *
      * @param context The involved faces context.
      * @return The value of the {@link OmniFaces#OMNIFACES_EVENT_PARAM_NAME} associated with the current component.
      */
@@ -123,7 +123,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current request was invoked by the current {@link OnloadParam} component.
      */
@@ -144,14 +144,14 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Decode all relevant {@link OnloadParam} components at once.
-     * 
+     *
      * @param context The involved faces context.
      */
     protected abstract void decodeAll(FacesContext context);
 
     /**
      * This basically acts as if immediate=true is set to save lifecycle overhead.
-     * 
+     *
      * @param context The involved faces context.
      * @param submittedValue The submitted value.
      */
@@ -193,7 +193,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns a space separated string of client IDs to update on ajax response.
-     * 
+     *
      * @return A space separated string of client IDs to update on ajax response.
      */
     public String getRender() {
@@ -202,7 +202,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Sets a space separated string of client IDs to update on ajax response.
-     * 
+     *
      * @param render A space separated string of client IDs to update on ajax response.
      */
     public void setRender(String render) {
@@ -213,7 +213,7 @@ public abstract class OnloadParam extends UIViewParameter {
 
     /**
      * Returns <code>true</code> if the current request is triggered by an onload param request of the given onload param event.
-     * 
+     *
      * @param context The involved faces context.
      * @param onloadEvent The onload param event.
      * @return <code>true</code> if the current request is triggered by an onload param request of the given onload param event.

@@ -110,7 +110,7 @@ public class ParamValue<V> implements Serializable {
 
     /**
      * Returns the submitted value. If this is a multi-valued parameter, then this returns only the first one.
-     * 
+     *
      * @return The submitted value.
      */
     public String getSubmittedValue() {
@@ -120,7 +120,7 @@ public class ParamValue<V> implements Serializable {
     /**
      * Returns the submitted values. If this is a multi-valued parameter, then this returns all of them. Since 3.8, any modifications to the array do not
      * anymore affect the original array.
-     * 
+     *
      * @return The submitted values.
      */
     public String[] getSubmittedValues() {
@@ -130,7 +130,7 @@ public class ParamValue<V> implements Serializable {
     /**
      * Returns the param's client ID. In case {@link Param#globalMessage()} returns {@code true} then it returns {@code null}, else
      * {@link UIViewRoot#getClientId(FacesContext)}.
-     * 
+     *
      * @param context The involved faces context.
      * @return The param's client ID.
      * @since 4.5

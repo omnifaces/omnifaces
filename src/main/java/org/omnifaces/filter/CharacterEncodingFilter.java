@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpSession;
  * <h2>Installation</h2>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
@@ -52,7 +52,7 @@ import jakarta.servlet.http.HttpSession;
  * <p>
  * As Faces/Facelets uses by default UTF-8 everywhere, the default charset is also set to UTF-8. When really necessary for some reason, then it can be
  * overridden by specifying the <code>encoding</code> initialization parameter in the <code>&lt;filter&gt;</code> element as follows:
- * 
+ *
  * <pre>
  * &lt;init-param&gt;
  *     &lt;description&gt;The character encoding which is to be used to parse the HTTP request body. Defaults to UTF-8.&lt;/description&gt;

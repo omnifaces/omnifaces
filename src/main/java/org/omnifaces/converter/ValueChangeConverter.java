@@ -26,7 +26,7 @@ import jakarta.faces.convert.Converter;
  * calls. In such case, you'd like to perform the expensive service/DAO call only when the submitted value is really changed as compared to the model value.
  * <p>
  * This converter offers you a template to do it transparently. To use it, just change your converters from:
- * 
+ *
  * <pre>
  * public class YourConverter implements Converter&lt;YourEntity&gt; {
  *
@@ -39,7 +39,7 @@ import jakarta.faces.convert.Converter;
  * </pre>
  * <p>
  * to
- * 
+ *
  * <pre>
  * public class YourConverter extends ValueChangeConverter&lt;YourEntity&gt; {
  *
@@ -63,7 +63,7 @@ public abstract class ValueChangeConverter<T> implements Converter<T> {
      * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object value is equal to the submitted value,
      * then immediately return its old object value unchanged. Otherwise, invoke {@link #getAsChangedObject(FacesContext, UIComponent, String)} which may in
      * turn do the necessary possibly expensive DAO operations.
-     * 
+     *
      * @throws ClassCastException When <code>T</code> is of wrong type.
      */
     @Override
@@ -85,7 +85,7 @@ public abstract class ValueChangeConverter<T> implements Converter<T> {
     /**
      * Use this method instead of {@link #getAsObject(FacesContext, UIComponent, String)} if you intend to perform the conversion only when the submitted value
      * is really changed as compared to the model value.
-     * 
+     *
      * @param context The involved faces context.
      * @param component The involved UI component.
      * @param submittedValue The submitted value.

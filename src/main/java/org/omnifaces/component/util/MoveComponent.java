@@ -290,7 +290,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns ID of the target component for which the component moving will be done.
-     * 
+     *
      * @return ID of the target component for which the component moving will be done.
      */
     public String getFor() {
@@ -299,7 +299,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Sets ID of the target component for which the component moving will be done.
-     * 
+     *
      * @param forValue ID of the target component for which the component moving will be done.
      */
     @FacesAttribute(required = true)
@@ -309,7 +309,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns the destination relative to the target component where the source component(s) are moved to. Default is <code>ADD_LAST</code>.
-     * 
+     *
      * @return The destination relative to the target component where the source component(s) are moved to.
      */
     public Destination getDestination() {
@@ -326,7 +326,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
      * <li><code>BEHAVIOR</code> - A Behavior will be moved to the behavior section of the target component
      * <li><code>AFTER</code> - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
      * </ul>
-     * 
+     *
      * @param destinationValue The destination relative to the target component where the source component(s) are moved to.
      */
     public void setDestination(Destination destinationValue) {
@@ -335,7 +335,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
-     * 
+     *
      * @return In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
      */
     public String getFacet() {
@@ -344,7 +344,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Sets in case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved.
-     * 
+     *
      * @param facetValue In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be
      * moved.
      */
@@ -354,7 +354,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     /**
      * Returns in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
-     * 
+     *
      * @return In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
      */
     public String getBehaviorDefaultEvent() {
@@ -365,7 +365,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
      * Sets in case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have. This
      * normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try to check whether
      * the behavior event matches with what the component supports.
-     * 
+     *
      * @param behaviorDefaultEventValue In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component
      * is 'supposed' to have.
      */
@@ -376,7 +376,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
     /**
      * Returns in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to
      * support.
-     * 
+     *
      * @return In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to
      * support.
      */
@@ -388,7 +388,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
      * Sets in case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
      * This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try to check
      * whether the behavior event matches with what the component supports.
-     * 
+     *
      * @param behaviorEventsValue In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is
      * 'supposed' to support.
      */

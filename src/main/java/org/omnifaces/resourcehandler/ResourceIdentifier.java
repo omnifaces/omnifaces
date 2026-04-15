@@ -52,7 +52,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given standard Faces resource identifier string format <code>library:name</code>.
-     * 
+     *
      * @param resourceIdentifier The standard Faces resource identifier.
      */
     public ResourceIdentifier(String resourceIdentifier) {
@@ -62,7 +62,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on library and name attributes of the given component resource.
-     * 
+     *
      * @param componentResource The component resource.
      */
     public ResourceIdentifier(UIComponent componentResource) {
@@ -72,7 +72,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given resource library and name.
-     * 
+     *
      * @param library The resource lirbary.
      * @param name The resource name.
      */
@@ -82,7 +82,7 @@ public class ResourceIdentifier {
 
     /**
      * Create a new instance based on given resource.
-     * 
+     *
      * @param resource The resource.
      * @since 3.13
      */
@@ -99,7 +99,7 @@ public class ResourceIdentifier {
 
     /**
      * Returns the resource library.
-     * 
+     *
      * @return The resource library.
      */
     public String getLibrary() {
@@ -108,7 +108,7 @@ public class ResourceIdentifier {
 
     /**
      * Returns the resource name.
-     * 
+     *
      * @return The resource name.
      */
     public String getName() {
@@ -118,7 +118,7 @@ public class ResourceIdentifier {
     /**
      * Returns the resource integrity as base64 encoded sha384 hash. This is lazily computed and will return an empty string when the integrity could not be
      * computed. The reason for the compute failure will be logged as WARNING.
-     * 
+     *
      * @return The resource integrity as base64 encoded sha384 hash.
      * @since 3.13
      */

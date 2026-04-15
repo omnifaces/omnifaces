@@ -105,7 +105,7 @@ public interface Cache extends Serializable {
 
     /**
      * Clears the entire cache
-     * 
+     *
      * @since 3.3
      */
     void clear();

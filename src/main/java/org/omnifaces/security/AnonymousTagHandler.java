@@ -31,7 +31,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="usage"><a href="#usage">Usage</a></h2>
  * <p>
  * To use the security taglib, declare the <code>omnifaces.security</code> namespace in your Facelets view:
- * 
+ *
  * <pre>
  * &lt;html xmlns:sec="omnifaces.security"&gt;
  * </pre>
@@ -42,7 +42,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-login"><a href="#example-login">Example: Login form for anonymous users</a></h2>
  * <p>
  * Display a login link only when the user is not authenticated:
- * 
+ *
  * <pre>
  * &lt;sec:isAnonymous&gt;
  *     &lt;h:link value="Login" outcome="/login" /&gt;
@@ -53,7 +53,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-welcome"><a href="#example-welcome">Example: Welcome message for guests</a></h2>
  * <p>
  * Show a different welcome message for anonymous users:
- * 
+ *
  * <pre>
  * &lt;sec:isAnonymous&gt;
  *     &lt;h:outputText value="Welcome, Guest! Please login to access all features." /&gt;
@@ -64,7 +64,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="example-combined"><a href="#example-combined">Example: Combined with isAuthenticated</a></h2>
  * <p>
  * Use together with <code>&lt;sec:isAuthenticated&gt;</code> to show different content based on authentication status:
- * 
+ *
  * <pre>
  * &lt;sec:isAnonymous&gt;
  *     &lt;h:form&gt;

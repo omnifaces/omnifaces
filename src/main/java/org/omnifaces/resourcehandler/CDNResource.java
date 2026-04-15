@@ -40,7 +40,7 @@ public class CDNResource extends RemappedResource {
     /**
      * Constructs a new CDN resource which remaps the given wrapped resource to the given CDN URL. The CDN URL is available by {@link #getRequestPath()}. The
      * local URL is available by {@link #getLocalRequestPath()}.
-     * 
+     *
      * @param resource The resource to be remapped.
      * @param cdnURL The CDN URL of the resource.
      */
@@ -50,7 +50,7 @@ public class CDNResource extends RemappedResource {
 
     /**
      * Returns the CDN URL. I.e. the remapped request path pointing a CDN host.
-     * 
+     *
      * @return The CDN URL.
      */
     @Override
@@ -60,7 +60,7 @@ public class CDNResource extends RemappedResource {
 
     /**
      * Returns the local URL. I.e. the original request path pointing the local host.
-     * 
+     *
      * @return The local URL.
      */
     public String getLocalRequestPath() {

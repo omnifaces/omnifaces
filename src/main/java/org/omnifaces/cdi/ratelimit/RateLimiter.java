@@ -53,7 +53,7 @@ import org.omnifaces.util.JNDI;
  * <h2>Usage</h2>
  * <p>
  * The recommended usage is with the {@link RateLimit} annotation.
- * 
+ *
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -63,7 +63,7 @@ import org.omnifaces.util.JNDI;
  *     public void processFooApiRequest() {
  *         // Process Foo API request ...
  *     }
- * 
+ *
  * }
  * </pre>
  *
@@ -94,7 +94,7 @@ import org.omnifaces.util.JNDI;
  *             response.sendError(429); // Too Many Requests
  *         }
  *     }
- * 
+ *
  * }
  * </pre>
  *

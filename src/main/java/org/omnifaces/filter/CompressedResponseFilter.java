@@ -60,7 +60,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the <code>&lt;servlet-name&gt;</code> of the
  * <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched on <code>REQUEST</code> only, you might want to explicitly add the
  * <code>ERROR</code> dispatcher to get it to run on error pages as well.
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;compressedResponseFilter&lt;/filter-name&gt;
@@ -76,7 +76,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * <p>
  * Mapping on <code>/*</code> may be too global as some types of requests (comet, long polling, etc) cannot be compressed. In that case, consider mapping it to
  * the exact <code>&lt;servlet-name&gt;</code> of the {@link FacesServlet} in the same <code>web.xml</code>.
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;compressedResponseFilter&lt;/filter-name&gt;
@@ -93,7 +93,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * <h2>Configuration (optional)</h2>
  * <p>
  * This filter supports three initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element as follows:
- * 
+ *
  * <pre>
  * &lt;init-param&gt;
  *     &lt;description&gt;The preferred algorithm. Must be one of Brotli, GZIP or Deflate (case insensitive). Defaults to automatic.&lt;/description&gt;

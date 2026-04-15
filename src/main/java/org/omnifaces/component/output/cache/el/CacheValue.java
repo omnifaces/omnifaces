@@ -50,7 +50,7 @@ public class CacheValue extends TagHandler {
 
     /**
      * Construct the tag.
-     * 
+     *
      * @param config The tag config.
      */
     public CacheValue(TagConfig config) {

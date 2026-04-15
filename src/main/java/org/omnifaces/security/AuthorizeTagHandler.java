@@ -38,7 +38,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2 id="usage"><a href="#usage">Usage</a></h2>
  * <p>
  * To use the security taglib, declare the <code>omnifaces.security</code> namespace in your Facelets view:
- * 
+ *
  * <pre>
  * &lt;html xmlns:sec="omnifaces.security"&gt;
  * </pre>
@@ -51,7 +51,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * Use the <strong><code>role</code></strong> attribute to check if the user has a specific role. The content will only be rendered if the user has the
  * specified role.
- * 
+ *
  * <pre>
  * &lt;sec:authorize role="ADMIN"&gt;
  *     &lt;h:link value="Admin Panel" outcome="/admin" /&gt;
@@ -63,7 +63,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * Use the <strong><code>anyRole</code></strong> attribute with comma-separated role names to check if the user has at least one of the specified roles. The
  * content will be rendered if the user has <em>any</em> of the roles.
- * 
+ *
  * <pre>
  * &lt;sec:authorize anyRole="ADMIN, MODERATOR, EDITOR"&gt;
  *     &lt;h:link value="Content Management" outcome="/cms" /&gt;
@@ -75,7 +75,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * Use the <strong><code>allRoles</code></strong> attribute with comma-separated role names to check if the user has all of the specified roles. The content
  * will only be rendered if the user has <em>all</em> of the roles.
- * 
+ *
  * <pre>
  * &lt;sec:authorize allRoles="ADMIN, AUDITOR"&gt;
  *     &lt;h:link value="Audit Logs" outcome="/audit" /&gt;
@@ -87,7 +87,7 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <p>
  * The optional <strong><code>var</code></strong> attribute exposes the boolean authorization result as a view-scoped variable. This is useful when you need to
  * use the authorization result in multiple places without repeating the role check.
- * 
+ *
  * <pre>
  * &lt;sec:authorize role="ADMIN" var="isAdmin" /&gt;
  *

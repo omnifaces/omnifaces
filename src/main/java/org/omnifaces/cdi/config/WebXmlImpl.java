@@ -285,7 +285,7 @@ class WebXmlImpl implements WebXml {
 
     /**
      * Create and return a mapping of all error page locations by exception type found in the given document.
-     * 
+     *
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked") // For the cast on Class<Throwable>.

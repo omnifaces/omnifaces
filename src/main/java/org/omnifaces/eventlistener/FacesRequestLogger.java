@@ -61,11 +61,11 @@ import org.omnifaces.util.Faces;
 /**
  * <p>
  * The <code>FacesRequestLogger</code> is a {@link PhaseListener} which logs the Faces request detail as {@link Level#INFO}. The log format is as below:
- * 
+ *
  * <pre>
  * method{url, user, action, params, messages, timer}
  * </pre>
- * 
+ *
  * Where:
  * <ul>
  * <li><code>method</code>: the HTTP request method, usually <code>GET</code> or <code>POST</code>.</li>
@@ -104,7 +104,7 @@ import org.omnifaces.util.Faces;
  * <h2>Installation</h2>
  * <p>
  * Register it as <code>&lt;phase-listener&gt;</code> in <code>faces-config.xml</code>.
- * 
+ *
  * <pre>
  * &lt;lifecycle&gt;
  *     &lt;phase-listener&gt;org.omnifaces.eventlistener.FacesRequestLogger&lt;/phase-listener&gt;
@@ -160,7 +160,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over log details.
-     * 
+     *
      * @param context The involved faces context.
      * @return Log details.
      */
@@ -177,7 +177,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of user details.
-     * 
+     *
      * @param context The involved faces context.
      * @return User details.
      */
@@ -194,7 +194,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of action details.
-     * 
+     *
      * @param context The involved faces context.
      * @return Action details.
      */
@@ -210,7 +210,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of request parameters.
-     * 
+     *
      * @param context The involved faces context.
      * @return Request parameters.
      */
@@ -242,7 +242,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
      * You can override this if you need to change the default pattern for password based request parameters which will be filtered in
      * {@link #getRequestParameters(FacesContext)}. The default pattern matches every request parameter name ending with "password" or "token", case
      * insensitive.
-     * 
+     *
      * @param context The involved faces context.
      * @return Pattern for password request parameters.
      */
@@ -252,7 +252,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     /**
      * You can override this if you need more fine grained control over logging of faces messages.
-     * 
+     *
      * @param context The involved faces context.
      * @return Faces messages.
      */

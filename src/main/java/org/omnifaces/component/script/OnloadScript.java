@@ -44,7 +44,7 @@ import org.omnifaces.util.Ajax;
  * etcetera, also after changes in the HTML DOM tree on ajax responses.
  * <p>
  * You can put it anywhere in the view, it will always be relocated to the end of body.
- * 
+ *
  * <pre>
  * &lt;o:onloadScript&gt;alert('OnloadScript is invoked!');&lt;/o:onloadScript&gt;
  * </pre>

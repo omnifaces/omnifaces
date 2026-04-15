@@ -51,7 +51,7 @@ public final class SocketEvent extends PushEvent {
 
     /**
      * Returns the close code. If this returns <code>null</code>, then it was {@link Opened}. If this returns non-<code>null</code>, then it was {@link Closed}.
-     * 
+     *
      * @return The close code.
      */
     public CloseCode getCloseCode() {
@@ -97,7 +97,7 @@ public final class SocketEvent extends PushEvent {
 
         /**
          * The literal of {@link Opened}.
-         * 
+         *
          * @since 3.2
          */
         AnnotationLiteral<Opened> LITERAL = new AnnotationLiteral<>() {
@@ -153,7 +153,7 @@ public final class SocketEvent extends PushEvent {
 
         /**
          * The literal of {@link Closed}.
-         * 
+         *
          * @since 3.2
          */
         AnnotationLiteral<Closed> LITERAL = new AnnotationLiteral<>() {

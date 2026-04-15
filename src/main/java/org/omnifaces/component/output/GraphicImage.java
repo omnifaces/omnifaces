@@ -58,7 +58,7 @@ import org.omnifaces.util.State;
  * <p>
  * Set <code>dataURI</code> attribute to <code>true</code> in order to render image in <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">data URI
  * format</a>.
- * 
+ *
  * <pre>
  * &lt;o:graphicImage name="icon.png" dataURI="true" /&gt; &lt;!-- Faces resource as data URI --&gt;
  * &lt;o:graphicImage value="#{bean.icon}" dataURI="true" /&gt; &lt;!-- byte[]/InputStream property as data URI --&gt;
@@ -75,7 +75,7 @@ import org.omnifaces.util.State;
  * <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean. The property will namely be evaluated at the moment the browser
  * requests the image content based on the URL as specified in HTML <code>&lt;img src&gt;</code>, which is usually a different request than the one which
  * rendered the Faces page. E.g.
- * 
+ *
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -97,7 +97,7 @@ import org.omnifaces.util.State;
  *
  * }
  * </pre>
- * 
+ *
  * <pre>
  * &#64;GraphicImageBean
  * public class Images {
@@ -111,7 +111,7 @@ import org.omnifaces.util.State;
  *
  * }
  * </pre>
- * 
+ *
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
  *     &lt;o:graphicImage value="#{images.get(image.id)}" /&gt;
@@ -131,7 +131,7 @@ import org.omnifaces.util.State;
  * In case your "image" entity supports it, you can also supply the "last modified" property which will be used in the <code>ETag</code> and
  * <code>Last-Modified</code> headers and in <code>If-Modified-Since</code> checks, hereby improving browser caching. The <code>lastModified</code> attribute
  * supports both {@link Date} and {@link Long} as timestamp in milliseconds.
- * 
+ *
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
  *     &lt;o:graphicImage value="#{images.get(image.id)}" lastModified="#{image.lastModified}" /&gt;
@@ -148,14 +148,14 @@ import org.omnifaces.util.State;
  * the content header is unrecognized, or when the image is rendered as regular image source, then the content type will default to <code>"image"</code> without
  * any subtype. This should work for most images in most browsers. This may however fail on newer images or in older browsers. In that case, you can explicitly
  * specify the image type via the <code>type</code> attribute which must represent a valid file extension. E.g.
- * 
+ *
  * <pre>
  * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" /&gt;
  * </pre>
  * <p>
  * The content type will be resolved via {@link Faces#getMimeType(String)}. You can add unrecognized ones as <code>&lt;mime-mapping&gt;</code> in
  * <code>web.xml</code>. E.g.
- * 
+ *
  * <pre>
  * &lt;mime-mapping&gt;
  *     &lt;extension&gt;svg&lt;/extension&gt;
@@ -167,7 +167,7 @@ import org.omnifaces.util.State;
  * <p>
  * When serving a SVG image, you can use <code>fragment</code> attribute to trigger <a href="https://www.w3.org/TR/SVG/linking.html#LinksIntoSVG">SVG view
  * modes</a> (beware of <a href="https://caniuse.com/#feat=svg-fragment">browser support</a>). E.g.
- * 
+ *
  * <pre>
  * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
  * </pre>
@@ -176,7 +176,7 @@ import org.omnifaces.util.State;
  * <p>
  * Since OmniFaces 3.10, you can set the <code>lazy</code> attribute to <code>true</code> to indicate that the referenced image should only be loaded when the
  * window is finished loading and the image is visible in the viewport.
- * 
+ *
  * <pre>
  * &lt;o:graphicImage ... lazy="true" /&gt;
  * </pre>
@@ -270,7 +270,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
     /**
      * Returns the URL needed for the 'src' attribute.
-     * 
+     *
      * @param context The involved faces context.
      * @return The URL needed for the 'src' attribute.
      * @throws IOException When something fails at I/O level.
@@ -344,7 +344,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Returns the resource name of the resource. Works the same way as on {@code <h:graphicImage>}. When this attribute is specified, 'value', 'type' and
      * 'lastModified' attributes are ignored.
-     * 
+     *
      * @return The resource name.
      */
     public String getName() {
@@ -354,7 +354,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Sets the resource name of the resource. Works the same way as on {@code <h:graphicImage>}. When this attribute is specified, 'value', 'type' and
      * 'lastModified' attributes are ignored.
-     * 
+     *
      * @param name The resource name.
      */
     public void setName(String name) {
@@ -364,7 +364,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Returns the resource library name of the resource. Works the same way as on {@code <h:graphicImage>}. This attribute is only used when 'name' attribute
      * is specified.
-     * 
+     *
      * @return The resource library name.
      */
     public String getLibrary() {
@@ -374,7 +374,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Sets the resource library name of the resource. Works the same way as on {@code <h:graphicImage>}. This attribute is only used when 'name' attribute is
      * specified.
-     * 
+     *
      * @param library The resource library name.
      */
     public void setLibrary(String library) {
@@ -384,7 +384,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Returns the image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This attribute is ignored when
      * 'name' attribute is specified.
-     * 
+     *
      * @return The image type.
      */
     public String getType() {
@@ -394,7 +394,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Sets the image type, represented as file extension. E.g. "webp", "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This attribute is ignored when
      * 'name' attribute is specified.
-     * 
+     *
      * @param type The image type.
      */
     public void setType(String type) {
@@ -404,7 +404,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Returns the URL fragment identifier, which will be appended to generated resource URL. This is particularly useful with SVG images with view modes. The
      * value does not necessarily need to start with '#', this will be checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
-     * 
+     *
      * @return The URL fragment identifier.
      */
     public String getFragment() {
@@ -414,7 +414,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Sets the URL fragment identifier, which will be appended to generated resource URL. This is particularly useful with SVG images with view modes. The
      * value does not necessarily need to start with '#', this will be checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
-     * 
+     *
      * @param fragment The URL fragment identifier.
      */
     public void setFragment(String fragment) {
@@ -424,7 +424,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Returns the "last modified" timestamp, can be either a {@link Long}, or {@link Date}, or {@link String} which is parseable as {@link Long}. This
      * attribute is ignored when 'name' attribute is specified or when 'dataURI' attribute is set to 'true'.
-     * 
+     *
      * @return The "last modified" timestamp.
      */
     public Object getLastModified() {
@@ -434,7 +434,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /**
      * Sets the "last modified" timestamp, can be either a {@link Long}, or {@link Date}, or {@link String} which is parseable as {@link Long}. This attribute
      * is ignored when 'name' attribute is specified or when 'dataURI' attribute is set to 'true'.
-     * 
+     *
      * @param lastModified The "last modified" timestamp.
      */
     public void setLastModified(Object lastModified) {
@@ -443,7 +443,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
     /**
      * Returns whether or not to render image in data URI format.
-     * 
+     *
      * @return Whether or not to render image in data URI format.
      * @since 3.10
      */
@@ -453,7 +453,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
     /**
      * Sets whether or not to render image in data URI format.
-     * 
+     *
      * @param dataURI Whether or not to render image in data URI format.
      * @since 3.10.1
      */
@@ -463,7 +463,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
     /**
      * Returns whether or not to lazily load image.
-     * 
+     *
      * @return Whether or not to lazily load image.
      * @since 3.10
      */
@@ -473,7 +473,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
     /**
      * Sets whether or not to lazily load image.
-     * 
+     *
      * @param lazy Whether or not to lazily load image.
      * @since 3.10
      */

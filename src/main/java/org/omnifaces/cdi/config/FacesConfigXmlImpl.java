@@ -132,7 +132,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a mapping of all resource bundle base names by var found in the given document.
-     * 
+     *
      * @throws XPathExpressionException
      */
     private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -151,7 +151,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of default locale and all supported locales in same order as in the given document.
-     * 
+     *
      * @throws XPathExpressionException
      */
     private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -177,7 +177,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of all resource handlers in same order as in the given document.
-     * 
+     *
      * @throws XPathExpressionException
      */
     private static List<Class<? extends ResourceHandler>> parseResourceHandlers(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
@@ -194,7 +194,7 @@ class FacesConfigXmlImpl implements FacesConfigXml {
 
     /**
      * Create and return a list of all exception handler factories in same order as in the given document.
-     * 
+     *
      * @throws XPathExpressionException
      */
     private static List<Class<? extends ExceptionHandlerFactory>> parseExceptionHandlerFactories(Element facesConfigXml, XPath xpath)

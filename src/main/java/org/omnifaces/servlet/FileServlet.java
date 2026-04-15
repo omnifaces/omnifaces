@@ -85,7 +85,7 @@ import org.omnifaces.util.Servlets;
  * </pre>
  * <p>
  * You can embed it in e.g. HTML5 video tag as below:
- * 
+ *
  * <pre>
  * &lt;video src="#{request.contextPath}/media/video.mp4" controls="controls" /&gt;
  * </pre>
@@ -195,7 +195,7 @@ public abstract class FileServlet extends HttpServlet {
      * Returns the file associated with the given HTTP servlet request. If this method throws {@link IllegalArgumentException}, then the servlet will return a
      * HTTP 400 error. If this method returns <code>null</code>, or if {@link File#isFile()} returns <code>false</code>, then the servlet will invoke
      * {@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @return The file associated with the given HTTP servlet request.
      * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid file request. The servlet will then return
@@ -207,7 +207,7 @@ public abstract class FileServlet extends HttpServlet {
      * Handles the case when the file is not found.
      * <p>
      * The default implementation sends a HTTP 404 error.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param response The involved HTTP servlet response.
      * @throws IOException When something fails at I/O level.
@@ -221,7 +221,7 @@ public abstract class FileServlet extends HttpServlet {
      * Returns how long the resource may be cached by the client before it expires, in seconds.
      * <p>
      * The default implementation returns 30 days in seconds.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The client cache expire time in seconds (not milliseconds!).
@@ -235,7 +235,7 @@ public abstract class FileServlet extends HttpServlet {
      * <p>
      * The default implementation delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a fallback default value of
      * <code>application/octet-stream</code>.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The content type associated with the given HTTP servlet request and file.
@@ -250,7 +250,7 @@ public abstract class FileServlet extends HttpServlet {
      * <p>
      * The default implementation will return <code>true</code> if the content type does <strong>not</strong> start with <code>text</code> or
      * <code>image</code>, and the <code>Accept</code> request header is either <code>null</code> or does not match the given content type.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param contentType The content type of the involved file.
      * @return <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content type.
@@ -264,7 +264,7 @@ public abstract class FileServlet extends HttpServlet {
      * Returns the file name to be used in <code>Content-Disposition</code> header. This does not need to be URL-encoded as this will be taken care of.
      * <p>
      * The default implementation returns {@link File#getName()}.
-     * 
+     *
      * @param request The involved HTTP servlet request.
      * @param file The involved file.
      * @return The file name to be used in <code>Content-Disposition</code> header.

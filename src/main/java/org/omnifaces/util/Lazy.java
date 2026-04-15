@@ -21,10 +21,10 @@ import java.util.function.Supplier;
  * Implements lazy-initialized object primarily for final and transient fields. Utilizes double-checked locking for optimization.
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * {@code
- * 
+ *
  * private final Lazy<Object> lazy = new Lazy<>(Object::new);
  * Object lazyInstance = lazy.get();
  * }

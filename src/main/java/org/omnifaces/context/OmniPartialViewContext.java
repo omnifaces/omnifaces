@@ -86,7 +86,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     /**
      * Construct a new OmniFaces partial view context around the given wrapped partial view context.
-     * 
+     *
      * @param wrapped The wrapped partial view context.
      */
     public OmniPartialViewContext(PartialViewContext wrapped) {
@@ -148,7 +148,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
      * Add an argument to the partial response. This is as JSON object available by <code>OmniFaces.Ajax.data</code>. For supported argument value types, read
      * {@link Json#encode(Object)}. If a given argument type is not supported, then an {@link IllegalArgumentException} will be thrown during end of render
      * response.
-     * 
+     *
      * @param name The argument name.
      * @param value The argument value.
      */
@@ -162,7 +162,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     /**
      * Add a callback script to the partial response. This script will be executed once the partial response is successfully retrieved at the client side.
-     * 
+     *
      * @param callbackScript The callback script to be added to the partial response.
      */
     public void addCallbackScript(String callbackScript) {
@@ -175,7 +175,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     /**
      * Reset the partial response. This clears any JavaScript arguments and callbacks set any data written to the {@link PartialResponseWriter}.
-     * 
+     *
      * @see FullAjaxExceptionHandler
      */
     public void resetPartialResponse() {
@@ -190,7 +190,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     /**
      * Close the partial response. If the writer is still in update phase, then end the update and the document. This fixes the Mojarra problem of incomplete
      * ajax responses caused by exceptions during ajax render response.
-     * 
+     *
      * @see FullAjaxExceptionHandler
      */
     public void closePartialResponse() {
@@ -209,7 +209,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     /**
      * Returns the current instance of the OmniFaces partial view context.
-     * 
+     *
      * @return The current instance of the OmniFaces partial view context.
      * @throws IllegalStateException When there is no current instance of the OmniFaces partial view context. That can happen when the
      * {@link OmniPartialViewContextFactory} is not properly registered, or when there's another {@link PartialViewContext} implementation which doesn't
@@ -221,7 +221,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     /**
      * Returns the current instance of the OmniFaces partial view context from the given faces context.
-     * 
+     *
      * @param context The faces context to obtain the current instance of the OmniFaces partial view context from.
      * @return The current instance of the OmniFaces partial view context from the given faces context.
      * @throws IllegalStateException When there is no current instance of the OmniFaces partial view context. That can happen when the
@@ -271,7 +271,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
     /**
      * This OmniFaces partial response writer adds support for passing arguments to JavaScript context, executing oncomplete callback scripts, resetting the
      * ajax response (specifically for {@link FullAjaxExceptionHandler}) and fixing incomlete XML response in case of exceptions.
-     * 
+     *
      * @author Bauke Scholtz
      */
     private static class OmniPartialResponseWriter extends PartialResponseWriter {
@@ -295,7 +295,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
         /**
          * An override which remembers if we're updating or not.
-         * 
+         *
          * @see #endDocument()
          * @see #reset()
          */
@@ -307,7 +307,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
         /**
          * An override which remembers if we're updating or not.
-         * 
+         *
          * @see #endDocument()
          * @see #reset()
          */

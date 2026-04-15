@@ -48,7 +48,7 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Validate the component hierarchy.
-     * 
+     *
      * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any children.
      */
     @Override
@@ -59,7 +59,7 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
-     * 
+     *
      * @see Tree#processTreeNode(FacesContext, PhaseId)
      */
     @Override
@@ -69,7 +69,7 @@ public class TreeInsertChildren extends TreeFamily {
 
     /**
      * Delegate visiting of the tree node to {@link Tree#visitTreeNode(VisitContext, VisitCallback)}.
-     * 
+     *
      * @see Tree#visitTreeNode(VisitContext, VisitCallback)
      */
     @Override

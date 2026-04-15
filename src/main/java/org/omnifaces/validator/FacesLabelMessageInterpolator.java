@@ -54,7 +54,7 @@ import jakarta.validation.MessageInterpolator;
  * <h2>Usage</h2>
  * <p>
  * As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
- * 
+ *
  * <pre>
  * jakarta.validation.constraints.Size.message = The size of {faces.label} must be between {min} and {max} characters
  * </pre>

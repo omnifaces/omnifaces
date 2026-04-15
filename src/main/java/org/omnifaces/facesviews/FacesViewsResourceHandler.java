@@ -41,7 +41,7 @@ public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 
     /**
      * Construct faces views resource handler.
-     * 
+     *
      * @param wrapped The resource handler to be wrapped.
      */
     public FacesViewsResourceHandler(ResourceHandler wrapped) {

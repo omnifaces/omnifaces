@@ -38,42 +38,42 @@ public final class JNDI {
 
     /**
      * JNDI namespace prefix, including the colon: <code>java:</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAMESPACE_PREFIX = "java:";
 
     /**
      * JNDI namespace to lookup components: <code>java:comp</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAMESPACE_COMPONENT = JNDI_NAMESPACE_PREFIX + "comp";
 
     /**
      * JNDI namespace to lookup all enterprise beans: <code>java:global</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAMESPACE_GLOBAL = JNDI_NAMESPACE_PREFIX + "global";
 
     /**
      * JNDI namespace to lookup local enterprise beans within the same module: <code>java:module</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAMESPACE_MODULE = JNDI_NAMESPACE_PREFIX + "module";
 
     /**
      * JNDI namespace to lookup local enterprise beans within the same application: <code>java:app</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAMESPACE_APPLICATION = JNDI_NAMESPACE_PREFIX + "app";
 
     /**
      * JNDI name prefix for environment entries: <code>java:comp/env</code>
-     * 
+     *
      * @since 3.9
      */
     public static final String JNDI_NAME_PREFIX_ENV_ENTRY = JNDI_NAMESPACE_COMPONENT + "/env";
@@ -97,7 +97,7 @@ public final class JNDI {
      * Example:
      * <p>
      * <b>web.xml</b>
-     * 
+     *
      * <pre>
      * &lt;env-entry&gt;
      *    &lt;cont&gt;org.omnifaces.TEST_INTEGER&lt;/env-entry-name&gt;
@@ -107,16 +107,16 @@ public final class JNDI {
      * </pre>
      * <p>
      * <b>Lookup in Java using relative name</b>
-     * 
+     *
      * <pre>
-     * 
+     *
      * Integer test = JNDI.getEnvEntry("org.omnifaces.TEST_INTEGER");
      * </pre>
      * <p>
      * <b>Lookup in Java using full JNDI name</b>
-     * 
+     *
      * <pre>
-     * 
+     *
      * Integer test = JNDI.lookup("java:comp/env/org.omnifaces.TEST_INTEGER");
      * </pre>
      *
@@ -140,7 +140,7 @@ public final class JNDI {
 
     /**
      * Returns the named object from the default JNDI instance.
-     * 
+     *
      * @param <T> The expected return type.
      * @param name the name of the object to be retrieved
      * @return the named object, or <code>null</code> if there is none.
@@ -181,7 +181,7 @@ public final class JNDI {
 
     /**
      * Guess JNDI name of given bean class, which can be a local or remote EJB.
-     * 
+     *
      * @param beanClass The bean class to guess JNDI name for.
      * @return The guessed JNDI name of the given bean class.
      * @since 3.9
@@ -192,7 +192,7 @@ public final class JNDI {
 
     /**
      * Guess JNDI name of given fully-qualified class name.
-     * 
+     *
      * @param className The fully-qualified class name to guess JNDI name for.
      * @return The guessed JNDI name of the given fully-qualified class name.
      * @since 3.9

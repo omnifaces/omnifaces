@@ -48,7 +48,7 @@ public class CombinedResource extends DynamicResource {
     /**
      * Constructs a new combined resource based on the given resource name. This constructor is only used by
      * {@link CombinedResourceHandler#createResource(String, String)}.
-     * 
+     *
      * @param resourceName The resource name of the combined resource.
      * @param cacheTTL The combined resource content cache TTL.
      */

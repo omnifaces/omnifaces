@@ -37,7 +37,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * <h2>Usage</h2>
  * <p>
  * It's similar to the <code>&lt;f:viewParam&gt;</code>.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:scriptParam script="new Date().getTimezoneOffset()" value="#{bean.clientTimeZoneOffset}" /&gt;
@@ -47,7 +47,7 @@ import org.omnifaces.vdl.FacesAttribute;
  * </pre>
  * <p>
  * You can use the <code>render</code> attribute to declare which components should be updated when a script parameter has been set.
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:scriptParam script="foo()" value="#{bean.resultOfFoo}" render="fooResult" /&gt;
@@ -66,22 +66,22 @@ import org.omnifaces.vdl.FacesAttribute;
  * <p>
  * Note that as it extends from the standard <code>&lt;f:viewParam&gt;</code>, its built-in conversion and validation functionality is also supported on this
  * component. So, the following is also possible:
- * 
+ *
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:scriptParam script="window.navigator" value="#{bean.clientNavigator}" /&gt;
  * &lt;/f:metadata&gt;
  * </pre>
- * 
+ *
  * With a <code>clientNavigator</code> being an instance of <code>jakarta.json.JsonObject</code>:
- * 
+ *
  * <pre>
- * 
+ *
  * private JsonObject clientNavigator;
  * </pre>
- * 
+ *
  * And this converter:
- * 
+ *
  * <pre>
  * package com.example;
  *
@@ -119,16 +119,16 @@ import org.omnifaces.vdl.FacesAttribute;
  *             throw new ConverterException("Not a valid JSON object", e);
  *         }
  *     }
- * 
+ *
  * }
  * </pre>
  *
  * <h2>Events</h2>
  * <p>
  * When the script params have been set, then any method with the {@link PostScriptParam} annotation will be fired:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;PostScriptParam
  * public void initScriptParams() {
  *     // ...
@@ -208,7 +208,7 @@ public class ScriptParam extends OnloadParam {
 
     /**
      * Returns the script to be evaluated.
-     * 
+     *
      * @return The script to be evaluated.
      */
     public String getScript() {
@@ -217,7 +217,7 @@ public class ScriptParam extends OnloadParam {
 
     /**
      * Sets the script to be evaluated.
-     * 
+     *
      * @param script The script to be evaluated.
      */
     @FacesAttribute(required = true)
@@ -230,7 +230,7 @@ public class ScriptParam extends OnloadParam {
     /**
      * Returns <code>true</code> if the current request is triggered by a script param request. I.e. if it is initiated by
      * <code>OmniFaces.ScriptParam.setScriptParamValues()</code> script which runs on page load.
-     * 
+     *
      * @param context The involved faces context.
      * @return <code>true</code> if the current request is triggered by a script param request.
      */

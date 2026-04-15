@@ -61,7 +61,7 @@ public class TreeNode extends TreeFamily {
 
     /**
      * Validate the component hierarchy.
-     * 
+     *
      * @throws IllegalStateException When the direct parent component isn't of type {@link Tree}, or when this component is nested in another {@link TreeNode},
      * or when there aren't any children of type {@link TreeNodeItem}.
      */
@@ -74,7 +74,7 @@ public class TreeNode extends TreeFamily {
 
     /**
      * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)} as it maintains all the nodes.
-     * 
+     *
      * @see Tree#processTreeNode(FacesContext, PhaseId)
      */
     @Override
@@ -90,7 +90,7 @@ public class TreeNode extends TreeFamily {
 
     /**
      * Returns the tree node level to render the node children for. The root level is {@code 0}.
-     * 
+     *
      * @return The tree node level.
      */
     public Integer getLevel() {
@@ -99,7 +99,7 @@ public class TreeNode extends TreeFamily {
 
     /**
      * Sets the tree node level to render the node children for. The root level is {@code 0}.
-     * 
+     *
      * @param level The tree node level.
      */
     public void setLevel(Integer level) {
