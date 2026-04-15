@@ -29,7 +29,7 @@ import jakarta.faces.application.ProjectStage;
  * <code>web.xml</code>.
  * <p>
  * Note that the Faces spec defines one parameter that can optionally be defined via an env entry instead of the typical context/init parameter;
- * {@link ProjectStage#PROJECT_STAGE_JNDI_NAME}. Mojarra defines an additional proprietary one: "java:comp/env/ClientStateSavingPassword".
+ * {@link ProjectStage#PROJECT_STAGE_JNDI_NAME}.
  *
  * @author Arjan Tijms
  * @since 1.6

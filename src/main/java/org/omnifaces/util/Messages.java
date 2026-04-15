@@ -630,10 +630,6 @@ public final class Messages {
 
     /**
      * Add a flash scoped faces message to the given client ID. Use this when you need to display the message after a redirect.
-     * <p>
-     * NOTE: the flash scope has in early Mojarra versions however some pretty peculiar problems. In older versions, the messages are remembered too long, or
-     * they are only displayed after refresh, or they are not displayed when the next request is on a different path. Only since Mojarra 2.1.14, all known flash
-     * scope problems are solved.
      *
      * @param clientId The client ID to add the flash scoped faces message for.
      * @param message The faces message.

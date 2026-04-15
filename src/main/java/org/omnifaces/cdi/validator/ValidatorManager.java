@@ -46,8 +46,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <p>
  * Since CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an explicit CDI managed bean scope annotation will be
  * registered for dependency injection support. In order to cover {@link FacesValidator} annotated classes as well, you need to explicitly set
- * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
- * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
+ * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
  * you need to add {@link Dependent} annotation to the validator class.
  *
  * <h2>AmbiguousResolutionException</h2>
@@ -56,12 +55,10 @@ import org.omnifaces.application.OmniApplicationFactory;
  * validator, then you may with <code>bean-discovery-mode="all"</code> face an {@link AmbiguousResolutionException}. This can be solved by placing
  * {@link Specializes} annotation on the subclass.
  *
- * <h2>JSF 2.3 compatibility</h2>
+ * <h2>@FacesValidator(managed=true) compatibility</h2>
  * <p>
- * JSF 2.3 introduced two new features for validators: parameterized validators and managed validators. When the validator is parameterized as in
- * <code>implements Validator&lt;T&gt;</code>, then you need to use at least OmniFaces 3.1 wherein the incompatibility was fixed. When the validator is managed
- * with the <code>managed=true</code> attribute set on the {@link FacesValidator} annotation, then the validator won't be managed by OmniFaces and will continue
- * to work fine for Faces. But the &lt;o:validator&gt; tag won't be able to set attributes on it.
+ * When the validator is managed with the <code>managed=true</code> attribute set on the {@link FacesValidator} annotation, then the validator won't be managed
+ * by OmniFaces and will continue to work fine for Faces. But the &lt;o:validator&gt; tag won't be able to set attributes on it.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

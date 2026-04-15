@@ -13,6 +13,7 @@
 package org.omnifaces.test.taghandler.validatebean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 import static org.openqa.selenium.Keys.TAB;
 
@@ -432,13 +433,12 @@ public class ValidateBeanIT extends OmniFacesIT {
         guardAjax(validateGroupByCommand::click);
         assertEquals("actionSuccess", getMessagesText());
 
-        // Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
-        // input.clear();
-        // input.sendKeys("x");
-        // guardAjax(validateDefaultAndGroupByCommand::click);
-        // var message = getMessagesText()
-        // assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's
-        // unordered.
+        input.clear();
+        input.sendKeys("x");
+        guardAjax(validateDefaultAndGroupByCommand::click);
+        var message = getMessagesText();
+        assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's
+                                                                                                                                               // unordered.
 
         input.clear();
         input.sendKeys("xx");
@@ -476,13 +476,14 @@ public class ValidateBeanIT extends OmniFacesIT {
         guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
         assertEquals("actionSuccess", getMessagesText());
 
-        // Bugs in Mojarra 4.1.x. Will be fixed in Mojarra 4.1.3
-        // validateDefaultAndGroupByInput.clear();
-        // validateDefaultAndGroupByInput.sendKeys("x");
-        // guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
-        // var message = getMessagesText();
-        // assertTrue(message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"),
-        // message + " contains default and group"); // It's unordered.
+        validateDefaultAndGroupByInput.clear();
+        validateDefaultAndGroupByInput.sendKeys("x");
+        guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
+        var message = getMessagesText();
+        assertTrue(
+            message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"),
+            message + " contains default and group"
+        ); // It's unordered.
 
         validateDefaultAndGroupByInput.clear();
         validateDefaultAndGroupByInput.sendKeys("xx");
@@ -502,12 +503,7 @@ public class ValidateBeanIT extends OmniFacesIT {
     @Test
     @DisabledIfSystemProperty(
         named = "profile.id", matches = "quarkus-.*", disabledReason = "jakarta.validation.ValidationException: HV000250: Uninitialized locale: en. Please register your locale as a locale to initialize when initializing your ValidatorFactory."
-    ) // Unclear
-      // why.
-      // Adding
-      // ValidationMessages_en.properties
-      // didn't
-      // help.
+    ) // Unclear why. Adding ValidationMessages_en.properties didn't help.
     void validateDefaultWithMessageForViolating() {
         validateDefaultWithMessageForViolatingInput.sendKeys("x");
         guardAjax(validateDefaultWithMessageForViolatingCommand::click);

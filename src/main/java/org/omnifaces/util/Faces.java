@@ -331,7 +331,7 @@ public final class Faces {
     }
 
     /**
-     * Returns the implementation information of currently loaded Faces implementation. E.g. "Mojarra 2.1.7-FCS".
+     * Returns the implementation information of currently loaded Faces implementation. E.g. "Mojarra 4.1.6".
      * <p>
      * This is also available in EL as <code>#{faces.implInfo}</code>.
      *

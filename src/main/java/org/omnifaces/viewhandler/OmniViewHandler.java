@@ -30,7 +30,6 @@ import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.hasSession;
-import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.isSessionNew;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
@@ -147,10 +146,6 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException {
         if (isDevelopment(context)) {
             validateComponentTreeStructure(context, viewToRender);
-        }
-
-        if (isAjaxRequest(context)) {
-            context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
         }
 
         if (isViewResourceRequest(context)) {

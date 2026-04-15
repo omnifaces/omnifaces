@@ -53,8 +53,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <p>
  * Since CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an explicit CDI managed bean scope annotation will be
  * registered for dependency injection support. In order to cover {@link FacesConverter} annotated classes as well, you need to explicitly set
- * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
- * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
+ * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
  * you need to add {@link Dependent} annotation to the converter class.
  *
  * <h2>AmbiguousResolutionException</h2>
@@ -69,12 +68,10 @@ import org.omnifaces.application.OmniApplicationFactory;
  * default constructor, or has a single argument constructor that takes a {@link Class} instance, then this converter will <strong>not</strong> be made eligible
  * for CDI. This change was added in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
  *
- * <h2>JSF 2.3 compatibility</h2>
+ * <h2>@FacesConverter(managed=true) compatibility</h2>
  * <p>
- * JSF 2.3 introduced two new features for converters: parameterized converters and managed converters. When the converter is parameterized as in
- * <code>implements Converter&lt;T&gt;</code>, then you need to use at least OmniFaces 3.1 wherein the incompatibility was fixed. When the converter is managed
- * with the <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, then the converter won't be managed by OmniFaces and will continue
- * to work fine for Faces. But the &lt;o:converter&gt; tag won't be able to set attributes on it.
+ * When the converter is managed with the <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, then the converter won't be managed
+ * by OmniFaces and will continue to work fine for Faces. But the &lt;o:converter&gt; tag won't be able to set attributes on it.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

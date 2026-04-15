@@ -38,9 +38,8 @@ import jakarta.faces.render.Renderer;
 import org.omnifaces.component.messages.OmniMessages;
 
 /**
- * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2, including the fix of tooltip rendering as
- * described in <a href="https://github.com/eclipse-ee4j/mojarra/issues/2164"> issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to
- * take the new features into account.
+ * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2, and afterwards slightly rewritten, refactored and
+ * enhanced to take the new features into account.
  *
  * @author Bauke Scholtz
  * @since 1.5
