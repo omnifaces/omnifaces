@@ -29,18 +29,18 @@
 		</license>
 	</licenses>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<scm>
 		<url>https://github.com/omnifaces/omnifaces</url>
 		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
 		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
 	</scm>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>central</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -158,23 +158,15 @@
 				</executions>
 			</plugin>
 			
-			<!-- Deploying is done via sonatype's Nexus  
-			
-				 Snapshot deploy: mvn clean deploy
-				 Release deploy: mvn clean deploy -P release
-			-->
+			<!-- Configure snapshot deployment (release deployment is done via 'release' profile). -->
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
-				<extensions>true</extensions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.1.4</version>
 				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<skip>false</skip>
 				</configuration>
 			</plugin>
-			
 		</plugins>
 	</build>
 
@@ -183,11 +175,21 @@
 			<id>release</id>
 			<build>
 				<plugins>
-					<!-- Signing with GPG is a requirement for a release deployment (to Maven central) -->
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.7.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<autoPublish>true</autoPublish>
+						</configuration>
+					</plugin>
+
+					<!-- Signing with GPG is a requirement for a release deployment to Maven central. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>3.2.7</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
