@@ -28,8 +28,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.util.Faces;
 
 /**
- * OmniFaces external context.
- * This external context performs the following tasks:
+ * OmniFaces external context. This external context performs the following tasks:
  * <ol>
  * <li>Since 2.2: Take care that the {@link Flash} will be ignored during an unload request.
  * </ol>
@@ -48,6 +47,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
     /**
      * Construct a new OmniFaces external context around the given wrapped external context.
+     * 
      * @param wrapped The wrapped external context.
      */
     public OmniExternalContext(ExternalContext wrapped) {
@@ -57,8 +57,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the current request is an unload request from {@link ViewScoped},
-     * then return a dummy flash scope which does not modify the flash state.
+     * If the current request is an unload request from {@link ViewScoped}, then return a dummy flash scope which does not modify the flash state.
      */
     @Override
     public Flash getFlash() {
