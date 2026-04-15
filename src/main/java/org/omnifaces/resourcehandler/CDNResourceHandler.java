@@ -240,7 +240,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
                 requestPath = cdnResources.get(new ResourceIdentifier(libraryName, "*"));
 
                 if (requestPath != null) {
+                    requestPath = evaluateExpressionGet(requestPath);
                     requestPath = requestPath.substring(0, requestPath.length() - 1) + resourceName;
+                    return new RemappedResource(resourceName, libraryName, requestPath);
                 }
             }
         }
