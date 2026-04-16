@@ -277,7 +277,7 @@ public class ImportConstants extends TagHandler {
         @Override
         public Object get(Object key) {
             if (!containsKey(key)) {
-                throw new IllegalArgumentException(ERROR_INVALID_CONSTANT.formatted(type.toString(), type));
+                throw new IllegalArgumentException(ERROR_INVALID_CONSTANT.formatted(type.toString(), String.valueOf(key)));
             }
 
             return super.get(key);
