@@ -46,8 +46,8 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <p>
  * Since CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an explicit CDI managed bean scope annotation will be
  * registered for dependency injection support. In order to cover {@link FacesValidator} annotated classes as well, you need to explicitly set
- * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>, then
- * you need to add {@link Dependent} annotation to the validator class.
+ * <code>bean-discovery-mode="all"</code> attribute in <code>beans.xml</code>. If you want to keep the default of <code>bean-discovery-mode="annotated"</code>,
+ * then you need to add {@link Dependent} annotation to the validator class.
  *
  * <h2>AmbiguousResolutionException</h2>
  * <p>

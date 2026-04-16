@@ -62,10 +62,10 @@ import org.omnifaces.vdl.FacesTagHandler;
  * <h2>&lt;f:viewParam required="true"&gt; fail</h2>
  * <p>
  * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in standard Faces spec. When the parameter is not
- * specified in the query string, it is retrieved as <code>null</code>, which causes an internal
- * <code>isRequired()</code> check to be performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the consequence
- * that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which the <code>&lt;o:viewParamValidationFailed&gt;</code>
- * is actually relying on. This is fixed in <code>&lt;o:viewParam&gt;</code>.
+ * specified in the query string, it is retrieved as <code>null</code>, which causes an internal <code>isRequired()</code> check to be performed instead of
+ * delegating the check to the standard <code>UIInput</code> implementation. This has the consequence that <code>PreValidateEvent</code> and
+ * <code>PostValidateEvent</code> listeners are never invoked, which the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed
+ * in <code>&lt;o:viewParam&gt;</code>.
  *
  * <h2>Examples</h2>
  * <p>

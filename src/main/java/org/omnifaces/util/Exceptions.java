@@ -79,9 +79,9 @@ public final class Exceptions {
     }
 
     /**
-     * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException} or {@link ELException}
-     * and then return it. If the given exception is already not an instance of the mentioned types, then it will directly be returned. Or if the exception,
-     * unwrapped or not, does not have a nested cause anymore, then it will be returned.
+     * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException} or {@link ELException} and then return it.
+     * If the given exception is already not an instance of the mentioned types, then it will directly be returned. Or if the exception, unwrapped or not, does
+     * not have a nested cause anymore, then it will be returned.
      *
      * @param exception The exception to be unwrapped from {@link FacesException} and {@link ELException}.
      * @return The unwrapped root cause.
