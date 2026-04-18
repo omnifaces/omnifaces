@@ -49,8 +49,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.devtools.v140.log.Log;
-import org.openqa.selenium.devtools.v140.network.Network;
+import org.openqa.selenium.devtools.v147.log.Log;
+import org.openqa.selenium.devtools.v147.network.Network;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -79,7 +79,7 @@ public abstract class OmniFacesIT {
 
                 var devTools = chrome.getDevTools();
                 devTools.createSession();
-                devTools.send(Network.enable(empty(), empty(), empty(), empty()));
+                devTools.send(Network.enable(empty(), empty(), empty(), empty(), empty()));
                 devTools.addListener(Network.responseReceived(), event -> {
                     String body;
 
