@@ -31,6 +31,7 @@ import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
+import static org.omnifaces.util.ResourcePaths.getParent;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.isRoot;
@@ -46,8 +47,6 @@ import static org.omnifaces.util.Xml.getNodeTextContents;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -699,11 +698,11 @@ public final class FacesViews {
     }
 
     static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String servletPath) {
-        Set<String> mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
+        var mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
 
-        for (Path path = Paths.get(servletPath); path.getParent() != null; path = path.getParent()) {
+        for (var path = stripTrailingSlash(servletPath); !path.isEmpty(); path = getParent(path)) {
             for (var mappedWelcomeFile : mappedWelcomeFiles) {
-                String subfolderWelcomeFile = path.toString() + mappedWelcomeFile;
+                var subfolderWelcomeFile = path + mappedWelcomeFile;
 
                 if (resources.containsKey(subfolderWelcomeFile + "/*")) {
                     return subfolderWelcomeFile;

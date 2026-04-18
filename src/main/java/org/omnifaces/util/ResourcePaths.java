@@ -164,4 +164,19 @@ public final class ResourcePaths {
         return join(PATH_SEPARATOR, resourcePaths);
     }
 
+    /**
+     * Returns the parent of the given resource path. That is, everything up to but excluding the last occurrence of {@value #PATH_SEPARATOR}. E.g. input
+     * <code>"/foo/bar"</code> will return <code>"/foo"</code>, input <code>"/foo"</code>, {@value #PATH_SEPARATOR} or an empty string will all return an empty
+     * string. This operates purely on the string representation and is therefore safe to use on URL paths regardless of the underlying operating system's file
+     * separator.
+     *
+     * @param resourcePath The resource path to get the parent of.
+     * @return The parent of the given resource path.
+     * @since 3.14.17
+     */
+    public static String getParent(String resourcePath) {
+        int lastSlash = resourcePath.lastIndexOf(PATH_SEPARATOR);
+        return (lastSlash < 0) ? "" : resourcePath.substring(0, lastSlash);
+    }
+
 }
