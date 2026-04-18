@@ -198,13 +198,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.41.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-devtools-v140</artifactId>
-            <version>4.38.0</version>
+            <version>4.43.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
