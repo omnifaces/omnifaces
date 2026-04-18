@@ -321,6 +321,10 @@ public abstract class OmniFacesIT {
         return System.getProperty("profile.id").startsWith("quarkus-");
     }
 
+    protected static boolean isMyFacesUsed() {
+        return System.getProperty("profile.id").endsWith("-myfaces");
+    }
+
     protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
         return buildWebArchive(testClass).createDeployment();
     }

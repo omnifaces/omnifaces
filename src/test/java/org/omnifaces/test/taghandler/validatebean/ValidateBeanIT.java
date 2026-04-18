@@ -437,8 +437,10 @@ public class ValidateBeanIT extends OmniFacesIT {
         input.sendKeys("x");
         guardAjax(validateDefaultAndGroupByCommand::click);
         var message = getMessagesText();
-        assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group"); // It's
-                                                                                                                                               // unordered.
+
+        if (!isMyFacesUsed()) { // Bugs in MyFaces. It validates only one group.
+            assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group"), message + " contains default and group");
+        }
 
         input.clear();
         input.sendKeys("xx");
@@ -480,10 +482,13 @@ public class ValidateBeanIT extends OmniFacesIT {
         validateDefaultAndGroupByInput.sendKeys("x");
         guardAjax(() -> validateDefaultByInput.sendKeys(TAB));
         var message = getMessagesText();
-        assertTrue(
-            message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"),
-            message + " contains default and group"
-        ); // It's unordered.
+
+        if (!isMyFacesUsed()) { // Bugs in MyFaces. It validates only one group.
+            assertTrue(
+                message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group"),
+                message + " contains default and group"
+            );
+        }
 
         validateDefaultAndGroupByInput.clear();
         validateDefaultAndGroupByInput.sendKeys("xx");
