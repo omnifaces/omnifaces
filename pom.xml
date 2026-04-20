@@ -530,14 +530,7 @@
             <plugin>
                 <groupId>com.github.matinh.vdldoc</groupId>
                 <artifactId>vdldoc-maven-plugin</artifactId>
-                <version>2.1</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.omnifaces</groupId>
-                        <artifactId>vdldoc</artifactId>
-                        <version>4.0</version>
-                    </dependency>
-                </dependencies>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>generate-vdldoc</id>
