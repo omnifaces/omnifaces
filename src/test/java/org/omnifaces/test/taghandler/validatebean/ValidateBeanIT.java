@@ -231,6 +231,18 @@ public class ValidateBeanIT extends OmniFacesIT {
     @FindBy(id = "validateNestedClassLevelActualWithMessageForViolating:command")
     private WebElement validateNestedClassLevelActualWithMessageForViolatingCommand;
 
+    @FindBy(id = "validateDeepNestedClassLevel:number1")
+    private WebElement validateDeepNestedClassLevelNumber1;
+
+    @FindBy(id = "validateDeepNestedClassLevel:number2")
+    private WebElement validateDeepNestedClassLevelNumber2;
+
+    @FindBy(id = "validateDeepNestedClassLevel:formMessage")
+    private WebElement validateDeepNestedClassLevelFormMessage;
+
+    @FindBy(id = "validateDeepNestedClassLevel:command")
+    private WebElement validateDeepNestedClassLevelCommand;
+
     @FindBy(id = "validateNestedListClassLevelWithMessageForViolating:list:0:number1")
     private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number1;
 
@@ -690,6 +702,25 @@ public class ValidateBeanIT extends OmniFacesIT {
         assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
         assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
         assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
+        assertEquals("actionSuccess", getMessagesText());
+    }
+
+    /**
+     * Issue #951: inputs bound beyond a non-{@code @Valid} nested property must still be collected into the copied bean when the containing property is
+     * {@code @Valid}. The class-level {@code @AssertTrue} on the intermediate depends on values inside the non-cascaded entity; pre-fix these values never
+     * reached the copy.
+     */
+    @Test
+    void validateDeepNestedClassLevel() {
+        validateDeepNestedClassLevelNumber1.sendKeys("2");
+        validateDeepNestedClassLevelNumber2.sendKeys("3");
+        guardAjax(validateDeepNestedClassLevelCommand::click);
+        assertEquals("number1Label, number2Label: invalidSum", validateDeepNestedClassLevelFormMessage.getText());
+
+        validateDeepNestedClassLevelNumber2.clear();
+        validateDeepNestedClassLevelNumber2.sendKeys("8"); // So it becomes 38.
+        guardAjax(validateDeepNestedClassLevelCommand::click);
+        assertEquals("", validateDeepNestedClassLevelFormMessage.getText());
         assertEquals("actionSuccess", getMessagesText());
     }
 
