@@ -233,6 +233,20 @@
                 showMessageFor="@violating" method="validateActual" />
         </o:form>
 
+        <o:form id="validateDeepNestedClassLevel">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITDeepNestedClassLevelBean.intermediate.entity.number1}" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITDeepNestedClassLevelBean.intermediate.entity.number2}" />
+
+            <h:message id="formMessage" for="validateDeepNestedClassLevel" />
+
+            <h:commandButton id="command" action="#{validateBeanITDeepNestedClassLevelBean.action}">
+                <f:ajax execute="@form" render="formMessage :messages" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITDeepNestedClassLevelBean}"
+                showMessageFor="@form" />
+        </o:form>
+
         <o:form id="validateNestedListClassLevelWithMessageForViolating">
             <ui:repeat id="list" value="#{validateBeanITNestedListClassLevelBean.entities}" var="entity">
                 <h:inputText id="number1" label="number1Label" value="#{entity.number1}" />
