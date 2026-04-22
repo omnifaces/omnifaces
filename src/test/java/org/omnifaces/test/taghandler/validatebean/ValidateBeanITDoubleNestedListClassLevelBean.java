@@ -28,8 +28,7 @@ import jakarta.validation.Valid;
 @RequestScoped
 public class ValidateBeanITDoubleNestedListClassLevelBean {
 
-    @Valid
-    private List<ValidateBeanITNestedEntity> nestedEntities;
+    private List<@Valid ValidateBeanITNestedEntity> nestedEntities;
 
     @PostConstruct
     public void init() {

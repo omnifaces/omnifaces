@@ -32,8 +32,7 @@ public class ValidateBeanITWithCustomTypeAsProperty implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Valid
-    private List<FlightNumber> flightNumbers;
+    private List<@Valid FlightNumber> flightNumbers;
 
     @PostConstruct
     public void init() {

@@ -19,8 +19,7 @@ import jakarta.validation.Valid;
 
 public class ValidateBeanITNestedEntity {
 
-    @Valid
-    private List<ValidateBeanITEntity> entities = new ArrayList<>();
+    private List<@Valid ValidateBeanITEntity> entities = new ArrayList<>();
 
     public List<ValidateBeanITEntity> getEntities() {
         return entities;
