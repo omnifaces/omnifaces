@@ -3,6 +3,7 @@ target/
 
 # Eclipse
 .classpath
+.factorypath
 .project
 .settings/
 *.jsfdia
