@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -189,8 +190,8 @@ public abstract class OmniFacesIT {
     }
 
     protected void openWithHashString(String hashString) {
-        open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver
-                                                                                                      // may not forcibly reload page.
+        // Query string trick is necessary because Selenium driver may not forcibly reload page.
+        open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString);
     }
 
     protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
@@ -213,9 +214,8 @@ public abstract class OmniFacesIT {
         var uuid = UUID.randomUUID().toString();
         executeScript("window.$ajax=true;faces.ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
         action.run();
-        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')")); // window.$ajax will be
-                                                                                                                                     // falsey when ajax
-                                                                                                                                     // redirect has occurred.
+        // window.$ajax will be falsey when ajax redirect has occurred.
+        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')"));
     }
 
     protected void guardPrimeFacesAjax(Runnable action) {
@@ -248,9 +248,13 @@ public abstract class OmniFacesIT {
     }
 
     protected void waitUntilTextContent(String elementId, Runnable ajaxPoller) {
+        waitUntil(elementId, e -> !e.getText().isBlank(), ajaxPoller);
+    }
+
+    private void waitUntil(String elementId, Function<WebElement, Boolean> predicate, Runnable ajaxPoller) {
         waitUntil(() -> {
             try {
-                if (!browser.findElement(By.id(elementId)).getText().isBlank()) {
+                if (predicate.apply(browser.findElement(By.id(elementId)))) {
                     return true;
                 }
             }
@@ -267,11 +271,15 @@ public abstract class OmniFacesIT {
     }
 
     protected void waitUntilTextContent(WebElement element) {
-        waitUntil(() -> !element.getText().isBlank());
+        waitUntilTextContent(element.getAttribute("id"));
     }
 
     protected void waitUntilTextContains(WebElement element, String expectedString) {
-        waitUntil(() -> element.getText().contains(expectedString));
+        waitUntilTextContains(element.getAttribute("id"), expectedString);
+    }
+
+    protected void waitUntilTextContains(String elementId, String expectedString) {
+        waitUntil(elementId, e -> e.getText().contains(expectedString), null);
     }
 
     protected void waitFor(Duration duration) {
@@ -285,8 +293,13 @@ public abstract class OmniFacesIT {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T executeScript(String script) {
-        return (T) ((JavascriptExecutor) browser).executeScript(script);
+    protected <T> T executeScript(String script, Object... arguments) {
+        return (T) ((JavascriptExecutor) browser).executeScript(script, arguments);
+    }
+
+    protected void scrollIntoView(WebElement element) {
+        executeScript("arguments[0].scrollIntoView({block: 'center'})", element);
+        waitFor(Duration.ofMillis(300)); // Allow any animations/listeners to complete.
     }
 
     protected void clearTextContent(WebElement messages) {
@@ -302,6 +315,10 @@ public abstract class OmniFacesIT {
     }
 
     protected static String stripHostAndJsessionid(String url) {
+        if (url.startsWith("data:")) {
+            return url;
+        }
+
         try {
             var builder = new URIBuilder(url);
             builder.setScheme(null);
