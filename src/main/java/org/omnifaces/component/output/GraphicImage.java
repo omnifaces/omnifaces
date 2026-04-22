@@ -214,7 +214,7 @@ public class GraphicImage extends HtmlGraphicImage {
     /** Attribute names inherited from superclass. */
     protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
 
-    private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
+    private static final String ERROR_MISSING_VALUE = "o:graphicImage 'name' or 'value' attribute must be specified.";
 
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
@@ -283,10 +283,6 @@ public class GraphicImage extends HtmlGraphicImage {
 
         if (name != null) {
             resource = createGraphicResourceByName(context, name, dataURI);
-
-            if (resource == null) {
-                return RES_NOT_FOUND;
-            }
         }
         else {
             ValueExpression value = getValueExpression(VALUE_ATTRIBUTE);
@@ -297,6 +293,10 @@ public class GraphicImage extends HtmlGraphicImage {
             else {
                 throw new IllegalArgumentException(ERROR_MISSING_VALUE);
             }
+        }
+
+        if (resource == null) {
+            return RES_NOT_FOUND;
         }
 
         String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
