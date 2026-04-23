@@ -57,8 +57,7 @@ export namespace InputFile {
 
                 const params: Record<string, string> = { fileName: fileName };
                 params[EVENT] = "validationFailed";
-                const faces = window.faces;
-                faces.ajax.request(inputFile.id, event, params);
+                window.faces.ajax.request(inputFile.id, event, params);
 
                 if (originalEnctype) {
                     inputFile.form.enctype = originalEnctype;

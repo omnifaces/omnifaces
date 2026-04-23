@@ -43,8 +43,7 @@ export namespace ScriptParam {
 
         params["execute"] = scriptParamId;
         params[EVENT] = "setScriptParamValues";
-        const faces = window.faces;
-        faces.ajax.request(form, null, params);
+        window.faces.ajax.request(form, null, params);
     }
 
     // Private static functions ---------------------------------------------------------------------------------------

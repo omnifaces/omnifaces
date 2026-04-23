@@ -83,8 +83,7 @@ export namespace HashParam {
         if (!updating) {
             const params: Record<string, string> = { execute: id, hash: window.location.hash.substring(1) };
             params[EVENT] = "setHashParamValues";
-            const faces = window.faces;
-            faces.ajax.request(Util.getFacesForm(), null, params);
+            window.faces.ajax.request(Util.getFacesForm(), null, params);
         }
     }
 
