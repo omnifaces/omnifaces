@@ -30,6 +30,7 @@ export { Push } from "./Push";
 export { InputFile } from "./InputFile";
 export { Form } from "./Form";
 export { HashParam } from "./HashParam";
+export { LazyPanel } from "./LazyPanel";
 export { ScriptParam } from "./ScriptParam";
 export { ServiceWorker } from "./ServiceWorker";
 export { GraphicImage } from "./GraphicImage";

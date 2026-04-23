@@ -35,6 +35,7 @@ describe("OmniFaces namespace", () => {
         InputFile: "object",
         Form: "object",
         HashParam: "object",
+        LazyPanel: "object",
         ScriptParam: "object",
         ServiceWorker: "object",
         Notification: "object",
@@ -78,6 +79,7 @@ describe("OmniFaces.Util namespace", () => {
         "addSubmitListener",
         "resolveFunction",
         "getFacesForm",
+        "addIntersectionListener",
         "updateParameter",
         "loadScript",
     ];
@@ -165,6 +167,13 @@ describe("OmniFaces.HashParam namespace", () => {
         const hp = OmniFaces.HashParam as Record<string, unknown>;
         expect(typeof hp.init).toBe("function");
         expect(typeof hp.update).toBe("function");
+    });
+});
+
+describe("OmniFaces.LazyPanel namespace", () => {
+    test("exposes init function", () => {
+        const lp = OmniFaces.LazyPanel as Record<string, unknown>;
+        expect(typeof lp.init).toBe("function");
     });
 });
 
