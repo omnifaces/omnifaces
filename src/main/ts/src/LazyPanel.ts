@@ -57,15 +57,13 @@ export namespace LazyPanel {
      * page; an error will be logged by {@link Util.getFacesForm} in that case.
      */
     function trigger(clientId: string, extraParams?: Record<string, unknown>) {
-        const form = Util.getFacesForm();
-
-        if (!form) {
+        if (!Util.getFacesForm()) {
             return;
         }
 
         const options: Record<string, unknown> = { execute: clientId, render: clientId, params: extraParams ?? {} };
         options[EVENT] = "loadLazyPanel";
-        window.faces.ajax.request(form, null, options);
+        window.faces.ajax.request(clientId, null, options);
     }
 
 }

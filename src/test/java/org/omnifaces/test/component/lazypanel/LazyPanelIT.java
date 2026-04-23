@@ -32,6 +32,9 @@ public class LazyPanelIT extends OmniFacesIT {
     @FindBy(id = "form:lazyNoArgs")
     private WebElement lazyNoArgs;
 
+    @FindBy(id = "lazyNoForm")
+    private WebElement lazyNoForm;
+
     @FindBy(id = "form:lazyNoListener")
     private WebElement lazyNoListener;
 
@@ -69,6 +72,20 @@ public class LazyPanelIT extends OmniFacesIT {
         assertFalse(isPresent("placeholder"), "placeholder is replaced");
         assertEquals("1", browser.findElement(By.id("triggerCount")).getText(), "onload fired exactly once");
         assertEquals("N/A", browser.findElement(By.id("triggeredClientId")).getText(), "event was not available");
+    }
+
+    @Test
+    void testLazyPanelNoForm() {
+        open("LazyPanelNoFormIT.xhtml");
+        assertTrue(isDisplayed("placeholder"), "placeholder is shown initially");
+        assertFalse(isPresent("loaded"), "loaded content is not yet rendered");
+
+        scrollIntoView(lazyNoForm);
+        waitUntilTextContains("lazyNoForm", "loaded content");
+        assertTrue(isPresent("loaded"), "loaded content is now rendered");
+        assertFalse(isPresent("placeholder"), "placeholder is replaced");
+        assertEquals("1", browser.findElement(By.id("triggerCount")).getText(), "onload fired exactly once");
+        assertEquals("lazyNoForm", browser.findElement(By.id("triggeredClientId")).getText(), "event carries component client id");
     }
 
     @Test
