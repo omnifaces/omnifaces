@@ -133,6 +133,75 @@ export namespace Util {
     }
 
     /**
+     * Invoke the given callback whenever an observed target intersects the viewport.
+     * Uses {@link IntersectionObserver} when available, with a throttled scroll/resize fallback otherwise.
+     * @param getTargets Function returning the current set of target elements. Called at registration time
+     *   to observe initial targets, and re-queried on each fallback tick to determine when cleanup may occur.
+     * @param onIntersect Callback invoked with each intersecting target.
+     * @param options.once When true, stop observing after the first intersection. When false (default),
+     *   each intersecting target is stopped individually and cleanup occurs once getTargets() is empty.
+     */
+    export function addIntersectionListener<T extends HTMLElement>(
+        getTargets: () => ArrayLike<T>,
+        onIntersect: (target: T) => void,
+        options?: { once?: boolean }
+    ) {
+        const once = options?.once === true;
+
+        if (window.IntersectionObserver) { // https://caniuse.com/?search=IntersectionObserver
+            const observer = new IntersectionObserver((entries, self) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        onIntersect(entry.target as T);
+
+                        if (once) {
+                            self.disconnect();
+                        }
+                        else {
+                            self.unobserve(entry.target);
+                        }
+                    }
+                });
+            });
+
+            Array.from(getTargets()).forEach(target => observer.observe(target));
+        }
+        else {
+            let throttle: number;
+            const listener = function() {
+                if (throttle) {
+                    clearTimeout(throttle); // Throttle is used because firing of resize and scroll events can get quite intense.
+                }
+
+                throttle = setTimeout(function() {
+                    const offsetTopThreshold = window.innerHeight + window.pageYOffset;
+                    const targets = Array.from(getTargets());
+                    let triggered = false;
+
+                    for (const target of targets) {
+                        if (target.offsetTop < offsetTopThreshold) {
+                            onIntersect(target);
+                            triggered = true;
+
+                            if (once) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if ((once && triggered) || getTargets().length === 0) {
+                        removeEventListener(window, "resize orientationChange", listener);
+                        removeEventListener(document, "scroll", listener);
+                    }
+                }, 50);
+            };
+
+            addEventListener(window, "resize orientationChange", listener);
+            addEventListener(document, "scroll", listener);
+        }
+    }
+
+    /**
      * Load a script.
      * @param url Required; The URL of the script.
      * @param crossorigin Optional; The crossorigin of the script. Defaults to "anonymous".

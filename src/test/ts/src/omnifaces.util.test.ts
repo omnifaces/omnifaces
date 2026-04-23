@@ -389,3 +389,181 @@ describe("OmniFaces.Util.loadScript", () => {
         delete (window as any).__testBegin;
     });
 });
+
+// ---- addIntersectionListener ----
+
+describe("OmniFaces.Util.addIntersectionListener (IntersectionObserver path)", () => {
+
+    type ObserverCallback = (entries: Partial<IntersectionObserverEntry>[], self: IntersectionObserver) => void;
+    let observerCallback: ObserverCallback;
+    let observed: Element[];
+    let unobserved: Element[];
+    let disconnectCount: number;
+    let originalIO: typeof IntersectionObserver | undefined;
+
+    beforeEach(() => {
+        observed = [];
+        unobserved = [];
+        disconnectCount = 0;
+        originalIO = window.IntersectionObserver;
+        (window as any).IntersectionObserver = class {
+            constructor(cb: ObserverCallback) {
+                observerCallback = cb;
+            }
+            observe(el: Element) { observed.push(el); }
+            unobserve(el: Element) { unobserved.push(el); }
+            disconnect() { disconnectCount++; }
+        };
+    });
+
+    afterEach(() => {
+        (window as any).IntersectionObserver = originalIO;
+        document.body.innerHTML = "";
+    });
+
+    test("observes each target returned by getTargets", () => {
+        const a = document.createElement("div");
+        const b = document.createElement("div");
+        document.body.append(a, b);
+
+        util().addIntersectionListener(() => [a, b], jest.fn());
+
+        expect(observed).toEqual([a, b]);
+    });
+
+    test("invokes callback and unobserves intersecting target when once is false", () => {
+        const target = document.createElement("div");
+        document.body.appendChild(target);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => [target], onIntersect);
+        observerCallback([{ isIntersecting: true, target }], { disconnect: () => disconnectCount++, unobserve: (el: Element) => unobserved.push(el) } as any);
+
+        expect(onIntersect).toHaveBeenCalledWith(target);
+        expect(unobserved).toEqual([target]);
+        expect(disconnectCount).toBe(0);
+    });
+
+    test("disconnects observer after first intersection when once is true", () => {
+        const target = document.createElement("div");
+        document.body.appendChild(target);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => [target], onIntersect, { once: true });
+        observerCallback([{ isIntersecting: true, target }], { disconnect: () => disconnectCount++, unobserve: (el: Element) => unobserved.push(el) } as any);
+
+        expect(onIntersect).toHaveBeenCalledWith(target);
+        expect(disconnectCount).toBe(1);
+        expect(unobserved).toEqual([]);
+    });
+
+    test("ignores entries where isIntersecting is false", () => {
+        const target = document.createElement("div");
+        document.body.appendChild(target);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => [target], onIntersect);
+        observerCallback([{ isIntersecting: false, target }], { disconnect: () => disconnectCount++, unobserve: (el: Element) => unobserved.push(el) } as any);
+
+        expect(onIntersect).not.toHaveBeenCalled();
+        expect(unobserved).toEqual([]);
+        expect(disconnectCount).toBe(0);
+    });
+});
+
+describe("OmniFaces.Util.addIntersectionListener (scroll/resize fallback)", () => {
+
+    let originalIO: typeof IntersectionObserver | undefined;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        originalIO = window.IntersectionObserver;
+        (window as any).IntersectionObserver = undefined;
+        Object.defineProperty(window, "innerHeight", { value: 1000, writable: true, configurable: true });
+        Object.defineProperty(window, "pageYOffset", { value: 0, writable: true, configurable: true });
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        (window as any).IntersectionObserver = originalIO;
+        document.body.innerHTML = "";
+    });
+
+    function makeTarget(offsetTop: number): HTMLElement {
+        const el = document.createElement("div");
+        Object.defineProperty(el, "offsetTop", { value: offsetTop, configurable: true });
+        document.body.appendChild(el);
+        return el;
+    }
+
+    test("fires callback for targets below threshold on scroll and removes listeners when once triggers", () => {
+        const target = makeTarget(500);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => [target], onIntersect, { once: true });
+
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).toHaveBeenCalledWith(target);
+
+        // Listeners must be removed: a second scroll should not re-fire.
+        onIntersect.mockClear();
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).not.toHaveBeenCalled();
+    });
+
+    test("does not fire when target is beyond viewport threshold", () => {
+        makeTarget(5000);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => Array.from(document.querySelectorAll("div")) as HTMLElement[], onIntersect);
+
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).not.toHaveBeenCalled();
+    });
+
+    test("keeps listening while getTargets() still returns pending targets (non-once)", () => {
+        // Simulate GraphicImage-style mutation: getTargets filters out elements marked "done".
+        const a = makeTarget(100);
+        const b = makeTarget(5000); // Not yet in viewport
+        const getTargets = () => Array.from(document.querySelectorAll<HTMLElement>("div:not([data-done])"));
+        const onIntersect = jest.fn((el: HTMLElement) => el.setAttribute("data-done", ""));
+
+        util().addIntersectionListener(getTargets, onIntersect);
+
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).toHaveBeenCalledWith(a);
+        expect(onIntersect).toHaveBeenCalledTimes(1);
+
+        // Bring b into viewport and scroll again — listeners must still be attached.
+        Object.defineProperty(b, "offsetTop", { value: 200, configurable: true });
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).toHaveBeenCalledWith(b);
+        expect(onIntersect).toHaveBeenCalledTimes(2);
+
+        // Now getTargets() is empty — a final scroll must be a no-op and listeners must be removed.
+        onIntersect.mockClear();
+        document.dispatchEvent(new Event("scroll"));
+        jest.runAllTimers();
+        expect(onIntersect).not.toHaveBeenCalled();
+    });
+
+    test("throttles rapid scroll events via setTimeout", () => {
+        const target = makeTarget(100);
+        const onIntersect = jest.fn();
+
+        util().addIntersectionListener(() => [target], onIntersect, { once: true });
+
+        document.dispatchEvent(new Event("scroll"));
+        document.dispatchEvent(new Event("scroll"));
+        document.dispatchEvent(new Event("scroll"));
+        expect(onIntersect).not.toHaveBeenCalled(); // Still throttled
+
+        jest.runAllTimers();
+        expect(onIntersect).toHaveBeenCalledTimes(1);
+    });
+});
