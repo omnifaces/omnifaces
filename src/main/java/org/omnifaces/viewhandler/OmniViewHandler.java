@@ -268,7 +268,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
                 while ((pending = queue.poll()) != null) {
                     String viewId = pending.getValue();
                     String viewState = pending.getKey();
-                    UIViewRoot viewRoot = super.createView(context, viewId);
+                    UIViewRoot viewRoot = new UIViewRoot();
+                    viewRoot.setViewId(viewId);
                     ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
                     RemoveViewStateFacesContext temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, viewState);
 
