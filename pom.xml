@@ -8,7 +8,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>3.14.17</version>
+	<version>3.14.18-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
@@ -790,6 +790,7 @@
 						<version>0.7.0</version>
 						<extensions>true</extensions>
 						<configuration>
+							<deploymentName>${project.artifactId}-${project.version}</deploymentName>
 							<autoPublish>true</autoPublish>
 						</configuration>
 					</plugin>
