@@ -60,6 +60,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.render.RenderKit;
 import javax.faces.render.ResponseStateManager;
+import javax.faces.view.ViewDeclarationLanguage;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
@@ -254,17 +255,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 				while ((pending = queue.poll()) != null) {
 					String unloadViewId = pending.getValue();
 					String unloadViewState = pending.getKey();
-					UIViewRoot unloadViewRoot = super.createView(context, unloadViewId);
-
-                    if (unloadViewRoot == null) {
-                    	unloadViewRoot = context.getApplication().getViewHandler().getViewDeclarationLanguage(context, unloadViewId).createView(context, unloadViewId);
-
-                    	if (unloadViewRoot == null) {
-                    		unloadViewRoot = new UIViewRoot();
-                    		unloadViewRoot.setViewId(unloadViewId);
-                    	}
-                    }
-
+					UIViewRoot unloadViewRoot = createViewForViewStateRemoval(context, unloadViewId);
 					ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
 					RemoveViewStateFacesContext temporaryContext = new RemoveViewStateFacesContext(context, unloadViewRoot, unloadViewState);
 
@@ -282,6 +273,35 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			}
 		}
 	}
+
+    /**
+     * Create a placeholder view used during {@link #performPendingViewStateRemovals(FacesContext)} to carry the view root state long enough for the associated
+     * view state to be located and removed. The view is neither built nor rendered.
+     * <p>
+     * Unlike {@link #unloadView(FacesContext, String)}, which runs during the actual unload request, this runs during a later unrelated request where
+     * {@code super.createView(context, viewId)} may return {@code null} - observed on Spring {@code FlowViewHandler}, which previously caused a
+     * {@link NullPointerException} in {@link #restoreViewRootState(FacesContext, ResponseStateManager, UIViewRoot)} (see issue #952). In that case this method
+     * works around it by obtaining the view directly from the view declaration language. As a defensive last resort, if that also returns {@code null}, a bare
+     * {@link UIViewRoot} is instantiated.
+     */
+    private UIViewRoot createViewForViewStateRemoval(FacesContext context, String viewId) {
+    	UIViewRoot viewRoot = super.createView(context, viewId);
+
+        if (viewRoot == null) {
+        	ViewDeclarationLanguage vdl = context.getApplication().getViewHandler().getViewDeclarationLanguage(context, viewId);
+
+        	if (vdl != null) {
+        		viewRoot = vdl.createView(context, viewId);
+        	}
+
+            if (viewRoot == null) {
+                viewRoot = new UIViewRoot();
+                viewRoot.setViewId(viewId);
+            }
+        }
+
+        return viewRoot;
+    }
 
 	/**
 	 * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
