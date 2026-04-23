@@ -119,7 +119,7 @@ describe("OmniFaces.LazyPanel.init (IntersectionObserver path)", () => {
 
         expect(mockFaces.ajax.request).toHaveBeenCalledTimes(1);
         const [source, event, options] = mockFaces.ajax.request.mock.calls[0];
-        expect(source).toBe(form);
+        expect(source).toBe("lp2");
         expect(event).toBeNull();
         expect(options.execute).toBe("lp2");
         expect(options.render).toBe("lp2");
