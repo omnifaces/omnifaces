@@ -141,6 +141,10 @@ public final class CombinedResourceInputStream extends InputStream {
      */
     @Override
     public int read(byte[] b, int offset, int length) throws IOException {
+        if (length == 0) {
+            return 0;
+        }
+
         if (preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length)) {
             // Delegate to single-byte read during preamble scanning (only a handful of bytes).
             int singleByte = read();

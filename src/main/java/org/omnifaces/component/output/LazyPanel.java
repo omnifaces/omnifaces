@@ -64,12 +64,13 @@ import org.omnifaces.vdl.FacesComponentConfig;
  * <p>
  * The <code>loaded</code> attribute is a server-side escape hatch: when <code>true</code>, the children are rendered immediately without any client side
  * observer. This is useful for print views, SEO crawlers, or tests.
+ *
  * <pre>
  * &lt;o:lazyPanel loaded="#{bean.printPreview}"&gt;
  *     ...
  * &lt;/o:lazyPanel&gt;
  * </pre>
- * 
+ *
  * <h2>Listener</h2>
  * <p>
  * The <code>listener</code> attribute can be used to invoke a bean method with an optional {@link LazyPanelEvent} argument. It is invoked exactly once, when

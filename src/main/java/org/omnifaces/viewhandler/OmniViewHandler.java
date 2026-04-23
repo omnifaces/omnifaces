@@ -291,7 +291,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         var viewRoot = super.createView(context, viewId);
 
         if (viewRoot == null) {
-            viewRoot = context.getApplication().getViewHandler().getViewDeclarationLanguage(context, viewId).createView(context, viewId);
+            var vdl = context.getApplication().getViewHandler().getViewDeclarationLanguage(context, viewId);
+
+            if (vdl != null) {
+                viewRoot = vdl.createView(context, viewId);
+            }
 
             if (viewRoot == null) {
                 viewRoot = new UIViewRoot();
