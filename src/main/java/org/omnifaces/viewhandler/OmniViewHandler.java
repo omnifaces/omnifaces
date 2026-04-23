@@ -255,10 +255,14 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 					String unloadViewId = pending.getValue();
 					String unloadViewState = pending.getKey();
 					UIViewRoot unloadViewRoot = super.createView(context, unloadViewId);
-					
-                    if (unloadViewRoot == null) { 
-                    	unloadViewRoot = new UIViewRoot();
-                    	unloadViewRoot.setViewId(unloadViewId);
+
+                    if (unloadViewRoot == null) {
+                    	unloadViewRoot = context.getApplication().getViewHandler().getViewDeclarationLanguage(context, viewId).createView(context, viewId);
+
+                    	if (unloadViewRoot == null) {
+                    		unloadViewRoot = new UIViewRoot();
+                    		unloadViewRoot.setViewId(unloadViewId);
+                    	}
                     }
 
 					ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
