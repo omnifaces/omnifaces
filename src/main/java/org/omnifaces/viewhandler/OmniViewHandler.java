@@ -255,6 +255,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 					String unloadViewId = pending.getValue();
 					String unloadViewState = pending.getKey();
 					UIViewRoot unloadViewRoot = super.createView(context, unloadViewId);
+					
+                    if (unloadViewRoot == null) { 
+                    	unloadViewRoot = new UIViewRoot();
+                    	unloadViewRoot.setViewId(unloadViewId);
+                    }
+
 					ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
 					RemoveViewStateFacesContext temporaryContext = new RemoveViewStateFacesContext(context, unloadViewRoot, unloadViewState);
 
