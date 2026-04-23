@@ -35,13 +35,13 @@ public class GraphicImageIT extends OmniFacesIT {
     void testLazyImage() {
         open("GraphicImageIT.xhtml");
         assertEquals("true", image.getAttribute("data-lazy"));
-        assertEquals("/GraphicImageIT/jakarta.faces.resource/logo.png.xhtml", stripHostAndJsessionid(image.getAttribute("data-src")));
+        assertEquals(contextPath + "/jakarta.faces.resource/logo.png.xhtml", stripHostAndJsessionid(image.getAttribute("data-src")));
         assertEquals("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", image.getAttribute("src"));
 
         scrollIntoView(image);
         assertEquals(null, image.getAttribute("data-lazy"));
         assertEquals(null, image.getAttribute("data-src"));
-        assertEquals("/GraphicImageIT/jakarta.faces.resource/logo.png.xhtml", stripHostAndJsessionid(image.getAttribute("src")));
+        assertEquals(contextPath + "/jakarta.faces.resource/logo.png.xhtml", stripHostAndJsessionid(image.getAttribute("src")));
     }
 
 }
