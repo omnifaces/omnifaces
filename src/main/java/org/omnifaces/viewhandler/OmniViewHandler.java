@@ -257,7 +257,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
                 while ((pending = queue.poll()) != null) {
                     var viewId = pending.getValue();
                     var viewState = pending.getKey();
-                    var viewRoot = createUnloadView(context, viewId);
+                    var viewRoot = createViewForViewStateRemoval(context, viewId);
                     var manager = getRenderKit(context).getResponseStateManager();
                     var temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, viewState);
 
@@ -281,13 +281,13 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * view state to be located and removed. The view is neither built nor rendered.
      * <p>
      * Unlike {@link #unloadView(FacesContext, String)}, which runs during the actual unload request, this runs during a later unrelated request where
-     * {@code super.createView(context, viewId)} may return {@code null} - observed on MyFaces, which previously caused a {@link NullPointerException} in
-     * {@link #restoreViewRootState(FacesContext, ResponseStateManager, UIViewRoot)} (see issue #952). In that case this method works around it by obtaining the
-     * view directly from the view declaration language. As a defensive last resort, if that also returns {@code null}, a bare {@link UIViewRoot} is
-     * instantiated; this is guaranteed to work on Mojarra, whereas on MyFaces the absence of a generated id is already compensated for in
+     * {@code super.createView(context, viewId)} may return {@code null} - observed on Spring {@code FlowViewHandler}, which previously caused a
+     * {@link NullPointerException} in {@link #restoreViewRootState(FacesContext, ResponseStateManager, UIViewRoot)} (see issue #952). In that case this method
+     * works around it by obtaining the view directly from the view declaration language. As a defensive last resort, if that also returns {@code null}, a bare
+     * {@link UIViewRoot} is instantiated; this is guaranteed to work on Mojarra, whereas on MyFaces the absence of a generated id is already compensated for in
      * {@link #restoreViewRootState(FacesContext, ResponseStateManager, UIViewRoot)}.
      */
-    private UIViewRoot createUnloadView(FacesContext context, String viewId) {
+    private UIViewRoot createViewForViewStateRemoval(FacesContext context, String viewId) {
         var viewRoot = super.createView(context, viewId);
 
         if (viewRoot == null) {
