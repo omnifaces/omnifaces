@@ -522,6 +522,7 @@ public abstract class OmniFacesIT {
     public enum WebXml {
         basic,
         distributable,
+        distributableWithThreeViewsInSession,
         withDevelopmentStage,
         withErrorPage,
         withFacesViews,
