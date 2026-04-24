@@ -502,6 +502,7 @@ public final class Hacks {
     /**
      * Returns true if the given ViewHandler is or wraps Spring WebFlow's org.springframework.faces.webflow.FlowViewHandler.
      * See also https://github.com/omnifaces/omnifaces/issues/952
+     * @since 3.14.19
      */
     public static boolean isSpringWebFlowViewHandler(ViewHandler viewHandler) {
         ViewHandler current = viewHandler;
