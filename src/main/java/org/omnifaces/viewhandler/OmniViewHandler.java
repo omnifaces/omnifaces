@@ -60,6 +60,7 @@ import jakarta.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.WebXml;
 import org.omnifaces.resourcehandler.PWAResourceHandler;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.taghandler.EnableRestorableView;
@@ -94,6 +95,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     private static final String SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS = "omnifaces.PendingViewStateRemovals";
 
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    private final boolean usePendingViewStateRemoval;
+
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
@@ -103,6 +108,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      */
     public OmniViewHandler(ViewHandler wrapped) {
         super(wrapped);
+        usePendingViewStateRemoval = WebXml.instance().isDistributable() && !Hacks.isSpringWebFlowViewHandler(wrapped);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -117,7 +123,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             return createServiceWorkerView(context, viewId);
         }
 
-        performPendingViewStateRemovals(context);
+        if (usePendingViewStateRemoval) {
+            performPendingViewStateRemovals(context);
+        }
+
         return super.createView(context, viewId);
     }
 
@@ -182,10 +191,16 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the view scoped beans and register a pending
-     * view state removal to be performed during the next {@link #createView(FacesContext, String)} call. Or, if the session is new (during an unload request,
-     * it implies it had expired), then explicitly send a permanent redirect to the original request URI. This way any authentication framework which remembers
-     * the "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the view scoped beans. On a distributable
+     * deployment (<code>&lt;distributable&gt;</code> in <code>web.xml</code>) the actual
+     * {@link Hacks#removeViewState(FacesContext, ResponseStateManager, String)} call is deferred to the next {@link #createView(FacesContext, String)} call via
+     * {@link #registerPendingViewStateRemoval(FacesContext, String)}, so that the unload beacon no longer concurrently mutates the session and last-writer-wins
+     * conflicts in distributed session stores are prevented (see issue #941). On a non-distributable deployment, or when Spring WebFlow's
+     * {@code FlowViewHandler} is detected in the wrapped chain, the removal is performed synchronously here; deferring it is pointless on a non-distributable
+     * deployment, and on Spring WebFlow the captured view ID is tied to a transient flow execution and no longer resolves during the next request (see issue
+     * #952). Or, if the session is new (during an unload request, it implies it had expired), then explicitly send a permanent redirect to the original request
+     * URI. This way any authentication framework which remembers the "last requested restricted URL" will redirect back to correct (non-unload) URL after login
+     * on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
@@ -194,7 +209,13 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         if (restoreViewRootState(context, manager, createdView)) {
             context.setProcessingEvents(true);
             context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
-            registerPendingViewStateRemoval(context, viewId);
+
+            if (usePendingViewStateRemoval) {
+                registerPendingViewStateRemoval(context, viewId);
+            }
+            else {
+                Hacks.removeViewState(context, manager, viewId);
+            }
         }
         else if (isSessionNew(context)) {
             redirectPermanent(context, getRequestURIWithQueryString(context));
