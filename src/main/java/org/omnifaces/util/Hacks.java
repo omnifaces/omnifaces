@@ -47,6 +47,8 @@ import java.util.logging.Logger;
 import javax.el.VariableMapper;
 import javax.faces.FacesWrapper;
 import javax.faces.application.ResourceHandler;
+import javax.faces.application.ViewHandler;
+import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
@@ -464,6 +466,31 @@ public final class Hacks {
 	public static boolean isTomcatWebSocketBombed(Session session, IllegalStateException illegalStateException) {
 		return session.getClass().getName().startsWith("org.apache.tomcat.websocket.")
 			&& illegalStateException.getMessage().contains("[TEXT_FULL_WRITING]");
+	}
+
+	// Spring WebFlow related -----------------------------------------------------------------------------------------
+
+	/**
+	 * Returns true if the given ViewHandler is or wraps Spring WebFlow's org.springframework.faces.webflow.FlowViewHandler.
+	 * See also https://github.com/omnifaces/omnifaces/issues/952
+	 * @since 3.14.19
+	 */
+	public static boolean isSpringWebFlowViewHandler(ViewHandler viewHandler) {
+		ViewHandler current = viewHandler;
+
+		while (current != null) {
+			if ("org.springframework.faces.webflow.FlowViewHandler".equals(current.getClass().getName())) {
+				return true;
+			}
+
+			if (!(current instanceof ViewHandlerWrapper)) {
+				return false;
+			}
+
+			current = ((ViewHandlerWrapper) current).getWrapped();
+		}
+
+		return false;
 	}
 
 }
