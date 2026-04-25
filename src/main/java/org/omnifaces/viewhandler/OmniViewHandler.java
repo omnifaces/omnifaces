@@ -210,11 +210,17 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             context.setProcessingEvents(true);
             context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 
+            // Use createdView.getViewId() rather than the raw URL viewId so that the canonical (post-deriveLogicalViewId)
+            // form is used when reconstructing the MyFaces SerializedViewKey. Otherwise the extensionless mapping case
+            // (e.g. raw "/pages/desktop" vs. canonical "/pages/desktop.xhtml") yields a different viewId.hashCode() and
+            // the view state is never actually removed (see issue #952).
+            var canonicalViewId = createdView.getViewId();
+
             if (usePendingViewStateRemoval) {
-                registerPendingViewStateRemoval(context, viewId);
+                registerPendingViewStateRemoval(context, canonicalViewId);
             }
             else {
-                Hacks.removeViewState(context, manager, viewId);
+                Hacks.removeViewState(context, manager, canonicalViewId);
             }
         }
         else if (isSessionNew(context)) {
@@ -276,17 +282,15 @@ public class OmniViewHandler extends ViewHandlerWrapper {
                 Entry<String, String> pending;
 
                 while ((pending = queue.poll()) != null) {
-                    var viewId = pending.getValue();
-                    var viewState = pending.getKey();
-                    var viewRoot = createViewForViewStateRemoval(context, viewId);
+                    var viewRoot = createViewForViewStateRemoval(context, pending.getValue());
                     var manager = getRenderKit(context).getResponseStateManager();
-                    var temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, viewState);
+                    var temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, pending.getKey());
 
                     try {
                         setContext(temporaryContext);
 
                         if (restoreViewRootState(temporaryContext, manager, viewRoot)) {
-                            Hacks.removeViewState(temporaryContext, manager, viewId);
+                            Hacks.removeViewState(temporaryContext, manager, viewRoot.getViewId());
                         }
                     }
                     finally {

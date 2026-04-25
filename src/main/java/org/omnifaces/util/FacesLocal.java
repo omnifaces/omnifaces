@@ -552,6 +552,9 @@ public final class FacesLocal {
         else if (path.endsWith(mapping)) {
             return path.substring(0, path.lastIndexOf('.')) + getFaceletsSuffix(context);
         }
+        else if (path.lastIndexOf('.') < path.lastIndexOf('/')) { // Extensionless mapping.
+            return path + getFaceletsSuffix(context);
+        }
 
         return path;
     }
