@@ -108,7 +108,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      */
     public OmniViewHandler(ViewHandler wrapped) {
         super(wrapped);
-        usePendingViewStateRemoval = WebXml.instance().isDistributable() && !Hacks.isSpringWebFlowViewHandler(wrapped);
+        usePendingViewStateRemoval = WebXml.instance().isDistributable();
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -195,12 +195,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * deployment (<code>&lt;distributable&gt;</code> in <code>web.xml</code>) the actual
      * {@link Hacks#removeViewState(FacesContext, ResponseStateManager, String)} call is deferred to the next {@link #createView(FacesContext, String)} call via
      * {@link #registerPendingViewStateRemoval(FacesContext, String)}, so that the unload beacon no longer concurrently mutates the session and last-writer-wins
-     * conflicts in distributed session stores are prevented (see issue #941). On a non-distributable deployment, or when Spring WebFlow's
-     * {@code FlowViewHandler} is detected in the wrapped chain, the removal is performed synchronously here; deferring it is pointless on a non-distributable
-     * deployment, and on Spring WebFlow the captured view ID is tied to a transient flow execution and no longer resolves during the next request (see issue
-     * #952). Or, if the session is new (during an unload request, it implies it had expired), then explicitly send a permanent redirect to the original request
-     * URI. This way any authentication framework which remembers the "last requested restricted URL" will redirect back to correct (non-unload) URL after login
-     * on a new session.
+     * conflicts in distributed session stores are prevented (see issue #941). On a non-distributable deployment the removal is performed synchronously here;
+     * deferring it is pointless then. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send a permanent
+     * redirect to the original request URI. This way any authentication framework which remembers the "last requested restricted URL" will redirect back to
+     * correct (non-unload) URL after login on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
