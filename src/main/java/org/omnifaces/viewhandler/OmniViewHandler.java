@@ -114,7 +114,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      */
     public OmniViewHandler(ViewHandler wrapped) {
         super(wrapped);
-        usePendingViewStateRemoval = WebXml.instance().isDistributable() && !Hacks.isSpringWebFlowViewHandler(wrapped);
+        usePendingViewStateRemoval = WebXml.instance().isDistributable();
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -207,13 +207,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * actual {@link Hacks#removeViewState(FacesContext, ResponseStateManager, String)} call is deferred to the next
      * {@link #createView(FacesContext, String)} call via {@link #registerPendingViewStateRemoval(FacesContext, String)},
      * so that the unload beacon no longer concurrently mutates the session and last-writer-wins conflicts in
-     * distributed session stores are prevented (see issue #941). On a non-distributable deployment, or when Spring
-     * WebFlow's {@code FlowViewHandler} is detected in the wrapped chain, the removal is performed synchronously here;
-     * deferring it is pointless on a non-distributable deployment, and on Spring WebFlow the captured view ID is tied
-     * to a transient flow execution and no longer resolves during the next request (see issue #952). Or, if the
-     * session is new (during an unload request, it implies it had expired), then explicitly send a permanent redirect
-     * to the original request URI. This way any authentication framework which remembers the "last requested
-     * restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+     * distributed session stores are prevented (see issue #941). On a non-distributable deployment the removal is
+     * performed synchronously here; deferring it is pointless then. Or, if the session is new (during an unload
+     * request, it implies it had expired), then explicitly send a permanent redirect to the original request URI.
+     * This way any authentication framework which remembers the "last requested restricted URL" will redirect back to
+     * correct (non-unload) URL after login on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
@@ -223,11 +221,17 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             context.setProcessingEvents(true);
             context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 
+            // Use createdView.getViewId() rather than the raw URL viewId so that the canonical (post-deriveLogicalViewId)
+            // form is used when reconstructing the MyFaces SerializedViewKey. Otherwise the extensionless mapping case
+            // (e.g. raw "/pages/desktop" vs. canonical "/pages/desktop.xhtml") yields a different viewId.hashCode() and
+            // the view state is never actually removed (see issue #952).
+            var canonicalViewId = createdView.getViewId();
+
             if (usePendingViewStateRemoval) {
-                registerPendingViewStateRemoval(context, viewId);
+                registerPendingViewStateRemoval(context, canonicalViewId);
             }
             else {
-                Hacks.removeViewState(context, manager, viewId);
+                Hacks.removeViewState(context, manager, canonicalViewId);
             }
         }
         else if (isSessionNew(context)) {
@@ -289,17 +293,15 @@ public class OmniViewHandler extends ViewHandlerWrapper {
                 Entry<String, String> pending;
 
                 while ((pending = queue.poll()) != null) {
-                    String viewId = pending.getValue();
-                    String viewState = pending.getKey();
-                    UIViewRoot viewRoot = createViewForViewStateRemoval(context, viewId);
+                    UIViewRoot viewRoot = createViewForViewStateRemoval(context, pending.getValue());
                     ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
-                    RemoveViewStateFacesContext temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, viewState);
+                    RemoveViewStateFacesContext temporaryContext = new RemoveViewStateFacesContext(context, viewRoot, pending.getKey());
 
                     try {
                         setContext(temporaryContext);
 
                         if (restoreViewRootState(temporaryContext, manager, viewRoot)) {
-                            Hacks.removeViewState(temporaryContext, manager, viewId);
+                            Hacks.removeViewState(temporaryContext, manager, viewRoot.getViewId());
                         }
                     }
                     finally {
