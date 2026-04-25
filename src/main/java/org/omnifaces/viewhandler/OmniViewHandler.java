@@ -208,11 +208,17 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 
+			// Use createdView.getViewId() rather than the raw URL viewId so that the canonical (post-deriveLogicalViewId)
+			// form is used when reconstructing the MyFaces SerializedViewKey. Otherwise the extensionless mapping case
+			// (e.g. raw "/pages/desktop" vs. canonical "/pages/desktop.xhtml") yields a different viewId.hashCode() and
+			// the view state is never actually removed (see issue #952).
+			String canonicalViewId = createdView.getViewId();
+
 			if (usePendingViewStateRemoval) {
-				registerPendingViewStateRemoval(context, viewId);
+				registerPendingViewStateRemoval(context, canonicalViewId);
 			}
 			else {
-				Hacks.removeViewState(context, manager, viewId);
+				Hacks.removeViewState(context, manager, canonicalViewId);
 			}
 		}
 		else if (isSessionNew(context)) {
@@ -284,7 +290,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 						setContext(temporaryContext);
 
 						if (restoreViewRootState(temporaryContext, manager, unloadViewRoot)) {
-							Hacks.removeViewState(temporaryContext, manager, unloadViewId);
+							Hacks.removeViewState(temporaryContext, manager, unloadViewRoot.getViewId());
 						}
 					}
 					finally {

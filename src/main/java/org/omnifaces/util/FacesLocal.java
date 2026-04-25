@@ -550,6 +550,10 @@ public final class FacesLocal {
 			return path.substring(0, path.lastIndexOf('.')) + Utils.coalesce(
 				getInitParameter(context, ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
 		}
+		else if (path.lastIndexOf('.') < path.lastIndexOf('/')) { // Extensionless mapping.
+			return path + Utils.coalesce(
+				getInitParameter(context, ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
+		}
 
 		return path;
 	}
