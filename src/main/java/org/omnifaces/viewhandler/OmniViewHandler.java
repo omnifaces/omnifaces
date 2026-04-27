@@ -234,7 +234,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 
 		if (viewRootState != null) {
+			String viewId = view.getViewId();
 			view.restoreState(context, viewRootState);
+			view.setViewId(viewId);
 			context.setViewRoot(view);
 			return true;
 		}
