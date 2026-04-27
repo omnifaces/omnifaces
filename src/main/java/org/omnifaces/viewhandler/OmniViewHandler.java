@@ -61,7 +61,6 @@ import jakarta.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.config.WebXml;
 import org.omnifaces.resourcehandler.PWAResourceHandler;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.taghandler.EnableRestorableView;
@@ -96,10 +95,6 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     private static final String SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS = "omnifaces.PendingViewStateRemovals";
 
-    // Variables ------------------------------------------------------------------------------------------------------
-
-    private final boolean usePendingViewStateRemoval;
-
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
@@ -109,7 +104,6 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      */
     public OmniViewHandler(ViewHandler wrapped) {
         super(wrapped);
-        usePendingViewStateRemoval = WebXml.instance().isDistributable();
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -124,10 +118,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
             return createServiceWorkerView(context, viewId);
         }
 
-        if (usePendingViewStateRemoval) {
-            performPendingViewStateRemovals(context);
-        }
-
+        performPendingViewStateRemovals(context);
         return super.createView(context, viewId);
     }
 
@@ -192,14 +183,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
     }
 
     /**
-     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the view scoped beans. On a distributable
-     * deployment (<code>&lt;distributable&gt;</code> in <code>web.xml</code>) the actual
+     * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the view scoped beans. The actual
      * {@link Hacks#removeViewState(FacesContext, ResponseStateManager, String)} call is deferred to the next {@link #createView(FacesContext, String)} call via
-     * {@link #registerPendingViewStateRemoval(FacesContext, String)}, so that the unload beacon no longer concurrently mutates the session and last-writer-wins
-     * conflicts in distributed session stores are prevented (see issue #941). On a non-distributable deployment the removal is performed synchronously here;
-     * deferring it is pointless then. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send a permanent
-     * redirect to the original request URI. This way any authentication framework which remembers the "last requested restricted URL" will redirect back to
-     * correct (non-unload) URL after login on a new session.
+     * {@link #registerPendingViewStateRemoval(FacesContext, UIViewRoot)}, so that the unload beacon no longer concurrently mutates the session and
+     * last-writer-wins conflicts in distributed session stores are prevented (see issue #941). Or, if the session is new (during an unload request, it implies
+     * it had expired), then explicitly send a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
+     * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
@@ -208,19 +197,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         if (restoreViewRootState(context, manager, createdView)) {
             context.setProcessingEvents(true);
             context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
-
-            // Use createdView.getViewId() rather than the raw URL viewId so that the canonical (post-deriveLogicalViewId)
-            // form is used when reconstructing the MyFaces SerializedViewKey. Otherwise the extensionless mapping case
-            // (e.g. raw "/pages/desktop" vs. canonical "/pages/desktop.xhtml") yields a different viewId.hashCode() and
-            // the view state is never actually removed (see issue #952).
-            var canonicalViewId = createdView.getViewId();
-
-            if (usePendingViewStateRemoval) {
-                registerPendingViewStateRemoval(context, canonicalViewId);
-            }
-            else {
-                Hacks.removeViewState(context, manager, canonicalViewId);
-            }
+            registerPendingViewStateRemoval(context, createdView);
         }
         else if (isSessionNew(context)) {
             redirectPermanent(context, getRequestURIWithQueryString(context));
@@ -268,9 +245,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         return false;
     }
 
-    private static void registerPendingViewStateRemoval(FacesContext context, String viewId) {
+    private static void registerPendingViewStateRemoval(FacesContext context, UIViewRoot view) {
         getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS, ConcurrentLinkedQueue::new)
-            .add(new SimpleImmutableEntry<>(getRequestParameter(context, VIEW_STATE_PARAM), viewId)); // Map.entry is not Serializable!
+            .add(new SimpleImmutableEntry<>(getRequestParameter(context, VIEW_STATE_PARAM), view.getViewId())); // Map.entry is not Serializable!
     }
 
     private void performPendingViewStateRemovals(FacesContext context) {
