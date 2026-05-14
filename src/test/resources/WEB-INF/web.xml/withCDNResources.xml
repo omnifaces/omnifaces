@@ -23,8 +23,13 @@
         <param-name>org.omnifaces.CDN_RESOURCE_HANDLER_URLS</param-name>
         <param-value>
             cdn:jquery-ui.css=https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css,
-            cdn:jquery.js=https://code.jquery.com/jquery-2.2.4.min.js
+            cdn:jquery.js=https://code.jquery.com/jquery-2.2.4.min.js,
+            wildcardlib:*=https://cdn.example.com/wildcardlib/*
         </param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.omnifaces.CDN_RESOURCE_HANDLER_EXCLUDED_RESOURCES</param-name>
+        <param-value>wildcardlib:keep-local.js</param-value>
     </context-param>
     <context-param>
         <param-name>org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED</param-name>
