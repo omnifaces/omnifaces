@@ -19,7 +19,9 @@ import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.faces.application.Resource;
 import jakarta.faces.application.ResourceDependency;
@@ -132,6 +134,27 @@ import jakarta.faces.application.ResourceHandler;
  * &lt;script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
  * </pre>
  *
+ * <h2>Excluding resources</h2>
+ * <p>
+ * Since 5.4, when using the wildcard configuration, it may happen that a specific resource of the library is not actually hosted on the CDN (e.g. PrimeFaces
+ * <code>dynamiccontent.properties</code> which is used by <code>&lt;p:fileDownload&gt;</code>). You can exclude individual resources from CDN remapping by
+ * means of the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_EXCLUDED_RESOURCES} context parameter, which takes a comma separated
+ * string of <code>libraryName:resourceName</code> identifiers. Excluded resources will be served as-is by the default Faces resource handler, bypassing the
+ * CDN.
+ *
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;primefaces:*=https://cdn.example.com/primefaces/15.0.15/*&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_EXCLUDED_RESOURCES&lt;/param-name&gt;
+ *     &lt;param-value&gt;primefaces:dynamiccontent.properties&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * Note that the match is exact: wildcards such as <code>library:*</code> are not supported in the exclude list.
+ *
  * <h2>EL expressions</h2>
  * <p>
  * The CDN resource handler supports evaluating EL expessions in the CDN URL. Here's an example:
@@ -192,6 +215,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
     /** The context parameter name to conditionally disable CDN resource handler. @since 2.0 */
     public static final String PARAM_NAME_CDN_DISABLED = "org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED";
 
+    /** The context parameter name to specify resource identifiers which needs to be excluded from CDN remapping. @since 5.4 */
+    public static final String PARAM_NAME_CDN_EXCLUDED_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_EXCLUDED_RESOURCES";
+
     private static final String ERROR_MISSING_INIT_PARAM = "Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
     private static final String ERROR_INVALID_INIT_PARAM = "Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax."
         + " It must follow 'resourceId=URL,resourceId=URL,resourceId=URL' syntax.";
@@ -203,6 +229,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
     private String disabledParam;
     private Map<ResourceIdentifier, String> cdnResources;
+    private Set<ResourceIdentifier> excludedResources;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -217,6 +244,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
         super(wrapped);
         disabledParam = getInitParameter(PARAM_NAME_CDN_DISABLED);
         cdnResources = initCDNResources();
+        excludedResources = initExcludedResources();
 
         if (cdnResources == null) {
             throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
@@ -239,6 +267,10 @@ public class CDNResourceHandler extends DefaultResourceHandler {
             if (parseBoolean(String.valueOf(disabled))) {
                 return resource;
             }
+        }
+
+        if (excludedResources.contains(new ResourceIdentifier(libraryName, resourceName))) {
+            return resource;
         }
 
         String requestPath = null;
@@ -298,6 +330,22 @@ public class CDNResourceHandler extends DefaultResourceHandler {
         });
 
         return cdnResources;
+    }
+
+    /**
+     * Initialize the set of resource identifiers which are excluded from CDN remapping.
+     *
+     * @return The set of excluded resources, or an empty set if the context parameter has not been set.
+     */
+    private static Set<ResourceIdentifier> initExcludedResources() {
+        var excludedResources = new HashSet<ResourceIdentifier>(1);
+        var excludedResourcesParam = getInitParameter(PARAM_NAME_CDN_EXCLUDED_RESOURCES);
+
+        if (!isEmpty(excludedResourcesParam)) {
+            splitAndTrim(excludedResourcesParam, ",").forEach(id -> excludedResources.add(new ResourceIdentifier(id)));
+        }
+
+        return excludedResources;
     }
 
 }
