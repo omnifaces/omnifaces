@@ -41,6 +41,10 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * {@link Collection}s and {@link Map}s of them and as last resort it will use the {@link Introspector} to examine it as a Javabean and encode it like a
  * {@link Map}.
  * <p>
+ * Since 5.4, each OmniFaces ajax response also exposes {@link FacesContext#isValidationFailed()} to the client side as
+ * <code>OmniFaces.Ajax.validationFailed</code> (boolean), so JavaScript can react to validation failures without server or DOM round-trips, e.g.
+ * <code>if (OmniFaces.Ajax.validationFailed) { ... }</code>.
+ * <p>
  * Note that {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)} can only update cell content when it has been wrapped in some container
  * component with a fixed ID.
  *

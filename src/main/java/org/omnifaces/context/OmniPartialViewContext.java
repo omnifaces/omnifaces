@@ -55,6 +55,8 @@ import org.omnifaces.util.Json;
  * <li>Fixes the no-feedback problem when a {@link ViewExpiredException} occurs during an ajax request on a page which is restricted by <code>web.xml</code>
  * <code>&lt;security-constraint&gt;</code>. The enduser will now properly be redirected to the login page instead of retrieving an ajax response with only a
  * changed view state (and effectively thus no visual feedback at all).</li>
+ * <li>Since 5.4, each OmniFaces ajax response exposes {@link FacesContext#isValidationFailed()} to the client side as
+ * <code>OmniFaces.Ajax.validationFailed</code> (boolean).</li>
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
@@ -73,7 +75,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String AJAX_DATA = "var OmniFaces=OmniFaces||{};OmniFaces.Ajax={data:%s};";
+    private static final String AJAX_OBJECT = "var OmniFaces=OmniFaces||{};OmniFaces.Ajax={validationFailed:%s%s};";
     private static final String ERROR_NO_OMNI_PVC = "There is no current OmniPartialViewContext instance.";
 
     // Variables ------------------------------------------------------------------------------------------------------
@@ -333,11 +335,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
                 endUpdate();
             }
             else {
-                if (context.arguments != null) {
-                    startEval();
-                    write(AJAX_DATA.formatted(Json.encode(context.arguments)));
-                    endEval();
-                }
+                var validationFailed = FacesContext.getCurrentInstance().isValidationFailed();
+                var data = context.arguments != null ? (",data:" + Json.encode(context.arguments)) : "";
+                startEval();
+                write(AJAX_OBJECT.formatted(validationFailed, data));
+                endEval();
 
                 if (context.callbackScripts != null) {
                     for (var callbackScript : context.callbackScripts) {
