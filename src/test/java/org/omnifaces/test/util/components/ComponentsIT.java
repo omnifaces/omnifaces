@@ -85,22 +85,23 @@ public class ComponentsIT extends OmniFacesIT {
 
     @Test
     void testAddScriptResource() {
-        assertFalse((Boolean) executeScript("return !!window.OmniFaces"));
+        assertFalse((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should NOT be loaded");
 
         guardAjax(addScriptResource::click);
-        assertEquals(0, consoleErrors.size());
-        assertTrue((Boolean) executeScript("return !!window.OmniFaces"));
+        assertEquals(0, consoleErrors.size(), "There should be NO console errors: " + consoleErrors);
+        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should be loaded");
+        assertEquals(1, networkResponses.size(), "There should be ONE network response: " + networkResponses);
         var responseBody = getResponseBody();
-        assertTrue(responseBody.contains("<partial-response"));
-        assertTrue(responseBody.contains("<eval"));
+        assertTrue(responseBody.contains("<partial-response"), "response body represent partial response: " + responseBody);
+        assertTrue(responseBody.contains("var OmniFaces=(()=>"), "response body should contain omnifaces.js script: " + responseBody);
 
         guardAjax(addScriptResource::click);
-        assertEquals(0, consoleErrors.size());
-        assertTrue((Boolean) executeScript("return !!window.OmniFaces"));
-        assertEquals(1, networkResponses.size());
+        assertEquals(0, consoleErrors.size(), "There should be no console errors: " + consoleErrors);
+        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should be loaded");
+        assertEquals(1, networkResponses.size(), "There should be ONE network response: " + networkResponses);
         responseBody = getResponseBody();
-        assertTrue(responseBody.contains("<partial-response"));
-        assertFalse(responseBody.contains("<eval"));
+        assertTrue(responseBody.contains("<partial-response"), "response body represent partial response: " + responseBody);
+        assertFalse(responseBody.contains("var OmniFaces=(()=>"), "response body should NOT contain omnifaces.js script: " + responseBody);
     }
 
 }
