@@ -55,8 +55,8 @@ import org.omnifaces.util.Json;
  * <li>Fixes the no-feedback problem when a {@link ViewExpiredException} occurs during an ajax request on a page which is restricted by <code>web.xml</code>
  * <code>&lt;security-constraint&gt;</code>. The enduser will now properly be redirected to the login page instead of retrieving an ajax response with only a
  * changed view state (and effectively thus no visual feedback at all).</li>
- * <li>Since 5.4, each Faces ajax response exposes {@link FacesContext#isValidationFailed()} to the client side as
- * <code>OmniFaces.Ajax.validationFailed</code> (boolean).</li>
+ * <li>Since 5.4, each Faces ajax response exposes {@link FacesContext#isValidationFailed()} to the client side as <code>OmniFaces.Ajax.validationFailed</code>
+ * (boolean).</li>
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
