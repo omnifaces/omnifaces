@@ -254,7 +254,13 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         if (hasSession(context)) {
             Queue<Entry<String, String>> queue = getSessionAttribute(context, SESSION_ATTRIBUTE_PENDING_VIEW_STATE_REMOVALS);
 
-            if (queue != null) {
+            if (queue != null && !queue.isEmpty()) {
+                // Eagerly create the ELContext while the real FacesContext is still the current instance. The loop below
+                // temporarily swaps in a RemoveViewStateFacesContext via setContext(). MyFaces binds and caches the request
+                // ELContext to whichever FacesContext is the current instance when getELContext() is first called, so
+                // creating it here prevents it from being bound to the temporary wrapper for the remainder of the request.
+                context.getELContext();
+
                 Entry<String, String> pending;
 
                 while ((pending = queue.poll()) != null) {
