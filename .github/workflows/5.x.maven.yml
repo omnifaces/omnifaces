@@ -31,6 +31,7 @@ jobs:
     name: Test 5.x on ${{matrix.server}}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         server: [ wildfly-mojarra, liberty-myfaces, glassfish-mojarra, tomcat-mojarra, tomcat-myfaces, payara-mojarra, quarkus-myfaces ]
     steps:
