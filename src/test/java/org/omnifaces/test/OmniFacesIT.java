@@ -120,17 +120,7 @@ public abstract class OmniFacesIT {
                     devTools.send(Log.enable());
                     devTools.addListener(Log.entryAdded(), entry -> {
                         if ("error".equalsIgnoreCase(entry.getLevel().toString())) {
-                            var url = entry.getUrl().map(u -> " [" + u + "]").orElse("");
-                            var stack = entry.getStackTrace()
-                                .map(
-                                    s -> s.getCallFrames().stream()
-                                        .map(
-                                            f -> "\n\tat " + f.getFunctionName() + "(" + f.getUrl() + ":" + f.getLineNumber() + ":" + f.getColumnNumber() + ")"
-                                        )
-                                        .collect(joining())
-                                )
-                                .orElse("");
-                            consoleErrors.add(entry.getSource() + ": " + entry.getText() + url + stack);
+                            consoleErrors.add(entry.getText());
                         }
                     });
 
@@ -222,14 +212,10 @@ public abstract class OmniFacesIT {
         networkResponses.clear();
         consoleErrors.clear();
         var uuid = UUID.randomUUID().toString();
-        executeScript(
-            "window.$ajax=true;"
-                + "faces.ajax.addOnEvent(data=>{if(data.status=='success')window.$ajax='" + uuid + "'});"
-                + "faces.ajax.addOnError(()=>window.$ajax='" + uuid + "')"
-        );
+        executeScript("window.$ajax=true;faces.ajax.addOnEvent(data=>{if(data.status=='complete')window.$ajax='" + uuid + "'})");
         action.run();
-        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')"));
         // window.$ajax will be falsey when ajax redirect has occurred.
+        waitUntil(() -> executeScript("return window.$ajax=='" + uuid + "' || (!window.$ajax && document.readyState=='complete')"));
     }
 
     protected void guardPrimeFacesAjax(Runnable action) {
