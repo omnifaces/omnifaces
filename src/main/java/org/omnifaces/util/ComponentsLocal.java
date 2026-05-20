@@ -31,7 +31,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
-import static org.omnifaces.util.AjaxLocal.load;
 import static org.omnifaces.util.AjaxLocal.oncomplete;
 import static org.omnifaces.util.Components.LABEL_ATTRIBUTE;
 import static org.omnifaces.util.Components.VALUE_ATTRIBUTE;
@@ -319,10 +318,7 @@ public final class ComponentsLocal {
     public static void addScriptResource(FacesContext context, String libraryName, String resourceName) {
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
-                // Because component resources are rendered BEFORE components and thus addScriptResource would be too late.
-                load(context, libraryName, resourceName);
-                addScriptResourceToBody(context, libraryName, resourceName); // Just to register it in the component tree as we need to mark it rendered.
-                context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
+                addScriptResourceToBody(context, libraryName, resourceName);
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
                 addScriptResourceToHead(context, libraryName, resourceName);
