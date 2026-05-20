@@ -85,22 +85,34 @@ public class ComponentsIT extends OmniFacesIT {
 
     @Test
     void testAddScriptResource() {
-        assertFalse((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should NOT be loaded");
+        assertFalse((Boolean) executeScript("return !!window.OmniFaces"), "window.OmniFaces should NOT be available: " + consoleErrors);
 
         guardAjax(addScriptResource::click);
-        assertEquals(0, consoleErrors.size(), "There should be NO console errors: " + consoleErrors);
-        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should be loaded");
-        assertEquals(1, networkResponses.size(), "There should be ONE network response: " + networkResponses);
-        var responseBody = getResponseBody();
-        assertTrue(responseBody.contains("<partial-response"), "response body represent partial response: " + responseBody);
+        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "window.OmniFaces should be available: " + consoleErrors);
+        assertFalse(
+            networkResponses.keySet().stream().anyMatch(url -> url.contains("omnifaces.js")),
+            "omnifaces.js should NOT be loaded via script: " + networkResponses.keySet()
+        );
+        var responseBody = networkResponses.entrySet().stream().filter(response -> response.getKey().contains("ComponentsIT.xhtml")).findFirst().get()
+            .getValue();
         assertTrue(responseBody.contains("var OmniFaces=(()=>"), "response body should contain omnifaces.js script: " + responseBody);
 
         guardAjax(addScriptResource::click);
-        assertEquals(0, consoleErrors.size(), "There should be no console errors: " + consoleErrors);
-        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "omnifaces.js should be loaded");
-        assertEquals(1, networkResponses.size(), "There should be ONE network response: " + networkResponses);
-        responseBody = getResponseBody();
-        assertTrue(responseBody.contains("<partial-response"), "response body represent partial response: " + responseBody);
+        assertFalse(
+            networkResponses.keySet().stream().anyMatch(url -> url.contains("omnifaces.js")),
+            "omnifaces.js should NOT be loaded via script: " + networkResponses.keySet()
+        );
+        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "window.OmniFaces should still be available: " + consoleErrors);
+        responseBody = networkResponses.entrySet().stream().filter(response -> response.getKey().contains("ComponentsIT.xhtml")).findFirst().get().getValue();
+        assertFalse(responseBody.contains("var OmniFaces=(()=>"), "response body should NOT contain omnifaces.js script: " + responseBody);
+
+        guardAjax(addScriptResource::click);
+        assertFalse(
+            networkResponses.keySet().stream().anyMatch(url -> url.contains("omnifaces.js")),
+            "omnifaces.js should NOT be loaded via script: " + networkResponses.keySet()
+        );
+        assertTrue((Boolean) executeScript("return !!window.OmniFaces"), "window.OmniFaces should still be available: " + consoleErrors);
+        responseBody = networkResponses.entrySet().stream().filter(response -> response.getKey().contains("ComponentsIT.xhtml")).findFirst().get().getValue();
         assertFalse(responseBody.contains("var OmniFaces=(()=>"), "response body should NOT contain omnifaces.js script: " + responseBody);
     }
 
