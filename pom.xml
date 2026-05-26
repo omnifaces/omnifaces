@@ -67,24 +67,25 @@
         <maven.source.excludeResources>true</maven.source.excludeResources>
 
         <!-- Test server versions. -->
-        <test.wildfly-mojarra.version>39.0.1.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
+        <test.wildfly-mojarra.version>40.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.liberty-myfaces.version>26.0.0.4-beta</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
-        <test.glassfish-mojarra.version>8.0.1</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>11.0.20</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
-        <test.payara-mojarra.version>7.2026.3</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
-        <test.quarkus.version>3.34.1</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
+        <test.glassfish-mojarra.version>8.0.2</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.tomcat.version>11.0.22</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+        <test.tomee-myfaces.version>10.1.5</test.tomee-myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+        <test.payara-mojarra.version>7.2026.5</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
+        <test.quarkus.version>3.35.4</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
-        <test.mojarra.version>4.1.7</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra.version>4.1.9</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.faces5.version>5.0.0-SNAPSHOT</test.faces5.version>
         <test.mojarra5.version>5.0.0-SNAPSHOT</test.mojarra5.version>
-        <test.myfaces.version>4.1.2</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
+        <test.myfaces.version>4.1.3</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
         <test.weld.version>6.0.4.Final</test.weld.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
         <test.hibernateValidator.version>9.1.0.Final</test.hibernateValidator.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>3.0.1</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
         <test.tyrus.version>2.2.2</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
-        <test.primefaces.version>15.0.13</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
+        <test.primefaces.version>15.0.15</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
@@ -1036,6 +1037,77 @@
                             <environmentVariables>
                                 <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
                             </environmentVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- TomEE - MyFaces integration test profile: mvn verify -P tomee-myfaces -->
+        <profile>
+            <id>tomee-myfaces</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.tomee</groupId>
+                    <artifactId>arquillian-tomee-remote</artifactId>
+                    <version>${test.tomee-myfaces.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.tomee</groupId>
+                                            <artifactId>apache-tomee</artifactId>
+                                            <version>${test.tomee-myfaces.version}</version>
+                                            <type>zip</type>
+                                            <classifier>webprofile</classifier>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>overlay-myfaces</id> <!-- Overlay TomEE's bundled MyFaces with ${test.myfaces.version}. -->
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}/lib</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.myfaces.core</groupId>
+                                            <artifactId>myfaces-api</artifactId>
+                                            <version>${test.myfaces.version}</version>
+                                            <destFileName>myfaces-api-4.0.3.jar</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.apache.myfaces.core</groupId>
+                                            <artifactId>myfaces-impl</artifactId>
+                                            <version>${test.myfaces.version}</version>
+                                            <destFileName>myfaces-impl-4.0.3.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}</tomee.dir>
+                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
