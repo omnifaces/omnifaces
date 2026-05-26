@@ -13,9 +13,7 @@
 package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
@@ -26,19 +24,8 @@ public class PWAResourceHandlerITBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final AtomicInteger INSTANCES = new AtomicInteger(); // #707
-
-    @PostConstruct
-    public void init() {
-        INSTANCES.incrementAndGet();
-    }
-
     public void submit() {
         // NOOP
-    }
-
-    public int getInstances() {
-        return INSTANCES.get();
     }
 
 }

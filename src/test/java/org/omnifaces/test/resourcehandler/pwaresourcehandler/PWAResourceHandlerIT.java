@@ -45,9 +45,6 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
     @FindBy(id = "form:viewScopedBeanHashCode")
     private WebElement viewScopedBeanHashCode;
 
-    @FindBy(id = "form:viewScopedBeanInstances")
-    private WebElement viewScopedBeanInstances;
-
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(PWAResourceHandlerIT.class);
@@ -56,8 +53,6 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
     @Test
     @Order(1)
     void verifyManifest() {
-        // String instances = viewScopedBeanInstances.getText();
-        // assertEquals("1", instances, "This is the first time the page is opened, so there should be only 1 view scoped bean instance");
         assertEquals("use-credentials", manifest.getAttribute("crossorigin"));
 
         browser.get(manifest.getAttribute("href"));
@@ -72,9 +67,6 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
     @Test
     @Order(2)
     void verifyServiceWorkerScript() {
-        // String instances = viewScopedBeanInstances.getText();
-        // assertEquals("2", instances, "This is the second time the page is opened, so there should be 2 view scoped bean instances");
-
         browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
         String serviceWorkerScript = browser.getPageSource();
         assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
@@ -83,23 +75,15 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
     @Test
     @Order(3)
     void verifyViewScopedBeanAfterAjaxSubmit() {
-        // String instances = viewScopedBeanInstances.getText();
-        // assertEquals("3", instances, "This is the third time the page is opened, so there should be 3 view scoped bean instances");
-
         String hashCode = viewScopedBeanHashCode.getText();
         guardAjax(ajaxSubmit::click);
         assertEquals(hashCode, viewScopedBeanHashCode.getText(), "It is still the same instance after 1st ajax submit");
-        // assertEquals(instances, viewScopedBeanInstances.getText(), "No additional instances have been created after 1st ajax submit");
 
         guardAjax(ajaxSubmit::click);
         assertEquals(hashCode, viewScopedBeanHashCode.getText(), "It is still the same instance after 2nd ajax submit");
-        // assertEquals(instances, viewScopedBeanInstances.getText(), "No additional instances have been created after 2nd ajax submit");
 
         guardAjax(ajaxSubmit::click);
         assertEquals(hashCode, viewScopedBeanHashCode.getText(), "It is still the same instance after 3rd ajax submit");
-        // assertEquals(instances, viewScopedBeanInstances.getText(), "No additional instances have been created after 3rd ajax submit");
     }
-
-    // TODO: see outcommented lines. This broke since migration from htmlunit to chrome?
 
 }
