@@ -142,7 +142,12 @@ import org.omnifaces.vdl.FacesAttribute;
  * &lt;/h:panelGroup&gt;
  * </pre>
  * <p>
- * TODO: support for immediate="true".
+ * Note that this validator always runs during the Process Validations phase and cannot itself be made to fire earlier by means of
+ * <code>immediate="true"</code>. When a referenced input component has <code>immediate="true"</code>, its own conversion and validation happens during the
+ * Apply Request Values phase; the cross-field validation will then still run against its converted value if that input passed, but is silently skipped if it
+ * failed (same behavior as when any referenced input has already been marked invalid by an earlier validator). When the triggering action component has
+ * <code>immediate="true"</code> and invokes <code>FacesContext#renderResponse()</code>, the Process Validations phase is skipped entirely and this validator
+ * does not run at all.
  *
  * @author Bauke Scholtz
  */

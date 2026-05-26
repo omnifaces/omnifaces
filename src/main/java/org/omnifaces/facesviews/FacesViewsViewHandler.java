@@ -183,7 +183,9 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         if (!isExtensionless(viewId)) {
             String viewIdExtension = getExtension(viewId);
 
-            // TODO Is this necessary? Which cases does this cover?
+            // Defensive patch for development-stage hot reload: FacesViewsResourceHandler may rescan and add a view with a previously-unseen extension, which
+            // won't be in the cached FACES_SERVLET_EXTENSIONS set (computed once from the FacesServlet's startup-time mappings). Without this, extensionless
+            // rendering would break for such views until restart.
             if (!extensions.contains(viewIdExtension)) {
                 extensions = new HashSet<>(extensions);
                 extensions.add(viewIdExtension);

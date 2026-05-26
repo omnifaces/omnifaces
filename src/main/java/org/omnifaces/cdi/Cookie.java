@@ -50,7 +50,7 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
  * private String bar;
  * </pre>
  * <p>
- * Validation is by design not supported as cookies are usually beyond enduser's control. TODO: conversion?
+ * Validation is by design not supported as cookies are not submitted as user input and are usually beyond the enduser's control.
  *
  * @since 2.1
  * @author Bauke Scholtz

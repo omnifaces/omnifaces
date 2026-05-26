@@ -330,7 +330,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
         for (var component : view.getComponentResources(context, TARGET_BODY)) {
             if (!(component instanceof DeferredScript)) {
-                continue; // We currently only support deferred scripts. TODO: support body scripts as well?
+                continue; // Only deferred scripts are combined in the body; other body scripts may contain inline EL.
             }
 
             builder.add(context, component, component.getRendererType(), new ResourceIdentifier(component), TARGET_BODY);

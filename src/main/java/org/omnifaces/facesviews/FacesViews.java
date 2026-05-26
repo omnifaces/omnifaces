@@ -235,7 +235,6 @@ public final class FacesViews {
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
     private static final String WEB_FRAGMENT_RESOURCE_DIRECTORY = "/META-INF/resources/";
 
-    // TODO: those should be properties of an @ApplicationScoped bean.
     private static final String SCAN_PATHS = "org.omnifaces.facesviews.scan_paths";
     private static final String PUBLIC_SCAN_PATHS = "org.omnifaces.facesviews.public_scan_paths";
     private static final String MULTIVIEWS_PATHS = "org.omnifaces.facesviews.multiviews_paths";
