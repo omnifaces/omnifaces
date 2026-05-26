@@ -16,19 +16,17 @@
 <html lang="en"
     xmlns:f="jakarta.faces.core"
     xmlns:h="jakarta.faces.html"
-    xmlns:ui="jakarta.faces.facelets"
     xmlns:o="omnifaces"
-    xmlns:p="primefaces"
 >
     <h:head>
-        <title>500</title>
-        <h:outputStylesheet name="style.css" />
+        <title>FullAjaxExceptionHandlerWithParamsIT</title>
     </h:head>
 
     <h:body>
-        <p:panel>
-            <div id="exception">#{requestScope['jakarta.servlet.error.exception']}</div>
-            <div id="reason">#{param.reason}</div>
-        </p:panel>
+        <o:form id="form">
+            <h:commandButton id="throwSomething" value="throwSomething" action="#{fullAjaxExceptionHandlerWithParamsITBean.throwSomething}">
+                <f:ajax />
+            </h:commandButton>
+        </o:form>
     </h:body>
 </html>

@@ -20,6 +20,7 @@ import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getServletContext;
@@ -65,9 +66,11 @@ import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.context.OmniPartialViewContextFactory;
 import org.omnifaces.filter.FacesExceptionFilter;
+import org.omnifaces.filter.MutableRequestFilter;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Reflection;
+import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -136,6 +139,20 @@ import org.omnifaces.util.Reflection;
  * <p>
  * Exceptions during render response can only be handled when the <code>jakarta.faces.FACELETS_BUFFER_SIZE</code> is large enough so that the so far rendered
  * response until the occurrence of the exception fits in there and can therefore safely be resetted.
+ *
+ * <h2>Passing parameters to the error page</h2>
+ * <p>
+ * Since OmniFaces 5.4, when the error page <code>&lt;location&gt;</code> contains a query string, the parameters can be accessed via <code>#{param}</code> and
+ * <code>#{paramValues}</code> on the error page. This requires the {@link MutableRequestFilter} to be installed (see its javadoc for the configuration).
+ *
+ * <pre>
+ * &lt;error-page&gt;
+ *     &lt;exception-type&gt;com.example.YourException&lt;/exception-type&gt;
+ *     &lt;location&gt;/WEB-INF/errorpages/custom.xhtml?reason=your_exception&lt;/location&gt;
+ * &lt;/error-page&gt;
+ * </pre>
+ * <p>
+ * If the {@link MutableRequestFilter} is not installed, the parameters are dropped and a warning is logged.
  *
  * <h2>Error in error page itself</h2>
  * <p>
@@ -292,6 +309,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         + " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
     private static final String LOG_ERROR_PAGE_ERROR = "FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
         + " Trying to render a hardcoded error page now.";
+    private static final String LOG_ERROR_PAGE_PARAMS_DROPPED = "FullAjaxExceptionHandler: Error page '%s' has query string '%s' but the MutableRequestFilter is not installed."
+        + " The query string parameters will not be available via #{param} on the error page."
+        + " Install the MutableRequestFilter as described in its javadoc to enable this.";
     private static final String ERROR_PAGE_ERROR = "<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
         + "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
         + "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
@@ -573,7 +593,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)
         throws IOException
     {
-        var viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
+        var viewId = getViewIdAndPrepareParamsIfNecessary(context, request, errorPageLocation);
         var viewHandler = context.getApplication().getViewHandler();
         var viewRoot = viewHandler.createView(context, viewId);
         Hacks.removeResourceDependencyState(context);
@@ -612,12 +632,24 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         }
     }
 
-    private static String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
+    private static String getViewIdAndPrepareParamsIfNecessary(FacesContext context, HttpServletRequest request, String errorPageLocation) {
         var parts = errorPageLocation.split("\\?", 2);
 
-        // TODO: #287: make params available via #{param(Values)}. Request wrapper needed :|
+        if (parts.length == 2 && !parts[1].isEmpty()) {
+            mergeQueryStringIntoMutableRequest(request, errorPageLocation, parts[1]);
+        }
 
         return normalizeViewId(context, parts[0]);
+    }
+
+    private static void mergeQueryStringIntoMutableRequest(HttpServletRequest request, String errorPageLocation, String queryString) {
+        try {
+            var mutableParameterMap = MutableRequestFilter.getMutableRequest(request).getMutableParameterMap();
+            Servlets.toParameterMap(queryString).forEach(mutableParameterMap::put);
+        }
+        catch (IllegalStateException e) {
+            logger.log(WARNING, LOG_ERROR_PAGE_PARAMS_DROPPED.formatted(errorPageLocation, queryString), e);
+        }
     }
 
 }
