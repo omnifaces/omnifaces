@@ -16,6 +16,7 @@ import static org.omnifaces.util.Faces.isValidationFailed;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.Size;
 
@@ -26,6 +27,7 @@ import org.omnifaces.cdi.Param;
 @ParamITCustomAnnotation
 public class ParamITCustomAnnotationBean {
 
+    @Inject
     @Param
     @Size(min = 2)
     private String stringParam;

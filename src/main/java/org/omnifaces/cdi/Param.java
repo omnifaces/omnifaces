@@ -56,6 +56,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param
  * private String foo;
  * </pre>
@@ -65,6 +66,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(name = "foo")
  * private String bar;
  * </pre>
@@ -97,9 +99,11 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(name = "foo")
  * private List&lt;String&gt; foos;
  *
+ * &#64;Inject
  * &#64;Param(name = "bar")
  * private String[] bars;
  * </pre>
@@ -112,6 +116,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(pathIndex = 0)
  * private String user;
  * </pre>
@@ -125,6 +130,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param
  * private Long id;
  * </pre>
@@ -134,6 +140,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(converter = "userConverter", validator = "priviledgedUser")
  * private User user;
  * </pre>
@@ -142,6 +149,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(name = "user", converter = "userConverter")
  * private List&lt;User&gt; users;
  * </pre>
@@ -151,6 +159,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(pathIndex = 0, converter = "userConverter", validator = "priviledgedUser")
  * private User user;
  * </pre>
@@ -166,6 +175,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(converterClass = UserConverter.class, validatorClass = PriviledgedUser.class)
  * private User user;
  * </pre>
@@ -178,6 +188,7 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  *
+ * &#64;Inject
  * &#64;Param(
  *     converterClass = DateTimeConverter.class, converterAttributes = {
  *         &#64;Attribute(
@@ -216,7 +227,9 @@ import org.omnifaces.util.Utils;
  * In case you wish to make it a global message, then you can since OmniFaces 4.5 set the {@code globalMessage} attribute to {@code true}:
  *
  * <pre>
+ * &#64;Inject
  * &#64;Param(globalMessage=true)
+ * private String foo;
  * </pre>
  *
  * So that these can only be displayed via below tag:
@@ -227,22 +240,11 @@ import org.omnifaces.util.Utils;
  *
  * <h2>Historical note</h2>
  * <p>
- * Before OmniFaces 3.6, the <code>&#64;</code>{@link Param} which is not of type {@link ParamValue} also required <code>&#64;</code>{@link Inject} as in:
- *
- * <pre>
- *
- * &#64;Inject
- * &#64;Param
- * private String foo;
- * </pre>
- * <p>
- * But this is not needed anymore since OmniFaces 3.6. This has the following advantages:
- * <ul>
- * <li>Less code
- * <li>Not anymore confusing <em>"No bean is eligible for injection to the injection point [JSR-365 §5.2.2]"</em> warnings in IDEs like Eclipse (caused by the
- * dynamic/generic type of the injection point).
- * </ul>
- * These will not anymore use the {@link DynamicParamValueProducer}. Instead the injection is "manually" done while creating the bean.
+ * Between OmniFaces 3.6 and 5.3, <code>&#64;</code>{@link Param} on a field of a type other than {@link ParamValue} also worked without
+ * <code>&#64;</code>{@link Inject}. As of OmniFaces 5.4, that usage is deprecated and a warning is logged at deployment time for each affected field. It will
+ * be removed in a future version. The underlying implementation populates the field reflectively via {@link java.lang.reflect.Field#setAccessible(boolean)}
+ * after CDI construction, which is incompatible with strong module encapsulation. The <code>&#64;</code>{@link Inject} path, by contrast, goes through the
+ * standard CDI injection pipeline via {@link DynamicParamValueProducer}.
  *
  * @since 1.6
  * @author Arjan Tijms

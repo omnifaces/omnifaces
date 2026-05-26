@@ -23,6 +23,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.convert.DateTimeConverter;
 import jakarta.faces.validator.LengthValidator;
 import jakarta.faces.validator.LongRangeValidator;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -34,23 +35,29 @@ import org.omnifaces.cdi.param.Attribute;
 @RequestScoped
 public class ParamITBean {
 
+    @Inject
     @Param
     @Size(min = 2)
     private String stringParam;
 
+    @Inject
     @Param(validatorClasses = LengthValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "2"), label = "String param array")
     private String[] stringParamArray;
 
+    @Inject
     @Param(validatorClasses = LengthValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "2"), validatorMessage = "Invalid length")
     private List<String> stringParamList;
 
+    @Inject
     @Param
     @Min(value = 42, message = "Invalid range")
     private Long longParam;
 
+    @Inject
     @Param(validatorClasses = LongRangeValidator.class, validatorAttributes = @Attribute(name = "minimum", value = "42"), validatorMessage = "Invalid range")
     private Long[] longParamArray;
 
+    @Inject
     @Param(
         validatorClasses = LongRangeValidator.class, validatorAttributes = @Attribute(
             name = "minimum", value = "42"
@@ -58,6 +65,7 @@ public class ParamITBean {
     )
     private List<Long> longParamList;
 
+    @Inject
     @Param(
         converterClass = DateTimeConverter.class, converterAttributes = { @Attribute(name = "type", value = "localDate"),
             @Attribute(
@@ -66,11 +74,13 @@ public class ParamITBean {
     )
     private LocalDate dateParam;
 
+    @Inject
     @Param(validatorClasses = ParamITEntityValidator.class)
     private ParamITEntity entityParam;
 
     private ParamITEntity entityViewParam;
 
+    @Inject
     @Param(converter = "jakarta.faces.Long", converterMessage = "Nope.")
     private Object paramWithConverterId;
 

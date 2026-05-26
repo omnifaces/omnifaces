@@ -16,6 +16,7 @@ import static org.omnifaces.util.Faces.isValidationFailed;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.Param;
@@ -24,6 +25,7 @@ import org.omnifaces.cdi.Param;
 @RequestScoped
 public class ParamITRequiredBean {
 
+    @Inject
     @Param(required = true)
     private String requiredStringParam;
 

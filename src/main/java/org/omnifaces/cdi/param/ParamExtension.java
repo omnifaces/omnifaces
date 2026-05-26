@@ -22,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.event.Observes;
@@ -55,6 +56,13 @@ import org.omnifaces.util.Beans;
  * @author Arjan Tijms
  */
 public class ParamExtension implements Extension {
+
+    private static final Logger logger = Logger.getLogger(ParamExtension.class.getName());
+
+    private static final String DEPRECATION_WARNING = "@Param on field '%s.%s' is missing @Inject."
+        + " Supporting @Param without @Inject is deprecated as of OmniFaces 5.4 and will be removed in a future version;"
+        + " the underlying implementation relies on reflective field access (Field.setAccessible) which is incompatible with strong module encapsulation."
+        + " Please add @Inject.";
 
     private final Set<Type> paramsWithInject = new HashSet<>();
 
@@ -112,18 +120,26 @@ public class ParamExtension implements Extension {
     }
 
     /**
-     * /** Process {@link Param} fields without {@link Inject} annotation.
+     * Process {@link Param} fields without {@link Inject} annotation.
      *
      * @param <T> The generic injection target type.
      * @param event The process injection target event.
      * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.
+     * @deprecated Since OmniFaces 5.4. Add {@link Inject} to the {@link Param} field instead. See class-level javadoc of {@link Param}.
      */
+    @Deprecated(since = "5.4", forRemoval = true)
     public static <T> void processParamsWithoutInject(ProcessInjectionTarget<T> event, Set<AnnotatedField<?>> paramsWithoutInject) {
         if (!paramsWithoutInject.isEmpty()) {
+            for (var field : paramsWithoutInject) {
+                var member = field.getJavaMember();
+                logger.warning(String.format(DEPRECATION_WARNING, member.getDeclaringClass().getName(), member.getName()));
+            }
+
             event.setInjectionTarget(new ParamInjectionTarget<>(event.getInjectionTarget(), paramsWithoutInject));
         }
     }
 
+    @Deprecated(since = "5.4", forRemoval = true)
     private static final class ParamInjectionTarget<T> extends InjectionTargetWrapper<T> {
 
         private final Set<AnnotatedField<?>> paramsWithoutInject;
