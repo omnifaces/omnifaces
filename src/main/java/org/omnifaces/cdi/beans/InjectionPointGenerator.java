@@ -30,9 +30,12 @@ import org.omnifaces.util.Beans;
 @Dependent
 public class InjectionPointGenerator {
 
-    // TODO: this is a workaround originally for older OWB versions, but while OWB is fixed, newer Weld versions
-    // are now broken. It seems this needs to be fixed in CDI 2.0.
-    // See https://issues.jboss.org/browse/CDI-610
+    // Provides a stable @Inject InjectionPoint metamodel that BeansLocal#getCurrentInjectionPoint
+    // passes to BeanManager#getInjectableReference together with the outer CreationalContext, so a
+    // custom Bean#create can recover the consuming InjectionPoint. CDI 4.x still has no portable
+    // API for this; the only alternative would be casting to Weld/OWB internals, which would tie
+    // OmniFaces to specific container implementations and break portability. DynamicParamValueProducer
+    // is the sole consumer.
 
     @Inject
     private InjectionPoint injectionPoint;
