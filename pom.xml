@@ -70,8 +70,8 @@
         <test.wildfly-mojarra.version>40.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.liberty-myfaces.version>26.0.0.4-beta</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
         <test.glassfish-mojarra.version>8.0.2</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>11.0.22</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.tomee-myfaces.version>10.1.5</test.tomee-myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+        <test.tomcat.version>11.0.22</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.payara-mojarra.version>7.2026.5</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
         <test.quarkus.version>3.35.4</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
 
@@ -892,6 +892,77 @@
             </build>
         </profile>
 
+        <!-- TomEE - MyFaces integration test profile: mvn verify -P tomee-myfaces -->
+        <profile>
+            <id>tomee-myfaces</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.tomee</groupId>
+                    <artifactId>arquillian-tomee-remote</artifactId>
+                    <version>${test.tomee-myfaces.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.tomee</groupId>
+                                            <artifactId>apache-tomee</artifactId>
+                                            <version>${test.tomee-myfaces.version}</version>
+                                            <type>zip</type>
+                                            <classifier>webprofile</classifier>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>overlay-myfaces</id> <!-- Overlay TomEE's bundled MyFaces with ${test.myfaces.version}. -->
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}/lib</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.myfaces.core</groupId>
+                                            <artifactId>myfaces-api</artifactId>
+                                            <version>${test.myfaces.version}</version>
+                                            <destFileName>myfaces-api-4.0.3.jar</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.apache.myfaces.core</groupId>
+                                            <artifactId>myfaces-impl</artifactId>
+                                            <version>${test.myfaces.version}</version>
+                                            <destFileName>myfaces-impl-4.0.3.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}</tomee.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Tomcat - Mojarra 5 integration test profile: mvn verify -P tomcat-mojarra5 -->
         <profile>
             <id>tomcat-mojarra5</id>
@@ -1037,77 +1108,6 @@
                             <environmentVariables>
                                 <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
                             </environmentVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- TomEE - MyFaces integration test profile: mvn verify -P tomee-myfaces -->
-        <profile>
-            <id>tomee-myfaces</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.tomee</groupId>
-                    <artifactId>arquillian-tomee-remote</artifactId>
-                    <version>${test.tomee-myfaces.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.tomee</groupId>
-                                            <artifactId>apache-tomee</artifactId>
-                                            <version>${test.tomee-myfaces.version}</version>
-                                            <type>zip</type>
-                                            <classifier>webprofile</classifier>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>overlay-myfaces</id> <!-- Overlay TomEE's bundled MyFaces with ${test.myfaces.version}. -->
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}/lib</outputDirectory>
-                                    <overWriteReleases>true</overWriteReleases>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.myfaces.core</groupId>
-                                            <artifactId>myfaces-api</artifactId>
-                                            <version>${test.myfaces.version}</version>
-                                            <destFileName>myfaces-api-4.0.3.jar</destFileName>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.apache.myfaces.core</groupId>
-                                            <artifactId>myfaces-impl</artifactId>
-                                            <version>${test.myfaces.version}</version>
-                                            <destFileName>myfaces-impl-4.0.3.jar</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee-myfaces.version}</tomee.dir>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
