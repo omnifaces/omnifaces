@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.model;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.forEach;
 
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
@@ -31,14 +33,13 @@ import jakarta.faces.model.SelectItemGroup;
 
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ScopedRunner;
+import org.omnifaces.util.Faces;
 import org.omnifaces.vdl.FacesAttribute;
 
 /**
  * <p>
  * The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a nested collection representing groups of
- * select items. This is basically the {@link UIComponent} counterpart of <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the
- * standard Faces API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end
- * up to be quite verbose.
+ * select items. This is basically the {@link UIComponent} counterpart of <code>jakarta.faces.model.SelectItemGroup</code>.
  *
  * <h2>Usage</h2>
  * <p>
@@ -55,7 +56,10 @@ import org.omnifaces.vdl.FacesAttribute;
  *
  * @author Bauke Scholtz
  * @since 3.0
+ * @deprecated Since OmniFaces 5.4. Use the standard <code>&lt;f:selectItemGroups&gt;</code> instead, which was introduced in Faces 4.0 and is functionally
+ * equivalent.
  */
+@Deprecated(since = "5.4", forRemoval = true)
 @FacesComponent(value = SelectItemGroups.COMPONENT_TYPE, namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SelectItemGroups extends UISelectItems {
 
@@ -66,7 +70,13 @@ public class SelectItemGroups extends UISelectItems {
 
     // Private constants ----------------------------------------------------------------------------------------------
 
+    private static final Logger logger = Logger.getLogger(SelectItemGroups.class.getName());
+
     private static final String ERROR_EXPRESSION_DISALLOWED = "A value expression is disallowed on 'var' attribute of SelectItemGroups.";
+    private static final String DEPRECATION_WARNING_LOGGED = SelectItemGroups.class.getName() + ".DEPRECATION_WARNING_LOGGED";
+    private static final String DEPRECATION_WARNING = "o:selectItemGroups is deprecated and will be removed in a future version."
+        + " Please migrate to the standard f:selectItemGroups, which was introduced in Faces 4.0 and is functionally equivalent."
+        + " First encountered in view: %s";
 
     private enum PropertyKeys {
 
@@ -103,6 +113,7 @@ public class SelectItemGroups extends UISelectItems {
      */
     @Override
     public Object getValue() {
+        logDeprecationWarningOnce();
         List<SelectItemGroup> groups = new ArrayList<>();
 
         createSelectItems(this, super.getValue(), SelectItemGroup::new, selectItemGroup -> {
@@ -122,6 +133,12 @@ public class SelectItemGroups extends UISelectItems {
         });
 
         return groups;
+    }
+
+    private static void logDeprecationWarningOnce() {
+        if (Faces.getApplicationMap().putIfAbsent(DEPRECATION_WARNING_LOGGED, TRUE) == null) {
+            logger.warning(String.format(DEPRECATION_WARNING, Faces.getViewId()));
+        }
     }
 
     private <S extends SelectItem> void createSelectItems(UIComponent component, Object values, Supplier<S> supplier, Consumer<S> callback) {
