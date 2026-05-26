@@ -320,7 +320,7 @@ public final class ComponentsLocal {
         if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
             if (isAjaxRequestWithPartialRendering(context)) {
                 // Because component resources are rendered BEFORE components and thus addScriptResource would be too late.
-            	// Both ViewScopedIT#conditionallyRenderViewScopedIT and ComponentsIT#addScriptResource must pass.
+                // Both ViewScopedIT#conditionallyRenderViewScopedIT and ComponentsIT#addScriptResource must pass.
                 load(context, libraryName, resourceName);
                 addScriptResourceToBody(context, libraryName, resourceName); // Just to register it in the component tree as we need to mark it rendered.
                 context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
