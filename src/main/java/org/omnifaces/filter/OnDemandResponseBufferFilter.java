@@ -64,8 +64,12 @@ public class OnDemandResponseBufferFilter extends HttpFilter {
         }
         finally {
             if (!bufferedResponse.isPassThrough()) {
-                // TODO: output stream support
-                response.getWriter().write(bufferedResponse.getBufferAsString());
+                if (bufferedResponse.isWriterUsed()) {
+                    response.getWriter().write(bufferedResponse.getBufferAsString());
+                }
+                else if (bufferedResponse.isOutputStreamUsed()) {
+                    response.getOutputStream().write(bufferedResponse.getBuffer());
+                }
             }
         }
 

@@ -79,11 +79,11 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
             return super.getOutputStream();
         }
 
-        if (writer != null) {
+        if (isWriterUsed()) {
             throw new IllegalStateException(ERROR_GETWRITER_ALREADY_CALLED);
         }
 
-        if (output == null) {
+        if (!isOutputStreamUsed()) {
             buffer = new ResettableBufferedOutputStream(createOutputStream(), getBufferSize());
             output = new DefaultServletOutputStream((OutputStream) buffer);
         }
@@ -97,11 +97,11 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
             return super.getWriter();
         }
 
-        if (output != null) {
+        if (isOutputStreamUsed()) {
             throw new IllegalStateException(ERROR_GETOUTPUT_ALREADY_CALLED);
         }
 
-        if (writer == null) {
+        if (!isWriterUsed()) {
             buffer = new ResettableBufferedWriter(
                 new OutputStreamWriter(
                     createOutputStream(),
@@ -122,10 +122,10 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
             return;
         }
 
-        if (writer != null) {
+        if (isWriterUsed()) {
             writer.flush();
         }
-        else if (output != null) {
+        else if (isOutputStreamUsed()) {
             output.flush();
         }
     }
@@ -136,10 +136,10 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
      * @throws IOException When an I/O error occurs.
      */
     public void close() throws IOException {
-        if (writer != null) {
+        if (isWriterUsed()) {
             writer.close();
         }
-        else if (output != null) {
+        else if (isOutputStreamUsed()) {
             output.close();
         }
     }
@@ -172,6 +172,26 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
      */
     public boolean isPassThrough() {
         return passThrough;
+    }
+
+    /**
+     * Returns whether {@link #getWriter()} has already been invoked on this response in buffering mode.
+     *
+     * @return <code>true</code>, if {@link #getWriter()} has been invoked in buffering mode, otherwise <code>false</code>.
+     * @since 5.4
+     */
+    public boolean isWriterUsed() {
+        return writer != null;
+    }
+
+    /**
+     * Returns whether {@link #getOutputStream()} has already been invoked on this response in buffering mode.
+     *
+     * @return <code>true</code>, if {@link #getOutputStream()} has been invoked in buffering mode, otherwise <code>false</code>.
+     * @since 5.4
+     */
+    public boolean isOutputStreamUsed() {
+        return output != null;
     }
 
     /**
