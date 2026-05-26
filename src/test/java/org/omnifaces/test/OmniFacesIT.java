@@ -472,8 +472,10 @@ public abstract class OmniFacesIT {
                 case withDevelopmentStage :
                     addQuarkusPropertyIfNecessary("jakarta.faces.PROJECT_STAGE", "Development");
                 case withErrorPage :
-                case withErrorPageAndParams :
                     addWebResource("WEB-INF/500.xhtml");
+                    break;
+                case withErrorPageAndParams :
+                    addWebResource("WEB-INF/500-with-params.xhtml");
                     break;
                 case withFacesViews :
                 case withFacesViewsLowercasedRequestURI :

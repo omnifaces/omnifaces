@@ -45,7 +45,7 @@
 
     <error-page>
         <error-code>500</error-code>
-        <location>/WEB-INF/500.xhtml?reason=oopsie</location>
+        <location>/WEB-INF/500-with-params.xhtml?reason=oopsie</location>
     </error-page>
 
     <mime-mapping>

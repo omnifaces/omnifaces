@@ -20,10 +20,14 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPageAndParams;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+@DisabledIfSystemProperty(
+    named = "profile.id", matches = "tomee-.*", disabledReason = "Bumps into OWB-1462 / TOMEE-4603: OpenWebBeans' NormalScopeProxyFactory generates the same proxy class name (org.apache.webbeans.custom.Map$$OwbNormalScopeProxy<hash>) for every @NormalScope bean of the same erased type, so the second Faces Map-typed implicit bean evaluated in a webapp (here #{param}, after #{requestScope} won the slot) hits LinkageError: attempted duplicate class definition. Fixed in TomEE 10.1.6 and 11.0.0 (both unreleased as of bump to 10.1.5); re-enable when 10.1.6 is on Maven Central."
+)
 public class FullAjaxExceptionHandlerWithParamsIT extends OmniFacesIT {
 
     @FindBy(id = "exception")
