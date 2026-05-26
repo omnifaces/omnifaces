@@ -30,6 +30,7 @@ import jakarta.validation.constraints.Size;
 
 import org.omnifaces.cdi.Param;
 import org.omnifaces.cdi.param.Attribute;
+import org.omnifaces.cdi.param.ParamValue;
 
 @Named
 @RequestScoped
@@ -82,7 +83,7 @@ public class ParamITBean {
 
     @Inject
     @Param(converter = "jakarta.faces.Long", converterMessage = "Nope.")
-    private Object paramWithConverterId;
+    private ParamValue<Object> paramWithConverterId;
 
     private String initResult;
 
@@ -140,11 +141,11 @@ public class ParamITBean {
         this.entityViewParam = entityViewParam;
     }
 
-    public Object getParamWithConverterId() {
+    public ParamValue<Object> getParamWithConverterId() {
         return paramWithConverterId;
     }
 
-    public void setParamWithConverterId(Object paramWithConverterId) {
+    public void setParamWithConverterId(ParamValue<Object> paramWithConverterId) {
         this.paramWithConverterId = paramWithConverterId;
     }
 

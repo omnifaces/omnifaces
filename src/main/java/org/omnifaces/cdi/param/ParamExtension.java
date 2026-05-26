@@ -115,6 +115,15 @@ public class ParamExtension implements Extension {
      */
     public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
         for (var paramWithInject : paramsWithInject) {
+            if (paramWithInject == Object.class) {
+                event.addDefinitionError(
+                    new IllegalArgumentException(
+                        "@Inject @Param on a field of type java.lang.Object is not supported because CDI cannot disambiguate it from @Param injection points of other types."
+                            + " Declare the field as a concrete type (e.g. Long, String) or as ParamValue<Object> instead."
+                    )
+                );
+                continue;
+            }
             event.addBean(new DynamicParamValueProducer(paramWithInject));
         }
     }

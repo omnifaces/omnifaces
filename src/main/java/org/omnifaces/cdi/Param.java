@@ -227,8 +227,9 @@ import org.omnifaces.util.Utils;
  * In case you wish to make it a global message, then you can since OmniFaces 4.5 set the {@code globalMessage} attribute to {@code true}:
  *
  * <pre>
+ *
  * &#64;Inject
- * &#64;Param(globalMessage=true)
+ * &#64;Param(globalMessage = true)
  * private String foo;
  * </pre>
  *

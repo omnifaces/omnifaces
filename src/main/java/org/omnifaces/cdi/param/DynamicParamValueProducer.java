@@ -54,7 +54,7 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
      * @param type Type to construct dynamic param value producer for.
      */
     public DynamicParamValueProducer(Type type) {
-        types = Set.of(type, Object.class);
+        types = (type == Object.class) ? Set.of(Object.class) : Set.of(type, Object.class);
     }
 
     @Override
