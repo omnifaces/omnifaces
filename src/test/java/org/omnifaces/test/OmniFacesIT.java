@@ -60,6 +60,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.v147.log.Log;
 import org.openqa.selenium.devtools.v147.network.Network;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -140,6 +142,14 @@ public abstract class OmniFacesIT {
                     Thread.currentThread().setContextClassLoader(originalClassLoader);
                 }
             }
+            case "firefox" -> {
+                WebDriverManager.firefoxdriver().setup();
+                var options = new FirefoxOptions();
+                options.addArguments("-headless");
+                yield new FirefoxDriver(options);
+                // NOTE: networkResponses and consoleErrors capture are Chrome DevTools Protocol only and not
+                // populated under Firefox. Tests requiring them must therefore run under chrome.
+            }
             default -> throw new UnsupportedOperationException("arquillian.browser='" + arquillianBrowser + "' is not yet supported");
         };
 
@@ -191,7 +201,9 @@ public abstract class OmniFacesIT {
         newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
         var newTab = newTabs.iterator().next();
         browser.switchTo().window(newTab);
-        waitUntil(() -> executeScript("return document.readyState=='complete'"));
+        // The new tab briefly reports readyState='complete' on its initial about:blank before navigating to the link's href (observed in headless Firefox),
+        // so additionally wait for the URL to leave the blank state before declaring the tab ready.
+        waitUntil(() -> executeScript("return document.readyState=='complete' && !['about:blank',''].includes(location.href)"));
         return newTab;
     }
 
@@ -354,6 +366,10 @@ public abstract class OmniFacesIT {
 
     protected static boolean isMyFacesUsed() {
         return System.getProperty("profile.id").endsWith("-myfaces");
+    }
+
+    protected static boolean isFirefox() {
+        return "firefox".equals(System.getProperty("arquillian.browser"));
     }
 
     protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {

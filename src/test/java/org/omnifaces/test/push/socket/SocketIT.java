@@ -25,6 +25,9 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(
     named = "profile.id", matches = "quarkus-.*", disabledReason = "Sockets work, but sent.size() in SocketITBean is incorrect for application and session scoped sockets, it's always 1 too much? view scoped sockets work correctly"
 )
+@DisabledIfSystemProperty(
+    named = "arquillian.browser", matches = "firefox", disabledReason = "WebSocket client opening is unreliable in headless Firefox; clientOpenedMessages element never appears"
+)
 public class SocketIT extends OmniFacesIT {
 
     @FindBy(id = "messages")

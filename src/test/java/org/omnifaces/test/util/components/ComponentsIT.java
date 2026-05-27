@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -84,6 +85,9 @@ public class ComponentsIT extends OmniFacesIT {
     }
 
     @Test
+    @DisabledIfSystemProperty(
+        named = "arquillian.browser", matches = "firefox", disabledReason = "asserts network responses captured via Chrome DevTools Protocol, which is not available under Firefox"
+    )
     void testAddScriptResource() {
         assertFalse((Boolean) executeScript("return !!window.OmniFaces"), "window.OmniFaces should NOT be available: " + consoleErrors);
 

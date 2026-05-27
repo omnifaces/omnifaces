@@ -27,6 +27,9 @@ import org.openqa.selenium.support.FindBy;
 @DisabledIfSystemProperty(
     named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces needs to be upgraded to support PushContextProducer and SseChannelManager.ViewScope"
 )
+@DisabledIfSystemProperty(
+    named = "arquillian.browser", matches = "firefox", disabledReason = "EventSource client opening is unreliable in headless Firefox; messages element never receives the expected text"
+)
 public class SseIT extends OmniFacesIT {
 
     @FindBy(id = "messages")

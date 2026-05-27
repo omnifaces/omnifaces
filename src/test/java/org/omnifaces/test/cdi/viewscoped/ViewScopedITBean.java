@@ -12,10 +12,13 @@
  */
 package org.omnifaces.test.cdi.viewscoped;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
-import static org.omnifaces.util.Faces.getViewId;
+import static org.omnifaces.util.Faces.getSessionAttribute;
 import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.Faces.setSessionAttribute;
+import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import java.io.Serializable;
@@ -35,8 +38,8 @@ public class ViewScopedITBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static boolean unloaded;
-    private static boolean destroyed;
+    private static final String SESSION_KEY_UNLOADED = ViewScopedITBean.class.getName() + ".unloaded";
+    private static final String SESSION_KEY_DESTROYED = ViewScopedITBean.class.getName() + ".destroyed";
 
     @PostConstruct
     public void init() {
@@ -52,13 +55,13 @@ public class ViewScopedITBean implements Serializable {
     }
 
     public void checkUnloadedOrDestroyed() {
-        if (unloaded) {
+        if (TRUE.equals(getSessionAttribute(SESSION_KEY_UNLOADED))) {
             addGlobalInfo("unload ");
-            unloaded = false;
+            setSessionAttribute(SESSION_KEY_UNLOADED, false);
         }
-        else if (destroyed) {
+        else if (TRUE.equals(getSessionAttribute(SESSION_KEY_DESTROYED))) {
             addGlobalInfo("destroy ");
-            destroyed = false;
+            setSessionAttribute(SESSION_KEY_DESTROYED, false);
         }
     }
 
@@ -87,11 +90,8 @@ public class ViewScopedITBean implements Serializable {
 
     @PreDestroy
     public void destroy() {
-        if (hasContext() && isUnloadRequest(getContext())) {
-            unloaded = true;
-        }
-        else {
-            destroyed = true;
+        if (hasContext()) {
+            setSessionAttribute(isUnloadRequest(getContext()) ? SESSION_KEY_UNLOADED : SESSION_KEY_DESTROYED, true);
         }
     }
 

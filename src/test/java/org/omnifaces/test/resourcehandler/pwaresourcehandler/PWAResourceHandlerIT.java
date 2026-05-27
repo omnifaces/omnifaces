@@ -55,13 +55,24 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
     void verifyManifest() {
         assertEquals("use-credentials", manifest.getAttribute("crossorigin"));
 
-        browser.get(manifest.getAttribute("href"));
+        String manifestBody;
+        if (isFirefox()) {
+            // Firefox would render the JSON manifest via its built-in JSON viewer when navigated to via browser.get(), so page source would contain the
+            // viewer DOM instead of the raw JSON. Fetch via in-page XHR (sync) to keep cookies/session and bypass the viewer.
+            manifestBody = (String) executeScript(
+                "var x = new XMLHttpRequest(); x.open('GET', arguments[0], false); x.send(); return x.responseText;",
+                manifest.getAttribute("href")
+            );
+        }
+        else {
+            browser.get(manifest.getAttribute("href"));
+            manifestBody = stripTags(browser.getPageSource());
+        }
 
         assertEquals(
             EXPECTED_MANIFEST.replace("{contextPath}", contextPath.replace("/", "\\/")).replace("{baseURL}", baseURL.toString().replace("/", "\\/")),
-            stripTags(browser.getPageSource())
-                .replaceAll("\\?v=[0-9]{13,}", "?v=1")
-        ); // Normalize any version query string on icon resource.
+            manifestBody.replaceAll("\\?v=[0-9]{13,}", "?v=1") // Normalize any version query string on icon resource.
+        );
     }
 
     @Test
