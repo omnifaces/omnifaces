@@ -13,6 +13,7 @@
 package org.omnifaces.test.component.inputfile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,6 +73,12 @@ public class InputFileIT extends OmniFacesIT {
 
 	@FindBy(id="uploadSingleMaxsizeClient:submit")
 	private WebElement uploadSingleMaxsizeClientSubmit;
+
+	@FindBy(id="uploadSingleMaxsizeClientAjaxRerender:file")
+	private WebElement uploadSingleMaxsizeClientAjaxRerenderFile;
+
+	@FindBy(id="uploadSingleMaxsizeClientAjaxRerender:rerender")
+	private WebElement uploadSingleMaxsizeClientAjaxRerenderButton;
 
 	@FindBy(id="uploadSingleMaxsizeServer:file")
 	private WebElement uploadSingleMaxsizeServerFile;
@@ -211,6 +218,13 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
+	public void uploadSingleMaxsizeClientAjaxRerender() {
+		assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+		guardAjax(uploadSingleMaxsizeClientAjaxRerenderButton).click();
+		assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+	}
+
+	@Test
 	public void uploadSingleMaxsizeServer() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
@@ -244,6 +258,16 @@ public class InputFileIT extends OmniFacesIT {
 		uploadMultipleAjaxFile2.sendKeys(txtFile2.getAbsolutePath());
 		guardAjaxUpload(uploadMultipleAjaxSubmit, messages);
 		assertEquals("uploadMultiple: " + txtFile1.length() + ", " + txtFile1.getName() + " uploadMultiple: " + txtFile2.length() + ", " + txtFile2.getName(), messages.getText());
+	}
+
+	private static int countOccurrences(String string, String substring) {
+		int count = 0;
+
+		for (int index = string.indexOf(substring); index != -1; index = string.indexOf(substring, index + substring.length())) {
+			count++;
+		}
+
+		return count;
 	}
 
 	private File createTempFile(String name, String extension, String content) throws IOException {
