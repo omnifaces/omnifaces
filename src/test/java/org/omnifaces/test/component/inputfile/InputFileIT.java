@@ -113,6 +113,12 @@ public class InputFileIT extends OmniFacesIT {
     @FindBy(id = "uploadMultipleMaxsizeServer:file2")
     private WebElement uploadMultipleMaxsizeServerFile2;
 
+    @FindBy(id = "uploadSingleMaxsizeClientAjaxRerender:file")
+    private WebElement uploadSingleMaxsizeClientAjaxRerenderFile;
+
+    @FindBy(id = "uploadSingleMaxsizeClientAjaxRerender:rerender")
+    private WebElement uploadSingleMaxsizeClientAjaxRerenderButton;
+
     @FindBy(id = "uploadMultipleMaxsizeServer:message")
     private WebElement uploadMultipleMaxsizeServerMessage;
 
@@ -232,6 +238,13 @@ public class InputFileIT extends OmniFacesIT {
     }
 
     @Test
+    void uploadSingleMaxsizeClientAjaxRerender() {
+        assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+        guardAjax(uploadSingleMaxsizeClientAjaxRerenderButton::click);
+        assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+    }
+
+    @Test
     void uploadSingleMaxsizeServer() throws IOException {
         var txtFile = createTempFile("file", "txt", "hello world");
         uploadSingleMaxsizeServerFile.sendKeys(txtFile.getAbsolutePath());
@@ -328,6 +341,16 @@ public class InputFileIT extends OmniFacesIT {
 
     private String getMessagesText() {
         return messages.getText().replaceAll("\\s+", " ");
+    }
+
+    private static int countOccurrences(String string, String substring) {
+        var count = 0;
+
+        for (var index = string.indexOf(substring); index != -1; index = string.indexOf(substring, index + substring.length())) {
+            count++;
+        }
+
+        return count;
     }
 
 }

@@ -16,9 +16,9 @@ import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getSessionAttribute;
+import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Faces.setSessionAttribute;
-import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import java.io.Serializable;

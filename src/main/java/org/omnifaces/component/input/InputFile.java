@@ -405,13 +405,21 @@ public class InputFile extends HtmlInputFile {
         }
 
         var maxsize = getMaxsize();
+        var onchange = getOnchange();
 
         if (maxsize != null) {
             validateHierarchy(context);
-            setOnchange(SCRIPT_ONCHANGE.formatted(getMessageComponentClientId(context), maxsize, coalesce(getOnchange(), "")));
+            setOnchange(SCRIPT_ONCHANGE.formatted(getMessageComponentClientId(context), maxsize, coalesce(onchange, "")));
         }
 
-        super.encodeEnd(context);
+        try {
+            super.encodeEnd(context);
+        }
+        finally {
+            if (maxsize != null) {
+                setOnchange(onchange); // Don't persist the validate script in the view state; it'd be re-prepended on every subsequent re-render. See #963.
+            }
+        }
     }
 
     /**

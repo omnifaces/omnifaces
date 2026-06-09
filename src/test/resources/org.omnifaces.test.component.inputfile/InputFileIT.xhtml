@@ -63,6 +63,17 @@
             <h:commandButton id="submit" value="submit" action="#{inputFileITBean.uploadSingle}" />
         </o:form>
 
+        <o:form id="uploadSingleMaxsizeClientAjaxRerender" enctype="multipart/form-data">
+            <h:panelGroup id="group" layout="block">
+                <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
+                    maxsize="10" maxsizeMessage="{0}: {1} larger than {2}" />
+                <h:message id="message" for="file" />
+            </h:panelGroup>
+            <h:commandButton id="rerender" value="rerender">
+                <f:ajax render="group" />
+            </h:commandButton>
+        </o:form>
+
         <o:form id="uploadSingleAcceptAnyImageAndPdf" enctype="multipart/form-data">
             <o:inputFile id="file" value="#{inputFileITBean.file}" label="label"
                 accept="image/*,.pdf" acceptMessage="{0}: {1} is not {2}" />
