@@ -40,7 +40,7 @@ jobs:
       uses: actions/setup-java@v5
       with:
         java-version: '21'
-        distribution: 'adopt'
+        distribution: 'temurin'
         cache: maven
     - name: Test with Maven
       run: mvn -B verify -P ${{matrix.server}} -Dfailsafe.rerunFailingTestsCount=2
@@ -55,7 +55,7 @@ jobs:
       uses: actions/setup-java@v5
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'temurin'
         server-id: central
         server-username: CENTRAL_USERNAME
         server-password: CENTRAL_PASSWORD
@@ -81,7 +81,7 @@ jobs:
       uses: actions/setup-java@v5
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'temurin'
         cache: maven
     - name: Cache Sonar packages
       uses: actions/cache@v5
