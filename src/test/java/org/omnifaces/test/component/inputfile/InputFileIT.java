@@ -29,6 +29,8 @@ import org.openqa.selenium.support.FindBy;
 
 public class InputFileIT extends OmniFacesIT {
 
+    private static final String VALIDATE_SCRIPT = "OmniFaces.InputFile.validate";
+
     @FindBy(id = "messages")
     private WebElement messages;
 
@@ -239,9 +241,9 @@ public class InputFileIT extends OmniFacesIT {
 
     @Test
     void uploadSingleMaxsizeClientAjaxRerender() {
-        assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+        assertEquals(1, countValidateBindings(uploadSingleMaxsizeClientAjaxRerenderFile));
         guardAjax(uploadSingleMaxsizeClientAjaxRerenderButton::click);
-        assertEquals(1, countOccurrences(uploadSingleMaxsizeClientAjaxRerenderFile.getAttribute("onchange"), "OmniFaces.InputFile.validate"));
+        assertEquals(1, countValidateBindings(uploadSingleMaxsizeClientAjaxRerenderFile));
     }
 
     @Test
@@ -341,6 +343,24 @@ public class InputFileIT extends OmniFacesIT {
 
     private String getMessagesText() {
         return messages.getText().replaceAll("\\s+", " ");
+    }
+
+    private int countValidateBindings(WebElement inputFile) {
+        // Faces 4.x
+        var onchange = inputFile.getAttribute("onchange");
+        var count = onchange == null ? 0 : countOccurrences(onchange, VALIDATE_SCRIPT);
+
+        // Faces 5.x Non-Ajax (CSP compatible)
+        for (var script : getBehaviorScripts(inputFile)) {
+            count += countOccurrences(script, VALIDATE_SCRIPT);
+        }
+
+        // Faces 5.x Ajax (CSP compatible)
+        for (var eval : getEvalScripts()) {
+            count += countOccurrences(eval, VALIDATE_SCRIPT);
+        }
+
+        return count;
     }
 
     private static int countOccurrences(String string, String substring) {

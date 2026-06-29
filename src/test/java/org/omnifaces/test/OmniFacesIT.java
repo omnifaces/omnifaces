@@ -38,6 +38,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.jboss.arquillian.junit5.ArquillianExtension;
@@ -265,6 +266,22 @@ public abstract class OmniFacesIT {
             .orElseThrow();
     }
 
+    /**
+     * Returns the contents of all <code>&lt;eval&gt;</code> sections of the last captured ajax partial response. Since Faces 5.0 (jakartaee/faces#2167) an
+     * ajax-re-rendered <code>on*</code> handler can be wired via such an eval script rather than inline on the element or behavior script, so a test inspecting
+     * the handler after an ajax re-render must consult these instead of the DOM.
+     */
+    protected List<String> getEvalScripts() {
+        var matcher = Pattern.compile("<eval>(.*?)</eval>", Pattern.DOTALL).matcher(getResponseBody());
+        var scripts = new ArrayList<String>();
+
+        while (matcher.find()) {
+            scripts.add(matcher.group(1));
+        }
+
+        return scripts;
+    }
+
     private void waitUntil(Supplier<Boolean> predicate) {
         new WebDriverWait(browser, ofSeconds(3)).until($ -> predicate.get());
     }
@@ -334,6 +351,33 @@ public abstract class OmniFacesIT {
 
     protected void clearTextContent(String messagesId) {
         executeScript("document.getElementById('" + messagesId + "').innerHTML='';");
+    }
+
+    /**
+     * Returns the contents of all inline (non-<code>src</code>) <code>&lt;script&gt;</code> elements whose text mentions the given element's ID. Since Faces
+     * 5.0 (jakartaee/faces#2167) an <code>on*</code> event handler wired at runtime via such a <code>&lt;script&gt;</code> block mentioning the element's ID
+     * and event name, instead of rendered as an inline <code>on*</code> attribute, so a test which needs to inspect a handler regardless of the implementation
+     * must consult both forms.
+     */
+    protected List<String> getBehaviorScripts(WebElement element) {
+        var id = element.getAttribute("id");
+        var scripts = new ArrayList<String>();
+
+        for (var script : browser.findElements(By.tagName("script"))) {
+            var src = script.getAttribute("src");
+
+            if (src != null && !src.isEmpty()) {
+                continue;
+            }
+
+            var content = script.getDomProperty("textContent");
+
+            if (content != null && (content.contains("'" + id + "'") || content.contains("\"" + id + "\""))) {
+                scripts.add(content);
+            }
+        }
+
+        return scripts;
     }
 
     protected static String stripJsessionid(String url) {
