@@ -78,31 +78,46 @@ public final class Hacks {
     private static final Class<?> PRIMEFACES_AJAX_SOURCE_CLASS = toClassOrNull("org.primefaces.component.api.AjaxSource");
     private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS = toClassOrNull("org.primefaces.component.dialog.Dialog");
 
-    private static final String MOJARRA_PACKAGE_PREFIX = "com.sun.faces.";
+    private static final Set<String> MOJARRA_PACKAGE_PREFIXES = unmodifiableSet(
+        "com.sun.faces.", // Mojarra 4.x and older.
+        "org.glassfish.mojarra." // Mojarra 5.x and newer.
+    );
     private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
     private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS = unmodifiableSet(
         "org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET", // MyFaces rendered @ResourceDependency(name$=.js) and <h:outputScript>
         "org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET"
     ); // MyFaces rendered @ResourceDependency(name$=.css) and <h:outputStylesheet>
-    private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
-    private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
     private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
-    private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
-        MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
-    };
+    private static final Set<String> PARAM_NAMES_RESOURCE_MAX_AGE = unmodifiableSet(
+        "com.sun.faces.defaultResourceMaxAge", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.defaultResourceMaxAge", // Mojarra 5.x and newer.
+        "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES" // MyFaces.
+    );
     private static final String MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID = "oam.view.resourceDependencyUniqueId";
 
-    private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
-    private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
-    private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
-    private static final String MOJARRA_VIEW_MAP_ID = "com.sun.faces.application.view.viewMapId";
-    private static final Set<String> MYFACES_SERIALIZED_VIEWS = unmodifiableSet(
-        "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW", // MyFaces 2.3.9
-        "org.apache.myfaces.application.viewstate.StateCacheServerSide.SERIALIZED_VIEW"
-    ); // MyFaces 2.3-next-M6
+    private static final Set<String> MOJARRA_SERIALIZED_VIEWS = unmodifiableSet(
+        "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.renderkit.ServerSideStateHelper.LogicalViewMap" // Mojarra 5.x and newer.
+    );
+    private static final Set<String> MOJARRA_SERIALIZED_VIEW_KEYS = unmodifiableSet(
+        "com.sun.faces.logicalViewMap", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.logicalViewMap" // Mojarra 5.x and newer.
+    );
+    private static final Set<String> MOJARRA_ACTIVE_VIEW_MAPS = unmodifiableSet(
+        "com.sun.faces.application.view.activeViewMaps", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.application.view.activeViewMaps" // Mojarra 5.x and newer.
+    );
+    private static final Set<String> MOJARRA_VIEW_MAP_IDS = unmodifiableSet(
+        "com.sun.faces.application.view.viewMapId", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.application.view.viewMapId" // Mojarra 5.x and newer.
+    );
+    private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.StateCacheServerSide.SERIALIZED_VIEW";
     private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
-    private static final String MOJARRA_CACHED_SERVLET_MAPPING_KEY = "com.sun.faces.INVOCATION_PATH";
+    private static final Set<String> MOJARRA_CACHED_SERVLET_MAPPING_KEYS = unmodifiableSet(
+        "com.sun.faces.INVOCATION_PATH", // Mojarra 4.x and older.
+        "org.glassfish.mojarra.INVOCATION_PATH" // Mojarra 5.x and newer.
+    );
     private static final String MYFACES_CACHED_SERVLET_MAPPING_KEY = "org.apache.myfaces.shared.application.DefaultViewHandlerSupport.CACHED_SERVLET_MAPPING";
 
     private static final String ERROR_MAX_AGE = "The '%s' init param must be a number. Encountered an invalid value of '%s'.";
@@ -132,7 +147,8 @@ public final class Hacks {
             var context = FacesContext.getCurrentInstance();
 
             if (context != null) {
-                mojarraUsed = getPackage(context).getName().startsWith(MOJARRA_PACKAGE_PREFIX);
+                var packageName = getPackage(context).getName();
+                mojarraUsed = MOJARRA_PACKAGE_PREFIXES.stream().anyMatch(packageName::startsWith);
             }
             else {
                 return false;
@@ -252,7 +268,8 @@ public final class Hacks {
      * @since 3.10
      */
     public static void clearCachedFacesServletMapping(FacesContext context) {
-        context.getAttributes().remove(isMyFacesUsed() ? MYFACES_CACHED_SERVLET_MAPPING_KEY : MOJARRA_CACHED_SERVLET_MAPPING_KEY);
+        context.getAttributes().keySet()
+            .removeAll(isMyFacesUsed() ? Collections.singleton(MYFACES_CACHED_SERVLET_MAPPING_KEY) : MOJARRA_CACHED_SERVLET_MAPPING_KEYS);
     }
 
     // Faces state saving related ------------------------------------------------------------------------------------
@@ -274,8 +291,7 @@ public final class Hacks {
                     return;
                 }
 
-                var viewCollection = MYFACES_SERIALIZED_VIEWS.stream().map(k -> getSessionAttribute(context, k)).filter(Objects::nonNull).findFirst()
-                    .orElse(null);
+                var viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
 
                 if (viewCollection == null) {
                     return;
@@ -329,16 +345,20 @@ public final class Hacks {
                 }
             }
             else { // Well, let's assume Mojarra.
-                Map<String, Object> serializedViews = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
+                Map<String, Object> serializedViews = MOJARRA_SERIALIZED_VIEWS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
+                    .filter(Objects::nonNull).findFirst().orElse(null);
 
                 if (serializedViews != null) {
-                    serializedViews.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
+                    MOJARRA_SERIALIZED_VIEW_KEYS.stream().map(key -> context.getAttributes().get(key)).filter(Objects::nonNull)
+                        .forEach(serializedViews::remove);
                 }
 
-                Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
+                Map<String, Object> activeViewMaps = MOJARRA_ACTIVE_VIEW_MAPS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
+                    .filter(Objects::nonNull).findFirst().orElse(null);
 
                 if (activeViewMaps != null) {
-                    activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
+                    var stateHelper = context.getViewRoot().getTransientStateHelper();
+                    MOJARRA_VIEW_MAP_IDS.stream().map(stateHelper::getTransient).filter(Objects::nonNull).forEach(activeViewMaps::remove);
                 }
             }
         }
