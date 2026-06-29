@@ -43,7 +43,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Test with Maven
-      run: mvn -B verify -P ${{matrix.server}}
+      run: mvn -B verify -P ${{matrix.server}} -Dfailsafe.rerunFailingTestsCount=2
 
   deploy:
     name: Deploy 5.x SNAPSHOT

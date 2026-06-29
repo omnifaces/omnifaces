@@ -89,6 +89,7 @@
 
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
+        <failsafe.rerunFailingTestsCount>0</failsafe.rerunFailingTestsCount> <!-- To rerun failing tests, use e.g. mvn clean verify -Dfailsafe.rerunFailingTestsCount=2 -->
 
         <!-- Sonar config. -->
         <sonar.organization>balusc-github</sonar.organization>
@@ -647,7 +648,7 @@
                                 <goal>verify</goal>
                             </goals>
                             <configuration>
-                                <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                                <rerunFailingTestsCount>${failsafe.rerunFailingTestsCount}</rerunFailingTestsCount>
                                 <systemPropertyVariables>
                                     <profile.id>${project.activeProfiles[0].id}</profile.id>
                                     <omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
