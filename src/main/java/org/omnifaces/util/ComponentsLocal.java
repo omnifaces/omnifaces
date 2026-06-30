@@ -326,7 +326,7 @@ public final class ComponentsLocal {
                 context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
             }
             else if (context.getCurrentPhaseId() != RENDER_RESPONSE || context.getResponseWriter() == null) {
-            	// A null response writer means rendering hasn't started yet, e.g. when invoked from a before-RENDER_RESPONSE phase listener.
+                // A null response writer means rendering hasn't started yet, e.g. when invoked from a before-RENDER_RESPONSE phase listener.
                 addScriptResourceToHead(context, libraryName, resourceName);
                 // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
                 subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName));
