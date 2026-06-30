@@ -325,13 +325,13 @@ public final class ComponentsLocal {
                 addScriptResourceToBody(context, libraryName, resourceName); // Just to register it in the component tree as we need to mark it rendered.
                 context.getApplication().getResourceHandler().markResourceRendered(context, resourceName, libraryName);
             }
-            else if (context.getCurrentPhaseId() != RENDER_RESPONSE || context.getResponseWriter() == null) {
-                // A null response writer means rendering hasn't started yet, e.g. when invoked from a before-RENDER_RESPONSE phase listener.
+            else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
                 addScriptResourceToHead(context, libraryName, resourceName);
                 // Fallback in case view rebuilds in the meanwhile. It will re-check if already added.
                 subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToBody(getContext(), libraryName, resourceName));
             }
             else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE)) || context.getResponseWriter() == null) {
+                // A null response writer means rendering hasn't started yet, e.g. when invoked from a before-RENDER_RESPONSE phase listener.
                 addScriptResourceToHead(context, libraryName, resourceName);
             }
             else {
