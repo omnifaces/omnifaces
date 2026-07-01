@@ -61,7 +61,7 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "profile.id", matches = ".*-myfaces", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
+    @DisabledIfSystemProperty(named = "profile.id", matches = ".*-myfaces.*", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
     void test() {
         try {
             var connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();

@@ -409,7 +409,7 @@ public abstract class OmniFacesIT {
     }
 
     protected static boolean isMyFacesUsed() {
-        return System.getProperty("profile.id").endsWith("-myfaces");
+        return System.getProperty("profile.id").contains("-myfaces");
     }
 
     protected static boolean isFirefox() {
