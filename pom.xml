@@ -1039,6 +1039,18 @@
                     </plugin>
                 </plugins>
             </build>
+            <repositories>
+                <repository>
+                    <id>central-portal-snapshots</id> <!-- Faces 5 API and Mojarra 5 impl are published here as SNAPSHOT. -->
+                    <url>https://central.sonatype.com/repository/maven-snapshots</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <!-- Tomcat - MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
@@ -1189,6 +1201,18 @@
                     </plugin>
                 </plugins>
             </build>
+            <repositories>
+                <repository>
+                    <id>apache-snapshots</id> <!-- MyFaces 5 impl is published here as SNAPSHOT. -->
+                    <url>https://repository.apache.org/snapshots</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <!-- Payara - Mojarra integration test profile: mvn verify -P payara-mojarra -->

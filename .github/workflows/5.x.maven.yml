@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server: [ wildfly-mojarra, liberty-myfaces, glassfish-mojarra, tomee-myfaces, tomcat-mojarra, tomcat-myfaces, payara-mojarra, quarkus-myfaces ]
+        server: [ wildfly-mojarra, liberty-myfaces, glassfish-mojarra, tomee-myfaces, tomcat-mojarra, tomcat-myfaces, payara-mojarra, quarkus-myfaces, tomcat-mojarra5, tomcat-myfaces5 ]
     steps:
     - uses: actions/checkout@v6
     - name: Set up JDK 21 (GlassFish/Payara doesn't support 17)
