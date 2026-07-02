@@ -449,7 +449,13 @@ public abstract class OmniFacesIT {
             var warLibraries = System.getProperty("war.libraries");
 
             if (warLibraries != null) {
-                archive.addAsLibraries(Maven.resolver().resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
+                // Faces 5 API and Mojarra 5 impl are published as SNAPSHOT in Central Portal snapshots, MyFaces 5 impl in Apache snapshots.
+                var resolver = warLibraries.contains("-SNAPSHOT")
+                    ? Maven.configureResolver()
+                        .withRemoteRepo("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots", "default")
+                        .withRemoteRepo("apache-snapshots", "https://repository.apache.org/snapshots", "default")
+                    : Maven.resolver();
+                archive.addAsLibraries(resolver.resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
             }
 
             addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
