@@ -392,6 +392,7 @@ public abstract class OmniFacesIT {
         withFacesViewsLowercasedRequestURI,
         withMultiViews,
         withThreeViewsInSession,
+        withThreeActiveViewScopes,
         withSocket,
         withClientStateSaving,
         withCDNResources,
