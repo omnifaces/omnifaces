@@ -39,7 +39,7 @@ jobs:
       uses: actions/setup-java@v5
       with:
         java-version: '8'
-        distribution: 'adopt'
+        distribution: 'temurin'
         cache: maven
     - name: Test with Maven
       run: mvn -B verify -P ${{matrix.server}}
@@ -54,7 +54,7 @@ jobs:
       uses: actions/setup-java@v5
       with:
         java-version: '8'
-        distribution: 'adopt'
+        distribution: 'temurin'
         server-id: central
         server-username: CENTRAL_USERNAME
         server-password: CENTRAL_PASSWORD
