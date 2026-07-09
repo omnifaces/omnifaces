@@ -25,16 +25,20 @@ import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
 
@@ -87,16 +91,28 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	@Override
 	public UUID getBeanStorageId() {
 		UUID beanStorageId = getViewAttribute(getClass().getName());
-		return beanStorageId != null && activeViewScopes.containsKey(beanStorageId) ? beanStorageId : null;
+		return beanStorageId != null && getBeanStorage(beanStorageId) != null ? beanStorageId : null;
 	}
 
 	@Override
 	public BeanStorage getBeanStorage(UUID beanStorageId) {
-		return activeViewScopes.get(beanStorageId);
+		ActiveBeanStorages activeBeanStorages = getActiveBeanStorages(true);
+		BeanStorage beanStorage = activeBeanStorages.getBeanStorage(beanStorageId);
+
+		if (beanStorage == null) {
+			beanStorage = activeViewScopes.get(beanStorageId);
+
+			if (beanStorage != null && !activeBeanStorages.acquire(beanStorageId, beanStorage)) {
+				beanStorage = null; // It was concurrently evicted and destroyed, so a new one must be created.
+			}
+		}
+
+		return beanStorage;
 	}
 
 	@Override
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
+		getActiveBeanStorages(true).acquire(beanStorageId, beanStorage); // Must happen before it's put in the LRU map, else a concurrent request could immediately evict and destroy it.
 		activeViewScopes.put(beanStorageId, beanStorage);
 		setViewAttribute(getClass().getName(), beanStorageId);
 	}
@@ -116,6 +132,12 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 		if (storage != null) {
 			storage.destroyBeans();
 			activeViewScopes.remove(beanStorageId);
+		}
+
+		ActiveBeanStorages activeBeanStorages = getActiveBeanStorages(false);
+
+		if (activeBeanStorages != null) {
+			activeBeanStorages.release(beanStorageId); // The view scope is explicitly gone, so the current request must no longer resolve it.
 		}
 	}
 
@@ -140,6 +162,14 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the bean storages which are in use by the current HTTP request, or <code>null</code> when there are none
+	 * and <code>create</code> is <code>false</code>.
+	 */
+	private static ActiveBeanStorages getActiveBeanStorages(boolean create) {
+		return Beans.getInstance(ActiveBeanStorages.class, create);
+	}
 
 	/**
 	 * Returns the max active view scopes depending on available context params. This will be calculated lazily once
@@ -172,8 +202,84 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
+	 * Holds the bean storages which are in use by the current HTTP request.
+	 * <p>
+	 * The LRU map of active view scopes is bound to a maximum capacity, so a request can have its bean storage evicted
+	 * by concurrent requests within the same session before it has finished. Acquiring the bean storage for the
+	 * duration of the request guarantees that the request keeps resolving the same bean storage and that its beans are
+	 * not prematurely destroyed by the eviction. An evicted bean storage is instead destroyed as soon as the last
+	 * request using it has finished.
+	 *
+	 * @author Bauke Scholtz
+	 * @see ViewScopeStorageInSession
+	 * @since 3.14.22
+	 */
+	@RequestScoped
+	protected static class ActiveBeanStorages {
+
+		private final Map<UUID, BeanStorage> beanStorages = new HashMap<>();
+
+		/**
+		 * Returns the bean storage which the current HTTP request has acquired under the given bean storage
+		 * identifier, or <code>null</code> if there is none.
+		 * @param beanStorageId The bean storage identifier.
+		 * @return The acquired bean storage, or <code>null</code> if there is none.
+		 */
+		protected BeanStorage getBeanStorage(UUID beanStorageId) {
+			return beanStorages.get(beanStorageId);
+		}
+
+		/**
+		 * Acquires the given bean storage for the duration of the current HTTP request. This is a no-op when it has
+		 * already been acquired by the current HTTP request.
+		 * @param beanStorageId The bean storage identifier.
+		 * @param beanStorage The bean storage.
+		 * @return <code>false</code> when the beans of the given bean storage have meanwhile been destroyed by a
+		 * concurrent eviction, in which case a new bean storage must be created.
+		 */
+		protected boolean acquire(UUID beanStorageId, BeanStorage beanStorage) {
+			if (beanStorages.containsKey(beanStorageId)) {
+				return true;
+			}
+
+			if (!beanStorage.acquire()) {
+				return false;
+			}
+
+			beanStorages.put(beanStorageId, beanStorage);
+			return true;
+		}
+
+		/**
+		 * Releases the bean storage identified by the given bean storage identifier, if the current HTTP request has
+		 * acquired it. This is invoked when the view scope is explicitly destroyed, such as during an unload or a
+		 * navigation, so that the current HTTP request will no longer resolve it.
+		 * @param beanStorageId The bean storage identifier.
+		 */
+		protected void release(UUID beanStorageId) {
+			BeanStorage beanStorage = beanStorages.remove(beanStorageId);
+
+			if (beanStorage != null) {
+				beanStorage.release();
+			}
+		}
+
+		/**
+		 * When the current HTTP request is about to be destroyed, release all bean storages which it still has
+		 * acquired.
+		 */
+		@PreDestroy
+		protected void preDestroyRequest() {
+			beanStorages.values().forEach(BeanStorage::release);
+			beanStorages.clear();
+		}
+
+	}
+
+	/**
 	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
-	 * invoke {@link BeanStorage#destroyBeans()}.
+	 * invoke {@link BeanStorage#evict()}, which destroys the beans only when no unfinished HTTP request is still using
+	 * the bean storage. See {@link ActiveBeanStorages}.
 	 */
 	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage>, Serializable {
 
@@ -181,7 +287,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 		@Override
 		public void onEviction(UUID id, BeanStorage storage) {
-			storage.destroyBeans();
+			storage.evict();
 		}
 
 	}
