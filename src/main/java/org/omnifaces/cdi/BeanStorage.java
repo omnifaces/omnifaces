@@ -47,6 +47,10 @@ public class BeanStorage implements Serializable {
     private final ConcurrentHashMap<String, ReentrantLock> locks;
     private final ReentrantLock lock = new ReentrantLock();
 
+    private transient int activeRequests;
+    private transient boolean evicted;
+    private transient boolean destroyed;
+
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
@@ -106,14 +110,62 @@ public class BeanStorage implements Serializable {
     }
 
     /**
+     * Registers that the current HTTP request has started using this bean storage, which will keep its beans alive until {@link #release()}.
+     *
+     * @return <code>false</code> when the beans have meanwhile been destroyed, in which case this bean storage must no longer be used.
+     * @since 5.4
+     */
+    public boolean acquire() {
+        return executeAtomically(lock, () -> {
+            if (destroyed) {
+                return false;
+            }
+
+            activeRequests++;
+            return true;
+        });
+    }
+
+    /**
+     * Registers that the current HTTP request has finished using this bean storage. When it was meanwhile evicted, and this was the last HTTP request using it,
+     * then its beans are destroyed.
+     *
+     * @since 5.4
+     */
+    public void release() {
+        executeAtomically(lock, () -> {
+            if (--activeRequests == 0 && evicted) {
+                destroyBeans();
+            }
+        });
+    }
+
+    /**
+     * Registers that this bean storage has been evicted. Its beans are destroyed immediately when no HTTP request is currently using it, otherwise the last
+     * HTTP request finishing with it will destroy them.
+     *
+     * @since 5.4
+     */
+    public void evict() {
+        executeAtomically(lock, () -> {
+            evicted = true;
+
+            if (activeRequests == 0) {
+                destroyBeans();
+            }
+        });
+    }
+
+    /**
      * Destroy all beans managed so far.
      */
-    public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
+    public void destroyBeans() {
         final var manager = Beans.getManager();
-        // Not sure if synchronization is absolutely necessary. Just to be on safe side.
+        // Locking is necessary to keep it atomic against acquire().
         Utils.executeAtomically(lock, () -> {
             beans.values().forEach(bean -> BeansLocal.destroy(manager, bean));
             beans.clear();
+            destroyed = true;
         });
     }
 
