@@ -305,6 +305,9 @@
                                         <include>src/**/*.xml</include>
                                         <include>src/**/*.xhtml</include>
                                     </includes>
+                                    <excludes>
+                                        <exclude>src/**/node_modules/**</exclude>
+                                    </excludes>
                                     <trimTrailingWhitespace />
                                     <endWithNewline />
                                     <indent>
