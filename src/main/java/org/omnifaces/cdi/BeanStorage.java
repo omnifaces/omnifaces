@@ -149,7 +149,7 @@ public class BeanStorage implements Serializable {
      */
     public void release() {
         executeAtomically(lock, () -> {
-            if (--activeRequests == 0 && evicted) {
+            if (activeRequests > 0 && --activeRequests == 0 && evicted) {
                 destroyBeans();
             }
         });
@@ -171,12 +171,16 @@ public class BeanStorage implements Serializable {
     }
 
     /**
-     * Destroy all beans managed so far.
+     * Destroy all beans managed so far. This is a no-op when they have already been destroyed.
      */
     public void destroyBeans() {
         final var manager = Beans.getManager();
         // Locking is necessary to keep it atomic against acquire().
         Utils.executeAtomically(lock, () -> {
+            if (destroyed) {
+                return;
+            }
+
             beans.values().forEach(bean -> BeansLocal.destroy(manager, bean));
             beans.clear();
             destroyed = true;
