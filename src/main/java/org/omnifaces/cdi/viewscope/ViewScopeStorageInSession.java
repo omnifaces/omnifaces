@@ -206,7 +206,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
      *
      * @author Bauke Scholtz
      * @see ViewScopeStorageInSession
-     * @since 4.7.11
+     * @since 3.14.22
      */
     @RequestScoped
     protected static class ActiveBeanStorages {

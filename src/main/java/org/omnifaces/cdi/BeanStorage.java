@@ -129,7 +129,7 @@ public class BeanStorage implements Serializable {
      * until {@link #release()}.
      * @return <code>false</code> when the beans have meanwhile been destroyed, in which case this bean storage must no
      * longer be used.
-     * @since 4.7.11
+     * @since 3.14.22
      */
     public boolean acquire() {
         return executeAtomically(lock, () -> {
@@ -145,7 +145,7 @@ public class BeanStorage implements Serializable {
     /**
      * Registers that the current HTTP request has finished using this bean storage. When it was meanwhile evicted, and
      * this was the last HTTP request using it, then its beans are destroyed.
-     * @since 4.7.11
+     * @since 3.14.22
      */
     public void release() {
         executeAtomically(lock, () -> {
@@ -158,7 +158,7 @@ public class BeanStorage implements Serializable {
     /**
      * Registers that this bean storage has been evicted. Its beans are destroyed immediately when no HTTP request is
      * currently using it, otherwise the last HTTP request finishing with it will destroy them.
-     * @since 4.7.11
+     * @since 3.14.22
      */
     public void evict() {
         executeAtomically(lock, () -> {
