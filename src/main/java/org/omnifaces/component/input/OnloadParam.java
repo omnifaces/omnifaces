@@ -26,6 +26,7 @@ import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.FacesLocal.getRequestMap;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.Utils.splitByWhitespace;
 
 import jakarta.faces.component.UIViewParameter;
 import jakarta.faces.context.FacesContext;
@@ -169,7 +170,7 @@ public abstract class OnloadParam extends UIViewParameter {
         var render = getRender();
 
         if (render != null) {
-            update(render.split("\\s+"));
+            update(splitByWhitespace(render));
         }
     }
 

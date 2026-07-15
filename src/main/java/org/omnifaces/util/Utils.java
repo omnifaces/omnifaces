@@ -115,6 +115,7 @@ public final class Utils {
     private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
     private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
+    private static final Pattern PATTERN_WHITESPACE = Pattern.compile("\\s+");
     private static final int UNICODE_3_BYTES = 0xfff;
     private static final int UNICODE_2_BYTES = 0xff;
     private static final int UNICODE_1_BYTE = 0xf;
@@ -441,6 +442,18 @@ public final class Utils {
      */
     public static String[] splitAndTrim(String string, String delimiter, int limit) {
         return stream(string.split(quote(delimiter), limit)).map(String::trim).toArray(String[]::new);
+    }
+
+    /**
+     * Split the given string on whitespace, i.e. on any sequence of one or more whitespace characters as per the regular expression <code>\s+</code>.
+     *
+     * @param string String to split on whitespace.
+     * @return An array of the split parts. When the string has leading whitespace, then the first element is an empty string, as per
+     * {@link String#split(String)}.
+     * @since 5.4.1
+     */
+    public static String[] splitByWhitespace(String string) {
+        return PATTERN_WHITESPACE.split(string);
     }
 
     // I/O ------------------------------------------------------------------------------------------------------------

@@ -51,6 +51,7 @@ import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.splitByWhitespace;
 import static org.omnifaces.util.Validators.resolveViolatedBasesAndProperties;
 import static org.omnifaces.util.Validators.validateBean;
 
@@ -704,7 +705,7 @@ public class ValidateBean extends TagHandler {
         String showMessageFor, String messageFormat
     )
     {
-        for (var forId : showMessageFor.split("\\s+")) {
+        for (var forId : splitByWhitespace(showMessageFor)) {
             var component = form.findComponent(forId);
             context.validationFailed();
 
@@ -760,7 +761,7 @@ public class ValidateBean extends TagHandler {
             }
         }
         else {
-            for (var clientId : showMessagesFor.split("\\s+")) {
+            for (var clientId : splitByWhitespace(showMessagesFor)) {
                 addErrors(clientId, violations, labels, messageFormat);
             }
         }

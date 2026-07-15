@@ -24,6 +24,7 @@ import static org.omnifaces.util.ComponentsLocal.validateHasParent;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
+import static org.omnifaces.util.Utils.splitByWhitespace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -264,7 +265,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         var namingContainerParent = getNamingContainer();
         List<UIInput> inputs = new ArrayList<>();
 
-        for (var clientId : components.split("\\s+")) {
+        for (var clientId : splitByWhitespace(components)) {
             for (var input : findInputComponents(namingContainerParent, clientId, PropertyKeys.components)) {
                 if (!input.isValid()) {
                     return Collections.emptyList();
@@ -395,7 +396,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
         else {
             var namingContainerParent = getNamingContainer();
 
-            for (var clientId : showMessageFor.split("\\s+")) {
+            for (var clientId : splitByWhitespace(showMessageFor)) {
                 var input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
                 addError(input.getClientId(context), message, labels);
             }

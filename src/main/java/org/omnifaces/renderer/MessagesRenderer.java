@@ -20,6 +20,7 @@ import static org.omnifaces.util.Renderers.writeText;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
+import static org.omnifaces.util.Utils.splitByWhitespace;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
 
         List<FacesMessage> messages = new ArrayList<>();
 
-        for (var forClientId : forClientIds.split("\\s+")) {
+        for (var forClientId : splitByWhitespace(forClientIds)) {
             var forComponent = component.findComponent(forClientId);
 
             if (forComponent == null) {
