@@ -80,6 +80,11 @@ public class OutputFormat extends HtmlOutputFormat {
 
     private final State state = new State(getStateHelper());
 
+    // Own the identity-based key derivation rather than relying on toString()/hashCode(), which a subclass could override.
+    private final String keyPrefix = getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
+    private final String writerKey = keyPrefix + "_writer";
+    private final String bufferKey = keyPrefix + "_buffer";
+
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
@@ -105,8 +110,8 @@ public class OutputFormat extends HtmlOutputFormat {
             ResponseWriter originalResponseWriter = context.getResponseWriter();
             var buffer = new StringWriter();
             context.setResponseWriter(originalResponseWriter.cloneWithWriter(buffer));
-            context.getAttributes().put(this + "_writer", originalResponseWriter);
-            context.getAttributes().put(this + "_buffer", buffer);
+            context.getAttributes().put(writerKey, originalResponseWriter);
+            context.getAttributes().put(bufferKey, buffer);
         }
 
         super.encodeBegin(context);
@@ -121,8 +126,8 @@ public class OutputFormat extends HtmlOutputFormat {
         super.encodeEnd(context);
 
         if (getVar() != null) {
-            ResponseWriter originalResponseWriter = (ResponseWriter) context.getAttributes().remove(this + "_writer");
-            StringWriter buffer = (StringWriter) context.getAttributes().remove(this + "_buffer");
+            ResponseWriter originalResponseWriter = (ResponseWriter) context.getAttributes().remove(writerKey);
+            StringWriter buffer = (StringWriter) context.getAttributes().remove(bufferKey);
             context.setResponseWriter(originalResponseWriter);
             context.getExternalContext().getRequestMap().put(getVar(), buffer.toString());
         }
