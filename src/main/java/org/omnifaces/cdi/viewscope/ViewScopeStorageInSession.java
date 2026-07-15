@@ -209,7 +209,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
      * @since 3.14.22
      */
     @RequestScoped
-    protected static class ActiveBeanStorages {
+    public static class ActiveBeanStorages {
 
         private final Map<UUID, BeanStorage> beanStorages = new HashMap<>();
 
