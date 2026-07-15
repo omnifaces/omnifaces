@@ -16,8 +16,8 @@ import static jakarta.faces.event.PhaseId.ANY_PHASE;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.faces.context.FacesContext;
@@ -55,16 +55,12 @@ public class CallbackPhaseListener implements PhaseListener {
 
     @Override
     public void beforePhase(PhaseEvent event) {
-        for (var phaseListener : getCallbackPhaseListenersForEvent(event)) {
-            phaseListener.beforePhase(event);
-        }
+        invokeCallbacks(event, true);
     }
 
     @Override
     public void afterPhase(PhaseEvent event) {
-        for (var phaseListener : getCallbackPhaseListenersForEvent(event)) {
-            phaseListener.afterPhase(event);
-        }
+        invokeCallbacks(event, false);
     }
 
     // Utility --------------------------------------------------------------------------------------------------------
@@ -95,22 +91,24 @@ public class CallbackPhaseListener implements PhaseListener {
         return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
     }
 
-    private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
+    private static void invokeCallbacks(PhaseEvent event, boolean before) {
         Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
 
-        if (phaseListeners == null) {
-            return Collections.emptySet();
+        if (phaseListeners == null || phaseListeners.isEmpty()) {
+            return;
         }
 
-        Set<PhaseListener> phaseListenersForEvent = new HashSet<>();
-
-        for (var phaseListener : phaseListeners) {
+        // Snapshot so a callback may (un)subscribe another request phase listener during its invocation.
+        for (var phaseListener : List.copyOf(phaseListeners)) {
             if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-                phaseListenersForEvent.add(phaseListener);
+                if (before) {
+                    phaseListener.beforePhase(event);
+                }
+                else {
+                    phaseListener.afterPhase(event);
+                }
             }
         }
-
-        return Collections.unmodifiableSet(phaseListenersForEvent);
     }
 
     private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {
