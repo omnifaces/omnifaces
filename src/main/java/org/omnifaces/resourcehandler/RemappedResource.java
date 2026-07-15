@@ -12,7 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -107,7 +107,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
             this.resourceName = resourceName;
         }
 
-        requestPath = requestPath.replaceFirst(quote("/" + previousResourceName), "/" + resourceName);
+        requestPath = replaceFirstLiteral(requestPath, "/" + previousResourceName, "/" + resourceName);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
         }
 
         var queryParam = (requestPath.contains("?ln=") ? "?" : "&") + "ln=";
-        requestPath = requestPath.replaceFirst(quote(queryParam + previousLibraryName), queryParam + libraryName);
+        requestPath = replaceFirstLiteral(requestPath, queryParam + previousLibraryName, queryParam + libraryName);
     }
 
     @Override

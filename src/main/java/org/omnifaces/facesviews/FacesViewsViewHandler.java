@@ -34,6 +34,7 @@ import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -214,15 +215,6 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         }
 
         return uri;
-    }
-
-    /**
-     * Replaces the first occurrence of the given target in the given value with the given replacement, treating both as literal strings rather than as a
-     * regular expression and a replacement pattern (unlike {@link String#replaceFirst(String, String)}). Package-private for unit testing.
-     */
-    static String replaceFirstLiteral(String value, String target, String replacement) {
-        int index = value.indexOf(target);
-        return index < 0 ? value : value.substring(0, index) + replacement + value.substring(index + target.length());
     }
 
 }

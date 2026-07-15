@@ -48,4 +48,28 @@ class UtilsTest {
         assertEquals(RFC_3986_UNRESERVED_CHARACTERS, Utils.encodeURI(RFC_3986_UNRESERVED_CHARACTERS));
     }
 
+    @Test
+    void testReplaceFirstLiteral() {
+        // Basic replacement of a substring within a context-path-prefixed value.
+        assertEquals("/ctx/foo/bar", Utils.replaceFirstLiteral("/ctx/Foo/Bar", "/Foo/Bar", "/foo/bar"));
+
+        // Target absent leaves the value unchanged.
+        assertEquals("/ctx/Foo/Bar", Utils.replaceFirstLiteral("/ctx/Foo/Bar", "/Baz", "/baz"));
+
+        // Only the first occurrence is replaced.
+        assertEquals("/foo?redirect=/Foo", Utils.replaceFirstLiteral("/Foo?redirect=/Foo", "/Foo", "/foo"));
+    }
+
+    @Test
+    void testReplaceFirstLiteralHandlesRegexMetacharacters() {
+        // Target is literal, not a regex: metacharacters must match themselves.
+        assertEquals("/ctx/a+b(c)/view", Utils.replaceFirstLiteral("/ctx/a+b(c)/View", "/a+b(c)/View", "/a+b(c)/view"));
+
+        // A '.' in the target must not act as a wildcard, so a non-matching value stays untouched.
+        assertEquals("/ctx/aXbc/rest", Utils.replaceFirstLiteral("/ctx/aXbc/rest", "/a.bc", "/z"));
+
+        // Replacement is literal too: '$' and '\' must not be interpreted as group references or escapes.
+        assertEquals("/ctx/f$0o\\1", Utils.replaceFirstLiteral("/ctx/FOO", "/FOO", "/f$0o\\1"));
+    }
+
 }

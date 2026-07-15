@@ -30,6 +30,7 @@ import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.setViewAttribute;
+import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -438,7 +439,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         var viewHandler = context.getApplication().getViewHandler();
         var viewIds = new LinkedHashSet<>(manifest.getCacheableViewIds());
         var cacheableResources = new LinkedHashSet<String>();
-        cacheableResources.add(manifest.getStartUrl().replaceFirst(Pattern.quote(getRequestDomainURL()), ""));
+        cacheableResources.add(replaceFirstLiteral(manifest.getStartUrl(), getRequestDomainURL(), ""));
 
         if (manifest.getOfflineViewId() != null) {
             viewIds.add(manifest.getOfflineViewId());

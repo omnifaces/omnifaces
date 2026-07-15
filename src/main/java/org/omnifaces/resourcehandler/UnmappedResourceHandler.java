@@ -21,6 +21,7 @@ import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
+import static org.omnifaces.util.Utils.replaceFirstLiteral;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
@@ -233,7 +234,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
         String mapping = getMapping();
 
         if (isPrefixMapping(mapping)) {
-            return path.replaceFirst(mapping, "");
+            return replaceFirstLiteral(path, mapping, "");
         }
         else if (path.contains("?")) {
             return path.replace(mapping + "?", "?");

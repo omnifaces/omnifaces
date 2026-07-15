@@ -456,6 +456,21 @@ public final class Utils {
         return PATTERN_WHITESPACE.split(string);
     }
 
+    /**
+     * Replaces the first occurrence of the given target in the given string with the given replacement, treating both as literal strings rather than as a
+     * regular expression and a replacement pattern (unlike {@link String#replaceFirst(String, String)}).
+     *
+     * @param string String to replace the first literal occurrence of the target in.
+     * @param target Literal target substring to be replaced.
+     * @param replacement Literal replacement.
+     * @return The string with the first literal occurrence of the target replaced, or the string unchanged when the target is absent.
+     * @since 5.4.1
+     */
+    public static String replaceFirstLiteral(String string, String target, String replacement) {
+        int index = string.indexOf(target);
+        return index < 0 ? string : string.substring(0, index) + replacement + string.substring(index + target.length());
+    }
+
     // I/O ------------------------------------------------------------------------------------------------------------
 
     /**
