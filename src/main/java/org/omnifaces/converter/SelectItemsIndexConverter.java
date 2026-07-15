@@ -86,7 +86,7 @@ public class SelectItemsIndexConverter implements Converter<Object> {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
+    private static final String ATTRIBUTE_PREFIX = "SelectItemsIndexConverter.";
 
     private static final String ERROR_SELECT_ITEMS_LIST_INDEX = "Could not determine index for value ''{0}'' in component {1}.";
     private static final String ERROR_GET_AS_OBJECT = "Could not convert value ''{0}'' for component {1}.";
@@ -118,7 +118,7 @@ public class SelectItemsIndexConverter implements Converter<Object> {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-        String key = ATTRIBUTE_SELECT_ITEMS.formatted(component.getClientId(context));
+        String key = ATTRIBUTE_PREFIX + component.getClientId(context);
         Entry<PhaseId, List<Object>> selectItemValuesByPhaseId = getContextAttribute(key);
 
         if (selectItemValuesByPhaseId == null || selectItemValuesByPhaseId.getKey() != context.getCurrentPhaseId()) {

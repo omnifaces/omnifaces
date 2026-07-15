@@ -123,7 +123,7 @@ public class GenericEnumConverter implements Converter<Enum> {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
+    private static final String ATTRIBUTE_PREFIX = "GenericEnumConverter.";
     private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
     private static final String ERROR_NO_ENUM_TYPE = "Cannot determine enum type, use standard EnumConverter instead.";
 
@@ -136,8 +136,8 @@ public class GenericEnumConverter implements Converter<Enum> {
         }
 
         Class<Enum> enumType = modelValue.getDeclaringClass();
-        setAttribute(component, ATTRIBUTE_ENUM_TYPE, enumType);
-        setViewAttribute(ATTRIBUTE_ENUM_TYPE.formatted(component.getClientId(context)), enumType);
+        setAttribute(component, ATTRIBUTE_PREFIX, enumType);
+        setViewAttribute(ATTRIBUTE_PREFIX + component.getClientId(context), enumType);
         return modelValue.name();
     }
 
@@ -148,8 +148,8 @@ public class GenericEnumConverter implements Converter<Enum> {
         }
 
         Class<Enum> enumType = coalesce(
-            getAttribute(component, ATTRIBUTE_ENUM_TYPE),
-            getViewAttribute(ATTRIBUTE_ENUM_TYPE.formatted(component.getClientId(context)))
+            getAttribute(component, ATTRIBUTE_PREFIX),
+            getViewAttribute(ATTRIBUTE_PREFIX + component.getClientId(context))
         );
 
         if (enumType == null) {
@@ -157,7 +157,7 @@ public class GenericEnumConverter implements Converter<Enum> {
                 ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
                 Method getter = getMethodReference(context.getELContext(), valueExpression).getMethod();
                 enumType = (Class<Enum>) ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments()[0];
-                setAttribute(component, ATTRIBUTE_ENUM_TYPE, requireNonNull(enumType));
+                setAttribute(component, ATTRIBUTE_PREFIX, requireNonNull(enumType));
             }
             catch (Exception e) {
                 throw new ConverterException(createError(ERROR_NO_ENUM_TYPE), e);
