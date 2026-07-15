@@ -269,14 +269,16 @@ public class CDNResourceHandler extends DefaultResourceHandler {
             }
         }
 
-        if (excludedResources.contains(new ResourceIdentifier(libraryName, resourceName))) {
+        var resourceIdentifier = new ResourceIdentifier(libraryName, resourceName);
+
+        if (excludedResources.contains(resourceIdentifier)) {
             return resource;
         }
 
         String requestPath = null;
 
         if (cdnResources != null) {
-            requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
+            requestPath = cdnResources.get(resourceIdentifier);
 
             if (requestPath == null) {
                 requestPath = cdnResources.get(new ResourceIdentifier(libraryName, "*"));
