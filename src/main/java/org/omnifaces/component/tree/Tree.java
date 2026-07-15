@@ -207,6 +207,10 @@ public class Tree extends TreeFamily implements NamingContainer {
             return;
         }
 
+        if (phaseId == PhaseId.RENDER_RESPONSE) {
+            nodes = null; // Rebuild the tree nodes once per render in case the child structure changed during invoke application.
+        }
+
         final var processValidations = phaseId == PhaseId.PROCESS_VALIDATIONS;
 
         process(context, getModel(phaseId), () -> {
@@ -304,7 +308,7 @@ public class Tree extends TreeFamily implements NamingContainer {
      * @see TreeInsertChildren
      */
     protected void processTreeNode(FacesContext context, PhaseId phaseId) {
-        processTreeNode(phaseId, treeNode -> {
+        processTreeNode(treeNode -> {
             if (treeNode != null) {
                 treeNode.process(context, phaseId);
             }
@@ -326,7 +330,7 @@ public class Tree extends TreeFamily implements NamingContainer {
      * @see TreeInsertChildren
      */
     protected boolean visitTreeNode(VisitContext context, VisitCallback callback) {
-        return processTreeNode(PhaseId.ANY_PHASE, treeNode -> {
+        return processTreeNode(treeNode -> {
             if (treeNode != null) {
                 return treeNode.visitTree(context, callback);
             }
@@ -364,18 +368,18 @@ public class Tree extends TreeFamily implements NamingContainer {
      * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and {@link #visitTreeNode(VisitContext, VisitCallback)} without code
      * duplication.
      *
-     * @param phaseId The current phase ID.
      * @param callback The callback to be invoked.
      * @return The callback result.
      */
-    private <R> R processTreeNode(PhaseId phaseId, Function<TreeNode, R> callback) {
+    private <R> R processTreeNode(Function<TreeNode, R> callback) {
         TreeNode treeNode = null;
 
         if (!currentModelNode.isLeaf()) {
-            treeNode = getNodes(phaseId).get(currentModelNode.getLevel());
+            var nodesByLevel = getNodes();
+            treeNode = nodesByLevel.get(currentModelNode.getLevel());
 
             if (treeNode == null) {
-                treeNode = getNodes(phaseId).get(null);
+                treeNode = nodesByLevel.get(null);
             }
         }
 
@@ -383,14 +387,14 @@ public class Tree extends TreeFamily implements NamingContainer {
     }
 
     /**
-     * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+     * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute. The result is cached and rebuilt once
+     * per render by {@link #process(FacesContext, PhaseId)}.
      *
-     * @param phaseId The current phase ID.
      * @return The tree nodes.
      * @throws IllegalStateException When there are multiple {@link TreeNode} components with the same level.
      */
-    private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
-        if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
+    private Map<Integer, TreeNode> getNodes() {
+        if (nodes == null) {
             nodes = new HashMap<>(getChildCount(), 1);
 
             for (var child : getChildren()) {
