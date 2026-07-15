@@ -16,6 +16,9 @@ import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isOneOf;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import jakarta.faces.component.UIOutput;
 import jakarta.faces.render.RenderKit;
 import jakarta.faces.render.RenderKitWrapper;
@@ -38,6 +41,8 @@ import org.omnifaces.renderer.CriticalStylesheetRenderer;
  */
 public class OmniRenderKit extends RenderKitWrapper {
 
+    private final Map<Renderer<?>, CorsAwareResourceRenderer> corsAwareRenderers = new ConcurrentHashMap<>();
+
     public OmniRenderKit(RenderKit wrapped) {
         super(wrapped);
     }
@@ -47,7 +52,12 @@ public class OmniRenderKit extends RenderKitWrapper {
         var renderer = super.getRenderer(family, rendererType);
         var corsSensitiveResource = UIOutput.COMPONENT_FAMILY.equals(family) && isOneOf(rendererType, RENDERER_TYPE_JS, RENDERER_TYPE_CSS) ||
             StylesheetFamily.COMPONENT_FAMILY.equals(family) && CriticalStylesheetRenderer.RENDERER_TYPE.equals(rendererType);
-        return corsSensitiveResource ? new CorsAwareResourceRenderer(renderer) : renderer;
+
+        if (!corsSensitiveResource || renderer == null) {
+            return renderer;
+        }
+
+        return corsAwareRenderers.computeIfAbsent(renderer, CorsAwareResourceRenderer::new);
     }
 
 }
