@@ -18,6 +18,8 @@ import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.model.SelectItem;
+import jakarta.faces.model.SelectItemGroup;
 import jakarta.inject.Named;
 
 @Named
@@ -26,6 +28,8 @@ public class SelectItemsConverterITBean {
 
     private SelectItemsConverterITEntity selectedEntity;
     private List<SelectItemsConverterITEntity> availableEntities;
+    private List<SelectItemsConverterITEntity> selectedEntities;
+    private List<SelectItem> groupedEntities;
 
     @PostConstruct
     public void init() {
@@ -33,6 +37,19 @@ public class SelectItemsConverterITBean {
             new SelectItemsConverterITEntity(1L),
             new SelectItemsConverterITEntity(2L),
             new SelectItemsConverterITEntity(3L)
+        );
+        groupedEntities = asList(
+            new SelectItemGroup(
+                "Group A", null, false, new SelectItem[] {
+                    new SelectItem(availableEntities.get(0), "one"),
+                    new SelectItem(availableEntities.get(1), "two")
+                }
+            ),
+            new SelectItemGroup(
+                "Group B", null, false, new SelectItem[] {
+                    new SelectItem(availableEntities.get(2), "three")
+                }
+            )
         );
     }
 
@@ -46,6 +63,18 @@ public class SelectItemsConverterITBean {
 
     public List<SelectItemsConverterITEntity> getAvailableEntities() {
         return availableEntities;
+    }
+
+    public List<SelectItemsConverterITEntity> getSelectedEntities() {
+        return selectedEntities;
+    }
+
+    public void setSelectedEntities(List<SelectItemsConverterITEntity> selectedEntities) {
+        this.selectedEntities = selectedEntities;
+    }
+
+    public List<SelectItem> getGroupedEntities() {
+        return groupedEntities;
     }
 
 }

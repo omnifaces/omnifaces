@@ -12,10 +12,19 @@
  */
 package org.omnifaces.converter;
 
+import static org.omnifaces.util.Faces.getContextAttribute;
+import static org.omnifaces.util.Faces.setContextAttribute;
+
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import java.util.Map.Entry;
+
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.model.SelectItem;
 
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.selectitems.SelectItemsCollector;
@@ -100,9 +109,11 @@ import org.omnifaces.vdl.FacesConverterTag;
 @FacesConverterTag(namespace = OmniFaces.OMNIFACES_NAMESPACE)
 public class SelectItemsConverter implements Converter<Object> {
 
+    private static final String ATTRIBUTE_PREFIX = "SelectItemsConverter.";
+
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
-        return SelectItemsUtils.findValueByStringConversion(context, component, value, this);
+        return SelectItemsUtils.findValueByStringConversion(context, component, getSelectItems(context, component), value, this);
     }
 
     @Override
@@ -112,6 +123,23 @@ public class SelectItemsConverter implements Converter<Object> {
         }
 
         return value.toString();
+    }
+
+    /**
+     * Returns the select items associated with the given component, cached in the faces context for the duration of the current phase, so that repeated
+     * conversions of multiple submitted values (such as of a select-many component) don't repeat the relatively expensive collection.
+     */
+    private static List<SelectItem> getSelectItems(FacesContext context, UIComponent component) {
+        String key = ATTRIBUTE_PREFIX + component.getClientId(context);
+        Entry<PhaseId, List<SelectItem>> selectItemsByPhaseId = getContextAttribute(key);
+
+        if (selectItemsByPhaseId == null || selectItemsByPhaseId.getKey() != context.getCurrentPhaseId()) {
+            List<SelectItem> selectItems = SelectItemsCollector.collectFromParent(context, component);
+            selectItemsByPhaseId = new SimpleEntry<>(context.getCurrentPhaseId(), selectItems);
+            setContextAttribute(key, selectItemsByPhaseId);
+        }
+
+        return selectItemsByPhaseId.getValue();
     }
 
 }

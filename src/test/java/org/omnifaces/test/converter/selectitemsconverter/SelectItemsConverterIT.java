@@ -27,11 +27,17 @@ public class SelectItemsConverterIT extends OmniFacesIT {
     @FindBy(id = "form:input")
     private WebElement input;
 
+    @FindBy(id = "form:manyInput")
+    private WebElement manyInput;
+
     @FindBy(id = "form:submit")
     private WebElement submit;
 
     @FindBy(id = "form:output")
     private WebElement output;
+
+    @FindBy(id = "form:manyOutput")
+    private WebElement manyOutput;
 
     @FindBy(id = "form:messages")
     private WebElement messages;
@@ -44,8 +50,15 @@ public class SelectItemsConverterIT extends OmniFacesIT {
     @Test
     void test() {
         new Select(input).selectByIndex(2);
+
+        // Select two grouped items so getAsObject is invoked multiple times in one decode (exercising the per-phase cache and SelectItemGroup recursion).
+        Select many = new Select(manyInput);
+        many.selectByVisibleText("one");
+        many.selectByVisibleText("three");
+
         guardAjax(submit::click);
         assertEquals("Entity[3]", output.getText());
+        assertEquals("[Entity[1], Entity[3]]", manyOutput.getText());
         assertEquals("", messages.getText());
     }
 

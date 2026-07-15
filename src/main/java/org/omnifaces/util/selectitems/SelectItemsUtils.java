@@ -49,7 +49,27 @@ public final class SelectItemsUtils {
      * @return the Object representation of the value where its string representation matches the input value.
      */
     public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter<Object> converter) {
-        return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
+        return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component), value, converter);
+    }
+
+    /**
+     * Finds an object value in the given {@link SelectItem} instances by means of matching its converted value with the given string value. This is a variant
+     * of {@link #findValueByStringConversion(FacesContext, UIComponent, String, Converter)} which takes the already collected select items, so that the caller
+     * can cache and reuse them across multiple invocations within the same phase.
+     *
+     * @param context The involved faces context.
+     * @param component The component with which the given {@link SelectItem}s are associated.
+     * @param selectItems The already collected select items to search in.
+     * @param value A string that should match the string representation of one of the values held by the {@link SelectItem}s.
+     * @param converter The faces {@link Converter} used to generate String representations for the values held by the {@link SelectItem}s.
+     * @return The object representation of the value where its string representation matches the input value.
+     * @since 5.4.1
+     */
+    public static Object findValueByStringConversion(
+        FacesContext context, UIComponent component, List<SelectItem> selectItems, String value, Converter<Object> converter
+    )
+    {
+        return findValueByStringConversion(context, component, selectItems.iterator(), value, converter);
     }
 
     private static Object findValueByStringConversion(

@@ -26,10 +26,14 @@
             <h:selectOneMenu id="input" value="#{selectItemsConverterITBean.selectedEntity}" converter="omnifaces.SelectItemsConverter">
                 <f:selectItems value="#{selectItemsConverterITBean.availableEntities}" var="entity" itemLabel="#{entity.name}" />
             </h:selectOneMenu>
+            <h:selectManyListbox id="manyInput" value="#{selectItemsConverterITBean.selectedEntities}" converter="omnifaces.SelectItemsConverter">
+                <f:selectItems value="#{selectItemsConverterITBean.groupedEntities}" />
+            </h:selectManyListbox>
             <h:commandButton id="submit">
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <h:outputText id="output" value="#{selectItemsConverterITBean.selectedEntity}" />
+            <h:outputText id="manyOutput" value="#{selectItemsConverterITBean.selectedEntities}" />
             <h:messages id="messages" />
         </h:form>
     </h:body>
