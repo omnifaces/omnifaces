@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ViewHandler;
@@ -81,6 +82,9 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
     private static final String ERROR_MULTI_VIEW_NOT_CONFIGURED = "MultiViews was not configured for the view id '%s', but path parameters were defined for it.";
 
+    // Splits an URI into [path, suffix] where suffix starts at the first query string ('?'), fragment ('#') or matrix parameter (';') delimiter, if any.
+    private static final Pattern PATTERN_URI_SUFFIX = Pattern.compile("(?=[?#;])");
+
     private final boolean extensionless;
     private final boolean lowercasedRequestURI;
 
@@ -119,7 +123,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         if (mappedResources.containsKey(resourceName) && (extensionless || isOriginalViewExtensionless(context))) {
             // User has requested to always render extensionless, or the requested viewId was mapped and the current
             // request is extensionless; render the action URL extensionless as well.
-            String[] uriAndRest = (lowercasedRequestURI ? actionURL.replaceFirst(viewId, resourceName) : actionURL).split("(?=[?#;])", 2);
+            String source = lowercasedRequestURI ? replaceFirstLiteral(actionURL, viewId, resourceName) : actionURL;
+            String[] uriAndRest = PATTERN_URI_SUFFIX.split(source, 2);
             String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndRest[0], viewId));
             var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
             var pathInfo = context.getViewRoot() != null && context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
@@ -152,7 +157,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
         if (isMultiViewsEnabled(getServletContext(context), viewId)) {
             // This is a MultiViews enabled viewId, so render the path parameters as well, replacing the current ones if any.
-            String[] uriAndRest = bookmarkableURL.split("(?=[?#;])", 2);
+            String[] uriAndRest = PATTERN_URI_SUFFIX.split(bookmarkableURL, 2);
             String uri = removePathInfoIfNecessary(context, uriAndRest[0]);
             var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
             var pathInfo = pathParams.stream().filter(Objects::nonNull).map(Utils::encodeURI).collect(joining(PATH_SEPARATOR, PATH_SEPARATOR, ""));
@@ -209,6 +214,15 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         }
 
         return uri;
+    }
+
+    /**
+     * Replaces the first occurrence of the given target in the given value with the given replacement, treating both as literal strings rather than as a
+     * regular expression and a replacement pattern (unlike {@link String#replaceFirst(String, String)}). Package-private for unit testing.
+     */
+    static String replaceFirstLiteral(String value, String target, String replacement) {
+        int index = value.indexOf(target);
+        return index < 0 ? value : value.substring(0, index) + replacement + value.substring(index + target.length());
     }
 
 }
