@@ -69,21 +69,21 @@
 
         <!-- Test server versions. -->
         <test.wildfly-mojarra4.version>36.0.1.Final</test.wildfly-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-dist -->
-        <test.liberty-myfaces3.version>25.0.0.5</test.liberty-myfaces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
-        <test.glassfish-mojarra4.version>7.0.25</test.glassfish-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomcat.version>10.1.41</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+        <test.liberty-myfaces3.version>25.0.0.12</test.liberty-myfaces3.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
+        <test.glassfish-mojarra4.version>7.1.1</test.glassfish-mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.tomcat.version>10.1.57</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.piranha.version>25.5.0</test.piranha.version> <!-- https://mvnrepository.com/artifact/cloud.piranha.arquillian/piranha-arquillian-server -->
-        <test.tomee-myfaces4.version>10.0.1</test.tomee-myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
-        <test.payara.version>6.2025.7</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
+        <test.tomee-myfaces4.version>10.1.5</test.tomee-myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+        <test.payara.version>6.2025.11</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
 
         <!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-        <test.mojarra4.version>4.0.11</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra4.version>4.0.20-SNAPSHOT</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.mojarra3.version>3.0.5</test.mojarra3.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.myfaces4.version>4.0.3</test.myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
         <test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
-        <test.weld5.version>5.1.6.Final</test.weld5.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
+        <test.weld5.version>5.1.7.Final</test.weld5.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
         <test.weld4.version>4.0.3.Final</test.weld4.version> <!-- https://mvnrepository.com/artifact/org.jboss.weld.servlet/weld-servlet-shaded -->
-        <test.hibernateValidator8.version>8.0.2.Final</test.hibernateValidator8.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <test.hibernateValidator8.version>8.0.4.Final</test.hibernateValidator8.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.hibernateValidator7.version>7.0.5.Final</test.hibernateValidator7.version> <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
         <test.jsonp.version>2.0.1</test.jsonp.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.json -->
         <test.jstl.version>2.0.0</test.jstl.version> <!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl NOTE: JSTL 3.x cannot be used because we also want to test Tomcat + Faces 3.0 -->
