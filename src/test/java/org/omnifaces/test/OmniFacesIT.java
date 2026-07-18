@@ -36,6 +36,8 @@ import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -289,9 +291,15 @@ public abstract class OmniFacesIT {
 
             if (warLibraries != null) {
                 // Mojarra 4 is published as SNAPSHOT in Central Portal snapshots. This cannot be declared as a repository in pom.xml as the ShrinkWrap
-                // resolver does not read those, it only reads the Maven settings.xml.
+                // resolver does not read those, it only reads the Maven settings.xml. The update policy must be explicitly set to always, else the daily
+                // default would keep serving a stale SNAPSHOT from the local repository, which in CI is restored from cache.
                 var resolver = warLibraries.contains("-SNAPSHOT")
-                    ? Maven.configureResolver().withRemoteRepo("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots", "default")
+                    ? Maven.configureResolver()
+                        .withRemoteRepo(
+                            MavenRemoteRepositories
+                                .createRemoteRepository("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots", "default")
+                                .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_ALWAYS)
+                        )
                     : Maven.resolver();
                 archive.addAsLibraries(resolver.resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
             }
