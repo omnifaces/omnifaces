@@ -46,6 +46,9 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepository;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -449,16 +452,25 @@ public abstract class OmniFacesIT {
             var warLibraries = System.getProperty("war.libraries");
 
             if (warLibraries != null) {
-                // Faces 5 API and Mojarra 5 impl are published as SNAPSHOT in Central Portal snapshots, MyFaces 5 impl in Apache snapshots.
+                // Faces 5 API and Mojarra 5 impl are published as SNAPSHOT in Central Portal snapshots, MyFaces 5 impl in Apache snapshots. These cannot be
+                // declared as a repository in pom.xml as the ShrinkWrap resolver does not read those, it only reads the Maven settings.xml.
                 var resolver = warLibraries.contains("-SNAPSHOT")
                     ? Maven.configureResolver()
-                        .withRemoteRepo("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots", "default")
-                        .withRemoteRepo("apache-snapshots", "https://repository.apache.org/snapshots", "default")
+                        .withRemoteRepo(createSnapshotRepository("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots"))
+                        .withRemoteRepo(createSnapshotRepository("apache-snapshots", "https://repository.apache.org/snapshots"))
                     : Maven.resolver();
                 archive.addAsLibraries(resolver.resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
             }
 
             addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
+        }
+
+        /**
+         * The update policy must be explicitly set to always, else the daily default would keep serving a stale SNAPSHOT from the local repository, which in CI
+         * is restored from cache.
+         */
+        private static MavenRemoteRepository createSnapshotRepository(String id, String url) {
+            return MavenRemoteRepositories.createRemoteRepository(id, url, "default").setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_ALWAYS);
         }
 
         private void addWebResources(File root, String directory) {
