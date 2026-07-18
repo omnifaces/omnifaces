@@ -288,7 +288,12 @@ public abstract class OmniFacesIT {
             var warLibraries = System.getProperty("war.libraries");
 
             if (warLibraries != null) {
-                archive.addAsLibraries(Maven.resolver().resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
+                // Mojarra 4 is published as SNAPSHOT in Central Portal snapshots. This cannot be declared as a repository in pom.xml as the ShrinkWrap
+                // resolver does not read those, it only reads the Maven settings.xml.
+                var resolver = warLibraries.contains("-SNAPSHOT")
+                    ? Maven.configureResolver().withRemoteRepo("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots", "default")
+                    : Maven.resolver();
+                archive.addAsLibraries(resolver.resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
             }
 
             addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
