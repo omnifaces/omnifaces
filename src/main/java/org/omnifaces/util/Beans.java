@@ -102,6 +102,22 @@ public final class Beans {
     // Hopefully unknown CDI proxy implementations follow the same de-facto standard.
     private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("(.+)(\\$\\$(.*)Proxy|Proxy(.*)\\$\\$)(.*)", CASE_INSENSITIVE);
 
+    // Whether a class is a proxy is a fixed property of that class, so compute it only once per class. A ClassValue is used rather than a map because it does
+    // not retain the class, which would prevent the web application's class loader from being garbage collected on undeploy.
+    private static final ClassValue<Boolean> PROXY_CLASSES = new ClassValue<>() {
+
+        @Override
+        protected Boolean computeValue(Class<?> beanClass) {
+            if (PROXY_INTERFACES.stream().anyMatch(proxyInterface -> proxyInterface.isAssignableFrom(beanClass))) {
+                return true;
+            }
+
+            // Fall back for unknown CDI proxy implementations.
+            return PATTERN_GENERATED_PROXY_CLASS_NAME.matcher(beanClass.getSimpleName()).matches();
+        }
+
+    };
+
     // Constructors ---------------------------------------------------------------------------------------------------
 
     private Beans() {
@@ -292,14 +308,7 @@ public final class Beans {
             return false;
         }
 
-        Class<?> beanClass = object instanceof Class ? (Class<?>) object : object.getClass();
-
-        if (PROXY_INTERFACES.stream().anyMatch(proxyInterface -> proxyInterface.isAssignableFrom(beanClass))) {
-            return true;
-        }
-
-        // Fall back for unknown CDI proxy implementations.
-        return PATTERN_GENERATED_PROXY_CLASS_NAME.matcher(beanClass.getSimpleName()).matches();
+        return PROXY_CLASSES.get(object instanceof Class ? (Class<?>) object : object.getClass());
     }
 
     /**
@@ -311,7 +320,7 @@ public final class Beans {
      * @since 3.8
      */
     public static <T> T unwrapIfNecessary(T object) {
-        return BeansLocal.unwrapIfNecessary(getManager(), object);
+        return isProxy(object) ? BeansLocal.unwrapIfNecessary(getManager(), object, true) : object;
     }
 
     /**
@@ -400,7 +409,7 @@ public final class Beans {
      * @since 1.8
      */
     public static <A extends Annotation> A getAnnotation(Annotated annotated, Class<A> annotationType) {
-        return BeansLocal.getAnnotation(getManager(), annotated, annotationType);
+        return BeansLocal.getAnnotation(Beans::getManager, annotated, annotationType);
     }
 
     /**

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.spi.AlterableContext;
@@ -152,13 +153,17 @@ public final class BeansLocal {
     /**
      * @see Beans#unwrapIfNecessary(Object)
      */
-    @SuppressWarnings("unchecked")
     public static <T> T unwrapIfNecessary(BeanManager beanManager, T object) {
+        return unwrapIfNecessary(beanManager, object, isProxy(object));
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> T unwrapIfNecessary(BeanManager beanManager, T object, boolean isProxy) {
         if (object == null) {
             return null;
         }
 
-        if (!isProxy(object)) {
+        if (!isProxy) {
             return object;
         }
 
@@ -174,6 +179,8 @@ public final class BeansLocal {
      * @see Beans#isActive(Class)
      */
     public static <S extends Annotation> boolean isActive(BeanManager beanManager, Class<S> scope) {
+        // Deliberately not BeanContainer#getContexts() as that returns all registered contexts of the scope rather than
+        // only the active one. OpenWebBeans and Weld disagree on that, which in turn breaks o:socket.
         try {
             return beanManager.getContext(scope).isActive();
         }
@@ -259,9 +266,10 @@ public final class BeansLocal {
      * @see Beans#getAnnotation(Annotated, Class)
      */
     public static <A extends Annotation> A getAnnotation(BeanManager beanManager, Annotated annotated, Class<A> annotationType) {
+        return getAnnotation(() -> beanManager, annotated, annotationType);
+    }
 
-        annotated.getAnnotation(annotationType);
-
+    static <A extends Annotation> A getAnnotation(Supplier<BeanManager> beanManager, Annotated annotated, Class<A> annotationType) {
         if (annotated.getAnnotations().isEmpty()) {
             return null;
         }
@@ -271,6 +279,7 @@ public final class BeansLocal {
         }
 
         Queue<Annotation> annotations = new LinkedList<>(annotated.getAnnotations());
+        var manager = beanManager.get();
 
         while (!annotations.isEmpty()) {
             var annotation = annotations.remove();
@@ -279,8 +288,8 @@ public final class BeansLocal {
                 return annotationType.cast(annotation);
             }
 
-            if (beanManager.isStereotype(annotation.annotationType())) {
-                annotations.addAll(beanManager.getStereotypeDefinition(annotation.annotationType()));
+            if (manager.isStereotype(annotation.annotationType())) {
+                annotations.addAll(manager.getStereotypeDefinition(annotation.annotationType()));
             }
         }
 
