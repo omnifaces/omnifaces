@@ -98,6 +98,14 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>central-snapshots</id>
+            <snapshots />
+            <url>https://central.sonatype.com/repository/maven-snapshots</url> <!-- Currently only used for the Mojarra SNAPSHOT versions. -->
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <!-- Required Jakarta EE 11 dependencies. -->
