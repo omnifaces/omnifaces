@@ -21,6 +21,7 @@
     <container qualifier="liberty">
         <configuration>
             <property name="wlpHome">target/wlp</property>
+            <property name="serverStopTimeout">60</property>
         </configuration>
     </container>
 
