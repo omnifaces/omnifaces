@@ -77,7 +77,7 @@
         <test.payara.version>6.2025.11</test.payara.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
 
         <!-- Test impl versions for servletcontainers (Tomcat/Piranha). -->
-        <test.mojarra4.version>4.0.20-SNAPSHOT</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra4.version>4.0.20</test.mojarra4.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.mojarra3.version>3.0.5</test.mojarra3.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.myfaces4.version>4.0.3</test.myfaces4.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
         <test.myfaces3.version>3.0.2</test.myfaces3.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
