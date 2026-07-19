@@ -15,6 +15,9 @@ package org.omnifaces.test.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.text.ParseException;
+import java.time.Instant;
+
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Utils;
 
@@ -70,6 +73,52 @@ class UtilsTest {
 
         // Replacement is literal too: '$' and '\' must not be interpreted as group references or escapes.
         assertEquals("/ctx/f$0o\\1", Utils.replaceFirstLiteral("/ctx/FOO", "/FOO", "/f$0o\\1"));
+    }
+
+    /**
+     * The HTTP date of RFC 9110 is a fixed length format which requires a two digit day of month. This is why {@link Utils#formatRFC1123(java.util.Date)}
+     * cannot use {@link java.time.format.DateTimeFormatter#RFC_1123_DATE_TIME}, as that one implements the more lenient RFC 1123 which also allows a single
+     * digit day of month.
+     */
+    @Test
+    void testFormatRFC1123PadsDayOfMonthToTwoDigits() {
+        // 3 June 2026, i.e. a day of month below 10, must be emitted as "03" and not as "3".
+        assertEquals("Wed, 03 Jun 2026 11:05:30 GMT", Utils.formatRFC1123(dateOf("2026-06-03T11:05:30Z")));
+
+        // A day of month above 10 is unaffected.
+        assertEquals("Sun, 28 Jun 2026 11:05:30 GMT", Utils.formatRFC1123(dateOf("2026-06-28T11:05:30Z")));
+    }
+
+    /**
+     * {@link Utils#formatRFC1123(java.util.Date)} cannot use {@link java.util.Date#toInstant()} as {@link java.sql.Date} and {@link java.sql.Time} throw an
+     * {@link UnsupportedOperationException} on it, while they are perfectly valid arguments, e.g. when reached via {@link org.omnifaces.util.Json} while
+     * serializing a bean holding a JPA entity.
+     */
+    @Test
+    void testFormatRFC1123AcceptsSqlDates() {
+        var millis = dateOf("2026-06-03T11:05:30Z").getTime();
+        var expected = "Wed, 03 Jun 2026 11:05:30 GMT";
+
+        assertEquals(expected, Utils.formatRFC1123(new java.util.Date(millis)));
+        assertEquals(expected, Utils.formatRFC1123(new java.sql.Date(millis)));
+        assertEquals(expected, Utils.formatRFC1123(new java.sql.Time(millis)));
+        assertEquals(expected, Utils.formatRFC1123(new java.sql.Timestamp(millis)));
+    }
+
+    /**
+     * {@link Utils#parseRFC1123(String)} must keep accepting whatever {@link Utils#formatRFC1123(java.util.Date)} emits, as both are used on the very same HTTP
+     * date headers.
+     */
+    @Test
+    void testFormatRFC1123RoundTrips() throws ParseException {
+        for (var text : new String[] { "1970-01-01T00:00:00Z", "2026-06-03T11:05:30Z", "2026-12-31T23:59:59Z" }) {
+            var date = dateOf(text);
+            assertEquals(date.getTime(), Utils.parseRFC1123(Utils.formatRFC1123(date)).getTime(), text);
+        }
+    }
+
+    private static java.util.Date dateOf(String isoInstant) {
+        return java.util.Date.from(Instant.parse(isoInstant));
     }
 
 }

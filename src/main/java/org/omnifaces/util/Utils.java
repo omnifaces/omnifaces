@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Locale.US;
 import static java.util.function.Predicate.not;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
@@ -55,6 +56,7 @@ import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
@@ -114,6 +116,7 @@ public final class Utils {
     private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
     private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
     private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+    private static final DateTimeFormatter FORMATTER_RFC1123_DATE = DateTimeFormatter.ofPattern(PATTERN_RFC1123_DATE, US).withZone(TIMEZONE_GMT.toZoneId());
     private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
     private static final Pattern PATTERN_WHITESPACE = Pattern.compile("\\s+");
     private static final int UNICODE_3_BYTES = 0xfff;
@@ -837,9 +840,7 @@ public final class Utils {
      * @since 1.2
      */
     public static String formatRFC1123(Date date) {
-        var sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
-        sdf.setTimeZone(TIMEZONE_GMT);
-        return sdf.format(date);
+        return FORMATTER_RFC1123_DATE.format(Instant.ofEpochMilli(date.getTime()));
     }
 
     /**

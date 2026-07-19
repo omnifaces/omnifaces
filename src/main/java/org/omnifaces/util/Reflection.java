@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -78,6 +79,18 @@ import jakarta.enterprise.inject.Typed;
 public final class Reflection {
 
     private static final Logger logger = Logger.getLogger(Reflection.class.getName());
+
+    // The candidate methods of a class are a fixed property of that class, hence they are collected only once per class, method name and parameter count.
+    // A ClassValue is used rather than a map because it does not retain the class, which would prevent the web application's class loader from being garbage
+    // collected on undeploy. Note that the collected methods are shared, so a caller which sets them accessible does so for all callers, which is harmless.
+    private static final ClassValue<Map<String, List<Method>>> CANDIDATE_METHODS = new ClassValue<>() {
+
+        @Override
+        protected Map<String, List<Method>> computeValue(Class<?> type) {
+            return new ConcurrentHashMap<>();
+        }
+
+    };
 
     private static final String ERROR_LOAD_CLASS = "Cannot load class '%s'.";
     private static final String ERROR_CREATE_INSTANCE = "Cannot create instance of class '%s'.";
@@ -633,16 +646,9 @@ public final class Reflection {
      * @return a method if one is found, null otherwise
      */
     public static Method findMethod(Object base, String methodName, Object... params) {
-
-        List<Method> methods = new ArrayList<>();
-
-        for (Class<?> cls = base instanceof Class ? (Class<?>) base : base.getClass(); cls != null; cls = cls.getSuperclass()) {
-            collectMethods(methods, cls, false, methodName, params);
-
-            for (Class<?> iface : cls.getInterfaces()) {
-                collectInterfaceMethods(methods, iface, methodName, params);
-            }
-        }
+        var type = base instanceof Class ? (Class<?>) base : base.getClass();
+        var methods = CANDIDATE_METHODS.get(type)
+            .computeIfAbsent(methodName + "/" + params.length, key -> collectCandidateMethods(type, methodName, params.length));
 
         if (methods.size() == 1) {
             return methods.get(0);
@@ -652,18 +658,32 @@ public final class Reflection {
         }
     }
 
-    private static void collectInterfaceMethods(List<Method> methods, Class<?> iface, String methodName, Object... params) {
-        collectMethods(methods, iface, true, methodName, params);
+    private static List<Method> collectCandidateMethods(Class<?> type, String methodName, int parameterCount) {
+        List<Method> methods = new ArrayList<>();
+
+        for (Class<?> cls = type; cls != null; cls = cls.getSuperclass()) {
+            collectMethods(methods, cls, false, methodName, parameterCount);
+
+            for (Class<?> iface : cls.getInterfaces()) {
+                collectInterfaceMethods(methods, iface, methodName, parameterCount);
+            }
+        }
+
+        return unmodifiableList(methods);
+    }
+
+    private static void collectInterfaceMethods(List<Method> methods, Class<?> iface, String methodName, int parameterCount) {
+        collectMethods(methods, iface, true, methodName, parameterCount);
 
         for (Class<?> superiface : iface.getInterfaces()) {
-            collectInterfaceMethods(methods, superiface, methodName, params);
+            collectInterfaceMethods(methods, superiface, methodName, parameterCount);
         }
     }
 
-    private static void collectMethods(List<Method> methods, Class<?> type, boolean iface, String methodName, Object... params) {
+    private static void collectMethods(List<Method> methods, Class<?> type, boolean iface, String methodName, int parameterCount) {
         for (var method : type.getDeclaredMethods()) {
             if (
-                (!iface || method.isDefault()) && method.getName().equals(methodName) && method.getParameterTypes().length == params.length
+                (!iface || method.isDefault()) && method.getName().equals(methodName) && method.getParameterTypes().length == parameterCount
                     && isNotOverridden(methods, method)
             ) {
                 methods.add(method);

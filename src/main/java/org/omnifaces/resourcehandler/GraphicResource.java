@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jakarta.el.ValueExpression;
 import jakarta.enterprise.inject.Any;
@@ -71,6 +72,7 @@ public class GraphicResource extends DynamicResource {
     private static final String DEFAULT_CONTENT_TYPE = "image";
     private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
     private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
+    private static final Pattern PATTERN_NON_WORD_CHARACTER = Pattern.compile("\\W");
     private static final String[] EMPTY_PARAMS = {};
 
     @SuppressWarnings({ "unchecked" })
@@ -309,7 +311,7 @@ public class GraphicResource extends DynamicResource {
      * This must return an unique and URL-safe identifier of the bean+method without any periods.
      */
     private static String getResourceBaseName(Class<?> beanClass, Method beanMethod) {
-        return beanClass.getSimpleName().replaceAll("\\W", "") + "_" + beanMethod.getName();
+        return PATTERN_NON_WORD_CHARACTER.matcher(beanClass.getSimpleName()).replaceAll("") + "_" + beanMethod.getName();
     }
 
     /**
