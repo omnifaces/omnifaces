@@ -77,7 +77,7 @@
         <test.quarkus-omnifaces.version>5.4.1</test.quarkus-omnifaces.version> <!-- https://mvnrepository.com/artifact/io.quarkiverse.omnifaces/quarkus-omnifaces -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
-        <test.mojarra.version>4.1.11-SNAPSHOT</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
+        <test.mojarra.version>4.1.11</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->
         <test.faces5.version>5.0.0-SNAPSHOT</test.faces5.version>
         <test.mojarra5.version>5.0.0-SNAPSHOT</test.mojarra5.version>
         <test.myfaces.version>4.1.3</test.myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.myfaces.core/myfaces-impl -->
