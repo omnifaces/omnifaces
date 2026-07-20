@@ -17,6 +17,7 @@ import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EV
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.logging.Level.FINEST;
 import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.FACES_SCRIPT_RESOURCE_NAME;
@@ -457,7 +458,7 @@ public final class Hacks {
         }
 
         var ajaxSource = (ClientBehaviorHolder) actionSource;
-        return ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesAjaxSource);
+        return ajaxSource.getClientBehaviors().getOrDefault(ajaxEvent, emptyList()).stream().anyMatch(Hacks::isPrimeFacesAjaxSource);
     }
 
     private static boolean isPrimeFacesAjaxSource(Object object) {
