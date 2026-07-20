@@ -63,6 +63,25 @@ class UtilsTest {
         assertEquals("/foo?redirect=/Foo", Utils.replaceFirstLiteral("/Foo?redirect=/Foo", "/Foo", "/foo"));
     }
 
+    /**
+     * Unlike {@link Utils#replaceFirstLiteral(String, String, String)} this one is anchored at the start, which is what a getter prefix needs.
+     */
+    @Test
+    void testReplacePrefix() {
+        // Basic prefix replacement.
+        assertEquals("Budget", Utils.replacePrefix("getBudget", "get", ""));
+
+        // A later occurrence of the very same substring must be left alone.
+        assertEquals("Widgets", Utils.replacePrefix("getWidgets", "get", ""));
+        assertEquals("isBudget", Utils.replacePrefix("isBudget", "get", ""));
+
+        // Absent prefix leaves the value unchanged.
+        assertEquals("isApproved", Utils.replacePrefix("isApproved", "get", ""));
+
+        // Replacement is literal too.
+        assertEquals("setValue", Utils.replacePrefix("getValue", "get", "set"));
+    }
+
     @Test
     void testReplaceFirstLiteralHandlesRegexMetacharacters() {
         // Target is literal, not a regex: metacharacters must match themselves.

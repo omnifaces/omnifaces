@@ -474,6 +474,21 @@ public final class Utils {
         return index < 0 ? string : string.substring(0, index) + replacement + string.substring(index + target.length());
     }
 
+    /**
+     * Replaces the given prefix of the given string with the given replacement, treating the prefix as a literal string rather than as a regular expression
+     * (unlike {@link String#replaceFirst(String, String)}). The string is returned unchanged when it does not start with the given prefix. Use this rather than
+     * {@link #replaceFirstLiteral(String, String, String)} when the prefix must specifically be anchored at the start.
+     *
+     * @param string String to replace the prefix of.
+     * @param prefix Literal prefix to be replaced.
+     * @param replacement Literal replacement.
+     * @return The string with the prefix replaced, or the string unchanged when it does not start with the prefix.
+     * @since 5.4.2
+     */
+    public static String replacePrefix(String string, String prefix, String replacement) {
+        return string.startsWith(prefix) ? replacement + string.substring(prefix.length()) : string;
+    }
+
     // I/O ------------------------------------------------------------------------------------------------------------
 
     /**

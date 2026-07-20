@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jakarta.faces.application.Resource;
 import jakarta.faces.component.UIComponent;
@@ -40,6 +41,7 @@ public class ResourceIdentifier {
     private static final Logger logger = Logger.getLogger(ResourceIdentifier.class.getName());
 
     private static final Map<String, String> INTEGRITIES = new ConcurrentHashMap<>();
+    private static final Pattern PATTERN_QUERY_STRING_OR_PATH_FRAGMENT = Pattern.compile("[?#;]");
 
     private static final String WARNING_CANNOT_COMPUTE_INTEGRITY = "Cannot compute integrity for %s; defaulting to empty string";
 
@@ -92,7 +94,7 @@ public class ResourceIdentifier {
 
     private void setLibraryAndName(String library, String name) {
         this.library = library;
-        this.name = name != null ? name.split("[?#;]", 2)[0] : null; // Split gets rid of query string and path fragment.
+        this.name = name != null ? PATTERN_QUERY_STRING_OR_PATH_FRAGMENT.split(name, 2)[0] : null; // Split gets rid of query string and path fragment.
     }
 
     // Getters --------------------------------------------------------------------------------------------------------

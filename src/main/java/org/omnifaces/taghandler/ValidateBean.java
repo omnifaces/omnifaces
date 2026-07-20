@@ -51,6 +51,7 @@ import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.replacePrefix;
 import static org.omnifaces.util.Utils.splitByWhitespace;
 import static org.omnifaces.util.Validators.resolveViolatedBasesAndProperties;
 import static org.omnifaces.util.Validators.validateBean;
@@ -523,7 +524,7 @@ public class ValidateBean extends TagHandler {
             return true;
         }
 
-        var propertyName = Introspector.decapitalize(getter.getName().replaceFirst("get", ""));
+        var propertyName = Introspector.decapitalize(replacePrefix(getter.getName(), "get", ""));
         var property = stream(beanClass.getDeclaredFields()).filter(field -> field.getName().equals(propertyName)).findFirst().orElse(null);
 
         if (property == null) {

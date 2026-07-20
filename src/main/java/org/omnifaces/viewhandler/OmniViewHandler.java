@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Pattern;
 
 import jakarta.faces.FacesException;
 import jakarta.faces.application.ViewExpiredException;
@@ -89,6 +90,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
+    private static final Pattern PATTERN_JSESSIONID = Pattern.compile(";jsessionid=[^&?#]*");
     private static final String XML_CONTENT_TYPE = "text/xml";
 
     private static final String ERROR_NESTED_FORM_ENCOUNTERED = "Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
@@ -421,7 +423,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
         @Override
         public String encodeActionURL(String url) {
-            return super.encodeActionURL(url).replaceAll(";jsessionid=[^&?#]*", "");
+            return PATTERN_JSESSIONID.matcher(super.encodeActionURL(url)).replaceAll("");
         }
 
     }

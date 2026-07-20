@@ -128,6 +128,8 @@ public final class ComponentsLocal {
 
     private static final Logger logger = Logger.getLogger(ComponentsLocal.class.getName());
 
+    private static final Pattern PATTERN_NON_WORD_CHARACTERS = Pattern.compile("\\W+");
+
     private static final String ERROR_MISSING_PARENT = "Component '%s' must have a parent of type '%s', but it cannot be found.";
     private static final String ERROR_MISSING_DIRECT_PARENT = "Component '%s' must have a direct parent of type '%s', but it cannot be found.";
     private static final String ERROR_MISSING_CHILD = "Component '%s' must have at least one child of type '%s', but it cannot be found.";
@@ -347,8 +349,12 @@ public final class ComponentsLocal {
         addScriptResource(context, FACES_SCRIPT_LIBRARY_NAME, FACES_SCRIPT_RESOURCE_NAME);
     }
 
+    private static String toValidComponentId(String name) {
+        return PATTERN_NON_WORD_CHARACTERS.matcher(name).replaceAll("_");
+    }
+
     private static UIComponent addScriptResourceToTarget(FacesContext context, String libraryName, String resourceName, String target) {
-        var id = (libraryName != null ? libraryName.replaceAll("\\W+", "_") + "_" : "") + resourceName.replaceAll("\\W+", "_");
+        var id = (libraryName != null ? toValidComponentId(libraryName) + "_" : "") + toValidComponentId(resourceName);
 
         for (var existingResource : context.getViewRoot().getComponentResources(context)) {
             if (id.equals(existingResource.getId())) {
