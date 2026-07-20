@@ -734,7 +734,7 @@ public class ValidateBeanIT extends OmniFacesIT {
         assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
         assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
         assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
-        assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+        assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
         assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
         assertEquals("", getMessagesText());
 
@@ -751,20 +751,31 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @Test
     void validateNestedListClassLevelWithMessagesForViolating() {
+        // The rows deliberately hold distinct values, as an iterating component reuses one and the same input for all of its rows and a mixup between them
+        // would go unnoticed when they all hold the same value.
         validateNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
         validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
-        validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
-        validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("1");
+        validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("3"); // So custom property path is not set in ValidateBeanITEntityValidator.
+        validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("3");
         guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand::click);
         assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
         assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
         assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
-        assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+        assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
         assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
         assertEquals("", getMessagesText());
 
+        // Fixing only the first row must clear only its messages, which is what proves that each row is collected with its own value.
         validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
-        validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand::click);
+        assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
+        assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+        assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
+        assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
+        assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
+        assertEquals("", getMessagesText());
+
+        validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 30
         guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand::click);
         assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
         assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());

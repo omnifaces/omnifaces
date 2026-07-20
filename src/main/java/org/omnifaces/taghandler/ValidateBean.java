@@ -628,22 +628,29 @@ public class ValidateBean extends TagHandler {
         Map<Object, PropertyPath> knownBaseProperties
     )
     {
+        if (getCollectingValidator(input) != null) {
+            return; // An iterating component such as ui:repeat reuses one and the same input for all of its rows, so it must be collected only once.
+        }
+
         input.addValidator(new CollectingValidator(collectedClientIds, collectedProperties, knownBaseProperties));
     }
 
     private static void removeCollectingValidator(UIInput input) {
-        Validator<?> collectingValidator = null;
-
-        for (var validator : input.getValidators()) {
-            if (validator instanceof CollectingValidator) {
-                collectingValidator = validator;
-                break;
-            }
-        }
+        var collectingValidator = getCollectingValidator(input);
 
         if (collectingValidator != null) {
             input.removeValidator(collectingValidator);
         }
+    }
+
+    private static Validator<?> getCollectingValidator(UIInput input) {
+        for (var validator : input.getValidators()) {
+            if (validator instanceof CollectingValidator) {
+                return validator;
+            }
+        }
+
+        return null;
     }
 
     private static Copier getCopier(FacesContext context, String copierName) {
