@@ -28,6 +28,7 @@ public class ValidateUniqueColumnITBean {
     private List<Item> partiallyExecutedItems;
     private List<Item> itemsBesideOtherInput;
     private List<Item> nonAjaxItems;
+    private List<Item> inputAjaxItems;
     private List<Item> formExecutedItems;
     private String otherInput;
 
@@ -38,6 +39,7 @@ public class ValidateUniqueColumnITBean {
         partiallyExecutedItems = createItems("A", "B", "AC");
         itemsBesideOtherInput = createItems("A", "B", "C");
         nonAjaxItems = createItems("A", "B", "C");
+        inputAjaxItems = createItems("A", "B", "AC");
         formExecutedItems = createItems("A", "B", "AC");
     }
 
@@ -77,6 +79,10 @@ public class ValidateUniqueColumnITBean {
 
     public List<Item> getFormExecutedItems() {
         return formExecutedItems;
+    }
+
+    public List<Item> getInputAjaxItems() {
+        return inputAjaxItems;
     }
 
     public String getOtherInput() {

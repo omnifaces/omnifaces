@@ -14,6 +14,7 @@ package org.omnifaces.test.taghandler.validateuniquecolumn;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.openqa.selenium.Keys.TAB;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -113,6 +114,21 @@ public class ValidateUniqueColumnIT extends OmniFacesIT {
 
     @FindBy(id = "form5:ok")
     private WebElement form5Ok;
+
+    @FindBy(id = "form6:table:0:input")
+    private WebElement form6Row0Input;
+
+    @FindBy(id = "form6:table:0:message")
+    private WebElement form6Row0Message;
+
+    @FindBy(id = "form6:table:1:input")
+    private WebElement form6Row1Input;
+
+    @FindBy(id = "form6:table:1:message")
+    private WebElement form6Row1Message;
+
+    @FindBy(id = "form6:ok")
+    private WebElement form6Ok;
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
@@ -255,6 +271,35 @@ public class ValidateUniqueColumnIT extends OmniFacesIT {
         assertEquals("", form5Row0Message.getText());
         assertEquals("", form5Row1Message.getText());
         assertEquals("OK!", form5Ok.getText());
+    }
+
+    /**
+     * An input may carry its own ajax behavior which executes only itself, in which case the remaining rows are not
+     * submitted at all, so their value is only available in the data model.
+     */
+    @Test
+    void validateDuplicateWhenInputAjaxExecutesOnlyItself() {
+        // Deliberately appending instead of replacing, as clear() already fires the change event on its own.
+        form6Row0Input.sendKeys("C"); // Turns "A" into "AC", which is the value of row 2.
+        guardAjax(() -> form6Row0Input.sendKeys(TAB)); // Only the blur fires the change event.
+
+        assertNotEquals("", form6Row0Message.getText());
+        assertEquals("", form6Ok.getText());
+    }
+
+    /**
+     * The counterpart of {@link #validateDuplicateWhenInputAjaxExecutesOnlyItself()}: a unique value must still be
+     * accepted.
+     */
+    @Test
+    void validateUniqueChangeWhenInputAjaxExecutesOnlyItselfIsAccepted() {
+        // Deliberately appending instead of replacing, as clear() already fires the change event on its own.
+        form6Row1Input.sendKeys("Z"); // Turns "B" into "BZ", which is unique.
+        guardAjax(() -> form6Row1Input.sendKeys(TAB)); // Only the blur fires the change event.
+
+        assertEquals("", form6Row0Message.getText());
+        assertEquals("", form6Row1Message.getText());
+        assertEquals("OK!", form6Ok.getText());
     }
 
 }
