@@ -480,6 +480,7 @@ public class ValidateBean extends TagHandler {
         var collectedClientIds = new HashSet<String>();
         var collectedProperties = new HashMap<PropertyPath, Object>();
         var knownBaseProperties = getBaseBeanPropertyPaths(bean, this::isValidAnnotationPresent);
+        var collectingInputs = new ArrayList<UIInput>();
         var collectBeanProperties = new ValidateBeanCallback() {
 
             @Override
@@ -487,7 +488,11 @@ public class ValidateBean extends TagHandler {
                 var context = FacesContext.getCurrentInstance();
                 forEachInputWithMatchingBase(
                     context, form, knownBaseProperties.keySet(),
-                    input -> addCollectingValidator(input, collectedClientIds, collectedProperties, knownBaseProperties)
+                    input -> {
+                        if (addCollectingValidatorIfAbsent(input, collectedClientIds, collectedProperties, knownBaseProperties)) {
+                            collectingInputs.add(input);
+                        }
+                    }
                 );
             }
 
@@ -498,7 +503,7 @@ public class ValidateBean extends TagHandler {
             @Override
             public void invoke() {
                 var context = FacesContext.getCurrentInstance();
-                forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
+                collectingInputs.forEach(ValidateBean::removeCollectingValidator);
                 var copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
                 setBeanProperties(copiedBean, collectedProperties);
                 validate(context, form, bean, copiedBean, collectedClientIds, true);
@@ -624,16 +629,17 @@ public class ValidateBean extends TagHandler {
         forEachInputWithMatchingBase(context, form, bases, null, callback);
     }
 
-    private static void addCollectingValidator(
+    private static boolean addCollectingValidatorIfAbsent(
         UIInput input, Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties,
         Map<Object, PropertyPath> knownBaseProperties
     )
     {
         if (getCollectingValidator(input) != null) {
-            return; // An iterating component such as ui:repeat reuses one and the same input for all of its rows, so it must be collected only once.
+            return false; // An iterating component such as ui:repeat reuses one and the same input for all of its rows, so it must be collected only once.
         }
 
         input.addValidator(new CollectingValidator(collectedClientIds, collectedProperties, knownBaseProperties));
+        return true;
     }
 
     private static void removeCollectingValidator(UIInput input) {
