@@ -41,7 +41,8 @@ import jakarta.faces.view.facelets.TagHandler;
  * The <code>&lt;o:validateUniqueColumn&gt;</code> validates if the given {@link UIInput} component in an {@link UIData}
  * component has an unique value throughout all rows, also those not visible by pagination. This validator works
  * directly on the data model and may therefore not work as expected if the data model does not represent
- * <strong>all</strong> available rows of the {@link UIData} component (e.g. when there's means of lazy loading).
+ * <strong>all</strong> available rows of the {@link UIData} component (e.g. when there's means of lazy loading). In
+ * such case you need to supply your own validator which queries the underlying data store.
  * <p>
  * The default message is
  * <blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
@@ -255,8 +256,11 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
             // Yes, this check does look a bit strange, but really physically the very same single UIInput component is
             // been reused in all rows of the UIData component. It's only its internal state which changes on a per-row
             // basis, as would happen during the tree visit. Those changes are reflected in the "input" reference.
+            // Deliberately getValue() and not getLocalValue(): rows which were not submitted, because of
+            // pagination or because the ajax request executed only a subset of the form, have no local value at
+            // all, so their value must be obtained from the data model instead.
             if (target == input && rowIndex != table.getRowIndex()
-                && input.isValid() && value.equals(input.getLocalValue()))
+                && input.isValid() && value.equals(input.getValue()))
             {
                 duplicate = true;
                 duplicateIndex = table.getRowIndex();
