@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Collections.emptyList;
 import static java.util.logging.Level.FINEST;
 import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -462,7 +463,7 @@ public final class Hacks {
         }
 
         var ajaxSource = (ClientBehaviorHolder) actionSource;
-        return ajaxSource.getClientBehaviors().get(ajaxEvent).stream().anyMatch(Hacks::isPrimeFacesAjaxSource);
+        return ajaxSource.getClientBehaviors().getOrDefault(ajaxEvent, emptyList()).stream().anyMatch(Hacks::isPrimeFacesAjaxSource);
     }
 
     private static boolean isPrimeFacesAjaxSource(Object object) {
