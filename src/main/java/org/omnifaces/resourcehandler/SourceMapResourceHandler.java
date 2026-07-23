@@ -93,7 +93,14 @@ public class SourceMapResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        String sourceMap = SOURCE_MAPS.computeIfAbsent(new ResourceIdentifier(libraryName, resourceName), this::computeSourceMap);
+        ResourceIdentifier resourceIdentifier = new ResourceIdentifier(libraryName, resourceName);
+        String cachedSourceMap = SOURCE_MAPS.get(resourceIdentifier);
+        String sourceMap = cachedSourceMap != null ? cachedSourceMap : computeSourceMap(resourceIdentifier);
+
+        if (cachedSourceMap == null && !sourceMap.isEmpty()) {
+            SOURCE_MAPS.put(resourceIdentifier, sourceMap); // Only resources which actually have a source map are cached, so that arbitrary resource names
+                                                            // cannot grow the cache unbounded.
+        }
 
         return super.decorateResource(sourceMap.isEmpty() ? resource : new ResourceWrapper(resource) {
 

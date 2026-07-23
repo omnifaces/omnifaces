@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.Push;
 
@@ -65,7 +69,7 @@ public class SocketEndpoint extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         if (SocketSessionManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
-            session.setMaxIdleTimeout(0);
+            session.setMaxIdleTimeout(getIdleTimeout(config));
         }
         else {
             try {
@@ -108,6 +112,42 @@ public class SocketEndpoint extends Endpoint {
         if (throwable != null) {
             logger.log(reason.getCloseCode() == GOING_AWAY ? FINE : SEVERE, ERROR_EXCEPTION, throwable);
         }
+    }
+
+    private static long getIdleTimeout(EndpointConfig config) {
+        var idleTimeout = config.getUserProperties().get(Socket.PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT);
+        return idleTimeout instanceof Long ? (Long) idleTimeout : 0;
+    }
+
+    /**
+     * This handshake configurator enforces that a session or view scoped channel can only be connected to by the HTTP session which registered it. Application
+     * scoped channels are by design not bound to any HTTP session.
+     *
+     * @author Bauke Scholtz
+     * @see SocketChannelManager
+     */
+    public static class Configurator extends ServerEndpointConfig.Configurator {
+
+        private static final String ERROR_UNAUTHORIZED_CHANNEL = "o:socket channel is not registered in the current HTTP session and therefore the handshake is refused.";
+
+        @Override
+        public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
+            var channelId = getChannelId(request);
+
+            if (
+                !SocketChannelManager.isApplicationScopedChannelId(channelId)
+                    && !SocketChannelManager.isChannelIdRegisteredInSession((HttpSession) request.getHttpSession(), channelId)
+            ) {
+                throw new IllegalStateException(ERROR_UNAUTHORIZED_CHANNEL);
+            }
+        }
+
+        private static String getChannelId(HandshakeRequest request) {
+            var path = request.getRequestURI().getPath();
+            var channel = path.substring(path.lastIndexOf('/') + 1);
+            return channel + "?" + request.getQueryString();
+        }
+
     }
 
 }

@@ -145,8 +145,8 @@ public final class CombinedResourceInfo {
         if (info == null) {
             var resourceIdentifiers = fromUniqueId(id);
 
-            if (resourceIdentifiers != null) {
-                info = create(id, resourceIdentifiers);
+            if (resourceIdentifiers != null && isCombinable(resourceIdentifiers)) {
+                info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
             }
         }
 
@@ -324,6 +324,31 @@ public final class CombinedResourceInfo {
         }
 
         return resourceIdentifiers;
+    }
+
+    /**
+     * Returns whether all given resource identifiers represent combinable resources, i.e. stylesheets and scripts. A combined resource may only reference
+     * stylesheet and script resources, never e.g. Facelets files or dynamic resources.
+     *
+     * @param resourceIdentifiers The set of resource identifiers to check.
+     * @return True if all given resource identifiers represent combinable resources.
+     */
+    private static boolean isCombinable(Set<ResourceIdentifier> resourceIdentifiers) {
+        for (var resourceIdentifier : resourceIdentifiers) {
+            var name = resourceIdentifier.getName();
+
+            if (name == null) {
+                return false;
+            }
+
+            var lowerCaseName = name.toLowerCase();
+
+            if (!lowerCaseName.endsWith(CombinedResourceHandler.EXTENSION_CSS) && !lowerCaseName.endsWith(CombinedResourceHandler.EXTENSION_JS)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

@@ -64,10 +64,26 @@ public class SocketSessionManager extends PushSessionManager<Session> {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    private static volatile int maxSessionsPerChannel = Integer.MAX_VALUE;
+
     @Inject
     private SocketUserManager socketUsers;
 
     // Actions --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Set the maximum number of concurrent web socket sessions allowed per channel. The default is unbounded.
+     *
+     * @param max The maximum number of concurrent web socket sessions allowed per channel.
+     */
+    static void setMaxSessionsPerChannel(int max) {
+        maxSessionsPerChannel = max;
+    }
+
+    @Override
+    protected int getMaxSessionsPerChannel() {
+        return maxSessionsPerChannel;
+    }
 
     /**
      * On open, add given web socket session to the mapping associated with its channel identifier and returns <code>true</code> if it's accepted (i.e. the

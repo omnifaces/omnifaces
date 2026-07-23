@@ -148,12 +148,22 @@ abstract class PushSessionManager<S> {
     protected boolean addSession(String channelId, S session) {
         var channelSessions = sessions.get(channelId);
 
-        if (channelSessions != null) {
+        if (channelSessions != null && channelSessions.size() < getMaxSessionsPerChannel()) {
             channelSessions.add(session);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Returns the maximum number of concurrent sessions allowed per channel. Defaults to unbounded; subclasses may override to impose an operator configured
+     * limit.
+     *
+     * @return The maximum number of concurrent sessions allowed per channel.
+     */
+    protected int getMaxSessionsPerChannel() {
+        return Integer.MAX_VALUE;
     }
 
     /**
