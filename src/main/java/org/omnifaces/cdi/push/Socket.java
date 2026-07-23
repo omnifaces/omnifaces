@@ -22,6 +22,7 @@ import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
+import static org.omnifaces.util.Utils.isNumber;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -79,6 +80,25 @@ import org.omnifaces.util.State;
  * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
  * possible across all containers (yet).
  * See also <a href="https://github.com/eclipse-ee4j/websocket-api/issues/211">WS spec issue 211</a>.
+ * <p>
+ * You can optionally set the maximum idle timeout in milliseconds of the web socket endpoint by below context
+ * parameter. The default is <code>0</code> (i.e. never automatically expire; a push connection is idle by nature as it
+ * only awaits server side messages).
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_IDLE_TIMEOUT&lt;/param-name&gt;
+ *     &lt;param-value&gt;300000&lt;/param-value&gt; &lt;!-- 5 minutes --&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * You can optionally set the maximum number of concurrent web socket sessions per channel by below context parameter.
+ * The default is unbounded.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.SOCKET_MAX_SESSIONS_PER_CHANNEL&lt;/param-name&gt;
+ *     &lt;param-value&gt;1000&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
  *
  *
  * <h3 id="usage-client"><a href="#usage-client">Usage (client)</a></h3>
@@ -739,6 +759,12 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	@Deprecated // TODO: remove in 3.0.
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 
+	/** The context parameter name to set the web socket endpoint's maximum idle timeout in milliseconds. The default is 0 (no timeout). @since 2.7.33 */
+	public static final String PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT = "org.omnifaces.SOCKET_ENDPOINT_IDLE_TIMEOUT";
+
+	/** The context parameter name to set the maximum number of concurrent web socket sessions per channel. The default is unbounded. @since 2.7.33 */
+	public static final String PARAM_SOCKET_MAX_SESSIONS_PER_CHANNEL = "org.omnifaces.SOCKET_MAX_SESSIONS_PER_CHANNEL";
+
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
@@ -757,6 +783,10 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	private static final String ERROR_ENDPOINT_NOT_ENABLED =
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
+	private static final String ERROR_INVALID_IDLE_TIMEOUT =
+		"The web socket endpoint's maximum idle timeout must be 0 or greater, but was: %s";
+	private static final String ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL =
+		"The maximum number of web socket sessions per channel must be at least 1, but was: %s";
 
 	private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init('%s','%s',%s,%s,%s);});";
 
@@ -1111,13 +1141,39 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 		try {
 			ServerContainer container = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
-			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
+			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
+				.configurator(new SocketEndpoint.Configurator())
+				.build();
+			config.getUserProperties().put(PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT, getIdleTimeout(context));
 			container.addEndpoint(config);
+			SocketSessionManager.setMaxSessionsPerChannel(getMaxSessionsPerChannel(context));
 			context.setAttribute(Socket.class.getName(), TRUE);
 		}
 		catch (Exception e) {
 			throw new FacesException(e);
 		}
+	}
+
+	private static long getIdleTimeout(ServletContext context) {
+		String value = context.getInitParameter(PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT);
+		long idleTimeout = value == null ? 0 : (isNumber(value) ? Long.parseLong(value) : -1); // A non-numeric value maps to -1 because 0 is a valid value meaning no timeout.
+
+		if (idleTimeout < 0) {
+			throw new IllegalArgumentException(format(ERROR_INVALID_IDLE_TIMEOUT, value));
+		}
+
+		return idleTimeout;
+	}
+
+	private static int getMaxSessionsPerChannel(ServletContext context) {
+		String value = context.getInitParameter(PARAM_SOCKET_MAX_SESSIONS_PER_CHANNEL);
+		long maxSessionsPerChannel = value == null ? Integer.MAX_VALUE : (isNumber(value) ? Long.parseLong(value) : -1);
+
+		if (maxSessionsPerChannel < 1 || maxSessionsPerChannel > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException(format(ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL, value));
+		}
+
+		return (int) maxSessionsPerChannel;
 	}
 
 }
