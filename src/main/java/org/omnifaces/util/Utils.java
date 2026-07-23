@@ -113,6 +113,7 @@ public final class Utils {
     private static final Logger logger = Logger.getLogger(Utils.class.getName());
 
     private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
+    private static final int MAX_UNSERIALIZED_LENGTH = 64 * 1024;
     private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
     private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
@@ -1153,7 +1154,26 @@ public final class Utils {
 
         try {
             var deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
-            return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
+            var inflater = new InflaterInputStream(deflated);
+
+            try {
+                var inflated = new ByteArrayOutputStream();
+                var buffer = new byte[DEFAULT_STREAM_BUFFER_SIZE];
+                int read;
+
+                while ((read = inflater.read(buffer)) != -1) {
+                    inflated.write(buffer, 0, read);
+
+                    if (inflated.size() > MAX_UNSERIALIZED_LENGTH) {
+                        throw new IllegalArgumentException("Unserialized data exceeds maximum allowed length of " + MAX_UNSERIALIZED_LENGTH + " bytes.");
+                    }
+                }
+
+                return new String(inflated.toByteArray(), UTF_8);
+            }
+            finally {
+                close(inflater);
+            }
         }
         catch (UnsupportedEncodingException e) {
             // This will occur when UTF-8 is not supported, but this is not to be expected these days.
