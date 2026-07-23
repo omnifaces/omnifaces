@@ -9,7 +9,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>1.14.3-SNAPSHOT</version>
+	<version>1.14.3</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
