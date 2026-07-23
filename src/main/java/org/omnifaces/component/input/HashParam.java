@@ -18,6 +18,7 @@ import static org.omnifaces.util.FacesLocal.getHashParameters;
 import static org.omnifaces.util.FacesLocal.getHashQueryString;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Servlets.toParameterMap;
+import static org.omnifaces.util.Utils.escapeJS;
 
 import java.util.List;
 import java.util.Map;
@@ -149,7 +150,7 @@ public class HashParam extends OnloadParam {
 
 	@Override
 	protected String getUpdateScript(FacesContext context) {
-		return format(SCRIPT_UPDATE, getName(), getRenderedValue(context));
+		return format(SCRIPT_UPDATE, escapeJS(getName(), true), escapeJS(getRenderedValue(context), true));
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
