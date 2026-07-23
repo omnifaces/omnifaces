@@ -75,6 +75,7 @@ public class SocketSessionManager {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private final ConcurrentHashMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
+	private static volatile int maxSessionsPerChannel = Integer.MAX_VALUE;
 
 	@Inject
 	private SocketUserManager socketUsers;
@@ -102,6 +103,14 @@ public class SocketSessionManager {
 	}
 
 	/**
+	 * Set the maximum number of concurrent web socket sessions allowed per channel. The default is unbounded.
+	 * @param max The maximum number of concurrent web socket sessions allowed per channel.
+	 */
+	static void setMaxSessionsPerChannel(int max) {
+		maxSessionsPerChannel = max;
+	}
+
+	/**
 	 * On open, add given web socket session to the mapping associated with its channel identifier and returns
 	 * <code>true</code> if it's accepted (i.e. the channel identifier is known) and the same session hasn't been added
 	 * before, otherwise <code>false</code>.
@@ -112,7 +121,7 @@ public class SocketSessionManager {
 		String channelId = getChannelId(session);
 		Collection<Session> sessions = socketSessions.get(channelId);
 
-		if (sessions != null && sessions.add(session)) {
+		if (sessions != null && sessions.size() < maxSessionsPerChannel && sessions.add(session)) {
 			Serializable user = socketUsers.getUser(getChannel(session), channelId);
 
 			if (user != null) {

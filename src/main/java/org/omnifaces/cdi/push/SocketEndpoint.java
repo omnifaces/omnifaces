@@ -20,10 +20,14 @@ import static org.omnifaces.cdi.PushContext.URI_PREFIX;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
+import javax.websocket.HandshakeResponse;
 import javax.websocket.Session;
+import javax.websocket.server.HandshakeRequest;
+import javax.websocket.server.ServerEndpointConfig;
 
 /**
  * <p>
@@ -58,7 +62,7 @@ public class SocketEndpoint extends Endpoint {
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
 		if (SocketSessionManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
-			session.setMaxIdleTimeout(0);
+			session.setMaxIdleTimeout(getIdleTimeout(config));
 		}
 		else {
 			try {
@@ -98,6 +102,42 @@ public class SocketEndpoint extends Endpoint {
 		if (throwable != null && reason.getCloseCode() != GOING_AWAY) {
 			logger.log(SEVERE, ERROR_EXCEPTION, throwable);
 		}
+	}
+
+	private static long getIdleTimeout(EndpointConfig config) {
+		Object idleTimeout = config.getUserProperties().get(Socket.PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT);
+		return idleTimeout instanceof Long ? (Long) idleTimeout : 0;
+	}
+
+	/**
+	 * This handshake configurator enforces that a session or view scoped channel can only be connected to by the HTTP
+	 * session which registered it. Application scoped channels are by design not bound to any HTTP session.
+	 *
+	 * @author Bauke Scholtz
+	 * @see SocketChannelManager
+	 */
+	public static class Configurator extends ServerEndpointConfig.Configurator {
+
+		private static final String ERROR_UNAUTHORIZED_CHANNEL =
+			"o:socket channel is not registered in the current HTTP session and therefore the handshake is refused.";
+
+		@Override
+		public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
+			String channelId = getChannelId(request);
+
+			if (!SocketChannelManager.isApplicationScopedChannelId(channelId)
+				&& !SocketChannelManager.isChannelIdRegisteredInSession((HttpSession) request.getHttpSession(), channelId))
+			{
+				throw new IllegalStateException(ERROR_UNAUTHORIZED_CHANNEL);
+			}
+		}
+
+		private static String getChannelId(HandshakeRequest request) {
+			String path = request.getRequestURI().getPath();
+			String channel = path.substring(path.lastIndexOf('/') + 1);
+			return channel + "?" + request.getQueryString();
+		}
+
 	}
 
 }

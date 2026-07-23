@@ -27,11 +27,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
 import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.util.Beans;
@@ -74,6 +77,9 @@ public class SocketChannelManager implements Serializable {
 
 	/** A good developer will unlikely declare more than three push channels in same application (one for each scope with each a global JS listener). */
 	static final int ESTIMATED_TOTAL_CHANNELS = ESTIMATED_CHANNELS_PER_APPLICATION + ESTIMATED_CHANNELS_PER_SESSION + ESTIMATED_CHANNELS_PER_VIEW;
+
+	/** The HTTP session attribute name under which the session and view scoped channel IDs owned by the session are held. */
+	static final String SESSION_SCOPE_CHANNEL_IDS = "org.omnifaces.cdi.push.SESSION_SCOPE_CHANNEL_IDS";
 
 	static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
@@ -152,7 +158,60 @@ public class SocketChannelManager implements Serializable {
 		}
 
 		socketSessions.register(channelId);
+
+		if (targetScope != APPLICATION_SCOPE) {
+			registerChannelIdInSession(channelId); // Session and view scoped channels may only be connected to by the owning HTTP session.
+		}
+
 		return channelId;
+	}
+
+	private static void registerChannelIdInSession(String channelId) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context == null) {
+			return;
+		}
+
+		HttpSession httpSession = (HttpSession) context.getExternalContext().getSession(true);
+
+		synchronized (httpSession) {
+			@SuppressWarnings("unchecked")
+			Set<String> channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
+
+			if (channelIds == null) {
+				channelIds = new CopyOnWriteArraySet<>();
+				httpSession.setAttribute(SESSION_SCOPE_CHANNEL_IDS, channelIds);
+			}
+
+			channelIds.add(channelId);
+		}
+	}
+
+	/**
+	 * Returns whether the given channel identifier represents an application scoped channel, which is by design not
+	 * bound to any HTTP session.
+	 * @param channelId The channel identifier to check.
+	 * @return Whether the given channel identifier represents an application scoped channel.
+	 */
+	static boolean isApplicationScopedChannelId(String channelId) {
+		return APPLICATION_SCOPE.containsValue(channelId);
+	}
+
+	/**
+	 * Returns whether the given session or view scoped channel identifier was registered by the given HTTP session.
+	 * @param httpSession The HTTP session of the incoming web socket handshake, may be <code>null</code>.
+	 * @param channelId The channel identifier to check.
+	 * @return Whether the given channel identifier was registered by the given HTTP session.
+	 */
+	static boolean isChannelIdRegisteredInSession(HttpSession httpSession, String channelId) {
+		if (httpSession == null) {
+			return false;
+		}
+
+		@SuppressWarnings("unchecked")
+		Set<String> channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
+		return channelIds != null && channelIds.contains(channelId);
 	}
 
 	/**
