@@ -269,6 +269,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static final String TARGET_BODY = "body";
 	private static final String COMPONENT_ADDED = "javax.faces.component.UIComponentBase.ADDED";
 
+	static final String EXTENSION_CSS = ".css";
+	static final String EXTENSION_JS = ".js";
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private String disabledParam;
@@ -442,11 +445,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 * @author Bauke Scholtz
 	 */
 	private final class CombinedResourceBuilder {
-
-		// Constants --------------------------------------------------------------------------------------------------
-
-		private static final String EXTENSION_CSS = ".css";
-		private static final String EXTENSION_JS = ".js";
 
 		// General stylesheet/script builder --------------------------------------------------------------------------
 

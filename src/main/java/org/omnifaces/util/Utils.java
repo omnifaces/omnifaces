@@ -93,6 +93,7 @@ public final class Utils {
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 	private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
 	private static final int BASE64_SEGMENT_LENGTH = 4;
+	private static final int MAX_UNSERIALIZED_LENGTH = 64 * 1024;
 	private static final int UNICODE_3_BYTES = 0xfff;
 	private static final int UNICODE_2_BYTES = 0xff;
 	private static final int UNICODE_1_BYTE = 0xf;
@@ -788,7 +789,26 @@ public final class Utils {
 		try {
 			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
-			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
+			InflaterInputStream inflater = new InflaterInputStream(deflated);
+
+			try {
+				ByteArrayOutputStream inflated = new ByteArrayOutputStream();
+				byte[] buffer = new byte[DEFAULT_STREAM_BUFFER_SIZE];
+				int read;
+
+				while ((read = inflater.read(buffer)) != -1) {
+					inflated.write(buffer, 0, read);
+
+					if (inflated.size() > MAX_UNSERIALIZED_LENGTH) {
+						throw new IllegalArgumentException("Unserialized data exceeds maximum allowed length of " + MAX_UNSERIALIZED_LENGTH + " bytes.");
+					}
+				}
+
+				return new String(inflated.toByteArray(), UTF_8);
+			}
+			finally {
+				close(inflater);
+			}
 		}
 		catch (UnsupportedEncodingException e) {
 			// This will occur when UTF-8 is not supported, but this is not to be expected these days.
