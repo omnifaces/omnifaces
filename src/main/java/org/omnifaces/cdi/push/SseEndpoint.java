@@ -49,7 +49,17 @@ public class SseEndpoint extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final byte[] SSE_NOT_FOUND_EVENT = "event: close\ndata: 404\n\n".getBytes(UTF_8);
 
+    // Properties -----------------------------------------------------------------------------------------------------
+
+    private long idleTimeout;
+
     // Actions --------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void init() {
+        var value = getInitParameter(Sse.PARAM_SSE_ENDPOINT_IDLE_TIMEOUT);
+        idleTimeout = value == null ? 0 : Long.parseLong(value);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -60,7 +70,7 @@ public class SseEndpoint extends HttpServlet {
         var channelId = channel + "?" + request.getQueryString();
         var sseSessions = Beans.getReference(SseSessionManager.class);
 
-        if (channel == null || !sseSessions.isRegistered(channelId)) {
+        if (channel == null || !sseSessions.isRegistered(channelId) || !isAuthorized(request, channelId)) {
             response.getOutputStream().write(SSE_NOT_FOUND_EVENT);
             return;
         }
@@ -69,8 +79,13 @@ public class SseEndpoint extends HttpServlet {
         response.flushBuffer();
 
         var asyncContext = request.startAsync();
-        asyncContext.setTimeout(0);
-        sseSessions.add(channelId, channel, asyncContext);
+        asyncContext.setTimeout(idleTimeout);
+
+        if (!sseSessions.add(channelId, channel, asyncContext)) {
+            sseSessions.closeSession(asyncContext);
+            return;
+        }
+
         asyncContext.addListener(new AsyncListener() {
 
             @Override
@@ -111,6 +126,15 @@ public class SseEndpoint extends HttpServlet {
     private static String getChannel(HttpServletRequest request) {
         var pathInfo = request.getPathInfo();
         return (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
+    }
+
+    /**
+     * A session or view scoped channel may only be connected to by the HTTP session which registered it. Application scoped channels are by design not bound to
+     * any HTTP session.
+     */
+    private static boolean isAuthorized(HttpServletRequest request, String channelId) {
+        return SseChannelManager.isApplicationScopedChannelId(channelId)
+            || PushChannelManager.isChannelIdRegisteredInSession(request.getSession(false), channelId);
     }
 
 }

@@ -17,6 +17,7 @@ import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SO
 import static jakarta.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
+import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
 import jakarta.faces.context.FacesContext;
+import jakarta.servlet.ServletContext;
 
 import org.omnifaces.vdl.FacesAttribute;
 
@@ -40,6 +42,9 @@ import org.omnifaces.vdl.FacesAttribute;
 abstract class PushComponent extends ChannelComponent implements ClientBehaviorHolder {
 
     // Constants ------------------------------------------------------------------------------------------------------
+
+    private static final String ERROR_INVALID_IDLE_TIMEOUT = "The context parameter '%s' must be 0 or greater, but was: %s";
+    private static final String ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL = "The context parameter '%s' must be at least 1, but was: %s";
 
     private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
 
@@ -138,6 +143,47 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
         }
 
         return scripts.append("}").toString();
+    }
+
+    // Configuration --------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the push endpoint's maximum idle timeout in milliseconds as configured by the given context parameter.
+     *
+     * @param context The involved servlet context.
+     * @param paramName The context parameter name holding the maximum idle timeout in milliseconds.
+     * @return The push endpoint's maximum idle timeout in milliseconds, defaulting to 0 (i.e. no timeout).
+     * @throws IllegalArgumentException When the context parameter value is not 0 or greater.
+     */
+    static long getIdleTimeout(ServletContext context, String paramName) {
+        var value = context.getInitParameter(paramName);
+        long idleTimeout = value == null ? 0 : (isNumber(value) ? Long.parseLong(value) : -1); // A non-numeric value maps to -1 because 0 is a valid value
+                                                                                               // meaning no timeout.
+
+        if (idleTimeout < 0) {
+            throw new IllegalArgumentException(ERROR_INVALID_IDLE_TIMEOUT.formatted(paramName, value));
+        }
+
+        return idleTimeout;
+    }
+
+    /**
+     * Returns the maximum number of concurrent push sessions per channel as configured by the given context parameter.
+     *
+     * @param context The involved servlet context.
+     * @param paramName The context parameter name holding the maximum number of concurrent push sessions per channel.
+     * @return The maximum number of concurrent push sessions per channel, defaulting to unbounded.
+     * @throws IllegalArgumentException When the context parameter value is not at least 1.
+     */
+    static int getMaxSessionsPerChannel(ServletContext context, String paramName) {
+        var value = context.getInitParameter(paramName);
+        long maxSessionsPerChannel = value == null ? Integer.MAX_VALUE : (isNumber(value) ? Long.parseLong(value) : -1);
+
+        if (maxSessionsPerChannel < 1 || maxSessionsPerChannel > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL.formatted(paramName, value));
+        }
+
+        return (int) maxSessionsPerChannel;
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------

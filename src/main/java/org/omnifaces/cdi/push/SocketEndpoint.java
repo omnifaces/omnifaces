@@ -136,7 +136,7 @@ public class SocketEndpoint extends Endpoint {
 
             if (
                 !SocketChannelManager.isApplicationScopedChannelId(channelId)
-                    && !SocketChannelManager.isChannelIdRegisteredInSession((HttpSession) request.getHttpSession(), channelId)
+                    && !PushChannelManager.isChannelIdRegisteredInSession((HttpSession) request.getHttpSession(), channelId)
             ) {
                 throw new IllegalStateException(ERROR_UNAUTHORIZED_CHANNEL);
             }

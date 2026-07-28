@@ -628,6 +628,7 @@ public abstract class OmniFacesIT {
         withThreeActiveViewScopes,
         withSocket,
         withSocketMaxSessions,
+        withSseMaxSessions,
         withClientStateSaving,
         withCDNResources,
         withInterpretEmptyStringSubmittedValuesAsNull,

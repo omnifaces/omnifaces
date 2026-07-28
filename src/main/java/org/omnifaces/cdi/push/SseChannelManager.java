@@ -61,6 +61,16 @@ public class SseChannelManager extends PushChannelManager {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns whether the given channel identifier represents an application scoped SSE channel, which is by design not bound to any HTTP session.
+     *
+     * @param channelId The channel identifier to check.
+     * @return Whether the given channel identifier represents an application scoped SSE channel.
+     */
+    static boolean isApplicationScopedChannelId(String channelId) {
+        return APPLICATION_SCOPE.containsValue(channelId);
+    }
+
+    /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
      *
      * @param channel The SSE channel.

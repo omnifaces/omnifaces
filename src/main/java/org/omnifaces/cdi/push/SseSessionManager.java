@@ -52,6 +52,8 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    private static volatile int maxSessionsPerChannel = Integer.MAX_VALUE;
+
     @Inject
     private SseUserManager sseUsers;
 
@@ -59,6 +61,20 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
     private final ConcurrentHashMap<String, Serializable> users = new ConcurrentHashMap<>();
 
     // Actions --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Set the maximum number of concurrent SSE connections allowed per channel. The default is unbounded.
+     *
+     * @param max The maximum number of concurrent SSE connections allowed per channel.
+     */
+    static void setMaxSessionsPerChannel(int max) {
+        maxSessionsPerChannel = max;
+    }
+
+    @Override
+    protected int getMaxSessionsPerChannel() {
+        return maxSessionsPerChannel;
+    }
 
     /**
      * On open, add given async context to the mapping associated with given channel identifier and return <code>true</code> if it's accepted (i.e. the channel

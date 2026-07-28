@@ -27,6 +27,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
+import org.omnifaces.test.push.PushTestUtil;
 
 /**
  * Verifies that a channel accepts no more concurrent web socket sessions than the configured maximum (here 1 via
@@ -49,7 +50,7 @@ public class SocketMaxSessionsIT extends OmniFacesIT {
     public void test() throws Exception {
         HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "SocketMaxSessionsIT.xhtml").openConnection();
         connection.setRequestProperty("Accept-Encoding", "identity");
-        String channelId = SocketTestUtil.getChannelId(SocketTestUtil.getResponseBody(connection), "capped");
+        String channelId = PushTestUtil.getChannelId(PushTestUtil.getResponseBody(connection), "capped");
 
         Socket first = handshake(channelId);
 
@@ -75,7 +76,7 @@ public class SocketMaxSessionsIT extends OmniFacesIT {
 
     private Socket handshake(String channelId) throws IOException {
         Socket socket = SocketTestUtil.sendHandshake(baseURL, channelId, null);
-        assertEquals(SWITCHING_PROTOCOLS, SocketTestUtil.readStatusCode(socket.getInputStream()), "Handshake accepted");
+        assertEquals(SWITCHING_PROTOCOLS, PushTestUtil.readStatusCode(socket.getInputStream()), "Handshake accepted");
         return socket;
     }
 

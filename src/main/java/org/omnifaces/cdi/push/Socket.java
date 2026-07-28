@@ -18,8 +18,6 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getRequestParameter;
-import static org.omnifaces.util.Utils.isNumber;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -763,9 +761,6 @@ public class Socket extends PushComponent {
     private static final String ERROR_ENDPOINT_NOT_ENABLED = "o:socket endpoint is not enabled."
         + " You need to use @Inject @Push PushContext or set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
-    private static final String ERROR_INVALID_IDLE_TIMEOUT = "The web socket endpoint's maximum idle timeout must be 0 or greater, but was: %s";
-    private static final String ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL = "The maximum number of web socket sessions per channel must be at least 1, but was: %s";
-
     private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init(false,'%s','%s',%s,%s,%s);});";
 
     private enum PropertyKeys {
@@ -879,37 +874,14 @@ public class Socket extends PushComponent {
             var config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
                 .configurator(new SocketEndpoint.Configurator())
                 .build();
-            config.getUserProperties().put(PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT, getIdleTimeout(context));
+            config.getUserProperties().put(PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT, getIdleTimeout(context, PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT));
             container.addEndpoint(config);
-            SocketSessionManager.setMaxSessionsPerChannel(getMaxSessionsPerChannel(context));
+            SocketSessionManager.setMaxSessionsPerChannel(getMaxSessionsPerChannel(context, PARAM_SOCKET_MAX_SESSIONS_PER_CHANNEL));
             context.setAttribute(Socket.class.getName(), TRUE);
         }
         catch (Exception e) {
             throw new FacesException(e);
         }
-    }
-
-    private static long getIdleTimeout(ServletContext context) {
-        var value = context.getInitParameter(PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT);
-        long idleTimeout = value == null ? 0 : (isNumber(value) ? Long.parseLong(value) : -1); // A non-numeric value maps to -1 because 0 is a valid value
-                                                                                               // meaning no timeout.
-
-        if (idleTimeout < 0) {
-            throw new IllegalArgumentException(ERROR_INVALID_IDLE_TIMEOUT.formatted(value));
-        }
-
-        return idleTimeout;
-    }
-
-    private static int getMaxSessionsPerChannel(ServletContext context) {
-        var value = context.getInitParameter(PARAM_SOCKET_MAX_SESSIONS_PER_CHANNEL);
-        long maxSessionsPerChannel = value == null ? Integer.MAX_VALUE : (isNumber(value) ? Long.parseLong(value) : -1);
-
-        if (maxSessionsPerChannel < 1 || maxSessionsPerChannel > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL.formatted(value));
-        }
-
-        return (int) maxSessionsPerChannel;
     }
 
 }

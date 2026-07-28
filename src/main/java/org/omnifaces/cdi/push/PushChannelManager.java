@@ -23,8 +23,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.context.FacesContext;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * <p>
@@ -61,6 +64,9 @@ abstract class PushChannelManager implements Serializable {
 
     /** A good developer will unlikely declare more than three push channels in same application (one for each scope with each a global JS listener). */
     static final int ESTIMATED_TOTAL_CHANNELS = ESTIMATED_CHANNELS_PER_APPLICATION + ESTIMATED_CHANNELS_PER_SESSION + ESTIMATED_CHANNELS_PER_VIEW;
+
+    /** The HTTP session attribute name under which the session and view scoped channel IDs owned by the session are held. */
+    static final String SESSION_SCOPE_CHANNEL_IDS = "org.omnifaces.cdi.push.SESSION_SCOPE_CHANNEL_IDS";
 
     static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
@@ -104,11 +110,58 @@ abstract class PushChannelManager implements Serializable {
      * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
      */
     protected String register(String channel, String scope, Serializable user) {
-        return switch (Scope.of(scope, user, getClass().getSimpleName())) {
+        var resolvedScope = Scope.of(scope, user, getClass().getSimpleName());
+
+        var channelId = switch (resolvedScope) {
             case APPLICATION -> register(null, channel, getApplicationScope(), sessionScopedChannels, getViewScopedChannels(false));
             case SESSION -> register(user, channel, sessionScopedChannels, getApplicationScope(), getViewScopedChannels(false));
             case VIEW -> register(user, channel, getViewScopedChannels(true), getApplicationScope(), sessionScopedChannels);
         };
+
+        if (resolvedScope != Scope.APPLICATION) {
+            registerChannelIdInSession(channelId); // Session and view scoped channels may only be connected to by the owning HTTP session.
+        }
+
+        return channelId;
+    }
+
+    private static void registerChannelIdInSession(String channelId) {
+        var context = FacesContext.getCurrentInstance();
+
+        if (context == null) {
+            return;
+        }
+
+        var httpSession = (HttpSession) context.getExternalContext().getSession(true);
+
+        synchronized (httpSession) {
+            @SuppressWarnings("unchecked")
+            var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
+
+            if (channelIds == null) {
+                channelIds = new CopyOnWriteArraySet<>();
+                httpSession.setAttribute(SESSION_SCOPE_CHANNEL_IDS, channelIds);
+            }
+
+            channelIds.add(channelId);
+        }
+    }
+
+    /**
+     * Returns whether the given session or view scoped channel identifier was registered by the given HTTP session.
+     *
+     * @param httpSession The HTTP session of the incoming push connection, may be <code>null</code>.
+     * @param channelId The channel identifier to check.
+     * @return Whether the given channel identifier was registered by the given HTTP session.
+     */
+    static boolean isChannelIdRegisteredInSession(HttpSession httpSession, String channelId) {
+        if (httpSession == null) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
+        return channelIds != null && channelIds.contains(channelId);
     }
 
     @SafeVarargs

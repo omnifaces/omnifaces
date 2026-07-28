@@ -127,6 +127,25 @@ import org.omnifaces.util.Json;
  * <p>
  * No explicit configuration is needed. The SSE endpoint is automatically registered during application startup when at least one
  * <code>&#64;</code>{@link Push}<code>(type=SSE)</code> qualified injection point is detected.
+ * <p>
+ * You can optionally set the maximum idle timeout in milliseconds of the SSE endpoint by below context parameter. The default is <code>0</code> (i.e. never
+ * automatically expire; a push connection is idle by nature as it only awaits server side messages).
+ *
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.SSE_ENDPOINT_IDLE_TIMEOUT&lt;/param-name&gt;
+ *     &lt;param-value&gt;300000&lt;/param-value&gt; &lt;!-- 5 minutes --&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * You can optionally set the maximum number of concurrent SSE connections per channel by below context parameter. The default is unbounded.
+ *
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.SSE_MAX_SESSIONS_PER_CHANNEL&lt;/param-name&gt;
+ *     &lt;param-value&gt;1000&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
  *
  *
  * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
@@ -714,6 +733,12 @@ public class Sse extends PushComponent {
     /** The component type, which is {@value org.omnifaces.cdi.push.Sse#COMPONENT_TYPE}. */
     public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.SseComponent";
 
+    /** The context parameter name to set the SSE endpoint's maximum idle timeout in milliseconds. The default is 0 (no timeout). @since 5.4.3 */
+    public static final String PARAM_SSE_ENDPOINT_IDLE_TIMEOUT = "org.omnifaces.SSE_ENDPOINT_IDLE_TIMEOUT";
+
+    /** The context parameter name to set the maximum number of concurrent SSE connections per channel. The default is unbounded. @since 5.4.3 */
+    public static final String PARAM_SSE_MAX_SESSIONS_PER_CHANNEL = "org.omnifaces.SSE_MAX_SESSIONS_PER_CHANNEL";
+
     // Private constants ----------------------------------------------------------------------------------------------
 
     private static final String ERROR_SERVLET_NOT_REGISTERED = "SSE endpoint is not registered."
@@ -796,7 +821,9 @@ public class Sse extends PushComponent {
         try {
             var registration = context.addServlet(SseEndpoint.class.getName(), SseEndpoint.class);
             registration.setAsyncSupported(true);
+            registration.setInitParameter(PARAM_SSE_ENDPOINT_IDLE_TIMEOUT, String.valueOf(getIdleTimeout(context, PARAM_SSE_ENDPOINT_IDLE_TIMEOUT)));
             registration.addMapping(SSE_URI_PREFIX + "/*");
+            SseSessionManager.setMaxSessionsPerChannel(getMaxSessionsPerChannel(context, PARAM_SSE_MAX_SESSIONS_PER_CHANNEL));
             context.setAttribute(Sse.class.getName(), Boolean.TRUE);
         }
         catch (Exception e) {

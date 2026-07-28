@@ -20,16 +20,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.SessionScoped;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpSession;
 
 import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.util.Beans;
@@ -52,9 +48,6 @@ public class SocketChannelManager extends PushChannelManager {
     private static final String ERROR_VIEW_SCOPE_UNAVAILABLE = "o:socket view scope is unavailable."
         + " Perhaps you need to explicitly register the SocketChannelManager.ViewScope as a CDI managed bean?";
 
-    /** The HTTP session attribute name under which the session and view scoped channel IDs owned by the session are held. */
-    static final String SESSION_SCOPE_CHANNEL_IDS = "org.omnifaces.cdi.push.SESSION_SCOPE_CHANNEL_IDS";
-
     // Properties -----------------------------------------------------------------------------------------------------
 
     private static final ConcurrentHashMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION, 1);
@@ -67,64 +60,14 @@ public class SocketChannelManager extends PushChannelManager {
 
     // Actions --------------------------------------------------------------------------------------------------------
 
-    @Override
-    protected String register(String channel, String scope, Serializable user) {
-        var channelId = super.register(channel, scope, user);
-
-        if (!isApplicationScopedChannelId(channelId)) {
-            registerChannelIdInSession(channelId); // Session and view scoped channels may only be connected to by the owning HTTP session.
-        }
-
-        return channelId;
-    }
-
-    private static void registerChannelIdInSession(String channelId) {
-        var context = FacesContext.getCurrentInstance();
-
-        if (context == null) {
-            return;
-        }
-
-        var httpSession = (HttpSession) context.getExternalContext().getSession(true);
-
-        synchronized (httpSession) {
-            @SuppressWarnings("unchecked")
-            var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
-
-            if (channelIds == null) {
-                channelIds = new CopyOnWriteArraySet<>();
-                httpSession.setAttribute(SESSION_SCOPE_CHANNEL_IDS, channelIds);
-            }
-
-            channelIds.add(channelId);
-        }
-    }
-
     /**
-     * Returns whether the given channel identifier represents an application scoped channel, which is by design not bound to any HTTP session.
+     * Returns whether the given channel identifier represents an application scoped web socket channel, which is by design not bound to any HTTP session.
      *
      * @param channelId The channel identifier to check.
-     * @return Whether the given channel identifier represents an application scoped channel.
+     * @return Whether the given channel identifier represents an application scoped web socket channel.
      */
     static boolean isApplicationScopedChannelId(String channelId) {
         return APPLICATION_SCOPE.containsValue(channelId);
-    }
-
-    /**
-     * Returns whether the given session or view scoped channel identifier was registered by the given HTTP session.
-     *
-     * @param httpSession The HTTP session of the incoming web socket handshake, may be <code>null</code>.
-     * @param channelId The channel identifier to check.
-     * @return Whether the given channel identifier was registered by the given HTTP session.
-     */
-    static boolean isChannelIdRegisteredInSession(HttpSession httpSession, String channelId) {
-        if (httpSession == null) {
-            return false;
-        }
-
-        @SuppressWarnings("unchecked")
-        var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
-        return channelIds != null && channelIds.contains(channelId);
     }
 
     /**
