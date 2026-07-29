@@ -47,13 +47,21 @@ public class PushExtension implements Extension {
     public <T> void collect(@Observes ProcessInjectionPoint<T, PushContext> event) {
         for (var qualifier : event.getInjectionPoint().getQualifiers()) {
             if (qualifier instanceof Push push) {
-                activate(push);
+                activate(push.type());
             }
         }
     }
 
-    private static void activate(Push push) {
-        switch (push.type()) {
+    /**
+     * Activate the push transport associated with the given type. This is intended for integrations in environments which do not support CDI portable
+     * extensions, such as Quarkus, where the <code>&#64;</code>{@link Push} injection points are instead detected at build time. It must be invoked before the
+     * servlet context is initialized, because that is when {@link Socket} and {@link Sse} register their endpoint.
+     *
+     * @param type The push type to activate.
+     * @since 5.4.4
+     */
+    public static void activate(Push.Type type) {
+        switch (type) {
             case SSE, NOTIFICATION -> sseActivated = true;
             case SOCKET -> socketActivated = true;
         }
