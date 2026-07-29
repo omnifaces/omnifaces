@@ -58,7 +58,9 @@
             <h:panelGroup id="output">
                  <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
             </h:panelGroup>
-            <h:dataTable id="data" value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.partialViewContext.ajaxRequest}" />
+            <h:dataTable id="data" value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" var="row" rendered="#{facesContext.partialViewContext.ajaxRequest}">
+                <h:column>#{row}</h:column>
+            </h:dataTable>
             <h:commandButton id="throwNonAjaxDuringUpdateModelValues" value="throwNonAjaxDuringUpdateModelValues" />
         </o:form>
         <o:form id="form2">
