@@ -48,6 +48,7 @@ public class SseEndpoint extends HttpServlet {
     private static final Logger logger = Logger.getLogger(SseEndpoint.class.getName());
     private static final long serialVersionUID = 1L;
     private static final byte[] SSE_NOT_FOUND_EVENT = "event: close\ndata: 404\n\n".getBytes(UTF_8);
+    private static final byte[] SSE_COMMENT_EVENT = ":\n\n".getBytes(UTF_8);
 
     // Properties -----------------------------------------------------------------------------------------------------
 
@@ -76,10 +77,11 @@ public class SseEndpoint extends HttpServlet {
         }
 
         response.setHeader("X-Accel-Buffering", "no"); // Disables response buffering in Nginx so SSE events are flushed immediately to the client.
-        response.flushBuffer();
 
         var asyncContext = request.startAsync();
         asyncContext.setTimeout(idleTimeout);
+        response.getOutputStream().write(SSE_COMMENT_EVENT); // Commits the response head, as flushBuffer() does not commit an empty buffer on all containers.
+        response.getOutputStream().flush();
 
         if (!sseSessions.add(channelId, channel, asyncContext)) {
             sseSessions.closeSession(asyncContext);
