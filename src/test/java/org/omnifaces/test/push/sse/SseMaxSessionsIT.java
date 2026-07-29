@@ -34,7 +34,7 @@ import org.omnifaces.test.push.PushTestUtil;
  * <code>connected</code> attribute and the browser would otherwise occupy the single allowed connection.
  */
 @DisabledIfSystemProperty(
-    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces needs to be upgraded to support PushContextProducer and SseChannelManager.ViewScope"
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces must first be upgraded to a version which activates @Push injection points at build time"
 )
 public class SseMaxSessionsIT extends OmniFacesIT {
 

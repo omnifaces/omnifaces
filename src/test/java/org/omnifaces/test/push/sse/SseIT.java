@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @DisabledIfSystemProperty(
-    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces needs to be upgraded to support PushContextProducer and SseChannelManager.ViewScope"
+    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces must first be upgraded to a version which activates @Push injection points at build time, and quarkus doesn't invoke AsyncListener on client disconnect so application and session scoped channels count one connection too many, see https://github.com/quarkusio/quarkus/issues/55731"
 )
 @DisabledIfSystemProperty(
     named = "arquillian.browser", matches = "firefox", disabledReason = "EventSource client opening is unreliable in headless Firefox; messages element never receives the expected text"
