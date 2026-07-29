@@ -77,10 +77,11 @@ public class SseEndpoint extends HttpServlet {
         }
 
         response.setHeader("X-Accel-Buffering", "no"); // Disables response buffering in Nginx so SSE events are flushed immediately to the client.
+        response.flushBuffer(); // Commits the response head on containers which only deliver it while the request is still synchronous.
 
         var asyncContext = request.startAsync();
         asyncContext.setTimeout(idleTimeout);
-        response.getOutputStream().write(SSE_COMMENT_EVENT); // Commits the response head, as flushBuffer() does not commit an empty buffer on all containers.
+        response.getOutputStream().write(SSE_COMMENT_EVENT); // Commits it on containers which don't commit an empty buffer. Clients ignore an SSE comment.
         response.getOutputStream().flush();
 
         if (!sseSessions.add(channelId, channel, asyncContext)) {
