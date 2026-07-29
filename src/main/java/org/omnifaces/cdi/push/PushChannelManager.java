@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.FacesContext;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingEvent;
+import jakarta.servlet.http.HttpSessionBindingListener;
 
 /**
  * <p>
@@ -67,6 +70,9 @@ abstract class PushChannelManager implements Serializable {
 
     /** The HTTP session attribute name under which the session and view scoped channel IDs owned by the session are held. */
     static final String SESSION_SCOPE_CHANNEL_IDS = "org.omnifaces.cdi.push.SESSION_SCOPE_CHANNEL_IDS";
+
+    /** Mirror of {@value #SESSION_SCOPE_CHANNEL_IDS} keyed by HTTP session ID, see {@link SessionScopeChannelIds}. */
+    private static final ConcurrentHashMap<String, SessionScopeChannelIds> CHANNEL_IDS_BY_SESSION_ID = new ConcurrentHashMap<>();
 
     static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
@@ -135,15 +141,18 @@ abstract class PushChannelManager implements Serializable {
         var httpSession = (HttpSession) context.getExternalContext().getSession(true);
 
         synchronized (httpSession) {
-            @SuppressWarnings("unchecked")
-            var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
+            // The type check also covers a session which was persisted or replicated by an OmniFaces version holding a plain set under this attribute.
+            var channelIds = httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS) instanceof SessionScopeChannelIds existingChannelIds
+                ? existingChannelIds
+                : null;
 
             if (channelIds == null) {
-                channelIds = new CopyOnWriteArraySet<>();
+                channelIds = new SessionScopeChannelIds();
                 httpSession.setAttribute(SESSION_SCOPE_CHANNEL_IDS, channelIds);
             }
 
             channelIds.add(channelId);
+            channelIds.bind(httpSession.getId());
         }
     }
 
@@ -155,13 +164,31 @@ abstract class PushChannelManager implements Serializable {
      * @return Whether the given channel identifier was registered by the given HTTP session.
      */
     static boolean isChannelIdRegisteredInSession(HttpSession httpSession, String channelId) {
-        if (httpSession == null) {
-            return false;
+        return httpSession != null
+            && httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS) instanceof SessionScopeChannelIds channelIds
+            && channelIds.contains(channelId);
+    }
+
+    /**
+     * Returns whether the given session or view scoped channel identifier was registered by the HTTP session identified by any of the given identifiers. This
+     * exists for containers which do not expose the HTTP session during the web socket handshake, such as Quarkus, where the caller can only present the raw
+     * cookie values. Those values are matched against known session identifiers and never trusted as such, so presenting an arbitrary one does not grant
+     * access.
+     *
+     * @param sessionIds The candidate HTTP session identifiers presented by the incoming push connection.
+     * @param channelId The channel identifier to check.
+     * @return Whether the given channel identifier was registered by any of the identified HTTP sessions.
+     */
+    static boolean isChannelIdRegisteredInSession(Collection<String> sessionIds, String channelId) {
+        for (var sessionId : sessionIds) {
+            var channelIds = CHANNEL_IDS_BY_SESSION_ID.get(sessionId);
+
+            if (channelIds != null && channelIds.contains(channelId)) {
+                return true;
+            }
         }
 
-        @SuppressWarnings("unchecked")
-        var channelIds = (Set<String>) httpSession.getAttribute(SESSION_SCOPE_CHANNEL_IDS);
-        return channelIds != null && channelIds.contains(channelId);
+        return false;
     }
 
     @SafeVarargs
@@ -323,6 +350,42 @@ abstract class PushChannelManager implements Serializable {
 
         getPushSessions().register(sessionScopedChannels.values());
         getPushSessions().register(getApplicationScope().values());
+    }
+
+    // Nested classes -------------------------------------------------------------------------------------------------
+
+    /**
+     * The session and view scoped channel identifiers owned by one HTTP session. It is held as HTTP session attribute so that it is automatically cleaned up
+     * when the session expires, and mirrored in {@link PushChannelManager#CHANNEL_IDS_BY_SESSION_ID} so that it remains reachable in containers which do not
+     * expose the HTTP session during the web socket handshake. The mirror is not replicated across nodes; {@link #bind(String)} restores it on the next channel
+     * registration, which also covers the container having changed the session identifier in the meanwhile.
+     */
+    private static final class SessionScopeChannelIds extends CopyOnWriteArraySet<String> implements HttpSessionBindingListener {
+
+        private static final long serialVersionUID = 1L;
+
+        private transient volatile String sessionId; // Volatile because valueUnbound() runs on the session reaper thread.
+
+        private void bind(String currentSessionId) {
+            if (!currentSessionId.equals(sessionId)) {
+                unbind();
+                sessionId = currentSessionId;
+                CHANNEL_IDS_BY_SESSION_ID.put(sessionId, this);
+            }
+        }
+
+        @Override
+        public void valueUnbound(HttpSessionBindingEvent event) {
+            unbind();
+        }
+
+        private void unbind() {
+            if (sessionId != null) {
+                CHANNEL_IDS_BY_SESSION_ID.remove(sessionId, this);
+                sessionId = null;
+            }
+        }
+
     }
 
 }

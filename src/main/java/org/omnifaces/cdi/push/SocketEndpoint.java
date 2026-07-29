@@ -17,8 +17,11 @@ import static jakarta.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.cdi.PushContext.SOCKET_URI_PREFIX;
+import static org.omnifaces.cdi.push.SocketChannelManager.isApplicationScopedChannelId;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -134,10 +137,7 @@ public class SocketEndpoint extends Endpoint {
         public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
             var channelId = getChannelId(request);
 
-            if (
-                !SocketChannelManager.isApplicationScopedChannelId(channelId)
-                    && !PushChannelManager.isChannelIdRegisteredInSession((HttpSession) request.getHttpSession(), channelId)
-            ) {
+            if (!isApplicationScopedChannelId(channelId) && !isChannelIdRegisteredInSession(request, channelId)) {
                 throw new IllegalStateException(ERROR_UNAUTHORIZED_CHANNEL);
             }
         }
@@ -146,6 +146,34 @@ public class SocketEndpoint extends Endpoint {
             var path = request.getRequestURI().getPath();
             var channel = path.substring(path.lastIndexOf('/') + 1);
             return channel + "?" + request.getQueryString();
+        }
+
+        private static boolean isChannelIdRegisteredInSession(HandshakeRequest request, String channelId) {
+            return request.getHttpSession() instanceof HttpSession httpSession
+                ? PushChannelManager.isChannelIdRegisteredInSession(httpSession, channelId)
+                : PushChannelManager.isChannelIdRegisteredInSession(getCookieValues(request), channelId);
+        }
+
+        private static Collection<String> getCookieValues(HandshakeRequest request) {
+            Collection<String> cookieValues = new ArrayList<>(1);
+
+            for (var header : request.getHeaders().entrySet()) {
+                if (!"cookie".equalsIgnoreCase(header.getKey())) {
+                    continue;
+                }
+
+                for (var cookies : header.getValue()) {
+                    for (var cookie : cookies.split(";")) {
+                        var separator = cookie.indexOf('=');
+
+                        if (separator > -1) {
+                            cookieValues.add(cookie.substring(separator + 1).trim());
+                        }
+                    }
+                }
+            }
+
+            return cookieValues;
         }
 
     }
