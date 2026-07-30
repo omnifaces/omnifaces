@@ -23,7 +23,6 @@ import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.omnifaces.test.push.PushTestUtil;
 
@@ -32,9 +31,6 @@ import org.omnifaces.test.push.PushTestUtil;
  * connectable by any (or no) HTTP session. Performs the connection as a raw HTTP request so that the connecting HTTP session (i.e. the presence or absence of
  * the <code>JSESSIONID</code> cookie) is fully controllable, which a browser driven test cannot do.
  */
-@DisabledIfSystemProperty(
-    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces must first be upgraded to a version which activates @Push injection points at build time"
-)
 public class SseSessionBindingIT extends OmniFacesIT {
 
     private static final int NOT_FOUND = 404;

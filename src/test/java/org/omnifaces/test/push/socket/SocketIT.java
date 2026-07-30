@@ -23,9 +23,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @DisabledIfSystemProperty(
-    named = "profile.id", matches = "quarkus-.*", disabledReason = "Sockets work, but sent.size() in SocketITBean is one too many for application and session scoped sockets, while view scoped sockets are correct. Unlike o:sse this is not a missed disconnect callback, as onClose does fire; an extra connection appears to be opened and its origin is not yet understood"
-)
-@DisabledIfSystemProperty(
     named = "arquillian.browser", matches = "firefox", disabledReason = "WebSocket client opening is unreliable in headless Firefox; clientOpenedMessages element never appears"
 )
 public class SocketIT extends OmniFacesIT {

@@ -74,7 +74,7 @@
         <test.tomcat.version>11.0.24</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.payara-mojarra.version>7.2026.6</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
         <test.quarkus.version>3.37.2</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
-        <test.quarkus-omnifaces.version>5.4.2</test.quarkus-omnifaces.version> <!-- https://mvnrepository.com/artifact/io.quarkiverse.omnifaces/quarkus-omnifaces -->
+        <test.quarkus-omnifaces.version>5.4.5</test.quarkus-omnifaces.version> <!-- https://mvnrepository.com/artifact/io.quarkiverse.omnifaces/quarkus-omnifaces -->
 
         <!-- Test impl versions for servletcontainers (Tomcat). -->
         <test.mojarra.version>4.1.11</test.mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.faces -->

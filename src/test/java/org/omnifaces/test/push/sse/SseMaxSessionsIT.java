@@ -21,7 +21,6 @@ import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.omnifaces.test.push.PushTestUtil;
 
@@ -33,9 +32,6 @@ import org.omnifaces.test.push.PushTestUtil;
  * The capped channel is declared in <code>SseMaxSessionsChannelIT.xhtml</code> instead of the page that this test opens, because <code>o:sse</code> has no
  * <code>connected</code> attribute and the browser would otherwise occupy the single allowed connection.
  */
-@DisabledIfSystemProperty(
-    named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus-omnifaces must first be upgraded to a version which activates @Push injection points at build time"
-)
 public class SseMaxSessionsIT extends OmniFacesIT {
 
     private static final int CLOSED_BY_SERVER = 200;

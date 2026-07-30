@@ -78,9 +78,9 @@ public abstract class OmniFacesIT {
 
     protected final Logger logger = Logger.getLogger(getClass().getName());
 
-    protected WebDriver browser;
-    protected Map<String, String> networkResponses = new LinkedHashMap<>();
-    protected List<String> consoleErrors = new ArrayList<>();
+    protected static WebDriver browser;
+    protected static Map<String, String> networkResponses = new LinkedHashMap<>();
+    protected static List<String> consoleErrors = new ArrayList<>();
 
     @ArquillianResource
     protected URL baseURL;
@@ -91,9 +91,18 @@ public abstract class OmniFacesIT {
     public void setup() {
         logger.fine(this + "#setup(); " + browser + "; " + baseURL);
         Logger.getLogger(RemoteWebDriver.class.getPackageName()).setLevel(Level.WARNING); // Tone down super verbose WebDriver#findElement logging.
+
+        if (browser == null) {
+            browser = createBrowser();
+        }
+
+        PageFactory.initElements(browser, this);
+    }
+
+    private static WebDriver createBrowser() {
         var arquillianBrowser = System.getProperty("arquillian.browser");
 
-        browser = switch (arquillianBrowser) {
+        return switch (arquillianBrowser) {
             case "chrome" -> {
                 WebDriverManager.chromedriver().setup();
                 var originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -156,18 +165,14 @@ public abstract class OmniFacesIT {
             }
             default -> throw new UnsupportedOperationException("arquillian.browser='" + arquillianBrowser + "' is not yet supported");
         };
-
-        PageFactory.initElements(browser, this);
     }
 
     @BeforeEach
     public void init() {
         logger.fine(this + "#init(); " + browser + "; " + baseURL);
 
-        if (browser == null) {
-            setup(); // Because quarkus-arquillian doesn't recognize the different lifecycle of @BeforeAll on a @TestInstance(Lifecycle.PER_CLASS) and forgets
-                     // to invoke it on each instantiation.
-        }
+        setup(); // Because quarkus-arquillian doesn't recognize the different lifecycle of @BeforeAll on a @TestInstance(Lifecycle.PER_CLASS) and forgets to
+                 // invoke it on each instantiation, so the browser of this instance would otherwise remain unbound.
 
         try {
             if (!baseURL.toExternalForm().endsWith("/")) {
@@ -185,7 +190,10 @@ public abstract class OmniFacesIT {
 
     @AfterAll
     public void teardown() {
-        browser.quit();
+        if (browser != null) {
+            browser.quit();
+            browser = null;
+        }
     }
 
     protected void refresh() {
