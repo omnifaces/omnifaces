@@ -41,6 +41,9 @@ public final class ResourcePaths {
     /** The extension separator, a period <code>.</code>. */
     public static final String EXTENSION_SEPARATOR = ".";
 
+    private static final char PATH_SEPARATOR_CHAR = PATH_SEPARATOR.charAt(0);
+    private static final char EXTENSION_SEPARATOR_CHAR = EXTENSION_SEPARATOR.charAt(0);
+
     private ResourcePaths() {
         // Hide constructor
     }
@@ -107,7 +110,7 @@ public final class ResourcePaths {
      * @return <code>true</code> if the resource path is extensionless, false otherwise.
      */
     public static boolean isExtensionless(String resourcePath) {
-        return !resourcePath.substring(resourcePath.lastIndexOf(PATH_SEPARATOR) + 1).contains(EXTENSION_SEPARATOR);
+        return resourcePath.indexOf(EXTENSION_SEPARATOR_CHAR, resourcePath.lastIndexOf(PATH_SEPARATOR_CHAR) + 1) < 0;
     }
 
     /**

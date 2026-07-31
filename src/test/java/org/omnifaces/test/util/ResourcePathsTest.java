@@ -95,7 +95,10 @@ class ResourcePathsTest {
         assertTrue(isExtensionless("/foo/noext"));
         assertTrue(isExtensionless("/foo.bar/baz"));
         assertTrue(isExtensionless("/"));
+        assertTrue(isExtensionless(""));
+        assertTrue(isExtensionless("/foo.bar/"));
         assertFalse(isExtensionless("index.xhtml"));
+        assertFalse(isExtensionless("/foo.bar/baz.xhtml"));
         assertFalse(isExtensionless("/foo/index.xhtml"));
         assertFalse(isExtensionless("archive.tar.gz"));
     }
