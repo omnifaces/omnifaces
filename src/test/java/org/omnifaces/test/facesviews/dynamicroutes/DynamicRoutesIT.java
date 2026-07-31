@@ -176,7 +176,7 @@ public class DynamicRoutesIT extends OmniFacesIT {
         assertEquals(expectedViewId, viewId.getText());
         assertEquals(contextPath + "/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));
         assertEquals(contextPath + "/" + expectedActionPath, stripHostAndJsessionid(form.getAttribute("action")));
-        assertEquals(contextPath + "/organizations/471/members", stripHostAndJsessionid(link.getAttribute("href")));
+        assertEquals(contextPath + "/organizations/977/members", stripHostAndJsessionid(link.getAttribute("href")));
         assertNoBrackets(form.getAttribute("action"));
         assertNoBrackets(link.getAttribute("href"));
         assertNoBrackets(browser.getCurrentUrl());
