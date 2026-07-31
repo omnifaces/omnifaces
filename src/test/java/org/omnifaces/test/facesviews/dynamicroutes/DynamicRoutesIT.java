@@ -14,6 +14,7 @@ package org.omnifaces.test.facesviews.dynamicroutes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withMultiViewsAndIndexWelcomeFile;
 
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -64,6 +66,32 @@ public class DynamicRoutesIT extends OmniFacesIT {
         return buildWebArchive(DynamicRoutesIT.class)
             .withWebXml(withMultiViewsAndIndexWelcomeFile)
             .createDeployment();
+    }
+
+    /**
+     * An outcome may spell out the dynamic route with its segment values already filled in, instead of naming the bracketed template and supplying every
+     * segment with a nested <code>&lt;o:pathParam name&gt;</code>.
+     */
+    @Test
+    void testConcreteOutcomeResolvesToItsDynamicRoute() {
+        open("DynamicRoutesIT.xhtml");
+        assertEquals(contextPath + "/organizations/977/members", hrefOf("concreteLink"));
+        assertEquals(contextPath + "/organizations/977/members", hrefOf("concreteElLink"));
+        assertEquals(contextPath + "/nl/products/12345/reviews", hrefOf("concreteMultiViewsLink"));
+    }
+
+    /**
+     * An outcome which matches no dynamic route keeps degrading to a target less component, as it does for any other unresolvable outcome.
+     */
+    @Test
+    void testUnmatchedConcreteOutcomeDoesNotResolve() {
+        open("DynamicRoutesIT.xhtml");
+        assertNull(hrefOf("concreteUnmatchedLink"));
+    }
+
+    private String hrefOf(String id) {
+        var href = browser.findElement(By.id(id)).getAttribute("href");
+        return href == null ? null : stripHostAndJsessionid(href);
     }
 
     @Test

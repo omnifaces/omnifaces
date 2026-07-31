@@ -69,4 +69,8 @@ public class DynamicRoutesITBean implements Serializable {
         return product;
     }
 
+    public String getExampleId() {
+        return "977";
+    }
+
 }

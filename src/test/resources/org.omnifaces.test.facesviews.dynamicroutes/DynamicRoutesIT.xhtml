@@ -28,6 +28,10 @@
         <p id="sku">#{dynamicRoutesITBean.sku}</p>
         <p id="convertedSku">#{dynamicRoutesITBean.product.sku}</p>
         <p id="pathIndex0">#{dynamicRoutesITBean.pathIndex0}</p>
+        <h:link id="concreteLink" value="concrete" outcome="/organizations/977/members" />
+        <h:link id="concreteElLink" value="concreteEl" outcome="/organizations/#{dynamicRoutesITBean.exampleId}/members" />
+        <h:link id="concreteMultiViewsLink" value="concreteMultiViews" outcome="/nl/products/12345/reviews" />
+        <h:link id="concreteUnmatchedLink" value="concreteUnmatched" outcome="/organizations/977/nonexisting" />
         <h:link id="link" outcome="/organizations/[id]/members">
             <o:pathParam name="id" value="977" />
         </h:link>

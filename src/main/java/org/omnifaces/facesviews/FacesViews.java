@@ -52,8 +52,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import jakarta.faces.application.Application;
+import jakarta.faces.application.ConfigurableNavigationHandler;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.webapp.FacesServlet;
@@ -269,6 +271,11 @@ public final class FacesViews {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
+    private static final Logger logger = Logger.getLogger(FacesViews.class.getName());
+
+    private static final String WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER = "The navigation handler '%s' is not a ConfigurableNavigationHandler, so an outcome which spells out a dynamic route with its segment values filled in"
+        + " cannot be resolved. Name the bracketed view as the outcome and supply every segment with a nested <o:pathParam name> instead.";
+
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
     private static final String WEB_FRAGMENT_RESOURCE_DIRECTORY = "/META-INF/resources/";
 
@@ -393,6 +400,21 @@ public final class FacesViews {
     public static void registerViewHandler(ServletContext servletContext, Application application) {
         if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
             application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
+            registerNavigationHandlerIfNecessary(servletContext, application);
+        }
+    }
+
+    /**
+     * Registers the navigation handler which resolves an outcome spelling out a dynamic route with its segment values already filled in. This is only of use
+     * when the application actually declares a dynamic route, so it is skipped otherwise.
+     */
+    private static void registerNavigationHandlerIfNecessary(ServletContext servletContext, Application application) {
+        var dynamicRoutes = DynamicRoutes.get(servletContext);
+
+        if (
+            dynamicRoutes != null && !dynamicRoutes.isEmpty() && application.getNavigationHandler() instanceof ConfigurableNavigationHandler navigationHandler
+        ) {
+            application.setNavigationHandler(new DynamicRoutesNavigationHandler(navigationHandler));
         }
     }
 
