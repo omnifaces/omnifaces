@@ -273,8 +273,9 @@ public final class FacesViews {
 
     private static final Logger logger = Logger.getLogger(FacesViews.class.getName());
 
-    private static final String WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER = "The navigation handler '%s' is not a ConfigurableNavigationHandler, so an outcome which spells out a dynamic route with its segment values filled in"
-        + " cannot be resolved. Name the bracketed view as the outcome and supply every segment with a nested <o:pathParam name> instead.";
+    private static final String WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER = "The navigation handler '%s' is not a ConfigurableNavigationHandler,"
+		+ " so an outcome which spells out a dynamic route with its segment values filled in cannot be resolved."
+		+ " Name the bracketed view as the outcome and supply every segment with a nested <o:pathParam name> instead.";
 
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
     private static final String WEB_FRAGMENT_RESOURCE_DIRECTORY = "/META-INF/resources/";
@@ -411,10 +412,17 @@ public final class FacesViews {
     private static void registerNavigationHandlerIfNecessary(ServletContext servletContext, Application application) {
         var dynamicRoutes = DynamicRoutes.get(servletContext);
 
-        if (
-            dynamicRoutes != null && !dynamicRoutes.isEmpty() && application.getNavigationHandler() instanceof ConfigurableNavigationHandler navigationHandler
-        ) {
-            application.setNavigationHandler(new DynamicRoutesNavigationHandler(navigationHandler));
+        if (dynamicRoutes == null || dynamicRoutes.isEmpty()) {
+            return;
+        }
+
+        var navigationHandler = application.getNavigationHandler();
+
+        if (navigationHandler instanceof ConfigurableNavigationHandler configurableNavigationHandler) {
+            application.setNavigationHandler(new DynamicRoutesNavigationHandler(configurableNavigationHandler));
+        }
+        else {
+            logger.warning(() -> WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER.formatted(navigationHandler.getClass().getName()));
         }
     }
 
