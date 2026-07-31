@@ -566,6 +566,7 @@ public abstract class OmniFacesIT {
                 case withFacesViews :
                 case withFacesViewsLowercasedRequestURI :
                 case withMultiViews :
+                case withMultiViewsAndIndexWelcomeFile :
                     addWebResource("WEB-INF/404.xhtml");
                     break;
                 default :
@@ -631,6 +632,7 @@ public abstract class OmniFacesIT {
         withFacesViews,
         withFacesViewsLowercasedRequestURI,
         withMultiViews,
+        withMultiViewsAndIndexWelcomeFile,
         withThreeViewsInSession,
         withThreeViewsInSessionAndExtensionlessMapping,
         withThreeActiveViewScopes,
