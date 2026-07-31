@@ -14,9 +14,14 @@
 -->
 <!DOCTYPE html>
 <html lang="en"
+    xmlns:f="jakarta.faces.core"
     xmlns:h="jakarta.faces.html"
     xmlns:o="omnifaces"
 >
+    <f:metadata>
+        <f:viewParam name="foo" value="#{dynamicRoutesITBean.foo}" />
+    </f:metadata>
+
     <h:head>
         <title>members</title>
     </h:head>
@@ -28,6 +33,8 @@
         <p id="sku">#{dynamicRoutesITBean.sku}</p>
         <p id="convertedSku">#{dynamicRoutesITBean.product.sku}</p>
         <p id="pathIndex0">#{dynamicRoutesITBean.pathIndex0}</p>
+        <p id="foo">#{dynamicRoutesITBean.foo}</p>
+        <h:link id="viewParamsLink" value="viewParams" outcome="/organizations/977/members?includeViewParams=true" />
         <h:link id="link" outcome="/organizations/[id]/members">
             <o:pathParam name="id" value="977" />
         </h:link>

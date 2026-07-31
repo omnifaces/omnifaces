@@ -12,17 +12,27 @@
  */
 package org.omnifaces.facesviews;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.component.output.PathParam.PATH_PARAM_NAME_ATTRIBUTE_PREFIX;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_DYNAMIC_ROUTE_PARAMS;
 import static org.omnifaces.util.FacesLocal.getServletContext;
+import static org.omnifaces.util.FacesLocal.setRequestAttribute;
+import static org.omnifaces.util.Reflection.findMethod;
+import static org.omnifaces.util.Reflection.invokeMethod;
+import static org.omnifaces.util.Servlets.toParameterMap;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import jakarta.faces.FacesException;
 import jakarta.faces.application.ConfigurableNavigationHandler;
-import jakarta.faces.application.ConfigurableNavigationHandlerWrapper;
 import jakarta.faces.application.NavigationCase;
+import jakarta.faces.application.NavigationHandler;
 import jakarta.faces.context.FacesContext;
 
 /**
@@ -41,27 +51,103 @@ import jakarta.faces.context.FacesContext;
  * @since 5.5
  * @see FacesViews
  */
-public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandlerWrapper {
+public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandler {
+
+    private static final char QUERY_STRING_SEPARATOR = '?';
+    private static final String REDIRECT_PARAM_NAME = "faces-redirect";
+    private static final String INCLUDE_VIEW_PARAMS_PARAM_NAME = "includeViewParams";
+
+    private final NavigationHandler wrapped;
 
     /**
      * Construct the dynamic routes navigation handler.
      *
      * @param wrapped The navigation handler to be wrapped.
      */
-    public DynamicRoutesNavigationHandler(ConfigurableNavigationHandler wrapped) {
-        super(wrapped);
+    public DynamicRoutesNavigationHandler(NavigationHandler wrapped) {
+        this.wrapped = wrapped;
+    }
+
+    /**
+     * Returns the wrapped navigation handler.
+     *
+     * @return The wrapped navigation handler.
+     */
+    public NavigationHandler getWrapped() {
+        return wrapped;
+    }
+
+    @Override
+    public Map<String, Set<NavigationCase>> getNavigationCases() {
+        return wrapped instanceof ConfigurableNavigationHandler configurable ? configurable.getNavigationCases() : emptyMap();
+    }
+
+    /**
+     * Obtains the navigation case of the wrapped navigation handler. Faces 4.1 declares this on {@link ConfigurableNavigationHandler} while Faces 5 merges it
+     * into {@link NavigationHandler} and deprecates the former, so a navigation handler of either shape must be asked, the latter reflectively as the compile
+     * baseline does not know that method yet.
+     */
+    private NavigationCase getWrappedNavigationCase(FacesContext context, String fromAction, String outcome) {
+        if (wrapped instanceof ConfigurableNavigationHandler configurable) {
+            return configurable.getNavigationCase(context, fromAction, outcome);
+        }
+
+        var method = findMethod(wrapped, "getNavigationCase", context, fromAction, outcome);
+        return method == null ? null : invokeMethod(wrapped, method, context, fromAction, outcome);
     }
 
     @Override
     public NavigationCase getNavigationCase(FacesContext context, String fromAction, String outcome) {
-        NavigationCase navigationCase = super.getNavigationCase(context, fromAction, outcome);
+        NavigationCase navigationCase = getWrappedNavigationCase(context, fromAction, outcome);
         return navigationCase != null ? navigationCase : getDynamicRouteNavigationCase(context, fromAction, outcome);
     }
 
     @Override
     public NavigationCase getNavigationCase(FacesContext context, String fromAction, String outcome, String toFlowDocumentId) {
-        NavigationCase navigationCase = super.getNavigationCase(context, fromAction, outcome, toFlowDocumentId);
-        return navigationCase != null ? navigationCase : getDynamicRouteNavigationCase(context, fromAction, outcome);
+        return getNavigationCase(context, fromAction, outcome);
+    }
+
+    /**
+     * The wrapped navigation handler resolves an action outcome by consulting its own navigation cases rather than this wrapper's, so a dynamic route would
+     * otherwise be invisible to it and the navigation would silently not happen at all.
+     */
+    @Override
+    public void handleNavigation(FacesContext context, String fromAction, String outcome) {
+        NavigationCase navigationCase = getWrappedNavigationCase(context, fromAction, outcome) != null
+            ? null
+            : getDynamicRouteNavigationCase(context, fromAction, outcome);
+
+        if (navigationCase == null) {
+            wrapped.handleNavigation(context, fromAction, outcome);
+        }
+        else {
+            performNavigation(context, navigationCase);
+        }
+    }
+
+    private static void performNavigation(FacesContext context, NavigationCase navigationCase) {
+        var viewHandler = context.getApplication().getViewHandler();
+        var toViewId = navigationCase.getToViewId(context);
+
+        if (!navigationCase.isRedirect()) {
+            // The request did not pass through the forwarding filter, so publish the segment values it would otherwise have exposed, as both the injection of
+            // a named path parameter and the rendering of the view's own action URL read them from there.
+            setRequestAttribute(context, FACES_VIEWS_DYNAMIC_ROUTE_PARAMS, FacesViewsViewHandler.getNamedPathParams(navigationCase.getParameters()));
+            context.setViewRoot(viewHandler.createView(context, toViewId));
+            context.renderResponse();
+            return;
+        }
+
+        var externalContext = context.getExternalContext();
+
+        try {
+            externalContext.redirect(
+                viewHandler.getRedirectURL(context, toViewId, navigationCase.getParameters(), navigationCase.isIncludeViewParams())
+            );
+        }
+        catch (IOException e) {
+            throw new FacesException(e);
+        }
     }
 
     private static NavigationCase getDynamicRouteNavigationCase(FacesContext context, String fromAction, String outcome) {
@@ -75,20 +161,34 @@ public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandle
             return null;
         }
 
-        DynamicRoutes.Match match = dynamicRoutes.match(outcome);
+        var queryStringIndex = outcome.indexOf(QUERY_STRING_SEPARATOR);
+        var path = queryStringIndex < 0 ? outcome : outcome.substring(0, queryStringIndex);
+        DynamicRoutes.Match match = dynamicRoutes.match(path);
 
         if (match == null) {
             return null;
         }
 
         Map<String, List<String>> parameters = new LinkedHashMap<>();
+        var redirect = false;
+        var includeViewParams = false;
+
+        if (queryStringIndex > -1) {
+            for (var parameter : toParameterMap(outcome.substring(queryStringIndex + 1)).entrySet()) {
+                switch (parameter.getKey()) {
+                    case REDIRECT_PARAM_NAME -> redirect = parseBoolean(parameter.getValue().get(0));
+                    case INCLUDE_VIEW_PARAMS_PARAM_NAME -> includeViewParams = parseBoolean(parameter.getValue().get(0));
+                    default -> parameters.put(parameter.getKey(), parameter.getValue());
+                }
+            }
+        }
 
         for (var param : match.params().entrySet()) {
             parameters.put(PATH_PARAM_NAME_ATTRIBUTE_PREFIX + param.getKey(), List.of(param.getValue()));
         }
 
         var fromViewId = context.getViewRoot() != null ? context.getViewRoot().getViewId() : null;
-        return new NavigationCase(fromViewId, fromAction, outcome, null, match.viewId(), null, unmodifiableMap(parameters), false, false);
+        return new NavigationCase(fromViewId, fromAction, outcome, null, match.viewId(), null, unmodifiableMap(parameters), redirect, includeViewParams);
     }
 
 }

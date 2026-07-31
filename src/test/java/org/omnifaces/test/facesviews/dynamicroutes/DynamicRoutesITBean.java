@@ -69,8 +69,26 @@ public class DynamicRoutesITBean implements Serializable {
         return product;
     }
 
+    private String foo;
+
+    public String getFoo() {
+        return foo;
+    }
+
+    public void setFoo(String foo) {
+        this.foo = foo;
+    }
+
     public String getExampleId() {
         return "977";
+    }
+
+    public String redirectToConcreteRoute() {
+        return "/organizations/977/members?faces-redirect=true";
+    }
+
+    public String forwardToConcreteRoute() {
+        return "/organizations/977/members";
     }
 
 }

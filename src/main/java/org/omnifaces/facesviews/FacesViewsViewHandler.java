@@ -209,6 +209,32 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
     }
 
     /**
+     * An override to interpolate the dynamic route segments of a redirect URL, which the wrapped view handler resolves by re-entering
+     * {@link #getActionURL(FacesContext, String)} for a view which is not the current one. A redirect has no outcome target component to hang a
+     * <code>&lt;o:pathParam&gt;</code> on, so the segment values come from the navigation case parameters instead.
+     */
+    @Override
+    public String getRedirectURL(FacesContext context, String viewId, Map<String, List<String>> parameters, boolean includeViewParams) {
+        if (!DynamicRoutes.isDynamicRoute(viewId)) {
+            return super.getRedirectURL(context, viewId, parameters, includeViewParams);
+        }
+
+        Map<String, List<String>> parametersWithoutPathParams = new LinkedHashMap<>(parameters);
+        parametersWithoutPathParams.keySet().removeIf(FacesViewsViewHandler::isPathParam);
+        setRequestAttribute(context, RENDERING_BOOKMARKABLE_URL, TRUE);
+
+        try {
+            var redirectURL = super.getRedirectURL(context, viewId, parametersWithoutPathParams, includeViewParams);
+            String[] uriAndRest = PATTERN_URI_SUFFIX.split(redirectURL, 2);
+            var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
+            return DynamicRoutes.interpolate(uriAndRest[0], getNamedPathParams(parameters)) + rest;
+        }
+        finally {
+            removeRequestAttribute(context, RENDERING_BOOKMARKABLE_URL);
+        }
+    }
+
+    /**
      * Obtains the bookmarkable URL with the dynamic route segments still in place, so that the values of <code>&lt;o:pathParam name&gt;</code> rather than
      * those of the current request end up in it. The wrapped view handler resolves the action URL by re-entering this view handler, which would otherwise
      * interpolate a link to the very view it is rendered on with that view's own segment values.
@@ -269,7 +295,10 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         return PathParam.PATH_PARAM_NAME_ATTRIBUTE_VALUE.equals(name) || name.startsWith(PathParam.PATH_PARAM_NAME_ATTRIBUTE_PREFIX);
     }
 
-    private static Map<String, String> getNamedPathParams(Map<String, List<String>> parameters) {
+    /**
+     * Extracts the values of the named path parameters from the given component or navigation case parameters, keyed by dynamic route segment name.
+     */
+    static Map<String, String> getNamedPathParams(Map<String, List<String>> parameters) {
         Map<String, String> namedPathParams = new LinkedHashMap<>();
 
         for (var entry : parameters.entrySet()) {

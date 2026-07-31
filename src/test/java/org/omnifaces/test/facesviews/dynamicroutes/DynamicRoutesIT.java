@@ -61,6 +61,15 @@ public class DynamicRoutesIT extends OmniFacesIT {
     @FindBy(id = "selfLink")
     private WebElement selfLink;
 
+    @FindBy(id = "redirectForm:forward")
+    private WebElement forwardSubmit;
+
+    @FindBy(id = "foo")
+    private WebElement foo;
+
+    @FindBy(id = "redirectForm:submit")
+    private WebElement redirectSubmit;
+
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(DynamicRoutesIT.class)
@@ -78,6 +87,66 @@ public class DynamicRoutesIT extends OmniFacesIT {
         assertEquals(contextPath + "/organizations/977/members", hrefOf("concreteLink"));
         assertEquals(contextPath + "/organizations/977/members", hrefOf("concreteElLink"));
         assertEquals(contextPath + "/nl/products/12345/reviews", hrefOf("concreteMultiViewsLink"));
+    }
+
+    /**
+     * A dynamic route segment comes from the path and a view parameter from the query string, so both must arrive on the same request.
+     */
+    @Test
+    void testViewParamOfADynamicRouteIsBound() {
+        open("organizations/123/members?foo=bar");
+        assertEquals("123", id.getText());
+        assertEquals("bar", foo.getText());
+    }
+
+    /**
+     * With includeViewParams the view parameters of the target view are carried over from the current request, which must not disturb the substituted segments.
+     */
+    @Test
+    void testIncludeViewParamsCarriesTheViewParamIntoTheDynamicRouteURL() {
+        open("organizations/123/members?foo=bar");
+        assertEquals(contextPath + "/organizations/977/members?foo=bar", hrefOf("viewParamsLink"));
+    }
+
+    /**
+     * A query string on the outcome must survive alongside the substituted segments.
+     */
+    @Test
+    void testConcreteOutcomeWithQueryStringResolves() {
+        open("DynamicRoutesIT.xhtml");
+        assertEquals(contextPath + "/organizations/977/members?foo=bar", hrefOf("concreteQueryLink"));
+    }
+
+    /**
+     * A redirect to a dynamic route has no outcome target component to hang a path parameter on, so the segment values must come from the outcome itself.
+     */
+    @Test
+    void testRedirectToConcreteOutcomeResolves() {
+        open("DynamicRoutesIT.xhtml");
+        guardHttp(redirectSubmit::click);
+        assertEquals(contextPath + "/organizations/977/members", stripHostAndJsessionid(browser.getCurrentUrl()));
+        assertEquals("977", id.getText());
+    }
+
+    /**
+     * Without faces-redirect the navigation renders the dynamic route in place, so the target view is shown, its own URL is interpolated, and the browser URL
+     * stays that of the posting view.
+     * <p>
+     * The injected segment value stays empty here, as the request scoped bean was already constructed when the action method ran, which is before the outcome
+     * decided which view to navigate to. Injecting it requires a new request, so use faces-redirect as in {@link #testRedirectToConcreteOutcomeResolves()}
+     * whenever the target view reads its segments.
+     */
+    @Test
+    void testForwardToConcreteOutcomeResolves() {
+        open("DynamicRoutesIT.xhtml");
+        var urlBeforeNavigation = stripHostAndJsessionid(browser.getCurrentUrl());
+
+        guardHttp(forwardSubmit::click);
+
+        assertEquals("members", browser.getTitle());
+        assertEquals(urlBeforeNavigation, stripHostAndJsessionid(browser.getCurrentUrl()));
+        assertEquals(contextPath + "/organizations/977/members", stripHostAndJsessionid(link.getAttribute("href")));
+        assertEquals("", id.getText());
     }
 
     /**

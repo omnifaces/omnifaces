@@ -24,6 +24,7 @@ import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS
 import static org.omnifaces.facesviews.PathAction.SEND_404;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
+import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
@@ -274,8 +275,8 @@ public final class FacesViews {
     private static final Logger logger = Logger.getLogger(FacesViews.class.getName());
 
     private static final String WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER = "The navigation handler '%s' is not a ConfigurableNavigationHandler,"
-		+ " so an outcome which spells out a dynamic route with its segment values filled in cannot be resolved."
-		+ " Name the bracketed view as the outcome and supply every segment with a nested <o:pathParam name> instead.";
+        + " so an outcome which spells out a dynamic route with its segment values filled in cannot be resolved."
+        + " Name the bracketed view as the outcome and supply every segment with a nested <o:pathParam name> instead.";
 
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
     private static final String WEB_FRAGMENT_RESOURCE_DIRECTORY = "/META-INF/resources/";
@@ -418,8 +419,9 @@ public final class FacesViews {
 
         var navigationHandler = application.getNavigationHandler();
 
-        if (navigationHandler instanceof ConfigurableNavigationHandler configurableNavigationHandler) {
-            application.setNavigationHandler(new DynamicRoutesNavigationHandler(configurableNavigationHandler));
+        // Faces 4.1 declares getNavigationCase on ConfigurableNavigationHandler while Faces 5 merges it into NavigationHandler, so accept either shape.
+        if (navigationHandler instanceof ConfigurableNavigationHandler || findMethod(navigationHandler, "getNavigationCase", null, null, null) != null) {
+            application.setNavigationHandler(new DynamicRoutesNavigationHandler(navigationHandler));
         }
         else {
             logger.warning(() -> WARNING_UNCONFIGURABLE_NAVIGATION_HANDLER.formatted(navigationHandler.getClass().getName()));

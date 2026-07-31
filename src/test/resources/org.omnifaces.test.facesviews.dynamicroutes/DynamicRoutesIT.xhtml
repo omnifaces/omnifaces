@@ -32,6 +32,11 @@
         <h:link id="concreteElLink" value="concreteEl" outcome="/organizations/#{dynamicRoutesITBean.exampleId}/members" />
         <h:link id="concreteMultiViewsLink" value="concreteMultiViews" outcome="/nl/products/12345/reviews" />
         <h:link id="concreteUnmatchedLink" value="concreteUnmatched" outcome="/organizations/977/nonexisting" />
+        <h:link id="concreteQueryLink" value="concreteQuery" outcome="/organizations/977/members?foo=bar" />
+        <h:form id="redirectForm">
+            <h:commandButton id="submit" value="redirect" action="#{dynamicRoutesITBean.redirectToConcreteRoute}" />
+            <h:commandButton id="forward" value="forward" action="#{dynamicRoutesITBean.forwardToConcreteRoute}" />
+        </h:form>
         <h:link id="link" outcome="/organizations/[id]/members">
             <o:pathParam name="id" value="977" />
         </h:link>
