@@ -17,11 +17,9 @@ import static jakarta.servlet.DispatcherType.REQUEST;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Locale.ENGLISH;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 import static org.omnifaces.facesviews.PathAction.SEND_404;
 import static org.omnifaces.util.Faces.getServletContext;
@@ -31,7 +29,6 @@ import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
-import static org.omnifaces.util.ResourcePaths.getParent;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.isRoot;
@@ -47,7 +44,6 @@ import static org.omnifaces.util.Xml.getNodeTextContents;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.Collator;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -56,7 +52,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ViewHandler;
@@ -235,21 +230,16 @@ public final class FacesViews {
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
     private static final String WEB_FRAGMENT_RESOURCE_DIRECTORY = "/META-INF/resources/";
 
+    private static final String ENABLED = "org.omnifaces.facesviews.enabled";
     private static final String SCAN_PATHS = "org.omnifaces.facesviews.scan_paths";
     private static final String PUBLIC_SCAN_PATHS = "org.omnifaces.facesviews.public_scan_paths";
-    private static final String MULTIVIEWS_PATHS = "org.omnifaces.facesviews.multiviews_paths";
     private static final String FACES_SERVLET_EXTENSIONS = "org.omnifaces.facesviews.faces_servlet_extensions";
     private static final String MAPPED_RESOURCES = "org.omnifaces.facesviews.mapped_resources";
     private static final String REVERSE_MAPPED_RESOURCES = "org.omnifaces.facesviews.reverse_mapped_resources";
-    private static final String MULTIVIEWS_RESOURCES = "org.omnifaces.facesviews.multiviews_resources";
     private static final String EXCLUDED_PATHS = "org.omnifaces.facesviews.exclude_paths";
     private static final String ENCOUNTERED_EXTENSIONS = "org.omnifaces.facesviews.encountered_extensions";
     private static final String MAPPED_WELCOME_FILES = "org.omnifaces.facesviews.mapped_welcome_files";
-    private static final String MULTIVIEWS_WELCOME_FILE = "org.omnifaces.facesviews.multiviews_welcome_file";
     private static final String FACES_SERVLET_NAME = "org.omnifaces.facesviews.faces_servlet_name";
-
-    private static Boolean facesViewsEnabled;
-    private static Boolean multiViewsEnabled;
 
     private FacesViews() {
         //
@@ -291,7 +281,7 @@ public final class FacesViews {
     private static void addForwardingFilterMappings(ServletContext servletContext, Map<String, String> collectedViews, FilterRegistration filterRegistration) {
         boolean filterAfterDeclaredFilters = parseBoolean(servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME));
 
-        if (hasMultiViewsWelcomeFile(servletContext)) {
+        if (MultiViews.hasWelcomeFile(servletContext)) {
             // When MultiViews is enabled and there are mapped welcome files, we need to filter on /* otherwise path params won't work on root.
             filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, "/*");
         }
@@ -409,12 +399,7 @@ public final class FacesViews {
                         .filter(e -> isExtensionless(e.getKey())).collect(toMap(Entry::getValue, Entry::getKey, (l, r) -> l))
                 )
             );
-            servletContext.setAttribute(
-                MULTIVIEWS_RESOURCES, unmodifiableSet(
-                    collectedViews.keySet().stream()
-                        .filter(k -> k.endsWith("/*")).map(v -> v.substring(0, v.length() - 2)).collect(toSet())
-                )
-            );
+            MultiViews.storeResources(servletContext, collectedViews);
             servletContext.setAttribute(EXCLUDED_PATHS, unmodifiableSet(excludedPaths));
 
             if (collectExtensions) {
@@ -453,13 +438,13 @@ public final class FacesViews {
         if (rootPaths == null) {
             rootPaths = new HashSet<>();
             rootPaths.add(new String[] { WEB_INF_VIEWS, null });
-            Set<String> multiViewsPaths = new TreeSet<>(Collator.getInstance(ENGLISH)); // Makes sure ! is sorted before /.
+            Set<String> multiViewsPaths = new HashSet<>();
 
             for (var rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
-                boolean multiViews = rootPath.endsWith("/*");
+                boolean multiViews = MultiViews.isScanPath(rootPath);
 
                 if (multiViews) {
-                    rootPath = rootPath.substring(0, rootPath.lastIndexOf("/*"));
+                    rootPath = MultiViews.stripScanPathSuffix(rootPath);
                 }
 
                 String[] rootPathAndExtension = rootPath.contains("*") ? rootPath.split(quote("*")) : new String[] { rootPath, null };
@@ -472,7 +457,7 @@ public final class FacesViews {
             }
 
             servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
-            servletContext.setAttribute(MULTIVIEWS_PATHS, unmodifiableSet(multiViewsPaths));
+            MultiViews.storePaths(servletContext, multiViewsPaths);
         }
 
         return rootPaths;
@@ -482,11 +467,7 @@ public final class FacesViews {
         servletContext.setAttribute(ENCOUNTERED_EXTENSIONS, unmodifiableSet(collectedExtensions));
 
         if (!collectedExtensions.isEmpty()) {
-            for (var welcomeFile : getMappedWelcomeFiles(servletContext)) {
-                if (isMultiViewsEnabled(servletContext) && collectedViews.containsKey(welcomeFile + "/*")) {
-                    servletContext.setAttribute(MULTIVIEWS_WELCOME_FILE, welcomeFile);
-                }
-            }
+            MultiViews.storeWelcomeFile(servletContext, collectedViews);
         }
     }
 
@@ -537,7 +518,7 @@ public final class FacesViews {
             return;
         }
 
-        boolean hasMultiViewsWelcomeFile = hasMultiViewsWelcomeFile(servletContext);
+        boolean hasMultiViewsWelcomeFile = MultiViews.hasWelcomeFile(servletContext);
 
         for (var resourcePath : resourcePaths) {
             var normalizedResourcePath = normalizeResourcePath(servletContext, resourcePath);
@@ -570,8 +551,8 @@ public final class FacesViews {
         String extensionlessResource = stripExtension(resource);
         String extensionlessResourcePath = stripExtension(resourcePath);
 
-        if (isMultiViewsResource(servletContext, extensionlessResourcePath)) {
-            collectedViews.put(extensionlessResource + "/*", resourcePath);
+        if (MultiViews.isResource(servletContext, extensionlessResourcePath)) {
+            collectedViews.put(extensionlessResource + MultiViews.SUFFIX, resourcePath);
         }
         else {
             if (hasMultiViewsWelcomeFile) { // This will install forwarding filter on /* and therefore we need to cover / ourselves.
@@ -648,24 +629,6 @@ public final class FacesViews {
         return (extensionToScan == null) || resource.endsWith(extensionToScan);
     }
 
-    private static boolean isMultiViewsResource(ServletContext servletContext, String resource) {
-        if (isMultiViewsEnabled(servletContext)) {
-            var path = resource + "/";
-
-            for (var multiviewsPath : getMultiViewsPaths(servletContext)) {
-                if (path.startsWith(multiviewsPath)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static boolean hasMultiViewsWelcomeFile(ServletContext servletContext) {
-        return isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
-    }
-
     // Helpers for FacesViewsForwardingFilter -------------------------------------------------------------------------
 
     static ExtensionAction getExtensionAction(ServletContext servletContext) {
@@ -694,22 +657,6 @@ public final class FacesViews {
         var queryString = (request.getQueryString() == null) ? "" : ("?" + request.getQueryString());
         String baseURL = getRequestBaseURL(request);
         return baseURL.substring(0, baseURL.length() - 1) + stripExtension(resource) + queryString;
-    }
-
-    static String getMultiViewsWelcomeFile(ServletContext servletContext, Map<String, String> resources, String servletPath) {
-        var mappedWelcomeFiles = getMappedWelcomeFiles(servletContext);
-
-        for (var path = stripTrailingSlash(servletPath); !path.isEmpty(); path = getParent(path)) {
-            for (var mappedWelcomeFile : mappedWelcomeFiles) {
-                var subfolderWelcomeFile = path + mappedWelcomeFile;
-
-                if (resources.containsKey(subfolderWelcomeFile + "/*")) {
-                    return subfolderWelcomeFile;
-                }
-            }
-        }
-
-        return getMultiViewsWelcomeFile(servletContext);
     }
 
     // Helpers for FacesViewsViewHandler ------------------------------------------------------------------------------
@@ -766,20 +713,12 @@ public final class FacesViews {
         }
     }
 
-    static Set<String> getMultiViewsPaths(ServletContext servletContext) {
-        return getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
-    }
-
     static Map<String, String> getMappedResources(ServletContext servletContext) {
         return getApplicationAttribute(servletContext, MAPPED_RESOURCES);
     }
 
     static Map<String, String> getReverseMappedResources(ServletContext servletContext) {
         return getApplicationAttribute(servletContext, REVERSE_MAPPED_RESOURCES);
-    }
-
-    static Set<String> getMultiViewsResources(ServletContext servletContext) {
-        return getApplicationAttribute(servletContext, MULTIVIEWS_RESOURCES);
     }
 
     static Set<String> getExcludedPaths(ServletContext servletContext) {
@@ -792,10 +731,6 @@ public final class FacesViews {
 
     static Set<String> getMappedWelcomeFiles(ServletContext servletContext) {
         return getApplicationAttribute(servletContext, MAPPED_WELCOME_FILES);
-    }
-
-    static String getMultiViewsWelcomeFile(ServletContext servletContext) {
-        return getApplicationAttribute(servletContext, MULTIVIEWS_WELCOME_FILE);
     }
 
     static String getFacesServletName(ServletContext servletContext) {
@@ -813,11 +748,14 @@ public final class FacesViews {
      * @since 2.5
      */
     public static boolean isFacesViewsEnabled(ServletContext servletContext) {
-        if (facesViewsEnabled == null) {
-            facesViewsEnabled = !"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME));
+        Boolean enabled = getApplicationAttribute(servletContext, ENABLED);
+
+        if (enabled == null) {
+            enabled = !"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME));
+            servletContext.setAttribute(ENABLED, enabled);
         }
 
-        return facesViewsEnabled;
+        return enabled;
     }
 
     /**
@@ -829,11 +767,7 @@ public final class FacesViews {
      * @since 2.5
      */
     public static boolean isMultiViewsEnabled(ServletContext servletContext) {
-        if (multiViewsEnabled == null) {
-            multiViewsEnabled = !isEmpty(getMultiViewsPaths(servletContext));
-        }
-
-        return multiViewsEnabled;
+        return MultiViews.isEnabled(servletContext);
     }
 
     /**
@@ -844,13 +778,7 @@ public final class FacesViews {
      * @since 2.6
      */
     public static boolean isMultiViewsEnabled(HttpServletRequest request) {
-        String resource = request.getServletPath();
-
-        if (isEmpty(resource) && request.getPathInfo() != null) {
-            resource = request.getPathInfo();
-        }
-
-        return isMultiViewsEnabled(request.getServletContext(), resource);
+        return MultiViews.isEnabled(request);
     }
 
     /**
@@ -862,34 +790,7 @@ public final class FacesViews {
      * @since 3.6
      */
     public static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
-        if (!isMultiViewsEnabled(servletContext)) {
-            return false;
-        }
-
-        String extensionlessResource = stripExtension(resource);
-        Set<String> excludedPaths = getExcludedPaths(servletContext);
-
-        if (!isEmpty(excludedPaths)) {
-            var path = extensionlessResource + "/";
-
-            if (excludedPaths.stream().anyMatch(path::startsWith)) {
-                return false;
-            }
-        }
-
-        Set<String> multiViewsResources = getMultiViewsResources(servletContext);
-
-        if (multiViewsResources != null && multiViewsResources.contains(extensionlessResource)) {
-            return true;
-        }
-
-        Map<String, String> mappedResources = getMappedResources(servletContext);
-
-        if (mappedResources != null && mappedResources.containsKey(extensionlessResource)) {
-            return false;
-        }
-
-        return getMultiViewsWelcomeFile(servletContext) != null;
+        return MultiViews.isEnabled(servletContext, resource);
     }
 
     /**

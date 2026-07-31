@@ -19,7 +19,6 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.isLowercasedRequestURI;
-import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
 import static org.omnifaces.util.Faces.getServletContext;
@@ -156,7 +155,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         parametersWithoutPathParams.remove(PathParam.PATH_PARAM_NAME_ATTRIBUTE_VALUE);
         String bookmarkableURL = super.getBookmarkableURL(context, viewId, parametersWithoutPathParams, includeViewParams);
 
-        if (isMultiViewsEnabled(getServletContext(context), viewId)) {
+        if (MultiViews.isEnabled(getServletContext(context), viewId)) {
             // This is a MultiViews enabled viewId, so render the path parameters as well, replacing the current ones if any.
             String[] uriAndRest = PATTERN_URI_SUFFIX.split(bookmarkableURL, 2);
             String uri = removePathInfoIfNecessary(context, uriAndRest[0]);

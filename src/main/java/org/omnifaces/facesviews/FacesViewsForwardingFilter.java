@@ -21,10 +21,8 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
-import static org.omnifaces.facesviews.FacesViews.getMultiViewsWelcomeFile;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.getReverseMappedResources;
-import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
@@ -101,7 +99,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         }
 
         var servletContext = getServletContext();
-        var multiViews = isMultiViewsEnabled(request);
+        var multiViews = MultiViews.isEnabled(request);
         var resources = getMappedResources(servletContext);
         var normalizedServletPath = stripTrailingSlash(servletPath);
         var resource = normalizedServletPath + (multiViews ? "/*" : "");
@@ -116,7 +114,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
                 servletPath += request.getPathInfo();
             }
 
-            resource = getMultiViewsWelcomeFile(servletContext, resources, servletPath);
+            resource = MultiViews.getWelcomeFile(servletContext, resources, servletPath);
 
             if (resource != null) {
                 var pathInfo = servletPath.substring(resource.substring(0, resource.lastIndexOf('/')).length());
