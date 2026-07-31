@@ -28,8 +28,8 @@ import org.openqa.selenium.support.FindBy;
     named = "profile.id", matches = "quarkus-.*", disabledReason = "quarkus does not invoke AsyncListener when the client disconnects, so the server side close events of a channel never arrive, fixed by https://github.com/quarkusio/quarkus-http/pull/217, see https://github.com/quarkusio/quarkus/issues/55731"
 )
 @DisabledIfSystemProperty(
-	    named = "arquillian.browser", matches = "firefox", disabledReason = "EventSource client opening is unreliable in headless Firefox; messages element never receives the expected text"
-	)
+    named = "arquillian.browser", matches = "firefox", disabledReason = "EventSource client opening is unreliable in headless Firefox; messages element never receives the expected text"
+)
 public class SseIT extends OmniFacesIT {
 
     @FindBy(id = "messages")
