@@ -138,6 +138,11 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
         }
 
         @Override
+        public String pathName() {
+            return EMPTY_STRING;
+        }
+
+        @Override
         public String label() {
             return EMPTY_STRING;
         }

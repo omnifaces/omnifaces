@@ -13,9 +13,11 @@
 package org.omnifaces.facesviews;
 
 import static jakarta.faces.application.ProjectStage.Development;
+import static jakarta.servlet.DispatcherType.REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.ExtensionAction.PROCEED;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_DYNAMIC_ROUTE_PARAMS;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -109,6 +112,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
             resources = scanAndStoreViews(servletContext, false);
         }
 
+        if (!resources.containsKey(resource) && forwardDynamicRouteIfNecessary(request, response, servletContext, normalizedServletPath)) {
+            return true;
+        }
+
         if (multiViews && !resources.containsKey(resource)) {
             if (request.getPathInfo() != null) {
                 servletPath += request.getPathInfo();
@@ -125,6 +132,37 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         }
 
         return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
+    }
+
+    /**
+     * Walk the scanned dynamic routes for a view whose bracketed directory names match the requested path, and forward to the physical view when one does,
+     * exposing the resolved segment values as a request attribute. An application without any bracketed directory never gets here.
+     */
+    private static boolean forwardDynamicRouteIfNecessary(
+        HttpServletRequest request, HttpServletResponse response, ServletContext servletContext, String normalizedServletPath
+    ) throws IOException, ServletException
+    {
+        var dynamicRoutes = DynamicRoutes.get(servletContext);
+
+        if (dynamicRoutes == null || dynamicRoutes.isEmpty()) {
+            return false;
+        }
+
+        var pathInfo = request.getPathInfo();
+        var match = dynamicRoutes.match(pathInfo == null ? normalizedServletPath : stripTrailingSlash(normalizedServletPath + pathInfo));
+
+        if (match == null) {
+            return false;
+        }
+
+        request.setAttribute(FACES_VIEWS_DYNAMIC_ROUTE_PARAMS, match.params());
+
+        if (match.pathInfo() != null) {
+            request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, match.pathInfo());
+        }
+
+        request.getRequestDispatcher(match.viewId()).forward(request, response);
+        return true;
     }
 
     private static boolean filterExtensionLess(
@@ -222,6 +260,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         var resources = getMappedResources(getServletContext());
 
         if (resources.containsKey(resource)) {
+            if (DynamicRoutes.isDynamicRoute(resource)) {
+                // The extensionless form of a dynamic route contains square brackets, which are gen-delims per RFC 3986, so it must never be redirected to.
+                // An inbound request for the physical view is refused, while the forwarding filter's own forward to it must proceed to the FacesServlet.
+                if (request.getDispatcherType() == REQUEST) {
+                    response.sendError(SC_NOT_FOUND);
+                    return true;
+                }
+
+                return false;
+            }
+
             if (resources.get(resource) != null) {
                 if (extensionAction == REDIRECT_TO_EXTENSIONLESS) {
                     redirectPermanent(response, getExtensionlessURLWithQuery(request, resource));

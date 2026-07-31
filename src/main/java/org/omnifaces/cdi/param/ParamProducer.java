@@ -30,9 +30,11 @@ import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.FacesLocal.getRequestParameterValues;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_DYNAMIC_ROUTE_PARAMS;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.getDefaultValue;
@@ -80,6 +82,7 @@ import org.omnifaces.cdi.Param;
 public class ParamProducer {
 
     private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
+    private static final String ERROR_BOTH_PATH_INDEX_AND_PATH_NAME = "Injection point '%s' declares both pathIndex and pathName. A path parameter is addressed either positionally or by name, not both.";
 
     private static Boolean interpretEmptyStringSubmittedValuesAsNull;
 
@@ -103,7 +106,7 @@ public class ParamProducer {
         var type = getType(injectionPoint);
 
         var context = FacesContext.getCurrentInstance();
-        var submittedValues = param.pathIndex() > -1 ? getPathParameter(context, param.pathIndex()) : getSubmittedValues(context, name);
+        var submittedValues = getSubmittedValues(context, param, name);
         var sourceType = getSourceType(type);
         Class<V> targetType = getTargetType(type);
         var paramValue = new ParamValue<>(param, name, label, sourceType, submittedValues, targetType);
@@ -156,6 +159,32 @@ public class ParamProducer {
         }
 
         return type;
+    }
+
+    private static String[] getSubmittedValues(FacesContext context, Param param, String name) {
+        var pathName = param.pathName();
+        var pathIndex = param.pathIndex();
+
+        if (!isEmpty(pathName)) {
+            if (pathIndex > -1) {
+                throw new IllegalArgumentException(ERROR_BOTH_PATH_INDEX_AND_PATH_NAME.formatted(name));
+            }
+
+            return getNamedPathParameter(context, pathName);
+        }
+
+        return pathIndex > -1 ? getPathParameter(context, pathIndex) : getSubmittedValues(context, name);
+    }
+
+    private static String[] getNamedPathParameter(FacesContext context, String pathName) {
+        Map<String, String> params = getRequestAttribute(context, FACES_VIEWS_DYNAMIC_ROUTE_PARAMS);
+
+        if (isEmpty(params)) {
+            return null;
+        }
+
+        var value = params.get(pathName);
+        return value == null ? null : new String[] { value };
     }
 
     private static String[] getPathParameter(FacesContext context, int pathIndex) {

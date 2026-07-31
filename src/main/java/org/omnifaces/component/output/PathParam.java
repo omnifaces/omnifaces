@@ -13,6 +13,7 @@
 package org.omnifaces.component.output;
 
 import static org.omnifaces.util.FacesLocal.createConverter;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.context.FacesContext;
@@ -23,9 +24,10 @@ import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.facesviews.FacesViewsViewHandler;
 
 /**
- * The <code>&lt;o:pathParam&gt;</code> is a component that extends the OmniFaces {@link Param} to support <code>MultiViews</code> feature of
- * {@link FacesViews}. It is done by rendering the supplied parameters of such components as <code>&lt;h:link&gt;</code> and <code>&lt;h:button&gt;</code> among
- * others as path parameters and not as query parameters as otherwise will be produced by <code>&lt;o:param&gt;</code> and <code>&lt;f:param&gt;</code> tags.
+ * The <code>&lt;o:pathParam&gt;</code> is a component that extends the OmniFaces {@link Param} to support the <code>MultiViews</code> and dynamic route segment
+ * features of {@link FacesViews}. It is done by rendering the supplied parameters of such components as <code>&lt;h:link&gt;</code> and
+ * <code>&lt;h:button&gt;</code> among others as path parameters and not as query parameters as otherwise will be produced by <code>&lt;o:param&gt;</code> and
+ * <code>&lt;f:param&gt;</code> tags.
  * <p>
  * The component has built-in support for a {@link Converter} to convert the supplied value to string by usual means via the <code>converter</code> attribute of
  * the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is already registered for the target class via
@@ -34,12 +36,17 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
  * This component doesn't support returning encoded output of its children as parameter value in case no value is present. This feature is provided by
  * {@link Param} component instead.
  * <p>
- * Also, the name attribute must not be specified for this component as it already evaluates to a predefined one.
+ * The name attribute is optional and selects between the two features. Without one the value is appended as the next positional path parameter of a
+ * <code>MultiViews</code> view, which requires MultiViews to be enabled. With one the value instead interpolates into the dynamic route segment of that name,
+ * which requires no MultiViews at all, only a view in a directory whose name is wrapped in square brackets. Both are described below and can be combined on one
+ * view.
+ *
+ * <h2>MultiViews path parameters</h2>
  * <p>
  * This component is used to create bookmarkable URLs via standard outcome target components that take into account <code>&lt;o:pathParam&gt;</code> tags nested
- * in the components. The path parameters will be rendered in the order they were declared for a view id that is defined as a multi view and if the view was not
- * defined as a multi view then they won't be rendered at all. Additionally, declaring path parameters for a non-multi view will be logged as a warning and a
- * faces warning message will be added for any stage different from <code>Production</code>.
+ * in the components. The unnamed path parameters will be rendered in the order they were declared for a view id that is defined as a multi view and if the view
+ * was not defined as a multi view then they won't be rendered at all. Additionally, declaring unnamed path parameters for a non-multi view will be logged as a
+ * warning and a faces warning message will be added for any stage different from <code>Production</code>.
  * <p>
  * In the following example the link to the multi view page will be rendered with two path parameters:
  *
@@ -53,6 +60,25 @@ import org.omnifaces.facesviews.FacesViewsViewHandler;
  * The code above will be rendered as: <code>&lt;a id="..." name="..." href="/context-path/multiview-supported-path/first/second"&gt;Link&lt;/a&gt;</code>. The
  * path parameters will be available via <code>@Inject @Param(pathIndex=0) private String first;</code> and
  * <code>@Inject @Param(pathIndex=1) private String second;</code> the usual way.
+ *
+ * <h2>Dynamic route segments</h2>
+ * <p>
+ * When the name attribute is specified, the value interpolates into the dynamic route segment of that name of the target view, as declared by a directory whose
+ * name is wrapped in square brackets. In the following example the link to <code>/organizations/[id]/members.xhtml</code> is rendered with the segment
+ * <code>id</code> substituted:
+ *
+ * <pre>
+ * &lt;h:link value="Link" outcome="/organizations/[id]/members"&gt;
+ *     &lt;o:pathParam name="id" value="123" /&gt;
+ * &lt;/h:link&gt;
+ * </pre>
+ *
+ * The code above will be rendered as: <code>&lt;a id="..." name="..." href="/context-path/organizations/123/members"&gt;Link&lt;/a&gt;</code>. The segment
+ * value will be available via <code>@Inject @Param(pathName="id") private String id;</code> the usual way.
+ * <p>
+ * Every dynamic route segment of the target view must be supplied, as a rendered URL may never contain the square brackets themselves. An unsupplied segment
+ * throws an {@link IllegalArgumentException}. The values of the current request are deliberately not inherited, so that a link means the same thing regardless
+ * of the page it is rendered on.
  *
  * @author Sergey Kuntsel
  * @param <T> The type of the value.
@@ -70,6 +96,14 @@ public class PathParam<T> extends Param<T> {
 
     /** The predefined value of the <code>name</code> attribute of this component. */
     public static final String PATH_PARAM_NAME_ATTRIBUTE_VALUE = "org.omnifaces.pathparam";
+
+    /**
+     * The prefix of the <code>name</code> attribute of this component when a name is specified, in which case the value interpolates into the dynamic route
+     * segment of that name rather than being appended positionally.
+     *
+     * @since 5.5
+     */
+    public static final String PATH_PARAM_NAME_ATTRIBUTE_PREFIX = PATH_PARAM_NAME_ATTRIBUTE_VALUE + ".";
 
     // Actions
     @Override
@@ -92,12 +126,15 @@ public class PathParam<T> extends Param<T> {
 
     @Override
     public void setName(String name) {
-        // Do nothing.
+        super.setName(name);
     }
 
     @Override
     public String getName() {
-        return PATH_PARAM_NAME_ATTRIBUTE_VALUE; // Always return a predefined name.
+        var name = super.getName();
+
+        // An unnamed path parameter is appended positionally, so all of them must collect under one and the same predefined name.
+        return isEmpty(name) || name.startsWith(PATH_PARAM_NAME_ATTRIBUTE_VALUE) ? PATH_PARAM_NAME_ATTRIBUTE_VALUE : (PATH_PARAM_NAME_ATTRIBUTE_PREFIX + name);
     }
 
 }

@@ -122,6 +122,31 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * This takes precedence over the <code>name</code> attribute.
+ * <p>
+ * The value is taken from the request path info. In a {@link org.omnifaces.facesviews.FacesViews} application that requires MultiViews to be enabled, by
+ * suffixing the <code>org.omnifaces.FACES_VIEWS_SCAN_PATHS</code> context parameter with <code>/*</code>, as the path info is otherwise empty. Outside of
+ * FacesViews it requires the <code>FacesServlet</code> to be prefix mapped.
+ *
+ * <h3>Dynamic route segments</h3>
+ * <p>
+ * A dynamic route segment can be injected by specifying the <code>pathName</code> attribute representing the name of the segment. The support was added in
+ * OmniFaces 5.5. On an example request <code>https://example.com/organizations/123/members</code>, which is mapped to
+ * <code>/organizations/[id]/members.xhtml</code>, the below example injects the segment value <code>123</code>.
+ *
+ * <pre>
+ *
+ * &#64;Inject
+ * &#64;Param(pathName = "id")
+ * private String organizationId;
+ * </pre>
+ * <p>
+ * This takes precedence over the <code>name</code> attribute. Specifying both <code>pathName</code> and <code>pathIndex</code> is a configuration error and
+ * throws an {@link IllegalArgumentException}.
+ * <p>
+ * This requires {@link org.omnifaces.facesviews.FacesViews} to be enabled and the view to live in a directory whose name is wrapped in square brackets, which
+ * is where the segment name comes from. MultiViews is not required, but composes with it: a dynamic route which is also a MultiViews view exposes its named
+ * segments through <code>pathName</code> and any trailing segments through <code>pathIndex</code> at the same time. See
+ * {@link org.omnifaces.facesviews.FacesViews} for how dynamic routes are declared.
  *
  * <h2>Conversion and validation</h2>
  * <p>
@@ -273,13 +298,25 @@ public @interface Param {
 
     /**
      * (Optional) The index of the path parameter. If specified the parameter will be extracted from the request path info on the given index instead of as
-     * request parameter. The first path parameter has an index of <code>0</code>. This takes precedence over <code>name</code> attribute.
+     * request parameter. The first path parameter has an index of <code>0</code>. This takes precedence over <code>name</code> attribute. Specifying both this
+     * and <code>pathName</code> is a configuration error.
      *
      * @return The index of the path parameter.
      * @since 2.5
      */
     @Nonbinding
     int pathIndex() default -1;
+
+    /**
+     * (Optional) The name of the dynamic route segment. If specified the parameter will be extracted from the dynamic route segment of the given name instead
+     * of as request parameter. This takes precedence over the <code>name</code> attribute. Specifying both this and <code>pathIndex</code> is a configuration
+     * error.
+     *
+     * @return The name of the dynamic route segment.
+     * @since 5.5
+     */
+    @Nonbinding
+    String pathName() default "";
 
     /**
      * (Optional) the label used to refer to the parameter.

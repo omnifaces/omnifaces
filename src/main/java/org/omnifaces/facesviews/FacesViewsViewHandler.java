@@ -13,8 +13,9 @@
 package org.omnifaces.facesviews;
 
 import static jakarta.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
+import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.WARNING;
-import static java.util.stream.Collectors.joining;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_DYNAMIC_ROUTE_PARAMS;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
@@ -26,12 +27,15 @@ import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
 import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
+import static org.omnifaces.util.FacesLocal.removeRequestAttribute;
+import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.Messages.addGlobalWarn;
 import static org.omnifaces.util.ResourcePaths.PATH_SEPARATOR;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
@@ -39,7 +43,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -55,7 +58,6 @@ import jakarta.servlet.ServletContextListener;
 
 import org.omnifaces.ApplicationProcessor;
 import org.omnifaces.component.output.PathParam;
-import org.omnifaces.util.Utils;
 
 /**
  * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to always render extensionless or if the
@@ -79,6 +81,8 @@ import org.omnifaces.util.Utils;
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
     private static final Logger logger = Logger.getLogger(FacesViewsViewHandler.class.getName());
+
+    private static final String RENDERING_BOOKMARKABLE_URL = "org.omnifaces.facesviews.rendering_bookmarkable_url";
 
     private static final String ERROR_MULTI_VIEW_NOT_CONFIGURED = "MultiViews was not configured for the view id '%s', but path parameters were defined for it.";
 
@@ -127,7 +131,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
             String[] uriAndRest = PATTERN_URI_SUFFIX.split(source, 2);
             String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndRest[0], viewId));
             var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
-            var pathInfo = context.getViewRoot() != null && context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
+            var pathInfo = isCurrentView(context, viewId) ? coalesce(getRequestPathInfo(context), "") : "";
+            uri = interpolateDynamicRouteIfNecessary(context, uri, viewId);
             return (pathInfo.isEmpty() ? uri : (stripTrailingSlash(uri) + pathInfo)) + rest;
         }
 
@@ -146,30 +151,134 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
     @Override
     public String getBookmarkableURL(FacesContext context, String viewId, Map<String, List<String>> parameters, boolean includeViewParams) {
         List<String> pathParams = parameters.get(PathParam.PATH_PARAM_NAME_ATTRIBUTE_VALUE);
+        Map<String, String> namedPathParams = getNamedPathParams(parameters);
 
-        if (isEmpty(pathParams)) {
+        if (isEmpty(pathParams) && namedPathParams.isEmpty() && !DynamicRoutes.isDynamicRoute(viewId)) {
             return super.getBookmarkableURL(context, viewId, parameters, includeViewParams);
         }
 
         Map<String, List<String>> parametersWithoutPathParams = new LinkedHashMap<>(parameters);
-        parametersWithoutPathParams.remove(PathParam.PATH_PARAM_NAME_ATTRIBUTE_VALUE);
-        String bookmarkableURL = super.getBookmarkableURL(context, viewId, parametersWithoutPathParams, includeViewParams);
+        parametersWithoutPathParams.keySet().removeIf(FacesViewsViewHandler::isPathParam);
+        String bookmarkableURL = getUninterpolatedBookmarkableURL(context, viewId, parametersWithoutPathParams, includeViewParams);
+        var multiViews = MultiViews.isEnabled(getServletContext(context), viewId);
 
-        if (MultiViews.isEnabled(getServletContext(context), viewId)) {
-            // This is a MultiViews enabled viewId, so render the path parameters as well, replacing the current ones if any.
-            String[] uriAndRest = PATTERN_URI_SUFFIX.split(bookmarkableURL, 2);
-            String uri = removePathInfoIfNecessary(context, uriAndRest[0]);
-            var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
-            var pathInfo = pathParams.stream().filter(Objects::nonNull).map(Utils::encodeURI).collect(joining(PATH_SEPARATOR, PATH_SEPARATOR, ""));
-            return stripTrailingSlash(uri) + pathInfo + rest;
-        }
-        else if (isDevelopment(context)) {
+        if (!multiViews && !isEmpty(pathParams) && isDevelopment(context)) {
             String message = String.format(ERROR_MULTI_VIEW_NOT_CONFIGURED, viewId);
             addGlobalWarn(message);
             logger.log(WARNING, message);
         }
 
-        return bookmarkableURL;
+        return buildPathParamsURL(
+            bookmarkableURL, getRequestPathInfo(context), DynamicRoutes.isDynamicRoute(viewId), namedPathParams, multiViews, pathParams
+        );
+    }
+
+    /**
+     * Assembles the bookmarkable URL from its parts: the URL as rendered by the wrapped view handler, with this request's path info removed, the dynamic route
+     * segments substituted by the named path parameters, and the unnamed path parameters appended as new path info.
+     * <p>
+     * This is deliberately free of any {@link FacesContext} lookup so that it can be unit tested on its own, as the interplay between a dynamic route and a
+     * MultiViews view is easy to get wrong and expensive to cover with integration tests alone.
+     *
+     * @param bookmarkableURL The URL as rendered by the wrapped view handler, still holding the bracketed segments.
+     * @param requestPathInfo The path info of the current request, if any.
+     * @param dynamicRoute Whether the target view is a dynamic route.
+     * @param namedPathParams The values of the named path parameters, by segment name.
+     * @param multiViews Whether the target view is a MultiViews view.
+     * @param pathParams The values of the unnamed path parameters, in declaration order.
+     * @return The assembled bookmarkable URL.
+     * @throws IllegalArgumentException When a dynamic route segment has no value.
+     */
+    static String buildPathParamsURL(
+        String bookmarkableURL, String requestPathInfo, boolean dynamicRoute, Map<String, String> namedPathParams, boolean multiViews, List<String> pathParams
+    )
+    {
+        String[] uriAndRest = PATTERN_URI_SUFFIX.split(bookmarkableURL, 2);
+        var rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
+        var uri = removePathInfo(uriAndRest[0], requestPathInfo);
+
+        if (dynamicRoute) {
+            uri = DynamicRoutes.interpolate(uri, namedPathParams);
+        }
+
+        if (multiViews) {
+            return stripTrailingSlash(uri) + getPathInfo(pathParams) + rest;
+        }
+
+        return dynamicRoute ? (stripTrailingSlash(uri) + rest) : bookmarkableURL;
+    }
+
+    /**
+     * Obtains the bookmarkable URL with the dynamic route segments still in place, so that the values of <code>&lt;o:pathParam name&gt;</code> rather than
+     * those of the current request end up in it. The wrapped view handler resolves the action URL by re-entering this view handler, which would otherwise
+     * interpolate a link to the very view it is rendered on with that view's own segment values.
+     */
+    private String getUninterpolatedBookmarkableURL(FacesContext context, String viewId, Map<String, List<String>> parameters, boolean includeViewParams) {
+        if (!DynamicRoutes.isDynamicRoute(viewId)) {
+            return super.getBookmarkableURL(context, viewId, parameters, includeViewParams);
+        }
+
+        setRequestAttribute(context, RENDERING_BOOKMARKABLE_URL, TRUE);
+
+        try {
+            return super.getBookmarkableURL(context, viewId, parameters, includeViewParams);
+        }
+        finally {
+            removeRequestAttribute(context, RENDERING_BOOKMARKABLE_URL);
+        }
+    }
+
+    /**
+     * Replaces the bracketed segments of a dynamic route by the values resolved for the current request, so that the rendered URL is the one the request
+     * actually came in on. Only the current view can be interpolated this way; a link to another dynamic route must name its segments explicitly with
+     * <code>&lt;o:pathParam&gt;</code>.
+     */
+    private static String interpolateDynamicRouteIfNecessary(FacesContext context, String uri, String viewId) {
+        if (!DynamicRoutes.isDynamicRoute(viewId) || TRUE.equals(getRequestAttribute(context, RENDERING_BOOKMARKABLE_URL))) {
+            return uri; // Another view's segments are supplied by <o:pathParam name>, which getBookmarkableURL() substitutes afterwards.
+        }
+
+        // Only the current view can be interpolated from the request; for any other view this is a redirect, which has no way to supply the segments and must
+        // therefore fail rather than emit a URL containing square brackets.
+        Map<String, String> params = isCurrentView(context, viewId) ? getRequestAttribute(context, FACES_VIEWS_DYNAMIC_ROUTE_PARAMS) : null;
+        return DynamicRoutes.interpolate(uri, params);
+    }
+
+    private static boolean isCurrentView(FacesContext context, String viewId) {
+        return context.getViewRoot() != null && context.getViewRoot().getViewId().equals(viewId);
+    }
+
+    /**
+     * Renders the unnamed path parameters as positional path info. This runs once per outcome target component, hence the plain loop.
+     */
+    private static String getPathInfo(List<String> pathParams) {
+        var pathInfo = new StringBuilder();
+
+        if (!isEmpty(pathParams)) {
+            for (var pathParam : pathParams) {
+                if (pathParam != null) {
+                    pathInfo.append(PATH_SEPARATOR).append(encodeURI(pathParam));
+                }
+            }
+        }
+
+        return pathInfo.toString();
+    }
+
+    private static boolean isPathParam(String name) {
+        return PathParam.PATH_PARAM_NAME_ATTRIBUTE_VALUE.equals(name) || name.startsWith(PathParam.PATH_PARAM_NAME_ATTRIBUTE_PREFIX);
+    }
+
+    private static Map<String, String> getNamedPathParams(Map<String, List<String>> parameters) {
+        Map<String, String> namedPathParams = new LinkedHashMap<>();
+
+        for (var entry : parameters.entrySet()) {
+            if (entry.getKey().startsWith(PathParam.PATH_PARAM_NAME_ATTRIBUTE_PREFIX) && !isEmpty(entry.getValue())) {
+                namedPathParams.put(entry.getKey().substring(PathParam.PATH_PARAM_NAME_ATTRIBUTE_PREFIX.length()), entry.getValue().get(0));
+            }
+        }
+
+        return namedPathParams;
     }
 
     private static boolean isOriginalViewExtensionless(FacesContext context) {
@@ -206,14 +315,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
         return uri;
     }
 
-    private static String removePathInfoIfNecessary(FacesContext context, String uri) {
-        String pathInfo = getRequestPathInfo(context);
-
-        if (pathInfo != null && uri.endsWith(pathInfo)) {
-            return uri.substring(0, uri.length() - pathInfo.length());
-        }
-
-        return uri;
+    private static String removePathInfo(String uri, String pathInfo) {
+        return (pathInfo != null && uri.endsWith(pathInfo)) ? uri.substring(0, uri.length() - pathInfo.length()) : uri;
     }
 
 }

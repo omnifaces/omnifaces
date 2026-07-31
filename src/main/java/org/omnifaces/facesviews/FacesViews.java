@@ -129,6 +129,40 @@ import org.omnifaces.util.Servlets;
  * private String baz;
  * </pre>
  *
+ * <h3>Dynamic routes configuration</h3>
+ * <p>
+ * A directory whose name is wrapped in square brackets is a dynamic route segment. It matches exactly one path segment and exposes it under the bracketed name.
+ * The support was added in OmniFaces 5.5 and needs no configuration beyond the scan path above. Given the following file:
+ *
+ * <pre>
+ * /organizations/[id]/members.xhtml
+ * </pre>
+ * <p>
+ * a request of <code>https://example.com/context/organizations/123/members</code> will forward to it and make the value <code>123</code> available as an
+ * injectable path parameter via <code>&#64;</code>{@link Param} in the managed bean associated with <code>/members.xhtml</code>.
+ *
+ * <pre>
+ *
+ * &#64;Inject
+ * &#64;Param(pathName = "id")
+ * private String id;
+ * </pre>
+ * <p>
+ * A dynamic route directory needs no welcome file, but when it has one, as in <code>/organizations/[id]/index.xhtml</code> with an extensionless
+ * <code>&lt;welcome-file&gt;index&lt;/welcome-file&gt;</code>, then the bare <code>/organizations/123</code> resolves to it as well. Dynamic route segments
+ * nest and compose with MultiViews, so <code>/[locale]/products/[sku]/reviews.xhtml</code> answers to <code>/nl/products/12345/reviews/2</code> with
+ * <code>nl</code> and <code>12345</code> available by name and <code>2</code> available as <code>&#64;Param(pathIndex = 0)</code>.
+ * <p>
+ * A request path is resolved by first looking for an exact match among the scanned views, then walking the dynamic route segments, and only then falling back
+ * to MultiViews. A literal directory is always preferred over a dynamic one at the same level, which means a literal sibling is a value the dynamic segment can
+ * never take: given <code>/organizations/[id]/members.xhtml</code> next to <code>/organizations/settings/members.xhtml</code>, an organization whose id is
+ * <code>settings</code> is unreachable. An application without any bracketed directory never reaches the dynamic route resolution at all and therefore behaves
+ * exactly as before.
+ * <p>
+ * Note that only a <em>directory</em> name is interpreted this way. A bracketed <em>file</em> name such as <code>[id].xhtml</code> is scanned literally and
+ * logged as a warning, as square brackets are gen-delims per RFC 3986 which containers may refuse in a URL outright. Links to a dynamic route are rendered with
+ * every segment substituted, which is why <code>&lt;o:pathParam name&gt;</code> must supply them, see {@link PathParam}.
+ *
  * <h3>Advanced configuration</h3>
  * <p>
  * See <a href="package-summary.html">package documentation</a> for configuration settings as to mapping, filtering and forwarding behavior.
@@ -225,6 +259,14 @@ public final class FacesViews {
      */
     public static final String FACES_VIEWS_ORIGINAL_PATH_INFO = "org.omnifaces.facesviews.original.path_info";
 
+    /**
+     * The name of the request attribute under which the resolved dynamic route segment values are stored, as an unmodifiable map of segment name to segment
+     * value. It is only present on a request which resolved to a dynamic route.
+     *
+     * @since 5.5
+     */
+    public static final String FACES_VIEWS_DYNAMIC_ROUTE_PARAMS = "org.omnifaces.facesviews.dynamic_route_params";
+
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final String[] RESTRICTED_DIRECTORIES = { "/WEB-INF/", "/META-INF/", "/resources/" };
@@ -288,7 +330,14 @@ public final class FacesViews {
         else {
             // Map the forwarding filter to all the resources we found.
             for (var mapping : collectedViews.keySet()) {
-                filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, mapping);
+                if (!DynamicRoutes.isDynamicRoute(mapping)) {
+                    filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, mapping);
+                }
+            }
+
+            // A dynamic route is not registrable as a URL pattern, so map the filter on the nearest static ancestor of each one instead.
+            for (var prefix : DynamicRoutes.get(servletContext).getFilterPrefixes()) {
+                filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, prefix);
             }
 
             // Additionally map the filter to all paths that were scanned and which are also directly accessible.
@@ -319,6 +368,7 @@ public final class FacesViews {
         Set<String> mappings = new HashSet<>(encounteredExtensions);
         mappings.addAll(getMappedWelcomeFiles(servletContext));
         mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
+        mappings.removeIf(DynamicRoutes::isDynamicRoute);
 
         ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
 
@@ -358,6 +408,7 @@ public final class FacesViews {
         Map<String, String> collectedViews = new HashMap<>();
         Set<String> collectedExtensions = new HashSet<>();
         Set<String> excludedPaths = new HashSet<>();
+        var dynamicRoutes = new DynamicRoutes();
 
         for (String[] rootPathAndExtension : getRootPathsAndExtensions(servletContext)) {
             String rootPath = rootPathAndExtension[0];
@@ -367,7 +418,9 @@ public final class FacesViews {
             }
             else {
                 String extension = rootPathAndExtension[1];
-                scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extension, collectedExtensions);
+                scanViews(
+                    servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extension, collectedExtensions, dynamicRoutes
+                );
             }
         }
 
@@ -400,6 +453,7 @@ public final class FacesViews {
                 )
             );
             MultiViews.storeResources(servletContext, collectedViews);
+            dynamicRoutes.store(servletContext);
             servletContext.setAttribute(EXCLUDED_PATHS, unmodifiableSet(excludedPaths));
 
             if (collectExtensions) {
@@ -511,7 +565,7 @@ public final class FacesViews {
      */
     private static void scanViews(
         ServletContext servletContext, String rootPath, Set<String> resourcePaths,
-        Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions
+        Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions, DynamicRoutes dynamicRoutes
     )
     {
         if (isEmpty(resourcePaths)) {
@@ -527,19 +581,19 @@ public final class FacesViews {
                 if (canScanDirectory(rootPath, normalizedResourcePath)) {
                     scanViews(
                         servletContext, rootPath, servletContext.getResourcePaths(normalizedResourcePath), collectedViews, extensionToScan,
-                        collectedExtensions
+                        collectedExtensions, dynamicRoutes
                     );
                 }
             }
             else if (canScanResource(normalizedResourcePath, extensionToScan)) {
-                scanView(servletContext, rootPath, normalizedResourcePath, collectedViews, collectedExtensions, hasMultiViewsWelcomeFile);
+                scanView(servletContext, rootPath, normalizedResourcePath, collectedViews, collectedExtensions, hasMultiViewsWelcomeFile, dynamicRoutes);
             }
         }
     }
 
     private static void scanView(
         ServletContext servletContext, String rootPath, String resourcePath,
-        Map<String, String> collectedViews, Set<String> collectedExtensions, boolean hasMultiViewsWelcomeFile
+        Map<String, String> collectedViews, Set<String> collectedExtensions, boolean hasMultiViewsWelcomeFile, DynamicRoutes dynamicRoutes
     )
     {
         // Strip the root path from the current path.
@@ -551,7 +605,12 @@ public final class FacesViews {
         String extensionlessResource = stripExtension(resource);
         String extensionlessResourcePath = stripExtension(resourcePath);
 
-        if (MultiViews.isResource(servletContext, extensionlessResourcePath)) {
+        boolean multiViews = MultiViews.isResource(servletContext, extensionlessResourcePath);
+
+        if (DynamicRoutes.isDynamicRoute(extensionlessResource)) {
+            dynamicRoutes.add(extensionlessResource, resourcePath, multiViews, isWelcomeFile(servletContext, extensionlessResource));
+        }
+        else if (multiViews) {
             collectedViews.put(extensionlessResource + MultiViews.SUFFIX, resourcePath);
         }
         else {
@@ -570,10 +629,16 @@ public final class FacesViews {
             }
         }
 
+        DynamicRoutes.warnIfBracketedFileName(extensionlessResource);
+
         // Optionally, collect all unique extensions that we have encountered.
         if (collectedExtensions != null) {
             collectedExtensions.add("*" + getExtension(resourcePath));
         }
+    }
+
+    private static boolean isWelcomeFile(ServletContext servletContext, String extensionlessResource) {
+        return getMappedWelcomeFiles(servletContext).stream().anyMatch(extensionlessResource::endsWith);
     }
 
     private static String normalizeRootPath(String rootPath) {
