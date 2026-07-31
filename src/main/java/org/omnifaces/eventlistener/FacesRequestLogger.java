@@ -291,8 +291,8 @@ public class FacesRequestLogger extends DefaultPhaseListener {
         public String getDuration(PhaseId phase) {
             int startPhase = phase == ANY_PHASE ? RESTORE_VIEW.getOrdinal() : phase.getOrdinal();
             int endPhase = phase == ANY_PHASE ? Collections.max(endTimes.keySet()) : phase.getOrdinal();
-			var startTime = startTimes.get(startPhase);
-			var endTime = endTimes.get(endPhase);
+            var startTime = startTimes.get(startPhase);
+            var endTime = endTimes.get(endPhase);
             return (startTime != null && endTime != null ? (endTime - startTime) / 1_000_000 : -1) + "ms";
         }
 
