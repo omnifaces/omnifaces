@@ -15,7 +15,7 @@ package org.omnifaces.facesviews;
 /**
  * The action that is done when a request for a public path from which faces views where scanned is done.
  * <p>
- * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ * For a guide on FacesViews, please see {@link FacesViews}.
  *
  * @author Arjan Tijms
  * @since 1.4

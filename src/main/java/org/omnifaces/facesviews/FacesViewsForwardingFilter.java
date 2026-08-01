@@ -54,7 +54,7 @@ import org.omnifaces.filter.HttpFilter;
  * A filter like this is needed for extensionless requests, since the FacesServlet does not take into account any other mapping than prefix- and extension
  * (suffix) mapping.
  * <p>
- * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ * For a guide on FacesViews, please see {@link FacesViews}.
  *
  * @author Arjan Tijms
  * @see FacesViews

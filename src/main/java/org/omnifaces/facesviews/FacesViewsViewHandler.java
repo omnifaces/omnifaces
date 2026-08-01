@@ -71,7 +71,7 @@ import org.omnifaces.component.output.PathParam;
  * {@link Filter#init(jakarta.servlet.FilterConfig)} method only works when all init methods are called during startup, OR when the filter filters every
  * request.
  * <p>
- * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ * For a guide on FacesViews, please see {@link FacesViews}.
  *
  * @author Arjan Tijms
  * @since 1.3

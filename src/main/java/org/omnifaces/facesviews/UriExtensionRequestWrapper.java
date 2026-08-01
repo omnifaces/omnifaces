@@ -26,7 +26,7 @@ import jakarta.servlet.http.MappingMatch;
  * This is needed since Faces implementations inspect the request to determine if a prefix (path) or suffix (extension) mapping was used. If the request is
  * neither (in effect, an "exact and extensionless mapping), Faces will get confused and not be able to derive view IDs etc correctly.
  * <p>
- * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ * For a guide on FacesViews, please see {@link FacesViews}.
  *
  * @author Arjan Tijms
  * @since 1.4

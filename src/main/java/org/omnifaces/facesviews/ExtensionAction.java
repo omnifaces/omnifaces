@@ -17,7 +17,7 @@ package org.omnifaces.facesviews;
  * <p>
  * Note that this is only used for views that were discovered via Faces Views. It has no affect on other resources, even if they have the same extension.
  * <p>
- * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ * For a guide on FacesViews, please see {@link FacesViews}.
  *
  * @author Arjan Tijms
  * @since 1.4
