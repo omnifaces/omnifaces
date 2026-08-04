@@ -20,7 +20,7 @@ export default tseslint.config(
             "@stylistic/quotes": ["error", "double", { avoidEscape: true }],
             "@stylistic/comma-spacing": ["error", { before: false, after: true }],
             "@stylistic/space-before-blocks": ["error", "always"],
-            "@stylistic/space-before-function-paren": ["error", "never"],
+            "@stylistic/space-before-function-paren": ["error", { anonymous: "never", named: "never", asyncArrow: "never", catch: "always" }],
             "@stylistic/keyword-spacing": ["error", { before: true, after: true }],
             "@stylistic/space-infix-ops": "error",
             "@stylistic/arrow-spacing": ["error", { before: true, after: true }],
