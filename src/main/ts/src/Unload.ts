@@ -59,6 +59,11 @@ export namespace Unload {
 
                 try {
                     const form = Util.getFacesForm();
+
+                    if (!form) {
+                        return;
+                    }
+
                     const url = form.action;
                     const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
                     const contentType = "application/x-www-form-urlencoded";

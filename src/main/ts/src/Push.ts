@@ -57,8 +57,8 @@ export namespace Push {
         readonly onclose: Function;
         readonly behaviors: Record<string, Function[]>;
 
-        socket: WebSocket;
-        reconnectAttempts: number;
+        socket: WebSocket | null = null;
+        reconnectAttempts: number | null = null;
 
         // Constructor ------------------------------------------------------------------------------------------------
 
@@ -163,7 +163,7 @@ export namespace Push {
         readonly onclose: Function;
         readonly behaviors: Record<string, Function[]>;
 
-        eventSource: EventSource;
+        eventSource: EventSource | null = null;
 
         // Constructor ------------------------------------------------------------------------------------------------
 

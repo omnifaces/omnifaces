@@ -10,7 +10,8 @@
   "scripts": {
     "build": "esbuild src/OmniFaces.ts --bundle --format=iife --global-name=OmniFaces --target=es2020 --minify --outfile=../../../target/classes/META-INF/resources/omnifaces/omnifaces.js && esbuild ../resources/META-INF/resources/omnifaces/sw.unminified.js --minify --target=es2020 --outfile=../../../target/classes/META-INF/resources/omnifaces/sw.js",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^4.2.0",

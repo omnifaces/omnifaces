@@ -38,7 +38,8 @@ export { ScriptErrorHandler } from "./ScriptErrorHandler";
 export { Notification } from "./Notification";
 
 /**
- * Declare optional global vars for the OmniFaces namespace which is needed by some modules; tsc needs this info.
+ * Declare optional global vars and custom events for the OmniFaces namespace which is needed by some modules;
+ * tsc needs this info.
  */
 declare global {
     interface Window {
@@ -47,5 +48,10 @@ declare global {
         myfaces: any,
         PrimeFaces: any,
         jQuery: any
+    }
+
+    interface WindowEventMap {
+        "omnifaces.notificationclick": CustomEvent,
+        "omnifaces.notificationclose": CustomEvent
     }
 }

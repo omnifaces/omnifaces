@@ -80,7 +80,7 @@ export namespace ScriptErrorHandler {
                 return;
             }
 
-            const key = params.errorMessage + params.sourceURL + params.lineNumber;
+            const key = `${params.errorMessage}${params.sourceURL}${params.lineNumber}`;
             const now = Date.now();
 
             while (recentErrors.length > 0 && now - recentErrors[0].time > config.errorExpiry) {

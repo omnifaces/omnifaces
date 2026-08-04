@@ -353,6 +353,15 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>npm run typecheck</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run typecheck</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>npm run build</id>
                         <goals>
                             <goal>npm</goal>

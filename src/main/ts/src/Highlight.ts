@@ -90,9 +90,9 @@ export namespace Highlight {
     /**
      * Returns an element by ID or name.
      * @param Client ID.
-     * @return HTML element identified by given client ID.
+     * @return HTML element identified by given client ID, if any.
      */
-    function getElementByIdOrName(clientId: string): HTMLElement {
+    function getElementByIdOrName(clientId: string): HTMLElement | null {
         let element = document.getElementById(clientId);
 
         if (!element) {
@@ -109,7 +109,7 @@ export namespace Highlight {
     /**
      * Remove the highlight. Remove the error style class from involved input element and its associated label.
      */
-    function removeHighlight() {
+    function removeHighlight(this: HTMLElement) {
         const input = this;
         Util.removeEventListener(input, "click input", removeHighlight);
         const styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
@@ -117,11 +117,10 @@ export namespace Highlight {
         if (styleClass) {
             input.removeAttribute(DATA_HIGHLIGHT_CLASS);
             input.classList.remove(styleClass);
-            let label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
 
-            if (label) {
+            if (input.getAttribute(DATA_HIGHLIGHT_LABEL)) {
                 input.removeAttribute(DATA_HIGHLIGHT_LABEL);
-                label = labelsByFor[input.id];
+                const label = labelsByFor[input.id];
                 label.classList.remove(styleClass);
             }
         }

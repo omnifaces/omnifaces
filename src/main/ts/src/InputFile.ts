@@ -37,18 +37,21 @@ export namespace InputFile {
             return true; // File API not supported (IE6-9). End of story. Let standard Faces code continue.
         }
 
-        document.getElementById(messageClientId).innerHTML = ""; // Clear out any previously rendered message.
+        document.getElementById(messageClientId)!.innerHTML = ""; // Clear out any previously rendered message.
 
-        for (var i = 0; i < inputFile.files.length; i++) {
-            const file = inputFile.files[i];
+        const files = inputFile.files!;
+        const form = inputFile.form!;
+
+        for (var i = 0; i < files.length; i++) {
+            const file = files[i];
 
             if (file.size > maxsize) {
                 const fileName = file.name;
-                let originalEnctype: string;
+                let originalEnctype: string | undefined;
 
                 if (window.mojarra) { // Mojarra doesn't add custom params when using iframe transport.
-                    originalEnctype = inputFile.form.enctype;
-                    inputFile.form.enctype = "application/x-www-form-urlencoded";
+                    originalEnctype = form.enctype;
+                    form.enctype = "application/x-www-form-urlencoded";
                 }
 
                 // Clear out selected files. Note: inputFile.value = null doesn't work in IE.
@@ -60,7 +63,7 @@ export namespace InputFile {
                 window.faces.ajax.request(inputFile.id, event, params);
 
                 if (originalEnctype) {
-                    inputFile.form.enctype = originalEnctype;
+                    form.enctype = originalEnctype;
                 }
 
                 return false;
