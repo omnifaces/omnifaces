@@ -15,6 +15,10 @@
 # Maven is deliberately absent: the pom pins the Faces/Quarkus/Tomcat/Weld test matrix via test.*.version
 # properties, which Dependabot would keep bumping away from the versions the CI matrix is meant to test.
 
+# The groups cover minor and patch only, so that a major arrives as a PR of its own and can be judged and
+# merged on its own. A group which also swallows majors yields one PR in which a breaking bump holds the
+# routine bumps hostage, and nothing in it can be merged separately.
+
 version: 2
 
 updates:
@@ -28,6 +32,7 @@ updates:
     groups:
       npm:
         patterns: [ "*" ]
+        update-types: [ minor, patch ]
 
   - package-ecosystem: github-actions
     directory: /
@@ -36,3 +41,4 @@ updates:
     groups:
       github-actions:
         patterns: [ "*" ]
+        update-types: [ minor, patch ]
