@@ -70,7 +70,7 @@
         <test.wildfly-mojarra.version>40.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.liberty-myfaces.version>26.0.0.6</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
         <test.glassfish-mojarra.version>8.0.3</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
-        <test.tomee-myfaces.version>10.1.5</test.tomee-myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
+        <test.tomee-myfaces.version>10.2.0</test.tomee-myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
         <test.tomcat.version>11.0.24</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
         <test.payara-mojarra.version>7.2026.6</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
         <test.quarkus.version>3.37.2</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
