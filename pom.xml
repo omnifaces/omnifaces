@@ -396,7 +396,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <nodeVersion>v22.22.0</nodeVersion>
+                    <nodeVersion>v24.19.0</nodeVersion>
                     <installDirectory>target</installDirectory>
                     <workingDirectory>${project.basedir}/src/main/ts</workingDirectory>
                 </configuration>
