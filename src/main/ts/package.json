@@ -13,9 +13,9 @@
     "lint:fix": "eslint --fix ."
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^4.2.0",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "esbuild": "^0.28.1",
-    "typescript": "^5.8.0",
-    "typescript-eslint": "^8.57.2"
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.65.0"
   }
 }
