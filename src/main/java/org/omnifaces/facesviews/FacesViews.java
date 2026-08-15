@@ -24,8 +24,8 @@ import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS
 import static org.omnifaces.facesviews.PathAction.SEND_404;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
-import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;

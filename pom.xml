@@ -271,6 +271,7 @@
                                     <excludes>
                                        <exclude>*.*</exclude> <!-- excludes files in root folder -->
                                        <exclude>**/.*</exclude> <!-- excludes dotfiles -->
+                                       <exclude>**/*.txt</exclude> <!-- excludes txt files -->
                                        <exclude>**/*.mjs</exclude> <!-- excludes eslint config file -->
                                     </excludes>
                                 </licenseSet>
@@ -297,6 +298,10 @@
                                 <eclipse>
                                     <file>${project.basedir}/src/main/eclipse-formatter.xml</file>
                                 </eclipse>
+                                <importOrder>
+                                    <file>${project.basedir}/src/main/eclipse-importorder.txt</file>
+                                </importOrder>
+                                <removeUnusedImports />
                                 <trimTrailingWhitespace />
                             </java>
                             <formats>
