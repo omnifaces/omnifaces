@@ -16,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSessionAndExtensionlessMapping;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +30,12 @@ import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+/**
+ * The unload is fired during <code>pagehide</code>, which takes place after the browser has already issued the request of the page being navigated to. Whether
+ * the unload request is processed before or after that request depends on whether the container serializes concurrent requests on the same session. The request
+ * during which an <code>unload</code> or <code>destroy</code> message is observed is therefore not fixed. The assertions on an individual response are hence
+ * limited to the event of the request itself, which is always the last one, and the unloads and destroys are asserted as totals at the end of the test.
+ */
 @TestMethodOrder(OrderAnnotation.class)
 public class ViewScopedExtensionlessIT extends OmniFacesIT {
 
@@ -56,6 +66,8 @@ public class ViewScopedExtensionlessIT extends OmniFacesIT {
     @FindBy(id = "form:conditionallyRenderViewScopedIT")
     private WebElement conditionallyRenderViewScopedIT;
 
+    private final List<String> observedMessages = new ArrayList<>();
+
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return buildWebArchive(ViewScopedExtensionlessIT.class)
@@ -68,6 +80,7 @@ public class ViewScopedExtensionlessIT extends OmniFacesIT {
         // Make sure browser is crisp clean before starting each test.
         teardown();
         setup();
+        observedMessages.clear(); // Arquillian reuses the test instance across test methods.
     }
 
     @Override
@@ -78,108 +91,122 @@ public class ViewScopedExtensionlessIT extends OmniFacesIT {
     @Test
     void nonAjax() {
         init();
-        assertEquals("init", getMessagesText());
+        observeMessages("init");
         var previousBean = bean.getText();
 
         // Unload.
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Submit then unload.
         guardHttp(nonAjaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Navigate then unload.
         guardHttp(nonAjaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Submit then navigate then unload.
         guardHttp(nonAjaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(nonAjaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Navigate then submit then unload.
         guardHttp(nonAjaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardHttp(nonAjaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
+
+        // Submit once more so that the unload of the last unload is observed as well.
+        guardHttp(nonAjaxSubmit::click);
+        assertEquals(previousBean, previousBean = bean.getText());
+        observeMessages("submit");
+
+        assertObservedEvents(9, 4, 3, 5, 3);
     }
 
     @Test
     void ajax() {
         init();
-        assertEquals("init", getMessagesText());
+        observeMessages("init");
         var previousBean = bean.getText();
 
         // Submit then unload.
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Navigate then unload.
         guardAjax(ajaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Submit then navigate then unload.
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardAjax(ajaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
 
         // Navigate then submit then unload.
         guardAjax(ajaxNavigate::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("navigate destroy init", getMessagesText());
+        observeMessages("init");
 
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
+
+        // Submit once more so that the unload of the last unload is observed as well.
+        guardAjax(ajaxSubmit::click);
+        assertEquals(previousBean, previousBean = bean.getText());
+        observeMessages("submit");
+
+        assertObservedEvents(8, 4, 3, 4, 3);
     }
 
     @Test
@@ -190,16 +217,23 @@ public class ViewScopedExtensionlessIT extends OmniFacesIT {
         // Trigger view scoped creation during conditional render.
         guardAjax(conditionallyRenderViewScopedIT::click);
         var previousBean = bean.getText();
-        assertEquals("init", getMessagesText());
+        observeMessages("init");
 
         // Submit then unload.
         guardAjax(ajaxSubmit::click);
         assertEquals(previousBean, previousBean = bean.getText());
-        assertEquals("submit", getMessagesText());
+        observeMessages("submit");
 
         guardHttp(unload::click);
         assertNotEquals(previousBean, previousBean = bean.getText());
-        assertEquals("unload init", getMessagesText());
+        observeMessages("init");
+
+        // Submit once more so that the unload of the unload is observed as well.
+        guardAjax(ajaxSubmit::click);
+        assertEquals(previousBean, previousBean = bean.getText());
+        observeMessages("submit");
+
+        assertObservedEvents(2, 2, 0, 1, 0);
     }
 
     @Test
@@ -244,6 +278,25 @@ public class ViewScopedExtensionlessIT extends OmniFacesIT {
 
     private String getMessagesText() {
         return messages.getText().replaceAll("\\s+", " ");
+    }
+
+    private void observeMessages(String expectedLastEvent) {
+        var messagesText = getMessagesText();
+        observedMessages.add(messagesText);
+        var events = messagesText.split(" ");
+        assertEquals(expectedLastEvent, events[events.length - 1]);
+    }
+
+    private void assertObservedEvents(int init, int submit, int navigate, int unload, int destroy) {
+        assertEquals(init, countObservedEvents("init"), "init");
+        assertEquals(submit, countObservedEvents("submit"), "submit");
+        assertEquals(navigate, countObservedEvents("navigate"), "navigate");
+        assertEquals(unload, countObservedEvents("unload"), "unload");
+        assertEquals(destroy, countObservedEvents("destroy"), "destroy");
+    }
+
+    private long countObservedEvents(String event) {
+        return observedMessages.stream().flatMap(messagesText -> Stream.of(messagesText.split(" "))).filter(event::equals).count();
     }
 
 }

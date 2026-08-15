@@ -16,7 +16,7 @@ import { VIEW_STATE_PARAM } from "./OmniFaces";
 import { Util } from "./Util";
 
 /**
- * Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a
+ * Fire "unload" event to server side via beacon or synchronous XHR when the window is being unloaded as result of a
  * non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes page,
  * or navigates away, or closes browser.
  *
@@ -35,8 +35,8 @@ export namespace Unload {
 
     /**
      * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-     * current document has a Faces form with a view state element. If so, then register the <code>unload</code> event to
-     * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the Faces view state value as
+     * current document has a Faces form with a view state element. If so, then register the <code>pagehide</code> event
+     * to send a beacon or synchronous XHR request with the OmniFaces view scope ID and the Faces view state value as
      * parameters. Also register the all Faces <code>submit</code> events to disable the unload event listener.
      * @param viewScopeId The OmniFaces view scope ID.
      */
@@ -50,8 +50,7 @@ export namespace Unload {
                 return;
             }
 
-            const unloadEvent = ("onbeforeunload" in window && !window.onbeforeunload) ? "beforeunload" : ("onpagehide" in window) ? "pagehide" : "unload";
-            Util.addEventListener(window, unloadEvent, function() {
+            Util.addEventListener(window, "pagehide", function() {
                 if (disabled) {
                     reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
                     return;

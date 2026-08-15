@@ -76,11 +76,11 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         uninstallMockBeacon();
     });
 
-    test("sends beacon with correct query on beforeunload event", () => {
+    test("sends beacon with correct query on pagehide event", () => {
         form = createFacesForm("f1", "/test/action");
         unload().init("viewScope42");
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         expect(getBeaconCalls().length).toBe(1);
         const call = getBeaconCalls()[0];
@@ -95,7 +95,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         form = createFacesForm("f2", "/test/action");
         unload().init("vs123");
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         const blob = getBeaconCalls()[0].data as Blob;
         const text = await new Promise<string>(resolve => { const r = new FileReader(); r.onload = () => resolve(r.result as string); r.readAsText(blob); });
@@ -104,12 +104,41 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         expect(text).toContain("jakarta.faces.ViewState=");
     });
 
+    test("sends beacon on pagehide event when page is eligible for back/forward cache", () => {
+        form = createFacesForm("fPersisted", "/test/action");
+        unload().init("vsPersisted");
+
+        window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
+
+        expect(getBeaconCalls().length).toBe(1);
+    });
+
+    test("does not send beacon on beforeunload event", () => {
+        form = createFacesForm("fBeforeUnload", "/test/action");
+        unload().init("vsBeforeUnload");
+
+        window.dispatchEvent(new Event("beforeunload"));
+
+        expect(getBeaconCalls().length).toBe(0);
+    });
+
+    test("does not touch window.onbeforeunload property", () => {
+        const handler = function() {};
+        window.onbeforeunload = handler;
+        form = createFacesForm("fProperty", "/test/action");
+        unload().init("vsProperty");
+
+        expect(window.onbeforeunload).toBe(handler);
+
+        window.onbeforeunload = null;
+    });
+
     test("does not send beacon when disabled", () => {
         form = createFacesForm("f3", "/test/action");
         unload().init("vsDisabled");
         unload().disable();
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         expect(getBeaconCalls().length).toBe(0);
     });
@@ -119,9 +148,9 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         unload().init("vsReenable");
         unload().disable();
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
         // Should have called reenable() internally, so next unload should fire
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         expect(getBeaconCalls().length).toBe(1);
     });
@@ -131,7 +160,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         unload().init("firstId");
         unload().init("secondId");
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         expect(getBeaconCalls().length).toBe(1);
         const blob = getBeaconCalls()[0].data as Blob;
@@ -161,7 +190,7 @@ describe("OmniFaces.Unload: XHR fallback on unload", () => {
         form = createFacesForm("fXhr", "/test/xhr-action");
         unload().init("vsXhr");
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(new Event("pagehide"));
 
         const xhr = lastXHR();
         expect(xhr).toBeDefined();

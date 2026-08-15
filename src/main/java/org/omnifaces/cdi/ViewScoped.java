@@ -145,16 +145,17 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * This setting has no effect when <code>saveInViewState</code> attribute is set to <code>true</code>.
  *
- * <h2>Using window.onbeforeunload</h2>
+ * <h2>Using beforeunload</h2>
  * <p>
- * If you have a custom <code>onbeforeunload</code> handler, then it's strongly recommended to use plain vanilla JS
- * <code>window.onbeforeunload = function</code> instead of e.g. jQuery <code>$(window).on("beforeunload", function)</code> or DOM
- * <code>window.addEventListener("beforeunload", function)</code> for this. This way the <code>@ViewScoped</code> unload can detect it and take it into account
- * and continue to work properly. Otherwise the view scoped bean will still be destroyed in background even when the user cancels and decides to stay in the
- * same page.
+ * A custom <code>beforeunload</code> handler can be registered in whatever way you like. The unload is hooked on the <code>pagehide</code> event, which is
+ * fired only once the navigation is actually committed, so an enduser who cancels your confirmation and stays in the same page keeps the view scoped bean.
  * <p>
- * Below is a kickoff example how to properly register it, assuming jQuery is available, and that "stateless" forms and inputs (for which you don't want to
- * trigger the unsaved data warning) have the class <code>stateless</code> set:
+ * Do note that the browser fires <code>pagehide</code> only after it has issued the request of the page being navigated to. The <code>&#64;PreDestroy</code> of
+ * the unloaded bean is therefore not guaranteed to be invoked before that request is processed.
+ * <p>
+ * The recommended way is <code>window.addEventListener("beforeunload", listener)</code> whereby the listener invokes <code>event.preventDefault()</code> in
+ * order to trigger the confirmation. Below is a kickoff example of an unsaved data warning, assuming jQuery is available, and that "stateless" forms and inputs
+ * (for which you don't want to trigger the warning) have the class <code>stateless</code> set:
  *
  * <pre>
  * $(document).on("change", "form:not(.stateless) :input:not(.stateless)", function() {
@@ -163,10 +164,18 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * OmniFaces.Util.addSubmitListener(function() { // This hooks on Mojarra/MyFaces/PrimeFaces ajax submit events too.
  *     $("body").data("unsavedchanges", false);
  * });
- * window.onbeforeunload = function() {
- *     return $("body").data("unsavedchanges") ? "You have unsaved data. Are you sure you wish to leave this page?" : null;
- * };
+ * window.addEventListener("beforeunload", function(event) {
+ *     if ($("body").data("unsavedchanges")) {
+ *         event.preventDefault();
+ *     }
+ * });
  * </pre>
+ * <p>
+ * Note that browsers ignore any message returned by the handler or assigned to <code>event.returnValue</code> and always show their own generic confirmation.
+ * <p>
+ * Since OmniFaces 5.5, assigning the handler to the <code>window.onbeforeunload</code> property, which was previously required in order to let the unload take
+ * it into account, is not necessary anymore. It keeps working, it just doesn't get any special treatment anymore. As that property holds only a single handler
+ * and thus clobbers any other one, <code>window.addEventListener()</code> as shown above is preferred.
  *
  * <h2>Using download links</h2>
  * <p>
