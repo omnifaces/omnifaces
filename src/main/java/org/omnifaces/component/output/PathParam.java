@@ -125,11 +125,6 @@ public class PathParam<T> extends Param<T> {
     }
 
     @Override
-    public void setName(String name) {
-        super.setName(name);
-    }
-
-    @Override
     public String getName() {
         var name = super.getName();
 

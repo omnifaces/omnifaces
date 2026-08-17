@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.facesviews.FacesViews.getExcludedPaths;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getMappedWelcomeFiles;
+import static org.omnifaces.util.ResourcePaths.PATH_SEPARATOR;
 import static org.omnifaces.util.ResourcePaths.getParent;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
@@ -96,7 +97,7 @@ final class MultiViews {
 
     static boolean isResource(ServletContext servletContext, String resource) {
         if (isEnabled(servletContext)) {
-            var path = resource + "/";
+            var path = resource + PATH_SEPARATOR;
 
             for (var multiViewsPath : getPaths(servletContext)) {
                 if (path.startsWith(multiViewsPath)) {
@@ -144,7 +145,7 @@ final class MultiViews {
         Set<String> excludedPaths = getExcludedPaths(servletContext);
 
         if (!isEmpty(excludedPaths)) {
-            var path = extensionlessResource + "/";
+            var path = extensionlessResource + PATH_SEPARATOR;
 
             if (excludedPaths.stream().anyMatch(path::startsWith)) {
                 return false;

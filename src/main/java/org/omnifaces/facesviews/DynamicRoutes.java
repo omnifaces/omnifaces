@@ -134,31 +134,7 @@ final class DynamicRoutes {
         for (var i = 0; i < segments.length - 1; i++) {
             var segment = segments[i];
             validate(segment, resource);
-
-            if (isDynamicSegment(segment)) {
-                var name = segment.substring(1, segment.length() - 1);
-
-                if (names.isEmpty()) {
-                    filterPrefixes.add(PATH_SEPARATOR + String.join(PATH_SEPARATOR, Arrays.copyOfRange(segments, 0, i)) + (i == 0 ? "*" : "/*"));
-                }
-
-                if (node.dynamic == null) {
-                    node.dynamic = new Node();
-                    node.dynamicName = name;
-                }
-                else if (!node.dynamicName.equals(name)) {
-                    throw new IllegalStateException(ERROR_AMBIGUOUS_SEGMENT.formatted(name, resource, node.dynamicName));
-                }
-
-                if (!names.add(name)) {
-                    throw new IllegalStateException(ERROR_DUPLICATE_SEGMENT.formatted(name, resource));
-                }
-
-                node = node.dynamic;
-            }
-            else {
-                node = node.literals.computeIfAbsent(segment, key -> new Node());
-            }
+            node = isDynamicSegment(segment) ? addDynamic(node, segments, i, names, resource) : node.literals.computeIfAbsent(segment, key -> new Node());
         }
 
         if (welcomeFile) {
@@ -168,6 +144,35 @@ final class DynamicRoutes {
         var fileNode = node.literals.computeIfAbsent(segments[segments.length - 1], key -> new Node());
         fileNode.viewId = resourcePath;
         fileNode.multiViews = multiViews;
+    }
+
+    /**
+     * Adds the dynamic route segment at the given index of the given segments to the given node and returns the node it leads to, collecting the segment name
+     * in the given names and registering the filter prefix when it is the first one of the resource.
+     *
+     * @throws IllegalStateException When the segment is ambiguous against a sibling or duplicate within the same resource.
+     */
+    private Node addDynamic(Node node, String[] segments, int index, Set<String> names, String resource) {
+        var segment = segments[index];
+        var name = segment.substring(1, segment.length() - 1);
+
+        if (names.isEmpty()) {
+            filterPrefixes.add(PATH_SEPARATOR + String.join(PATH_SEPARATOR, Arrays.copyOfRange(segments, 0, index)) + (index == 0 ? "*" : "/*"));
+        }
+
+        if (node.dynamic == null) {
+            node.dynamic = new Node();
+            node.dynamicName = name;
+        }
+        else if (!node.dynamicName.equals(name)) {
+            throw new IllegalStateException(ERROR_AMBIGUOUS_SEGMENT.formatted(name, resource, node.dynamicName));
+        }
+
+        if (!names.add(name)) {
+            throw new IllegalStateException(ERROR_DUPLICATE_SEGMENT.formatted(name, resource));
+        }
+
+        return node.dynamic;
     }
 
     /**
@@ -276,24 +281,11 @@ final class DynamicRoutes {
         }
 
         var interpolated = new StringBuilder(uri.length());
+        var start = 0;
 
-        for (var start = 0; start <= uri.length();) {
+        while (start <= uri.length()) {
             var separator = uri.indexOf(PATH_SEPARATOR_CHAR, start);
-            var segment = uri.substring(start, separator < 0 ? uri.length() : separator);
-
-            if (isDynamicSegment(segment)) {
-                var name = segment.substring(1, segment.length() - 1);
-                var value = values == null ? null : values.get(name);
-
-                if (value == null || value.isEmpty()) {
-                    throw new IllegalArgumentException(ERROR_MISSING_SEGMENT_VALUE.formatted(name, uri));
-                }
-
-                interpolated.append(encodeURI(value));
-            }
-            else {
-                interpolated.append(segment);
-            }
+            interpolated.append(interpolateSegment(uri.substring(start, separator < 0 ? uri.length() : separator), values, uri));
 
             if (separator < 0) {
                 break;
@@ -304,6 +296,26 @@ final class DynamicRoutes {
         }
 
         return interpolated.toString();
+    }
+
+    /**
+     * Returns the given segment as-is when it is not a dynamic route segment, else the URI encoded value of the same name.
+     *
+     * @throws IllegalArgumentException When the segment has no value.
+     */
+    private static String interpolateSegment(String segment, Map<String, String> values, String uri) {
+        if (!isDynamicSegment(segment)) {
+            return segment;
+        }
+
+        var name = segment.substring(1, segment.length() - 1);
+        var value = values == null ? null : values.get(name);
+
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(ERROR_MISSING_SEGMENT_VALUE.formatted(name, uri));
+        }
+
+        return encodeURI(value);
     }
 
     private static String[] split(String path) {

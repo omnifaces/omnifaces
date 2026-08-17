@@ -849,7 +849,11 @@ public final class Servlets {
 
         if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
             try {
-                return BeansLocal.getInstance(beanManager, ServletContext.class);
+                var requestScopedContext = BeansLocal.getInstance(beanManager, ServletContext.class);
+
+                if (requestScopedContext != null) {
+                    return requestScopedContext;
+                }
             }
             catch (Exception ignore) {
                 logger.log(FINEST, "Ignoring thrown exception; will fall back to explicitly searching in application scope.", ignore);
