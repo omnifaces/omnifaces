@@ -20,6 +20,11 @@
     version="6.1"
 >
     <context-param>
+        <param-name>jakarta.faces.FACELETS_BUFFER_SIZE</param-name>
+        <param-value>1048576</param-value> <!-- 1MB -->
+    </context-param>
+
+    <context-param>
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>

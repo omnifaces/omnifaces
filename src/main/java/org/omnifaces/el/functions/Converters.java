@@ -65,6 +65,7 @@ public final class Converters {
 
     private static final String ERROR_NOT_AN_ARRAY = "The given type '%s' is not an array at all.";
     private static final String ERROR_INVALID_FRAGMENT_SIZE = "The given fragment size '%s' must be at least 1.";
+    private static final String ERROR_INVALID_CONVERTER_ID = "The given converter ID '%s' is unknown.";
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -342,11 +343,18 @@ public final class Converters {
      * @param object The object to be converted to {@link String} by the converter identified by given converter ID.
      * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter identified by the given converter ID, invoked
      * with {@link FacesContext#getCurrentInstance()}, {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+     * @throws IllegalArgumentException When no converter instance can be associated with the given converter ID.
      * @since 3.10
      */
     public static String convert(String converterId, Object object) {
         var context = Faces.getContext();
-        return createConverter(context, converterId).getAsString(context, getCurrentComponent(context), object);
+        Converter<Object> converter = createConverter(context, converterId);
+
+        if (converter == null) {
+            throw new IllegalArgumentException(ERROR_INVALID_CONVERTER_ID.formatted(converterId));
+        }
+
+        return converter.getAsString(context, getCurrentComponent(context), object);
     }
 
 }
