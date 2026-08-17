@@ -19,6 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.config.OmniFaces.getVersion;
 import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
 import static org.omnifaces.util.ComponentsLocal.addScript;
 import static org.omnifaces.util.ComponentsLocal.addScriptResource;
@@ -412,8 +413,10 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         }
         else {
             try (var scanner = new Scanner(getResourceAsStream("/" + OMNIFACES_LIBRARY_NAME + "/" + SERVICEWORKER_RESOURCE_NAME), UTF_8)) {
+                var cacheableResources = getCacheableResources(manifest);
                 return scanner.useDelimiter("\\A").next()
-                    .replace("$cacheableResources", Json.encode(getCacheableResources(manifest)))
+                    .replace("$cacheVersion", getVersion() + "." + Integer.toHexString(cacheableResources.hashCode()))
+                    .replace("$cacheableResources", Json.encode(cacheableResources))
                     .replace("$offlineResource", Json.encode(getOfflineResource(manifest)));
             }
         }
@@ -499,7 +502,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
+        return resource.getRequestPath();
     }
 
     /**

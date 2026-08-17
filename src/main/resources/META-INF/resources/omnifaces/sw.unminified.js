@@ -22,7 +22,7 @@
  * @see PWAResourceHandler
  * @see <a href="https://css-tricks.com/serviceworker-for-offline/">https://css-tricks.com/serviceworker-for-offline/</a>
  */
-var cacheName = "omnifaces.4.6.4"; // Should be bumped every time this sw.unminified.js logic is changed.
+var cacheName = "omnifaces.$cacheVersion";
 var cacheableResources = $cacheableResources;
 var offlineResource = $offlineResource;
 
@@ -46,7 +46,6 @@ self.addEventListener("fetch", function(event) {
         return; // Not our resource.
     }
 
-    requestURL.searchParams.delete('v'); // Removes the v= parameter usually indicating the cache bust version (VersionedResourceHandler, OmniVersionResourceHandler, PrimeResourceHandler, etc).
     var url = requestURL.toString();
     var method = request.method;
     var sendEvent = function(name, detail) {

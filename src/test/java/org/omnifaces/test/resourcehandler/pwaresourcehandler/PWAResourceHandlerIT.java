@@ -38,6 +38,8 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         + "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"prefer_related_applications\":false,\"related_applications\":[],\"screenshots\":[],\"shortcuts\":[],"
         + "\"start_url\":\"{baseURL}\"}";
 
+    private static final String CACHE_BUSTED_SCRIPT_RESOURCE = "(?s).*omnifaces\\.js[^\"]*v=[^\"&\\s]+.*";
+
     @FindBy(css="link[rel=manifest]")
     private WebElement manifest;
 
@@ -68,6 +70,10 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
             .replaceAll("\\?v=[0-9]{13,}", "?v=1")); // Normalize any version query string on icon resource.
     }
 
+    /**
+     * The cacheable resources must carry the cache bust version, so that the cache entries of one deployment cannot be matched by the requests of the next one,
+     * and so that the cache version changes along and prunes them on activate.
+     */
     @Test
     @Order(2)
     void verifyServiceWorkerScript() {
@@ -77,6 +83,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
         String serviceWorkerScript = browser.getPageSource();
         assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
+        assertTrue(serviceWorkerScript.matches(CACHE_BUSTED_SCRIPT_RESOURCE), serviceWorkerScript + " matches '" + CACHE_BUSTED_SCRIPT_RESOURCE + "'");
     }
 
     @Test
