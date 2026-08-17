@@ -96,6 +96,9 @@
         <!-- Sonar config. -->
         <sonar.organization>balusc-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.sources>src/main/java,src/main/ts</sonar.sources> <!-- The TypeScript is not a Maven source root, so it must be listed explicitly along with the Java. -->
+        <sonar.tests>src/test/java,src/test/ts</sonar.tests>
+        <sonar.exclusions>**/node_modules/**</sonar.exclusions>
     </properties>
 
     <dependencies>
