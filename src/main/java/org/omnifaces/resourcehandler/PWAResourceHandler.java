@@ -40,7 +40,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
@@ -282,9 +281,6 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     /** The resource name <code>sw.js</code>. */
     public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
 
-    private static final Pattern PATTERN_V_PARAM_FIRST = Pattern.compile("\\?v=[^&#]*&");
-    private static final Pattern PATTERN_V_PARAM_NEXT = Pattern.compile("[?&]v=[^&#]*");
-
     private static final String SCRIPT_INIT = "OmniFaces.ServiceWorker.init('%s','%s')";
 
     private record CachedContents(byte[] manifestContents, byte[] serviceWorkerContents, long lastModified) {
@@ -523,8 +519,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
             return null;
         }
 
-        // Strips the v= parameter indicating the cache bust version.
-        return PATTERN_V_PARAM_NEXT.matcher(PATTERN_V_PARAM_FIRST.matcher(resource.getRequestPath()).replaceAll("?")).replaceAll("");
+        return resource.getRequestPath();
     }
 
     /**

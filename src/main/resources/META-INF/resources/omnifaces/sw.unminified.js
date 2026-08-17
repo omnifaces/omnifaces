@@ -45,7 +45,6 @@ self.addEventListener("fetch", function(event) {
         return; // Not our resource.
     }
 
-    requestURL.searchParams.delete('v'); // Removes the v= parameter usually indicating the cache bust version (VersionedResourceHandler, OmniVersionResourceHandler, PrimeResourceHandler, etc).
     const url = requestURL.toString();
     const method = request.method;
     const sendEvent = (name, detail) => {

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -75,12 +76,17 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         );
     }
 
+    /**
+     * The cacheable resources must carry the cache bust version, so that the cache entries of one deployment cannot be matched by the requests of the next one,
+     * and so that the cache version changes along and prunes them on activate.
+     */
     @Test
     @Order(2)
     void verifyServiceWorkerScript() {
         browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
         String serviceWorkerScript = browser.getPageSource();
         assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
+        assertTrue(serviceWorkerScript.contains("v=" + OmniFaces.getVersion()), serviceWorkerScript + " contains 'v=" + OmniFaces.getVersion() + "'");
     }
 
     @Test

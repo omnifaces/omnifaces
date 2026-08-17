@@ -214,7 +214,7 @@ describe("sw.js: fetch handler behavior", () => {
         expect(result).toBe(freshResponse);
     });
 
-    test("strips v parameter from URL before cache matching", async () => {
+    test("retains v parameter in URL for cache matching", async () => {
         const env = loadServiceWorker();
         const mockResponse = { status: 200 };
         env.fetchMock.mockResolvedValue(mockResponse);
@@ -224,10 +224,23 @@ describe("sw.js: fetch handler behavior", () => {
         env.listeners["fetch"](event);
 
         expect(event.respondWith).toHaveBeenCalledTimes(1);
-        // The URL passed to caches.match should not contain the v parameter
         const matchedUrl = env.cachesMatch.mock.calls[0][0];
-        expect(matchedUrl).not.toContain("v=1.0");
+        expect(matchedUrl).toContain("v=1.0");
         expect(matchedUrl).toContain("other=keep");
+    });
+
+    test("resource GET does not match a cache entry stored without the cache bust version", async () => {
+        const env = loadServiceWorker();
+        const staleResponse = { status: 200, body: "stale" };
+        const freshResponse = { status: 200, body: "fresh" };
+        env.cachesMatch.mockImplementation((url: string) => Promise.resolve(url === "http://localhost/jakarta.faces.resource/app.js" ? staleResponse : undefined));
+        env.fetchMock.mockResolvedValue(freshResponse);
+
+        const event = createFetchEvent("http://localhost/jakarta.faces.resource/app.js?v=2", "GET", "cors");
+        env.listeners["fetch"](event);
+
+        const result = await event.respondWith.mock.calls[0][0];
+        expect(result).toBe(freshResponse);
     });
 
     test("POST online sends online event", async () => {
