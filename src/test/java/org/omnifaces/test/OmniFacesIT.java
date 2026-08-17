@@ -557,6 +557,8 @@ public abstract class OmniFacesIT {
             switch (webXml) {
                 case withDevelopmentStage :
                     addQuarkusPropertyIfNecessary("jakarta.faces.PROJECT_STAGE", "Development");
+                    addWebResource("WEB-INF/500.xhtml");
+                    break;
                 case withErrorPage :
                     addWebResource("WEB-INF/500.xhtml");
                     break;
