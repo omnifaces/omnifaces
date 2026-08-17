@@ -36,6 +36,8 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 		+ "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"orientation\":\"any\",\"prefer_related_applications\":false,\"related_applications\":[],"
 		+ "\"start_url\":\"http:\\/\\/localhost:8080\\/PWAResourceHandlerIT\\/\"}";
 
+	private static final String CACHE_BUSTED_SCRIPT_RESOURCE = "(?s).*omnifaces\\.js[^\"]*v=[^\"&\\s]+.*";
+
 	@FindBy(css="link[rel=manifest]")
 	private WebElement manifest;
 
@@ -66,6 +68,10 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 			.replace("127.0.0.1", "localhost")); // Depends on server used. We don't want to be dependent on that.
 	}
 
+	/**
+	 * The cacheable resources must carry the cache bust version, so that the cache entries of one deployment cannot be
+	 * matched by the requests of the next one, and so that the cache version changes along and prunes them on activate.
+	 */
 	@Test
 	@Order(2)
 	public void verifyServiceWorkerScript() {
@@ -75,6 +81,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 		open(manifest.getAttribute("href").split("/PWAResourceHandlerIT", 2)[1].replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
 		String serviceWorkerScript = browser.getPageSource();
 		assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
+		assertTrue(serviceWorkerScript.matches(CACHE_BUSTED_SCRIPT_RESOURCE), serviceWorkerScript + " matches '" + CACHE_BUSTED_SCRIPT_RESOURCE + "'");
 	}
 
 	@Test

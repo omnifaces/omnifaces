@@ -22,7 +22,7 @@
  * @see PWAResourceHandler
  * @see <a href="https://css-tricks.com/serviceworker-for-offline/">https://css-tricks.com/serviceworker-for-offline/</a>
  */
-var cacheName = "omnifaces.3.7.1"; // Should be bumped every time this sw.unminified.js logic is changed.
+var cacheName = "omnifaces.$cacheVersion";
 var cacheableResources = $cacheableResources;
 var offlineResource = $offlineResource;
 
@@ -41,7 +41,7 @@ self.addEventListener("install", function(event) {
 self.addEventListener("fetch", function(event) {
 	var request = event.request;
 	var method = request.method;
-	var url = request.url.replace(new RegExp("([?&])v=.*?([&#]|$)", "i"), "$2"); // Strips the v= parameter indicating the cache bust version.
+	var url = request.url;
 	var sendEvent = function(name, detail) {
 		self.clients.matchAll().then(function(clients) {
 			clients.forEach(function(client) {
