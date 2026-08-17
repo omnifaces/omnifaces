@@ -42,6 +42,15 @@ abstract class ChannelComponent extends ScriptFamily {
 
     static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
 
+    private static final String ERROR_EXPRESSION_CHANNEL = "%s 'channel' attribute may not contain an EL expression.";
+    private static final String ERROR_INVALID_USER = "%s 'user' attribute '%s' does not represent a valid user identifier."
+        + " It must implement Serializable and preferably have low memory footprint."
+        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.";
+    private static final String ERROR_INVALID_CHANNEL = "%s 'channel' attribute '%s' does not represent a valid channel name."
+        + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.";
+    private static final String ERROR_DUPLICATE_CHANNEL = "%s 'channel' attribute '%s' is already used by %s on the same view."
+        + " Channel names must be unique across o:socket, o:sse and o:notification.";
+
     private enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.
         channel,
@@ -64,18 +73,14 @@ abstract class ChannelComponent extends ScriptFamily {
     @Override
     public void setValueExpression(String name, ValueExpression binding) {
         if (PropertyKeys.channel.toString().equals(name)) {
-            throw new IllegalArgumentException("%s 'channel' attribute may not contain an EL expression.".formatted(getTagName()));
+            throw new IllegalArgumentException(ERROR_EXPRESSION_CHANNEL.formatted(getTagName()));
         }
 
         if (PropertyKeys.user.toString().equals(name)) {
             var user = binding.getValue(getFacesContext().getELContext());
 
             if (user != null && !(user instanceof Serializable)) {
-                throw new IllegalArgumentException(
-                    "%s 'user' attribute '%s' does not represent a valid user identifier."
-                        + " It must implement Serializable and preferably have low memory footprint."
-                        + " Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.".formatted(getTagName(), user)
-                );
+                throw new IllegalArgumentException(ERROR_INVALID_USER.formatted(getTagName(), user));
             }
         }
 
@@ -91,20 +96,14 @@ abstract class ChannelComponent extends ScriptFamily {
      */
     void validateChannel(FacesContext context, String channel) {
         if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-            throw new IllegalArgumentException(
-                "%s 'channel' attribute '%s' does not represent a valid channel name."
-                    + " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.".formatted(getTagName(), channel)
-            );
+            throw new IllegalArgumentException(ERROR_INVALID_CHANNEL.formatted(getTagName(), channel));
         }
 
         var registeredChannels = getViewAttribute(context, ChannelComponent.class.getName(), HashMap::new);
         var existingChannel = registeredChannels.put(channel, getTagName());
 
         if (existingChannel != null && !existingChannel.equals(getTagName())) {
-            throw new IllegalArgumentException(
-                "%s 'channel' attribute '%s' is already used by %s on the same view."
-                    + " Channel names must be unique across o:socket, o:sse and o:notification.".formatted(getTagName(), channel, existingChannel)
-            );
+            throw new IllegalArgumentException(ERROR_DUPLICATE_CHANNEL.formatted(getTagName(), channel, existingChannel));
         }
     }
 
