@@ -24,7 +24,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.omnifaces.config.OmniFaces;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -36,6 +35,8 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         + "\"icons\":[{\"sizes\":\"512x512\",\"src\":\"{contextPath}\\/jakarta.faces.resource\\/icon.png.xhtml?v=1\",\"type\":\"image\\/png\"}],"
         + "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"prefer_related_applications\":false,\"related_applications\":[],\"screenshots\":[],\"shortcuts\":[],"
         + "\"start_url\":\"{baseURL}\"}";
+
+    private static final String CACHE_BUSTED_SCRIPT_RESOURCE = "(?s).*omnifaces\\.js[^\"]*v=[^\"&\\s]+.*";
 
     @FindBy(css = "link[rel=manifest]")
     private WebElement manifest;
@@ -86,7 +87,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
         String serviceWorkerScript = browser.getPageSource();
         assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
-        assertTrue(serviceWorkerScript.contains("v=" + OmniFaces.getVersion()), serviceWorkerScript + " contains 'v=" + OmniFaces.getVersion() + "'");
+        assertTrue(serviceWorkerScript.matches(CACHE_BUSTED_SCRIPT_RESOURCE), serviceWorkerScript + " matches '" + CACHE_BUSTED_SCRIPT_RESOURCE + "'");
     }
 
     @Test
