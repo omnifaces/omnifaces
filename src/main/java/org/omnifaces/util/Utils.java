@@ -1194,28 +1194,20 @@ public final class Utils {
             return null;
         }
 
-        try {
-            var deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(string));
-            var inflater = new InflaterInputStream(deflated);
+        try (var inflater = new InflaterInputStream(new ByteArrayInputStream(Base64.getUrlDecoder().decode(string)))) {
+            var inflated = new ByteArrayOutputStream();
+            var buffer = new byte[DEFAULT_STREAM_BUFFER_SIZE];
+            int read;
 
-            try {
-                var inflated = new ByteArrayOutputStream();
-                var buffer = new byte[DEFAULT_STREAM_BUFFER_SIZE];
-                int read;
+            while ((read = inflater.read(buffer)) != -1) {
+                inflated.write(buffer, 0, read);
 
-                while ((read = inflater.read(buffer)) != -1) {
-                    inflated.write(buffer, 0, read);
-
-                    if (inflated.size() > MAX_UNSERIALIZED_LENGTH) {
-                        throw new IllegalArgumentException("Unserialized data exceeds maximum allowed length of " + MAX_UNSERIALIZED_LENGTH + " bytes.");
-                    }
+                if (inflated.size() > MAX_UNSERIALIZED_LENGTH) {
+                    throw new IllegalArgumentException("Unserialized data exceeds maximum allowed length of " + MAX_UNSERIALIZED_LENGTH + " bytes.");
                 }
+            }
 
-                return new String(inflated.toByteArray(), UTF_8);
-            }
-            finally {
-                close(inflater);
-            }
+            return new String(inflated.toByteArray(), UTF_8);
         }
         catch (UnsupportedEncodingException e) {
             // This will occur when UTF-8 is not supported, but this is not to be expected these days.
