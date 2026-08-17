@@ -137,9 +137,13 @@ public final class CombinedResourceInfo {
      * Returns the combined resource info identified by the given ID from the cache. A new one will be created based on the given ID if absent in cache.
      *
      * @param id The ID of the combined resource info to be returned from the cache.
-     * @return The combined resource info identified by the given ID from the cache.
+     * @return The combined resource info identified by the given ID from the cache, or <code>null</code> if the ID is not valid.
      */
     public static CombinedResourceInfo get(String id) {
+        if (id == null) {
+            return null;
+        }
+
         var info = CACHE.get(id);
 
         if (info == null) {
@@ -314,6 +318,10 @@ public final class CombinedResourceInfo {
         }
         catch (IllegalArgumentException ignore) {
             logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt, just return null to indicate 404.", ignore);
+            return null;
+        }
+
+        if (resourcesId == null) {
             return null;
         }
 

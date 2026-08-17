@@ -48,6 +48,7 @@ class CombinedResourceInfoTest {
     @Test
     void malformedIdIsRejected() {
         assertNull(CombinedResourceInfo.get("this-is-not-a-valid-id"), "malformed ID is rejected");
+        assertNull(CombinedResourceInfo.get(null), "absent ID is rejected");
     }
 
     @Test
