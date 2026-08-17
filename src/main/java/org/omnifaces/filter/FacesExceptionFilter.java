@@ -166,7 +166,9 @@ public class FacesExceptionFilter extends HttpFilter {
      */
     protected void logException(HttpServletRequest request, Throwable exception, String location, String message, Object... parameters) {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-            logger.log(SEVERE, "[%s][%s] %s".formatted(request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), message.formatted(parameters)), exception);
+            logger.log(
+                SEVERE, exception, () -> "[%s][%s] %s".formatted(request.getAttribute(EXCEPTION_UUID), getRemoteAddr(request), message.formatted(parameters))
+            );
         }
     }
 

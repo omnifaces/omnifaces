@@ -563,8 +563,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
     protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
         if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
             logger.log(
-                SEVERE, "[%s][%s] %s".formatted(getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), message.formatted(parameters)),
-                exception
+                SEVERE, exception,
+                () -> "[%s][%s] %s".formatted(getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), message.formatted(parameters))
             );
         }
     }

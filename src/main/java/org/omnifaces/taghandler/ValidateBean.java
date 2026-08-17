@@ -709,7 +709,7 @@ public class ValidateBean extends TagHandler {
 
         if (isDevelopment(context)) {
             for (var violation : undisplayed) {
-                logger.log(WARNING, String.format(WARN_UNDISPLAYED_VIOLATION, violation.getMessage(), violation.getPropertyPath()));
+                logger.log(WARNING, () -> WARN_UNDISPLAYED_VIOLATION.formatted(violation.getMessage(), violation.getPropertyPath()));
             }
         }
     }

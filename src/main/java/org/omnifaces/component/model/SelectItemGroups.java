@@ -137,7 +137,7 @@ public class SelectItemGroups extends UISelectItems {
 
     private static void logDeprecationWarningOnce() {
         if (Faces.getApplicationMap().putIfAbsent(DEPRECATION_WARNING_LOGGED, TRUE) == null) {
-            logger.warning(String.format(DEPRECATION_WARNING, Faces.getViewId()));
+            logger.warning(() -> DEPRECATION_WARNING.formatted(Faces.getViewId()));
         }
     }
 

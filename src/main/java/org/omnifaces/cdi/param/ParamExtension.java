@@ -141,13 +141,17 @@ public class ParamExtension implements Extension {
         if (!paramsWithoutInject.isEmpty()) {
             for (var field : paramsWithoutInject) {
                 var member = field.getJavaMember();
-                logger.warning(String.format(DEPRECATION_WARNING, member.getDeclaringClass().getName(), member.getName()));
+                logger.warning(() -> DEPRECATION_WARNING.formatted(member.getDeclaringClass().getName(), member.getName()));
             }
 
             event.setInjectionTarget(new ParamInjectionTarget<>(event.getInjectionTarget(), paramsWithoutInject));
         }
     }
 
+    /**
+     * @deprecated Since 5.4. Supporting <code>@Param</code> without <code>@Inject</code> relies on reflective field access, which is incompatible with strong
+     * module encapsulation. Add <code>@Inject</code> to the field instead.
+     */
     @Deprecated(since = "5.4", forRemoval = true)
     private static final class ParamInjectionTarget<T> extends InjectionTargetWrapper<T> {
 

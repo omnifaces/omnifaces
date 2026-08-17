@@ -759,7 +759,14 @@ public final class Reflection {
      * @since 2.7.2
      */
     public static boolean isAssignable(Object source, Class<?> targetType) {
-        Class<?> sourceType = source instanceof Class ? (Class<?>) source : source != null ? source.getClass() : null;
+        Class<?> sourceType;
+
+        if (source instanceof Class<?> sourceClass) {
+            sourceType = sourceClass;
+        }
+        else {
+            sourceType = source != null ? source.getClass() : null;
+        }
 
         if (sourceType != null && targetType.isPrimitive()) {
             sourceType = getPrimitiveType(sourceType);

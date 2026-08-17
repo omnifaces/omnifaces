@@ -157,8 +157,7 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
      */
     static long getIdleTimeout(ServletContext context, String paramName) {
         var value = context.getInitParameter(paramName);
-        long idleTimeout = value == null ? 0 : (isNumber(value) ? Long.parseLong(value) : -1); // A non-numeric value maps to -1 because 0 is a valid value
-                                                                                               // meaning no timeout.
+        long idleTimeout = parseLongInitParameter(value, 0);
 
         if (idleTimeout < 0) {
             throw new IllegalArgumentException(ERROR_INVALID_IDLE_TIMEOUT.formatted(paramName, value));
@@ -177,13 +176,28 @@ abstract class PushComponent extends ChannelComponent implements ClientBehaviorH
      */
     static int getMaxSessionsPerChannel(ServletContext context, String paramName) {
         var value = context.getInitParameter(paramName);
-        long maxSessionsPerChannel = value == null ? Integer.MAX_VALUE : (isNumber(value) ? Long.parseLong(value) : -1);
+        long maxSessionsPerChannel = parseLongInitParameter(value, Integer.MAX_VALUE);
 
         if (maxSessionsPerChannel < 1 || maxSessionsPerChannel > Integer.MAX_VALUE) {
             throw new IllegalArgumentException(ERROR_INVALID_MAX_SESSIONS_PER_CHANNEL.formatted(paramName, value));
         }
 
         return (int) maxSessionsPerChannel;
+    }
+
+    /**
+     * Parses the given context parameter value as a long.
+     *
+     * @param value The context parameter value, if any.
+     * @param defaultValue The value to return when the context parameter is absent.
+     * @return The parsed value, or <code>-1</code> when it is not numeric, as the callers reject that while <code>0</code> may be a valid value.
+     */
+    private static long parseLongInitParameter(String value, long defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return isNumber(value) ? Long.parseLong(value) : -1;
     }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
