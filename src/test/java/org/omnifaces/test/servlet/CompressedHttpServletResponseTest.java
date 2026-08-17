@@ -60,6 +60,7 @@ class CompressedHttpServletResponseTest {
 
             @Override
             public void setWriteListener(WriteListener writeListener) {
+                // NOOP.
             }
 
         };

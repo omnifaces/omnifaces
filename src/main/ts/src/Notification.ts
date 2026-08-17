@@ -68,7 +68,7 @@ export namespace Notification {
      */
     export async function requestPermission(channel?: string): Promise<string> {
         if (!window.Notification) {
-            return Promise.resolve("denied");
+            return "denied";
         }
 
         return window.Notification.requestPermission().then(function(permission) {

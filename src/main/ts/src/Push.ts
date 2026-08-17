@@ -102,8 +102,6 @@ export namespace Push {
          * Opens the reconnecting web socket.
          */
         open() {
-            const self = this;
-
             if (this.socket && this.socket.readyState == 1) {
                 return;
             }
@@ -111,31 +109,31 @@ export namespace Push {
             this.socket = new WebSocket(this.url);
 
             this.socket.onopen = () => {
-                if (self.reconnectAttempts == null) {
-                    self.onopen(self.channel);
+                if (this.reconnectAttempts == null) {
+                    this.onopen(this.channel);
                 }
 
-                self.reconnectAttempts = 0;
+                this.reconnectAttempts = 0;
             };
 
             this.socket.onmessage = (event: MessageEvent) => {
                 const message = JSON.parse(event.data);
-                self.onmessage(message, self.channel, event);
-                self.behaviors[message]?.forEach(behavior => behavior());
+                this.onmessage(message, this.channel, event);
+                this.behaviors[message]?.forEach(behavior => behavior());
             };
 
             this.socket.onclose = (event: CloseEvent) => {
-                if (!self.socket
+                if (!this.socket
                     || (event.code == 1000 && event.reason == REASON_EXPIRED)
                     || (event.code == 1008 && event.reason == REASON_UNKNOWN_CHANNEL)
-                    || (self.reconnectAttempts == null)
-                    || (self.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
+                    || (this.reconnectAttempts == null)
+                    || (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
                 ) {
-                    self.onclose(event.code, self.channel, event);
+                    this.onclose(event.code, this.channel, event);
                 }
                 else {
-                    self.onerror(event.code, self.channel, event);
-                    setTimeout(self.open.bind(self), RECONNECT_INTERVAL * self.reconnectAttempts++);
+                    this.onerror(event.code, this.channel, event);
+                    setTimeout(this.open.bind(this), RECONNECT_INTERVAL * this.reconnectAttempts++);
                 }
             };
         }

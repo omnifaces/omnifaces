@@ -56,6 +56,8 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
     // Private constants ----------------------------------------------------------------------------------------------
 
     private static final String LAYOUT_TABLE = "table";
+    private static final String PROPERTY_STYLE_CLASS = "styleClass";
+    private static final String ATTRIBUTE_CLASS = "class";
     private static final Map<Severity, String> SEVERITY_NAMES = createSeverityNames();
 
     private static Map<Severity, String> createSeverityNames() {
@@ -193,7 +195,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
             var writer = context.getResponseWriter();
             writer.startElement("div", component);
             writeAttribute(writer, "id", component.getClientId(context));
-            writeAttribute(writer, component, "styleClass", "class");
+            writeAttribute(writer, component, PROPERTY_STYLE_CLASS, ATTRIBUTE_CLASS);
             writer.endElement("div");
         }
     }
@@ -213,7 +215,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
         var writer = context.getResponseWriter();
         writer.startElement(table ? LAYOUT_TABLE : "ul", component);
         writeAttribute(writer, "id", component.getClientId(context));
-        writeAttribute(writer, component, "styleClass", "class");
+        writeAttribute(writer, component, PROPERTY_STYLE_CLASS, ATTRIBUTE_CLASS);
         writeAttributes(writer, component, "style", "title", "lang", "dir");
 
         for (var message : messages) {
@@ -240,7 +242,7 @@ public class MessagesRenderer extends Renderer<OmniMessages> {
         writer.startElement(table ? "tr" : "li", component);
         var severityName = SEVERITY_NAMES.get(message.getSeverity());
         writeAttribute(writer, component, severityName + "Style", "style");
-        writeAttribute(writer, component, severityName + "Class", "class", "styleClass");
+        writeAttribute(writer, component, severityName + "Class", ATTRIBUTE_CLASS, PROPERTY_STYLE_CLASS);
 
         if (table) {
             writer.startElement("td", component);

@@ -110,17 +110,16 @@ export namespace Highlight {
      * Remove the highlight. Remove the error style class from involved input element and its associated label.
      */
     function removeHighlight(this: HTMLElement) {
-        const input = this;
-        Util.removeEventListener(input, "click input", removeHighlight);
-        const styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
+        Util.removeEventListener(this, "click input", removeHighlight);
+        const styleClass = this.getAttribute(DATA_HIGHLIGHT_CLASS);
 
         if (styleClass) {
-            input.removeAttribute(DATA_HIGHLIGHT_CLASS);
-            input.classList.remove(styleClass);
+            this.removeAttribute(DATA_HIGHLIGHT_CLASS);
+            this.classList.remove(styleClass);
 
-            if (input.getAttribute(DATA_HIGHLIGHT_LABEL)) {
-                input.removeAttribute(DATA_HIGHLIGHT_LABEL);
-                const label = labelsByFor[input.id];
+            if (this.getAttribute(DATA_HIGHLIGHT_LABEL)) {
+                this.removeAttribute(DATA_HIGHLIGHT_LABEL);
+                const label = labelsByFor[this.id];
                 label.classList.remove(styleClass);
             }
         }

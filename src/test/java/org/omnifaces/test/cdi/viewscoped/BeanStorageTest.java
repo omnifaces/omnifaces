@@ -49,6 +49,7 @@ public class BeanStorageTest {
 
                 @Override
                 public void destroy(Object instance, CreationalContext<Object> context) {
+                    // NOOP.
                 }
 
             };
@@ -67,6 +68,7 @@ public class BeanStorageTest {
 
             @Override
             public void destroy(Object instance, CreationalContext<Object> context) {
+                // NOOP.
             }
 
         };
@@ -75,10 +77,12 @@ public class BeanStorageTest {
 
             @Override
             public void push(Object incompleteInstance) {
+                // NOOP.
             }
 
             @Override
             public void release() {
+                // NOOP.
             }
 
         };

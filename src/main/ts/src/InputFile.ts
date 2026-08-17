@@ -42,9 +42,7 @@ export namespace InputFile {
         const files = inputFile.files!;
         const form = inputFile.form!;
 
-        for (var i = 0; i < files.length; i++) {
-            const file = files[i];
-
+        for (const file of files) {
             if (file.size > maxsize) {
                 const fileName = file.name;
                 let originalEnctype: string | undefined;

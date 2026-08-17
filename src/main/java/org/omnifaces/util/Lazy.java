@@ -42,7 +42,7 @@ public final class Lazy<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     private transient T delegate;
     private transient volatile boolean initialized;
-    private final Supplier<T> initFunction;
+    private final SerializableSupplier<T> initFunction;
     private final Lock lock = new ReentrantLock();
 
     public interface SerializableSupplier<T> extends Supplier<T>, Serializable {

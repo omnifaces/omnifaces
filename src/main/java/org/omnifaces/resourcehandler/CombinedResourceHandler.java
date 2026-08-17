@@ -258,6 +258,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
     private static final String TARGET_HEAD = "head";
     private static final String TARGET_BODY = "body";
 
+    private static final String ATTRIBUTE_ONBEGIN = "onbegin";
+    private static final String ATTRIBUTE_ONSUCCESS = "onsuccess";
+    private static final String ATTRIBUTE_ONERROR = "onerror";
+
     static final String EXTENSION_CSS = ".css";
     static final String EXTENSION_JS = ".js";
     private static final String COMPONENT_ADDED = "jakarta.faces.component.UIComponentBase.ADDED";
@@ -568,9 +572,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
                 }
                 else {
                     if (deferredScript) {
-                        mergeAttribute(this.componentResource, componentResource, "onbegin");
-                        mergeAttribute(this.componentResource, componentResource, "onsuccess");
-                        mergeAttribute(this.componentResource, componentResource, "onerror");
+                        mergeAttribute(this.componentResource, componentResource, ATTRIBUTE_ONBEGIN);
+                        mergeAttribute(this.componentResource, componentResource, ATTRIBUTE_ONSUCCESS);
+                        mergeAttribute(this.componentResource, componentResource, ATTRIBUTE_ONERROR);
                     }
                     componentResourcesToRemove.add(componentResource);
                 }
@@ -630,23 +634,23 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
             if (RENDERER_TYPE_JS.equals(rendererType)) {
                 componentResource.getPassThroughAttributes().put(
-                    "onerror", "document.write('<script src=\"" + fallbackURL
+                    ATTRIBUTE_ONERROR, "document.write('<script src=\"" + fallbackURL
                         + "\" crossorigin=\"" + getCrossorigin(context) + "\" integrity=\"" + getIntegrityIfNecessary(context, cdnResource) + "\"></script>')"
                 );
             }
             else if (isOneOf(rendererType, RENDERER_TYPE_CSS, CriticalStylesheetRenderer.RENDERER_TYPE)) {
-                componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallbackURL + "'");
+                componentResource.getPassThroughAttributes().put(ATTRIBUTE_ONERROR, "this.onerror=null;this.href='" + fallbackURL + "'");
             }
             else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
                 var callbacks = "";
-                var onsuccess = (String) componentResource.getAttributes().get("onsuccess");
+                var onsuccess = (String) componentResource.getAttributes().get(ATTRIBUTE_ONSUCCESS);
 
                 if (onsuccess != null) {
                     callbacks = ",null,function(){" + onsuccess + "}";
                 }
 
                 componentResource.getAttributes().put(
-                    "onerror", "OmniFaces.Util.loadScript('" + fallbackURL
+                    ATTRIBUTE_ONERROR, "OmniFaces.Util.loadScript('" + fallbackURL
                         + "','" + getCrossorigin(context) + "','" + getIntegrityIfNecessary(context, cdnResource) + "'" + callbacks + ")"
                 );
             }
