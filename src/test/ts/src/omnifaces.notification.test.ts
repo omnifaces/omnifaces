@@ -64,9 +64,13 @@ describe("OmniFaces.Notification.init", () => {
         uninstallMockNotification();
     });
 
-    test("initializes without error", () => {
+    test("does not call onunsupported when Notification API and service worker are available", () => {
+        const onunsupported = jest.fn();
         installMockNotification("granted");
-        notification().init("ch1", { icon: "/icon.png" });
+
+        notification().init("ch1", { icon: "/icon.png", onunsupported });
+
+        expect(onunsupported).not.toHaveBeenCalled();
     });
 
     test("calls onunsupported when Notification API is missing", () => {
