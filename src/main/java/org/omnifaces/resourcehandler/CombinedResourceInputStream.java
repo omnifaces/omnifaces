@@ -145,28 +145,8 @@ public final class CombinedResourceInputStream extends InputStream {
             return 0;
         }
 
-        if (preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length)) {
-            // Delegate to single-byte read during preamble scanning (only a handful of bytes).
-            int singleByte = read();
-
-            if (singleByte == -1) {
-                return -1;
-            }
-
-            b[offset] = (byte) singleByte;
-            int count = 1;
-
-            while (count < length && (preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length))) {
-                singleByte = read();
-
-                if (singleByte == -1) {
-                    break;
-                }
-
-                b[offset + count++] = (byte) singleByte;
-            }
-
-            return count;
+        if (hasBufferedOutput()) {
+            return readBuffered(b, offset, length);
         }
 
         int read;
@@ -182,6 +162,39 @@ public final class CombinedResourceInputStream extends InputStream {
         }
 
         return read;
+    }
+
+    /**
+     * Returns whether the preamble is still being scanned or previously buffered preamble output is still pending.
+     */
+    private boolean hasBufferedOutput() {
+        return preamble || (pendingOutput != null && pendingOutputOffset < pendingOutput.length);
+    }
+
+    /**
+     * Delegates to single-byte read during preamble scanning, which involves only a handful of bytes.
+     */
+    private int readBuffered(byte[] b, int offset, int length) throws IOException {
+        int singleByte = read();
+
+        if (singleByte == -1) {
+            return -1;
+        }
+
+        b[offset] = (byte) singleByte;
+        int count = 1;
+
+        while (count < length && hasBufferedOutput()) {
+            singleByte = read();
+
+            if (singleByte == -1) {
+                break;
+            }
+
+            b[offset + count++] = (byte) singleByte;
+        }
+
+        return count;
     }
 
     /**
@@ -235,55 +248,75 @@ public final class CombinedResourceInputStream extends InputStream {
      * @throws IOException If something fails at I/O level.
      */
     private int readPreamble() throws IOException {
-        while (true) {
-            int b = currentStream.read();
+        int b = currentStream.read();
 
-            if (b == -1) {
-                preamble = false;
-                return -1;
-            }
-
-            if (b != '\'' && b != '"') {
-                return b;
-            }
-
-            var buf = new ByteArrayOutputStream();
-            int c;
-
-            while ((c = currentStream.read()) != -1 && c != b) {
-                buf.write(c);
-            }
-
+        if (b == -1) {
             preamble = false;
-
-            if ("use strict".equals(buf.toString(UTF_8))) {
-                int next;
-
-                while ((next = currentStream.read()) != -1) {
-                    if (next == '\n') {
-                        break;
-                    }
-
-                    if (next != ';' && next != ' ' && next != '\t' && next != '\r') {
-                        return next; // Stop: real code follows on the same line.
-                    }
-                }
-
-                return currentStream.read();
-            }
-
-            byte[] content = buf.toByteArray();
-            pendingOutput = new byte[content.length + (c == -1 ? 1 : 2)];
-            pendingOutput[0] = (byte) b;
-            System.arraycopy(content, 0, pendingOutput, 1, content.length);
-
-            if (c != -1) {
-                pendingOutput[content.length + 1] = (byte) c;
-            }
-
-            pendingOutputOffset = 0;
-            return pendingOutput[pendingOutputOffset++] & 0xFF;
+            return -1;
         }
+
+        if (b != '\'' && b != '"') {
+            return b;
+        }
+
+        var buf = new ByteArrayOutputStream();
+        int c;
+
+        while ((c = currentStream.read()) != -1 && c != b) {
+            buf.write(c);
+        }
+
+        preamble = false;
+
+        if ("use strict".equals(buf.toString(UTF_8))) {
+            return readAfterUseStrict();
+        }
+
+        return queuePendingOutput(b, buf.toByteArray(), c);
+    }
+
+    /**
+     * Consumes the remainder of the line holding the <code>"use strict"</code> directive.
+     *
+     * @return The first byte after the directive, or the first byte of real code when that follows on the same line, or <code>-1</code> if the stream is
+     * exhausted.
+     * @throws IOException If something fails at I/O level.
+     */
+    private int readAfterUseStrict() throws IOException {
+        int next;
+
+        while ((next = currentStream.read()) != -1) {
+            if (next == '\n') {
+                break;
+            }
+
+            if (next != ';' && next != ' ' && next != '\t' && next != '\r') {
+                return next; // Stop: real code follows on the same line.
+            }
+        }
+
+        return currentStream.read();
+    }
+
+    /**
+     * Queues the quoted string which turned out not to be the <code>"use strict"</code> directive as pending output, including its quotes.
+     *
+     * @param quote The opening quote character.
+     * @param content The bytes between the quotes.
+     * @param closingQuote The closing quote character, or <code>-1</code> if the stream was exhausted before it was found.
+     * @return The first byte of the queued output.
+     */
+    private int queuePendingOutput(int quote, byte[] content, int closingQuote) {
+        pendingOutput = new byte[content.length + (closingQuote == -1 ? 1 : 2)];
+        pendingOutput[0] = (byte) quote;
+        System.arraycopy(content, 0, pendingOutput, 1, content.length);
+
+        if (closingQuote != -1) {
+            pendingOutput[content.length + 1] = (byte) closingQuote;
+        }
+
+        pendingOutputOffset = 0;
+        return pendingOutput[pendingOutputOffset++] & 0xFF;
     }
 
 }

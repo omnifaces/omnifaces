@@ -286,85 +286,97 @@ public final class Hacks {
     public static void removeViewState(FacesContext context, ResponseStateManager manager, String viewId) {
         try {
             if (isMyFacesUsed()) {
-                var state = invokeMethod(manager, "getSavedState", context);
-
-                if (!(state instanceof String)) {
-                    return;
-                }
-
-                var viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
-
-                if (viewCollection == null) {
-                    return;
-                }
-
-                var stateCache = invokeMethod(manager, "getStateCache", context);
-                var stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-                var key = invokeMethod(
-                    invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context,
-                    normalizeViewId(context, viewId), stateId
-                );
-
-                List<Serializable> keys = accessField(viewCollection, "_keys");
-                Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
-                Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
-
-                synchronized (viewCollection) { // Those fields are not concurrent maps.
-                    keys.remove(key);
-                    serializedViews.remove(key);
-                    var previousKey = precedence.remove(key);
-
-                    if (previousKey != null) {
-                        for (var entry : precedence.entrySet()) {
-                            if (entry.getValue().equals(key)) {
-                                entry.setValue(previousKey);
-                            }
-                        }
-                    }
-
-                    Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
-                    Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
-
-                    if (viewScopeIds == null || viewScopeIdCounts == null || viewScopeIds.get(key) == null) {
-                        return; // Most likely cached page with client side state saving.
-                    }
-
-                    var viewScopeId = viewScopeIds.remove(key);
-                    var count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
-
-                    if (count < 1) {
-                        viewScopeIdCounts.remove(viewScopeId);
-                        var viewScopeProvider = getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER);
-
-                        if (viewScopeProvider != null) { // This was removed in MyFaces 4.x and leveraged to CDI, see #729.
-                            invokeMethod(viewScopeProvider, "destroyViewScopeMap", context, viewScopeId);
-                        }
-                    }
-                    else {
-                        viewScopeIdCounts.put(viewScopeId, count);
-                    }
-                }
+                removeMyFacesViewState(context, manager, viewId);
             }
             else { // Well, let's assume Mojarra.
-                Map<String, Object> serializedViews = MOJARRA_SERIALIZED_VIEWS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
-                    .filter(Objects::nonNull).findFirst().orElse(null);
-
-                if (serializedViews != null) {
-                    MOJARRA_SERIALIZED_VIEW_KEYS.stream().map(key -> context.getAttributes().get(key)).filter(Objects::nonNull)
-                        .forEach(serializedViews::remove);
-                }
-
-                Map<String, Object> activeViewMaps = MOJARRA_ACTIVE_VIEW_MAPS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
-                    .filter(Objects::nonNull).findFirst().orElse(null);
-
-                if (activeViewMaps != null) {
-                    var stateHelper = context.getViewRoot().getTransientStateHelper();
-                    MOJARRA_VIEW_MAP_IDS.stream().map(stateHelper::getTransient).filter(Objects::nonNull).forEach(activeViewMaps::remove);
-                }
+                removeMojarraViewState(context);
             }
         }
         catch (IllegalStateException e) {
             logger.log(FINEST, "Ignoring thrown exception; this may occur when session is invalidated at the same moment.", e);
+        }
+    }
+
+    private static void removeMyFacesViewState(FacesContext context, ResponseStateManager manager, String viewId) {
+        var state = invokeMethod(manager, "getSavedState", context);
+
+        if (!(state instanceof String)) {
+            return;
+        }
+
+        var viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+
+        if (viewCollection == null) {
+            return;
+        }
+
+        var stateCache = invokeMethod(manager, "getStateCache", context);
+        var stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+        var key = invokeMethod(
+            invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context,
+            normalizeViewId(context, viewId), stateId
+        );
+
+        List<Serializable> keys = accessField(viewCollection, "_keys");
+        Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
+        Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
+
+        synchronized (viewCollection) { // Those fields are not concurrent maps.
+            keys.remove(key);
+            serializedViews.remove(key);
+            var previousKey = precedence.remove(key);
+
+            if (previousKey != null) {
+                for (var entry : precedence.entrySet()) {
+                    if (entry.getValue().equals(key)) {
+                        entry.setValue(previousKey);
+                    }
+                }
+            }
+
+            removeMyFacesViewScope(context, viewCollection, key);
+        }
+    }
+
+    private static void removeMyFacesViewScope(FacesContext context, Object viewCollection, Object key) {
+        Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+        Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+
+        if (viewScopeIds == null || viewScopeIdCounts == null || viewScopeIds.get(key) == null) {
+            return; // Most likely cached page with client side state saving.
+        }
+
+        var viewScopeId = viewScopeIds.remove(key);
+        var count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
+
+        if (count < 1) {
+            viewScopeIdCounts.remove(viewScopeId);
+            var viewScopeProvider = getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER);
+
+            if (viewScopeProvider != null) { // This was removed in MyFaces 4.x and leveraged to CDI, see #729.
+                invokeMethod(viewScopeProvider, "destroyViewScopeMap", context, viewScopeId);
+            }
+        }
+        else {
+            viewScopeIdCounts.put(viewScopeId, count);
+        }
+    }
+
+    private static void removeMojarraViewState(FacesContext context) {
+        Map<String, Object> serializedViews = MOJARRA_SERIALIZED_VIEWS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
+            .filter(Objects::nonNull).findFirst().orElse(null);
+
+        if (serializedViews != null) {
+            MOJARRA_SERIALIZED_VIEW_KEYS.stream().map(key -> context.getAttributes().get(key)).filter(Objects::nonNull)
+                .forEach(serializedViews::remove);
+        }
+
+        Map<String, Object> activeViewMaps = MOJARRA_ACTIVE_VIEW_MAPS.stream().<Map<String, Object>>map(key -> getSessionAttribute(context, key))
+            .filter(Objects::nonNull).findFirst().orElse(null);
+
+        if (activeViewMaps != null) {
+            var stateHelper = context.getViewRoot().getTransientStateHelper();
+            MOJARRA_VIEW_MAP_IDS.stream().map(stateHelper::getTransient).filter(Objects::nonNull).forEach(activeViewMaps::remove);
         }
     }
 

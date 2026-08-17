@@ -651,21 +651,7 @@ public final class FacesViews {
 
         if (!collectedViews.isEmpty()) {
             if (isLowercasedRequestURI(servletContext)) {
-                for (var mapping : new HashSet<>(collectedViews.entrySet())) {
-                    String resourceName = mapping.getKey();
-                    String lowercasedResourceName = resourceName.toLowerCase();
-
-                    if (!resourceName.equals(lowercasedResourceName)) {
-                        collectedViews.put(lowercasedResourceName, mapping.getValue());
-
-                        if (isExtensionless(resourceName)) {
-                            collectedViews.remove(resourceName);
-                        }
-                        else {
-                            mapping.setValue(null);
-                        }
-                    }
-                }
+                lowercaseCollectedViews(collectedViews);
             }
 
             servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
@@ -685,6 +671,30 @@ public final class FacesViews {
         }
 
         return collectedViews;
+    }
+
+    /**
+     * Adds a lowercased mapping for each collected view whose resource name is not already lowercased, so that a lowercased request URI resolves to the same
+     * view.
+     *
+     * @param collectedViews The collected views to be lowercased in place.
+     */
+    private static void lowercaseCollectedViews(Map<String, String> collectedViews) {
+        for (var mapping : new HashSet<>(collectedViews.entrySet())) {
+            String resourceName = mapping.getKey();
+            String lowercasedResourceName = resourceName.toLowerCase();
+
+            if (!resourceName.equals(lowercasedResourceName)) {
+                collectedViews.put(lowercasedResourceName, mapping.getValue());
+
+                if (isExtensionless(resourceName)) {
+                    collectedViews.remove(resourceName);
+                }
+                else {
+                    mapping.setValue(null);
+                }
+            }
+        }
     }
 
     private static void scanAndStoreWelcomeFiles(ServletContext servletContext) {
