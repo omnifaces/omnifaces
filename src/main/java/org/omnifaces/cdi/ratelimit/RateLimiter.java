@@ -12,13 +12,13 @@
  */
 package org.omnifaces.cdi.ratelimit;
 
-import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRemoteAddr;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -120,6 +120,7 @@ public class RateLimiter {
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final Map<String, RequestCounter> requestCountsByClientId = new ConcurrentHashMap<>();
+    private Clock clock = Clock.systemDefaultZone();
     private ScheduledExecutorService executorService;
     private boolean managedExecutorService;
 
@@ -200,10 +201,10 @@ public class RateLimiter {
     }
 
     private void checkRateLimit(String clientId, int maxRequestsPerTimeWindow, Duration timeWindow) {
-        var now = currentTimeMillis();
+        var now = clock.millis();
         var timeWindowInMillis = timeWindow.toMillis();
         requestCountsByClientId.entrySet().removeIf(entry -> now - entry.getValue().starttime >= timeWindowInMillis);
-        var counter = requestCountsByClientId.compute(clientId, ($, rc) -> (rc == null) ? new RequestCounter() : rc.increment());
+        var counter = requestCountsByClientId.compute(clientId, ($, rc) -> (rc == null) ? new RequestCounter(now) : rc.increment());
 
         if (counter.count > maxRequestsPerTimeWindow && now - counter.starttime < timeWindowInMillis) {
             var elapsedTimeInMillis = now - counter.starttime;
@@ -251,6 +252,15 @@ public class RateLimiter {
         }
     }
 
+    /**
+     * Sets the clock which is used to measure the time window, so that a test can advance it without waiting.
+     *
+     * @param clock The clock which is used to measure the time window.
+     */
+    void setClock(Clock clock) {
+        this.clock = clock;
+    }
+
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
@@ -261,8 +271,8 @@ public class RateLimiter {
         long starttime;
         int count;
 
-        public RequestCounter() {
-            this.starttime = currentTimeMillis();
+        public RequestCounter(long starttime) {
+            this.starttime = starttime;
             this.count = 1;
         }
 

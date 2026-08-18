@@ -337,6 +337,10 @@ public abstract class OmniFacesIT {
     }
 
     protected void waitFor(Duration duration) {
+    protected void waitUntilAttributeAbsent(WebElement element, String attributeName) {
+        waitUntil(element.getAttribute("id"), e -> e.getAttribute(attributeName) == null, null);
+    }
+
         try {
             Thread.sleep(duration.toMillis());
         }
@@ -353,7 +357,6 @@ public abstract class OmniFacesIT {
 
     protected void scrollIntoView(WebElement element) {
         executeScript("arguments[0].scrollIntoView({block: 'center'})", element);
-        waitFor(Duration.ofMillis(300)); // Allow any animations/listeners to complete.
     }
 
     protected void clearTextContent(WebElement messages) {

@@ -13,6 +13,7 @@
 package org.omnifaces.test.cdi.viewscoped;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getSessionAttribute;
@@ -22,6 +23,8 @@ import static org.omnifaces.util.Faces.setSessionAttribute;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -40,18 +43,44 @@ public class ViewScopedITBean implements Serializable {
 
     private static final String SESSION_KEY_UNLOADED = ViewScopedITBean.class.getName() + ".unloaded";
     private static final String SESSION_KEY_DESTROYED = ViewScopedITBean.class.getName() + ".destroyed";
+    private static final String SESSION_KEY_UNLOAD_LATCH = ViewScopedITBean.class.getName() + ".unloadLatch";
+
+    private static final Duration UNLOAD_TIMEOUT = Duration.ofMillis(500);
 
     @PostConstruct
     public void init() {
-        try {
-            Thread.sleep(500); // Give unload opportunity to hit server.
-        }
-        catch (InterruptedException e) {
-            throw new FacesException(e);
-        }
-
+        awaitUnloadOrDestroy();
         checkUnloadedOrDestroyed();
         addGlobalInfo("init ");
+    }
+
+    /**
+     * The unload is fired during <code>pagehide</code>, concurrently with the request for the page being navigated to, so the destroy of the previous view may
+     * still be in flight while this bean is being constructed. Await it up to {@link #UNLOAD_TIMEOUT} so that {@link #checkUnloadedOrDestroyed()} observes it.
+     * The latch is replaced afterwards so that the next construction awaits the next destroy.
+     */
+    private static void awaitUnloadOrDestroy() {
+        try {
+            getUnloadLatch().await(UNLOAD_TIMEOUT.toMillis(), MILLISECONDS);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FacesException(e);
+        }
+        finally {
+            setSessionAttribute(SESSION_KEY_UNLOAD_LATCH, new CountDownLatch(1));
+        }
+    }
+
+    private static CountDownLatch getUnloadLatch() {
+        CountDownLatch latch = getSessionAttribute(SESSION_KEY_UNLOAD_LATCH);
+
+        if (latch == null) {
+            latch = new CountDownLatch(1);
+            setSessionAttribute(SESSION_KEY_UNLOAD_LATCH, latch);
+        }
+
+        return latch;
     }
 
     public void checkUnloadedOrDestroyed() {
@@ -92,6 +121,7 @@ public class ViewScopedITBean implements Serializable {
     public void destroy() {
         if (hasContext()) {
             setSessionAttribute(isUnloadRequest(getContext()) ? SESSION_KEY_UNLOADED : SESSION_KEY_DESTROYED, true);
+            getUnloadLatch().countDown();
         }
     }
 

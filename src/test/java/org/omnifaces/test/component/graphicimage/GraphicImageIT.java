@@ -39,7 +39,7 @@ public class GraphicImageIT extends OmniFacesIT {
         assertEquals("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", image.getAttribute("src"));
 
         scrollIntoView(image);
-        assertEquals(null, image.getAttribute("data-lazy"));
+        waitUntilAttributeAbsent(image, "data-lazy");
         assertEquals(null, image.getAttribute("data-src"));
         assertEquals(contextPath + "/jakarta.faces.resource/logo.png.xhtml", stripHostAndJsessionid(image.getAttribute("src")));
     }
