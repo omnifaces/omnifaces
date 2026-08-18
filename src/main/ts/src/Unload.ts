@@ -11,8 +11,7 @@
 /// specific language governing permissions and limitations under the License.
 ///
 
-import { EVENT } from "./OmniFaces";
-import { VIEW_STATE_PARAM } from "./OmniFaces";
+import { EVENT, VIEW_STATE_PARAM } from "./OmniFaces";
 import { Util } from "./Util";
 
 /**

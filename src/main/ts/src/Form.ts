@@ -11,8 +11,7 @@
 /// specific language governing permissions and limitations under the License.
 ///
 
-import { VIEW_STATE_PARAM } from "./OmniFaces";
-import { CLIENT_WINDOW_PARAM } from "./OmniFaces";
+import { CLIENT_WINDOW_PARAM, VIEW_STATE_PARAM } from "./OmniFaces";
 import { Util } from "./Util";
 
 /**
@@ -76,13 +75,13 @@ export namespace Form {
     }
 
     function containsNamedChild(executeIds: string[], key: string) {
-        const name = key.replace(/%3A/g, "\\:");
+        const name = key.replace(/%3A/g, String.raw`\:`);
 
         try {
             for (const executeId of executeIds) {
                 const parent = document.getElementById(executeId);
 
-                if (parent && parent.querySelector("[name='" + name + "']")) {
+                if (parent?.querySelector("[name='" + name + "']")) {
                     return true;
                 }
             }

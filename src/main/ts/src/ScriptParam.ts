@@ -55,8 +55,12 @@ export namespace ScriptParam {
 
         const clone: Record<any, any> = {};
 
-        for (let property in object) {
-            object[property] instanceof Function || object[property] instanceof Object || (clone[property] = object[property]);
+        for (const property in object) {
+            const value = object[property];
+
+            if (value === null || (typeof value !== "function" && typeof value !== "object")) {
+                clone[property] = value;
+            }
         }
 
         return clone;

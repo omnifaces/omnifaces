@@ -127,7 +127,7 @@ export namespace Push {
          * Opens the reconnecting web socket.
          */
         open() {
-            if (this.socket && this.socket.readyState == 1) {
+            if (this.socket?.readyState == 1) {
                 return;
             }
 

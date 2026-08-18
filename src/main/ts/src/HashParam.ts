@@ -40,7 +40,7 @@ export namespace HashParam {
             return;
         }
 
-        if (!!window.location.hash) {
+        if (window.location.hash) {
             setHashParamValues();
         }
 
@@ -65,7 +65,7 @@ export namespace HashParam {
 
         if (newHashQueryString != oldHashQueryString) {
             const history = window.history;
-            if (history && history.pushState) {
+            if (history?.pushState) {
                 const url = location.href.split(/#/, 2)[0] + (newHashQueryString ? "#" : "") + newHashQueryString;
                 history.pushState(null, document.title, url);
             }

@@ -101,7 +101,7 @@ export namespace Notification {
             throw new Error("OmniFaces.Notification.show: title is required.");
         }
 
-        if (!window.Notification || window.Notification.permission !== "granted" || !navigator.serviceWorker) {
+        if (window.Notification?.permission !== "granted" || !navigator.serviceWorker) {
             return;
         }
 

@@ -98,7 +98,7 @@ export namespace Highlight {
         if (!element) {
             const elements = document.getElementsByName(clientId); // #21
 
-            if (elements && elements.length) {
+            if (elements?.length) {
                 element = elements[0];
             }
         }

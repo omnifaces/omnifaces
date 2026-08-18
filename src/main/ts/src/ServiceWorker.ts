@@ -35,7 +35,7 @@ export namespace ServiceWorker {
 
         navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope });
         navigator.serviceWorker.addEventListener("message", function(event) {
-            if (event.data && event.data.type == EVENT) {
+            if (event.data?.type == EVENT) {
                 window.dispatchEvent(new CustomEvent(event.data.name, { detail: event.data.detail }));
             }
         });
