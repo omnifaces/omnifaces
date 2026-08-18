@@ -196,7 +196,8 @@ class DynamicRoutesTest {
      */
     @Test
     void testInterpolationRejectsAnEmptySegmentValue() {
-        assertThrows(IllegalArgumentException.class, () -> DynamicRoutes.interpolate("/organizations/[id]/members", Map.of("id", "")));
+        var emptySegmentValue = Map.of("id", "");
+        assertThrows(IllegalArgumentException.class, () -> DynamicRoutes.interpolate("/organizations/[id]/members", emptySegmentValue));
     }
 
     @Test

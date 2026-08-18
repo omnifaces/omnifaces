@@ -149,17 +149,23 @@ class LruCacheTest {
 
     @Test
     void testImmutableViews() {
+        var keySet = lruCache.keySet();
+        var values = lruCache.values();
+        var entrySet = lruCache.entrySet();
+        var newEntry = new SimpleEntry<>("k", "v");
+        var existingEntry = new SimpleEntry<>("k0", "v0");
+
         assertAll(
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.keySet().add("k"), "lruCache.keySet().add(\"k0\")"),
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.keySet().remove("k0"), "lruCache.keySet().remove(\"k0\")"),
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.values().add("v"), "lruCache.values().add(\"v\")"),
-            () -> assertThrows(UnsupportedOperationException.class, () -> lruCache.values().remove("v0"), "lruCache.values().remove(\"v0\")"),
+            () -> assertThrows(UnsupportedOperationException.class, () -> keySet.add("k"), "lruCache.keySet().add(\"k\")"),
+            () -> assertThrows(UnsupportedOperationException.class, () -> keySet.remove("k0"), "lruCache.keySet().remove(\"k0\")"),
+            () -> assertThrows(UnsupportedOperationException.class, () -> values.add("v"), "lruCache.values().add(\"v\")"),
+            () -> assertThrows(UnsupportedOperationException.class, () -> values.remove("v0"), "lruCache.values().remove(\"v0\")"),
             () -> assertThrows(
-                UnsupportedOperationException.class, () -> lruCache.entrySet().add(new SimpleEntry<>("k", "v")),
-                "lruCache.entrySet().remove(new SimpleEntry<>(\"k\", \"v\"))"
+                UnsupportedOperationException.class, () -> entrySet.add(newEntry),
+                "lruCache.entrySet().add(new SimpleEntry<>(\"k\", \"v\"))"
             ),
             () -> assertThrows(
-                UnsupportedOperationException.class, () -> lruCache.entrySet().remove(new SimpleEntry<>("k0", "v0")),
+                UnsupportedOperationException.class, () -> entrySet.remove(existingEntry),
                 "lruCache.entrySet().remove(new SimpleEntry<>(\"k0\", \"v0\"))"
             )
         );

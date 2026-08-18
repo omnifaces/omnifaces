@@ -12,51 +12,38 @@
  */
 package org.omnifaces.test.taghandler.validatebean;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.copier.CloneCopier;
 
 class CloneCopierTest {
 
+    private final CloneCopier copier = new CloneCopier();
+
     @Test
     void testDoesNotImplementCloneable() {
-        try {
-            new CloneCopier().copy(new DoesNotImplementCloneable());
-            fail();
-        }
-        catch (IllegalStateException e) {
-        }
+        var bean = new DoesNotImplementCloneable();
+        assertThrows(IllegalStateException.class, () -> copier.copy(bean));
     }
 
     @Test
     void testImplementsCloneableButDoesNotOverrideClone() {
-        try {
-            new CloneCopier().copy(new ImplementsCloneableButDoesNotOverrideClone());
-            fail();
-        }
-        catch (IllegalStateException e) {
-        }
+        var bean = new ImplementsCloneableButDoesNotOverrideClone();
+        assertThrows(IllegalStateException.class, () -> copier.copy(bean));
     }
 
     @Test
     void testImplementsCloneableButHasProtectedClone() {
-        try {
-            new CloneCopier().copy(new ImplementsCloneableButHasProtectedClone());
-            fail();
-        }
-        catch (IllegalStateException e) {
-        }
+        var bean = new ImplementsCloneableButHasProtectedClone();
+        assertThrows(IllegalStateException.class, () -> copier.copy(bean));
     }
 
     @Test
     void testImplementsCloneable() {
-        try {
-            new CloneCopier().copy(new ImplementsCloneable());
-        }
-        catch (IllegalStateException e) {
-            fail(e);
-        }
+        var bean = new ImplementsCloneable();
+        assertDoesNotThrow(() -> copier.copy(bean));
     }
 
     public static class DoesNotImplementCloneable {

@@ -97,8 +97,9 @@ class FacesViewsViewHandlerTest {
 
     @Test
     void testUnsuppliedSegmentIsRejected() {
+        var pathParams = List.of("9");
         assertThrows(IllegalArgumentException.class, () -> buildURL("/ctx/organizations/[id]/members", null, true, emptyMap(), false, emptyList()));
-        assertThrows(IllegalArgumentException.class, () -> buildURL("/ctx/organizations/[id]/members", null, true, emptyMap(), true, List.of("9")));
+        assertThrows(IllegalArgumentException.class, () -> buildURL("/ctx/organizations/[id]/members", null, true, emptyMap(), true, pathParams));
     }
 
     private static String buildURL(
