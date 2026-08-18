@@ -16,6 +16,7 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "esbuild": "^0.28.1",
+    "eslint": "^10.1.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0"
   }
