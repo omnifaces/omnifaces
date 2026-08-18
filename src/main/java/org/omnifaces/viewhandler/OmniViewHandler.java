@@ -13,6 +13,7 @@
 package org.omnifaces.viewhandler;
 
 import static jakarta.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
+import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
@@ -36,6 +37,7 @@ import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.isSessionNew;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
+import static org.omnifaces.util.FacesLocal.setResponseStatus;
 import static org.omnifaces.util.Platform.getDefaultFacesServletMapping;
 
 import java.io.IOException;
@@ -201,10 +203,15 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * issue #941). Or, if the session is new (during an unload request, it implies it had expired), then explicitly
      * send a permanent redirect to the original request URI. This way any authentication framework which remembers the
      * "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+     * <p>
+     * A non-redirecting unload is answered with a 204, never with an empty 200: the unload is in flight alongside
+     * the request for the page being navigated to, and a bodyless 200 is indistinguishable from that page's own
+     * response.
      */
     private UIViewRoot unloadView(FacesContext context, String viewId) {
         var createdView = super.createView(context, viewId);
         var manager = getRenderKit(context).getResponseStateManager();
+        var redirected = false;
 
         if (restoreViewRootState(context, manager, createdView)) {
             context.setProcessingEvents(true);
@@ -213,6 +220,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         }
         else if (isSessionNew(context)) {
             redirectPermanent(context, getRequestURIWithQueryString(context));
+            redirected = true;
+        }
+
+        if (!redirected) {
+            setResponseStatus(context, SC_NO_CONTENT);
         }
 
         context.responseComplete();
