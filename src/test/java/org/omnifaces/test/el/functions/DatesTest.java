@@ -46,7 +46,7 @@ class DatesTest {
     private static final ZoneId CUR = ZoneId.of("America/Curacao");
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         TimeZone.setDefault(TimeZone.getTimeZone(UTC));
     }
 

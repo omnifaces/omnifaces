@@ -34,14 +34,14 @@ class DateProducerTest {
     private static ZoneOffset testZoneOffset;
 
     @BeforeAll
-    public static void setTestTimeZone() {
+    static void setTestTimeZone() {
         originalTimeZone = TimeZone.getDefault();
         testZoneOffset = ZoneOffset.ofHours(-3);
         TimeZone.setDefault(TimeZone.getTimeZone(testZoneOffset));
     }
 
     @AfterAll
-    public static void restoreTestTimeZone() {
+    static void restoreTestTimeZone() {
         TimeZone.setDefault(originalTimeZone);
     }
 

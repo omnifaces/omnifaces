@@ -25,7 +25,7 @@ import jakarta.enterprise.context.spi.CreationalContext;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.cdi.BeanStorage;
 
-public class BeanStorageTest {
+class BeanStorageTest {
 
     @Test
     void testgetBeanThreadSafety() {

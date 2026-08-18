@@ -31,7 +31,7 @@ class LazyTest {
     private final AtomicInteger numCreations = new AtomicInteger();
 
     @BeforeEach
-    public void before() {
+    void before() {
         numCreations.set(0);
     }
 
