@@ -18,6 +18,8 @@ import static org.omnifaces.el.functions.Strings.stripTags;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.MANIFEST_RESOURCE_NAME;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.SERVICEWORKER_RESOURCE_NAME;
 
+import java.util.regex.Pattern;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.MethodOrderer;
@@ -36,7 +38,7 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         + "\"lang\":\"en\",\"name\":\"PWAResourceHandlerIT\",\"prefer_related_applications\":false,\"related_applications\":[],\"screenshots\":[],\"shortcuts\":[],"
         + "\"start_url\":\"{baseURL}\"}";
 
-    private static final String CACHE_BUSTED_SCRIPT_RESOURCE = "(?s).*omnifaces\\.js[^\"]*v=[^\"&\\s]+.*";
+    private static final Pattern CACHE_BUSTED_SCRIPT_RESOURCE = Pattern.compile("omnifaces\\.js[^\"]*v=[^\"&\\s]+");
 
     @FindBy(css = "link[rel=manifest]")
     private WebElement manifest;
@@ -87,7 +89,10 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         browser.get(manifest.getAttribute("href").replace(MANIFEST_RESOURCE_NAME, SERVICEWORKER_RESOURCE_NAME));
         String serviceWorkerScript = browser.getPageSource();
         assertTrue(serviceWorkerScript.contains("/PWAResourceHandlerIT.xhtml"), serviceWorkerScript + " contains '/PWAResourceHandlerIT.xhtml'");
-        assertTrue(serviceWorkerScript.matches(CACHE_BUSTED_SCRIPT_RESOURCE), serviceWorkerScript + " matches '" + CACHE_BUSTED_SCRIPT_RESOURCE + "'");
+        assertTrue(
+            CACHE_BUSTED_SCRIPT_RESOURCE.matcher(serviceWorkerScript).find(),
+            () -> serviceWorkerScript + " contains '" + CACHE_BUSTED_SCRIPT_RESOURCE + "'"
+        );
     }
 
     @Test

@@ -13,10 +13,12 @@
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedResourceHandler;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -34,6 +36,8 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
     private static final String CRITICAL_COMBINED_STYLESHEET_NAME = serializeURLSafe("critical.css");
     private static final String HEAD_COMBINED_STYLESHEET_NAME = serializeURLSafe("main.css|screen.css");
     private static final String HEAD_PRINT_STYLESHEET_NAME = "print";
+
+    private static final Pattern RESOURCE_NAME = Pattern.compile("/jakarta\\.faces\\.resource/([^/.]+)\\.(?:js|css)\\.xhtml");
 
     @FindBy(css = "script[src*='ln=omnifaces.combined']")
     private List<WebElement> combinedScripts;
@@ -127,19 +131,13 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
         waitUntilTextContent(deferredInBody); // Wait until last o:deferredScript is finished.
 
         assertEquals(2, combinedScripts.size());
-        assertEquals(HEAD_COMBINED_SCRIPT_NAME, combinedScripts.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-        assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, combinedScripts.get(1).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+        assertEquals(HEAD_COMBINED_SCRIPT_NAME, extractResourceName(combinedScripts.get(0), "src"));
+        assertEquals(DEFERRED_COMBINED_SCRIPT_NAME, extractResourceName(combinedScripts.get(1), "src"));
         assertEquals(2, combinedStylesheets.size());
-        assertEquals(
-            CRITICAL_COMBINED_STYLESHEET_NAME,
-            combinedStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]
-        );
-        assertEquals(
-            HEAD_COMBINED_STYLESHEET_NAME,
-            combinedStylesheets.get(1).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]
-        );
+        assertEquals(CRITICAL_COMBINED_STYLESHEET_NAME, extractResourceName(combinedStylesheets.get(0), "href"));
+        assertEquals(HEAD_COMBINED_STYLESHEET_NAME, extractResourceName(combinedStylesheets.get(1), "href"));
         assertEquals(1, printStylesheets.size());
-        assertEquals(HEAD_PRINT_STYLESHEET_NAME, printStylesheets.get(0).getAttribute("href").split("(.*/jakarta.faces.resource/)|(\\.css\\.xhtml.*)")[1]);
+        assertEquals(HEAD_PRINT_STYLESHEET_NAME, extractResourceName(printStylesheets.get(0), "href"));
 
         assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
         assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
@@ -148,6 +146,13 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
         assertEquals("5,bodyWithoutTarget", bodyWithoutTarget.getText());
         assertEquals("6,deferredInHead", deferredInHead.getText());
         assertEquals("7,deferredInBody", deferredInBody.getText());
+    }
+
+    private static String extractResourceName(WebElement element, String attributeName) {
+        var url = element.getAttribute(attributeName);
+        var matcher = RESOURCE_NAME.matcher(url);
+        assertTrue(matcher.find(), () -> url + " matches " + RESOURCE_NAME);
+        return matcher.group(1);
     }
 
 }

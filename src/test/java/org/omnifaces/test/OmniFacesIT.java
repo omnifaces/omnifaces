@@ -19,6 +19,7 @@ import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCustomCDNResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
+import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -336,11 +337,11 @@ public abstract class OmniFacesIT {
         waitUntil(elementId, e -> e.getText().contains(expectedString), null);
     }
 
-    protected void waitFor(Duration duration) {
     protected void waitUntilAttributeAbsent(WebElement element, String attributeName) {
         waitUntil(element.getAttribute("id"), e -> e.getAttribute(attributeName) == null, null);
     }
 
+    protected void waitFor(Duration duration) {
         try {
             Thread.sleep(duration.toMillis());
         }
@@ -470,7 +471,8 @@ public abstract class OmniFacesIT {
                         .withRemoteRepo(createSnapshotRepository("central-portal-snapshots", "https://central.sonatype.com/repository/maven-snapshots"))
                         .withRemoteRepo(createSnapshotRepository("apache-snapshots", "https://repository.apache.org/snapshots"))
                     : Maven.resolver();
-                archive.addAsLibraries(resolver.resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
+                var coordinates = splitAndTrim(warLibraries, ",").toArray(String[]::new);
+                archive.addAsLibraries(resolver.resolve(coordinates).withTransitivity().asFile());
             }
 
             addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
