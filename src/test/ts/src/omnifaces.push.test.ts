@@ -39,17 +39,17 @@ describe("OmniFaces.Push.init", () => {
         push().init(false, "", "dupChannel?t=1", null, null, null, null, {}, false);
         push().init(false, "", "dupChannel?t=2", null, null, null, null, {}, false);
         push().open("dupChannel");
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
     });
 
     test("autoconnect=true opens socket immediately", () => {
         push().init(false, "", "autoChannel", null, null, null, null, {}, true);
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
     });
 
     test("autoconnect=false does not open socket", () => {
         push().init(false, "", "noAutoChannel", null, null, null, null, {}, false);
-        expect(getWSInstances().length).toBe(0);
+        expect(getWSInstances()).toHaveLength(0);
     });
 
     test("calls onclose with -1 when WebSocket is not supported", () => {
@@ -61,7 +61,7 @@ describe("OmniFaces.Push.init", () => {
             (code: number, channel: string) => closeCalls.push([code, channel]),
             {}, false);
 
-        expect(closeCalls.length).toBe(1);
+        expect(closeCalls).toHaveLength(1);
         expect(closeCalls[0][0]).toBe(-1);
         expect(closeCalls[0][1]).toBe("noWsChannel");
 
@@ -117,7 +117,7 @@ describe("OmniFaces.Push.open", () => {
     test("creates WebSocket on open", () => {
         push().init(false, "", "openTest", null, null, null, null, {}, false);
         push().open("openTest");
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
     });
 
     test("does not create second WebSocket if already open", () => {
@@ -125,7 +125,7 @@ describe("OmniFaces.Push.open", () => {
         push().open("openTest2");
         lastWS().simulateOpen();
         push().open("openTest2");
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
     });
 });
 
@@ -174,11 +174,11 @@ describe("OmniFaces.Push: onopen callback", () => {
         push().init(false, "", "onOpenReconn", (ch: string) => calls.push(ch), null, null, null, {}, false);
         push().open("onOpenReconn");
         lastWS().simulateOpen();
-        expect(calls.length).toBe(1);
+        expect(calls).toHaveLength(1);
 
         // Simulate unexpected close (triggers reconnect)
         lastWS().simulateClose(1006);
-        expect(calls.length).toBe(1);
+        expect(calls).toHaveLength(1);
     });
 
     test("onopen resolves string function name from window", () => {
@@ -213,7 +213,7 @@ describe("OmniFaces.Push: onmessage callback", () => {
         lastWS().simulateOpen();
         lastWS().simulateMessage("hello");
 
-        expect(calls.length).toBe(1);
+        expect(calls).toHaveLength(1);
         expect(calls[0][0]).toBe("hello");
         expect(calls[0][1]).toBe("msgCh1");
         expect(calls[0][2]).toBeDefined();
@@ -300,7 +300,7 @@ describe("OmniFaces.Push: onerror callback", () => {
         lastWS().simulateOpen();
         lastWS().simulateClose(1006, "Abnormal");
 
-        expect(errors.length).toBe(1);
+        expect(errors).toHaveLength(1);
         expect(errors[0][0]).toBe(1006);
         expect(errors[0][1]).toBe("errCh1");
     });
@@ -309,11 +309,11 @@ describe("OmniFaces.Push: onerror callback", () => {
         push().init(false, "", "errCh2", null, null, null, null, {}, false);
         push().open("errCh2");
         lastWS().simulateOpen();
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
 
         lastWS().simulateClose(1006, "Abnormal");
         jest.advanceTimersByTime(0); // First reconnect at 0ms (500 * 0)
-        expect(getWSInstances().length).toBe(2);
+        expect(getWSInstances()).toHaveLength(2);
     });
 });
 
@@ -334,7 +334,7 @@ describe("OmniFaces.Push: onclose callback", () => {
         lastWS().simulateOpen();
         lastWS().simulateClose(1000, "Expired");
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(1000);
         expect(closes[0][1]).toBe("clExpired");
     });
@@ -349,7 +349,7 @@ describe("OmniFaces.Push: onclose callback", () => {
         lastWS().simulateOpen();
         lastWS().simulateClose(1008, "Unknown channel");
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(1008);
     });
 
@@ -365,8 +365,8 @@ describe("OmniFaces.Push: onclose callback", () => {
         lastWS().simulateOpen();
         lastWS().simulateClose(1000, "");
 
-        expect(closes.length).toBe(0);
-        expect(errors.length).toBe(1);
+        expect(closes).toHaveLength(0);
+        expect(errors).toHaveLength(1);
     });
 });
 
@@ -391,14 +391,14 @@ describe("OmniFaces.Push: reconnect behavior", () => {
         // First disconnect: delay = 500 * 0 = 0ms
         lastWS().simulateClose(1006);
         jest.advanceTimersByTime(0);
-        expect(getWSInstances().length).toBe(2);
+        expect(getWSInstances()).toHaveLength(2);
 
         // Second disconnect: delay = 500 * 1 = 500ms
         lastWS().simulateClose(1006);
         jest.advanceTimersByTime(499);
-        expect(getWSInstances().length).toBe(2);
+        expect(getWSInstances()).toHaveLength(2);
         jest.advanceTimersByTime(1);
-        expect(getWSInstances().length).toBe(3);
+        expect(getWSInstances()).toHaveLength(3);
     });
 
     test("stops reconnecting after 25 attempts and calls onclose", () => {
@@ -416,7 +416,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
         }
 
         lastWS().simulateClose(1006);
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(1006);
     });
 
@@ -427,13 +427,13 @@ describe("OmniFaces.Push: reconnect behavior", () => {
 
         lastWS().simulateClose(1006);
         jest.advanceTimersByTime(0);
-        expect(getWSInstances().length).toBe(2);
+        expect(getWSInstances()).toHaveLength(2);
 
         lastWS().simulateOpen(); // Reset counter
 
         lastWS().simulateClose(1006);
         jest.advanceTimersByTime(0); // Should reconnect at 0ms again
-        expect(getWSInstances().length).toBe(3);
+        expect(getWSInstances()).toHaveLength(3);
     });
 
     test("explicit close prevents reconnect", () => {
@@ -443,7 +443,7 @@ describe("OmniFaces.Push: reconnect behavior", () => {
 
         push().close("rcExplicit");
         jest.advanceTimersByTime(10000);
-        expect(getWSInstances().length).toBe(1);
+        expect(getWSInstances()).toHaveLength(1);
     });
 });
 
@@ -481,20 +481,20 @@ describe("OmniFaces.Push SSE: init", () => {
 
     test("creates EventSource for SSE channel", () => {
         push().init(true, "/ctx", "sseCh1?token=abc", null, null, null, null, {}, true);
-        expect(getESInstances().length).toBe(1);
+        expect(getESInstances()).toHaveLength(1);
         expect(lastES().url).toContain("/ctx/omnifaces.sse/sseCh1?token=abc");
     });
 
     test("autoconnect=false does not open EventSource", () => {
         push().init(true, "/ctx", "sseCh2?token=abc", null, null, null, null, {}, false);
-        expect(getESInstances().length).toBe(0);
+        expect(getESInstances()).toHaveLength(0);
     });
 
     test("does not create duplicate EventSource for same channel", () => {
         push().init(true, "/ctx", "sseDup?t=1", null, null, null, null, {}, false);
         push().init(true, "/ctx", "sseDup?t=2", null, null, null, null, {}, false);
         push().open("sseDup");
-        expect(getESInstances().length).toBe(1);
+        expect(getESInstances()).toHaveLength(1);
     });
 
     test("calls onclose with -1 when EventSource is not supported", () => {
@@ -506,7 +506,7 @@ describe("OmniFaces.Push SSE: init", () => {
             (code: number, channel: string) => closeCalls.push([code, channel]),
             {}, false);
 
-        expect(closeCalls.length).toBe(1);
+        expect(closeCalls).toHaveLength(1);
         expect(closeCalls[0][0]).toBe(-1);
         expect(closeCalls[0][1]).toBe("noEsCh");
 
@@ -552,7 +552,7 @@ describe("OmniFaces.Push SSE: onmessage callback", () => {
         lastES().simulateOpen();
         lastES().simulateMessage("hello");
 
-        expect(calls.length).toBe(1);
+        expect(calls).toHaveLength(1);
         expect(calls[0][0]).toBe("hello");
         expect(calls[0][1]).toBe("sseMsg1");
         expect(calls[0][2]).toBeDefined();
@@ -619,7 +619,7 @@ describe("OmniFaces.Push SSE: onerror callback", () => {
         lastES().simulateOpen();
         lastES().simulateError();
 
-        expect(errors.length).toBe(1);
+        expect(errors).toHaveLength(1);
         expect(errors[0][0]).toBe(500);
         expect(errors[0][1]).toBe("sseErr1");
         expect(errors[0][2]).toBeInstanceOf(Event);
@@ -635,7 +635,7 @@ describe("OmniFaces.Push SSE: onerror callback", () => {
         lastES().simulateOpen();
         lastES().simulateServerClose();
 
-        expect(errors.length).toBe(0);
+        expect(errors).toHaveLength(0);
     });
 });
 
@@ -656,7 +656,7 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         lastES().simulateOpen();
         lastES().simulateServerClose();
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(200);
         expect(closes[0][1]).toBe("sseCl1");
         expect(closes[0][2]).toBeInstanceOf(Event);
@@ -672,7 +672,7 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         lastES().simulateOpen();
         push().close("sseCl2");
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(204);
         expect(closes[0][1]).toBe("sseCl2");
         expect(closes[0][2]).toBeUndefined();
@@ -688,7 +688,7 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         lastES().simulateOpen();
         lastES().simulateCloseEvent(404);
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(404);
         expect(closes[0][1]).toBe("sseCl5");
         expect(closes[0][2]).toBeDefined();
@@ -704,7 +704,7 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         lastES().simulateOpen();
         lastES().simulateCloseEvent(200);
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(200);
         expect(closes[0][1]).toBe("sseCl7");
         expect(closes[0][2]).toBeDefined();
@@ -729,7 +729,7 @@ describe("OmniFaces.Push SSE: onclose callback", () => {
         lastES().simulateOpen();
         lastES().simulateError();
 
-        expect(closes.length).toBe(0);
+        expect(closes).toHaveLength(0);
     });
 
     test("close before open does not throw", () => {
@@ -750,7 +750,7 @@ describe("OmniFaces.Push SSE: open/close lifecycle", () => {
         push().open("sseLc1");
         lastES().simulateOpen();
         push().open("sseLc1");
-        expect(getESInstances().length).toBe(1);
+        expect(getESInstances()).toHaveLength(1);
     });
 
     test("EventSource is nullified after server close", () => {
@@ -763,7 +763,7 @@ describe("OmniFaces.Push SSE: open/close lifecycle", () => {
         lastES().simulateOpen();
         lastES().simulateServerClose();
 
-        expect(closes.length).toBe(1);
+        expect(closes).toHaveLength(1);
         expect(closes[0][0]).toBe(200);
     });
 });

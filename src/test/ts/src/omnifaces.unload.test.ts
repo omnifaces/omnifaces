@@ -82,7 +82,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
         window.dispatchEvent(new Event("pagehide"));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         const call = getBeaconCalls()[0];
         expect(call.url).toContain("/test/action");
 
@@ -110,7 +110,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
         window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 
     test("does not send beacon on beforeunload event", () => {
@@ -119,7 +119,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
         window.dispatchEvent(new Event("beforeunload"));
 
-        expect(getBeaconCalls().length).toBe(0);
+        expect(getBeaconCalls()).toHaveLength(0);
     });
 
     test("does not touch window.onbeforeunload property", () => {
@@ -140,7 +140,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
         window.dispatchEvent(new Event("pagehide"));
 
-        expect(getBeaconCalls().length).toBe(0);
+        expect(getBeaconCalls()).toHaveLength(0);
     });
 
     test("re-enables after disabled unload fires", () => {
@@ -152,7 +152,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         // Should have called reenable() internally, so next unload should fire
         window.dispatchEvent(new Event("pagehide"));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 
     test("subsequent init updates viewScopeId without re-registering listeners", async () => {
@@ -162,7 +162,7 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
         window.dispatchEvent(new Event("pagehide"));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         const blob = getBeaconCalls()[0].data as Blob;
         const text = await new Promise<string>(resolve => { const r = new FileReader(); r.onload = () => resolve(r.result as string); r.readAsText(blob); });
         expect(text).toContain("id=secondId");

@@ -39,7 +39,7 @@ describe("OmniFaces.GraphicImage: lazy image selector", () => {
         document.body.appendChild(img);
 
         const matches = document.querySelectorAll("img[src][data-src][data-lazy]");
-        expect(matches.length).toBe(1);
+        expect(matches).toHaveLength(1);
         expect(matches[0]).toBe(img);
     });
 
@@ -49,7 +49,7 @@ describe("OmniFaces.GraphicImage: lazy image selector", () => {
         document.body.appendChild(img);
 
         const matches = document.querySelectorAll("img[src][data-src][data-lazy]");
-        expect(matches.length).toBe(0);
+        expect(matches).toHaveLength(0);
     });
 
     test("does not match images without data-lazy", () => {
@@ -59,7 +59,7 @@ describe("OmniFaces.GraphicImage: lazy image selector", () => {
         document.body.appendChild(img);
 
         const matches = document.querySelectorAll("img[src][data-src][data-lazy]");
-        expect(matches.length).toBe(0);
+        expect(matches).toHaveLength(0);
     });
 
     test("matches multiple lazy images", () => {
@@ -72,7 +72,7 @@ describe("OmniFaces.GraphicImage: lazy image selector", () => {
         }
 
         const matches = document.querySelectorAll("img[src][data-src][data-lazy]");
-        expect(matches.length).toBe(3);
+        expect(matches).toHaveLength(3);
     });
 
     test("loadLazyImage pattern: data-src replaces src, data attributes are removed", () => {
@@ -98,6 +98,6 @@ describe("OmniFaces.GraphicImage: lazy image selector", () => {
 
         // Image should no longer match the lazy selector
         const matches = document.querySelectorAll("img[src][data-src][data-lazy]");
-        expect(matches.length).toBe(0);
+        expect(matches).toHaveLength(0);
     });
 });

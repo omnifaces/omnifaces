@@ -62,7 +62,7 @@ describe("OmniFaces.ScriptErrorHandler: error reporting", () => {
     test("sends error details via navigator.sendBeacon", () => {
         window.onerror!("Test error", "test.js", 42, 10, new Error("Test error"));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         expect(lastBeaconCall().url).toBe("/error-endpoint");
     });
 
@@ -152,21 +152,21 @@ describe("OmniFaces.ScriptErrorHandler: deduplication", () => {
         window.onerror!("Same error", "same.js", 10, 1, new Error("Same error"));
         window.onerror!("Same error", "same.js", 10, 1, new Error("Same error"));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 
     test("reports different errors separately", () => {
         window.onerror!("Error A", "a.js", 10, 1, new Error("Error A"));
         window.onerror!("Error B", "b.js", 20, 1, new Error("Error B"));
 
-        expect(getBeaconCalls().length).toBe(2);
+        expect(getBeaconCalls()).toHaveLength(2);
     });
 
     test("reports same message from different source/line as separate errors", () => {
         window.onerror!("Same msg", "a.js", 10, 1, new Error("Same msg"));
         window.onerror!("Same msg", "a.js", 20, 1, new Error("Same msg"));
 
-        expect(getBeaconCalls().length).toBe(2);
+        expect(getBeaconCalls()).toHaveLength(2);
     });
 
     test("forgets the recent errors on reinitialization", () => {
@@ -202,14 +202,14 @@ describe("OmniFaces.ScriptErrorHandler: ignoreSelector", () => {
         document.body.appendChild(marker);
 
         window.onerror!("Suppressed error", "test.js", 1, 1, new Error("Suppressed error"));
-        expect(getBeaconCalls().length).toBe(0);
+        expect(getBeaconCalls()).toHaveLength(0);
     });
 
     test("reports error when no matching element exists", () => {
         scriptErrorHandler().init("/error-endpoint", ".ignore-errors", 10, 60000);
 
         window.onerror!("Reported error", "test.js", 1, 1, new Error("Reported error"));
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 });
 
@@ -230,11 +230,11 @@ describe("OmniFaces.ScriptErrorHandler: maxRecentErrors", () => {
         window.onerror!("Error 1", "a.js", 1, 1, new Error("Error 1"));
         window.onerror!("Error 2", "b.js", 2, 1, new Error("Error 2"));
         window.onerror!("Error 3", "c.js", 3, 1, new Error("Error 3"));
-        expect(getBeaconCalls().length).toBe(3);
+        expect(getBeaconCalls()).toHaveLength(3);
 
         // New error should evict oldest and be reported
         window.onerror!("Error 4", "d.js", 4, 1, new Error("Error 4"));
-        expect(getBeaconCalls().length).toBe(4);
+        expect(getBeaconCalls()).toHaveLength(4);
     });
 });
 
@@ -253,17 +253,17 @@ describe("OmniFaces.ScriptErrorHandler: errorExpiry", () => {
         scriptErrorHandler().init("/error-endpoint", null, 10, 100); // 100ms expiry
 
         window.onerror!("Expiring error", "exp.js", 1, 1, new Error("Expiring error"));
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
 
         // Duplicate within expiry
         window.onerror!("Expiring error", "exp.js", 1, 1, new Error("Expiring error"));
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
 
         // Advance time past expiry
         const origDateNow = Date.now;
         Date.now = () => origDateNow() + 200;
         window.onerror!("Expiring error", "exp.js", 1, 1, new Error("Expiring error"));
-        expect(getBeaconCalls().length).toBe(2);
+        expect(getBeaconCalls()).toHaveLength(2);
         Date.now = origDateNow;
     });
 });
@@ -301,7 +301,7 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
             promise: Promise.reject(error).catch(() => {}),
         }));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         const data = lastBeaconCall().data as URLSearchParams;
         expect(data.get("errorMessage")).toBe("Cannot read property 'x' of null");
         expect(data.get("errorName")).toBe("TypeError");
@@ -315,7 +315,7 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
             promise: Promise.reject("something went wrong").catch(() => {}),
         }));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         const data = lastBeaconCall().data as URLSearchParams;
         expect(data.get("errorMessage")).toBe("something went wrong");
         expect(data.get("errorName")).toBe("UnhandledRejection");
@@ -329,7 +329,7 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
             promise: Promise.reject(reason).catch(() => {}),
         }));
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
         const data = lastBeaconCall().data as URLSearchParams;
         expect(data.get("errorMessage")).toBe("{\"code\":500}");
         expect(data.get("errorName")).toBe("UnhandledRejection");
@@ -343,6 +343,6 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
             }));
         }
 
-        expect(getBeaconCalls().length).toBe(1);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 });
