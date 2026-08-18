@@ -99,6 +99,9 @@
         <sonar.sources>src/main/java,src/main/ts</sonar.sources> <!-- The TypeScript is not a Maven source root, so it must be listed explicitly along with the Java. -->
         <sonar.tests>src/test/java,src/test/ts</sonar.tests>
         <sonar.exclusions>**/node_modules/**</sonar.exclusions>
+        <!-- Ignored rules live in the project settings on SonarCloud, not here, as sonar.issue.ignore.multicriteria is a multi value property which is not
+             persisted when it is passed by the scanner. Currently ignored on **/*.java are java:S110, java:S115, java:S117, java:S1989, java:S2143,
+             java:S5786 and java:S6813. -->
     </properties>
 
     <dependencies>
