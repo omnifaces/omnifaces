@@ -12,15 +12,12 @@
  */
 package org.omnifaces.cdi.ratelimit;
 
-import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,14 +27,12 @@ import org.junit.jupiter.api.Test;
 
 class RateLimiterTest {
 
-    private static final Instant START_TIME = Instant.parse("2026-01-01T00:00:00Z");
-
     private static final String FIRST_IP = "192.0.2.1";
     private static final String SECOND_IP = "192.0.2.2";
 
     private RateLimiter rateLimiter;
     private HttpServletRequest request;
-    private Instant now;
+    private long nanos;
 
     @BeforeEach
     void setUp() {
@@ -98,7 +93,7 @@ class RateLimiterTest {
     void testRateLimitResetAfterTimeWindow() {
         var timeWindow = Duration.ofMillis(100);
         var maxRequests = 2;
-        freezeClock();
+        freezeTicker();
 
         for (var i = 0; i < maxRequests; i++) {
             assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
@@ -106,7 +101,7 @@ class RateLimiterTest {
 
         assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
 
-        advanceClock(timeWindow);
+        advanceTicker(timeWindow);
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
     }
@@ -115,7 +110,7 @@ class RateLimiterTest {
     void testAutomaticCleanupOfExpiredEntries() {
         var timeWindow = Duration.ofMillis(50);
         var maxRequests = 1;
-        freezeClock();
+        freezeTicker();
 
         var request1 = mock(HttpServletRequest.class);
         when(request1.getRemoteAddr()).thenReturn(FIRST_IP);
@@ -126,7 +121,7 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request1, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request2, maxRequests, timeWindow, 0));
 
-        advanceClock(timeWindow);
+        advanceTicker(timeWindow);
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request1, maxRequests, timeWindow, 0));
     }
@@ -141,14 +136,13 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 1));
     }
 
-    private void freezeClock() {
-        now = START_TIME;
-        rateLimiter.setClock(Clock.fixed(now, UTC));
+    private void freezeTicker() {
+        nanos = 0;
+        rateLimiter.setTicker(() -> nanos);
     }
 
-    private void advanceClock(Duration duration) {
-        now = now.plus(duration);
-        rateLimiter.setClock(Clock.fixed(now, UTC));
+    private void advanceTicker(Duration duration) {
+        nanos += duration.toNanos();
     }
 
 }

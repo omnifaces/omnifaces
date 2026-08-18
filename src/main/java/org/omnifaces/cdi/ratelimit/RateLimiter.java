@@ -14,11 +14,11 @@ package org.omnifaces.cdi.ratelimit;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRemoteAddr;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.LongSupplier;
 import java.util.logging.Logger;
 
 import jakarta.annotation.PostConstruct;
@@ -120,7 +121,7 @@ public class RateLimiter {
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final Map<String, RequestCounter> requestCountsByClientId = new ConcurrentHashMap<>();
-    private Clock clock = Clock.systemDefaultZone();
+    private LongSupplier ticker = System::nanoTime;
     private ScheduledExecutorService executorService;
     private boolean managedExecutorService;
 
@@ -201,16 +202,16 @@ public class RateLimiter {
     }
 
     private void checkRateLimit(String clientId, int maxRequestsPerTimeWindow, Duration timeWindow) {
-        var now = clock.millis();
-        var timeWindowInMillis = timeWindow.toMillis();
-        requestCountsByClientId.entrySet().removeIf(entry -> now - entry.getValue().starttime >= timeWindowInMillis);
+        var now = ticker.getAsLong();
+        var timeWindowInNanos = timeWindow.toNanos();
+        requestCountsByClientId.entrySet().removeIf(entry -> now - entry.getValue().starttime >= timeWindowInNanos);
         var counter = requestCountsByClientId.compute(clientId, ($, rc) -> (rc == null) ? new RequestCounter(now) : rc.increment());
 
-        if (counter.count > maxRequestsPerTimeWindow && now - counter.starttime < timeWindowInMillis) {
-            var elapsedTimeInMillis = now - counter.starttime;
+        if (counter.count > maxRequestsPerTimeWindow) {
+            var elapsedTimeInNanos = now - counter.starttime;
 
-            if (elapsedTimeInMillis < timeWindowInMillis) {
-                throw new RateLimitExceededException(clientId, timeWindowInMillis - elapsedTimeInMillis);
+            if (elapsedTimeInNanos < timeWindowInNanos) {
+                throw new RateLimitExceededException(clientId, Math.max(1, NANOSECONDS.toMillis(timeWindowInNanos - elapsedTimeInNanos)));
             }
         }
     }
@@ -253,12 +254,13 @@ public class RateLimiter {
     }
 
     /**
-     * Sets the clock which is used to measure the time window, so that a test can advance it without waiting.
+     * Sets the ticker which is used to measure the time window, so that a test can advance it without waiting. It must be monotonic, as the time window is
+     * measured as an elapsed duration rather than as a moment in time.
      *
-     * @param clock The clock which is used to measure the time window.
+     * @param ticker The ticker which is used to measure the time window, in nanoseconds.
      */
-    void setClock(Clock clock) {
-        this.clock = clock;
+    void setTicker(LongSupplier ticker) {
+        this.ticker = ticker;
     }
 
     // Nested classes -------------------------------------------------------------------------------------------------
