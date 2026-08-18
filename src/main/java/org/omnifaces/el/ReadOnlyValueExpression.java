@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el;
 
+import java.util.Objects;
+
 import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
@@ -110,14 +112,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
         // Property checks.
         var other = (ReadOnlyValueExpression) object;
-        var value = getValue(null);
-        var otherValue = other.getValue(null);
-        if (value == null ? otherValue != null : !value.equals(otherValue)) {
-            return false;
-        }
-
-        // All passed.
-        return true;
+        return Objects.equals(getValue(null), other.getValue(null));
     }
 
     @Override

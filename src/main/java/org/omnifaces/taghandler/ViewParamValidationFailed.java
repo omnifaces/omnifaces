@@ -147,7 +147,7 @@ public class ViewParamValidationFailed extends TagHandler {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
-    private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9][0-9][0-9]");
+    private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9]\\d\\d");
 
     private static final String ERROR_INVALID_PARENT = "%s This must be a child of UIViewRoot or UIViewParameter. Encountered parent of type '%s'."
         + " You need to enclose it in f:metadata or f|o:viewParam.";

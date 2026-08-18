@@ -210,7 +210,7 @@ public class CacheControlFilter extends HttpFilter {
         String expiresParam = getInitParameter(INIT_PARAM_EXPIRES);
 
         if (expiresParam != null) {
-            if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
+            if (!expiresParam.matches("\\d{1,9}[wdhms]?")) {
                 throw new ServletException(ERROR_EXPIRES.formatted(expiresParam));
             }
 

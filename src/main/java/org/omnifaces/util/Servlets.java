@@ -574,7 +574,7 @@ public final class Servlets {
                     ? ""
                     : entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
                         .replace("\\\"", "\"") // Unescape quotes.
-                        .replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
+                        .replaceAll("%\\\\(\\\\d{2})", "%$1") // Unescape %xx.
                         .trim();
                 map.put(name, value);
                 builder = new StringBuilder();

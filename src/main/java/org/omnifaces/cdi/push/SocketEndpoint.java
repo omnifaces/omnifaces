@@ -119,7 +119,7 @@ public class SocketEndpoint extends Endpoint {
 
     private static long getIdleTimeout(EndpointConfig config) {
         var idleTimeout = config.getUserProperties().get(Socket.PARAM_SOCKET_ENDPOINT_IDLE_TIMEOUT);
-        return idleTimeout instanceof Long ? (Long) idleTimeout : 0;
+        return idleTimeout instanceof Long value ? value : 0;
     }
 
     /**

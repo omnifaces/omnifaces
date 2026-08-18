@@ -206,7 +206,7 @@ public class CompressedResponseFilter extends HttpFilter {
         var thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
 
         if (thresholdParam != null) {
-            if (!thresholdParam.matches("[0-9]{1,4}")) {
+            if (!thresholdParam.matches("\\d{1,4}")) {
                 throw new ServletException(ERROR_THRESHOLD.formatted(thresholdParam));
             }
             else {
