@@ -46,15 +46,11 @@ public class ScriptParamIT extends OmniFacesIT {
     void testScriptParam() {
         waitUntilTextContent("scriptLoadTimestamp");
 
-        long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
-        long scriptLoadTimestamp = Long.valueOf(this.scriptLoadTimestamp.getText());
-        assertTrue(scriptLoadTimestamp > pageLoadTimestamp, "Script param is set later");
-
-        String clientTimeZoneOffset = this.clientTimeZoneOffset.getText();
-        assertTrue(Utils.isNumber(clientTimeZoneOffset), "Client time zone offset is a number");
-
-        String appName = this.appName.getText();
-        assertEquals("Netscape", appName, "navigator.appName is 'Netscape'");
+        var pageLoadTime = Long.parseLong(pageLoadTimestamp.getText());
+        var scriptLoadTime = Long.parseLong(scriptLoadTimestamp.getText());
+        assertTrue(scriptLoadTime > pageLoadTime, "Script param is set later");
+        assertTrue(Utils.isNumber(clientTimeZoneOffset.getText()), "Client time zone offset is a number");
+        assertEquals("Netscape", appName.getText(), "navigator.appName is 'Netscape'");
     }
 
 }

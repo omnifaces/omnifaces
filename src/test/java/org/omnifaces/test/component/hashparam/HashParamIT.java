@@ -48,9 +48,9 @@ public class HashParamIT extends OmniFacesIT {
         openWithHashString("foo=baz&bar=kaz");
         waitUntilTextContent("hashLoadTimestamp");
 
-        long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
-        long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
-        assertTrue(hashLoadTimestamp > pageLoadTimestamp, "Hash param is set later");
+        var pageLoadTime = Long.parseLong(pageLoadTimestamp.getText());
+        var hashLoadTime = Long.parseLong(hashLoadTimestamp.getText());
+        assertTrue(hashLoadTime > pageLoadTime, "Hash param is set later");
 
         foo.sendKeys("");
         bar.sendKeys("bar");
