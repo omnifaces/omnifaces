@@ -291,7 +291,7 @@ public class InputFile extends HtmlInputFile {
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final State state = new State(getStateHelper());
-    private transient Object transientSubmittedValue;
+    private Object transientSubmittedValue;
     private String messageComponentClientId;
 
     // Actions --------------------------------------------------------------------------------------------------------

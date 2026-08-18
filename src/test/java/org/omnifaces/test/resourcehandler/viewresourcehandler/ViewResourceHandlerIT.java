@@ -14,7 +14,6 @@ package org.omnifaces.test.resourcehandler.viewresourcehandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withViewResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withViewResources;
 import static org.omnifaces.test.resourcehandler.viewresourcehandler.ViewResourceHandlerITBean.LAST_MODIFIED;
@@ -62,32 +61,27 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 
     @Test
     @DisabledIfSystemProperty(named = "profile.id", matches = ".*-myfaces.*", disabledReason = "URLs are for some reason mapped to .xml instead of .xhtml?")
-    void test() {
-        try {
-            var connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
-            assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");
-            assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type").replace(" ", ""), "Content type");
+    void test() throws Exception {
+        var connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
+        assertEquals(HttpStatus.SC_OK, connection.getResponseCode(), "Response code");
+        assertEquals(EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type").replace(" ", ""), "Content type");
 
-            String actualPageSource;
+        String actualPageSource;
 
-            try (var scanner = new Scanner(connection.getInputStream(), UTF_8)) {
-                actualPageSource = scanner.useDelimiter("\\A").next();
-            }
-
-            var actualXmlProlog = actualPageSource
-                .substring(0, actualPageSource.indexOf("<!--")) // That XML comment is the generated license.txt comment.
-                .trim();
-            var actualXmlBody = actualPageSource
-                .substring(actualPageSource.indexOf("-->") + 3)
-                .replaceAll(">\\s+<", "><") // Get rid of whitespace between tags. This isn't consistent among servers.
-                .trim();
-
-            assertEquals(EXPECTED_XML_PROLOG, actualXmlProlog, "XML prolog");
-            assertEquals(EXPECTED_XML_BODY.replace("{baseURL}", baseURL.toString()), actualXmlBody, "Page source");
+        try (var scanner = new Scanner(connection.getInputStream(), UTF_8)) {
+            actualPageSource = scanner.useDelimiter("\\A").next();
         }
-        catch (Exception e) {
-            fail("Exception thrown: " + e);
-        }
+
+        var actualXmlProlog = actualPageSource
+            .substring(0, actualPageSource.indexOf("<!--")) // That XML comment is the generated license.txt comment.
+            .trim();
+        var actualXmlBody = actualPageSource
+            .substring(actualPageSource.indexOf("-->") + 3)
+            .replaceAll(">\\s+<", "><") // Get rid of whitespace between tags. This isn't consistent among servers.
+            .trim();
+
+        assertEquals(EXPECTED_XML_PROLOG, actualXmlProlog, "XML prolog");
+        assertEquals(EXPECTED_XML_BODY.replace("{baseURL}", baseURL.toString()), actualXmlBody, "Page source");
     }
 
 }
