@@ -93,6 +93,47 @@ describe("OmniFaces.ScriptErrorHandler: error reporting", () => {
         expect(data.has("errorMessage")).toBe(true);
         expect(data.has("sourceURL")).toBe(false);
     });
+
+    test("falls back to the error message when the message is not a string", () => {
+        window.onerror!(new Event("error"), "fallback.js", 1, 1, new Error("Error from the error argument"));
+
+        const data = lastBeaconCall().data as URLSearchParams;
+        expect(data.get("errorMessage")).toBe("Error from the error argument");
+    });
+
+    test("reports the message of an error event when the handler is invoked as event listener", () => {
+        const event = new ErrorEvent("error", { message: "Uncaught TypeError: x is not a function" });
+        window.onerror!(event);
+
+        const data = lastBeaconCall().data as URLSearchParams;
+        expect(data.get("errorMessage")).toBe("Uncaught TypeError: x is not a function");
+    });
+
+    test("reports the event name and type when the message is an event carrying neither", () => {
+        window.onerror!(new Event("securitypolicyviolation"), "stringify.js", 2, 2, undefined as any);
+
+        const data = lastBeaconCall().data as URLSearchParams;
+        expect(data.get("errorMessage")).toBe("Event: securitypolicyviolation");
+    });
+
+    test("trims the stack trace to stay within the beacon length", () => {
+        const error = new Error("Huge stack");
+        error.stack = "x".repeat(70000);
+        window.onerror!("Huge stack", "huge.js", 3, 3, error);
+
+        const data = lastBeaconCall().data as URLSearchParams;
+        expect(data.get("errorMessage")).toBe("Huge stack");
+        expect(data.get("errorStack")).toMatch(/x\.\.\.$/);
+        expect(data.toString().length).toBeLessThanOrEqual(60000);
+    });
+
+    test("trims the message too when there is no stack trace to sacrifice", () => {
+        window.onerror!("y".repeat(70000), "long.js", 4, 4, undefined as any);
+
+        const data = lastBeaconCall().data as URLSearchParams;
+        expect(data.get("errorMessage")).toMatch(/y\.\.\.$/);
+        expect(data.toString().length).toBeLessThanOrEqual(60000);
+    });
 });
 
 describe("OmniFaces.ScriptErrorHandler: deduplication", () => {
@@ -269,7 +310,7 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
         expect(data.has("errorStack")).toBe(false);
     });
 
-    test("sends object reason stringified with UnhandledRejection name", () => {
+    test("sends object reason serialized with UnhandledRejection name", () => {
         const reason = { code: 500 };
         window.dispatchEvent(new PromiseRejectionEvent("unhandledrejection", {
             reason,
@@ -278,7 +319,7 @@ describe("OmniFaces.ScriptErrorHandler: unhandledrejection", () => {
 
         expect(getBeaconCalls().length).toBe(1);
         const data = lastBeaconCall().data as URLSearchParams;
-        expect(data.get("errorMessage")).toBe("[object Object]");
+        expect(data.get("errorMessage")).toBe("{\"code\":500}");
         expect(data.get("errorName")).toBe("UnhandledRejection");
     });
 
