@@ -15,6 +15,8 @@ package org.omnifaces.el;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
 
 import jakarta.el.MethodInfo;
 
@@ -95,6 +97,27 @@ public class MethodReference extends MethodInfo {
      */
     public boolean isFromMethod() {
         return fromMethod;
+    }
+
+    // Object overrides -----------------------------------------------------------------------------------------------
+
+    @Override
+    public boolean equals(Object object) {
+        if (!super.equals(object)) { // Which already compares the class along with the method name, return type and parameter types.
+            return false;
+        }
+
+        var other = (MethodReference) object;
+
+        return Objects.equals(base, other.base)
+            && Objects.equals(method, other.method)
+            && Arrays.equals(actualParameters, other.actualParameters)
+            && fromMethod == other.fromMethod;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), base, method, Arrays.hashCode(actualParameters), fromMethod);
     }
 
 }
