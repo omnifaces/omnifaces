@@ -108,7 +108,7 @@ public class DateProducer {
          * Constructs a new proxyable temporal date which is initialized with {@link ZonedDateTime#now()}.
          */
         public TemporalDate() {
-            this(ZonedDateTime.now());
+            this(ZonedDateTime.now(ZoneId.systemDefault()));
         }
 
         /**

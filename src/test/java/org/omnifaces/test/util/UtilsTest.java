@@ -17,6 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Utils;
@@ -138,6 +143,19 @@ class UtilsTest {
 
     private static java.util.Date dateOf(String isoInstant) {
         return java.util.Date.from(Instant.parse(isoInstant));
+    }
+
+    /**
+     * An OffsetTime carries its own offset, so the date it is paired with must be today in that offset rather than today in the default zone of the JVM. The
+     * two offsets below are 26 hours apart and their local dates therefore always differ, so at any instant at least one of them differs from the default zone.
+     */
+    @Test
+    void testToZonedDateTimeDatesAnOffsetTimeInItsOwnOffset() {
+        for (var offset : List.of(ZoneOffset.ofHours(14), ZoneOffset.ofHours(-12))) {
+            var zonedDateTime = Utils.toZonedDateTime(OffsetTime.of(LocalTime.NOON, offset));
+
+            assertEquals(LocalDate.now(offset), zonedDateTime.toLocalDate(), "date at " + offset);
+        }
     }
 
 }

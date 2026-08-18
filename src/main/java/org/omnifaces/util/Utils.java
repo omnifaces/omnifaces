@@ -979,10 +979,10 @@ public final class Utils {
             return localDate.atStartOfDay(zone);
         }
         else if (date instanceof OffsetTime offsetTime) {
-            return offsetTime.atDate(LocalDate.now()).toZonedDateTime();
+            return offsetTime.atDate(LocalDate.now(zone)).toZonedDateTime();
         }
         else if (date instanceof LocalTime localTime) {
-            return localTime.atDate(LocalDate.now()).atZone(zone);
+            return localTime.atDate(LocalDate.now(zone)).atZone(zone);
         }
         else if (date instanceof TemporalDate temporalDate) {
             return temporalDate.getZonedDateTime();
