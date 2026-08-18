@@ -168,6 +168,18 @@ describe("OmniFaces.ScriptErrorHandler: deduplication", () => {
 
         expect(getBeaconCalls().length).toBe(2);
     });
+
+    test("forgets the recent errors on reinitialization", () => {
+        window.onerror!("Forgotten error", "forgotten.js", 10, 1, new Error("Forgotten error"));
+        window.onerror!("Forgotten error", "forgotten.js", 10, 1, new Error("Forgotten error"));
+
+        expect(getBeaconCalls()).toHaveLength(1);
+
+        scriptErrorHandler().init("/error-endpoint", null, 10, 60000);
+        window.onerror!("Forgotten error", "forgotten.js", 10, 1, new Error("Forgotten error"));
+
+        expect(getBeaconCalls()).toHaveLength(2);
+    });
 });
 
 describe("OmniFaces.ScriptErrorHandler: ignoreSelector", () => {

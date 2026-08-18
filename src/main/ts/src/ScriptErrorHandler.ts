@@ -47,6 +47,7 @@ export namespace ScriptErrorHandler {
         config.ignoreSelector = ignoreSelector;
         config.maxRecentErrors = maxRecentErrors;
         config.errorExpiry = errorExpiry;
+        recentErrors.length = 0; // The deduplication is bound to maxRecentErrors and errorExpiry, so it cannot outlive them.
 
         window.onerror = (message, source, line, column, error) => {
             send({
