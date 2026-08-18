@@ -100,7 +100,7 @@ public final class Beans {
 
     // Both Weld and OWB generate proxy class names as "BeanClassName[...]$$[...]Proxy[...]" with a "$$" and "Proxy" in it.
     // Hopefully unknown CDI proxy implementations follow the same de-facto standard.
-    private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("(.+)(\\$\\$(.*)Proxy|Proxy(.*)\\$\\$)(.*)", CASE_INSENSITIVE);
+    private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("\\$\\$.*Proxy|Proxy.*\\$\\$", CASE_INSENSITIVE);
 
     // Whether a class is a proxy is a fixed property of that class, so compute it only once per class. A ClassValue is used rather than a map because it does
     // not retain the class, which would prevent the web application's class loader from being garbage collected on undeploy.
@@ -112,8 +112,9 @@ public final class Beans {
                 return true;
             }
 
-            // Fall back for unknown CDI proxy implementations.
-            return PATTERN_GENERATED_PROXY_CLASS_NAME.matcher(beanClass.getSimpleName()).matches();
+            // Fall back for unknown CDI proxy implementations. The match starts at index 1 as the generated part is always preceded by the bean class name.
+            var simpleName = beanClass.getSimpleName();
+            return !simpleName.isEmpty() && PATTERN_GENERATED_PROXY_CLASS_NAME.matcher(simpleName).find(1);
         }
 
     };
