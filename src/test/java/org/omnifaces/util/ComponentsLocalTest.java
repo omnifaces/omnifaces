@@ -13,17 +13,21 @@
 package org.omnifaces.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -46,196 +50,34 @@ class ComponentsLocalTest {
         when(mockedFacesContext.getNamingContainerSeparatorChar()).thenReturn(':');
     }
 
-    @Test
-    void testStripIterationIndex_simpleCase() {
-        // Given: A client ID with one iteration index
-        var clientId = "form:table:0:input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The iteration index should be removed
-        assertEquals("form:table:input", result);
+    static Stream<Arguments> clientIds() {
+        return Stream.of(
+            arguments("form:table:0:input", "form:table:input"),
+            arguments("form:outerTable:5:innerTable:12:input", "form:outerTable:innerTable:input"),
+            arguments("form:input:button", "form:input:button"),
+            arguments("form:table:99:", "form:table:"),
+            arguments("0:table:input", "table:input"),
+            arguments("form:table:123456:input", "form:table:input"),
+            arguments("", ""),
+            arguments("input", "input"),
+            arguments("form1:table2:input3", "form1:table2:input3"),
+            arguments("form1:table2:5:input3", "form1:table2:input3"),
+            arguments("form1:outerTable2:7:innerTable3:99:input4", "form1:outerTable2:innerTable3:input4"),
+            arguments("form:component123:button", "form:component123:button"),
+            arguments("1form:2table:3:button4", "1form:2table:button4"),
+            arguments("form:table123abc:0:input", "form:table123abc:input"),
+            arguments("myForm1:dataTable2:15:column3:nested4:42:outputText5", "myForm1:dataTable2:column3:nested4:outputText5"),
+            arguments("123form:456table:7:input", "123form:456table:input")
+        );
     }
 
-    @Test
-    void testStripIterationIndex_multipleIterationIndices() {
-        // Given: A client ID with multiple iteration indices (nested UIData)
-        var clientId = "form:outerTable:5:innerTable:12:input";
-
-        // When: Stripping iteration indices
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: All iteration indices should be removed
-        assertEquals("form:outerTable:innerTable:input", result);
-    }
-
-    @Test
-    void testStripIterationIndex_noIterationIndex() {
-        // Given: A client ID without any iteration index
-        var clientId = "form:input:button";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The client ID should remain unchanged
-        assertEquals("form:input:button", result);
-    }
-
-    @Test
-    void testStripIterationIndex_iterationIndexAtEnd() {
-        // Given: A client ID ending with an iteration index
-        var clientId = "form:table:99:";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The iteration index should be removed
-        assertEquals("form:table:", result);
-    }
-
-    @Test
-    void testStripIterationIndex_iterationIndexAtStart() {
-        // Given: A client ID starting with an iteration index
-        var clientId = "0:table:input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The iteration index should be removed
-        assertEquals("table:input", result);
-    }
-
-    @Test
-    void testStripIterationIndex_largeIterationIndex() {
-        // Given: A client ID with a large iteration number
-        var clientId = "form:table:123456:input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The iteration index should be removed
-        assertEquals("form:table:input", result);
-    }
-
-    @Test
-    void testStripIterationIndex_emptyString() {
-        // Given: An empty client ID
-        var clientId = "";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Should return empty string
-        assertEquals("", result);
-    }
-
-    @Test
-    void testStripIterationIndex_singleComponent() {
-        // Given: A single component name without separators
-        var clientId = "input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Should return the same name
-        assertEquals("input", result);
-    }
-
-    @Test
-    void testStripIterationIndex_componentNamesWithDigits() {
-        // Given: Component names containing digits (not iteration indices)
-        var clientId = "form1:table2:input3";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Component names with digits should remain unchanged
-        assertEquals("form1:table2:input3", result);
-    }
-
-    @Test
-    void testStripIterationIndex_componentNamesWithDigitsAndIterationIndex() {
-        // Given: Component names with digits AND an iteration index
-        var clientId = "form1:table2:5:input3";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only the iteration index should be removed, not the digits in component names
-        assertEquals("form1:table2:input3", result);
-    }
-
-    @Test
-    void testStripIterationIndex_componentNamesWithDigitsAndMultipleIterationIndices() {
-        // Given: Component names with digits AND multiple iteration indices
-        var clientId = "form1:outerTable2:7:innerTable3:99:input4";
-
-        // When: Stripping iteration indices
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only the iteration indices should be removed
-        assertEquals("form1:outerTable2:innerTable3:input4", result);
-    }
-
-    @Test
-    void testStripIterationIndex_allDigitComponentName() {
-        // Given: A component name that is all digits (but part of the name, not an iteration index)
-        var clientId = "form:component123:button";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: The component name with digits should remain unchanged
-        assertEquals("form:component123:button", result);
-    }
-
-    @Test
-    void testStripIterationIndex_digitPrefixAndSuffix() {
-        // Given: Component names with digit prefixes and suffixes
-        var clientId = "1form:2table:3:button4";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only pure numeric iteration index should be removed
-        assertEquals("1form:2table:button4", result);
-    }
-
-    @Test
-    void testStripIterationIndex_consecutiveDigitsInComponentName() {
-        // Given: Component name with consecutive digits
-        var clientId = "form:table123abc:0:input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only the iteration index (pure digits) should be removed
-        assertEquals("form:table123abc:input", result);
-    }
-
-    @Test
-    void testStripIterationIndex_mixedScenario() {
-        // Given: Complex scenario with component names containing digits and iteration indices
-        var clientId = "myForm1:dataTable2:15:column3:nested4:42:outputText5";
-
-        // When: Stripping iteration indices
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only iteration indices (15, 42) should be removed, component name digits remain
-        assertEquals("myForm1:dataTable2:column3:nested4:outputText5", result);
-    }
-
-    @Test
-    void testStripIterationIndex_startingWithDigitComponentName() {
-        // Given: Component starting with digits followed by letters (not an iteration index)
-        var clientId = "123form:456table:7:input";
-
-        // When: Stripping iteration index
-        String result = ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId);
-
-        // Then: Only the pure numeric iteration index should be removed
-        assertEquals("123form:456table:input", result);
+    /**
+     * Only a path segment which consists entirely of digits is an iteration index, so digits anywhere within a component name must be left alone.
+     */
+    @ParameterizedTest(name = "[{index}] \"{0}\" is stripped to \"{1}\"")
+    @MethodSource("clientIds")
+    void testStripIterationIndex(String clientId, String expected) {
+        assertEquals(expected, ComponentsLocal.stripIterationIndex(mockedFacesContext, clientId));
     }
 
 }
