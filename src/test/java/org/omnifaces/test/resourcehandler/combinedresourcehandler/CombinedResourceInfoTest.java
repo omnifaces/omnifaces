@@ -20,10 +20,12 @@ import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.resourcehandler.CombinedResourceInfo;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * Verifies that a manipulated (i.e. not server-issued) combined resource ID cannot make the combined resource handler serve arbitrary resources, inflate
@@ -56,6 +58,17 @@ class CombinedResourceInfoTest {
         String bomb = serializeURLSafe(repeat("style.css|", 10000)); // Compresses tiny but inflates to ~100 KB, over the 64 KiB cap.
         assertThrows(IllegalArgumentException.class, () -> unserializeURLSafe(bomb), "over-large inflation is rejected");
         assertNull(CombinedResourceInfo.get(bomb), "combined resource with over-large inflation is rejected");
+    }
+
+    @Test
+    void uniqueIdIsReversedBackIntoItsResourceIdentifiers() throws Exception {
+        var resourceIdentifiers = List.of(new ResourceIdentifier("reverse.css"), new ResourceIdentifier("library:reverse.js"));
+        var builder = new CombinedResourceInfo.Builder();
+        resourceIdentifiers.forEach(builder::add);
+        var id = builder.create();
+        getCache().remove(id); // Else the instance which create() cached is returned and the ID is never decoded again.
+
+        assertEquals(resourceIdentifiers, List.copyOf(CombinedResourceInfo.get(id).getResourceIdentifiers()), "resource identifiers");
     }
 
     @Test

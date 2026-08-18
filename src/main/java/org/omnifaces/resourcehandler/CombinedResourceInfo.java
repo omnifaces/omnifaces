@@ -131,6 +131,19 @@ public final class CombinedResourceInfo {
             return id;
         }
 
+        // Helpers ----------------------------------------------------------------------------------------------------
+
+        /**
+         * Create an unique ID based on the given set of resource identifiers. The current implementation converts the set to a <code>|</code>-delimited string
+         * which is serialized using {@link Utils#serialize(String)}.
+         *
+         * @param resourceIdentifiers The set of resource identifiers to create an unique ID for.
+         * @return The unique ID of the given set of resource identifiers.
+         */
+        private static String toUniqueId(Set<ResourceIdentifier> resourceIdentifiers) {
+            return serializeURLSafe(Converters.joinCollection(resourceIdentifiers, "|"));
+        }
+
     }
 
     /**
@@ -294,18 +307,7 @@ public final class CombinedResourceInfo {
     // Helpers ----------------------------------------------------------------------------------------------------
 
     /**
-     * Create an unique ID based on the given set of resource identifiers. The current implementation converts the set to a <code>|</code>-delimited string
-     * which is serialized using {@link Utils#serialize(String)}.
-     *
-     * @param resourceIdentifiers The set of resource identifiers to create an unique ID for.
-     * @return The unique ID of the given set of resource identifiers.
-     */
-    private static String toUniqueId(Set<ResourceIdentifier> resourceIdentifiers) {
-        return serializeURLSafe(Converters.joinCollection(resourceIdentifiers, "|"));
-    }
-
-    /**
-     * Create an ordered set of resource identifiers based on the given unique ID. This does the reverse of {@link #toUniqueId(Map)}.
+     * Create an ordered set of resource identifiers based on the given unique ID. This does the reverse of {@link Builder#toUniqueId(Set)}.
      *
      * @param id The unique ID of the set of resource identifiers.
      * @return The set of resource identifiers based on the given unique ID, or <code>null</code> if the ID is not valid.
