@@ -57,7 +57,7 @@ export namespace HashParam {
         const location = window.location;
         let oldHashQueryString = location.hash;
 
-        if (!!oldHashQueryString && oldHashQueryString.charAt(0) == "#") {
+        if (oldHashQueryString.startsWith("#")) {
             oldHashQueryString = oldHashQueryString.substring(1);
         }
 

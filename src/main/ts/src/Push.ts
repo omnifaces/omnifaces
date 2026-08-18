@@ -47,7 +47,9 @@ export namespace Push {
 
     // Private static classes -----------------------------------------------------------------------------------------
 
-    class SocketConnection implements Connection {
+    abstract class PushConnection implements Connection {
+
+        // Private fields ---------------------------------------------------------------------------------------------
 
         readonly url: string;
         readonly channel: string;
@@ -57,25 +59,16 @@ export namespace Push {
         readonly onclose: Function;
         readonly behaviors: Record<string, Function[]>;
 
-        socket: WebSocket | null = null;
-        reconnectAttempts: number | null = null;
-
         // Constructor ------------------------------------------------------------------------------------------------
 
         /**
-         * Creates a reconnecting web socket connection. When the web socket successfully connects on first attempt,
-         * then it will automatically reconnect on timeout with cumulative intervals of 500ms with a maximum of 25
-         * attempts (~3 minutes). The <code>onclose</code> function will be called with the error code of the last
-         * attempt.
          * @constructor
-         * @param url The URL of the web socket.
+         * @param url The URL of the push endpoint.
          * @param channel The name of the push channel.
-         * @param onopen The function to be invoked when the web socket is opened.
+         * @param onopen The function to be invoked when the connection is opened.
          * @param onmessage The function to be invoked when a message is received.
-         * @param onerror The function to be invoked when a connection error has occurred and the web socket will
-         * attempt to reconnect.
-         * @param onclose The function to be invoked when the web socket is closed and will not anymore attempt to
-         * reconnect.
+         * @param onerror The function to be invoked when a connection error has occurred.
+         * @param onclose The function to be invoked when the connection is closed.
          * @param behaviors Client behavior functions to be invoked when specific message is received.
          */
         constructor(
@@ -98,6 +91,38 @@ export namespace Push {
 
         // Public functions -------------------------------------------------------------------------------------------
 
+        abstract open(): void;
+
+        abstract close(): void;
+
+        // Protected functions ----------------------------------------------------------------------------------------
+
+        /**
+         * Parses the given message event and invokes the onmessage function along with any client behaviors which are
+         * registered on the received message.
+         * @param event The message event received from the push endpoint.
+         */
+        protected handleMessage(event: MessageEvent) {
+            const message = JSON.parse(event.data);
+            this.onmessage(message, this.channel, event);
+            this.behaviors[message]?.forEach(behavior => behavior());
+        }
+    }
+
+    /**
+     * A reconnecting web socket connection. When the web socket successfully connects on first attempt, then it will
+     * automatically reconnect on timeout with cumulative intervals of 500ms with a maximum of 25 attempts (~3 minutes).
+     * The <code>onclose</code> function will be called with the error code of the last attempt.
+     */
+    class SocketConnection extends PushConnection {
+
+        // Private fields ---------------------------------------------------------------------------------------------
+
+        socket: WebSocket | null = null;
+        reconnectAttempts: number | null = null;
+
+        // Public functions -------------------------------------------------------------------------------------------
+
         /**
          * Opens the reconnecting web socket.
          */
@@ -116,11 +141,7 @@ export namespace Push {
                 this.reconnectAttempts = 0;
             };
 
-            this.socket.onmessage = (event: MessageEvent) => {
-                const message = JSON.parse(event.data);
-                this.onmessage(message, this.channel, event);
-                this.behaviors[message]?.forEach(behavior => behavior());
-            };
+            this.socket.onmessage = (event: MessageEvent) => this.handleMessage(event);
 
             this.socket.onclose = (event: CloseEvent) => {
                 if (!this.socket
@@ -151,68 +172,34 @@ export namespace Push {
         }
     }
 
-    class SseConnection implements Connection {
+    /**
+     * An SSE connection. The browser's <code>EventSource</code> API handles reconnect natively.
+     * <p>
+     * The <code>onerror</code> function will be invoked with three arguments:
+     * <ul>
+     * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>500</code> means a connection
+     * error occurred and the browser will automatically attempt to reconnect.</li>
+     * <li><code>channel</code>: the channel name.</li>
+     * <li><code>event</code>: the raw <code>Event</code> instance from the <code>EventSource</code> API.</li>
+     * </ul>
+     * <p>
+     * The <code>onclose</code> function will be invoked with three arguments:
+     * <ul>
+     * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>-1</code> means the
+     * <code>EventSource</code> API is not supported by the client. <code>200</code> means the server explicitly
+     * closed the connection (e.g. on session or view expiry). <code>204</code> means the client explicitly closed
+     * the connection via <code>OmniFaces.Push.close()</code>. <code>404</code> means the channel is unknown.</li>
+     * <li><code>channel</code>: the channel name.</li>
+     * <li><code>event</code>: the raw <code>Event</code> instance, if available. Present for server close
+     * (<code>200</code> and <code>404</code>), absent for unsupported (<code>-1</code>) and client close
+     * (<code>204</code>).</li>
+     * </ul>
+     */
+    class SseConnection extends PushConnection {
 
-        readonly url: string;
-        readonly channel: string;
-        readonly onopen: Function;
-        readonly onmessage: Function;
-        readonly onerror: Function;
-        readonly onclose: Function;
-        readonly behaviors: Record<string, Function[]>;
+        // Private fields ---------------------------------------------------------------------------------------------
 
         eventSource: EventSource | null = null;
-
-        // Constructor ------------------------------------------------------------------------------------------------
-
-        /**
-         * Creates an SSE connection. The browser's <code>EventSource</code> API handles reconnect natively.
-         * <p>
-         * The <code>onerror</code> function will be invoked with three arguments:
-         * <ul>
-         * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>500</code> means a connection
-         * error occurred and the browser will automatically attempt to reconnect.</li>
-         * <li><code>channel</code>: the channel name.</li>
-         * <li><code>event</code>: the raw <code>Event</code> instance from the <code>EventSource</code> API.</li>
-         * </ul>
-         * <p>
-         * The <code>onclose</code> function will be invoked with three arguments:
-         * <ul>
-         * <li><code>code</code>: synthetic HTTP-based close code as integer. <code>-1</code> means the
-         * <code>EventSource</code> API is not supported by the client. <code>200</code> means the server explicitly
-         * closed the connection (e.g. on session or view expiry). <code>204</code> means the client explicitly closed
-         * the connection via <code>OmniFaces.Push.close()</code>. <code>404</code> means the channel is unknown.</li>
-         * <li><code>channel</code>: the channel name.</li>
-         * <li><code>event</code>: the raw <code>Event</code> instance, if available. Present for server close
-         * (<code>200</code> and <code>404</code>), absent for unsupported (<code>-1</code>) and client close
-         * (<code>204</code>).</li>
-         * </ul>
-         * @constructor
-         * @param url The URL of the SSE endpoint.
-         * @param channel The name of the push channel.
-         * @param onopen The function to be invoked when the SSE connection is opened.
-         * @param onmessage The function to be invoked when a message is received.
-         * @param onerror The function to be invoked when a connection error has occurred.
-         * @param onclose The function to be invoked when the SSE connection is closed.
-         * @param behaviors Client behavior functions to be invoked when specific message is received.
-         */
-        constructor(
-            url: string,
-            channel: string,
-            onopen: Function,
-            onmessage: Function,
-            onerror: Function,
-            onclose: Function,
-            behaviors: Record<string, Function[]>
-        ) {
-            this.url = url;
-            this.channel = channel;
-            this.onopen = onopen;
-            this.onmessage = onmessage;
-            this.onerror = onerror;
-            this.onclose = onclose;
-            this.behaviors = behaviors;
-        }
 
         // Public functions -------------------------------------------------------------------------------------------
 
@@ -230,14 +217,10 @@ export namespace Push {
                 this.onopen(this.channel);
             };
 
-            this.eventSource.onmessage = (event: MessageEvent) => {
-                const message = JSON.parse(event.data);
-                this.onmessage(message, this.channel, event);
-                this.behaviors[message]?.forEach(behavior => behavior());
-            };
+            this.eventSource.onmessage = (event: MessageEvent) => this.handleMessage(event);
 
             this.eventSource.addEventListener("close", (event: MessageEvent) => {
-                const code = parseInt(event.data);
+                const code = Number.parseInt(event.data);
                 this.eventSource?.close();
                 this.eventSource = null;
                 this.onclose(code, this.channel, event);
@@ -366,9 +349,15 @@ export namespace Push {
      */
     function getSocketURL(host: string, uri: string): string {
         host = host ?? "";
-        const base = (!host || host.startsWith("/")) ? window.location.host
-            : (host.startsWith(":")) ? window.location.hostname
-                : "";
+        let base = "";
+
+        if (!host || host.startsWith("/")) {
+            base = window.location.host;
+        }
+        else if (host.startsWith(":")) {
+            base = window.location.hostname;
+        }
+
         return `${WS_PROTOCOL}${base}${host}${WS_URI_PREFIX}/${uri}`;
     }
 
