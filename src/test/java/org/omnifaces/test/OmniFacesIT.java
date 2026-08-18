@@ -570,10 +570,7 @@ public abstract class OmniFacesIT {
                 case withErrorPageAndParams :
                     addWebResource("WEB-INF/500-with-params.xhtml");
                     break;
-                case withFacesViews :
-                case withFacesViewsLowercasedRequestURI :
-                case withMultiViews :
-                case withMultiViewsAndIndexWelcomeFile :
+                case withFacesViews, withFacesViewsLowercasedRequestURI, withMultiViews, withMultiViewsAndIndexWelcomeFile :
                     addWebResource("WEB-INF/404.xhtml");
                     break;
                 default :
