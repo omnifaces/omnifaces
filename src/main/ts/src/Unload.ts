@@ -29,14 +29,24 @@ export namespace Unload {
 
     let id: string;
     let disabled: boolean;
+    let sent: boolean;
 
     // Public static functions ----------------------------------------------------------------------------------------
 
     /**
      * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-     * current document has a Faces form with a view state element. If so, then register the <code>pagehide</code> event
-     * to send a beacon or synchronous XHR request with the OmniFaces view scope ID and the Faces view state value as
-     * parameters. Also register the all Faces <code>submit</code> events to disable the unload event listener.
+     * current document has a Faces form with a view state element. If so, then register the <code>beforeunload</code>
+     * and <code>pagehide</code> events to send a beacon or synchronous XHR request with the OmniFaces view scope ID and
+     * the Faces view state value as parameters. Also register the all Faces <code>submit</code> events to disable the
+     * unload event listener.
+     * <p>
+     * The beacon goes out on <code>beforeunload</code>, which fires before the browser issues the request of the page
+     * being navigated to, so that the unload never competes with that request. Only when the document holds a leave
+     * confirmation, recognizable by another listener having called <code>preventDefault()</code> on the event or having
+     * set its <code>returnValue</code>, is the
+     * beacon held back until <code>pagehide</code>, which fires only once the navigation is actually committed and thus
+     * keeps the view scoped beans alive for an enduser who cancels. The listeners are therefore registered on load,
+     * after the application's own.
      * @param viewScopeId The OmniFaces view scope ID.
      */
     export function init(viewScopeId: string) {
@@ -49,9 +59,8 @@ export namespace Unload {
                 return;
             }
 
-            Util.addEventListener(window, "pagehide", function() {
-                if (disabled) {
-                    reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+            const send = function() {
+                if (sent) {
                     return;
                 }
 
@@ -65,6 +74,7 @@ export namespace Unload {
                     const url = form.action;
                     const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
                     const contentType = "application/x-www-form-urlencoded";
+                    sent = true;
 
                     if (navigator.sendBeacon) {
                         // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
@@ -81,6 +91,23 @@ export namespace Unload {
                 catch (e) {
                     // Fail silently. You never know.
                 }
+            };
+
+            Util.addOnloadListener(function() {
+                Util.addEventListener(window, "beforeunload", function(event: BeforeUnloadEvent) {
+                    if (!disabled && !event.defaultPrevented && !event.returnValue) {
+                        send();
+                    }
+                });
+
+                Util.addEventListener(window, "pagehide", function() {
+                    if (disabled) {
+                        reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+                        return;
+                    }
+
+                    send(); // Just in case current browser doesn't support beforeunload.
+                });
             });
 
             Util.addSubmitListener(function() {
@@ -90,6 +117,7 @@ export namespace Unload {
 
         id = viewScopeId;
         disabled = false;
+        sent = false;
     }
 
     /**

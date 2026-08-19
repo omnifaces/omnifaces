@@ -147,11 +147,17 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  *
  * <h2>Using beforeunload</h2>
  * <p>
- * A custom <code>beforeunload</code> handler can be registered in whatever way you like. The unload is hooked on the <code>pagehide</code> event, which is
- * fired only once the navigation is actually committed, so an enduser who cancels your confirmation and stays in the same page keeps the view scoped bean.
+ * A custom <code>beforeunload</code> handler can be registered in whatever way you like. The unload is hooked on the <code>beforeunload</code> event, which is
+ * fired before the browser issues the request of the page being navigated to, so that the unload never competes with that request.
  * <p>
- * Do note that the browser fires <code>pagehide</code> only after it has issued the request of the page being navigated to. The <code>&#64;PreDestroy</code> of
- * the unloaded bean is therefore not guaranteed to be invoked before that request is processed.
+ * Only when the document holds a leave confirmation, recognizable by the event having been canceled or having its <code>returnValue</code> set, is the unload
+ * held back until the <code>pagehide</code> event, which is fired only once the navigation is actually committed, so an enduser who cancels your confirmation
+ * and stays in the same page keeps the view scoped bean. The <code>pagehide</code> event doubles as fallback for browsers which do not support
+ * <code>beforeunload</code>, such as Safari on iOS. There the unload is fired only after the browser has issued the request of the page being navigated to, and
+ * the <code>&#64;PreDestroy</code> of the unloaded bean is therefore not guaranteed to be invoked before that request is processed.
+ * <p>
+ * Do note that OmniFaces registers its handlers only once the document has loaded, so that any handler of the application is registered before them and its
+ * confirmation is thus visible to them. A handler which is registered any later cannot be taken into account.
  * <p>
  * The recommended way is <code>window.addEventListener("beforeunload", listener)</code> whereby the listener invokes <code>event.preventDefault()</code> in
  * order to trigger the confirmation. Below is a kickoff example of an unsaved data warning, assuming jQuery is available, and that "stateless" forms and inputs
@@ -174,8 +180,9 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * Note that browsers ignore any message returned by the handler or assigned to <code>event.returnValue</code> and always show their own generic confirmation.
  * <p>
  * Since OmniFaces 5.5, assigning the handler to the <code>window.onbeforeunload</code> property, which was previously required in order to let the unload take
- * it into account, is not necessary anymore. It keeps working, it just doesn't get any special treatment anymore. As that property holds only a single handler
- * and thus clobbers any other one, <code>window.addEventListener()</code> as shown above is preferred.
+ * it into account, is not necessary anymore. It keeps working, as a message returned by such a handler ends up in <code>event.returnValue</code> and is thereby
+ * recognized as a leave confirmation. As that property holds only a single handler and thus clobbers any other one, <code>window.addEventListener()</code> as
+ * shown above is preferred.
  *
  * <h2>Using download links</h2>
  * <p>

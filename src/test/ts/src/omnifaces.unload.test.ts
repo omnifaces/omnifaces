@@ -22,6 +22,25 @@ beforeAll(() => loadOmniFacesJs());
 
 const unload = () => OmniFaces.Unload as Record<string, Function>;
 
+// The unload listeners are registered on load, so let that task run before dispatching any event.
+const initUnload = async (viewScopeId: string) => {
+    unload().init(viewScopeId);
+    await new Promise(resolve => setTimeout(resolve, 0));
+};
+
+// jsdom has no BeforeUnloadEvent, and Event#returnValue is there the legacy boolean alias of the canceled flag, so
+// shadow it with the empty string which a real BeforeUnloadEvent carries.
+const beforeUnloadEvent = () => {
+    const event = new Event("beforeunload", { cancelable: true });
+    Object.defineProperty(event, "returnValue", { value: "", writable: true, configurable: true });
+    return event;
+};
+
+const readBeacon = async () => {
+    const blob = getBeaconCalls()[0].data as Blob;
+    return new Promise<string>(resolve => { const reader = new FileReader(); reader.onload = () => resolve(reader.result as string); reader.readAsText(blob); });
+};
+
 describe("OmniFaces.Unload.init", () => {
 
     let form: HTMLFormElement | undefined;
@@ -76,11 +95,11 @@ describe("OmniFaces.Unload: beacon on unload", () => {
         uninstallMockBeacon();
     });
 
-    test("sends beacon with correct query on pagehide event", () => {
+    test("sends beacon with correct query on beforeunload event", async () => {
         form = createFacesForm("f1", "/test/action");
-        unload().init("viewScope42");
+        await initUnload("viewScope42");
 
-        window.dispatchEvent(new Event("pagehide"));
+        window.dispatchEvent(beforeUnloadEvent());
 
         expect(getBeaconCalls()).toHaveLength(1);
         const call = getBeaconCalls()[0];
@@ -93,59 +112,95 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
     test("beacon query contains event, id and ViewState parameters", async () => {
         form = createFacesForm("f2", "/test/action");
-        unload().init("vs123");
+        await initUnload("vs123");
 
-        window.dispatchEvent(new Event("pagehide"));
+        window.dispatchEvent(beforeUnloadEvent());
 
-        const blob = getBeaconCalls()[0].data as Blob;
-        const text = await new Promise<string>(resolve => { const r = new FileReader(); r.onload = () => resolve(r.result as string); r.readAsText(blob); });
+        const text = await readBeacon();
         expect(text).toContain("omnifaces.event=unload");
         expect(text).toContain("id=vs123");
         expect(text).toContain("jakarta.faces.ViewState=");
     });
 
-    test("sends beacon on pagehide event when page is eligible for back/forward cache", () => {
+    test("sends beacon on pagehide event when browser does not support beforeunload", async () => {
+        form = createFacesForm("fPagehide", "/test/action");
+        await initUnload("vsPagehide");
+
+        window.dispatchEvent(new Event("pagehide"));
+
+        expect(getBeaconCalls()).toHaveLength(1);
+    });
+
+    test("sends beacon on pagehide event when page is eligible for back/forward cache", async () => {
         form = createFacesForm("fPersisted", "/test/action");
-        unload().init("vsPersisted");
+        await initUnload("vsPersisted");
 
         window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
 
         expect(getBeaconCalls()).toHaveLength(1);
     });
 
-    test("does not send beacon on beforeunload event", () => {
-        form = createFacesForm("fBeforeUnload", "/test/action");
-        unload().init("vsBeforeUnload");
+    test("sends beacon only once when both beforeunload and pagehide fire", async () => {
+        form = createFacesForm("fBoth", "/test/action");
+        await initUnload("vsBoth");
 
-        window.dispatchEvent(new Event("beforeunload"));
+        window.dispatchEvent(beforeUnloadEvent());
+        window.dispatchEvent(new Event("pagehide"));
 
-        expect(getBeaconCalls()).toHaveLength(0);
+        expect(getBeaconCalls()).toHaveLength(1);
     });
 
-    test("does not touch window.onbeforeunload property", () => {
+    test("holds back beacon until pagehide when the beforeunload event is canceled", async () => {
+        form = createFacesForm("fPrevented", "/test/action");
+        await initUnload("vsPrevented");
+
+        const event = beforeUnloadEvent();
+        event.preventDefault(); // as a leave confirmation of the application does
+        window.dispatchEvent(event);
+        expect(getBeaconCalls()).toHaveLength(0); // enduser can still cancel the navigation
+
+        window.dispatchEvent(new Event("pagehide"));
+        expect(getBeaconCalls()).toHaveLength(1); // navigation is committed
+    });
+
+    test("holds back beacon until pagehide when returnValue is set on the beforeunload event", async () => {
+        form = createFacesForm("fReturnValue", "/test/action");
+        await initUnload("vsReturnValue");
+
+        const event = beforeUnloadEvent();
+        (event as BeforeUnloadEvent).returnValue = "You have unsaved changes."; // as a legacy leave confirmation does
+        window.dispatchEvent(event);
+        expect(getBeaconCalls()).toHaveLength(0);
+
+        window.dispatchEvent(new Event("pagehide"));
+        expect(getBeaconCalls()).toHaveLength(1);
+    });
+
+    test("does not touch window.onbeforeunload property", async () => {
         const handler = function() {};
         window.onbeforeunload = handler;
         form = createFacesForm("fProperty", "/test/action");
-        unload().init("vsProperty");
+        await initUnload("vsProperty");
 
         expect(window.onbeforeunload).toBe(handler);
 
         window.onbeforeunload = null;
     });
 
-    test("does not send beacon when disabled", () => {
+    test("does not send beacon when disabled", async () => {
         form = createFacesForm("f3", "/test/action");
-        unload().init("vsDisabled");
+        await initUnload("vsDisabled");
         unload().disable();
 
+        window.dispatchEvent(beforeUnloadEvent());
         window.dispatchEvent(new Event("pagehide"));
 
         expect(getBeaconCalls()).toHaveLength(0);
     });
 
-    test("re-enables after disabled unload fires", () => {
+    test("re-enables after disabled unload fires", async () => {
         form = createFacesForm("f4", "/test/action");
-        unload().init("vsReenable");
+        await initUnload("vsReenable");
         unload().disable();
 
         window.dispatchEvent(new Event("pagehide"));
@@ -157,14 +212,13 @@ describe("OmniFaces.Unload: beacon on unload", () => {
 
     test("subsequent init updates viewScopeId without re-registering listeners", async () => {
         form = createFacesForm("f5", "/test/action");
-        unload().init("firstId");
-        unload().init("secondId");
+        await initUnload("firstId");
+        await initUnload("secondId");
 
-        window.dispatchEvent(new Event("pagehide"));
+        window.dispatchEvent(beforeUnloadEvent());
 
         expect(getBeaconCalls()).toHaveLength(1);
-        const blob = getBeaconCalls()[0].data as Blob;
-        const text = await new Promise<string>(resolve => { const r = new FileReader(); r.onload = () => resolve(r.result as string); r.readAsText(blob); });
+        const text = await readBeacon();
         expect(text).toContain("id=secondId");
         expect(text).not.toContain("id=firstId");
     });
@@ -183,14 +237,14 @@ describe("OmniFaces.Unload: XHR fallback on unload", () => {
         uninstallMockXHR();
     });
 
-    test("sends synchronous XHR POST when sendBeacon is unavailable", () => {
+    test("sends synchronous XHR POST when sendBeacon is unavailable", async () => {
         const origBeacon = navigator.sendBeacon;
         Object.defineProperty(navigator, "sendBeacon", { value: undefined, configurable: true, writable: true });
 
         form = createFacesForm("fXhr", "/test/xhr-action");
-        unload().init("vsXhr");
+        await initUnload("vsXhr");
 
-        window.dispatchEvent(new Event("pagehide"));
+        window.dispatchEvent(beforeUnloadEvent());
 
         const xhr = lastXHR();
         expect(xhr).toBeDefined();
