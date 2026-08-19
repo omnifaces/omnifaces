@@ -1,0 +1,48 @@
+<!--
+
+    Copyright OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+	xmlns:o="http://omnifaces.org/ui"
+>
+	<h:head />
+
+	<h:body>
+		<h:form id="form">
+			<h:inputText id="outside" />
+
+			<o:massAttribute name="disabled" value="true">
+				<h:inputText id="unconditional" />
+
+				<c:if test="#{massAttributeITBean.shown}">
+					<h:inputText id="direct" />
+				</c:if>
+
+				<h:panelGroup id="group">
+					<c:if test="#{massAttributeITBean.shown}">
+						<h:inputText id="nested" />
+					</c:if>
+				</h:panelGroup>
+			</o:massAttribute>
+
+			<h:commandButton id="show" value="show" action="#{massAttributeITBean.show}">
+				<f:ajax render="@form" />
+			</h:commandButton>
+		</h:form>
+	</h:body>
+</html>

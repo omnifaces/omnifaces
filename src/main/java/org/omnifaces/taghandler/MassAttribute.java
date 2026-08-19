@@ -13,17 +13,18 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.String.format;
+import static java.util.Collections.newSetFromMap;
+import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
 import javax.faces.component.UIComponent;
-import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
@@ -146,18 +147,16 @@ public class MassAttribute extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		List<UIComponent> oldChildren = new ArrayList<>(parent.getChildren());
+		Set<UIComponent> oldComponents = newSetFromMap(new IdentityHashMap<UIComponent, Boolean>());
+		oldComponents.addAll(findComponentsInChildren(parent, UIComponent.class));
 		nextHandler.apply(context, parent);
-
-		if (ComponentHandler.isNew(parent)) {
-			List<UIComponent> newChildren = new ArrayList<>(parent.getChildren());
-			newChildren.removeAll(oldChildren);
-			applyMassAttribute(context, newChildren);
-		}
+		List<UIComponent> newComponents = findComponentsInChildren(parent, UIComponent.class);
+		newComponents.removeAll(oldComponents);
+		applyMassAttribute(context, newComponents);
 	}
 
-	private void applyMassAttribute(FaceletContext context, List<UIComponent> children) {
-		for (UIComponent component : children) {
+	private void applyMassAttribute(FaceletContext context, List<UIComponent> components) {
+		for (UIComponent component : components) {
 			if ((targetClasses == null || isOneInstanceOf(component.getClass(), targetClasses)) && component.getValueExpression(name) == null) {
 				Object literalValue = component.getAttributes().get(name);
 
@@ -166,8 +165,6 @@ public class MassAttribute extends TagHandler {
 					component.setValueExpression(name, value.getValueExpression(context, type));
 				}
 			}
-
-			applyMassAttribute(context, component.getChildren());
 		}
 	}
 
