@@ -22,6 +22,7 @@ import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Reflection.invokeMethod;
 import static org.omnifaces.util.Servlets.toParameterMap;
+import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -96,10 +97,46 @@ public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandle
         return method == null ? null : invokeMethod(wrapped, method, context, fromAction, outcome);
     }
 
+    /**
+     * Obtains the navigation case of the wrapped navigation handler for an outcome which is known to resolve to a dynamic route, discarding the global faces
+     * messages it adds when it finds none of its own. A Faces implementation warns about an outcome it cannot resolve when the project stage is Development,
+     * which does not hold for such an outcome, as the dynamic route resolves it.
+     */
+    private NavigationCase getWrappedNavigationCaseForDynamicRoute(FacesContext context, String fromAction, String outcome) {
+        var globalMessageCount = context.getMessageList(null).size();
+        NavigationCase navigationCase = getWrappedNavigationCase(context, fromAction, outcome);
+
+        if (navigationCase == null) {
+            dropGlobalMessagesAddedSince(context, globalMessageCount);
+        }
+
+        return navigationCase;
+    }
+
+    private static void dropGlobalMessagesAddedSince(FacesContext context, int globalMessageCount) {
+        var iterator = context.getMessages(null);
+
+        for (var i = 0; iterator.hasNext(); i++) {
+            iterator.next();
+
+            if (i >= globalMessageCount) {
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
+     * An explicitly declared navigation case for an outcome which also resolves to a dynamic route takes precedence over that dynamic route.
+     */
     @Override
     public NavigationCase getNavigationCase(FacesContext context, String fromAction, String outcome) {
-        NavigationCase navigationCase = getWrappedNavigationCase(context, fromAction, outcome);
-        return navigationCase != null ? navigationCase : getDynamicRouteNavigationCase(context, fromAction, outcome);
+        NavigationCase dynamicRouteNavigationCase = getDynamicRouteNavigationCase(context, fromAction, outcome);
+
+        if (dynamicRouteNavigationCase == null) {
+            return getWrappedNavigationCase(context, fromAction, outcome);
+        }
+
+        return coalesce(getWrappedNavigationCaseForDynamicRoute(context, fromAction, outcome), dynamicRouteNavigationCase);
     }
 
     @Override
@@ -113,15 +150,13 @@ public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandle
      */
     @Override
     public void handleNavigation(FacesContext context, String fromAction, String outcome) {
-        NavigationCase navigationCase = getWrappedNavigationCase(context, fromAction, outcome) != null
-            ? null
-            : getDynamicRouteNavigationCase(context, fromAction, outcome);
+        NavigationCase navigationCase = getDynamicRouteNavigationCase(context, fromAction, outcome);
 
-        if (navigationCase == null) {
-            wrapped.handleNavigation(context, fromAction, outcome);
+        if (navigationCase != null && getWrappedNavigationCaseForDynamicRoute(context, fromAction, outcome) == null) {
+            performNavigation(context, navigationCase);
         }
         else {
-            performNavigation(context, navigationCase);
+            wrapped.handleNavigation(context, fromAction, outcome);
         }
     }
 
