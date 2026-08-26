@@ -113,7 +113,7 @@ public final class Servlets {
 
     private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
     private static final Pattern HEADER_TRAILING_SEMICOLON = Pattern.compile(";$");
-    private static final Pattern HEADER_SURROUNDING_QUOTES = Pattern.compile("^\"|\"$");
+    private static final Pattern HEADER_SURROUNDING_QUOTES = Pattern.compile("(?:^\")|(?:\"$)");
     // Browsers send unescaped Windows paths in a quoted filename, so a backslash in a quoted header value stays literal outside this one shape.
     private static final Pattern HEADER_ESCAPED_PERCENT_ENCODING = Pattern.compile("%\\\\(\\d{2})");
     private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
