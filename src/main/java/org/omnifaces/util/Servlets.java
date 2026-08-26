@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
@@ -111,6 +112,10 @@ public final class Servlets {
     private static final Logger logger = Logger.getLogger(Servlets.class.getName());
 
     private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
+    private static final Pattern HEADER_TRAILING_SEMICOLON = Pattern.compile(";$");
+    private static final Pattern HEADER_SURROUNDING_QUOTES = Pattern.compile("^\"|\"$");
+    // Browsers send unescaped Windows paths in a quoted filename, so a backslash in a quoted header value stays literal outside this one shape.
+    private static final Pattern HEADER_ESCAPED_PERCENT_ENCODING = Pattern.compile("%\\\\(\\d{2})");
     private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
     private static final String FACES_AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
@@ -568,20 +573,20 @@ public final class Servlets {
             }
 
             if (!quoted && c == ';' || i + 1 == header.length()) {
-                var entry = Utils.splitAndTrim(builder.toString().replaceAll(";$", ""), "=", 2);
+                var entry = Utils.splitAndTrim(HEADER_TRAILING_SEMICOLON.matcher(builder).replaceAll(""), "=", 2);
                 var name = entry[0].toLowerCase();
-                var value = entry.length == 1
-                    ? ""
-                    : entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
-                        .replace("\\\"", "\"") // Unescape quotes.
-                        .replaceAll("%\\\\(\\\\d{2})", "%$1") // Unescape %xx.
-                        .trim();
+                var value = entry.length == 1 ? "" : unescapeHeaderValue(entry[1]);
                 map.put(name, value);
                 builder = new StringBuilder();
             }
         }
 
         return unmodifiableMap(map);
+    }
+
+    private static String unescapeHeaderValue(String value) {
+        var unquoted = HEADER_SURROUNDING_QUOTES.matcher(value).replaceAll("").replace("\\\"", "\"");
+        return HEADER_ESCAPED_PERCENT_ENCODING.matcher(unquoted).replaceAll("%$1").trim();
     }
 
     /**

@@ -112,6 +112,19 @@ class ServletsTest {
         }
     }
 
+    /**
+     * A header value is unquoted, escaped quotes are unescaped, and a backslash escaping a percent encoding is dropped so that the percent encoding survives.
+     * The last one is observable via {@link Servlets#headerToMap(String)} only, as {@link Servlets#getSubmittedFileName(Part)} additionally strips every
+     * remaining backslash.
+     */
+    @Test
+    void testHeaderToMapUnescapesValue() {
+        assertEquals("foo.html", Servlets.headerToMap("form-data; filename=\"foo.html\";").get("filename"));
+        assertEquals("\"quoted\".html", Servlets.headerToMap("form-data; filename=\"\\\"quoted\\\".html\"").get("filename"));
+        assertEquals("foo-%41.html", Servlets.headerToMap("form-data; filename=\"foo-%\\41.html\"").get("filename"));
+        assertEquals("foo-%\\4x.html", Servlets.headerToMap("form-data; filename=\"foo-%\\4x.html\"").get("filename"));
+    }
+
     @Test
     void testFormatContentDisposition() {
         for (String[] test : DOWNLOAD_CONTENT_DISPOSITIONS) {
