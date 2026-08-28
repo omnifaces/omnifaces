@@ -70,8 +70,11 @@
         <test.wildfly-mojarra.version>40.0.0.Final</test.wildfly-mojarra.version> <!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-preview-dist -->
         <test.liberty-myfaces.version>26.0.0.6</test.liberty-myfaces.version> <!-- https://mvnrepository.com/artifact/io.openliberty/openliberty-runtime -->
         <test.glassfish-mojarra.version>8.0.3</test.glassfish-mojarra.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
+        <test.glassfish-mojarra5.version>9.0.0-M3</test.glassfish-mojarra5.version> <!-- https://mvnrepository.com/artifact/org.glassfish.main.distributions/glassfish -->
         <test.tomee-myfaces.version>10.2.0</test.tomee-myfaces.version> <!-- https://mvnrepository.com/artifact/org.apache.tomee/apache-tomee -->
         <test.tomcat.version>11.0.24</test.tomcat.version> <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat -->
+        <test.tomcat12.version>12.0.0-M1-SNAPSHOT</test.tomcat12.version> <!-- Faces 5 needs Servlet 6.2, first available in Tomcat 12. -->
+        <test.tomcat12.dir>apache-tomcat-12.0.0-M1-dev</test.tomcat12.dir> <!-- The directory inside the zip does not carry the snapshot qualifier. -->
         <test.payara-mojarra.version>7.2026.6</test.payara-mojarra.version> <!-- https://mvnrepository.com/artifact/fish.payara.distributions/payara-web -->
         <test.quarkus.version>3.37.2</test.quarkus.version> <!-- https://mvnrepository.com/artifact/io.quarkus.platform/quarkus-bom -->
         <test.quarkus-omnifaces.version>5.4.5</test.quarkus-omnifaces.version> <!-- https://mvnrepository.com/artifact/io.quarkiverse.omnifaces/quarkus-omnifaces -->
@@ -103,6 +106,19 @@
              persisted when it is passed by the scanner. Currently ignored on **/*.java are java:S110, java:S115, java:S117, java:S1989, java:S2143,
              java:S5786 and java:S6813. -->
     </properties>
+
+    <repositories>
+        <repository>
+            <id>apache-snapshots</id>
+            <url>https://repository.apache.org/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
 
@@ -843,6 +859,46 @@
             </build>
         </profile>
 
+        <!-- GlassFish - Mojarra 5 integration test profile: mvn verify -P glassfish-mojarra5 -->
+        <profile>
+            <id>glassfish-mojarra5</id>
+            <dependencies>
+                <dependency>
+                    <groupId>ee.omnifish.arquillian</groupId>
+                    <artifactId>arquillian-glassfish-server-managed</artifactId>
+                    <version>2.1.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.glassfish.main.distributions</groupId>
+                                    <artifactId>glassfish</artifactId>
+                                    <version>${test.glassfish-mojarra5.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <glassfish.home>${project.build.directory}/glassfish9</glassfish.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Tomcat - Mojarra integration test profile: mvn verify -P tomcat-mojarra -->
         <profile>
             <id>tomcat-mojarra</id>
@@ -1010,7 +1066,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.tomcat</groupId>
                                     <artifactId>tomcat</artifactId>
-                                    <version>${test.tomcat.version}</version>
+                                    <version>${test.tomcat12.version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
@@ -1027,7 +1083,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/${test.tomcat12.dir}/conf</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
@@ -1057,7 +1113,7 @@
                                 </war.libraries>
                             </systemPropertyVariables>
                             <environmentVariables>
-                                <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
+                                <CATALINA_HOME>${project.build.directory}/${test.tomcat12.dir}</CATALINA_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
@@ -1161,7 +1217,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.tomcat</groupId>
                                     <artifactId>tomcat</artifactId>
-                                    <version>${test.tomcat.version}</version>
+                                    <version>${test.tomcat12.version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
@@ -1178,7 +1234,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/${test.tomcat12.dir}/conf</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>${project.basedir}/src/test/resources/arquillian/tomcat</directory>
@@ -1207,7 +1263,7 @@
                                 </war.libraries>
                             </systemPropertyVariables>
                             <environmentVariables>
-                                <CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
+                                <CATALINA_HOME>${project.build.directory}/${test.tomcat12.dir}</CATALINA_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
