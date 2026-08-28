@@ -20,7 +20,7 @@ import static org.omnifaces.test.CustomCDNResourceHandler.FOREIGN_CDN_HOST;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedAndCustomCDNResourceHandler;
 
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -33,9 +33,8 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * When a combined resource is decorated into a CDN resource, then the combined resource handler arranges a fallback which loads the local URL in case the CDN
- * request errors out. Whether that arrangement is rendered as an inline <code>onerror</code> attribute or wired at runtime by the Faces implementation is not
- * fixed, so these assert the fallback by making the CDN request actually fail and observing the outcome in the browser rather than by inspecting the markup
- * which arranges it.
+ * request errors out. These make the CDN request fail and assert the outcome in the browser: the resources still execute, and each local URL is loaded without
+ * a <code>crossorigin</code> attribute and with the <code>integrity</code> attribute of the local content.
  * <p>
  * The fallback URL is same origin and must therefore never get a <code>crossorigin</code> attribute, while it must still get an <code>integrity</code>
  * attribute, as subresource integrity does not require CORS for same origin resources. See {@link org.omnifaces.renderer.CorsAwareResourceRenderer} for the
@@ -78,7 +77,7 @@ public class CombinedResourceHandlerCDNFallbackIT extends OmniFacesIT {
     void everyFallbackHasNoCrossoriginButDoesHaveIntegrity() {
         openWithFailingCDN();
         assertResourcesExecuted();
-        var fallbacks = getCombinedScripts(false);
+        var fallbacks = getFallbackScripts();
         assertEquals(2, fallbacks.size(), () -> "both the combined script and the deferred combined script must have fallen back, but got " + fallbacks);
 
         for (var fallback : fallbacks) {
@@ -95,7 +94,7 @@ public class CombinedResourceHandlerCDNFallbackIT extends OmniFacesIT {
     void everyCdnResourceHasIntegrity() {
         openWithFailingCDN();
         assertResourcesExecuted();
-        var cdnResources = getCombinedScripts(true);
+        var cdnResources = getCdnScripts();
         assertEquals(2, cdnResources.size(), () -> "both combined resources must have been requested from the CDN host, but got " + cdnResources);
         cdnResources.forEach(CombinedResourceHandlerCDNFallbackIT::assertIntegrity);
     }
@@ -118,15 +117,24 @@ public class CombinedResourceHandlerCDNFallbackIT extends OmniFacesIT {
     }
 
     /**
-     * Returns the script elements which load a combined resource, either the ones pointing at the CDN host whose requests have errored out, or the ones which
-     * the fallback has since loaded from the local host. The CDN URL is remapped to the bare resource name and therefore carries no library query parameter,
-     * hence the two are told apart by host rather than by one selector.
+     * Returns the script elements which load a combined resource from the local host, which is where the fallback loads it from after the CDN request has
+     * errored out.
      */
-    private List<WebElement> getCombinedScripts(boolean cdn) {
+    private List<WebElement> getFallbackScripts() {
+        return findScripts(src -> src.contains("ln=" + LIBRARY_NAME));
+    }
+
+    /**
+     * Returns the script elements which point at the CDN host. Their URL is remapped to the bare resource name and therefore carries no library query
+     * parameter, hence they are told apart by host.
+     */
+    private List<WebElement> getCdnScripts() {
+        return findScripts(src -> src.startsWith(FOREIGN_CDN_HOST));
+    }
+
+    private List<WebElement> findScripts(Predicate<String> srcMatches) {
         return browser.findElements(By.cssSelector("script[src]")).stream()
-            .map(script -> Map.entry(script, String.valueOf(script.getDomAttribute("src"))))
-            .filter(entry -> cdn ? entry.getValue().startsWith(FOREIGN_CDN_HOST) : entry.getValue().contains("ln=" + LIBRARY_NAME))
-            .map(Map.Entry::getKey)
+            .filter(script -> srcMatches.test(String.valueOf(script.getDomAttribute("src"))))
             .toList();
     }
 

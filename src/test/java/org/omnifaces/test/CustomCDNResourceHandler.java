@@ -45,7 +45,7 @@ public class CustomCDNResourceHandler extends DefaultResourceHandler {
             return resource;
         }
 
-        // The failCDN request parameter is just for testing! In real world you'd not supply this as a request parameter.
+        // Test-only switch; a real CDN handler would not take this from a request parameter.
         if (FOREIGN_RESOURCE_NAME.equals(resourceName) || (LIBRARY_NAME.equals(libraryName) && parseBoolean(getRequestParameter("failCDN")))) {
             return new CDNResource(resource, FOREIGN_CDN_HOST + "/" + resourceName);
         }
