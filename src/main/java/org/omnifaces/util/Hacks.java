@@ -98,11 +98,13 @@ public final class Hacks {
 
     private static final Set<String> MOJARRA_SERIALIZED_VIEWS = unmodifiableSet(
         "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap", // Mojarra 4.x and older.
-        "org.glassfish.mojarra.renderkit.ServerSideStateHelper.StatefulPageMap" // Mojarra 5.x and newer.
+        "org.glassfish.mojarra.renderkit.ServerSideStateHelper.LogicalViewMap", // Mojarra 5.0.0-M5 and older.
+        "org.glassfish.mojarra.renderkit.ServerSideStateHelper.StatefulPageMap" // Mojarra 5.0.0-M6 and newer.
     );
     private static final Set<String> MOJARRA_SERIALIZED_VIEW_KEYS = unmodifiableSet(
         "com.sun.faces.logicalViewMap", // Mojarra 4.x and older.
-        "org.glassfish.mojarra.statefulPageMap" // Mojarra 5.x and newer.
+        "org.glassfish.mojarra.logicalViewMap", // Mojarra 5.0.0-M5 and older.
+        "org.glassfish.mojarra.statefulPageMap" // Mojarra 5.0.0-M6 and newer.
     );
     private static final Set<String> MOJARRA_ACTIVE_VIEW_MAPS = unmodifiableSet(
         "com.sun.faces.application.view.activeViewMaps", // Mojarra 4.x and older.
