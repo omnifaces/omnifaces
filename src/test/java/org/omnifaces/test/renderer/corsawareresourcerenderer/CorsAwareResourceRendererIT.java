@@ -13,6 +13,9 @@
 package org.omnifaces.test.renderer.corsawareresourcerenderer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.omnifaces.test.CustomCDNResourceHandler.FOREIGN_CDN_HOST;
+import static org.omnifaces.test.CustomCDNResourceHandler.FOREIGN_RESOURCE_NAME;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCustomCDNResourceHandler;
 
 import java.util.List;
@@ -128,11 +131,12 @@ public class CorsAwareResourceRendererIT extends OmniFacesIT {
         verifyResource(cdn, scripts.get(7), "bodyWithoutTarget.js", "sha384-EMmkadXDdPdNjCflKfSSW8A9XMCMbiEmLsluVtWZqaQ3mK7jLI8NU2oJVcevT0Eu");
         verifyResource(cdn, scripts.get(8), "bodyWithTargetBody.js", "sha384-JnLkXmxPO/A8G7J/VtTg9CHTnnrTJPfDsjL3QQvhiAowR8WbPaUDkOpgAp044kIg");
 
-        assertEquals(4, stylesheets.size());
+        assertEquals(5, stylesheets.size());
         verifyResource(cdn, stylesheets.get(0), "main.css", "sha384-hmM7cEaWvNHIMK+DAetvH/W2YeFiZ4/TICjWYU6p6xAPd6jJXj56lPbAYz2CTeUQ");
         verifyResource(cdn, stylesheets.get(1), "screen.css", "sha384-hmM7cEaWvNHIMK+DAetvH/W2YeFiZ4/TICjWYU6p6xAPd6jJXj56lPbAYz2CTeUQ");
         verifyResource(cdn, stylesheets.get(2), "print.css", "sha384-AIsliUu+8ppE/NCo06ISdZKX7hhjAdYQJMrbMW/txDh/v0tKmoe6aFQzfV6K0L9g");
         verifyResource(cdn, stylesheets.get(3), "critical.css", "sha384-nU5EqlzYAANG4pJ2kuSgvHzDKJjS8V27+XyDben6m+nehM68hlUvEpU7fmey3W3w");
+        verifyForeignResource(cdn, stylesheets.get(4));
 
         assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
         assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
@@ -143,13 +147,36 @@ public class CorsAwareResourceRendererIT extends OmniFacesIT {
         assertEquals("7,deferredInBody", deferredInBody.getText());
     }
 
+    /**
+     * Verifies that a same origin resource never gets a <code>crossorigin</code> attribute, and that it only gets an <code>integrity</code> attribute when it
+     * is a CDN resource. See {@link org.omnifaces.renderer.CorsAwareResourceRenderer} for the rationale.
+     */
     private static void verifyResource(boolean cdn, WebElement element, String name, String integrity) {
         var src = element.getAttribute("script".equals(element.getTagName()) ? "src" : "href");
         assertEquals(name, src.split("/jakarta\\.faces\\.resource/", 2)[1].split(".xhtml", 2)[0]);
-        assertEquals("anonymous", element.getAttribute("crossorigin"));
+        assertNull(element.getDomAttribute("crossorigin"));
 
         if (integrity != null) {
-            assertEquals(cdn ? integrity : "", element.getAttribute("integrity"));
+            assertEquals(cdn ? integrity : null, element.getDomAttribute("integrity"));
+        }
+    }
+
+    /**
+     * Verifies that a resource which is remapped to another origin does get a <code>crossorigin</code> attribute, and an <code>integrity</code> attribute as it
+     * is a CDN resource.
+     */
+    private static void verifyForeignResource(boolean cdn, WebElement element) {
+        var href = element.getDomAttribute("href");
+
+        if (cdn) {
+            assertEquals(FOREIGN_CDN_HOST + "/" + FOREIGN_RESOURCE_NAME, href);
+            assertEquals("anonymous", element.getDomAttribute("crossorigin"));
+            assertEquals("sha384-uILaDNPsjx5aztysnulkvOxS8W1t5NZmYrezNnRl6I/irdkjtD3RyFAOSd747mVe", element.getDomAttribute("integrity"));
+        }
+        else {
+            assertEquals(FOREIGN_RESOURCE_NAME, href.split("/jakarta\\.faces\\.resource/", 2)[1].split(".xhtml", 2)[0]);
+            assertNull(element.getDomAttribute("crossorigin"));
+            assertNull(element.getDomAttribute("integrity"));
         }
     }
 

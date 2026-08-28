@@ -20,13 +20,22 @@ import jakarta.faces.application.ResourceHandler;
 import org.omnifaces.renderer.CorsAwareResourceRenderer;
 
 /**
- * This {@link Resource} implementation can be used as a marker class to signal the custom {@link ResourceHandler} such as {@link CombinedResourceHandler} that
- * the given resource actually returns a CDN URL, and offers a method to return the local URL which can be used as fallback in case the CDN request errors out.
- * Since 5.0, also the {@link CorsAwareResourceRenderer} will check for it in order to decide whether to automatically generate the <code>integrity</code>
- * attribute.
+ * <p>
+ * This {@link Resource} implementation is a marker class which signals that the given resource is served from a CDN host. It offers a method to return the
+ * local URL which can be used as fallback in case the CDN request errors out.
+ * <p>
+ * It is intended to be returned by a {@link ResourceHandler} which you write yourself and which uploads your own resources to your own CDN host, so that the
+ * CDN content stays byte for byte identical to the local content. The {@link CombinedResourceHandler} will then render an <code>onerror</code> handler which
+ * falls back to the local URL, and the {@link CorsAwareResourceRenderer} will then render the <code>integrity</code> attribute.
+ * <p>
+ * The {@link CDNResourceHandler} does not return this type, it returns a {@link RemappedResource}. Its CDN URLs point to third party hosts whose content is not
+ * byte for byte identical to the local content, and an integrity hash computed from the local content would therefore cause the browser to block the resource.
  *
  * @author Bauke Scholtz
  * @since 2.7
+ * @see CDNResourceHandler
+ * @see CombinedResourceHandler
+ * @see CorsAwareResourceRenderer
  */
 public class CDNResource extends RemappedResource {
 

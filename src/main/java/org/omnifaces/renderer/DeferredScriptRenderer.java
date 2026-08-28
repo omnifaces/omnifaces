@@ -12,7 +12,7 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.renderer.CorsAwareResourceRenderer.getCrossorigin;
+import static org.omnifaces.renderer.CorsAwareResourceRenderer.getCrossoriginIfNecessary;
 import static org.omnifaces.renderer.CorsAwareResourceRenderer.getIntegrityIfNecessary;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.FacesLocal.createResource;
@@ -67,7 +67,7 @@ public class DeferredScriptRenderer extends Renderer<DeferredScript> {
             writer.write("OmniFaces.DeferredScript.add('");
             writer.write(resource.getRequestPath());
             writer.write("','");
-            writer.write(getCrossorigin(context));
+            writer.write(getCrossoriginIfNecessary(context, resource));
             writer.write("','");
             writer.write(getIntegrityIfNecessary(context, resource));
             writer.write("'");

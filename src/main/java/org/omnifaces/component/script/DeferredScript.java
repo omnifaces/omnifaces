@@ -24,7 +24,9 @@ import jakarta.faces.event.PostAddToViewEvent;
 import jakarta.faces.event.PostRestoreStateEvent;
 
 import org.omnifaces.config.OmniFaces;
+import org.omnifaces.renderer.CorsAwareResourceRenderer;
 import org.omnifaces.renderer.DeferredScriptRenderer;
+import org.omnifaces.resourcehandler.CDNResource;
 import org.omnifaces.util.State;
 import org.omnifaces.vdl.FacesAttribute;
 
@@ -38,9 +40,10 @@ import org.omnifaces.vdl.FacesAttribute;
  * This will give bonus points with among others the Google PageSpeed tool, on the contrary to placing the script at bottom of body, or using
  * <code>defer="true"</code> or even <code>async="true"</code>.
  * <p>
- * Since 2.4 this will render the <code>crossorigin</code> attribute with a value of <code>anonymous</code>. Since 3.13 this will also render the
- * <code>integrity</code> attribute with a base64 encoded sha384 hash as SRI, see also
- * <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">MDN</a>.
+ * When the script resource is served from another origin, then this will render the <code>crossorigin</code> attribute with by default a value of
+ * <code>anonymous</code>. When the script resource is a {@link CDNResource}, then this will render the <code>integrity</code> attribute with a base64 encoded
+ * sha384 hash as SRI, see also <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">MDN</a>. See
+ * {@link CorsAwareResourceRenderer} for details.
  *
  * <h2>Usage</h2>
  * <p>

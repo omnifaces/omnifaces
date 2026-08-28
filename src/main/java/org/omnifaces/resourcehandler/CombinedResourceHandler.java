@@ -13,7 +13,6 @@
 package org.omnifaces.resourcehandler;
 
 import static java.lang.Boolean.parseBoolean;
-import static org.omnifaces.renderer.CorsAwareResourceRenderer.getCrossorigin;
 import static org.omnifaces.renderer.CorsAwareResourceRenderer.getIntegrityIfNecessary;
 import static org.omnifaces.util.Components.isRendered;
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
@@ -207,6 +206,9 @@ import org.omnifaces.util.cache.Cache;
  * including the combined resources, and you want to be able to have a fallback to local host URL when the CDN host is unreachable, then you can let your custom
  * {@link ResourceHandler} return a {@link CDNResource} which wraps the original resource and the CDN URL. The combined resource handler will make sure that the
  * appropriate <code>onerror</code> attributes are added to the component resources which initiates the fallback resource in case the CDN request errors out.
+ * <p>
+ * The fallback URL points to the local host and therefore does not get a <code>crossorigin</code> attribute. The <code>integrity</code> attribute is still
+ * emitted, as subresource integrity does not require CORS for same origin resources.
  * <p>
  * Historical note: before 5.0, the {@link CombinedResourceHandler} also added <code>crossorigin</code> and <code>integrity</code> attributes to every combined
  * resource, but it also unnecessarily did that when the resource is not a CDN resource, and all non-combined resources were ignored. Hence this task has since
@@ -635,7 +637,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
             if (RENDERER_TYPE_JS.equals(rendererType)) {
                 componentResource.getPassThroughAttributes().put(
                     ATTRIBUTE_ONERROR, "document.write('<script src=\"" + fallbackURL
-                        + "\" crossorigin=\"" + getCrossorigin(context) + "\" integrity=\"" + getIntegrityIfNecessary(context, cdnResource) + "\"></script>')"
+                        + "\" integrity=\"" + getIntegrityIfNecessary(context, cdnResource) + "\"></script>')"
                 );
             }
             else if (isOneOf(rendererType, RENDERER_TYPE_CSS, CriticalStylesheetRenderer.RENDERER_TYPE)) {
@@ -651,7 +653,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
                 componentResource.getAttributes().put(
                     ATTRIBUTE_ONERROR, "OmniFaces.Util.loadScript('" + fallbackURL
-                        + "','" + getCrossorigin(context) + "','" + getIntegrityIfNecessary(context, cdnResource) + "'" + callbacks + ")"
+                        + "','','" + getIntegrityIfNecessary(context, cdnResource) + "'" + callbacks + ")"
                 );
             }
         }

@@ -204,8 +204,8 @@ export namespace Util {
     /**
      * Load a script.
      * @param url Required; The URL of the script.
-     * @param crossorigin Optional; The crossorigin of the script. Defaults to "anonymous".
-     * @param integrity Optional; The integrity of the script. Defaults to "".
+     * @param crossorigin Optional; The crossorigin of the script. When empty, then no crossorigin attribute will be set at all.
+     * @param integrity Optional; The integrity of the script. When empty, then no integrity attribute will be set at all.
      * @param begin Optional; Function to invoke before deferred script is loaded.
      * @param success Optional; Function to invoke after deferred script is successfully loaded.
      * @param error Optional; Function to invoke when loading of deferred script failed.
@@ -222,8 +222,14 @@ export namespace Util {
 
         script.async = true;
         script.src = url;
-        script.setAttribute("crossorigin", crossorigin || "anonymous");
-        script.setAttribute("integrity", integrity || "");
+
+        if (crossorigin) {
+            script.setAttribute("crossorigin", crossorigin);
+        }
+
+        if (integrity) {
+            script.setAttribute("integrity", integrity);
+        }
 
         script.onerror = () => {
             errorFunction();

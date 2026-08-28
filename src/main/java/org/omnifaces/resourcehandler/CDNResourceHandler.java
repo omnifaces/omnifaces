@@ -27,6 +27,8 @@ import jakarta.faces.application.Resource;
 import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.application.ResourceHandler;
 
+import org.omnifaces.renderer.CorsAwareResourceRenderer;
+
 /**
  * <p>
  * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the default local URLs for Faces resources. This
@@ -199,6 +201,14 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * If you're also using the {@link CombinedResourceHandler}, then you need to understand that CDN resources can simply not be combined, as that would defeat the
  * CDN purpose. The {@link CombinedResourceHandler} will therefore automatically exclude all CDN resources from combining.
+ *
+ * <h2>Subresource integrity</h2>
+ * <p>
+ * The {@link CorsAwareResourceRenderer} will render the <code>crossorigin</code> attribute on the resources remapped by this resource handler, as they are
+ * served from another origin, but it will not render the <code>integrity</code> attribute, because this resource handler returns a {@link RemappedResource} and
+ * not a {@link CDNResource}. The CDN URLs configured here point to third party hosts whose content is not byte for byte identical to the local content, and an
+ * integrity hash computed from the local content would therefore cause the browser to block the resource. If you want subresource integrity, then upload your
+ * own resources to your own CDN host and return a {@link CDNResource} from a {@link ResourceHandler} which you write yourself.
  *
  * @author Bauke Scholtz
  * @since 1.2

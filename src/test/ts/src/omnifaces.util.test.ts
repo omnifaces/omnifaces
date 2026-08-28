@@ -328,14 +328,15 @@ describe("OmniFaces.Util.loadScript", () => {
         expect(script.getAttribute("integrity")).toBe("sha256-abc");
     });
 
-    test("defaults crossorigin to 'anonymous' when empty", () => {
+    test("omits crossorigin and integrity attributes when empty", () => {
         jest.useFakeTimers();
         util().loadScript("/test.js", "", "", null, null, null, null);
         jest.runAllTimers();
         jest.useRealTimers();
 
         const script = document.head.querySelector("script[src='/test.js']") as HTMLScriptElement;
-        expect(script.getAttribute("crossorigin")).toBe("anonymous");
+        expect(script.hasAttribute("crossorigin")).toBe(false);
+        expect(script.hasAttribute("integrity")).toBe(false);
     });
 
     test("calls begin function before appending script", () => {

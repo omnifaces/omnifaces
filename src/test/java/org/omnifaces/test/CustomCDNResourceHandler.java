@@ -23,6 +23,12 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 
 public class CustomCDNResourceHandler extends DefaultResourceHandler {
 
+    /** The resource which is remapped to {@link #FOREIGN_CDN_HOST} in order to cover the cross origin case. */
+    public static final String FOREIGN_RESOURCE_NAME = "foreign.css";
+
+    /** The host of {@link #FOREIGN_RESOURCE_NAME}. The .invalid TLD is reserved by RFC 2606 and therefore guaranteed to never resolve. */
+    public static final String FOREIGN_CDN_HOST = "https://cdn.example.invalid";
+
     public CustomCDNResourceHandler(ResourceHandler wrapped) {
         super(wrapped);
     }
@@ -33,6 +39,10 @@ public class CustomCDNResourceHandler extends DefaultResourceHandler {
 
         if (skipCDN || resource == null) {
             return resource;
+        }
+
+        if (FOREIGN_RESOURCE_NAME.equals(resourceName)) {
+            return new CDNResource(resource, FOREIGN_CDN_HOST + "/" + resourceName);
         }
 
         return new CDNResource(resource, resource.getRequestPath()); // Just a dummy CDN resource for testing! In real world you'd prepend CDN host to the

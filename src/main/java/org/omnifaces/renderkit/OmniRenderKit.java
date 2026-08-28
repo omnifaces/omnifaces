@@ -50,10 +50,15 @@ public class OmniRenderKit extends RenderKitWrapper {
     @Override
     public Renderer<?> getRenderer(String family, String rendererType) {
         var renderer = super.getRenderer(family, rendererType);
+
+        if (renderer == null) {
+            return renderer;
+        }
+
         var corsSensitiveResource = UIOutput.COMPONENT_FAMILY.equals(family) && isOneOf(rendererType, RENDERER_TYPE_JS, RENDERER_TYPE_CSS) ||
             StylesheetFamily.COMPONENT_FAMILY.equals(family) && CriticalStylesheetRenderer.RENDERER_TYPE.equals(rendererType);
 
-        if (!corsSensitiveResource || renderer == null) {
+        if (!corsSensitiveResource) {
             return renderer;
         }
 
