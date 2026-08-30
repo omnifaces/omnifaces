@@ -45,6 +45,7 @@ public class SocketITBean implements Serializable {
     private PushContext viewScopedAjaxAware;
 
     private String ajaxAwareMessage;
+    private boolean toggleableConnected;
 
     public void pushApplicationScopedServerEvent() {
         String timestamp = String.valueOf(nanoTime());
@@ -66,6 +67,14 @@ public class SocketITBean implements Serializable {
 
     public String getAjaxAwareMessage() {
         return ajaxAwareMessage;
+    }
+
+    public void toggleConnected() {
+        toggleableConnected = !toggleableConnected;
+    }
+
+    public boolean isToggleableConnected() {
+        return toggleableConnected;
     }
 
 }

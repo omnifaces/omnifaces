@@ -77,6 +77,14 @@
 
         <h:link id="closeAllSockets" value="closeAllSockets" onclick="closeAllSockets();return false;" />
 
+        <o:form id="toggle">
+            <h:commandButton id="toggleConnected" value="toggleConnected" action="#{socketITBean.toggleConnected}">
+                <f:ajax render=":messages" />
+            </h:commandButton>
+        </o:form>
+
+        <o:socket channel="toggleable" connected="#{socketITBean.toggleableConnected}" onopen="clientOpened" onclose="clientClosed" />
+
         <o:socket channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
         <o:socket channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
 

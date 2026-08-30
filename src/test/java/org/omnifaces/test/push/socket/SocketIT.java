@@ -13,6 +13,7 @@
 package org.omnifaces.test.push.socket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -60,6 +61,9 @@ public class SocketIT extends OmniFacesIT {
     @FindBy(id = "closeAllSockets")
     private WebElement closeAllSockets;
 
+    @FindBy(id = "toggle:toggleConnected")
+    private WebElement toggleConnected;
+
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
         return createWebArchive(SocketIT.class);
@@ -67,6 +71,7 @@ public class SocketIT extends OmniFacesIT {
 
     @Test
     void test() {
+        testToggleConnected();
         testOnopen();
 
         assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
@@ -94,6 +99,17 @@ public class SocketIT extends OmniFacesIT {
         // that numbers should equal respectively 3, 2, 1 on first session and 3, 1, 1 on second session.
 
         testOnclose(firstTab);
+    }
+
+    /**
+     * A socket whose connected attribute flips to true on a postback must be opened by the script which the postback emits, and that script must name the
+     * channel. It is the only path on which the channel name is interpolated at postback time rather than at initial render, so it is also the only one where a
+     * broken interpolation would go unnoticed until the socket silently fails to open.
+     */
+    private void testToggleConnected() {
+        assertFalse(clientOpenedMessages.getText().contains("|toggleable|"), "It is initially not connected");
+        guardAjax(toggleConnected::click);
+        waitUntilTextContains(clientOpenedMessages, "|toggleable|");
     }
 
     private void testOnopen() {
