@@ -86,7 +86,7 @@ public class SocketFacesListener implements SystemEventListener {
             boolean previouslyConnected = sockets.get(socket.getChannel()).setValue(connected);
 
             if (connected != previouslyConnected) {
-                addScript(context, connected ? SCRIPT_OPEN : SCRIPT_CLOSE.formatted(socket.getChannel()));
+                addScript(context, (connected ? SCRIPT_OPEN : SCRIPT_CLOSE).formatted(socket.getChannel()));
             }
         });
     }
