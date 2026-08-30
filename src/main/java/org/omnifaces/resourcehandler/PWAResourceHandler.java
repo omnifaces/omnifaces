@@ -27,6 +27,7 @@ import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getViewId;
 import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
 import java.io.ByteArrayInputStream;
@@ -549,11 +550,6 @@ public class PWAResourceHandler extends DefaultResourceHandler {
         if (viewId != null) {
             VIEW_IDS_WITH_SERVICE_WORKER.add(viewId);
         }
-    }
-
-    private static String getViewId(FacesContext context) {
-        var viewRoot = context.getViewRoot();
-        return viewRoot != null ? viewRoot.getViewId() : null;
     }
 
     /**
