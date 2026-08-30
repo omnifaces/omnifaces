@@ -22,7 +22,7 @@
             <link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" />
         </h:head>
         <h:body>
-            <h:outputText id="transient" value="#{facesContext.viewRoot.transient}" />
+            <h:outputText id="transient" value="#{facesContext.viewRoot.isTransient()}" />
         </h:body>
     </f:view>
 </html>
