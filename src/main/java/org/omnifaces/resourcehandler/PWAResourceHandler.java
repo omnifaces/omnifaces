@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.Boolean.TRUE;
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -28,8 +27,6 @@ import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getViewAttribute;
-import static org.omnifaces.util.FacesLocal.setViewAttribute;
 import static org.omnifaces.util.Utils.replaceFirstLiteral;
 
 import java.io.ByteArrayInputStream;
@@ -39,6 +36,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -278,6 +277,16 @@ public class PWAResourceHandler extends DefaultResourceHandler {
     /** The content type <code>application/manifest+json</code>. */
     private static final String MANIFEST_CONTENT_TYPE = "application/manifest+json";
 
+    /**
+     * View IDs whose Facelet references the web app manifest, and which therefore register the service worker.
+     *
+     * <p>
+     * Whether a view does that is a property of the Facelet rather than of a visitor or of one view instance, so it is remembered per view ID for the whole
+     * application. It cannot be remembered per request, because an ajax postback does not re-render the head where the manifest is referenced, and it must not
+     * be remembered in the view map, because creating that map makes the implementation create an HTTP session and thereby defeats a transient view.
+     */
+    private static final Set<String> VIEW_IDS_WITH_SERVICE_WORKER = ConcurrentHashMap.newKeySet();
+
     /** The resource name <code>sw.js</code>. */
     public static final String SERVICEWORKER_RESOURCE_NAME = "sw.js";
 
@@ -325,7 +334,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
                     addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
                     addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
                     addScript(context, SCRIPT_INIT.formatted(getServiceWorkerUrl(context), getServiceWorkerScope(context)));
-                    setViewAttribute(context, PWAResourceHandler.class.getName(), true);
+                    markActive(context);
                 }
                 else {
                     logger.warning(() -> WARNING_NO_CACHEABLE_VIEW_IDS.formatted(manifest.getClass().getName()));
@@ -530,7 +539,21 @@ public class PWAResourceHandler extends DefaultResourceHandler {
      * @since 5.2
      */
     public static boolean isActive(FacesContext context) {
-        return TRUE.equals(getViewAttribute(context, PWAResourceHandler.class.getName()));
+        var viewId = getViewId(context);
+        return viewId != null && VIEW_IDS_WITH_SERVICE_WORKER.contains(viewId);
+    }
+
+    private static void markActive(FacesContext context) {
+        var viewId = getViewId(context);
+
+        if (viewId != null) {
+            VIEW_IDS_WITH_SERVICE_WORKER.add(viewId);
+        }
+    }
+
+    private static String getViewId(FacesContext context) {
+        var viewRoot = context.getViewRoot();
+        return viewRoot != null ? viewRoot.getViewId() : null;
     }
 
     /**

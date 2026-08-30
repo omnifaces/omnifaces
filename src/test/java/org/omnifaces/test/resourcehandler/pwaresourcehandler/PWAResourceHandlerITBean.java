@@ -14,9 +14,11 @@ package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 
 import java.io.Serializable;
 
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.resourcehandler.PWAResourceHandler;
 
 @Named
 @ViewScoped
@@ -26,6 +28,14 @@ public class PWAResourceHandlerITBean implements Serializable {
 
     public void submit() {
         // NOOP
+    }
+
+    /**
+     * The flag that o:notification checks before it renders; it must survive an ajax postback which does not re-render the head, because that is where the
+     * manifest resource which sets it is referenced.
+     */
+    public boolean isPwaActive() {
+        return PWAResourceHandler.isActive(FacesContext.getCurrentInstance());
     }
 
 }

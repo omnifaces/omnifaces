@@ -16,19 +16,13 @@
 <html lang="en"
     xmlns:f="jakarta.faces.core"
     xmlns:h="jakarta.faces.html"
-    xmlns:ui="jakarta.faces.facelets"
-    xmlns:o="omnifaces"
 >
-    <h:head>
-        <link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" crossorigin="use-credentials" />
-    </h:head>
-    <h:body>
-        <o:form id="form">
-            <h:commandButton id="ajaxSubmit" value="ajaxSubmit" action="#{pWAResourceHandlerITBean.submit}">
-                <f:ajax execute="@form" render="@form" />
-            </h:commandButton>
-            <h:outputText id="viewScopedBeanHashCode" value="#{pWAResourceHandlerITBean.hashCode()}" />
-            <h:outputText id="pwaActive" value="#{pWAResourceHandlerITBean.pwaActive}" />
-        </o:form>
-    </h:body>
+    <f:view transient="true">
+        <h:head>
+            <link rel="manifest" href="#{resource['omnifaces:manifest.webmanifest']}" />
+        </h:head>
+        <h:body>
+            <h:outputText id="transient" value="#{facesContext.viewRoot.transient}" />
+        </h:body>
+    </f:view>
 </html>

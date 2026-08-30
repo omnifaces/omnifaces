@@ -13,10 +13,12 @@
 package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.el.functions.Strings.stripTags;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.MANIFEST_RESOURCE_NAME;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.SERVICEWORKER_RESOURCE_NAME;
+import static org.openqa.selenium.By.id;
 
 import java.util.regex.Pattern;
 
@@ -48,6 +50,9 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
     @FindBy(id = "form:viewScopedBeanHashCode")
     private WebElement viewScopedBeanHashCode;
+
+    @FindBy(id = "form:pwaActive")
+    private WebElement pwaActive;
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
@@ -95,8 +100,20 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
         );
     }
 
+    /**
+     * An ajax postback does not re-render the head, so the manifest resource which marks the handler active is not created again. On a stateful view the mark
+     * must nevertheless survive, because o:notification refuses to render without it.
+     */
     @Test
     @Order(3)
+    void verifyStillActiveAfterAjaxSubmit() {
+        assertEquals("true", pwaActive.getText(), "It is active on the initial render");
+        guardAjax(ajaxSubmit::click);
+        assertEquals("true", pwaActive.getText(), "It is still active after ajax submit");
+    }
+
+    @Test
+    @Order(4)
     void verifyViewScopedBeanAfterAjaxSubmit() {
         String hashCode = viewScopedBeanHashCode.getText();
         guardAjax(ajaxSubmit::click);
@@ -107,6 +124,20 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
         guardAjax(ajaxSubmit::click);
         assertEquals(hashCode, viewScopedBeanHashCode.getText(), "It is still the same instance after 3rd ajax submit");
+    }
+
+    /**
+     * Referencing the manifest must not create an HTTP session. A stateless application declares its views transient precisely so that no per-user server state
+     * exists, and a session created behind its back reintroduces sticky routing and replication for every request thereafter.
+     */
+    @Test
+    @Order(5)
+    void verifyNoSessionIsCreatedOnTransientView() {
+        browser.manage().deleteAllCookies();
+        open("PWAResourceHandlerITTransientView.xhtml");
+
+        assertEquals("true", browser.findElement(id("transient")).getText(), "The view is transient");
+        assertNull(browser.manage().getCookieNamed("JSESSIONID"), "No session is created");
     }
 
 }
