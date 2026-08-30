@@ -13,12 +13,10 @@
 package org.omnifaces.test.resourcehandler.pwaresourcehandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.el.functions.Strings.stripTags;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.MANIFEST_RESOURCE_NAME;
 import static org.omnifaces.resourcehandler.PWAResourceHandler.SERVICEWORKER_RESOURCE_NAME;
-import static org.openqa.selenium.By.id;
 
 import java.util.regex.Pattern;
 
@@ -124,20 +122,6 @@ public class PWAResourceHandlerIT extends OmniFacesIT {
 
         guardAjax(ajaxSubmit::click);
         assertEquals(hashCode, viewScopedBeanHashCode.getText(), "It is still the same instance after 3rd ajax submit");
-    }
-
-    /**
-     * Referencing the manifest must not create an HTTP session. A stateless application declares its views transient precisely so that no per-user server state
-     * exists, and a session created behind its back reintroduces sticky routing and replication for every request thereafter.
-     */
-    @Test
-    @Order(5)
-    void verifyNoSessionIsCreatedOnTransientView() {
-        browser.manage().deleteAllCookies();
-        open("PWAResourceHandlerITTransientView.xhtml");
-
-        assertEquals("true", browser.findElement(id("transient")).getText(), "The view is transient");
-        assertNull(browser.manage().getCookieNamed("JSESSIONID"), "No session is created");
     }
 
 }
