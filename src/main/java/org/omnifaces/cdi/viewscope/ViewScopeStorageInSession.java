@@ -19,8 +19,7 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MOJARRA_NU
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NUMBER_OF_VIEWS;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.getViewAttribute;
-import static org.omnifaces.util.Faces.setViewAttribute;
+import static org.omnifaces.util.Faces.getViewMap;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.Serializable;
@@ -83,7 +82,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     @Override
     public UUID getBeanStorageId() {
-        UUID beanStorageId = getViewAttribute(getClass().getName());
+        var beanStorageId = (UUID) getViewMap().get(getClass().getName());
         return beanStorageId != null && getBeanStorage(beanStorageId) != null ? beanStorageId : null;
     }
 
@@ -108,7 +107,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
         getActiveBeanStorages(true).acquire(beanStorageId, beanStorage); // Must happen before it's put in the LRU map, else a concurrent request could
                                                                          // immediately evict and destroy it.
         activeViewScopes.put(beanStorageId, beanStorage);
-        setViewAttribute(getClass().getName(), beanStorageId);
+        getViewMap().put(getClass().getName(), beanStorageId);
     }
 
     /**
