@@ -13,6 +13,11 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptyMap;
+import static org.omnifaces.util.Beans.getInstance;
+import static org.omnifaces.util.Beans.isActive;
+import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.Faces.hasSession;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -82,7 +87,7 @@ abstract class PushChannelManager implements Serializable {
         SESSION,
         VIEW;
 
-        static Scope of(String value, Serializable user, String componentName) {
+        static Scope of(String value, Serializable user, String tagName) {
             if (value == null) {
                 return user == null ? APPLICATION : SESSION;
             }
@@ -93,7 +98,7 @@ abstract class PushChannelManager implements Serializable {
                 }
             }
 
-            throw new IllegalArgumentException(ERROR_INVALID_SCOPE.formatted(componentName, value));
+            throw new IllegalArgumentException(ERROR_INVALID_SCOPE.formatted(tagName, value));
         }
 
     }
@@ -108,27 +113,49 @@ abstract class PushChannelManager implements Serializable {
     /**
      * Register given channel on given scope and return the channel identifier.
      *
+     * @param tagName The name of the tag which declared the given channel, for use in any error message.
      * @param channel The push channel.
-     * @param scope The push scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
-     * <code>null</code>, the default is <code>application</code>.
+     * @param scope The resolved push scope.
      * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      * @return The push channel identifier.
-     * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
+     * @throws IllegalArgumentException When channel already exists on a different scope.
      */
-    protected String register(String channel, String scope, Serializable user) {
-        var resolvedScope = Scope.of(scope, user, getClass().getSimpleName());
-
-        var channelId = switch (resolvedScope) {
-            case APPLICATION -> register(null, channel, getApplicationScope(), sessionScopedChannels, getViewScopedChannels(false));
-            case SESSION -> register(user, channel, sessionScopedChannels, getApplicationScope(), getViewScopedChannels(false));
-            case VIEW -> register(user, channel, getViewScopedChannels(true), getApplicationScope(), sessionScopedChannels);
+    protected String register(String tagName, String channel, Scope scope, Serializable user) {
+        var channelId = switch (scope) {
+            case APPLICATION -> register(tagName, null, channel, getApplicationScope(), sessionScopedChannels, getViewScopedChannels(false));
+            case SESSION -> register(tagName, user, channel, sessionScopedChannels, getApplicationScope(), getViewScopedChannels(false));
+            case VIEW -> register(tagName, user, channel, getViewScopedChannels(true), getApplicationScope(), sessionScopedChannels);
         };
 
-        if (resolvedScope != Scope.APPLICATION) {
+        if (scope != Scope.APPLICATION) {
             registerChannelIdInSession(channelId); // Session and view scoped channels may only be connected to by the owning HTTP session.
         }
 
         return channelId;
+    }
+
+    /**
+     * Register given channel on application scope and return the channel identifier, without resolving the {@link SessionScoped} channel manager. Application
+     * scoped channels are by design not bound to any HTTP session, so declaring one may not implicitly create one. This may only be used while no HTTP session
+     * exists, as the session and view scope are then by definition empty and thus cannot already hold a channel of the same name.
+     *
+     * @param channel The push channel.
+     * @param applicationScope The application scope channel IDs.
+     * @param pushSessions The push session manager.
+     * @return The push channel identifier.
+     */
+    protected static String registerApplicationScopedChannel(
+        String channel, ConcurrentHashMap<String, String> applicationScope,
+        PushSessionManager<?> pushSessions
+    )
+    {
+        var channelId = applicationScope.computeIfAbsent(channel, PushChannelManager::newChannelId);
+        pushSessions.register(channelId);
+        return channelId;
+    }
+
+    private static String newChannelId(String channel) {
+        return channel + "?" + UUID.randomUUID();
     }
 
     private static void registerChannelIdInSession(String channelId) {
@@ -192,15 +219,15 @@ abstract class PushChannelManager implements Serializable {
     }
 
     @SafeVarargs
-    private String register(Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
+    private String register(String tagName, Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
         if (!targetScope.containsKey(channel)) {
             for (var otherScope : otherScopes) {
                 if (otherScope.containsKey(channel)) {
-                    throw new IllegalArgumentException(ERROR_DUPLICATE_CHANNEL.formatted(getClass().getSimpleName(), channel));
+                    throw new IllegalArgumentException(ERROR_DUPLICATE_CHANNEL.formatted(tagName, channel));
                 }
             }
 
-            ((ConcurrentHashMap<String, String>) targetScope).putIfAbsent(channel, channel + "?" + UUID.randomUUID());
+            ((ConcurrentHashMap<String, String>) targetScope).putIfAbsent(channel, newChannelId(channel));
         }
 
         var channelId = targetScope.get(channel);
@@ -353,6 +380,62 @@ abstract class PushChannelManager implements Serializable {
     }
 
     // Nested classes -------------------------------------------------------------------------------------------------
+
+    /**
+     * The session and view scoped channel identifiers of one push channel manager, referenced by a push context so that they remain reachable when another
+     * thread sends a push message during which the session and view scope are not necessarily active anymore. Both scopes are resolved and published together,
+     * so that a push context never observes one of them without the other.
+     */
+    record ScopedChannels(Map<String, String> sessionScope, Map<String, String> viewScope) implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final ScopedChannels UNRESOLVED = new ScopedChannels(EMPTY_SCOPE, EMPTY_SCOPE);
+
+        /**
+         * Returns the session and view scoped channels of the given push channel manager, reusing the given current ones when they are already resolved. This
+         * never implicitly creates an HTTP session; as long as the channel manager has not been created, which is by definition the case as long as no HTTP
+         * session exists, this returns unresolved channels and the caller may retry on a later invocation.
+         *
+         * @param current The currently known scoped channels, if any.
+         * @param channelManagerType The push channel manager type.
+         * @return The session and view scoped channels of the given push channel manager.
+         */
+        static ScopedChannels resolve(ScopedChannels current, Class<? extends PushChannelManager> channelManagerType) {
+            if (current != null && !current.isUnresolved()) {
+                return current;
+            }
+
+            var channelManager = isSessionScopeResolvable() ? getInstance(channelManagerType, false) : null;
+
+            if (channelManager == null) {
+                return UNRESOLVED;
+            }
+
+            return new ScopedChannels(
+                channelManager.getSessionScopedChannels(),
+                isViewScopeResolvable() ? channelManager.getViewScopedChannels(true) : EMPTY_SCOPE
+            );
+        }
+
+        private boolean isUnresolved() {
+            return sessionScope == EMPTY_SCOPE || (viewScope == EMPTY_SCOPE && isViewScopeResolvable());
+        }
+
+        /**
+         * The session scope may only be resolved when that cannot implicitly create an HTTP session. Within a faces context the HTTP session itself gives the
+         * only portable answer; outside of it the CDI session context is consulted, whose lookup does not create an HTTP session as long as it may not create
+         * the bean.
+         */
+        private static boolean isSessionScopeResolvable() {
+            return (!hasContext() || hasSession()) && isActive(SessionScoped.class);
+        }
+
+        private static boolean isViewScopeResolvable() {
+            return hasContext() && getViewRoot() != null;
+        }
+
+    }
 
     /**
      * The session and view scoped channel identifiers owned by one HTTP session. It is held as HTTP session attribute so that it is automatically cleaned up

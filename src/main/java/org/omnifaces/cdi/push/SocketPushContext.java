@@ -13,11 +13,8 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.singleton;
-import static org.omnifaces.cdi.push.PushChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Beans.isActive;
-import static org.omnifaces.util.Faces.hasContext;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -27,10 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import jakarta.enterprise.context.SessionScoped;
-
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.cdi.push.PushChannelManager.ScopedChannels;
 import org.omnifaces.util.Json;
 
 /**
@@ -51,22 +47,20 @@ public class SocketPushContext implements PushContext {
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final String channel;
-    private final Map<String, String> sessionScopedChannels;
-    private final Map<String, String> viewScopedChannels;
+    private volatile ScopedChannels scopedChannels;
     private transient SocketSessionManager socketSessions;
     private transient SocketUserManager socketUsers;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Creates a web socket push context whereby the mutable map of session and view scope channel identifiers is referenced, so it's still available when
-     * another thread invokes {@link #send(Object)} during which the session and view scope is not necessarily active anymore.
+     * Creates a web socket push context whereby the mutable maps of session and view scope channel identifiers are referenced as soon as an HTTP session
+     * exists, so they are still available when another thread invokes {@link #send(Object)} during which the session and view scope is not necessarily active
+     * anymore.
      */
-    SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
+    SocketPushContext(String channel, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
         this.channel = channel;
-        boolean hasSession = isActive(SessionScoped.class);
-        sessionScopedChannels = hasSession ? socketChannels.getSessionScopedChannels() : EMPTY_SCOPE;
-        viewScopedChannels = hasSession && hasContext() ? socketChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
+        scopedChannels = ScopedChannels.resolve(null, SocketChannelManager.class);
         this.socketSessions = socketSessions;
         this.socketUsers = socketUsers;
     }
@@ -75,7 +69,7 @@ public class SocketPushContext implements PushContext {
 
     @Override
     public Set<Future<Void>> send(Object message) {
-        return getSocketSessions().send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
+        return getSocketSessions().send(resolveChannelId(), Json.encode(message));
     }
 
     @Override
@@ -100,6 +94,29 @@ public class SocketPushContext implements PushContext {
         }
 
         return resultsByUser;
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Resolve the channel identifier against the referenced session and view scope channel identifiers, falling back to the application scope. The scoped
+     * channels are re-resolved only when the channel is unknown, so that an application scoped channel never pays for a lookup it does not need. They may be
+     * absent after deserialization.
+     */
+    private String resolveChannelId() {
+        var current = scopedChannels;
+        var channelId = current != null ? getChannelId(channel, current.sessionScope(), current.viewScope()) : null;
+
+        if (channelId == null) {
+            var resolved = ScopedChannels.resolve(current, SocketChannelManager.class);
+
+            if (resolved != current) {
+                scopedChannels = resolved;
+                channelId = getChannelId(channel, resolved.sessionScope(), resolved.viewScope());
+            }
+        }
+
+        return channelId;
     }
 
     // Lazy getters in case this gets serialized ----------------------------------------------------------------------

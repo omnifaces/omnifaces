@@ -801,10 +801,10 @@ public class Sse extends PushComponent {
         var previousUser = (Serializable) registeredUsers.put(channel, component.getUser());
 
         if (previousUser != null && !previousUser.equals(component.getUser())) {
-            SseChannelManager.getInstance().switchUser(channel, scope, previousUser, component.getUser());
+            SseChannelManager.getInstance().switchUser(component.getTagName(), channel, scope, previousUser, component.getUser());
         }
 
-        return SseChannelManager.getInstance().register(channel, scope, component.getUser());
+        return SseChannelManager.register(context, component.getTagName(), channel, scope, component.getUser());
     }
 
     /**

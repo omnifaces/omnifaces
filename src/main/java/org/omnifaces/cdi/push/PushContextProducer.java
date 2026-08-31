@@ -41,16 +41,10 @@ public class PushContextProducer {
     private InjectionPoint injectionPoint;
 
     @Inject
-    private SocketChannelManager socketChannels;
-
-    @Inject
     private SocketSessionManager socketSessions;
 
     @Inject
     private SocketUserManager socketUsers;
-
-    @Inject
-    private SseChannelManager sseChannels;
 
     @Inject
     private SseSessionManager sseSessions;
@@ -73,9 +67,9 @@ public class PushContextProducer {
         String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
 
         return switch (push.type()) {
-            case SSE -> new SsePushContext(channel, false, sseChannels, sseSessions, sseUsers);
-            case NOTIFICATION -> new SsePushContext(channel, true, sseChannels, sseSessions, sseUsers);
-            case SOCKET -> new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
+            case SSE -> new SsePushContext(channel, false, sseSessions, sseUsers);
+            case NOTIFICATION -> new SsePushContext(channel, true, sseSessions, sseUsers);
+            case SOCKET -> new SocketPushContext(channel, socketSessions, socketUsers);
         };
     }
 

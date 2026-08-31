@@ -2729,6 +2729,8 @@ public final class Faces {
 
     /**
      * Returns the view scope map.
+     * <p>
+     * On a transient view the {@link #getViewAttribute(String)} and related methods do not use this map.
      *
      * @return The view scope map.
      * @throws NullPointerException When faces context is unavailable.
@@ -2740,6 +2742,9 @@ public final class Faces {
 
     /**
      * Returns the view scope attribute value associated with the given name.
+     * <p>
+     * On a transient view this is held in the request scope. Such a view is by definition rebuilt on every request, so its view map cannot outlive the request
+     * anyway, and touching it may implicitly create an HTTP session. This is thus not necessarily the same map as {@link #getViewMap()}.
      *
      * @param <T> The expected return type.
      * @param name The view scope attribute name.
@@ -2754,6 +2759,9 @@ public final class Faces {
 
     /**
      * Returns the view scope attribute value associated with the given name, or computes the supplied value if absent.
+     * <p>
+     * On a transient view this is held in the request scope. Such a view is by definition rebuilt on every request, so its view map cannot outlive the request
+     * anyway, and touching it may implicitly create an HTTP session. This is thus not necessarily the same map as {@link #getViewMap()}.
      *
      * @param <T> The expected return type.
      * @param name The view scope attribute name.
@@ -2770,6 +2778,9 @@ public final class Faces {
 
     /**
      * Sets the view scope attribute value associated with the given name.
+     * <p>
+     * On a transient view this is held in the request scope. Such a view is by definition rebuilt on every request, so its view map cannot outlive the request
+     * anyway, and touching it may implicitly create an HTTP session. This is thus not necessarily the same map as {@link #getViewMap()}.
      *
      * @param name The view scope attribute name.
      * @param value The view scope attribute value.
@@ -2782,6 +2793,9 @@ public final class Faces {
 
     /**
      * Removes the view scope attribute value associated with the given name.
+     * <p>
+     * On a transient view this is held in the request scope. Such a view is by definition rebuilt on every request, so its view map cannot outlive the request
+     * anyway, and touching it may implicitly create an HTTP session. This is thus not necessarily the same map as {@link #getViewMap()}.
      *
      * @param <T> The expected return type.
      * @param name The view scope attribute name.

@@ -14,6 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.FacesLocal.hasSession;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 
@@ -71,15 +73,37 @@ public class SocketChannelManager extends PushChannelManager {
     }
 
     /**
+     * Register the given channel on the given scope and return the channel identifier. When the scope resolves to application scope while no HTTP session
+     * exists yet, then this bypasses this {@link SessionScoped} bean, so that <code>&lt;o:socket&gt;</code> stays usable on stateless views.
+     *
+     * @param context The involved faces context.
+     * @param tagName The name of the tag which declared the given channel, for use in any error message.
+     * @param channel The web socket channel.
+     * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
+     * <code>null</code>, the default is <code>application</code>.
+     * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
+     * @return The web socket channel identifier.
+     * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
+     */
+    static String register(FacesContext context, String tagName, String channel, String scope, Serializable user) {
+        var resolvedScope = Scope.of(scope, user, tagName);
+
+        return resolvedScope == Scope.APPLICATION && !hasSession(context)
+            ? registerApplicationScopedChannel(channel, APPLICATION_SCOPE, getReference(SocketSessionManager.class))
+            : getInstance().register(tagName, channel, resolvedScope, user);
+    }
+
+    /**
      * Switch the user on the given channel on the given scope from the given old user to the given new user.
      *
+     * @param tagName The name of the tag which declared the given channel, for use in any error message.
      * @param channel The web socket channel.
      * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and <code>view</code>, case insensitive. If
      * <code>null</code>, the default is <code>application</code>.
      * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope may not be <code>application</code>.
      */
-    protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
+    protected void switchUser(String tagName, String channel, String scope, Serializable oldUser, Serializable newUser) {
         if (oldUser != null) {
             var userId = getSessionUsers().remove(oldUser);
 
@@ -88,7 +112,7 @@ public class SocketChannelManager extends PushChannelManager {
             }
         }
 
-        register(channel, scope, newUser);
+        register(tagName, channel, Scope.of(scope, newUser, tagName), newUser);
         fireEvent(new SocketEvent(channel, newUser, oldUser, null), Switched.LITERAL);
     }
 

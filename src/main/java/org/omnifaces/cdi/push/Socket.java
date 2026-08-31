@@ -802,7 +802,7 @@ public class Socket extends PushComponent {
 
             var port = getPort();
             var host = (port != null ? ":" + port : "") + getRequestContextPath(context);
-            var channelId = SocketChannelManager.getInstance().register(channel, getScope(), getUser());
+            var channelId = SocketChannelManager.register(context, getTagName(), channel, getScope(), getUser());
             var functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
             var behaviors = getBehaviorScripts();
             var connected = isConnected();

@@ -120,7 +120,8 @@ public class SocketFacesListener implements SystemEventListener {
         var previouslyConnectedUser = getSockets(context).put(socket.getChannel(), currentlyConnectedUser);
 
         if (previouslyConnectedUser != null && !Objects.equals(previouslyConnectedUser.getKey(), socket.getUser())) {
-            SocketChannelManager.getInstance().switchUser(socket.getChannel(), socket.getScope(), previouslyConnectedUser.getKey(), socket.getUser());
+            SocketChannelManager.getInstance()
+                .switchUser(socket.getTagName(), socket.getChannel(), socket.getScope(), previouslyConnectedUser.getKey(), socket.getUser());
         }
 
         return previouslyConnectedUser == null;

@@ -13,11 +13,8 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.singleton;
-import static org.omnifaces.cdi.push.PushChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SseChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Beans.isActive;
-import static org.omnifaces.util.Faces.hasContext;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -27,11 +24,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import jakarta.enterprise.context.SessionScoped;
-
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.Notification.Message;
+import org.omnifaces.cdi.push.PushChannelManager.ScopedChannels;
 import org.omnifaces.util.Json;
 
 /**
@@ -57,23 +53,20 @@ public class SsePushContext implements PushContext {
 
     private final String channel;
     private final boolean notification;
-    private final Map<String, String> sessionScopedChannels;
-    private final Map<String, String> viewScopedChannels;
+    private volatile ScopedChannels scopedChannels;
     private transient SseSessionManager sseSessions;
     private transient SseUserManager sseUsers;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
     /**
-     * Creates an SSE push context whereby the mutable map of session and view scope channel identifiers is referenced, so it's still available when another
-     * thread invokes {@link #send(Object)} during which the session and view scope is not necessarily active anymore.
+     * Creates an SSE push context whereby the mutable maps of session and view scope channel identifiers are referenced as soon as an HTTP session exists, so
+     * they are still available when another thread invokes {@link #send(Object)} during which the session and view scope is not necessarily active anymore.
      */
-    SsePushContext(String channel, boolean notification, SseChannelManager sseChannels, SseSessionManager sseSessions, SseUserManager sseUsers) {
+    SsePushContext(String channel, boolean notification, SseSessionManager sseSessions, SseUserManager sseUsers) {
         this.channel = channel;
         this.notification = notification;
-        boolean hasSession = isActive(SessionScoped.class);
-        sessionScopedChannels = hasSession ? sseChannels.getSessionScopedChannels() : EMPTY_SCOPE;
-        viewScopedChannels = hasSession && hasContext() ? sseChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
+        scopedChannels = ScopedChannels.resolve(null, SseChannelManager.class);
         this.sseSessions = sseSessions;
         this.sseUsers = sseUsers;
     }
@@ -83,7 +76,7 @@ public class SsePushContext implements PushContext {
     @Override
     public Set<Future<Void>> send(Object message) {
         validateMessage(message);
-        return getSseSessions().send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), Json.encode(message));
+        return getSseSessions().send(resolveChannelId(), Json.encode(message));
     }
 
     @Override
@@ -117,6 +110,27 @@ public class SsePushContext implements PushContext {
         if (notification && !(message instanceof Message)) {
             throw new IllegalArgumentException(ERROR_INVALID_NOTIFICATION_MESSAGE);
         }
+    }
+
+    /**
+     * Resolve the channel identifier against the referenced session and view scope channel identifiers, falling back to the application scope. The scoped
+     * channels are re-resolved only when the channel is unknown, so that an application scoped channel never pays for a lookup it does not need. They may be
+     * absent after deserialization.
+     */
+    private String resolveChannelId() {
+        var current = scopedChannels;
+        var channelId = current != null ? getChannelId(channel, current.sessionScope(), current.viewScope()) : null;
+
+        if (channelId == null) {
+            var resolved = ScopedChannels.resolve(current, SseChannelManager.class);
+
+            if (resolved != current) {
+                scopedChannels = resolved;
+                channelId = getChannelId(channel, resolved.sessionScope(), resolved.viewScope());
+            }
+        }
+
+        return channelId;
     }
 
     // Lazy getters in case this gets serialized ----------------------------------------------------------------------

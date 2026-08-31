@@ -1734,11 +1734,20 @@ public final class FacesLocal {
     }
 
     /**
+     * Returns the map holding the view scope attributes. This is the view map, except on a transient view, whose view map cannot outlive the request anyway and
+     * may implicitly create an HTTP session when touched. The store thus follows the current view root, so a value written under one view root is not
+     * necessarily visible under another one within the same request.
+     */
+    private static Map<String, Object> getViewScope(FacesContext context) {
+        return context.getViewRoot().isTransient() ? getRequestMap(context) : getViewMap(context);
+    }
+
+    /**
      * @see Faces#getViewAttribute(String)
      */
     @SuppressWarnings("unchecked")
     public static <T> T getViewAttribute(FacesContext context, String name) {
-        return (T) getViewMap(context).get(name);
+        return (T) getViewScope(context).get(name);
     }
 
     /**
@@ -1760,7 +1769,7 @@ public final class FacesLocal {
      * @see Faces#setViewAttribute(String, Object)
      */
     public static void setViewAttribute(FacesContext context, String name, Object value) {
-        getViewMap(context).put(name, value);
+        getViewScope(context).put(name, value);
     }
 
     /**
@@ -1768,7 +1777,7 @@ public final class FacesLocal {
      */
     @SuppressWarnings("unchecked")
     public static <T> T removeViewAttribute(FacesContext context, String name) {
-        return (T) getViewMap(context).remove(name);
+        return (T) getViewScope(context).remove(name);
     }
 
     // Session scope --------------------------------------------------------------------------------------------------
