@@ -15,14 +15,14 @@
 -->
 <server description="arquillian">
     <featureManager>
-        <feature>faces-4.1</feature>
-        <feature>expressionLanguage-6.0</feature>
-        <feature>servlet-6.1</feature>
-        <feature>cdi-4.1</feature>
-        <feature>websocket-2.2</feature>
-        <feature>validation-3.1</feature>
-        <feature>jsonp-2.1</feature> <!-- Not for OmniFaces itself, but for ScriptParamIT test case -->
-        <!-- NOTE: jakartaee-11.0 is not yet available in 26.0.0.1-beta; once available, all of above can be replaced with a single jakartaee-11.0 feature -->
+        <platform>jakartaee-11.0</platform>
+        <feature>faces</feature>
+        <feature>expressionLanguage</feature>
+        <feature>servlet</feature>
+        <feature>cdi</feature>
+        <feature>websocket</feature>
+        <feature>validation</feature>
+        <feature>jsonp</feature>
         <feature>localConnector-1.0</feature>
     </featureManager>
     <applicationMonitor updateTrigger="mbean" />
