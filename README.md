@@ -4,3 +4,7 @@
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 [OmniFaces homepage is available at **omnifaces.org**](http://omnifaces.org).
+
+## Commercial support
+
+OmniFaces is maintained by [BalusC BV](https://balusc.org). For commercial support, Jakarta Faces consulting or migration work, mail <bauke@balusc.org>.
