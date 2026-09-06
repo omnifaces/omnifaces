@@ -58,8 +58,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         server-id: central
-        server-username: CENTRAL_USERNAME
-        server-password: CENTRAL_PASSWORD
+        server-username-env-var: CENTRAL_USERNAME
+        server-password-env-var: CENTRAL_PASSWORD
     - name: Extract project version
       id: project
       run: echo version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) >> $GITHUB_OUTPUT
