@@ -15,6 +15,7 @@ package org.omnifaces.el.functions;
 import static java.time.format.TextStyle.FULL;
 import static java.time.format.TextStyle.SHORT;
 import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 import static org.omnifaces.util.Faces.getLocale;
@@ -221,7 +222,7 @@ public final class Dates {
      */
     @SuppressWarnings("unchecked")
     private static <D> D add(D date, int amount, ChronoUnit unit) {
-        return (D) fromZonedDateTime(toZonedDateTime(date).plus(amount, unit), date.getClass());
+        return (D) fromZonedDateTime(toZonedDateTime(requireNonNull(date, "date")).plus(amount, unit), date.getClass());
     }
 
     // Calculating ----------------------------------------------------------------------------------------------------
@@ -286,7 +287,10 @@ public final class Dates {
      * Helper method which converts the given dates to zoned dates and returns the unit difference of the given chrono unit.
      */
     private static <D> int dateDiff(D start, D end, ChronoUnit unit) {
-        return (int) unit.between(toZonedDateTime(start).truncatedTo(ChronoUnit.DAYS), toZonedDateTime(end).truncatedTo(ChronoUnit.DAYS));
+        return (int) unit.between(
+            toZonedDateTime(requireNonNull(start, "start")).truncatedTo(ChronoUnit.DAYS),
+            toZonedDateTime(requireNonNull(end, "end")).truncatedTo(ChronoUnit.DAYS)
+        );
     }
 
     /**
@@ -335,7 +339,7 @@ public final class Dates {
      * Helper method which calculates the time difference of the given two dates in given time unit.
      */
     private static <D> long timeDiff(D start, D end, ChronoUnit unit) {
-        return unit.between(toZonedDateTime(start), toZonedDateTime(end));
+        return unit.between(toZonedDateTime(requireNonNull(start, "start")), toZonedDateTime(requireNonNull(end, "end")));
     }
 
     // Mappings -------------------------------------------------------------------------------------------------------

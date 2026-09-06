@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
@@ -53,7 +54,7 @@ public class SsePushContext implements PushContext {
 
     private final String channel;
     private final boolean notification;
-    private volatile ScopedChannels scopedChannels;
+    private final AtomicReference<ScopedChannels> scopedChannels;
     private transient SseSessionManager sseSessions;
     private transient SseUserManager sseUsers;
 
@@ -66,7 +67,7 @@ public class SsePushContext implements PushContext {
     SsePushContext(String channel, boolean notification, SseSessionManager sseSessions, SseUserManager sseUsers) {
         this.channel = channel;
         this.notification = notification;
-        scopedChannels = ScopedChannels.resolve(null, SseChannelManager.class);
+        scopedChannels = new AtomicReference<>(ScopedChannels.resolve(null, SseChannelManager.class));
         this.sseSessions = sseSessions;
         this.sseUsers = sseUsers;
     }
@@ -118,14 +119,14 @@ public class SsePushContext implements PushContext {
      * absent after deserialization.
      */
     private String resolveChannelId() {
-        var current = scopedChannels;
+        var current = scopedChannels.get();
         var channelId = current != null ? getChannelId(channel, current.sessionScope(), current.viewScope()) : null;
 
         if (channelId == null) {
             var resolved = ScopedChannels.resolve(current, SseChannelManager.class);
 
             if (resolved != current) {
-                scopedChannels = resolved;
+                scopedChannels.set(resolved);
                 channelId = getChannelId(channel, resolved.sessionScope(), resolved.viewScope());
             }
         }

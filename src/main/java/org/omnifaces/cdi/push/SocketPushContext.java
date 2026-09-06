@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
@@ -47,7 +48,7 @@ public class SocketPushContext implements PushContext {
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final String channel;
-    private volatile ScopedChannels scopedChannels;
+    private final AtomicReference<ScopedChannels> scopedChannels;
     private transient SocketSessionManager socketSessions;
     private transient SocketUserManager socketUsers;
 
@@ -60,7 +61,7 @@ public class SocketPushContext implements PushContext {
      */
     SocketPushContext(String channel, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
         this.channel = channel;
-        scopedChannels = ScopedChannels.resolve(null, SocketChannelManager.class);
+        scopedChannels = new AtomicReference<>(ScopedChannels.resolve(null, SocketChannelManager.class));
         this.socketSessions = socketSessions;
         this.socketUsers = socketUsers;
     }
@@ -104,14 +105,14 @@ public class SocketPushContext implements PushContext {
      * absent after deserialization.
      */
     private String resolveChannelId() {
-        var current = scopedChannels;
+        var current = scopedChannels.get();
         var channelId = current != null ? getChannelId(channel, current.sessionScope(), current.viewScope()) : null;
 
         if (channelId == null) {
             var resolved = ScopedChannels.resolve(current, SocketChannelManager.class);
 
             if (resolved != current) {
-                scopedChannels = resolved;
+                scopedChannels.set(resolved);
                 channelId = getChannelId(channel, resolved.sessionScope(), resolved.viewScope());
             }
         }
