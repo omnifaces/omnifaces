@@ -27,8 +27,13 @@ import static org.omnifaces.util.Utils.openConnection;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.WebXml;
+import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.FacesLocal;
 
@@ -289,12 +294,21 @@ public abstract class WebAppManifest {
                 .collect(toSet());
             welcomeFileURLs.add(contextPath + "/");
 
-            var viewHandler = context.getApplication().getViewHandler();
-            cacheableViewIds = viewHandler.getViews(context, "/").filter(viewId -> welcomeFileURLs.contains(viewHandler.getActionURL(context, viewId)))
-                .collect(toSet());
+            cacheableViewIds = findViewIdsMatchingURLs(context, context.getApplication().getViewHandler(), welcomeFileURLs);
         }
 
         return cacheableViewIds;
+    }
+
+    /**
+     * Returns the view IDs whose action URL is one of the given URLs. A view below a dynamic route segment is skipped: it has no URL of its own, so it can
+     * never match, and asking the view handler for one would throw.
+     */
+    static Set<String> findViewIdsMatchingURLs(FacesContext context, ViewHandler viewHandler, Set<String> urls) {
+        return viewHandler.getViews(context, "/")
+            .filter(viewId -> !FacesViews.isDynamicRoute(viewId))
+            .filter(viewId -> urls.contains(viewHandler.getActionURL(context, viewId)))
+            .collect(toSet());
     }
 
     /**

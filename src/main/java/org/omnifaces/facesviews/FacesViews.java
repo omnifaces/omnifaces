@@ -1092,6 +1092,20 @@ public final class FacesViews {
     }
 
     /**
+     * Returns whether the given resource has at least one dynamic route segment, such as <code>/organizations/[id]/members</code>. Such a resource has no URL
+     * of its own: it is only addressable within a request supplying a value for every one of its segments. Callers which enumerate views, such as
+     * {@link jakarta.faces.application.ViewHandler#getViews(jakarta.faces.context.FacesContext, String)} consumers, can use this to skip the ones they cannot
+     * address.
+     *
+     * @param resource The resource, which may be a view ID.
+     * @return Whether the given resource has at least one dynamic route segment.
+     * @since 5.5.3
+     */
+    public static boolean isDynamicRoute(String resource) {
+        return DynamicRoutes.isDynamicRoute(resource);
+    }
+
+    /**
      * Strips any mapped welcome file prefix path from the given resource.
      *
      * @param servletContext The involved servlet context.
