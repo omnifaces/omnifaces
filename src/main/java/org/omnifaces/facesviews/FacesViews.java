@@ -1094,7 +1094,7 @@ public final class FacesViews {
     /**
      * Returns whether the given resource has at least one dynamic route segment, such as <code>/organizations/[id]/members</code>. Such a resource has no URL
      * of its own: it is only addressable within a request supplying a value for every one of its segments. Callers which enumerate views, such as
-     * {@link jakarta.faces.application.ViewHandler#getViews(jakarta.faces.context.FacesContext, String)} consumers, can use this to skip the ones they cannot
+     * {@link ViewHandler#getViews(FacesContext, String, jakarta.faces.application.ViewVisitOption...)} consumers, can use this to skip the ones they cannot
      * address.
      *
      * @param resource The resource, which may be a view ID.
