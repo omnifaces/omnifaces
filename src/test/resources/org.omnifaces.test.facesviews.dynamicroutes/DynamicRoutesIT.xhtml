@@ -31,7 +31,8 @@
         <h:link id="concreteLink" value="concrete" outcome="/organizations/977/members" />
         <h:link id="concreteElLink" value="concreteEl" outcome="/organizations/#{dynamicRoutesITBean.exampleId}/members" />
         <h:link id="concreteMultiViewsLink" value="concreteMultiViews" outcome="/nl/products/12345/reviews" />
-        <h:link id="concreteUnmatchedLink" value="concreteUnmatched" outcome="/organizations/977/nonexisting" />
+        <h:link id="concreteUnmatchedLink" value="concreteUnmatched" outcome="/elsewhere/977/nonexisting" />
+        <h:link id="concreteRemainderLink" value="concreteRemainder" outcome="/organizations/977/nonexisting" />
         <h:link id="concreteQueryLink" value="concreteQuery" outcome="/organizations/977/members?foo=bar" />
         <h:form id="redirectForm">
             <h:commandButton id="submit" value="redirect" action="#{dynamicRoutesITBean.redirectToConcreteRoute}" />

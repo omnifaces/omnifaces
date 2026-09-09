@@ -120,6 +120,28 @@ class DynamicRoutesTest {
         assertEquals("/2", match.pathInfo());
     }
 
+    /**
+     * A welcome file answers for its own directory, so it is the view of that level and swallows the remainder just like any other MultiViews view does.
+     */
+    @Test
+    void testMultiViewsWelcomeFileSwallowsTheRemainderAsPathInfo() {
+        var routes = new DynamicRoutes();
+        routes.add("/[gym]/member/index", "/[gym]/member/index.xhtml", true, true);
+
+        var match = routes.match("/cbc/member/2026-09-07");
+        assertEquals("/[gym]/member/index.xhtml", match.viewId());
+        assertEquals(Map.of("gym", "cbc"), match.params());
+        assertEquals("/2026-09-07", match.pathInfo());
+    }
+
+    @Test
+    void testNonMultiViewsWelcomeFileRequiresThePathToBeFullyConsumed() {
+        var routes = new DynamicRoutes();
+        routes.add("/[gym]/member/index", "/[gym]/member/index.xhtml", false, true);
+
+        assertNull(routes.match("/cbc/member/2026-09-07"));
+    }
+
     @Test
     void testNonMultiViewsViewRequiresThePathToBeFullyConsumed() {
         var routes = new DynamicRoutes();

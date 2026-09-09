@@ -47,6 +47,10 @@ import jakarta.faces.context.FacesContext;
  * {@value org.omnifaces.component.output.PathParam#PATH_PARAM_NAME_ATTRIBUTE_PREFIX}. Both implementations merge the parameters of a navigation case into the
  * ones handed to {@link jakarta.faces.application.ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)}, which is where
  * {@link FacesViewsViewHandler} substitutes them back into the URL.
+ * <p>
+ * Only the named segments come from the outcome. An outcome whose trailing segments would be swallowed as the path info of a MultiViews view resolves to no
+ * navigation case, as a navigation case has no way to carry them; name the view itself in the outcome and supply those segments with a nested unnamed
+ * <code>&lt;o:pathParam&gt;</code>.
  *
  * @author Bauke Scholtz
  * @since 5.5
@@ -200,7 +204,7 @@ public class DynamicRoutesNavigationHandler extends ConfigurableNavigationHandle
         var path = queryStringIndex < 0 ? outcome : outcome.substring(0, queryStringIndex);
         DynamicRoutes.Match match = dynamicRoutes.match(path);
 
-        if (match == null) {
+        if (match == null || match.pathInfo() != null) {
             return null;
         }
 

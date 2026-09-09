@@ -158,6 +158,16 @@ public class DynamicRoutesIT extends OmniFacesIT {
         assertNull(hrefOf("concreteUnmatchedLink"));
     }
 
+    /**
+     * An outcome whose trailing segments a MultiViews view would swallow as path info resolves to no navigation case, as a navigation case cannot carry them.
+     * Here the welcome file of the dynamic route directory is that MultiViews view.
+     */
+    @Test
+    void testConcreteOutcomeWithAMultiViewsRemainderDoesNotResolve() {
+        open("DynamicRoutesIT.xhtml");
+        assertNull(hrefOf("concreteRemainderLink"));
+    }
+
     private String hrefOf(String id) {
         var href = browser.findElement(By.id(id)).getAttribute("href");
         return href == null ? null : stripHostAndJsessionid(href);
@@ -213,6 +223,19 @@ public class DynamicRoutesIT extends OmniFacesIT {
 
         // Linking to the very view being rendered must replace this request's path info, not append to it.
         assertEquals(contextPath + "/de/products/999/reviews/9", stripHostAndJsessionid(selfLink.getAttribute("href")));
+    }
+
+    /**
+     * A welcome file answers for its own directory, so it is the view of that level and swallows the trailing segments just like any other MultiViews view
+     * does, and a link to itself renders them back.
+     */
+    @Test
+    void testWelcomeFileOfADynamicRouteComposesWithMultiViews() {
+        open("organizations/123/456");
+        verify200("organizationIndex", "organizations/123/456", "/organizations/[id]/index.xhtml");
+        assertEquals("123", id.getText());
+        assertEquals("456", pathIndex0.getText());
+        assertEquals(contextPath + "/organizations/456/9", stripHostAndJsessionid(selfLink.getAttribute("href")));
     }
 
     /**

@@ -74,6 +74,7 @@ final class DynamicRoutes {
         private String viewId;
         private boolean multiViews;
         private String welcomeFileViewId;
+        private boolean welcomeFileMultiViews;
 
     }
 
@@ -139,6 +140,7 @@ final class DynamicRoutes {
 
         if (welcomeFile) {
             node.welcomeFileViewId = resourcePath;
+            node.welcomeFileMultiViews = multiViews;
         }
 
         var fileNode = node.literals.computeIfAbsent(segments[segments.length - 1], key -> new Node());
@@ -257,13 +259,25 @@ final class DynamicRoutes {
             params.remove(node.dynamicName);
         }
 
-        // The path is not consumed by any deeper view, so a MultiViews view at this level swallows the remainder as path info.
+        // The path is not consumed by any deeper view, so a MultiViews view at this level swallows the remainder as path info. A level without a view of its
+        // own name is answered for by its welcome file, which is then that view.
         if (node.viewId != null && node.multiViews) {
-            var remainder = Arrays.copyOfRange(segments, index, segments.length);
-            return new Match(node.viewId, unmodifiableMap(params), PATH_SEPARATOR + String.join(PATH_SEPARATOR, remainder));
+            return swallowRemainder(node.viewId, params, segments, index);
+        }
+
+        if (node.welcomeFileViewId != null && node.welcomeFileMultiViews) {
+            return swallowRemainder(node.welcomeFileViewId, params, segments, index);
         }
 
         return null;
+    }
+
+    /**
+     * Returns a match on the given view for the segments consumed so far, with the ones from the given index on as its path info.
+     */
+    private static Match swallowRemainder(String viewId, Map<String, String> params, String[] segments, int index) {
+        var remainder = Arrays.copyOfRange(segments, index, segments.length);
+        return new Match(viewId, unmodifiableMap(params), PATH_SEPARATOR + String.join(PATH_SEPARATOR, remainder));
     }
 
     /**
