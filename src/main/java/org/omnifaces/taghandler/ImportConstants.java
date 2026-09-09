@@ -207,7 +207,7 @@ public class ImportConstants extends TagHandler {
                         constants.putIfAbsent(field.getName(), field.get(null));
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(ERROR_FIELD_ACCESS.formatted(type, field.getName()), e);
+                        throw new IllegalArgumentException(ERROR_FIELD_ACCESS.formatted(field.getName(), type), e);
                     }
                 }
             }
