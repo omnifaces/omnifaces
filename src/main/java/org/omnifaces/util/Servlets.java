@@ -666,7 +666,7 @@ public final class Servlets {
      * <p>
      * Format an UTF-8 compatible content disposition header for the given filename and whether it's an attachment.
      *
-     * @param filename The filename to appear in "Save As" dialogue.
+     * @param filename The filename to appear in "Save As" dialog.
      * @param attachment Whether the content should be provided as an attachment or inline.
      * @return An UTF-8 compatible content disposition header.
      * @since 2.6

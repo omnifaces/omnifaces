@@ -187,7 +187,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <h2>Using download links</h2>
  * <p>
  * If you have a synchronous download link as in <code>&lt;a href="/path/to/file.ext"&gt;</code>, then the unload will also be triggered. For HTML5-capable
- * browsers it's sufficient to add the <code>download</code> attribute representing the file name you'd like to use in the client specific "Save As" dialogue.
+ * browsers it's sufficient to add the <code>download</code> attribute representing the file name you'd like to use in the client specific "Save As" dialog.
  *
  * <pre>
  * &lt;a href="/path/to/file.ext" download="file.ext"&gt;download&lt;/a&gt;

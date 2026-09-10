@@ -55,9 +55,9 @@ import org.omnifaces.vdl.FacesAttribute;
  * in the order as they appear in the form. So if this validator is been placed before all of the components, then it will be executed before any of the
  * component's own converters and validators. If this validator fails, then the component's own converters and validators will not be fired. If this validator
  * is been placed after all of the components, then it will be executed after any of the component's own converters and validators. If any of them fails, then
- * this validator will not be exeucted. It is not recommended to put this validator somewhere in between the referenced components as the resulting behaviour
- * may be confusing, for example because only the values of preceding components are converted and the values of following components are not converted. Put
- * this validator either before or after all of the components, depending on how you would like to prioritize the validation.
+ * this validator will not be exeucted. It is not recommended to put this validator somewhere in between the referenced components as the resulting behavior may
+ * be confusing, for example because only the values of preceding components are converted and the values of following components are not converted. Put this
+ * validator either before or after all of the components, depending on how you would like to prioritize the validation.
  *
  * <pre>
  * &lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
