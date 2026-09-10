@@ -119,15 +119,11 @@ public final class Beans {
 
     };
 
-    // Obtaining the bean manager from CDI.current() is relatively expensive in at least Weld, which resolves it based on the class which invoked CDI, and
-    // therefore walks the entire stack trace of the current thread on every single call. As OmniFaces obtains it on nearly every invocation below, and thus
-    // many times per request, it is remembered here. Weld's outcome depends on the bean archive of the caller, which is this class, so the class loader is
-    // the correct key. Only the last one is remembered, because there is in the by far most common case only one, and this way the bean manager of an
-    // undeployed web application is never retained any longer than until the next call from another one.
-    private record CachedManager(ClassLoader classLoader, BeanManager manager) {
-    }
+    // Obtaining the bean manager is relatively expensive in at least Weld, so it is remembered, but only when this class is loaded by the web application's own
+    // class loader, as it would otherwise both retain and hand out the bean manager of a foreign web application.
+    private static final ClassLoader CLASS_LOADER = Beans.class.getClassLoader();
 
-    private static volatile CachedManager cachedManager;
+    private static volatile BeanManager cachedManager;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -138,25 +134,23 @@ public final class Beans {
     // Utility --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the CDI bean manager. Once obtained, it is remembered for the context class loader of the current thread, as obtaining it is a relatively
-     * expensive task in some CDI implementations.
+     * Returns the CDI bean manager. Once obtained, it is remembered as long as this class is loaded by the web application's own class loader, as obtaining it
+     * is a relatively expensive task in some CDI implementations.
      *
      * @return The CDI bean manager.
      * @since 2.0
      * @see CDI#getBeanManager()
      */
     public static BeanManager getManager() {
-        var classLoader = Thread.currentThread().getContextClassLoader();
-        var cached = cachedManager;
-
-        if (cached != null && cached.classLoader() == classLoader) {
-            return cached.manager();
+        if (Thread.currentThread().getContextClassLoader() != CLASS_LOADER) {
+            return lookupManager();
         }
 
-        var manager = lookupManager();
+        var manager = cachedManager;
 
-        if (manager != null) { // An absent bean manager, e.g. when the CDI container hasn't been booted yet, must not be remembered.
-            cachedManager = new CachedManager(classLoader, manager);
+        if (manager == null) {
+            manager = lookupManager();
+            cachedManager = manager;
         }
 
         return manager;
