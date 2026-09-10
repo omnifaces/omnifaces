@@ -22,13 +22,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * The bean manager is obtained only once per web application, which relies on OmniFaces being loaded by the very class loader which is also the context class
- * loader of the request thread, as is the case when it sits in the <code>/WEB-INF/lib</code> of the web application.
+ * The bean manager is obtained only once per web application, which is identified by the context class loader of the request thread. This relies on that class
+ * loader being the same object for every request of the same web application, no matter which thread of the pool serves it.
  */
 public class BeansIT extends OmniFacesIT {
 
-    @FindBy(id = "classLoaderOwnedByWebApp")
-    private WebElement classLoaderOwnedByWebApp;
+    @FindBy(id = "contextClassLoaderStable")
+    private WebElement contextClassLoaderStable;
 
     @FindBy(id = "managerRemembered")
     private WebElement managerRemembered;
@@ -40,12 +40,11 @@ public class BeansIT extends OmniFacesIT {
 
     @Test
     void test() {
-        assertEquals("true", classLoaderOwnedByWebApp.getText(), "OmniFaces is loaded by the context class loader of the request thread");
-        assertEquals("true", managerRemembered.getText(), "bean manager is the same instance during the same request");
-
-        refresh();
-
-        assertEquals("true", managerRemembered.getText(), "bean manager is still the same instance during the next request");
+        for (var request = 1; request <= 4; request++) {
+            assertEquals("true", contextClassLoaderStable.getText(), "context class loader is the same instance during request " + request);
+            assertEquals("true", managerRemembered.getText(), "bean manager is the same instance during request " + request);
+            refresh();
+        }
     }
 
 }

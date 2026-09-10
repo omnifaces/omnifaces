@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
@@ -43,8 +44,7 @@ import org.junit.jupiter.api.Test;
  * Obtaining the bean manager is not necessarily cheap. Weld resolves it based on the class which invoked {@link CDI}, and therefore walks the entire stack
  * trace of the current thread on every single {@link CDI#getBeanManager()} call. As OmniFaces obtains the bean manager on nearly every {@link Beans}
  * invocation, and thus many times per request, it may be obtained only once per web application. The tests below therefore count how often the CDI API is
- * actually consulted, which is a deterministic measure, as opposed to elapsed time. Each of them loads {@link Beans} in its own class loader, exactly like a
- * web application does, so that it can never observe the bean manager which another test has left behind.
+ * actually consulted, which is a deterministic measure, as opposed to elapsed time.
  */
 class BeansGetManagerTest {
 
@@ -53,12 +53,18 @@ class BeansGetManagerTest {
     private ClassLoader originalClassLoader;
     private Map<ClassLoader, BeanManager> beanManagersPerClassLoader;
     private AtomicInteger beanManagerLookups;
+    private BeanManager beanManager;
 
     @BeforeEach
     void setUp() {
         originalClassLoader = Thread.currentThread().getContextClassLoader();
+
+        // Every test runs in its own class loader so that it can never observe the bean manager which another test has left behind.
+        Thread.currentThread().setContextClassLoader(newWebAppClassLoader());
+
         beanManagersPerClassLoader = new HashMap<>();
         beanManagerLookups = new AtomicInteger();
+        beanManager = beanManagerOf(Thread.currentThread().getContextClassLoader());
         setCDIProvider(mockCDI(this::beanManagerOf));
     }
 
@@ -72,9 +78,7 @@ class BeansGetManagerTest {
 
     @Test
     void managerIsObtainedFromCDI() {
-        var webApp = newClassLoader("webApp", originalClassLoader);
-
-        assertSame(beanManagerOf(webApp), getManager(webApp));
+        assertSame(beanManager, Beans.getManager());
     }
 
     /**
@@ -83,31 +87,59 @@ class BeansGetManagerTest {
      */
     @Test
     void managerIsObtainedFromCDIOnlyOnce() {
-        var webApp = newClassLoader("webApp", originalClassLoader);
-
         for (var i = 0; i < 100; i++) {
-            assertSame(beanManagerOf(webApp), getManager(webApp));
+            assertSame(beanManager, Beans.getManager());
         }
 
-        assertEquals(1, beanManagerLookups.get(), "CDI#getBeanManager() must be consulted only once");
+        assertEquals(1, beanManagerLookups.get(), "CDI#getBeanManager() must be consulted only once for the same class loader");
     }
 
     /**
-     * OmniFaces may sit in a class loader which is shared by multiple web applications, e.g. in the <code>/lib</code> of an EAR. Each of them has its own bean
-     * manager, so the outcome may then never be remembered, otherwise one web application would obtain the bean manager of another one, and the bean manager of
-     * an undeployed web application would be retained.
+     * OmniFaces may be deployed in a class loader which is shared by multiple web applications, e.g. when it sits in the <code>/lib</code> of an EAR. Each of
+     * them has its own bean manager, so the outcome may never be shared among class loaders.
      */
     @Test
-    void managerIsNotRememberedWhenClassLoaderIsShared() {
-        var earLib = newClassLoader("earLib", originalClassLoader);
-        var webAppA = newClassLoader("webAppA", earLib);
-        var webAppB = newClassLoader("webAppB", earLib);
+    void managerIsNotSharedAmongClassLoaders() {
+        var thisWebAppClassLoader = Thread.currentThread().getContextClassLoader();
+        var otherWebAppClassLoader = newWebAppClassLoader();
+        var managerOfThisWebApp = Beans.getManager();
 
-        assertSame(beanManagerOf(webAppA), getManager(earLib, webAppA));
-        assertSame(beanManagerOf(webAppB), getManager(earLib, webAppB));
-        assertSame(beanManagerOf(webAppA), getManager(earLib, webAppA));
+        Thread.currentThread().setContextClassLoader(otherWebAppClassLoader);
+        var managerOfOtherWebApp = Beans.getManager();
+        assertNotSame(managerOfThisWebApp, managerOfOtherWebApp);
 
-        assertEquals(3, beanManagerLookups.get(), "CDI#getBeanManager() must be consulted on every call");
+        Thread.currentThread().setContextClassLoader(thisWebAppClassLoader);
+        assertSame(managerOfThisWebApp, Beans.getManager());
+
+        Thread.currentThread().setContextClassLoader(otherWebAppClassLoader);
+        assertSame(managerOfOtherWebApp, Beans.getManager());
+    }
+
+    /**
+     * The web application which the bean manager belongs to is identified by the context class loader, so when there is none, then there is nothing to remember
+     * it for.
+     */
+    @Test
+    void managerIsNotRememberedWithoutContextClassLoader() {
+        Thread.currentThread().setContextClassLoader(null);
+
+        assertSame(beanManagerOf(null), Beans.getManager());
+        assertSame(beanManagerOf(null), Beans.getManager());
+        assertEquals(2, beanManagerLookups.get(), "CDI#getBeanManager() must be consulted on every call");
+    }
+
+    /**
+     * The bean manager of a web application which is being destroyed may not be retained, otherwise its class loader can never be garbage collected when
+     * OmniFaces sits in a class loader which outlives it, e.g. in the <code>/lib</code> of an EAR.
+     */
+    @Test
+    void managerIsForgottenWhenWebAppIsDestroyed() {
+        assertSame(beanManager, Beans.getManager());
+
+        Beans.forgetManager();
+
+        assertSame(beanManager, Beans.getManager());
+        assertEquals(2, beanManagerLookups.get(), "CDI#getBeanManager() must be consulted again after the web application is destroyed");
     }
 
     /**
@@ -116,14 +148,13 @@ class BeansGetManagerTest {
      */
     @Test
     void absentManagerIsNotRemembered() {
-        var webApp = newClassLoader("webApp", originalClassLoader);
         var available = new AtomicBoolean(false);
         setCDIProvider(mockCDI(classLoader -> available.get() ? beanManagerOf(classLoader) : null));
 
-        assertNull(getManager(webApp));
+        assertNull(Beans.getManager());
 
         available.set(true);
-        assertSame(beanManagerOf(webApp), getManager(webApp));
+        assertSame(beanManager, Beans.getManager());
     }
 
     /**
@@ -132,70 +163,19 @@ class BeansGetManagerTest {
      */
     @Test
     void managerIsObtainedFromJNDIWhenCDIIsUnavailable() throws NamingException {
-        var webApp = newClassLoader("webApp", originalClassLoader);
         var jndiContext = mock(Context.class);
-        when(jndiContext.lookup(JNDI_NAME_BEAN_MANAGER)).thenReturn(beanManagerOf(webApp));
+        when(jndiContext.lookup(JNDI_NAME_BEAN_MANAGER)).thenReturn(beanManager);
         TestInitialContextFactory.context = jndiContext;
         System.setProperty(INITIAL_CONTEXT_FACTORY, TestInitialContextFactory.class.getName());
         setCDIProvider(null);
 
-        assertSame(beanManagerOf(webApp), getManager(webApp));
+        assertSame(beanManager, Beans.getManager());
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Returns the bean manager as obtained by the {@link Beans} of the given class loader, while it is also the context class loader, which is exactly the
-     * situation of a web application having OmniFaces in its own <code>/WEB-INF/lib</code>.
-     */
-    private static BeanManager getManager(ClassLoader classLoader) {
-        return getManager(classLoader, classLoader);
-    }
-
-    /**
-     * Returns the bean manager as obtained by the {@link Beans} of the given class loader, while the given other class loader is the context class loader,
-     * which is exactly the situation of a web application having OmniFaces in a shared class loader.
-     */
-    private static BeanManager getManager(ClassLoader classLoader, ClassLoader contextClassLoader) {
-        Thread.currentThread().setContextClassLoader(contextClassLoader);
-
-        try {
-            return (BeanManager) Class.forName(Beans.class.getName(), true, classLoader).getMethod("getManager").invoke(null);
-        }
-        catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Returns a class loader which loads the OmniFaces classes itself, exactly like a web application does, and delegates all other classes to the given
-     * parent, so that the CDI API and the provider set on it remain shared.
-     */
-    private static ClassLoader newClassLoader(String name, ClassLoader parent) {
-        return new URLClassLoader(name, new URL[] { Beans.class.getProtectionDomain().getCodeSource().getLocation() }, parent) {
-
-            @Override
-            protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
-                synchronized (getClassLoadingLock(className)) {
-                    if (findResource(className.replace('.', '/') + ".class") == null) {
-                        return super.loadClass(className, resolve);
-                    }
-
-                    var loadedClass = findLoadedClass(className);
-
-                    if (loadedClass == null) {
-                        loadedClass = findClass(className);
-                    }
-
-                    if (resolve) {
-                        resolveClass(loadedClass);
-                    }
-
-                    return loadedClass;
-                }
-            }
-
-        };
+    private static ClassLoader newWebAppClassLoader() {
+        return new URLClassLoader("webapp", new URL[0], BeansGetManagerTest.class.getClassLoader());
     }
 
     private BeanManager beanManagerOf(ClassLoader classLoader) {

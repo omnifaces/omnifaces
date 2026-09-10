@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -119,11 +120,9 @@ public final class Beans {
 
     };
 
-    // Obtaining the bean manager is relatively expensive in at least Weld, so it is remembered, but only when this class is loaded by the web application's own
-    // class loader, as it would otherwise both retain and hand out the bean manager of a foreign web application.
-    private static final ClassLoader CLASS_LOADER = Beans.class.getClassLoader();
-
-    private static volatile BeanManager cachedManager;
+    // The web application is identified by the context class loader of the current thread. Beware that this is not necessarily the class loader which loaded
+    // this class, as e.g. Liberty puts a per-application wrapper around it.
+    private static final Map<ClassLoader, BeanManager> CACHED_MANAGERS = new ConcurrentHashMap<>();
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -134,26 +133,46 @@ public final class Beans {
     // Utility --------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the CDI bean manager. Once obtained, it is remembered as long as this class is loaded by the web application's own class loader, as obtaining it
-     * is a relatively expensive task in some CDI implementations.
+     * Returns the CDI bean manager. Once obtained, it is remembered for the web application at hand until it is destroyed, as obtaining it is a relatively
+     * expensive task in some CDI implementations.
      *
      * @return The CDI bean manager.
      * @since 2.0
      * @see CDI#getBeanManager()
      */
     public static BeanManager getManager() {
-        if (Thread.currentThread().getContextClassLoader() != CLASS_LOADER) {
+        var classLoader = Thread.currentThread().getContextClassLoader();
+
+        if (classLoader == null) {
             return lookupManager();
         }
 
-        var manager = cachedManager;
+        var manager = CACHED_MANAGERS.get(classLoader);
 
         if (manager == null) {
             manager = lookupManager();
-            cachedManager = manager;
+
+            if (manager != null) {
+                CACHED_MANAGERS.put(classLoader, manager);
+            }
         }
 
         return manager;
+    }
+
+    /**
+     * Forgets the CDI bean manager which was remembered for the context class loader of the current thread, if any. This is invoked by the OmniFaces
+     * application listener when the web application is being destroyed.
+     *
+     * @since 5.5.4
+     * @see #getManager()
+     */
+    public static void forgetManager() {
+        var classLoader = Thread.currentThread().getContextClassLoader();
+
+        if (classLoader != null) {
+            CACHED_MANAGERS.remove(classLoader);
+        }
     }
 
     private static BeanManager lookupManager() {

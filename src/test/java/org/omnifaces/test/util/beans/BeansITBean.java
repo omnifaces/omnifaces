@@ -22,10 +22,17 @@ import org.omnifaces.util.Beans;
 @ApplicationScoped
 public class BeansITBean {
 
+    private ClassLoader contextClassLoader;
     private BeanManager manager;
 
-    public boolean isClassLoaderOwnedByWebApp() {
-        return Thread.currentThread().getContextClassLoader() == Beans.class.getClassLoader();
+    public boolean isContextClassLoaderStable() {
+        var currentContextClassLoader = Thread.currentThread().getContextClassLoader();
+
+        if (contextClassLoader == null) {
+            contextClassLoader = currentContextClassLoader;
+        }
+
+        return contextClassLoader == currentContextClassLoader;
     }
 
     public boolean isManagerRemembered() {
