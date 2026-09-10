@@ -164,7 +164,7 @@ public final class Beans {
      * Forgets the CDI bean manager which was remembered for the context class loader of the current thread, if any. This is invoked by the OmniFaces
      * application listener when the web application is being destroyed.
      *
-     * @since 5.5.4
+     * @since 3.14.25
      * @see #getManager()
      */
     public static void forgetManager() {
