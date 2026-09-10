@@ -35,6 +35,7 @@ import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.ViewResourceHandler;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.cache.CacheInitializer;
 
 /**
@@ -51,6 +52,9 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
  * </ol>
+ * <p>
+ * When the servlet context is destroyed, this forgets the CDI bean manager which {@link Beans} has remembered for this
+ * web application.
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
  * If any exception is thrown, then the deployment will fail, unless the {@value OmniFaces#PARAM_NAME_SKIP_DEPLOYMENT_EXCEPTION}
@@ -110,6 +114,11 @@ public class ApplicationListener extends DefaultServletContextListener {
 				throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 			}
 		}
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+		Beans.forgetManager();
 	}
 
 	private void checkJSF23Available() {

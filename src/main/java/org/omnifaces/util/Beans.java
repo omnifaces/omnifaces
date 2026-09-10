@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -92,6 +93,10 @@ public final class Beans {
 	// Hopefully unknown CDI proxy implementations follow the same de-facto standard.
 	private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("(.+)(\\$\\$(.*)Proxy|Proxy(.*)\\$\\$)(.*)", CASE_INSENSITIVE);
 
+	// The web application is identified by the context class loader of the current thread. Beware that this is not necessarily the class loader which
+	// loaded this class, as e.g. Liberty puts a per-application wrapper around it.
+	private static final Map<ClassLoader, BeanManager> CACHED_MANAGERS = new ConcurrentHashMap<>();
+
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -102,12 +107,47 @@ public final class Beans {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the CDI bean manager.
+	 * Returns the CDI bean manager. Once obtained, it is remembered for the web application at hand until it is destroyed, as obtaining it is a
+	 * relatively expensive task in some CDI implementations.
 	 * @return The CDI bean manager.
 	 * @since 2.0
 	 * @see CDI#getBeanManager()
 	 */
 	public static BeanManager getManager() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+		if (classLoader == null) {
+			return lookupManager();
+		}
+
+		BeanManager manager = CACHED_MANAGERS.get(classLoader);
+
+		if (manager == null) {
+			manager = lookupManager();
+
+			if (manager != null) {
+				CACHED_MANAGERS.put(classLoader, manager);
+			}
+		}
+
+		return manager;
+	}
+
+	/**
+	 * Forgets the CDI bean manager which was remembered for the context class loader of the current thread, if any. This is invoked by the OmniFaces
+	 * application listener when the web application is being destroyed.
+	 * @since 3.14.25
+	 * @see #getManager()
+	 */
+	public static void forgetManager() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+		if (classLoader != null) {
+			CACHED_MANAGERS.remove(classLoader);
+		}
+	}
+
+	private static BeanManager lookupManager() {
 		try {
 			return CDI.current().getBeanManager();
 		}
