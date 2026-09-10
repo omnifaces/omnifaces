@@ -49,7 +49,7 @@ jobs:
   deploy:
     name: Deploy 5.x SNAPSHOT
     needs: test
-    if: github.actor != 'dependabot[bot]'
+    if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
@@ -74,7 +74,7 @@ jobs:
   analyze:
     name: Analyze 5.x with Sonar
     needs: test
-    if: github.actor != 'dependabot[bot]'
+    if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
