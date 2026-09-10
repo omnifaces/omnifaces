@@ -215,7 +215,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[${java.version},)</version>
+                                    <version>[${javase.version},)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
