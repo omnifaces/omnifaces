@@ -23,12 +23,108 @@
     <short-name>t</short-name>
 
     <tag>
-        <tag-name>test</tag-name>
-        <source>tags/test.xhtml</source>
+        <tag-name>plain</tag-name>
+        <source>tags/plain.xhtml</source>
+        <attribute>
+            <name>attr</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>declared</tag-name>
+        <source>tags/declared.xhtml</source>
+        <attribute>
+            <name>attr</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>declaredWithDefault</tag-name>
+        <source>tags/declaredWithDefault.xhtml</source>
+        <attribute>
+            <name>attr</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>wrapper</tag-name>
+        <source>tags/wrapper.xhtml</source>
+        <attribute>
+            <name>attr</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>identified</tag-name>
+        <source>tags/identified.xhtml</source>
         <attribute>
             <name>id</name>
             <required>false</required>
             <type>java.lang.String</type>
         </attribute>
     </tag>
+
+    <tag>
+        <tag-name>identifier</tag-name>
+        <source>tags/identifier.xhtml</source>
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>child</tag-name>
+        <source>tags/child.xhtml</source>
+        <attribute>
+            <name>field</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>setter</tag-name>
+        <source>tags/setter.xhtml</source>
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>declaredLocal</tag-name>
+        <source>tags/declaredLocal.xhtml</source>
+        <attribute>
+            <name>local</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <tag-name>plainLocal</tag-name>
+        <source>tags/plainLocal.xhtml</source>
+    </tag>
+
+    <tag>
+        <tag-name>declaringSetter</tag-name>
+        <source>tags/declaringSetter.xhtml</source>
+        <attribute>
+            <name>local</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
 </facelet-taglib>

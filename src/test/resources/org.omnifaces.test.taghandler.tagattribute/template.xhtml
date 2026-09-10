@@ -12,12 +12,4 @@
     specific language governing permissions and limitations under the License.
 
 -->
-<ui:composition
-    xmlns:ui="jakarta.faces.facelets"
-    xmlns:o="omnifaces"
->
-  <o:tagAttribute name="id"/>
-  <o:tagAttribute name="styleClass"/>
-
-  <span class="#{styleClass}">#{id}</span>
-</ui:composition>
+<ui:composition xmlns:ui="jakarta.faces.facelets"><ui:insert name="body"/></ui:composition>
