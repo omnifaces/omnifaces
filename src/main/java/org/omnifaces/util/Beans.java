@@ -136,7 +136,7 @@ public final class Beans {
      * Returns the CDI bean manager. Once obtained, it is remembered for the web application at hand until it is destroyed, as obtaining it is a relatively
      * expensive task in some CDI implementations.
      *
-     * @return The CDI bean manager.
+     * @return The CDI bean manager, or <code>null</code> when CDI is not available in this environment.
      * @since 2.0
      * @see CDI#getBeanManager()
      */

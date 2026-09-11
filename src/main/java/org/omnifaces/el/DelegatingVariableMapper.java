@@ -90,8 +90,8 @@ public class DelegatingVariableMapper extends VariableMapper {
     }
 
     private ValueExpression resolveInheritedVariable(String name) {
-        return wrapped instanceof DelegatingVariableMapper
-            ? ((DelegatingVariableMapper) wrapped).resolveVariableSkippingDeclarations(name)
+        return wrapped instanceof DelegatingVariableMapper delegatingVariableMapper
+            ? delegatingVariableMapper.resolveVariableSkippingDeclarations(name)
             : wrapped.resolveVariable(name);
     }
 
