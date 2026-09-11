@@ -92,6 +92,9 @@
         <test.tyrus.version>2.2.2</test.tyrus.version> <!-- https://mvnrepository.com/artifact/org.glassfish.tyrus/tyrus-container-servlet -->
         <test.primefaces.version>15.0.17</test.primefaces.version> <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 
+        <!-- Test tool versions. -->
+        <test.mockito.version>5.20.0</test.mockito.version> <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+
         <!-- Arquillian config. -->
         <arquillian.browser>chrome</arquillian.browser> <!-- To use a different browser, use e.g. mvn clean verify -Darquillian.browser=firefox -->
         <failsafe.rerunFailingTestsCount>0</failsafe.rerunFailingTestsCount> <!-- To rerun failing tests, use e.g. mvn clean verify -Dfailsafe.rerunFailingTestsCount=2 -->
@@ -206,8 +209,14 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${test.mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.20.0</version>
+            <version>${test.mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -726,7 +735,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.5.1</version>
                     <configuration>
-                        <argLine>${jacoco.agent.ut}</argLine>
+                        <argLine>${jacoco.agent.ut} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${test.mockito.version}/mockito-core-${test.mockito.version}.jar</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
