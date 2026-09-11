@@ -122,6 +122,8 @@ public final class Servlets {
     private static final String WEB_XML = "/WEB-INF/web.xml";
     private static final String QUARKUS_WEB_XML = "META-INF/web.xml";
 
+    private static final String ERROR_NO_SERVLET_CONTEXT = "Cannot obtain ServletContext because there is no FacesContext and the CDI BeanManager instance is not available in this environment.";
+
     // Variables ------------------------------------------------------------------------------------------------------
 
     private static Boolean facesDevelopment;
@@ -845,6 +847,7 @@ public final class Servlets {
      * there.
      *
      * @return The servlet context.
+     * @throws IllegalStateException When there is no Faces context and CDI is not available in this environment.
      * @since 3.10
      * @see Faces#getServletContext()
      * @see Beans#getInstance(Bean, boolean)
@@ -855,6 +858,10 @@ public final class Servlets {
         }
 
         var beanManager = Beans.getManager();
+
+        if (beanManager == null) {
+            throw new IllegalStateException(ERROR_NO_SERVLET_CONTEXT);
+        }
 
         if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
             try {
