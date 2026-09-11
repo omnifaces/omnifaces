@@ -102,6 +102,7 @@
         <sonar.sources>src/main/java,src/main/ts</sonar.sources> <!-- The TypeScript is not a Maven source root, so it must be listed explicitly along with the Java. -->
         <sonar.tests>src/test/java,src/test/ts</sonar.tests>
         <sonar.exclusions>**/node_modules/**</sonar.exclusions>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml,${project.build.directory}/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!-- Ignored rules live in the project settings on SonarCloud, not here, as sonar.issue.ignore.multicriteria is a multi value property which is not
              persisted when it is passed by the scanner. Currently ignored on **/*.java are java:S110, java:S115, java:S117, java:S1989, java:S2143,
              java:S5786 and java:S6813. -->
@@ -611,6 +612,53 @@
                 </executions>
             </plugin>
 
+            <!-- Configure the code coverage reports which are picked up by Sonar. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.15</version>
+                <executions>
+                    <execution>
+                        <id>prepare unit test agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>jacoco.agent.ut</propertyName>
+                            <includes>
+                                <include>org.omnifaces.*</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate unit test report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>prepare integration test agent</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>jacoco.agent.it</propertyName>
+                            <includes>
+                                <include>org.omnifaces.*</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate integration test report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report-integration</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Configure snapshot deployment (release deployment is done via 'release' profile). -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -677,6 +725,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.5.1</version>
+                    <configuration>
+                        <argLine>${jacoco.agent.ut}</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -739,6 +790,8 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <jboss.home>${project.build.directory}/wildfly-preview-${test.wildfly-mojarra.version}</jboss.home>
+                                <!-- The jboss.options replaces WildFly's own default VM arguments, so they must be repeated here. -->
+                                <jboss.options>-Xms64m -Xmx512m -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -Djboss.modules.system.pkgs=org.jboss.byteman ${jacoco.agent.it}</jboss.options>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

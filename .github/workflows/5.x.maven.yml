@@ -45,6 +45,14 @@ jobs:
         cache: maven
     - name: Test with Maven
       run: mvn -B verify -P ${{matrix.server}} -Dfailsafe.rerunFailingTestsCount=2
+    - name: Upload coverage reports
+      if: ${{!cancelled() && matrix.server == 'wildfly-mojarra'}}
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-reports
+        path: |
+          target/site/jacoco/jacoco.xml
+          target/site/jacoco-it/jacoco.xml
 
   deploy:
     name: Deploy 5.x SNAPSHOT
@@ -98,8 +106,16 @@ jobs:
         path: ~/.m2
         key: ${{runner.os}}-m2-${{hashFiles('**/pom.xml')}}
         restore-keys: ${{runner.os}}-m2
-    - name: Build and analyze
-      run: mvn -B clean package org.sonarsource.scanner.maven:sonar-maven-plugin:5.7.0.6970:sonar -Dsonar.projectKey=omnifaces_omnifaces -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
+    - name: Build with Maven
+      run: mvn -B clean package -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
+    - name: Download coverage reports
+      uses: actions/download-artifact@v8
+      continue-on-error: true # The coverage reports are absent when the wildfly-mojarra job failed.
+      with:
+        name: coverage-reports
+        path: target/site
+    - name: Analyze with Sonar
+      run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.7.0.6970:sonar -Dsonar.projectKey=omnifaces_omnifaces
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
