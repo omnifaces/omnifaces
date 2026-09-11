@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import org.junit.jupiter.api.Test;
@@ -35,65 +36,55 @@ class AuthenticatedTagHandlerTest extends BaseSecurityTagHandlerTest {
     private Principal principal;
 
     @Test
-    void testUserIsAuthenticated_contentRendered() throws Throwable {
+    void testUserIsAuthenticated_contentRendered() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(principal);
         var handler = new AuthenticatedTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testUserIsAnonymous_contentNotRendered() throws Throwable {
+    void testUserIsAnonymous_contentNotRendered() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(null);
         var handler = new AuthenticatedTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testNullSecurityContext_noException() throws Throwable {
+    void testNullSecurityContext_noException() throws IOException {
         when(securityContextInstance.get()).thenReturn(null);
         var handler = new AuthenticatedTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testMultipleInvocations_consistentBehavior() throws Throwable {
+    void testMultipleInvocations_consistentBehavior() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(principal);
         var handler = new AuthenticatedTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, times(2)).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, times(2)).apply(faceletContext, parent);
     }
 
     @Test
-    void testDifferentPrincipals_contentAlwaysRendered() throws Throwable {
+    void testDifferentPrincipals_contentAlwaysRendered() throws IOException {
         var principal1 = mock(Principal.class);
         var principal2 = mock(Principal.class);
         var handler = new AuthenticatedTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            when(securityContext.getCallerPrincipal()).thenReturn(principal1);
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        when(securityContext.getCallerPrincipal()).thenReturn(principal1);
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
 
-            when(securityContext.getCallerPrincipal()).thenReturn(principal2);
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        when(securityContext.getCallerPrincipal()).thenReturn(principal2);
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
 
-            verify(nextHandler, times(2)).apply(faceletContext, parent);
-        });
+        verify(nextHandler, times(2)).apply(faceletContext, parent);
     }
 
 }

@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.omnifaces.test.CDIProviders.resetCDIProvider;
+import static org.omnifaces.test.CDIProviders.setCDIProvider;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -71,7 +73,7 @@ class BeansGetManagerTest {
     @AfterEach
     void tearDown() {
         Thread.currentThread().setContextClassLoader(originalClassLoader);
-        CDIProviderResetter.reset();
+        resetCDIProvider();
         System.clearProperty(INITIAL_CONTEXT_FACTORY);
         TestInitialContextFactory.context = null;
     }
@@ -210,33 +212,7 @@ class BeansGetManagerTest {
         return null;
     }
 
-    /**
-     * Installs a CDI provider returning the given CDI instance, or one throwing {@link IllegalStateException} as the CDI API itself does when there is none,
-     * when the given CDI instance is <code>null</code>.
-     */
-    private static void setCDIProvider(CDI<Object> cdi) {
-        CDI.setCDIProvider(() -> {
-            if (cdi == null) {
-                throw new IllegalStateException("Unable to access CDI");
-            }
-
-            return cdi;
-        });
-    }
-
     // Inner classes --------------------------------------------------------------------------------------------------
-
-    /**
-     * The CDI API does not offer any way to uninstall a programmatically set CDI provider, but the field holding it is protected static and thus accessible to
-     * subclasses, so that the JVM wide state of the CDI API can be left behind clean for other tests.
-     */
-    private abstract static class CDIProviderResetter extends CDI<Object> {
-
-        static void reset() {
-            configuredProvider = null;
-        }
-
-    }
 
     /**
      * Serves the mocked JNDI context to {@link javax.naming.InitialContext}.

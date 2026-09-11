@@ -12,8 +12,9 @@
  */
 package org.omnifaces.test.security;
 
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static org.omnifaces.test.CDIProviders.resetCDIProvider;
+import static org.omnifaces.test.CDIProviders.setCDIProvider;
 
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.spi.CDI;
@@ -23,8 +24,8 @@ import jakarta.faces.view.facelets.FaceletHandler;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.security.enterprise.SecurityContext;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 
 abstract class BaseSecurityTagHandlerTest {
@@ -55,13 +56,12 @@ abstract class BaseSecurityTagHandlerTest {
         when(cdi.select(SecurityContext.class)).thenReturn(securityContextInstance);
         when(securityContextInstance.get()).thenReturn(securityContext);
         when(tagConfig.getNextHandler()).thenReturn(nextHandler);
+        setCDIProvider(cdi);
     }
 
-    protected void withMockedCDI(Executable test) throws Throwable {
-        try (var mockedCDI = mockStatic(CDI.class)) {
-            mockedCDI.when(CDI::current).thenReturn(cdi);
-            test.execute();
-        }
+    @AfterEach
+    void tearDownBase() {
+        resetCDIProvider();
     }
 
 }

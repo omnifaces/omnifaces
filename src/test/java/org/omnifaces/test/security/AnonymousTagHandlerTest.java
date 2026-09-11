@@ -19,6 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import org.junit.jupiter.api.Test;
@@ -34,48 +35,40 @@ class AnonymousTagHandlerTest extends BaseSecurityTagHandlerTest {
     private Principal principal;
 
     @Test
-    void testUserIsAnonymous_contentRendered() throws Throwable {
+    void testUserIsAnonymous_contentRendered() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(null);
         var handler = new AnonymousTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testUserIsAuthenticated_contentNotRendered() throws Throwable {
+    void testUserIsAuthenticated_contentNotRendered() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(principal);
         var handler = new AnonymousTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testNullSecurityContext_noException() throws Throwable {
+    void testNullSecurityContext_noException() throws IOException {
         when(securityContextInstance.get()).thenReturn(null);
         var handler = new AnonymousTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testMultipleInvocations_consistentBehavior() throws Throwable {
+    void testMultipleInvocations_consistentBehavior() throws IOException {
         when(securityContext.getCallerPrincipal()).thenReturn(null);
         var handler = new AnonymousTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, times(2)).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, times(2)).apply(faceletContext, parent);
     }
 
 }

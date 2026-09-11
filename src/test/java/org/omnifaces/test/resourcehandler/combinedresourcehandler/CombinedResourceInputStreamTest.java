@@ -14,7 +14,6 @@ package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -24,7 +23,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jakarta.faces.application.Resource;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,10 +40,32 @@ import org.omnifaces.util.Faces;
 class CombinedResourceInputStreamTest {
 
     @Mock
+    private FacesContext context;
+
+    @Mock
+    private ExternalContext externalContext;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
     private Resource resource1;
 
     @Mock
     private Resource resource2;
+
+    @BeforeEach
+    void setUp() {
+        when(context.getExternalContext()).thenReturn(externalContext);
+        when(externalContext.getRequest()).thenReturn(request);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test.xhtml"));
+        Faces.setContext(context);
+    }
+
+    @AfterEach
+    void tearDown() {
+        Faces.setContext(null);
+    }
 
     @Test
     void testUseStrictWithDoubleQuotesIsStripped() throws IOException {
@@ -113,12 +139,8 @@ class CombinedResourceInputStreamTest {
         resources.add(resource1);
         resources.add(resource2);
 
-        try (var mockedFaces = mockStatic(Faces.class)) {
-            mockedFaces.when(Faces::getRequestDomainURL).thenReturn("http://localhost");
-
-            try (var stream = new CombinedResourceInputStream(resources, "text/css")) {
-                assertEquals("\"use strict\";\nbody {}\n\r\ndiv {}\n\r\n", new String(stream.readAllBytes(), UTF_8));
-            }
+        try (var stream = new CombinedResourceInputStream(resources, "text/css")) {
+            assertEquals("\"use strict\";\nbody {}\n\r\ndiv {}\n\r\n", new String(stream.readAllBytes(), UTF_8));
         }
     }
 
@@ -167,20 +189,16 @@ class CombinedResourceInputStreamTest {
         resources.add(resource1);
         resources.add(resource2);
 
-        try (var mockedFaces = mockStatic(Faces.class)) {
-            mockedFaces.when(Faces::getRequestDomainURL).thenReturn("http://localhost");
+        try (var stream = new CombinedResourceInputStream(resources, "application/javascript")) {
+            byte[] buf = new byte[4096];
+            var result = new StringBuilder();
+            int read;
 
-            try (var stream = new CombinedResourceInputStream(resources, "application/javascript")) {
-                byte[] buf = new byte[4096];
-                var result = new StringBuilder();
-                int read;
-
-                while ((read = stream.read(buf, 0, buf.length)) != -1) {
-                    result.append(new String(buf, 0, read, UTF_8));
-                }
-
-                assertEquals("var a = 1;\n\r\nvar b = 2;\n\r\n", result.toString());
+            while ((read = stream.read(buf, 0, buf.length)) != -1) {
+                result.append(new String(buf, 0, read, UTF_8));
             }
+
+            assertEquals("var a = 1;\n\r\nvar b = 2;\n\r\n", result.toString());
         }
     }
 
@@ -201,12 +219,8 @@ class CombinedResourceInputStreamTest {
         resources.add(resource1);
         resources.add(resource2);
 
-        try (var mockedFaces = mockStatic(Faces.class)) {
-            mockedFaces.when(Faces::getRequestDomainURL).thenReturn("http://localhost");
-
-            try (var stream = new CombinedResourceInputStream(resources, "application/javascript")) {
-                assertEquals(expected, new String(stream.readAllBytes(), UTF_8));
-            }
+        try (var stream = new CombinedResourceInputStream(resources, "application/javascript")) {
+            assertEquals(expected, new String(stream.readAllBytes(), UTF_8));
         }
     }
 

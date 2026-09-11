@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,246 +59,206 @@ class AuthorizeTagHandlerTest extends BaseSecurityTagHandlerTest {
     }
 
     @Test
-    void testRoleAttribute_authorized() throws Throwable {
+    void testRoleAttribute_authorized() throws IOException {
         mockAttribute("role", "ADMIN");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(true);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testRoleAttribute_unauthorized() throws Throwable {
+    void testRoleAttribute_unauthorized() throws IOException {
         mockAttribute("role", "ADMIN");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(false);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testAnyRoleAttribute_userHasOneRole() throws Throwable {
+    void testAnyRoleAttribute_userHasOneRole() throws IOException {
         mockAttribute("anyRole", "ADMIN, MODERATOR, EDITOR");
         lenient().when(securityContext.isCallerInRole("ADMIN")).thenReturn(false);
         lenient().when(securityContext.isCallerInRole("MODERATOR")).thenReturn(true);
         lenient().when(securityContext.isCallerInRole("EDITOR")).thenReturn(false);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testAnyRoleAttribute_userHasNoRoles() throws Throwable {
+    void testAnyRoleAttribute_userHasNoRoles() throws IOException {
         mockAttribute("anyRole", "ADMIN, MODERATOR");
         when(securityContext.isCallerInRole(anyString())).thenReturn(false);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testAllRolesAttribute_userHasAllRoles() throws Throwable {
+    void testAllRolesAttribute_userHasAllRoles() throws IOException {
         mockAttribute("allRoles", "ADMIN, AUDITOR");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(true);
         when(securityContext.isCallerInRole("AUDITOR")).thenReturn(true);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testAllRolesAttribute_userMissingOneRole() throws Throwable {
+    void testAllRolesAttribute_userMissingOneRole() throws IOException {
         mockAttribute("allRoles", "ADMIN, AUDITOR");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(true);
         when(securityContext.isCallerInRole("AUDITOR")).thenReturn(false);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testVarAttribute_authorized() throws Throwable {
+    void testVarAttribute_authorized() {
         mockAttribute("role", "ADMIN");
         mockAttribute("var", "isAdmin");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(true);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(faceletContext).setAttribute("isAdmin", true);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(faceletContext).setAttribute("isAdmin", true);
     }
 
     @Test
-    void testVarAttribute_unauthorized() throws Throwable {
+    void testVarAttribute_unauthorized() {
         mockAttribute("role", "ADMIN");
         mockAttribute("var", "isAdmin");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(false);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(faceletContext).setAttribute("isAdmin", false);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(faceletContext).setAttribute("isAdmin", false);
     }
 
     @Test
-    void testNoAttributesSpecified_throwsException() throws Throwable {
+    void testNoAttributesSpecified_throwsException() {
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
-        });
+        assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
     }
 
     @Test
-    void testMultipleAttributesSpecified_throwsException() throws Throwable {
+    void testMultipleAttributesSpecified_throwsException() {
         mockAttribute("role", "ADMIN");
         mockAttribute("anyRole", "USER");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
-        });
+        assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
     }
 
     @Test
-    void testRoleAttributeWithCommas_throwsException() throws Throwable {
+    void testRoleAttributeWithCommas_throwsException() {
         mockAttribute("role", "ADMIN,USER");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
-        });
+        assertThrows(TagAttributeException.class, () -> handler.apply(faceletContext, parent));
     }
 
     @Test
-    void testNullSecurityContext_noException() throws Throwable {
+    void testNullSecurityContext_noException() throws IOException {
         mockAttribute("role", "ADMIN");
         when(securityContextInstance.get()).thenReturn(null);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testEmptyRoleValue_noException() throws Throwable {
+    void testEmptyRoleValue_noException() throws IOException {
         mockAttribute("role", "");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testBlankRoleValue_noException() throws Throwable {
+    void testBlankRoleValue_noException() throws IOException {
         mockAttribute("role", " ");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
     }
 
     @Test
-    void testRoleWithWhitespace_processedCorrectly() throws Throwable {
+    void testRoleWithWhitespace_processedCorrectly() throws IOException {
         mockAttribute("role", " ADMIN ");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(true);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testAnyRoleWithWhitespace_processedCorrectly() throws Throwable {
+    void testAnyRoleWithWhitespace_processedCorrectly() throws IOException {
         mockAttribute("anyRole", " ADMIN , USER ");
         when(securityContext.isCallerInRole("ADMIN")).thenReturn(false);
         when(securityContext.isCallerInRole("USER")).thenReturn(true);
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler).apply(faceletContext, parent);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler).apply(faceletContext, parent);
     }
 
     @Test
-    void testEmptyRoleValue_varStillSet() throws Throwable {
+    void testEmptyRoleValue_varStillSet() throws IOException {
         mockAttribute("role", "");
         mockAttribute("var", "hasRole");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-            verify(faceletContext).setAttribute("hasRole", false);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
+        verify(faceletContext).setAttribute("hasRole", false);
     }
 
     @Test
-    void testBlankRoleValue_varStillSet() throws Throwable {
+    void testBlankRoleValue_varStillSet() throws IOException {
         mockAttribute("role", "   ");
         mockAttribute("var", "hasRole");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-            verify(faceletContext).setAttribute("hasRole", false);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
+        verify(faceletContext).setAttribute("hasRole", false);
     }
 
     @Test
-    void testEmptyAnyRoleValue_varStillSet() throws Throwable {
+    void testEmptyAnyRoleValue_varStillSet() throws IOException {
         mockAttribute("anyRole", "");
         mockAttribute("var", "hasAnyRole");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-            verify(faceletContext).setAttribute("hasAnyRole", false);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
+        verify(faceletContext).setAttribute("hasAnyRole", false);
     }
 
     @Test
-    void testEmptyAllRolesValue_varStillSet() throws Throwable {
+    void testEmptyAllRolesValue_varStillSet() throws IOException {
         mockAttribute("allRoles", "");
         mockAttribute("var", "hasAllRoles");
         var handler = new AuthorizeTagHandler(tagConfig);
 
-        withMockedCDI(() -> {
-            assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
-            verify(nextHandler, never()).apply(any(), any());
-            verify(faceletContext).setAttribute("hasAllRoles", false);
-        });
+        assertDoesNotThrow(() -> handler.apply(faceletContext, parent));
+        verify(nextHandler, never()).apply(any(), any());
+        verify(faceletContext).setAttribute("hasAllRoles", false);
     }
 
     private void mockAttribute(String name, String value) {
