@@ -19,6 +19,8 @@ import java.io.Serializable;
  * <p>
  * Note that this takes Strings for both key and value since it's not intended as a general cache solution, but is something specific for the {@link Cache}
  * component which caches rendered output.
+ * <p>
+ * An implementation must be thread safe, and each of the below methods must be atomic, as a single cache instance is shared by every caller within its scope.
  *
  * @since 1.1
  * @author Arjan Tijms

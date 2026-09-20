@@ -44,18 +44,8 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public Serializable getObject(String key) {
-        var entry = cacheStore.get(key);
-
-        if (entry != null) {
-            if (entry.isValid()) {
-                return entry.getValue();
-            }
-            else {
-                cacheStore.remove(key);
-            }
-        }
-
-        return null;
+        var entry = getValidEntry(key);
+        return entry != null ? entry.getValue() : null;
     }
 
     @Override
@@ -75,49 +65,38 @@ public abstract class TimeToLiveCache implements Cache {
 
     @Override
     public void putObject(String key, Serializable value, int timeToLive) {
-        var entry = cacheStore.get(key);
+        cacheStore.compute(key, (k, entry) -> {
+            if (entry == null || !entry.isValid()) {
+                return new CacheEntry(value, timeToLiveToDate(timeToLive));
+            }
 
-        if (entry == null || !entry.isValid()) {
-            cacheStore.put(
-                key, new CacheEntry(
-                    value,
-                    timeToLiveToDate(timeToLive)
-                )
-            );
-        }
-        else {
             entry.setValue(value);
             entry.setValidTill(timeToLiveToDate(timeToLive));
-        }
+            return entry;
+        });
     }
 
     @Override
     public void putAttribute(String key, String name, Serializable value, int timeToLive) {
-        var entry = cacheStore.get(key);
-
-        if (entry == null || !entry.isValid()) {
+        cacheStore.compute(key, (k, entry) -> {
             // NOTE: timeToLive is only used when a new entry is created
-            entry = new CacheEntry(null, timeToLiveToDate(timeToLive));
-            cacheStore.put(key, entry);
-        }
-
-        entry.getAttributes().put(name, value);
+            var validEntry = entry == null || !entry.isValid() ? new CacheEntry(null, timeToLiveToDate(timeToLive)) : entry;
+            validEntry.getAttributes().put(name, value);
+            return validEntry;
+        });
     }
 
     @Override
     public Serializable getAttribute(String key, String name) {
-        var entry = cacheStore.get(key);
+        var entry = getValidEntry(key);
+        return entry != null ? entry.getAttributes().get(name) : null;
+    }
 
-        if (entry != null) {
-            if (entry.isValid()) {
-                return entry.getAttributes().get(name);
-            }
-            else {
-                cacheStore.remove(key);
-            }
-        }
-
-        return null;
+    /**
+     * Returns the entry of the given key, removing it first when it has expired.
+     */
+    private CacheEntry getValidEntry(String key) {
+        return cacheStore.computeIfPresent(key, (k, entry) -> entry.isValid() ? entry : null);
     }
 
     @Override

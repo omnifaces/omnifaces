@@ -87,22 +87,14 @@ public class CombinedResource extends DynamicResource {
      */
     private InputStream getInputStreamFromCache() throws IOException {
         var combinedResourceCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), CACHE_SCOPE);
-        byte[] cachedCombinedResource;
-
-        synchronized (CombinedResourceHandler.class) {
-            cachedCombinedResource = (byte[]) combinedResourceCache.getObject(resourceId);
-        }
+        var cachedCombinedResource = (byte[]) combinedResourceCache.getObject(resourceId);
 
         if (cachedCombinedResource == null) {
             try (var combinedResourceInputStream = new CombinedResourceInputStream(info.getResources(), getContentType())) {
                 cachedCombinedResource = combinedResourceInputStream.readAllBytes();
             }
 
-            synchronized (CombinedResourceHandler.class) {
-                if (combinedResourceCache.getObject(resourceId) == null) {
-                    combinedResourceCache.putObject(resourceId, cachedCombinedResource, cacheTTL);
-                }
-            }
+            combinedResourceCache.putObject(resourceId, cachedCombinedResource, cacheTTL);
         }
 
         return new ByteArrayInputStream(cachedCombinedResource);
