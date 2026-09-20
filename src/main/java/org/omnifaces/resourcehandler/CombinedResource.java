@@ -71,7 +71,7 @@ public class CombinedResource extends DynamicResource {
 	@Override
 	public InputStream getInputStream() throws IOException {
 		if (info != null && !info.getResources().isEmpty()) {
-			if (cacheTTL == null) {
+			if (cacheTTL == null || !info.isServerIssued()) {
 				return new CombinedResourceInputStream(info.getResources());
 			}
 			else {
