@@ -13,22 +13,27 @@
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.omnifaces.resourcehandler.CombinedResourceInfo;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * Verifies that a manipulated (i.e. not server-issued) combined resource ID cannot make the combined resource handler
  * serve arbitrary resources, inflate without bound, or grow its cache. Only structurally valid IDs which exclusively
- * reference stylesheet and script resources are accepted, and they are not retained in the cache.
+ * reference stylesheet and script resources are accepted, they are not retained in the cache, and their content is
+ * not cached either.
  */
 class CombinedResourceInfoTest {
 
@@ -63,6 +68,23 @@ class CombinedResourceInfoTest {
 		int size = cache.size();
 		assertNotNull(CombinedResourceInfo.get(serializeURLSafe("uncached.css")), "structurally valid ID is served");
 		assertEquals(size, cache.size(), "forged ID is not retained in the cache");
+	}
+
+	@Test
+	void forgedIdDecodingToAServerIssuedOneIsNotItselfServerIssued() throws Exception {
+		CombinedResourceInfo.Builder builder = new CombinedResourceInfo.Builder();
+		builder.add(new ResourceIdentifier("cacheable.css"));
+		String serverIssuedId = builder.create();
+
+		assertTrue(isServerIssued(CombinedResourceInfo.get(serverIssuedId)), "ID minted by the builder is server issued");
+		assertFalse(isServerIssued(CombinedResourceInfo.get(serializeURLSafe("cacheable.css|cacheable.css"))),
+			"duplicate padded ID decodes to the same resource but is not server issued");
+	}
+
+	private static boolean isServerIssued(CombinedResourceInfo info) throws Exception {
+		Method method = CombinedResourceInfo.class.getDeclaredMethod("isServerIssued");
+		method.setAccessible(true);
+		return (Boolean) method.invoke(info);
 	}
 
 	private static Map<?, ?> getCache() throws Exception {
