@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
@@ -31,6 +33,9 @@ import org.omnifaces.util.FunctionalInterfaces.SerializableBiConsumer;
 /**
  * Minimal implementation of thread safe LRU cache with support for eviction listener. Inspired by
  * <a href="https://github.com/ben-manes/concurrentlinkedhashmap">ConcurrentLinkedHashMap</a>.
+ * <p>
+ * The compute methods hold the lock while the function runs, so the function must be short and must not access this cache, else it will block every other
+ * caller or deadlock. The eviction listener runs after the lock is released.
  *
  * @author Bauke Scholtz
  * @param <K> The generic map key type.
@@ -43,6 +48,7 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
 
     private static final String ERROR_NULL_KEY_DISALLOWED = "key may not be null";
     private static final String ERROR_NULL_VALUE_DISALLOWED = "value may not be null";
+    private static final String ERROR_NULL_FUNCTION_DISALLOWED = "function may not be null";
 
     private final int maximumCapacity;
     private final SerializableBiConsumer<K, V> evictionListener;
@@ -113,18 +119,80 @@ public class LruCache<K extends Serializable, V extends Serializable> implements
         Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
         var previousValue = executeAtomically(lock, () -> {
             var existingValue = entries.remove(key);
-
-            while (entries.size() >= maximumCapacity) {
-                var leastRecentlyUsedKey = entries.keySet().iterator().next();
-                evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
-            }
-
-            entries.put(key, onlyIfAbsent && existingValue != null ? existingValue : value);
+            insert(key, onlyIfAbsent && existingValue != null ? existingValue : value, evictedEntries);
             return existingValue;
         });
 
-        evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
+        notifyEvicted(evictedEntries);
         return previousValue;
+    }
+
+    /**
+     * Inserts the given entry, first evicting least recently used entries into the given set until there is room. The caller must hold the lock and must notify
+     * the eviction listener after releasing it.
+     */
+    private void insert(K key, V value, Set<Entry<K, V>> evictedEntries) {
+        while (entries.size() >= maximumCapacity) {
+            var leastRecentlyUsedKey = entries.keySet().iterator().next();
+            evictedEntries.add(new SimpleEntry<>(leastRecentlyUsedKey, entries.remove(leastRecentlyUsedKey)));
+        }
+
+        entries.put(key, value);
+    }
+
+    private void notifyEvicted(Set<Entry<K, V>> evictedEntries) {
+        evictedEntries.forEach(evictedEntry -> evictionListener.accept(evictedEntry.getKey(), evictedEntry.getValue()));
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        requireNonNull(mappingFunction, ERROR_NULL_FUNCTION_DISALLOWED);
+        return remap(key, (k, existingValue) -> existingValue != null ? existingValue : mappingFunction.apply(k));
+    }
+
+    @Override
+    public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        requireNonNull(remappingFunction, ERROR_NULL_FUNCTION_DISALLOWED);
+        return remap(key, (k, existingValue) -> existingValue == null ? null : remappingFunction.apply(k, existingValue));
+    }
+
+    @Override
+    public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        requireNonNull(remappingFunction, ERROR_NULL_FUNCTION_DISALLOWED);
+        return remap(key, remappingFunction);
+    }
+
+    @Override
+    public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        requireNonNull(value, ERROR_NULL_VALUE_DISALLOWED);
+        requireNonNull(remappingFunction, ERROR_NULL_FUNCTION_DISALLOWED);
+        return remap(key, (k, existingValue) -> existingValue == null ? value : remappingFunction.apply(existingValue, value));
+    }
+
+    /**
+     * Applies the given remapping function to the current value of the given key while the lock is held, then stores its outcome, removing the entry when it is
+     * null. The function therefore runs exactly once per call, which is what distinguishes these methods from the non atomic defaults of {@link ConcurrentMap}.
+     */
+    private V remap(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        requireNonNull(key, ERROR_NULL_KEY_DISALLOWED);
+        Set<Entry<K, V>> evictedEntries = new HashSet<>(1);
+        var newValue = executeAtomically(lock, () -> {
+            var existingValue = entries.get(key);
+            var remappedValue = remappingFunction.apply(key, existingValue);
+
+            if (remappedValue == null) {
+                entries.remove(key);
+            }
+            else if (remappedValue != existingValue) {
+                entries.remove(key);
+                insert(key, remappedValue, evictedEntries);
+            }
+
+            return remappedValue;
+        });
+
+        notifyEvicted(evictedEntries);
+        return newValue;
     }
 
     @Override

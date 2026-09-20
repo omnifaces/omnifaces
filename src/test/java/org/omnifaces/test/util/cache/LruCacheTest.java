@@ -18,6 +18,8 @@ import static java.util.stream.IntStream.rangeClosed;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.Concurrency.testThreadSafety;
@@ -28,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -184,6 +187,43 @@ class LruCacheTest {
         Iterator<?> iterator = viewSupplier.get().iterator();
         iterator.next();
         iterator.remove();
+    }
+
+    @Test
+    void testComputeIfAbsentAppliesFunctionOnlyOnce() {
+        var invocations = new AtomicInteger();
+
+        testThreadSafety(i -> lruCache.computeIfAbsent("computed", key -> {
+            invocations.incrementAndGet();
+            return "v";
+        }), ITERATIONS);
+
+        assertEquals(1, invocations.get(), "mapping function is applied once for an absent key");
+        assertEquals("v", lruCache.get("computed"), "computed value is stored");
+    }
+
+    @Test
+    void testComputeRemovesEntryWhenFunctionReturnsNull() {
+        lruCache.put("removable", "v");
+
+        assertNull(lruCache.compute("removable", (k, v) -> null), "compute returns null");
+        assertFalse(lruCache.containsKey("removable"), "entry is removed when the function returns null");
+    }
+
+    @Test
+    void testMergeCombinesWithExistingValue() {
+        lruCache.put("merged", "a");
+
+        assertEquals("ab", lruCache.merge("merged", "b", String::concat), "existing value is merged");
+        assertEquals("b", lruCache.merge("absent", "b", String::concat), "absent value is put as is");
+    }
+
+    @Test
+    void testComputeIfAbsentEvictsLeastRecentlyUsed() {
+        lruCache.computeIfAbsent("evicting", key -> "v");
+
+        assertEquals(SIZE, lruCache.size(), "cache stays at its maximum size");
+        assertEquals(1, evicted.size(), "one entry is evicted to make room");
     }
 
     @Test
