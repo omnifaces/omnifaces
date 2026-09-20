@@ -2,3 +2,10 @@ build/
 dist/
 *.jsfdia
 *.asc
+*.tern-project
+/bin
+/target
+/.settings
+/.project
+/.classpath
+rebel.xml

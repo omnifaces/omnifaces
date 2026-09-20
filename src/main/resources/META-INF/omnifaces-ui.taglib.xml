@@ -1,0 +1,4065 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2012 OmniFaces.
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+   the License. You may obtain a copy of the License at
+
+	   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+   an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+   specific language governing permissions and limitations under the License.
+ -->
+<facelet-taglib id="o"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
+	version="2.0"
+>
+	<namespace>http://omnifaces.org/ui</namespace>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
+				hierarchy by declaring the appropriate JSF components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
+				does namely not render any HTML markup by itself.
+				<p>
+				The component value must point to a tree of data objects represented by a <code>TreeModel</code> instance, typically
+				established via a <code>ValueExpression</code>. During iterative processing over the nodes of tree in the tree model,
+				the object for the current node is exposed as a request attribute under the key specified by the <code>var</code>
+				attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code>
+				attribute.
+				<p>
+				The <code>&lt;o:tree&gt;</code> tag supports only child tags of type <code>&lt;o:treeNode&gt;</code>, representing
+				parent tree nodes. There can be multiple <code>&lt;o:treeNode&gt;</code> tags, each representing a separate parent
+				tree node level, so that different markup could be declared for each tree node level, if necessary. The
+				<code>&lt;o:treeNode&gt;</code> tag in turn supports child tag <code>&lt;o:treeNodeItem&gt;</code> which represents
+				each child of the current parent tree node. The <code>&lt;o:treeNodeItem&gt;</code> in turn supports child tag
+				<code>&lt;o:treeInsertChildren&gt;</code> which represents the insertion point of the grand children.
+				<p>
+				Here is a basic usage example where each parent tree node level is treated the same way via a single
+				<code>&lt;o:treeNode&gt;</code>:
+				<pre>
+&lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
+  &lt;o:treeNode&gt;
+    &lt;ul&gt;
+      &lt;o:treeNodeItem&gt;
+        &lt;li&gt;
+          #{node.index} #{item.someProperty}
+          &lt;o:treeInsertChildren /&gt;
+        &lt;/li&gt;
+      &lt;/o:treeNodeItem&gt;
+    &lt;/ul&gt;
+  &lt;/o:treeNode&gt;
+&lt;/o:tree&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>tree</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.tree.Tree</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The current value of this component. As far only <code>TreeModel</code> is allowed as value.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the request attribute which exposes the wrapped data of the current node of the tree
+					model.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the request attribute which exposes the current node of the tree model.
+				]]>
+			</description>
+			<name>varNode</name>
+			<required>false</required>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code>
+				attribute of the <code>&lt;o:tree&gt;</code> will expose the parent tree node. Each of its children is processed by
+				<code>&lt;o:treeNodeItem&gt;</code> on which the <code>var</code> attribute of the <code>&lt;o:tree&gt;</code> in
+				turn exposes each child of the parent tree node.
+				<p>
+				The optional <code>level</code> attribute can be used to specify for which tree node level as obtained by
+				<code>TreeModel#getLevel()</code> the <code>&lt;o:treeNode&gt;</code> should be rendered. The root tree node has level 0.
+				If the <code>level</code> attribute is unspecified, then the <code>&lt;o:treeNode&gt;</code> will be rendered for any
+				tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
+			]]>
+		</description>
+		<tag-name>treeNode</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.tree.TreeNode</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The tree node level to render the node children for. The root level is <code>0</code>.
+				]]>
+			</description>
+			<name>level</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by
+				<code>&lt;o:treeNode&gt;</code>. Within this component, the <code>var</code> attribute of the parent
+				<code>&lt;o:tree&gt;</code> component will expose the child tree node.
+				<p>
+				Within <code>&lt;o:treeNodeItem&gt;</code> you can use <code>&lt;o:treeInsertChildren&gt;</code> to declare the
+				place where to recursively render the <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn
+				interpreted as a parent tree node (i.e. where you'd like to insert the grand-children).
+			]]>
+		</description>
+		<tag-name>treeNodeItem</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.tree.TreeNodeItem</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn
+				further interpreted as <code>&lt;o:treeNode&gt;</code>.
+			]]>
+		</description>
+		<tag-name>treeInsertChildren</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.tree.TreeInsertChildren</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			This component includes the output from a resource located at the given path. This path can
+			not extend outside of the current Servlet context. A resource is either a Servlet or a JSP
+			page.
+		</description>
+		<tag-name>resourceInclude</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.ResourceInclude</component-type>
+		</component>
+		 <attribute>
+			<description>A String specifying the pathname to the resource</description>
+			<name>path</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>DeferredScript</strong> is a component which defers the loading of the given script resource to the window
+				load event. In other words, the given script resource is only loaded when the window is really finished with loading.
+				So, the enduser can start working with the webpage without waiting for the additional scripts to be loaded. Usually,
+				it are those kind of scripts which are just for progressive enhancement and thus not essential for the functioning
+				of the webpage.
+				<p>
+				This will give bonus points with among others the Google PageSpeed tool, on the contrary to placing the script at
+				bottom of body, or using <code>defer="true"</code> or even <code>async="true"</code>.
+			]]>
+		</description>
+		<tag-name>deferredScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.DeferredScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The "library name" part of the resource identifier.
+				]]>
+			</description>
+			<name>library</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The "resource name" part of the resource identifier.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The group name on which the deferred script resources should be combined by CombinedResourceHandler. 
+					All deferred scripts resources having the same combined group name will be combined into a single 
+					deferred script in the place where the first member of the group occurs in the component tree.
+				]]>
+			</description>
+			<name>group</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					JavaScript code to execute right before the script loading begins.
+				]]>
+			</description>
+			<name>onbegin</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					JavaScript code to execute when the script loading is successfully completed.
+				]]>
+			</description>
+			<name>onsuccess</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					JavaScript code to execute when the script loading has failed.
+				]]>
+			</description>
+			<name>onerror</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:onloadScript</code></strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
+				end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree) and will re-execute its
+				script body on every ajax request. This is particularly useful if you want to re-execute a specific helper script
+				to manipulate the HTML DOM tree, such as (re-)adding fancy tooltips, performing highlights, etcetera, also after
+				changes in the HTML DOM tree on ajax responses.
+				<p>
+				You can put it anywhere in the view, it will always be relocated to the end of body.
+				<pre>
+&lt;o:onloadScript&gt;alert('OnloadScript is invoked!');&lt;/o:onloadScript&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>onloadScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.OnloadScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:highlight</code></strong> is a helper component which highlights all invalid <code>UIInput</code> components and the
+				associated labels by adding an error style class to them. Additionally, it by default focuses the first invalid 
+				<code>UIInput</code> component. The <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as 
+				long as there's only one of it.	Preferably put it somewhere in the master template for forms.
+				<pre>
+&lt;h:form&gt;
+  &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
+  &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
+  &lt;h:commandButton value="Submit" action="#{bean.submit}" /&gt;
+&lt;/h:form&gt;
+&lt;o:highlight /&gt;
+				</pre>
+				<p>
+				The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class
+				yourself. For example,
+				<pre>
+label.error {
+  color: #f00;
+}
+input.error, select.error, textarea.error {
+  background-color: #fee;
+}
+				</pre>
+				<p>
+				You can override the default error style class by the <code>styleClass</code> attribute:
+				<pre>
+&lt;o:highlight styleClass="invalid" /&gt;
+				</pre>
+				<p>
+				You can disable the default focus on the first invalid input element setting the <code>focus</code> attribute.
+				<pre>
+&lt;o:highlight styleClass="invalid" focus="false" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>highlight</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.Highlight</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
+				]]>
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the first error element should gain focus. Defaults to <code>true</code>.
+				]]>
+			</description>
+			<name>focus</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<p><strong>o:conditionalComment</strong> is an <code>UIComponent</code> which renders a conditional comment. Conditional
+				comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
+				the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:
+				<pre>
+&lt;!--[if lte IE 7]&gt;
+  &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
+&lt;![endif]--&gt;
+				</pre>
+				<p>However, Facelets renders them HTML-escaped and if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
+				set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
+				<code>&lt;h:outputText escape="false"&gt;</code>.
+				<pre>
+&lt;h:outputText value="&amp;lt;!--[if lte IE 7]&amp;gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;&amp;lt;![endif]--&amp;gt;" escape="false" /&gt;
+				</pre>
+				<p>This component is designed to solve this problem.
+				<pre>
+&lt;o:conditionalComment if="lte IE 7"&gt;
+  &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
+&lt;/o:conditionalComment&gt;
+				</pre>
+				<p>Note that you cannot use this with <code>&lt;h:outputStylesheet&gt;</code> as it would implicitly be relocated as
+				direct child of <code>&lt;h:head&gt;</code>.
+			]]>
+		</description>
+		<tag-name>conditionalComment</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.ConditionalComment</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>if</code> condition of the conditional comment. This is exactly the value you would use
+					in <code>&lt;!--[if ...]&gt;</code>, e.g. <code>if="lte IE 7"</code>.
+				]]>
+			</description>
+			<name>if</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateAll</code></strong> validates validates if ALL of the given <code>UIInput</code>
+				components have been filled out. The default message is
+				<blockquote>{0}: Please fill out all of those fields</blockquote>
+				<hr>
+				<h3>General usage of all multiple field validators</h3>
+				<p>
+				This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components
+				in question. The <code>UIInput</code> components must be referenced by a space separated collection of
+				their client IDs in the <code>components</code> attribute. This validator can be placed anywhere in the
+				form, but keep in mind that the components will be validated in the order as they appear in the form.
+				So if this validator is been placed before all of the components, then it will be executed before any of
+				the component's own validators. If this validator fails, then the component's own validators will not be
+				fired. If this validator is been placed after all of the components, then it will be executed after any
+				of the component's own validators. If any of them fails, then this validator will not be exeucted. It
+				is not recommended to put this validator somewhere in between the referenced components as the resulting
+				behaviour may be confusing. Put this validator either before or after all of the components, depending
+				on how you would like to prioritize the validation.
+				<pre>
+&lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
+&lt;h:message for="myId" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+				</pre>
+				<p>
+				By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will
+				be added on the client ID of this validator component. The default message can be changed by the <code>message</code>
+				attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
+				referenced input components.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
+				</pre>
+				<p>
+				You can use <code>invalidateAll="false"</code> to mark only those components which are actually invalid as invalid.
+				In case of for example "input all" or "input all or none" validation, that would be only the fields which are left
+				empty.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" invalidateAll="false" /&gt;
+				</pre>
+				<p>
+				The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:message for="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:message for="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+&lt;h:message for="baz" /&gt;
+				</pre>
+				<p>
+				The faces message can also be shown for only the invalidated components using <code>showMessageFor="@invalid"</code>.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
+				</pre>
+				<p>
+				The faces message can also be shown for specific components referenced by a space separated collection of their
+				client IDs in <code>showMessageFor</code> attribute.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
+				</pre>
+				<p>
+				The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
+				<p>
+				The validator can be disabled by the <code>disabled</code> attribute. It accepts a request based EL expression.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
+				</pre>
+				<p>
+				There is a read-only <code>validationFailed</code> attribute which can be used to determine if the validation by
+				this component has failed.
+				<pre>
+&lt;o:validateMultipleFields id="myId" binding="#{myId}" components="foo bar baz" /&gt;
+&lt;h:panelGroup rendered="#{myId.validationFailed}"&gt;
+    Validation has failed! &lt;h:message for="myId" /&gt;
+&lt;/h:panelGroup&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>validateAll</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateAll</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether to invalidate <strong>all</strong> fields or only those which are empty.
+				]]>
+			</description>
+			<name>invalidateAll</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateAllOrNone</code></strong> validates validates if at least ALL of the given <code>UIInput</code>
+				components have been filled out or that NONE of the given <code>UIInput</code> components have been
+				filled out. The default message is
+				<blockquote>{0}: Please fill out all or none of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+			]]>
+		</description>
+		<tag-name>validateAllOrNone</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateAllOrNone</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether to invalidate <strong>all</strong> fields or only those which are empty.
+				]]>
+			</description>
+			<name>invalidateAll</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateOneOrMore</code></strong> validates if at least ONE of the given <code>UIInput</code>
+				components has been filled out. The default message is
+				<blockquote>{0}: Please fill out at least one of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+			]]>
+		</description>
+		<tag-name>validateOneOrMore</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateOneOrMore</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateOne</code></strong> validates if ONLY ONE of the given <code>UIInput</code>
+				components has been filled out. The default message is
+				<blockquote>{0}: Please fill out only one of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+			]]>
+		</description>
+		<tag-name>validateOne</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateOne</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateOneOrNone</code></strong> validates if ONLY ONE of the given <code>UIInput</code> components has been filled
+				out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
+				<blockquote>{0}: Please fill out only one or none of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+			]]>
+		</description>
+		<tag-name>validateOneOrNone</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateOneOrNone</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateEqual</code></strong> validates if ALL of the given <code>UIInput</code> components have the
+				same value. The default message is
+				<blockquote>{0}: Please fill out the same value for all of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+			]]>
+		</description>
+		<tag-name>validateEqual</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateEqual</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateUnique</code></strong> validates if ALL of the given <code>UIInput</code> components have an
+				unique value. The default message is
+				<blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+			]]>
+		</description>
+		<tag-name>validateUnique</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateUnique</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateOrder</strong> validates if the values of the given <code>UIInput</code> components as specified in
+				the <code>components</code> attribute are in the order as specified by the <code>type</code> attribute which accepts
+				the following values:
+				<ul>
+				<li><code>lt</code> (default): from least to greatest, without duplicates.</li>
+				<li><code>lte</code>: from least to greatest, allowing duplicates (equal values next to each other).</li>
+				<li><code>gt</code>: from greatest to least, without duplicates.</li>
+				<li><code>gte</code>: from greatest to least, allowing duplicates (equal values next to each other).</li>
+				</ul>
+				The default message is
+				<blockquote>{0}: Please fill out the values of all those fields in order</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
+				<p>
+				This validator has the additional requirement that the to-be-validated values must implement <code>Comparable</code>.
+				This validator throws an <code>IllegalArgumentException</code> when one or more of the values do not implement it.
+			]]>
+		</description>
+		<tag-name>validateOrder</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateOrder</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The ordering type, available values are "lt", "lte", "gt" and "gte", defaults to "lt".
+				]]>
+			</description>
+			<name>type</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateMultiple</strong> allows the developer to validate multiple fields by a custom validator method:
+				<pre>
+&lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.validateValues}" /&gt;
+&lt;h:message for="myId" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+				</pre>
+				<pre>
+public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+    // ...
+}
+				</pre>
+				<p>Or by a managed bean instance which implements the <code>MultiFieldValidator</code> interface:
+				<pre>
+&lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{validateValuesBean}" /&gt;
+&lt;h:message for="myId" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+				</pre>
+				<pre>
+{@literal @}ManagedBean
+{@literal @}RequestScoped
+public class ValidateValuesBean implements MultiFieldValidator {
+    {@literal @}Override
+    boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+        // ...
+    }
+}
+				</pre>
+			]]>
+		</description>
+		<tag-name>validateMultiple</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateMultiple</component-type>
+			<handler-class>org.omnifaces.component.validator.ValidateMultipleHandler</handler-class>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					This attribute can take either a <code>ValueExpression</code> representing an implementation of the
+					<code>MultiFieldValidator</code> instance, or a <code>MethodExpression</code> representing a validator
+					method with the following signature: 
+					<code>boolean validate(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values)</code>
+					that will be called during Process Validations phase to perform correctness checks on the value of
+					this component.
+				]]>
+			</description>
+			<name>validator</name>
+			<required>true</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
+				possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
+				build time basis. This allows the developer to change the attributes on a per request basis, such as the
+				<code>disabled</code> attribute.
+				<pre>
+&lt;o:validator validatorId="someValidatorId" disabled="#{param.disableValidation}" /&gt;
+				</pre>
+				<p>Note that not all available attributes are listed. This depends on the validator you're specifying.
+				When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
+				<code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
+				<code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
+				request based value expressions.
+				<pre>
+&lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>validator</tag-name>
+		<validator>
+			<validator-id>omnifaces.Validator</validator-id>
+			<handler-class>org.omnifaces.taghandler.Validator</handler-class>
+		</validator>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression that evaluates to an object that implements the javax.faces.validator.Validator
+					interface.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.validator.Validator</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Validator identifier of the <code>Validator</code> to be created and registered.
+				]]>
+			</description>
+			<name>validatorId</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If present, this attribute refers to the value of one of the exposed attached objects within the
+					composite component inside of which this tag is nested.
+				]]>
+			</description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with the label of the referenced input component. Note that this attribute is ignored 
+					when the parent component has already <code>validatorMessage</code> specified.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling request based determination of whether or not this validator is enabled on
+					the enclosing component.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:converter&gt;</code> basically extends the <code>&lt;f:converter&gt;</code> tag family with the
+				possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
+				build time basis. This allows the developer to change the attributes on a per request basis.
+				<p>
+				When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
+				<code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attribuces such as
+				<code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
+				request based value expressions.
+				<pre>
+&lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>converter</tag-name>
+		<converter>
+			<converter-id>omnifaces.Converter</converter-id>
+			<handler-class>org.omnifaces.taghandler.Converter</handler-class>
+		</converter>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression that evaluates to an object that implements the javax.faces.convert.Converter
+					interface.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter identifier of the <code>Converter</code> to be created and registered.
+				]]>
+			</description>
+			<name>converterId</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If present, this attribute refers to the value of one of the exposed attached objects within the
+					composite component inside of which this tag is nested.
+				]]>
+			</description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+				<![CDATA[
+					<strong>ViewParameter</strong> is a component that extends the standard <code>UIViewParameter</code> and provides a
+					stateless mode of operation and fixes the issue wherein null model values are converted to empty string parameters
+					in query string (e.g. when <code>includeViewParams=true</code>) and the (bean) validation never being triggered
+					when the parameter is completely absent in query string, causing e.g. <code>@NotNull</code> to fail.
+					<p>
+					The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired
+					when being bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
+					To solve this, this component by default stores the submitted value as a component property instead of in the model
+					(and thus in the view state in case the binding is to a view scoped bean).
+					<p>
+					The standard UIViewParameter implementation calls the converter regardless of whether the evaluated model value is
+					<code>null</code> or not. As converters by specification return an empty string in case of <code>null</code> value,
+					this is being added to the query string as an empty parameter. This is not desired.
+					<p>
+					The standard UIViewParameter implementation uses an internal "is required" check when the submitted value is
+					<code>null</code>, hereby completely bypassing the standard <code>UIInput</code> validation, including any bean
+					validation annotations and even the <code>PreValidateEvent</code> and <code>PostValidateEvent</code> events. This is not
+					desired.
+					<p>
+					You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
+					<code>o:</code>.
+				]]>
+		</description>
+		<tag-name>viewParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ViewParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameter from which the value for this component
+	                is retrieved on an initial request or to override the stored value on a
+	                postback.
+		        ]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                Converter instance registered with this component.
+	            ]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the converter message, replacing any message
+	                that comes from the converter.
+	            ]]>
+			</description>
+			<name>converterMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The component identifier for this component. This value must be
+	                unique within the closest parent component that is a naming
+	                container.
+	            ]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                Flag indicating that the user is required to provide a submitted
+	                value for this input component. This component extends the behavior of
+	                this by only making this required for a non-faces request.
+	            ]]>
+			</description>
+			<name>required</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the validation message for the "required"
+	                facility, if the "required" facility is used.
+	            ]]>
+			</description>
+			<name>requiredMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                MethodExpression representing a validator method that will be
+	                called
+	                during Process Validations to perform correctness checks on the
+	                value of this component. The expression must evaluate to a
+	                public
+	                method that takes FacesContext, UIComponent, and Object
+	                parameters,
+	                with a return type of void.
+	            ]]>
+			</description>
+			<name>validator</name>
+			<required>false</required>
+			<method-signature>void validate(javax.faces.context.FacesContext,
+				javax.faces.component.UIComponent, java.lang.Object)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the validator message, replacing any
+	                message that comes from the validator.
+	            ]]>
+			</description>
+			<name>validatorMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression to which the value of the request parameter, as
+	                determined by the name attribute, is bound. The resolved value of this
+	                expression is used when encoding the view parameter into a bookmarkable link or
+	                redirect URL with view parameter encoding enabled. If this attribute is omitted,
+	                the value of the request parameter will instead be the local value of the
+	                UIViewParameter.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                <p>
+					The default value to be used when actual value of the request parameter is <code>null</code> or empty.
+				]]>
+			</description>
+			<name>default</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<p>
+
+	                MethodExpression representing a value change listener method
+	                that will be notified when a new value has been set for this
+	                input component. The expression must evaluate to a public
+	                method that takes a <code>ValueChangeEvent</code>
+	                parameter,
+	                with a return type of void, or
+	                to a public method that takes no arguments with a return type
+	                of void. In the latter case, the method has no way of easily
+	                knowing what the new value is, but this can be useful in cases
+	                where a notification is needed that "this value
+	                changed".
+
+	                </p>
+	            ]]>
+			</description>
+			<name>valueChangeListener</name>
+			<required>false</required>
+			<method-signature>void
+				valueChange(javax.faces.event.ValueChangeEvent)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The maximum number of characters that may
+	                be entered in this field.
+	            ]]>
+			</description>
+			<name>maxlength</name>
+			<required>false</required>
+			<type>int</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The ValueExpression linking this component to a property in a
+	                backing bean
+	            ]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                If present, this attribute refers to the value of one of the exposed
+	                attached objects within the composite component inside
+	                of which this tag is nested.
+	            ]]>
+            </description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:methodParam</code></strong> is a tag handler that can be used to pass a method expression
+				into a Facelets tag.
+				<p>
+				By default this is not possible, and the expression that's intended to be a method expression will be created and
+				made available as a value expression. This handler should be placed inside a Facelets tag as follows:
+				<pre>
+&lt;ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:o="http://omnifaces.org/ui"
+&gt;
+	&lt;o:methodParam name="method" value="#{action}"/&gt;
+
+	&lt;h:commandButton value="test" action="#{method}" /&gt;
+
+&lt;/ui:composition&gt;
+				</pre>
+				<p>
+				Assuming the above is a tag called <code>actionmethod</code> in the namespace <code>test</code>, a method can be passed into it
+				as follows:
+				<pre>
+&lt;test:actionmethod action="#{methodParamBean.doAction}" /&gt;
+				</pre>
+				<p>
+				In case a method with no parameters is passed that is to be used as an action listener with no parameters, then the component
+				using this method unfortunely has to be wrapped by a component that puts the method in request scoped (with nested visibility),
+				e.g. by using <code>ui:repeat</code> as follows:
+				<pre>
+&lt;ui:repeat var="method" value="#{method}"&gt;
+	&lt;h:commandButton value="test" actionListener="#{method}" /&gt;
+&lt;/ui:repeat&gt;
+				</pre>
+				<p>
+				Using modern EL implementations, this is not needed in case the EL expression references the method using explicit parenthesis,
+				e.g. <code>#{methodParamBean.doAction()}</code>
+			]]>
+		</description>
+		<tag-name>methodParam</tag-name>
+		<handler-class>org.omnifaces.taghandler.MethodParam</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.
+	            ]]>
+            </description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The value expression that is to be interpreted and invoked as a method expression. This is typically the
+	               name of the parameter by which a value is passed into the Facelets tag.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+				<![CDATA[
+					<strong>ComponentIdParam</strong> is a component that allows component ids to be provided as request parameters
+ 					causing only components with matching ids to be rendered.
+ 					<p>
+ 					Both simple component ids as well as client ids are supported. Components can be rendered without their parents
+ 					having to be rendered. As such, e.g. single rows appearing in a table can be rendered without any of the
+ 					surrounding markup appearing in the response.
+ 					<p>
+ 					The intended usage of this component is to allow client-side scripts to request markup for specific components
+ 					via a GET request (as opposed to AJAX based post-backs).
+					<p>
+					This component is used in the same way view parameters are and needs to be put into the metadata section of a
+					Facelet.
+				]]>
+		</description>
+		<tag-name>componentIdParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ComponentIdParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameters from which the values are retrieved on an initial request that
+	                represent component ids of those components from which the markup should appear in the response (i.e. which
+	                should be rendered)
+		        ]]>
+			</description>
+			<name>componentIdName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameters from which the values are retrieved on an initial request that
+	                represent client ids of those components from which the markup should appear in the response (i.e. which
+	                should be rendered)
+		        ]]>
+			</description>
+			<name>clientIdName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                Whether children of the components identified by <code>clientIdName</code> or
+	                <code>componentIdName</code> are rendered in addition to the component itself.
+	                Defaults to <code>true</code>
+		        ]]>
+			</description>
+			<name>renderChildren</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The component identifier for this component. This value must be
+	                unique within the closest parent component that is a naming
+	                container.
+	            ]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The ValueExpression linking this component to a property in a
+	                backing bean
+	            ]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+        <description>
+        	<![CDATA[
+				<strong>OutputFormat</strong> is a component that extends the standard <code>HtmlOutputFormat</code> and provides support
+				for capturing the output and exposing it into the request scope by the variable name as specified by the
+				<code>var</code> attribute.
+             ]]>
+        </description>
+        <tag-name>outputFormat</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.OutputFormat</component-type>
+        </component>
+		<attribute>
+			<description>
+				Converter instance registered with this	component.
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	component identifier for this component. This value	must be
+				unique within the closest parent component that	is a naming
+				container.
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating	whether	or not this	component should be	rendered
+				(during	Render Response	Phase),	or processed on	any	subsequent
+				form submit. The default value for this	property is	true.
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	current	value of this component.
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				If specified, then the output will be captured and exposed in the request scope by the given variable name.
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				Direction indication for text that does	not	inherit
+				directionality.
+				Valid values are "LTR" (left-to-right) and "RTL"
+				(right-to-left).
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating	that characters	that are sensitive
+				in HTML	and	XML	markup must	be escaped.	This flag
+				is set to "true" by	default.
+			</description>
+			<name>escape</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Code describing	the	language used in the generated markup
+				for	this component.
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				CSS	style(s) to	be applied when	this component is rendered.
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Space-separated	list of	CSS	style class(es)	to be applied when
+				this element is	rendered. This value must be passed	through
+				as the "class" attribute on	generated markup.
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Advisory title information about markup	elements generated
+				for	this component.
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	ValueExpression	linking	this component to a	property in	a
+				backing	bean
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+        <description>
+        	<![CDATA[
+	        	<strong><code>o:outputLabel</code></strong> is a component that extends the standard outputLabel and provides extra support for
+	 			automatically setting its value as the label of the component identified by its <code>for</code> attribute.
+	        	<p>
+	            It renders an HTML "label" element. If a "for" attribute is specified, the component specified by the value of the "for"
+	            attribute is queried for its client id, which is then rendered as the value of the "for" attribute of the HTML label element.
+             ]]>
+        </description>
+        <tag-name>outputLabel</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.OutputLabel</component-type>
+        </component>
+        <attribute>
+            <description>
+                Converter instance registered with this component.
+            </description>
+            <name>converter</name>
+            <required>false</required>
+            <type>javax.faces.convert.Converter</type>
+        </attribute>
+        <attribute>
+            <description>
+                The component identifier for this component. This value must be
+                unique within the closest parent component that is a naming
+                container.
+            </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating whether or not this component should be rendered
+                (during Render Response Phase), or processed on any subsequent
+                form submit. The default value for this property is true.
+            </description>
+            <name>rendered</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                The value that will be rendered as the content of the HTML label element. If the for attribute
+                is specified the component identified by it will have its label attribute set to this value.
+                (both literals and value expressions are supported)
+            </description>
+            <name>value</name>
+            <required>false</required>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                Access key that, when pressed, transfers focus
+                to this element.
+            </description>
+            <name>accesskey</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Direction indication for text that does not inherit
+                directionality.
+                Valid values are "LTR" (left-to-right) and "RTL"
+                (right-to-left).
+            </description>
+            <name>dir</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating that characters that are sensitive
+                in HTML and XML markup must be escaped. If omitted, this
+                flag is assumed to be "true".
+            </description>
+            <name>escape</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Client identifier of the component for which this element
+                is a label. The label attribute of that component will be set
+                to the value of this component.
+            </description>
+            <name>for</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Code describing the language used in the generated markup
+                for this component.
+            </description>
+            <name>lang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this element loses focus.
+            </description>
+            <name>onblur</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                clicked over this element.
+            </description>
+            <name>onclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                double clicked over this element.
+            </description>
+            <name>ondblclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this element receives focus.
+            </description>
+            <name>onfocus</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed down over this element.
+            </description>
+            <name>onkeydown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed and released over this element.
+            </description>
+            <name>onkeypress</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                released over this element.
+            </description>
+            <name>onkeyup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                pressed down over this element.
+            </description>
+            <name>onmousedown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved within this element.
+            </description>
+            <name>onmousemove</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved away from this element.
+            </description>
+            <name>onmouseout</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved onto this element.
+            </description>
+            <name>onmouseover</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                released over this element.
+            </description>
+            <name>onmouseup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                CSS style(s) to be applied when this component is rendered.
+            </description>
+            <name>style</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Space-separated list of CSS style class(es) to be applied when
+                this element is rendered. This value must be passed through
+                as the "class" attribute on generated markup.
+            </description>
+            <name>styleClass</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Position of this element in the tabbing order
+                for the current document. This value must be
+                an integer between 0 and 32767.
+            </description>
+            <name>tabindex</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Advisory title information about markup elements generated
+                for this component.
+            </description>
+            <name>title</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                The ValueExpression linking this component to a property in a
+                backing bean
+            </description>
+            <name>binding</name>
+            <required>false</required>
+            <type>javax.faces.component.UIComponent</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+        	<![CDATA[
+        		<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
+				parameters in the request URL after a post-back and offers in combination with the
+				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
+				validation failures so that the invoke action phase will be executed anyway.
+             ]]>
+        </description>
+        <tag-name>form</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.input.Form</component-type>
+        </component>
+        <attribute>
+            <description>
+                The component identifier for this component. This value must be
+                unique within the closest parent component that is a naming
+                container.
+            </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Whether to include view parameters in the action URI.
+            </description>
+            <name>includeViewParams</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Whether to include all URL (GET) request parameters in the action URI. This overrides includeViewParams.
+            </description>
+            <name>includeRequestParams</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Whether to use current request URI with query string as action URI. This overrides includeViewParams and includeRequestParams.
+            </description>
+            <name>useRequestURI</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating whether or not this form should prepend its id
+                to its descendent's id during the clientId generation process.
+                If this flag is not set, the default value is true.
+            </description>
+            <name>prependId</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating whether or not this component should be rendered
+                (during Render Response Phase), or processed on any subsequent
+                form submit. The default value for this property is true.
+            </description>
+            <name>rendered</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                List of content types that a server processing this form
+                will handle correctly
+            </description>
+            <name>accept</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                List of character encodings for input data
+                that are accepted by the server processing
+                this form.
+            </description>
+            <name>acceptcharset</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Direction indication for text that does not inherit
+                directionality.
+                Valid values are "LTR" (left-to-right) and "RTL"
+                (right-to-left).
+            </description>
+            <name>dir</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Content type used to submit the form to the server. If not
+                specified, the default value is
+                "application/x-www-form-urlencoded".
+            </description>
+            <name>enctype</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Code describing the language used in the generated markup
+                for this component.
+            </description>
+            <name>lang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                clicked over this element.
+            </description>
+            <name>onclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                double clicked over this element.
+            </description>
+            <name>ondblclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed down over this element.
+            </description>
+            <name>onkeydown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed and released over this element.
+            </description>
+            <name>onkeypress</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                released over this element.
+            </description>
+            <name>onkeyup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                pressed down over this element.
+            </description>
+            <name>onmousedown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved within this element.
+            </description>
+            <name>onmousemove</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved away from this element.
+            </description>
+            <name>onmouseout</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved onto this element.
+            </description>
+            <name>onmouseover</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                released over this element.
+            </description>
+            <name>onmouseup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this form is reset.
+            </description>
+            <name>onreset</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this form is submitted.
+            </description>
+            <name>onsubmit</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                CSS style(s) to be applied when this component is rendered.
+            </description>
+            <name>style</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Space-separated list of CSS style class(es) to be applied when
+                this element is rendered. This value must be passed through
+                as the "class" attribute on generated markup.
+            </description>
+            <name>styleClass</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of a frame where the response
+                retrieved after this form submit is to
+                be displayed.
+            </description>
+            <name>target</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Advisory title information about markup elements generated
+                for this component.
+            </description>
+            <name>title</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                The ValueExpression linking this component to a property in a
+                backing bean
+            </description>
+            <name>binding</name>
+            <required>false</required>
+            <type>javax.faces.component.UIComponent</type>
+        </attribute>
+    </tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
+				instead of to the response. This output is then inserted into a cache and on subsequent requests the
+				content retrieved from the cache is used.
+				<p>
+				By default the viewid concatenated to the component id via an underscore is used as the cache key.
+				<p>
+				Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
+				simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
+				<p>
+				An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
+				If no such provider is installed, a default caching implementation is used that's based on
+				<a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a> in case
+				a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
+				<hr>
+				<h3>Setting a custom caching provider</h3>
+				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
+				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
+				For example:
+				<pre>
+&lt;context-param&gt;
+	&lt;param-name&gt;org.omnifaces.CACHE_PROVIDER&lt;/param-name&gt;
+	&lt;param-value&gt;com.example.MyProvider&lt;/param-value&gt;
+&lt;/context-param&gt;
+				</pre>
+				<p>
+				The default provider, <code>org.omnifaces.component.output.cache.DefaultCacheProvider</code> can be used as an
+				example.
+				<hr>
+				<h3>Global settings</h3>
+				<p>For the default provider, the maximum capacity and the default time to live can be specified for the
+				supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
+				evicted following a least recently used policy. The default time to live specifies for how long
+				entries are considered to be valid. A value for the <code>time</code> attribute on this component
+				will override this global default time to live. The following context parameters can be used in web.xml:
+				<p>
+				<table>
+				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code></td>
+				<td>Sets the maximum number of elements that will be stored per web module (application scope). Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_SESSION_MAX_CAPACITY</code></td>
+				<td>Sets the maximum number of elements that will be stored per session. Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_APPLICATION_TTL</code></td>
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the application scope.
+				Can be overriden by individal cache components. Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_SESSION_TTL</code></td>
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the session scope.
+				Can be overriden by individal cache components. Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_INSTALL_BUFFER_FILTER</code></td>
+				<td>Boolean that when true installs a Servlet Filter (Servlet 3.0+ only) that works in conjunction with the <code>useBuffer</code> attribute of the Cache component
+				    to enable an alternative way to grab the content that needs to be cached. This is a convenience setting that is a short-cut
+				    for installing the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> filter manually. If more finegrained control
+				    is needed regarding which place in the filter chain the filter appears and which resources it exactly filters, this setting
+				    should not be used and the mentioned filter should be manually configured. Default: <code>false</code>)
+				 </td>
+ 				</tr>
+ 				</table>
+ 				<hr>
+				<h3>Servlet 2.5 configuration</h3>
+				<p>If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
+				<code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a
+				listener in web.xml:
+				<pre>
+&lt;listener&gt;
+	&lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
+&lt;/listener&gt;
+				</pre>
+				<p>In case the alternative caching method via buffering is used, <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs
+				to be installed as a Servlet Filter in web.xml, filtering either the FacesServlet itself or any page on which the alternative caching
+				method is required.
+			]]>
+		</description>
+		<tag-name>cache</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.Cache</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional key used to store content in the cache. If no key is specified, a key is calculated
+					based on the client Id of this component.
+					<p>
+					While auto-generated keys can be convenient, note that in the face of dynamic behavior on a view the
+					id of a component and thus the cache key can change in ways that are difficult to predict.
+					<p>
+					Keys are relative to the scope for which they are defined, meaning a key "foo" for the a session scoped
+					cache will not conflict with a key of the same name for an application scoped cache.
+				 ]]>
+            </description>
+			<name>key</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional scope identifier used to set the scope in which caching takes place. If no scope is specified,
+					the default scope "session" will be used.
+					<p>
+					The supported scopes depent on the caching provider that is installed via the
+					<code>org.omnifaces.CACHE_PROVIDER</code>. If no such provider is installed, a default one is used
+					that supports scopes "session" and "application".
+					<p>
+					A runtime exception will be thrown if an unsupported value for scope is used.
+				 ]]>
+            </description>
+			<name>scope</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional amount of time in seconds for which the cached content is valid (TTL). This is counted
+					from the moment content is actually added to the cache. If no time is provided the content will be subject
+					to the global cache settings, and in absence of these are subject to the behavior of the cache implementation
+					that is used. The default cache implementation will simply cache indefinitely.
+					<p>
+					Whether the content is actually removed from the cache (to preserve memory) after the given time has elapsed is
+					dependend on the actual cache implementation that is used. The default cache implementation will
+					<strong>NOT</strong> do this automatically, but will instead remove it only when the cache item is being accessed
+					again.
+					<p>
+					Following the above, new content will only be inserted into the cache following a page request. A time of e.g. <code>30</code>
+					<strong>will not</strong> cause new content to be inserted into the cache at <code>30</code> seconds intervals.
+					<p>
+					Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This means after content times out,
+					several simultaneous page requests may render the same content and it's undetermined which of those will end up being cached.
+				 ]]>
+            </description>
+			<name>time</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Switches to an alternative method to grab the content generated by the children of this component. Default is <code>false</code>.
+					<p>
+					Normally this content is obtained by replacing the so-called response writer when the parent Cache
+					component delegates rendering to its children. However, in some cases (like <code>h:form</code>) there is an amount
+					of post-processing being done on the response outside the context of this parent - child delegation.
+					<p>
+					Via this switch, the full response is buffered if the cache doesn't contain content for this component and special
+					markers are inserted surrounding the children's rendering. Afterwards, the content between the markers (if any) is
+					extracted and inserted into the cache. Note that the full response is only buffered incase there's no value in the cache.
+					For all other requests this buffering will not happen.
+					<p>
+					Since this is clearly a more resource intensive and invasive method to grab content, it's not enabled by default.
+					In addition to setting this attribute to <code>true</code>, the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code>
+					Servlet Filter needs to be configured to filter the Faces Servlet (or alternatively just the pages for which the buffering
+					method should be used).
+				 ]]>
+            </description>
+			<name>useBuffer</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Resets the cache when set to <code>true</code>. Default is <code>false</code>.
+					<p>
+					This attribute can be used to reset the cache, meaning that the first time the cache component is rendered
+					again, it will re-render its children and will cause any cached value expressions (via <code>o:cacheValue</code>) to be
+					re-evaluated when its next referenced.
+					<p>
+					Note that this value has to remain true until the cache component is rendered, after that it should be set to false
+					again otherwise the cached content will be reset again at the next rendering.
+				 ]]>
+            </description>
+			<name>reset</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    Disables the cache when set to <code>true</code>. Default is <code>false</code>.
+                    <p>
+                    This attribute can be used to disable the cache (temporarily). In disabled state the children will be rendered directly
+                    and cached content (if any) will not be used, nor will the rendering outcome of the children be cached.
+                    <p>
+                    When the attribute is set to <code>false</code> again any content that was cached before the cache was disabled will be
+                    shown again if said content is still available in the cache. The content that was rendered when the cache was disabled
+                    has no effect on any such previously cached content.
+                 ]]>
+            </description>
+            <name>disabled</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				Tag handler (runs at tree build-time) that makes a value expression available under the given name that caches its value.
+				Although the value expressions scope is that of the entire Facelet in which this tag appears, the value it self is cached
+				using the parent Cache component.
+				<p>
+				This means that if the parent <code>o:Cache</code> component clears its cache (e.g. because of time to live expiration), the value cached
+				by this value expression will be automatically cleared as well.
+				<p>
+				The direct parent of this component <b>MUST</b> be <code>o:Cache</code> or a potential subclass of the associated UIComponent.
+				It's an error to have any other kind of parent.
+				<p>
+				The intended use of this is to explicitly cache a value expression that is used by one of the component children of <code>o:Cache</code>,
+				so that even after a post-back (where the cached markup is of nu use) the original value expression will not be re-evaluated.
+			]]>
+		</description>
+		<tag-name>cacheValue</tag-name>
+		<handler-class>org.omnifaces.component.output.cache.el.CacheValue</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               Name under which the value expression will be made available to EL, scoped to the Facelet in which this tag occurs.
+	            ]]>
+            </description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The value expression for which its value will be cached on demand and made available as a new value expression.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<p>The <code>&lt;o:importConstants&gt;</code> allows the developer to have a mapping of all constant field values of
+				the given type in the request scope. The constant field values are those public static final fields. This works for
+				classes, interfaces and enums. For example:
+				<pre>
+public class Foo {
+    public static final String FOO1 = "foo1";
+    public static final String FOO2 = "foo2";
+}
+
+public interface Bar {
+    public static final String BAR1 = "bar1";
+    public static final String BAR2 = "bar2";
+}
+
+public enum Baz {
+    BAZ1, BAZ2;
+}
+				</pre>
+				<p>The constant field values of the above types can be mapped into the request scope as follows:
+				<pre>
+&lt;o:importConstants type="com.example.Foo" /&gt;
+&lt;o:importConstants type="com.example.Bar" /&gt;
+&lt;o:importConstants type="com.example.Baz" var="Bazzz" /&gt;
+...
+#{Foo.FOO1}, #{Foo.FOO2}, #{Bar.BAR1}, #{Bar.BAR2}, #{Bazzz.BAZ1}, #{Bazzz.BAZ2}
+				</pre>
+				<p>The map is by default stored in the request scope by the simple name of the type as variable name. You can override
+				this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
+				the above example.
+				<p>
+				The resolved constants are by reference stored in the cache to improve retrieving performance.
+			]]>
+		</description>
+		<tag-name>importConstants</tag-name>
+		<handler-class>org.omnifaces.taghandler.ImportConstants</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The fully qualified name of the class/interface/enum to import the constant field values for.
+	            ]]>
+            </description>
+			<name>type</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The name of the request attribute which exposes the mapping of the constants in the request scope.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<p>The <code>&lt;o:importFunctions&gt;</code> allows the developer to have access to all functions of the given
+				fully qualified name of a type in the Facelet scope using the usual EL functions syntax without the need to register them
+				in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
+				<strong>non</strong>-<code>void</code> return type. For example:
+				<pre>
+&lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
+&lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
+...
+#{m:abs(-10)}
+#{m:max(bean.number1, bean.number2)}
+...
+&lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
+				</pre>
+				<p>The functions prefix becomes by default the simple name of the type. You can override this by explicitly
+				specifying the <code>var</code> attribute. If there are multiple function methods with exactly the same name, then
+				the one with the least amount of parameters will be used. If there are multiple function methods with exactly the
+				same name and amount of parameters, then the choice is unspecified (technically, JVM-dependent) and should not be
+				relied upon. So if you absolutely need to differentiate functions in such case, give them each a different name.</p>
+				<p>Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
+				design not easily possible to change it to the period <code>.</code> operator. Also note that in case of
+				<code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is already available
+				through the implicit EL variables <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc
+				such as <code>#{request.contextPath}</code> which should be preferred over
+				<code>#{Faces:getRequestContextPath()}</code>.</p>
+				<p>
+				The resolved functions are by reference stored in the cache to improve retrieving performance.
+			]]>
+		</description>
+		<tag-name>importFunctions</tag-name>
+		<handler-class>org.omnifaces.taghandler.ImportFunctions</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The fully qualified name of the class to import the public static non-void methods for.
+	            ]]>
+            </description>
+			<name>type</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				   The EL functions prefix which exposes the functions in the Facelet scope.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when
+				executing an <code>UICommand</code> action. This taghandler must be placed inside an <code>UICommand</code> component and the
+				parent <code>UIForm</code> must be an <code>&lt;o:form&gt;</code>.
+				<p>
+				Any validation errors will be ignored and thus not be displayed. Note that the model values will (obviously) only be
+				updated for components which have passed the validation.
+			]]>
+		</description>
+		<tag-name>ignoreValidationFailed</tag-name>
+		<handler-class>org.omnifaces.taghandler.IgnoreValidationFailed</handler-class>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:enableRestorableView&gt;</code> instructs the view handler to recreate the entire view whenever the
+				view has been expired, i.e. whenever <code>#restoreView(FacesContext, String)</code> returns <code>null</code> and the
+				current request is a postback. This effectively prevents <code>ViewExpiredException</code> on the view. This tag needs to
+				be placed in <code>&lt;f:metadata&gt;</code> of the view.
+				<p>
+				There are however technical design limitations: please consult the javadoc for details. To the point, the bean associated
+				with the view has to be exclusively request scoped in order to properly recreate the same view.
+			]]>
+		</description>
+		<tag-name>enableRestorableView</tag-name>
+		<handler-class>org.omnifaces.taghandler.EnableRestorableView</handler-class>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation groups on a
+				per-<code>UICommand</code> or <code>UIInput</code> component basis. Usage example:
+				<pre>
+&lt;h:commandButton&gt;
+    &lt;o:validateBean groups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
+&lt;/h:commandButton&gt;
+		        </pre>
+			]]>
+		</description>
+		<tag-name>validateBean</tag-name>
+		<handler-class>org.omnifaces.taghandler.ValidateBean</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					A comma-separated list of validation groups. A validation group is a fully-qualified class name.
+				]]>
+			</description>
+			<name>validationGroups</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling page level determination of whether or not this validator is enabled.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If specified, then only the given bean will be validated at class level.
+					If unspecified, then only the bean properties bound to the in the current request processed/executed input fields will be validated "as usual".
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Set the class level validation method, which can be either 'validateCopy' or 'validateActual'.
+					If set to 'validateCopy', then it will perform the validation on a copy/clone of the actual bean. 
+					This has the advantage that the validation can be performed before the model is updated.
+					If set to 'validateActual', then it will perform the validation on the actual bean instance.
+					This has the disadvantage that the validation can only be performed after the model is updated 
+					and thus the action method will always be invoked regardless of the validation outcome.
+					Defaults to 'validateCopy'.
+					This attribute is ignored when the 'value' attribute is unspecified.
+				]]>
+			</description>
+			<name>method</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'.
+					This can be either an EL expression referring a concrete instance, or a String representing the fully qualified name of the instance of the org.omnifaces.util.copier.Copier interface, which must be stateless and/or threadsafe.
+					If unspecified, then it defaults to the best possibility in this order: Cloneable, or Serializable, or copy constructor, or default constructor.
+					This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'.
+				]]>
+			</description>
+			<name>copier</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateUniqueColumn</strong> validates if the given <code>UIInput</code> component in an <code>UIData</code> component
+				has an unique value throughout all rows, also those not visible by pagination. This validator works directly on the
+				data model and may therefore not work as expected if the data model does not represent <strong>all</strong> available
+				rows of the <code>UIData</code> component (e.g. when there's means of lazy loading).
+				<p>
+				The default message is
+				<blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
+				<p>
+				Usage example:
+				<pre>
+&lt;h:dataTable value="#{bean.items}" var="item"&gt;
+  &lt;h:column&gt;
+    &lt;h:inputText value="#{item.value}"&gt;
+      &lt;o:validateUniqueColumn /&gt;
+    &lt;/h:inputText&gt;
+  &lt;/h:column&gt;
+&lt;/h:dataTable&gt;
+				</pre>
+				<p>
+				In an invalidating case, only the first row on which the value is actually changed (i.e. the value change event has
+				been fired on the input component in the particular row) will be marked invalid and a faces message will be added
+				on the client ID of the input component in the particular row. The default message can be changed by the
+				<code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with the label of the
+				input component. Any "{1}" placeholder in the message will be substituted with the 1-based row index of the data
+				model. Note that this does not take pagination into account and that this needs if necessary to be taken care of in
+				the custom message yourself.
+				<pre>
+&lt;o:validateUniqueColumn message="Duplicate value!" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>validateUniqueColumn</tag-name>
+		<handler-class>org.omnifaces.taghandler.ValidateUniqueColumn</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be substituted with the label of the
+					input component. Any "{1}" placeholder in the message will be substituted with the 1-based row index of the data
+					model.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
+				if they don't already have an attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code>
+				and <code>rendered</code>, any literal (static) attribute value will be ignored and overridden. Only if they have
+				already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
+				limitation specifically for boolean attributes as they don't default to <code>null</code>.
+				<p>
+				For example, the following setup
+				<pre>
+&lt;o:massAttribute name="disabled" value="true"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" disabled="true" /&gt;
+    &lt;h:inputText id="input3" disabled="false" /&gt;
+    &lt;h:inputText id="input4" disabled="#{true}" /&gt;
+    &lt;h:inputText id="input5" disabled="#{false}" /&gt;
+&lt;/o:massAttribute&gt;
+				</pre>
+				will set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and
+				<code>input3</code> as those are the only components <strong>without</strong> a value expression on the boolean attribute.
+				<p>
+				As another general example without booleans, the following setup
+				<pre>
+&lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" styleClass="some" /&gt;
+    &lt;h:inputText id="input3" styleClass="#{'some'}" /&gt;
+    &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
+&lt;/o:massAttribute&gt;
+				</pre>
+				will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
+				that's the only component on which the attribute is absent.
+				Do note that the specified EL expression will actually be evaluated on a per-component basis.
+				<p>
+				To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
+				(as that would otherwise fail in the example below because they don't have a <code>valid</code> property):
+				<pre>
+&lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
+    &lt;h:outputLabel for="input1" /&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:outputLabel for="input2" /&gt;
+    &lt;h:inputText id="input2" /&gt;
+    &lt;h:outputLabel for="input3" /&gt;
+    &lt;h:inputText id="input3" /&gt;
+&lt;/o:massAttribute&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>massAttribute</tag-name>
+		<handler-class>org.omnifaces.taghandler.MassAttribute</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the attribute to be set on all nested components. This cannot be set to <code>id</code>
+					or <code>binding</code> as those are already evaluated during view build time and they shouldn't be
+					shared among components anyway.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The value of the attribute to be set on all nested components. This will be evaluated on a
+					per-component basis. In other words, <code>#{component}</code> can be used here to refer the 
+					"current" component.
+				]]>
+			</description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The FQN (fully qualified name) of the specific <code>UIComponent</code> (super)class for which the
+					attribute should be set. For example, <code>javax.faces.component.UIInput</code> which has the
+					<code>valid</code> property.
+				]]>
+			</description>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				<p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
+				function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
+				call <code>functionName()</code> in the JavaScript context.
+				<p>
+				The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in an <code>UIForm</code> component. The
+				<code>name</code> attribute is required and it represents the JavaScript function name. The <code>execute</code>
+				and <code>render</code> attributes work exactly the same as in <code>&lt;f:ajax&gt;</code>. The <code>onbegin</code>
+				and <code>oncomplete</code> attributes must represent (valid!) JavaScript code which will be executed before sending
+				the ajax request and after processing the ajax response respectively. The <code>action</code>,
+				<code>actionListener</code> and <code>immediate</code> attributes work exactly the same as in
+				<code>&lt;h:commandXxx&gt;</code>.
+				<p>
+				Basic usage example of <code>&lt;o:commandScript&gt;</code> which submits the entire form on click of a plain HTML
+				button:
+				<pre>
+&lt;h:form&gt;
+  &lt;h:inputText value="#{bean.input1}" ... /&gt;
+  &lt;h:inputText value="#{bean.input2}" ... /&gt;
+  &lt;h:inputText value="#{bean.input3}" ... /&gt;
+  &lt;o:commandScript name="submitForm" action="#{bean.submit}" render="@form" /&gt;
+&lt;/h:form&gt;
+&lt;input type="button" value="submit" onclick="submitForm()" /&gt;
+				</pre>
+				<p>
+				Usage example which uses the <code>&lt;o:commandScript&gt;</code> as a poll function which updates every 3 seconds:
+				<pre>
+&lt;h:form&gt;
+  &lt;h:dataTable id="data" value="#{bean.data}" ...&gt;...&lt;/h:dataTable&gt;
+  &lt;o:commandScript name="updateData" action="#{bean.reloadData}" render="data" /&gt;
+&lt;/h:form&gt;
+&lt;h:outputScript target="body"&gt;setInterval(updateData, 3000);&lt;/h:outputScript&gt;
+				</pre>
+				The component also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
+				<code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>. The function
+				also supports a JS object as argument which will then end up in the HTTP request parameter map:
+				<pre>
+functionName({ name1: "value1", name2: "value2" });
+				</pre>
+				<p>
+				With the above example, the parameters are in the action method available as follows:
+				<pre>
+String name1 = Faces.getRequestParameter("name1"); // value1
+String name2 = Faces.getRequestParameter("name2"); // value2
+				</pre>
+			]]>
+		</description>
+		<tag-name>commandScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.CommandScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The script function name.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to process on ajax request.
+				]]>
+			</description>
+			<name>execute</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to update on ajax response.
+				]]>
+			</description>
+			<name>render</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A script to execute before ajax request is fired.
+				]]>
+			</description>
+			<name>onbegin</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A script to execute after ajax response is processed.
+				]]>
+			</description>
+			<name>oncomplete</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the command script should automatically run inline during page load.
+					Note that this thus runs immediately at the moment the script is been interpreted by the web browser
+					and thus not in end of HTML body or during window load event. So if the script logic depends on the
+					HTML DOM tree composition, then it will depend on location of the command script component itself.
+				]]>
+			</description>
+			<name>autorun</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing the application action to invoke when this component is
+					activated by the user. The expression must evaluate to a public method that takes no parameters, and
+					returns an <code>Object</code> (the <code>toString()</code> of which is called to derive the logical
+					outcome) which is passed to the <code>NavigationHandler</code> for this application.
+				]]>
+			</description>
+			<name>action</name>
+			<required>false</required>
+			<method-signature>java.lang.Object action()</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing an action listener method that will be notified when this
+					component is activated by the user. The expression must evaluate to a public method that takes an 
+					<code>ActionEvent</code> parameter, with a return type of void, or to a public method that takes no
+					arguments with a return type of void. In the latter case, the method has no way of easily knowing
+					where the event came from, but this can be useful in cases where a notification is needed that
+					"some action happened".
+				]]>
+			</description>
+			<name>actionListener</name>
+			<required>false</required>
+			<method-signature>void actionListener(javax.faces.event.ActionEvent)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that, if this component is activated by the user, notifications should be delivered
+					to interested listeners and actions immediately (that is, during Apply Request Values phase) rather
+					than waiting until Invoke Application phase.
+				]]>
+			</description>
+			<name>immediate</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>Param</strong> is a component that extends the standard <code>UIParameter</code> to implement <code>ValueHolder</code>
+				and thus support a <code>Converter</code> to convert the supplied value to string, if necessary.
+				<p>
+				You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
+				<code>o:</code> to get the extra support for a <code>Converter</code> by usual means via the <code>converter</code>
+				attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
+				already registered for the target class.
+				Also, if no value is specified, but children are present, then the encoded output of children will be returned as
+				value. This is useful when you want to supply JSF components or HTML as parameter of an unescaped
+				<code>&lt;h:outputFormat&gt;</code>. For example,
+				<pre>
+				&lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
+				  &lt;o:param&gt;&lt;h:link outcome="contact" value="#{bundle.contact}" /&gt;&lt;/o:param&gt;
+				&lt;/h:outputFormat&gt;
+				</pre>
+				<p>with this bundle
+				<pre>
+				paragraph = Please {0} for more information.
+				contact = contact us
+				</pre>
+				<p>will result in the link being actually encoded as output format parameter value.
+			]]>
+		</description>
+		<tag-name>param</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.Param</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Name of the parameter to be created.
+				]]>
+			</description>
+			<name>name</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Value of the parameter to be set.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter instance registered with this component.
+				]]>
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag enabling or disabling the inclusion of the parameter.
+				]]>
+			</description>
+			<name>disable</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:messages&gt;</code> is a component that extends the standard <code>&lt;h:messages&gt;</code> with
+				the following new features:
+				<dl>
+				<dt>Multiple <code>for</code> components</dt>
+				<dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
+				would only display messages for <code>input1</code> and <code>input3</code>:
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="input1 input3" /&gt;
+  &lt;h:inputText id="input1" /&gt;
+  &lt;h:inputText id="input2" /&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				It can even refer non-input components which in turn contains input components. The example below would only display
+				messages for <code>input1</code> and <code>input2</code>:
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="inputs" /&gt;
+  &lt;h:panelGroup id="inputs"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" /&gt;
+  &lt;/h:panelGroup&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				You can even combine them. The example below would only display messages for <code>input1</code>,
+				<code>input2</code> and <code>input4</code>.
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="inputs input4" /&gt;
+  &lt;h:panelGroup id="inputs"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" /&gt;
+  &lt;/h:panelGroup&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				</dd>
+				<dt>Displaying single message</dt>
+				<dd>Show a single custom message whenever the component has received any faces message. This is particularly useful
+				when you want to display a global message in case any of the in <code>for</code> specified components has a faces
+				message. For example:
+				<pre><code>
+&lt;o:messages for="form" message="There are validation errors. Please fix them." /&gt;
+&lt;h:form id="form"&gt;
+  &lt;h:inputText id="input1" /&gt;&lt;h:message for="input1" /&gt;
+  &lt;h:inputText id="input2" /&gt;&lt;h:message for="input2" /&gt;
+  &lt;h:inputText id="input3" /&gt;&lt;h:message for="input3" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				</dd>
+				<dt>HTML escaping</dt>
+				<dd>Control HTML escaping by the new <code>escape</code> attribute.
+				<pre><code>
+&lt;o:messages escape="false" /&gt;
+				</code></pre>
+				Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
+				</dd>
+				<dt>Iteration markup control</dt>
+				<dd>Control iteration markup fully by the new <code>var</code> attribute which sets the current <code>FacesMessage</code>
+				in the request scope and disables the default table/list rendering. For example,
+				<pre><code>
+&lt;dl&gt;
+  &lt;o:messages var="message"&gt;
+    &lt;dt&gt;#{message.severity}&lt;/dt&gt;
+    &lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
+  &lt;/o:messages&gt;
+&lt;/dl&gt;
+				</code></pre>
+				Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
+				the <code>&lt;o:messages&gt;</code> component. It should be used for pure output only, like as the standard
+				<code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>message</code>
+				and <code>escape</code> attributes have in this case no effect. With a single message, there's no point of
+				iteration. As to escaping, just use <code>&lt;h:outputText escape="false"&gt;</code> the usual way.
+				</dd>
+				</dl>
+				<p>
+				Design notice: the component class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid
+				confusion with the <code>Messages</code> utility class.
+			]]>
+		</description>
+		<tag-name>messages</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.messages.OmniMessages</component-type>
+			<renderer-type>org.omnifaces.Messages</renderer-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.
+					Default value is "true".
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that only global messages (that is, messages not associated with any client identifier) are to be displayed.
+					Default value is "false".
+				]]>
+			</description>
+			<name>globalOnly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components whose messages needs to be displayed.
+					It is also possible to specify the client ID of a parent component containing UI input components of interest.
+					This attribute is ignored when the globalOnly attribute is set to "true".
+				]]>
+			</description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the message should be redisplayed if already displayed by another message(s) component beforehand.
+					Default value is "true".
+				]]>
+			</description>
+			<name>redisplay</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the request attribute which exposes the current faces message in the request scope.
+					This will trigger rendering without any HTML markup and delegate the markup control to the developer like as ui:repeat.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The single INFO message to be shown instead when this component has any faces message.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The type of layout markup to use when rendering error messages.
+					Valid values are "table" (an HTML table) and "list" (an HTML unordered list).
+					Default value is "list".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>layout</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The tooltip to be applied on the of HTML table or ul when this component is rendered.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the summary portion of displayed messages should be included.
+					Default value is "true".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>showSummary</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the detail portion of displayed messages should be included.
+					Default value is "false".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>showDetail</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the detail portion of the message should be displayed as a tooltip.
+					Default value is "false".
+					This attribute is ignored when the var or title attribute is specified.
+				]]>
+			</description>
+			<name>tooltip</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that characters in summary and detail that are sensitive in HTML and XML markup must be escaped.
+					Default value is "true".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>escape</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to be applied on the HTML table or HTML ul when this component is rendered.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Space-separated list of CSS style class(es) to be applied on the HTML table or ul when this component is rendered.
+					This value must be passed through as the "class" attribute on generated markup.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "INFO".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>infoStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "INFO".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>infoClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "WARN".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>warnStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "WARN".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>warnClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "ERROR".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>errorStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "ERROR".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>errorClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "FATAL".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>fatalStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "FATAL".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>fatalClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Code describing the language used in the generated markup for this component.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Direction indication for text that does not inherit directionality.
+					Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+</facelet-taglib>
