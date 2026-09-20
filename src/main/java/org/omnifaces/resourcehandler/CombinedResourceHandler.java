@@ -127,6 +127,18 @@ import org.omnifaces.util.cache.Cache;
  * difference on postbacks, but only on initial requests. The combined resource content is by default cached in an application scoped cache in heap space. This
  * can be customized as per instructions in {@link Cache} javadoc. As to the heap space consumption, note that without caching the same amount of heap space is
  * allocated and freed for each request that can't be served from the browser cache, so chances are you won't notice the memory penalty of caching.
+ * <p>
+ * The cache holds one entry per distinct combination of resources which was actually requested, and an expired entry is only reclaimed when that same
+ * combination is requested again. On a deployment with many distinct combinations, cap the shared application scoped cache with the below context parameter.
+ *
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY&lt;/param-name&gt;
+ *     &lt;param-value&gt;100&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * Note that this cache is shared with <code>&lt;o:cache&gt;</code>, so account for both when choosing the value.
  *
  * <h2>Configuration</h2>
  * <p>
@@ -157,7 +169,8 @@ import org.omnifaces.util.cache.Cache;
  * <td>Set with a value greater than 0 to activate server-side caching of the combined resource files. The value is interpreted as cache TTL (time to live) in
  * seconds and is only effective when the Faces project stage is <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}.
  * Combined resource files are removed from the cache if they are older than this parameter indicates (and regenerated if newly requested). The default value is
- * 0 (i.e. not cached). For global cache settings refer {@link Cache} javadoc.</td>
+ * 0 (i.e. not cached). The cache is unbounded unless <code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code> is set. For global cache settings refer
+ * {@link Cache} javadoc.</td>
  * </tr>
  * </table>
  * <p>
