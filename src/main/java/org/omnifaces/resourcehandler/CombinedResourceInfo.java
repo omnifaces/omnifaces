@@ -59,6 +59,7 @@ public final class CombinedResourceInfo {
 
 	private String id;
 	private Set<ResourceIdentifier> resourceIdentifiers;
+	private boolean serverIssued;
 	private Set<Resource> resources;
 	private int contentLength;
 	private long lastModified;
@@ -68,10 +69,12 @@ public final class CombinedResourceInfo {
 	/**
 	 * Creates an instance of combined resource info based on the given ID and ordered set of resource identifiers.
 	 * @param resourceIdentifiers Ordered set of resource identifiers, which are to be combined in a single resource.
+	 * @param serverIssued Whether the ID was issued by this deployment, as opposed to reconstructed from a request.
 	 */
-	private CombinedResourceInfo(String id, Set<ResourceIdentifier> resourceIdentifiers) {
+	private CombinedResourceInfo(String id, Set<ResourceIdentifier> resourceIdentifiers, boolean serverIssued) {
 		this.id = id;
 		this.resourceIdentifiers = resourceIdentifiers;
+		this.serverIssued = serverIssued;
 	}
 
 	/**
@@ -146,7 +149,7 @@ public final class CombinedResourceInfo {
 			Set<ResourceIdentifier> resourceIdentifiers = fromUniqueId(id);
 
 			if (resourceIdentifiers != null && isCombinable(resourceIdentifiers)) {
-				info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
+				info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers), false);
 			}
 		}
 
@@ -160,7 +163,7 @@ public final class CombinedResourceInfo {
 	 * @return New combined resource info identified by given ID.
 	 */
 	private static CombinedResourceInfo create(String id, Set<ResourceIdentifier> resourceIdentifiers) {
-		CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
+		CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers), true);
 		CACHE.put(id, info);
 		return info;
 	}
@@ -246,6 +249,16 @@ public final class CombinedResourceInfo {
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns whether the ID of this combined resource info was issued by this deployment. A combined resource ID is
+	 * unauthenticated, so an ID which was reconstructed from a request may name any combinable resource and is not
+	 * necessarily one this deployment would ever render.
+	 * @return Whether the ID of this combined resource info was issued by this deployment.
+	 */
+	boolean isServerIssued() {
+		return serverIssued;
+	}
 
 	/**
 	 * Returns the ordered set of resource identifiers of this combined resource info.
