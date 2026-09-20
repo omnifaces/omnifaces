@@ -21,6 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -83,9 +87,7 @@ class CombinedResourceInfoTest {
 
     @Test
     void forgedIdDecodingToAServerIssuedOneIsNotItselfServerIssued() throws Exception {
-        var builder = new CombinedResourceInfo.Builder();
-        builder.add(new ResourceIdentifier("cacheable.css"));
-        var serverIssuedId = builder.create();
+        var serverIssuedId = createId("cacheable.css");
 
         assertTrue(isServerIssued(CombinedResourceInfo.get(serverIssuedId)), "ID minted by the builder is server issued");
         assertFalse(
@@ -98,6 +100,54 @@ class CombinedResourceInfoTest {
         var method = CombinedResourceInfo.class.getDeclaredMethod("isServerIssued");
         method.setAccessible(true);
         return (Boolean) method.invoke(info);
+    }
+
+    @Test
+    void cacheStopsGrowingAtItsMaximumSizeAndEvictsTheLeastRecentlyUsedFirst() throws Exception {
+        var cache = getCache();
+        cache.clear();
+        var maxCacheEntries = getMaxCacheEntries();
+        var firstId = createId("overflow0.css");
+
+        for (var i = 1; i < maxCacheEntries; i++) {
+            createId("overflow" + i + ".css");
+        }
+
+        assertEquals(maxCacheEntries, cache.size(), "cache is filled up to its maximum size");
+        assertNotNull(CombinedResourceInfo.get(firstId), "first ID is still cached");
+
+        createId("overflow" + maxCacheEntries + ".css");
+
+        assertEquals(maxCacheEntries, cache.size(), "cache does not grow beyond its maximum size");
+        assertTrue(cache.containsKey(firstId), "most recently used ID survives eviction");
+    }
+
+    @Test
+    void cachedInfoSurvivesSerialization() throws Exception {
+        var id = createId("serializable.css");
+        var info = CombinedResourceInfo.get(id);
+        var bytes = new ByteArrayOutputStream();
+
+        try (var output = new ObjectOutputStream(bytes)) {
+            output.writeObject(info);
+        }
+
+        try (var input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            var deserialized = (CombinedResourceInfo) input.readObject();
+            assertEquals(info.getResourceIdentifiers(), deserialized.getResourceIdentifiers(), "resource identifiers survive");
+        }
+    }
+
+    private static String createId(String resourceName) {
+        var builder = new CombinedResourceInfo.Builder();
+        builder.add(new ResourceIdentifier(resourceName));
+        return builder.create();
+    }
+
+    private static int getMaxCacheEntries() throws Exception {
+        var field = CombinedResourceInfo.class.getDeclaredField("MAX_CACHE_ENTRIES");
+        field.setAccessible(true);
+        return (Integer) field.get(null);
     }
 
     private static Map<?, ?> getCache() throws Exception {

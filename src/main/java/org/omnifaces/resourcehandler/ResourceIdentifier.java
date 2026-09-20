@@ -15,6 +15,7 @@ package org.omnifaces.resourcehandler;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.FacesLocal.createResource;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
@@ -34,9 +35,11 @@ import jakarta.faces.context.FacesContext;
  * @author Bauke Scholtz
  * @since 1.3
  */
-public class ResourceIdentifier {
+public class ResourceIdentifier implements Serializable {
 
     // Constants ------------------------------------------------------------------------------------------------------
+
+    private static final long serialVersionUID = 1L;
 
     private static final Logger logger = Logger.getLogger(ResourceIdentifier.class.getName());
 

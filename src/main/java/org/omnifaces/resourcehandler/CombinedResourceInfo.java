@@ -21,11 +21,11 @@ import static org.omnifaces.util.Utils.openConnection;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import jakarta.faces.application.Resource;
@@ -33,6 +33,7 @@ import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.el.functions.Converters;
 import org.omnifaces.util.Utils;
+import org.omnifaces.util.cache.LruCache;
 
 /**
  * <p>
@@ -41,13 +42,17 @@ import org.omnifaces.util.Utils;
  *
  * @author Bauke Scholtz
  */
-public final class CombinedResourceInfo {
+public final class CombinedResourceInfo implements Serializable {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = Logger.getLogger(CombinedResourceInfo.class.getName());
 
-    private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
+    private static final int MAX_CACHE_ENTRIES = 1000;
+
+    private static final Map<String, CombinedResourceInfo> CACHE = new LruCache<>(MAX_CACHE_ENTRIES);
 
     private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
         + " and therefore a 404 will be returned for the combined resource ID %s";
@@ -57,7 +62,7 @@ public final class CombinedResourceInfo {
     private String id;
     private Set<ResourceIdentifier> resourceIdentifiers;
     private boolean serverIssued;
-    private Set<Resource> resources;
+    private transient Set<Resource> resources;
     private int contentLength;
     private long lastModified;
 
