@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_HEADER_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
@@ -242,13 +243,15 @@ public class ViewScopeManager {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given request is triggered by an unload request.
+	 * Returns <code>true</code> if the given request is triggered by an unload request. The request header is checked
+	 * before the request parameter, so that an unload request carrying the header is recognized without parsing the
+	 * request body.
 	 * @param request The involved request.
 	 * @return <code>true</code> if the given request is triggered by an unload request.
 	 * @since 3.1
 	 */
 	public static boolean isUnloadRequest(HttpServletRequest request) {
-		return "unload".equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
+		return "unload".equals(request.getHeader(OMNIFACES_EVENT_HEADER_NAME)) || "unload".equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
 	}
 
 }
