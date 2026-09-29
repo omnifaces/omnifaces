@@ -15,9 +15,9 @@ import { EVENT, VIEW_STATE_PARAM } from "./OmniFaces";
 import { Util } from "./Util";
 
 /**
- * Fire "unload" event to server side via beacon or synchronous XHR when the window is being unloaded as result of a
- * non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes page,
- * or navigates away, or closes browser.
+ * Fire "unload" event to server side via keepalive fetch, beacon or synchronous XHR when the window is being unloaded as
+ * result of a non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes
+ * page, or navigates away, or closes browser.
  *
  * @author Bauke Scholtz
  * @see org.omnifaces.cdi.ViewScopeManager
@@ -26,6 +26,12 @@ import { Util } from "./Util";
 export namespace Unload {
 
     // Private static fields ------------------------------------------------------------------------------------------
+
+    const EVENT_HEADER = "OmniFaces-Event";
+    const VIEW_SCOPE_HEADER = "OmniFaces-View-Scope";
+    const VIEW_STATE_HEADER = "OmniFaces-View-State";
+    // A server side view state ID is far below; a client side view state may exceed the header size limit of the server.
+    const MAX_VIEW_STATE_HEADER_LENGTH = 1024;
 
     let id: string;
     let disabled: boolean;
@@ -47,6 +53,11 @@ export namespace Unload {
      * beacon held back until <code>pagehide</code>, which fires only once the navigation is actually committed and thus
      * keeps the view scoped beans alive for an enduser who cancels. The listeners are therefore registered on load,
      * after the application's own.
+     * <p>
+     * When the view state is not longer than <code>MAX_VIEW_STATE_HEADER_LENGTH</code>, then the request is sent via
+     * keepalive fetch when the browser supports it. The keepalive fetch and the synchronous XHR request then carry the
+     * same parameters in request headers as well. The server receives the headers even when the browser aborts the
+     * request while its body is still in transit.
      * @param viewScopeId The OmniFaces view scope ID.
      */
     export function init(viewScopeId: string) {
@@ -72,19 +83,43 @@ export namespace Unload {
                     }
 
                     const url = form.action;
-                    const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
+                    const viewState = form[VIEW_STATE_PARAM].value;
+                    const query = EVENT + "=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(viewState);
                     const contentType = "application/x-www-form-urlencoded";
+                    const headers: Record<string, string> = {"Content-Type": contentType};
+                    const viewStateFitsInHeader = viewState.length <= MAX_VIEW_STATE_HEADER_LENGTH;
                     sent = true;
 
-                    if (navigator.sendBeacon) {
-                        // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
-                        navigator.sendBeacon(url, new Blob([query], {type: contentType}));
+                    if (viewStateFitsInHeader) {
+                        headers[EVENT_HEADER] = "unload";
+                        headers[VIEW_SCOPE_HEADER] = id;
+                        headers[VIEW_STATE_HEADER] = viewState;
                     }
-                    else {
+
+                    const sendBeacon = function() {
+                        if (navigator.sendBeacon) {
+                            navigator.sendBeacon(url, new Blob([query], {type: contentType}));
+                            return true;
+                        }
+
+                        return false;
+                    };
+
+                    if (viewStateFitsInHeader && window.Request && "keepalive" in Request.prototype) {
+                        fetch(url, {method: "POST", keepalive: true, credentials: "same-origin", headers: headers, body: query}).catch(sendBeacon);
+                    }
+                    else if (!sendBeacon()) {
+                        // Fallback to synchronous XHR, even though all browsers anno 2026 are supposed to support sendBeacon.
                         const xhr = new XMLHttpRequest();
                         xhr.open("POST", url, false);
                         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                        xhr.setRequestHeader("Content-Type", contentType);
+
+                        for (const name in headers) {
+                            if (headers.hasOwnProperty(name)) {
+                                xhr.setRequestHeader(name, headers[name]);
+                            }
+                        }
+
                         xhr.send(query);
                     }
                 }

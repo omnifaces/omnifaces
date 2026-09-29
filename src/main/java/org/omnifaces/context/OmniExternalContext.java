@@ -12,10 +12,22 @@
  */
 package org.omnifaces.context;
 
+import static jakarta.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toMap;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_HEADER_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_VIEW_SCOPE_HEADER_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_VIEW_STATE_HEADER_NAME;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.faces.context.ExternalContext;
@@ -31,6 +43,9 @@ import org.omnifaces.util.Faces;
  * OmniFaces external context. This external context performs the following tasks:
  * <ol>
  * <li>Since 2.2: Take care that the {@link Flash} will be ignored during an unload request.
+ * <li>Since 3.14.26: If the current request is an unload request from {@link ViewScoped} carrying the event in a request header, then return the request
+ * parameters from the request headers without parsing the request body, so that the unload also succeeds when the client aborted while the request body was
+ * still in transit.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -42,6 +57,11 @@ public class OmniExternalContext extends ExternalContextWrapper {
     // Constants ------------------------------------------------------------------------------------------------------
 
     private static final Flash DUMMY_FLASH = new DummyFlash();
+
+    // Variables ------------------------------------------------------------------------------------------------------
+
+    private Map<String, String> unloadRequestParameterMap;
+    private Map<String, String[]> unloadRequestParameterValuesMap;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -66,6 +86,79 @@ public class OmniExternalContext extends ExternalContextWrapper {
         }
 
         return super.getFlash();
+    }
+
+    /**
+     * If the current request is an unload request from {@link ViewScoped} carrying the event in a request header, then return the request parameters from the
+     * request headers, else return the original request parameter map.
+     */
+    @Override
+    public Map<String, String> getRequestParameterMap() {
+        return isUnloadRequestWithHeaders() ? unloadRequestParameterMap : super.getRequestParameterMap();
+    }
+
+    /**
+     * If the current request is an unload request from {@link ViewScoped} carrying the event in a request header, then return the request parameters from the
+     * request headers, else return the original request parameter values map.
+     */
+    @Override
+    public Map<String, String[]> getRequestParameterValuesMap() {
+        if (!isUnloadRequestWithHeaders()) {
+            return super.getRequestParameterValuesMap();
+        }
+
+        if (unloadRequestParameterValuesMap == null) {
+            unloadRequestParameterValuesMap = unmodifiableMap(
+                unloadRequestParameterMap.entrySet().stream()
+                    .collect(toMap(Entry::getKey, entry -> new String[] { entry.getValue() }))
+            );
+        }
+
+        return unloadRequestParameterValuesMap;
+    }
+
+    /**
+     * If the current request is an unload request from {@link ViewScoped} carrying the event in a request header, then return the names of the request
+     * parameters from the request headers, else return the original request parameter names.
+     */
+    @Override
+    public Iterator<String> getRequestParameterNames() {
+        return isUnloadRequestWithHeaders() ? unloadRequestParameterMap.keySet().iterator() : super.getRequestParameterNames();
+    }
+
+    /**
+     * Forget the request parameters from the request headers of the previous request.
+     */
+    @Override
+    public void setRequest(Object request) {
+        super.setRequest(request);
+        unloadRequestParameterMap = null;
+        unloadRequestParameterValuesMap = null;
+    }
+
+    private boolean isUnloadRequestWithHeaders() {
+        if (unloadRequestParameterMap == null) {
+            unloadRequestParameterMap = createUnloadRequestParameterMap(getRequestHeaderMap());
+        }
+
+        return !unloadRequestParameterMap.isEmpty();
+    }
+
+    /**
+     * Returns the unload request parameters from the given request headers, or an empty map when the event header is absent, in which case the request body is
+     * the only source of the unload request parameters.
+     */
+    private static Map<String, String> createUnloadRequestParameterMap(Map<String, String> headers) {
+        if (!"unload".equals(headers.get(OMNIFACES_EVENT_HEADER_NAME))) {
+            return emptyMap();
+        }
+
+        var parameters = new HashMap<String, String>();
+        parameters.put(OMNIFACES_EVENT_PARAM_NAME, "unload");
+        parameters.put("id", headers.get(OMNIFACES_VIEW_SCOPE_HEADER_NAME));
+        parameters.put(VIEW_STATE_PARAM, headers.get(OMNIFACES_VIEW_STATE_HEADER_NAME));
+        parameters.values().removeIf(Objects::isNull);
+        return unmodifiableMap(parameters);
     }
 
     // Inner classes --------------------------------------------------------------------------------------------------

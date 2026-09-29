@@ -309,6 +309,48 @@ export function lastBeaconCall(): BeaconCall {
     return beaconCalls[beaconCalls.length - 1];
 }
 
+// ---- Mock fetch with keepalive support ----
+
+export interface FetchCall {
+    url: string;
+    init: RequestInit;
+}
+
+let fetchCalls: FetchCall[];
+let fetchRejects: boolean;
+
+/**
+ * Install a mock fetch and a Request whose prototype has keepalive, as browsers supporting keepalive fetch offer.
+ * jsdom has neither. Install before dispatching the unload events, as Unload detects keepalive fetch support when sending.
+ */
+export function installMockFetch(): void {
+    fetchCalls = [];
+    fetchRejects = false;
+    const request = function() {} as unknown as typeof Request;
+    Object.defineProperty(request.prototype, "keepalive", { value: false });
+    Object.assign(globalThis, {
+        Request: request,
+        fetch: (url: string, init?: RequestInit): Promise<unknown> => {
+            fetchCalls.push({ url, init: init ?? {} });
+            return fetchRejects ? Promise.reject(new TypeError("Failed to fetch")) : Promise.resolve({ status: 204 });
+        },
+    });
+}
+
+export function uninstallMockFetch(): void {
+    delete (globalThis as Record<string, unknown>).Request;
+    delete (globalThis as Record<string, unknown>).fetch;
+}
+
+export function resetFetchCalls(rejects = false): void {
+    fetchCalls = [];
+    fetchRejects = rejects;
+}
+
+export function getFetchCalls(): FetchCall[] {
+    return fetchCalls;
+}
+
 // ---- Mock ServiceWorker ----
 
 export interface MockServiceWorkerContainer {

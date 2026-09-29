@@ -16,6 +16,7 @@
  */
 
 import { loadOmniFacesJs } from "../test-setup";
+import { MAX_VIEW_STATE_HEADER_LENGTH, VIEW_STATE_PARAM } from "../test-constants";
 import { createFacesForm, installMockBeacon, uninstallMockBeacon, getBeaconCalls, installMockXHR, uninstallMockXHR, lastXHR } from "../test-helpers";
 
 beforeAll(() => loadOmniFacesJs());
@@ -255,6 +256,43 @@ describe("OmniFaces.Unload: XHR fallback on unload", () => {
         expect(xhr.requestHeaders["Content-Type"]).toBe("application/x-www-form-urlencoded");
         expect(xhr.body).toContain("omnifaces.event=unload");
         expect(xhr.body).toContain("id=vsXhr");
+
+        Object.defineProperty(navigator, "sendBeacon", { value: origBeacon, configurable: true, writable: true });
+    });
+
+    test("carries event, view scope ID and view state in request headers of synchronous XHR POST", async () => {
+        const origBeacon = navigator.sendBeacon;
+        Object.defineProperty(navigator, "sendBeacon", { value: undefined, configurable: true, writable: true });
+
+        form = createFacesForm("fXhrHeaders", "/test/xhr-action");
+        const viewState = (form.elements.namedItem(VIEW_STATE_PARAM) as HTMLInputElement).value;
+        await initUnload("vsXhrHeaders");
+
+        window.dispatchEvent(beforeUnloadEvent());
+
+        const xhr = lastXHR();
+        expect(xhr.requestHeaders["OmniFaces-Event"]).toBe("unload");
+        expect(xhr.requestHeaders["OmniFaces-View-Scope"]).toBe("vsXhrHeaders");
+        expect(xhr.requestHeaders["OmniFaces-View-State"]).toBe(viewState);
+
+        Object.defineProperty(navigator, "sendBeacon", { value: origBeacon, configurable: true, writable: true });
+    });
+
+    test("omits request headers of synchronous XHR POST when view state is too long for a request header", async () => {
+        const origBeacon = navigator.sendBeacon;
+        Object.defineProperty(navigator, "sendBeacon", { value: undefined, configurable: true, writable: true });
+
+        form = createFacesForm("fXhrTooLong", "/test/xhr-action");
+        (form.elements.namedItem(VIEW_STATE_PARAM) as HTMLInputElement).value = "x".repeat(MAX_VIEW_STATE_HEADER_LENGTH + 1);
+        await initUnload("vsXhrTooLong");
+
+        window.dispatchEvent(beforeUnloadEvent());
+
+        const xhr = lastXHR();
+        expect(xhr.requestHeaders["Content-Type"]).toBe("application/x-www-form-urlencoded");
+        expect(xhr.requestHeaders["OmniFaces-Event"]).toBeUndefined();
+        expect(xhr.requestHeaders["OmniFaces-View-Scope"]).toBeUndefined();
+        expect(xhr.requestHeaders["OmniFaces-View-State"]).toBeUndefined();
 
         Object.defineProperty(navigator, "sendBeacon", { value: origBeacon, configurable: true, writable: true });
     });

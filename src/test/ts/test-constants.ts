@@ -17,4 +17,5 @@
 
 export const EVENT = "omnifaces.event";
 export const VIEW_STATE_PARAM = "jakarta.faces.ViewState";
+export const MAX_VIEW_STATE_HEADER_LENGTH = 1024;
 export const CLIENT_WINDOW_PARAM = "jakarta.faces.ClientWindow";

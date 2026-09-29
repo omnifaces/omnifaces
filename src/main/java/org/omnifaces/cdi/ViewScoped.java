@@ -58,6 +58,11 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <code>true</code> in order to force Faces to store whole view scoped bean instances annotated with this annotation in the Faces view state instead of in the
  * HTTP session. For more detail, see the {@link #saveInViewState()}.
  * <p>
+ * Since OmniFaces 3.14.26, browsers supporting keepalive fetch send the unload request via keepalive fetch whenever the view state is short enough for a
+ * request header, which is the case with server side state saving. The keepalive fetch and the synchronous XHR request then carry their parameters in the
+ * <code>OmniFaces-Event</code>, <code>OmniFaces-View-Scope</code> and <code>OmniFaces-View-State</code> request headers as well, so that the server can process
+ * the unload without the request body, which may be lost when the browser aborts the request while it is still in transit.
+ * <p>
  * In a nutshell: if you want the <code>&#64;PreDestroy</code> to be invoked on browser unload too, then use OmniFaces 2.2+ with this view scope annotation. Or,
  * if you want to store whole view scoped beans in the Faces view state when using client side state saving, then use OmniFaces 2.6+ with this view scope
  * annotation and the <code>saveInViewState</code> attribute set to <code>true</code>.
