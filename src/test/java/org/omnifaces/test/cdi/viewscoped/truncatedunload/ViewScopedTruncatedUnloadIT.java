@@ -40,8 +40,8 @@ import org.openqa.selenium.support.FindBy;
 /**
  * An unload request sent via keepalive fetch or synchronous XHR carries its event, view scope ID and view state in request headers, next to the same values in
  * the request body, as long as the view state is short enough for a request header. The client script is verified against stubbed fetch and XHR. The server
- * receives the headers even when the client aborts while the body is still in transit, and must then unload the view from the headers alone, without touching
- * the request body. The abort is simulated via a raw socket.
+ * receives the headers even when the body is still in transit or never arrives, and must then unload the view from the headers alone, without waiting for the
+ * request body. A body still in transit is simulated via a raw socket which declares the full <code>Content-Length</code> but sends only part of the body.
  */
 public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
 
@@ -192,7 +192,6 @@ public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
             output.write(head.toString().getBytes(ISO_8859_1));
             output.write(body, 0, (int) (body.length * sentBodyFraction));
             output.flush();
-            socket.shutdownOutput();
 
             var statusLine = new BufferedReader(new InputStreamReader(socket.getInputStream(), ISO_8859_1)).readLine();
             return statusLine == null ? -1 : Integer.parseInt(statusLine.split(" ")[1]);
