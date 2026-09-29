@@ -46,6 +46,24 @@ public final class OmniFaces {
     /** Returns the "omnifaces.event" request parameter name. */
     public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
 
+    /**
+     * Returns the "OmniFaces-Event" request header name.
+     * @since 3.14.26
+     */
+    public static final String OMNIFACES_EVENT_HEADER_NAME = "OmniFaces-Event";
+
+    /**
+     * Returns the "OmniFaces-View-Scope" request header name.
+     * @since 3.14.26
+     */
+    public static final String OMNIFACES_VIEW_SCOPE_HEADER_NAME = "OmniFaces-View-Scope";
+
+    /**
+     * Returns the "OmniFaces-View-State" request header name.
+     * @since 3.14.26
+     */
+    public static final String OMNIFACES_VIEW_STATE_HEADER_NAME = "OmniFaces-View-State";
+
     /** Returns the "omnifaces_form" ID of dynamic form. */
     public static final String OMNIFACES_DYNAMIC_FORM_ID = "omnifaces_form";
 
