@@ -12,10 +12,10 @@
  */
 package org.omnifaces.test.cdi.viewscoped.truncatedunload;
 
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,8 +29,6 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -52,9 +50,7 @@ public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
     private static final String HEADER_VIEW_SCOPE = "OmniFaces-View-Scope";
     private static final String HEADER_VIEW_STATE = "OmniFaces-View-State";
 
-    private static final Pattern UNLOAD_INIT = Pattern.compile("Unload\\.init\\('([^']+)'");
     private static final int RESPONSE_TIMEOUT_MILLIS = (int) TimeUnit.SECONDS.toMillis(10);
-    private static final int HTTP_NO_CONTENT = 204;
     private static final int TOO_LONG_VIEW_STATE_LENGTH = 1025;
 
     private static final String SCRIPT_STUB_KEEPALIVE_FETCH = "window.Request = function() {};"
@@ -168,7 +164,7 @@ public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
         String viewStateValue = viewState.getAttribute("value");
         URI action = URI.create(form.getAttribute("action"));
         byte[] body = ("omnifaces.event=unload&id=" + viewScopeId + "&jakarta.faces.ViewState=" + URLEncoder.encode(viewStateValue, UTF_8.name())).getBytes(UTF_8);
-        String cookies = browser.manage().getCookies().stream().map(cookie -> cookie.getName() + "=" + cookie.getValue()).collect(joining("; "));
+        String cookies = getCookies();
         int port = baseURL.getPort() != -1 ? baseURL.getPort() : baseURL.getDefaultPort();
 
         StringBuilder head = new StringBuilder()
@@ -197,12 +193,6 @@ public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
             String statusLine = new BufferedReader(new InputStreamReader(socket.getInputStream(), ISO_8859_1)).readLine();
             return statusLine == null ? -1 : Integer.parseInt(statusLine.split(" ")[1]);
         }
-    }
-
-    private String getViewScopeId() {
-        Matcher unloadInit = UNLOAD_INIT.matcher(browser.getPageSource());
-        assertTrue(unloadInit.find(), "unload script is rendered");
-        return unloadInit.group(1);
     }
 
 }
