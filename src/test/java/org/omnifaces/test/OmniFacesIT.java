@@ -12,17 +12,23 @@
  */
 package org.omnifaces.test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Duration.ofSeconds;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.joining;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedAndCustomCDNResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCustomCDNResourceHandler;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Utils.splitAndTrim;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -64,8 +70,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.devtools.v147.log.Log;
-import org.openqa.selenium.devtools.v147.network.Network;
+import org.openqa.selenium.devtools.v154.log.Log;
+import org.openqa.selenium.devtools.v154.network.Network;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -77,6 +83,9 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 @ExtendWith(ArquillianExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public abstract class OmniFacesIT {
+
+    private static final Pattern UNLOAD_INIT = Pattern.compile("Unload\\.init\\('([^']+)'");
+    private static final int CONNECTION_TIMEOUT_IN_MILLIS = 60000;
 
     protected final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -394,6 +403,45 @@ public abstract class OmniFacesIT {
         }
 
         return scripts;
+    }
+
+    /**
+     * Returns the cookies of the browser in the format of a <code>Cookie</code> request header.
+     */
+    protected static String getCookies() {
+        return browser.manage().getCookies().stream().map(cookie -> cookie.getName() + "=" + cookie.getValue()).collect(joining("; "));
+    }
+
+    /**
+     * Returns the OmniFaces view scope ID of the current page, as rendered by the unload script.
+     */
+    protected static String getViewScopeId() {
+        var unloadInit = UNLOAD_INIT.matcher(browser.getPageSource());
+        assertTrue(unloadInit.find(), "unload script is rendered");
+        return unloadInit.group(1);
+    }
+
+    /**
+     * Opens a connection to the given path, which is resolved against the base URL, and which presents the given <code>Cookie</code> request header if not
+     * <code>null</code>. Every connection gets its own socket.
+     */
+    protected HttpURLConnection openConnection(String path, String cookies) throws IOException {
+        var connection = (HttpURLConnection) new URL(baseURL, path).openConnection();
+        connection.setConnectTimeout(CONNECTION_TIMEOUT_IN_MILLIS);
+        connection.setReadTimeout(CONNECTION_TIMEOUT_IN_MILLIS);
+        connection.setRequestProperty("Connection", "close");
+
+        if (cookies != null) {
+            connection.setRequestProperty("Cookie", cookies);
+        }
+
+        return connection;
+    }
+
+    protected static String readResponseBody(HttpURLConnection connection) throws IOException {
+        try (var reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), UTF_8))) {
+            return reader.lines().collect(joining("\n"));
+        }
     }
 
     protected static String stripJsessionid(String url) {
