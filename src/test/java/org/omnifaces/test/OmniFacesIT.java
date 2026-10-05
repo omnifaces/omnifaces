@@ -12,17 +12,26 @@
  */
 package org.omnifaces.test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
 import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 import static org.omnifaces.util.Utils.isOneOf;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit5.ArquillianExtension;
@@ -41,6 +50,9 @@ import com.google.common.base.Predicate;
 
 @ExtendWith(ArquillianExtension.class)
 public abstract class OmniFacesIT {
+
+	private static final Pattern UNLOAD_INIT = Pattern.compile("Unload\\.init\\('([^']+)'");
+	private static final int CONNECTION_TIMEOUT_IN_MILLIS = 60000;
 
 	@Drone
 	protected WebDriver browser;
@@ -120,6 +132,45 @@ public abstract class OmniFacesIT {
 
 	private void clearMessages(WebElement messages) {
 		executeScript("document.getElementById('" + messages.getAttribute("id") + "').innerHTML='';");
+	}
+
+	/**
+	 * Returns the cookies of the browser in the format of a <code>Cookie</code> request header.
+	 */
+	protected String getCookies() {
+		return browser.manage().getCookies().stream().map(cookie -> cookie.getName() + "=" + cookie.getValue()).collect(joining("; "));
+	}
+
+	/**
+	 * Returns the OmniFaces view scope ID of the current page, as rendered by the unload script.
+	 */
+	protected String getViewScopeId() {
+		Matcher unloadInit = UNLOAD_INIT.matcher(browser.getPageSource());
+		assertTrue(unloadInit.find(), "unload script is rendered");
+		return unloadInit.group(1);
+	}
+
+	/**
+	 * Opens a connection to the given path, which is resolved against the base URL, and which presents the given
+	 * <code>Cookie</code> request header if not <code>null</code>. Every connection gets its own socket.
+	 */
+	protected HttpURLConnection openConnection(String path, String cookies) throws IOException {
+		HttpURLConnection connection = (HttpURLConnection) new URL(baseURL, path).openConnection();
+		connection.setConnectTimeout(CONNECTION_TIMEOUT_IN_MILLIS);
+		connection.setReadTimeout(CONNECTION_TIMEOUT_IN_MILLIS);
+		connection.setRequestProperty("Connection", "close");
+
+		if (cookies != null) {
+			connection.setRequestProperty("Cookie", cookies);
+		}
+
+		return connection;
+	}
+
+	protected static String readResponseBody(HttpURLConnection connection) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), UTF_8))) {
+			return reader.lines().collect(joining("\n"));
+		}
 	}
 
 	protected static String stripJsessionid(String url) {

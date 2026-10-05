@@ -12,18 +12,13 @@
  */
 package org.omnifaces.test.cdi.viewscoped.concurrent;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeActiveViewScopes;
 import static org.omnifaces.test.cdi.viewscoped.concurrent.ViewScopedConcurrentITLatch.CONCURRENT_REQUESTS;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +38,6 @@ public class ViewScopedConcurrentIT extends OmniFacesIT {
 	private static final String PAGE = "ViewScopedConcurrentIT.xhtml";
 	private static final String PARAM_VALUE = "foo";
 	private static final String EXPECTED_OUTPUT = "<span id=\"param\">" + PARAM_VALUE + "</span>";
-	private static final int TIMEOUT_IN_MILLIS = 60000;
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
@@ -100,25 +94,6 @@ public class ViewScopedConcurrentIT extends OmniFacesIT {
 
 	private String getResponseBody(String path, String jsessionidCookie) throws IOException {
 		return readResponseBody(openConnection(path, jsessionidCookie));
-	}
-
-	private HttpURLConnection openConnection(String path, String jsessionidCookie) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + path).openConnection();
-		connection.setConnectTimeout(TIMEOUT_IN_MILLIS);
-		connection.setReadTimeout(TIMEOUT_IN_MILLIS);
-		connection.setRequestProperty("Connection", "close"); // Ensure that every request gets its own socket.
-
-		if (jsessionidCookie != null) {
-			connection.setRequestProperty("Cookie", jsessionidCookie);
-		}
-
-		return connection;
-	}
-
-	private static String readResponseBody(HttpURLConnection connection) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), UTF_8))) {
-			return reader.lines().collect(joining("\n"));
-		}
 	}
 
 }
