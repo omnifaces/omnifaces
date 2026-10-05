@@ -54,6 +54,9 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * is done by <code>navigator.sendBeacon</code>. For browsers not supporting <code>navigator.sendBeacon</code>, it will
  * fallback to a synchronous XHR request.
  * <p>
+ * There is no guarantee that the {@link FacesContext} is available during <code>&#64;PreDestroy</code>, so its logic
+ * should not rely on that.
+ * <p>
  * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
  * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
  * at <code>ViewExpiredException</code> on the other views which were created/opened earlier. As side effect of this
