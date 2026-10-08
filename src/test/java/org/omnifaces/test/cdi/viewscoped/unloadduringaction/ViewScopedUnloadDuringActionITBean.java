@@ -39,14 +39,14 @@ public class ViewScopedUnloadDuringActionITBean implements Serializable {
      * The outcome is set as request attribute, as rendering a property of this bean would resolve a new instance when this one is destroyed.
      */
     public void action() {
-        probe.startAction();
+        probe.startAction(id);
         setRequestAttribute("destroyedDuringAction", destroyed);
     }
 
     @PreDestroy
     public void destroy() {
         destroyed = true;
-        probe.destroyBean();
+        probe.destroyBean(id);
     }
 
     public String getId() {

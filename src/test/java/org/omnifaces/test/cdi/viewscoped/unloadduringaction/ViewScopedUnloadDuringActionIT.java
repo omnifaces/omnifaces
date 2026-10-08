@@ -13,6 +13,7 @@
 package org.omnifaces.test.cdi.viewscoped.unloadduringaction;
 
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,11 +39,15 @@ import org.openqa.selenium.support.FindBy;
  */
 public class ViewScopedUnloadDuringActionIT extends OmniFacesIT {
 
+    private static final Pattern BEAN = Pattern.compile("<div id=\"bean\">([^<]*)</div>");
     private static final Pattern DESTROYED_DURING_ACTION = Pattern.compile("<div id=\"destroyedDuringAction\">([^<]*)</div>");
 
     /** The hidden form fields carry the view state and the implementation specific marker of the submitted form. */
     private static final String SCRIPT_SERIALIZE_HIDDEN_FORM_FIELDS = "return Array.prototype.map.call(document.querySelectorAll('#form input[type=hidden]'),"
         + " function(input) { return encodeURIComponent(input.name) + '=' + encodeURIComponent(input.value); }).join('&');";
+
+    @FindBy(id = "bean")
+    private WebElement bean;
 
     @FindBy(id = "form")
     private WebElement form;
@@ -57,7 +62,22 @@ public class ViewScopedUnloadDuringActionIT extends OmniFacesIT {
 
     @Test
     public void unloadDuringActionMustDestroyBeanOnlyAfterAction() throws Exception {
+        unloadDuringAction(false);
+    }
+
+    /**
+     * Creating a new view after the unload performs the pending view state removal of the unloaded view, which may destroy the view map of the unloaded view.
+     * The action must nonetheless keep resolving its own bean.
+     */
+    @Test
+    public void unloadAndCreateNewViewDuringActionMustDestroyBeanOnlyAfterAction() throws Exception {
+        unloadDuringAction(true);
+    }
+
+    private void unloadDuringAction(boolean createNewView) throws Exception {
+        getProbe("reset");
         executeScript("OmniFaces.Unload.disable()");
+        var beanId = bean.getText();
         var cookies = getCookies();
         var action = form.getAttribute("action");
         String formParams = executeScript(SCRIPT_SERIALIZE_HIDDEN_FORM_FIELDS);
@@ -71,8 +91,15 @@ public class ViewScopedUnloadDuringActionIT extends OmniFacesIT {
             var unload = post(action, "omnifaces.event=unload&id=" + getViewScopeId() + viewStateParam, cookies);
             assertEquals(HTTP_NO_CONTENT, unload.getResponseCode(), "unload response status");
 
+            if (createNewView) {
+                var newView = openConnection(action, cookies);
+                assertEquals(HTTP_OK, newView.getResponseCode(), "new view response status");
+            }
+
             getProbe("releaseAction");
-            assertEquals("false", getDestroyedDuringAction(actionResponse.get()), "bean destroyed during action");
+            var actionResponseBody = actionResponse.get();
+            assertEquals(beanId, find(BEAN, actionResponseBody), "bean rendered after action");
+            assertEquals("false", find(DESTROYED_DURING_ACTION, actionResponseBody), "bean destroyed during action");
             assertEquals("true", getProbe("awaitBeanDestroyed"), "bean destroyed after action");
         }
         finally {
@@ -106,10 +133,10 @@ public class ViewScopedUnloadDuringActionIT extends OmniFacesIT {
         }
     }
 
-    private static String getDestroyedDuringAction(String responseBody) {
-        var destroyedDuringAction = DESTROYED_DURING_ACTION.matcher(responseBody);
-        assertTrue(destroyedDuringAction.find(), () -> "action response is rendered: " + responseBody);
-        return destroyedDuringAction.group(1);
+    private static String find(Pattern pattern, String responseBody) {
+        var matcher = pattern.matcher(responseBody);
+        assertTrue(matcher.find(), () -> "action response is rendered: " + responseBody);
+        return matcher.group(1);
     }
 
     private String getProbe(String command) throws IOException {
