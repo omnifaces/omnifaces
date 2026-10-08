@@ -37,6 +37,9 @@ public class ViewScopedUnloadDuringActionITServlet extends HttpServlet {
 		String command = String.valueOf(request.getPathInfo());
 
 		switch (command) {
+			case "/reset":
+				probe.reset();
+				break;
 			case "/awaitActionStarted":
 				response.getWriter().print(probe.awaitActionStarted());
 				break;

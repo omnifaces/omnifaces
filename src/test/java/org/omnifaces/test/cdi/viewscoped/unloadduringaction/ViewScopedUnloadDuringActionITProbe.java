@@ -16,22 +16,34 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.CountDownLatch;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 /**
  * Lets the test hold the action of the view scoped bean while it sends the unload request, and observe when the bean
- * is destroyed. The latches cannot be reset, so this supports a single test run per deployment.
+ * is destroyed. Only the destroy of the bean whose action was held is observed. The test must {@link #reset()} it
+ * before each run.
  */
 @ApplicationScoped
 public class ViewScopedUnloadDuringActionITProbe {
 
 	private static final int TIMEOUT_IN_SECONDS = 30;
 
-	private final CountDownLatch actionStarted = new CountDownLatch(1);
-	private final CountDownLatch actionReleased = new CountDownLatch(1);
-	private final CountDownLatch beanDestroyed = new CountDownLatch(1);
+	private volatile String actionBeanId;
+	private volatile CountDownLatch actionStarted;
+	private volatile CountDownLatch actionReleased;
+	private volatile CountDownLatch beanDestroyed;
 
-	public void startAction() {
+	@PostConstruct
+	public void reset() {
+		actionBeanId = null;
+		actionStarted = new CountDownLatch(1);
+		actionReleased = new CountDownLatch(1);
+		beanDestroyed = new CountDownLatch(1);
+	}
+
+	public void startAction(String beanId) {
+		actionBeanId = beanId;
 		actionStarted.countDown();
 		await(actionReleased);
 	}
@@ -44,8 +56,10 @@ public class ViewScopedUnloadDuringActionITProbe {
 		actionReleased.countDown();
 	}
 
-	public void destroyBean() {
-		beanDestroyed.countDown();
+	public void destroyBean(String beanId) {
+		if (beanId.equals(actionBeanId)) {
+			beanDestroyed.countDown();
+		}
 	}
 
 	public boolean awaitBeanDestroyed() {

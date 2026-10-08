@@ -21,6 +21,7 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NU
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
@@ -34,6 +35,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.component.TransientStateHelper;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.BeanStorage;
@@ -90,7 +92,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	@Override
 	public UUID getBeanStorageId() {
-		UUID beanStorageId = getViewAttribute(getClass().getName());
+		UUID beanStorageId = getViewBeanStorageId();
 		return beanStorageId != null && getBeanStorage(beanStorageId) != null ? beanStorageId : null;
 	}
 
@@ -114,7 +116,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
 		getActiveBeanStorages(true).acquire(beanStorageId, beanStorage); // Must happen before it's put in the LRU map, else a concurrent request could immediately evict and destroy it.
 		activeViewScopes.put(beanStorageId, beanStorage);
-		setViewAttribute(getClass().getName(), beanStorageId);
+		setViewBeanStorageId(beanStorageId);
 	}
 
 	/**
@@ -164,6 +166,32 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the bean storage identifier of the current view. It is remembered in the transient state of the view root
+	 * for the duration of the current HTTP request, so that the current HTTP request keeps resolving it when the view map
+	 * is concurrently destroyed. On MyFaces, performing the pending view state removal of an unloaded view destroys its
+	 * view map.
+	 */
+	private UUID getViewBeanStorageId() {
+		TransientStateHelper transientState = getViewRoot().getTransientStateHelper();
+		UUID beanStorageId = (UUID) transientState.getTransient(getClass().getName());
+
+		if (beanStorageId == null) {
+			beanStorageId = getViewAttribute(getClass().getName());
+
+			if (beanStorageId != null) {
+				transientState.putTransient(getClass().getName(), beanStorageId);
+			}
+		}
+
+		return beanStorageId;
+	}
+
+	private void setViewBeanStorageId(UUID beanStorageId) {
+		setViewAttribute(getClass().getName(), beanStorageId);
+		getViewRoot().getTransientStateHelper().putTransient(getClass().getName(), beanStorageId);
+	}
 
 	/**
 	 * Returns the bean storages which are in use by the current HTTP request, or <code>null</code> when there are none
