@@ -56,7 +56,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-        server-id: central
+        server-id: central-snapshots
         server-username: CENTRAL_USERNAME
         server-password: CENTRAL_PASSWORD
     - name: Extract project version
