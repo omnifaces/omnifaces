@@ -15,6 +15,7 @@ package org.omnifaces.util.cache;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.list;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.Reflection.instance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,9 +81,9 @@ public final class CacheInitializer {
 
 	private static CacheProvider createInstance(String cacheProviderName) {
 		try {
-			return (CacheProvider) Class.forName(cacheProviderName).newInstance();
+			return instance(cacheProviderName);
 		}
-		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+		catch (IllegalStateException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}

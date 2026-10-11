@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Servlets.getWebXmlURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
@@ -307,16 +308,14 @@ enum WebXmlSingleton implements WebXml {
 
 	/**
 	 * Create and return a mapping of all error page locations by exception type found in the given document.
-	 * @throws ClassNotFoundException
 	 */
-	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException, ClassNotFoundException {
+	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException {
 		Map<Class<Throwable>, String> errorPageLocations = new HashMap<>();
 		NodeList exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
 			Node node = exceptionTypes.item(i);
-			Class<Throwable> exceptionClass = (Class<Throwable>) Class.forName(getTextContent(node));
+			Class<Throwable> exceptionClass = toClass(getTextContent(node));
 			String exceptionLocation = xpath.compile(XPATH_LOCATION).evaluate(node.getParentNode()).trim();
 			Class<Throwable> key = (exceptionClass == Throwable.class) ? null : exceptionClass;
 			errorPageLocations.computeIfAbsent(key, k -> exceptionLocation);
