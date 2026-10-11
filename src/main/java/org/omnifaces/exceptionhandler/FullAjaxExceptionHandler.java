@@ -29,6 +29,7 @@ import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.splitAndTrim;
@@ -386,9 +387,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
         if (!isEmpty(typesParam)) {
             splitAndTrim(typesParam, ",").forEach(typeParam -> {
                 try {
-                    types.add((Class<? extends Throwable>) Class.forName(typeParam));
+                    types.add(toClass(typeParam));
                 }
-                catch (ClassNotFoundException e) {
+                catch (IllegalStateException e) {
                     throw new IllegalArgumentException(
                         format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
                 }
