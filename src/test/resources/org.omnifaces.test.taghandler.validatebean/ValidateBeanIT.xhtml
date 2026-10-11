@@ -66,6 +66,17 @@
             </h:commandButton>
         </o:form>
 
+        <o:form id="validateDefaultWithMessageForViolatingAndForm">
+            <h:inputText id="input" label="inputLabel" value="#{validateBeanITDefaultBean.input}" />
+            <h:message id="inputMessage" for="input" />
+            <h:message id="formMessage" for="validateDefaultWithMessageForViolatingAndForm" />
+
+            <h:commandButton id="command" action="#{validateBeanITDefaultBean.action}">
+                <f:ajax execute="@form" render="inputMessage formMessage :messages" />
+                <o:validateBean value="#{validateBeanITDefaultBean}" showMessageFor="@violating @form" />
+            </h:commandButton>
+        </o:form>
+
         <o:form id="validateClassLevelDefault">
             <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
             <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
@@ -126,6 +137,20 @@
                 showMessageFor="@form" />
         </o:form>
 
+        <o:form id="validateClassLevelWithBlankMessageFor">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="formMessage :messages" />
+            </h:commandButton>
+
+            <h:message id="formMessage" for="validateClassLevelWithBlankMessageFor" />
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor=" " />
+        </o:form>
+
         <o:form id="validateClassLevelWithMessageForAll">
             <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
             <h:message id="number1Message" for="number1" />
@@ -184,6 +209,150 @@
 
             <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
                 showMessageFor="@violating" method="validateActual" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForViolatingAndGlobal">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:message id="formMessage" for="validateClassLevelWithMessageForViolatingAndGlobal" />
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message formMessage globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @global" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForTooManyKeywords">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:message id="formMessage" for="validateClassLevelWithMessageForTooManyKeywords" />
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message formMessage globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @global @form" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForInvalidCombination">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:message id="formMessage" for="validateClassLevelWithMessageForInvalidCombination" />
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message formMessage globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@all @global" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForDuplicateViolating">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:message id="formMessage" for="validateClassLevelWithMessageForDuplicateViolating" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @violating" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForDuplicateViolatingAndGlobal">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @violating @global" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForViolatingAndAll">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message :messages" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @all" />
+        </o:form>
+
+        <o:form id="validateClassLevelWithMessageForViolatingAndClientId">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message :messages" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating number2 " />
+        </o:form>
+
+        <o:form id="validateClassLevelActualWithMessageForViolatingAndGlobal">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+                showMessageFor="@violating @global" method="validateActual" />
+        </o:form>
+
+        <o:form id="validateNestedClassLevelWithMessageForViolatingAndGlobal">
+            <h:inputText id="number1" label="number1Label" value="#{validateBeanITNestedClassLevelBean.entity.number1}" />
+            <h:message id="number1Message" for="number1" />
+            <h:inputText id="number2" label="number2Label" value="#{validateBeanITNestedClassLevelBean.entity.number2}" />
+            <h:message id="number2Message" for="number2" />
+
+            <h:message id="formMessage" for="validateNestedClassLevelWithMessageForViolatingAndGlobal" />
+            <h:messages id="globalMessage" globalOnly="true" />
+
+            <h:commandButton id="command" action="#{validateBeanITNestedClassLevelBean.action}">
+                <f:ajax execute="@form" render="number1Message number2Message formMessage globalMessage" />
+            </h:commandButton>
+
+            <o:validateBean value="#{validateBeanITNestedClassLevelBean}"
+                showMessageFor="@violating @global" />
         </o:form>
 
         <h:form id="validateConvertedEntityActualWithMessageForViolating">

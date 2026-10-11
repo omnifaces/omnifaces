@@ -18,6 +18,7 @@ import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
 import static jakarta.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static jakarta.faces.view.facelets.ComponentHandler.isNew;
 import static java.text.MessageFormat.format;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singleton;
 import static java.util.logging.Level.SEVERE;
@@ -48,8 +49,8 @@ import static org.omnifaces.util.Reflection.getBaseBeanPropertyPaths;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setBeanProperties;
 import static org.omnifaces.util.Reflection.toClass;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
+import static org.omnifaces.util.Utils.isBlank;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.replacePrefix;
 import static org.omnifaces.util.Utils.splitByWhitespace;
@@ -61,11 +62,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.Method;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -251,14 +254,12 @@ import org.omnifaces.vdl.FacesTagHandler;
  * </pre>
  * <p>
  * The faces message can also be shown for components which match {@link jakarta.validation.ConstraintViolation#getPropertyPath() Property Path of the
- * ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can be found, the message will fallback to being added
- * with client ID of the parent {@link UIForm}.
+ * ConstraintViolation} using <code>showMessageFor="@violating"</code>. When no matching component can be found, the violation is not displayed and does not
+ * fail validation, so that bean properties which are not bound to any input component in the form cannot block the form submit. A class level constraint
+ * violation matches all components bound to the validated bean.
  *
  * <pre>
- * &lt;h:form id="formId"&gt;
- *     ...
- *     &lt;!-- Unmatched messages shown here: --&gt;
- *     &lt;h:message for="formId" /&gt;
+ * &lt;h:form&gt;
  *     ...
  *     &lt;h:inputText id="foo" value="#{bean.product.item}" /&gt;
  *
@@ -269,8 +270,33 @@ import org.omnifaces.vdl.FacesTagHandler;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. The <code>showMessageFor</code> attribute does by
- * design not have any effect when <code>validateMethod="actual"</code> is used.
+ * Since OmniFaces 3.14.28, a fallback can be specified after <code>@violating</code>, separated by a space. This can be <code>@form</code>, <code>@all</code>,
+ * <code>@global</code>, or a space separated collection of client IDs. Class level constraint violations and violations without a matching component will then
+ * fail validation and be shown for the fallback. With <code>@all</code> and client IDs, the components are invalidated and labeled as described above. With
+ * <code>@form</code> and <code>@global</code>, the message is only added, without label and without invalidating any component.
+ *
+ * <pre>
+ * &lt;h:form id="formId"&gt;
+ *     ...
+ *     &lt;!-- Class level and unmatched messages are shown here: --&gt;
+ *     &lt;h:message for="formId" /&gt;
+ *     ...
+ *     &lt;h:inputText id="foo" value="#{bean.product.item}" /&gt;
+ *
+ *     &lt;!-- Messages where ConstraintViolation PropertyPath is "item" are shown here: --&gt;
+ *     &lt;h:message for="foo" /&gt;
+ *     ...
+ *     &lt;o:validateBean ... value="#{bean.product}" showMessageFor="@violating @form" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * The <code>showMessageFor</code> attribute accepts at most two keywords, and only in the form of <code>@violating</code> followed by a fallback keyword. Any
+ * other combination of keywords, or of keywords and client IDs, is logged as warning, and then only its first valid part is used. For example,
+ * <code>@all @global</code> is treated as <code>@all</code>, and <code>@violating @global @form</code> is treated as <code>@violating @global</code>.
+ * <p>
+ * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. When <code>method="validateActual"</code> is
+ * used, the validated input components are not collected. In that case <code>@all</code>, also as fallback of <code>@violating</code>, does not show any
+ * message, and <code>@form</code> and <code>@global</code> show the message without labels.
  *
  * <h3>Message format</h3>
  * <p>
@@ -312,9 +338,14 @@ public class ValidateBean extends TagHandler {
     private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
     private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
+    private static final String SHOWMESSAGEFOR_VIOLATING = "@violating";
+    private static final int MAX_SHOWMESSAGEFOR_KEYWORDS = 2;
     private static final String ERROR_MISSING_FORM = "o:validateBean must be nested in an UIForm.";
     private static final String ERROR_INVALID_PARENT = "o:validateBean parent must be an instance of UIInput or UICommand.";
     private static final String WARN_UNDISPLAYED_VIOLATION = "o:validateBean could not display violation message '%s' for property path '%s'.";
+    private static final String WARN_TOO_MANY_KEYWORDS = "o:validateBean showMessageFor '%s' has more than " + MAX_SHOWMESSAGEFOR_KEYWORDS
+        + " keywords; only '%s' is used.";
+    private static final String WARN_INVALID_COMBINATION = "o:validateBean showMessageFor '%s' is an invalid combination; only '%s' is used.";
 
     // Enums ----------------------------------------------------------------------------------------------------------
 
@@ -357,7 +388,7 @@ public class ValidateBean extends TagHandler {
     private String copier;
 
     @FacesAttribute(
-        description = "The identifier for which this validator should show the message. Defaults to \"@form\" which is the parent UIForm. Other available values are \"@all\", \"@invalid\", \"@global\" and \"@violating\". Any other space separated value will be treated as client ID of UI input component."
+        description = "The identifier for which this validator should show the message. Defaults to \"@form\" which is the parent UIForm. Other available values are \"@all\", \"@invalid\", \"@global\" and \"@violating\". Any other space separated value will be treated as client ID of UI input component. Since OmniFaces 3.14.28, \"@violating\" can be followed by a space separated fallback, e.g. \"@violating @global\", which will be used for class level constraint violations and violations without a matching component."
     )
     private String showMessageFor;
 
@@ -403,7 +434,7 @@ public class ValidateBean extends TagHandler {
         method = ValidateMethod.of(getString(context, getAttribute("method")));
         validationGroups = getString(context, getAttribute("validationGroups"));
         copier = getString(context, getAttribute("copier"));
-        showMessageFor = coalesce(getString(context, getAttribute("showMessageFor")), DEFAULT_SHOWMESSAGEFOR);
+        showMessageFor = getString(context, getAttribute("showMessageFor"));
         messageFormat = getString(context, getAttribute("messageFormat"));
 
         // We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
@@ -430,6 +461,8 @@ public class ValidateBean extends TagHandler {
             return;
         }
 
+        var showMessageForAndFallback = parseShowMessageFor(showMessageFor);
+
         Object bean = null;
 
         if (value != null) {
@@ -445,10 +478,10 @@ public class ValidateBean extends TagHandler {
 
         if (!disabled) {
             if (method == ValidateMethod.validateActual) {
-                validateActualBean(form, bean);
+                validateActualBean(form, bean, showMessageForAndFallback);
             }
             else {
-                validateCopiedBean(form, bean);
+                validateCopiedBean(form, bean, showMessageForAndFallback);
             }
         }
     }
@@ -456,13 +489,13 @@ public class ValidateBean extends TagHandler {
     /**
      * After update model values phase, validate actual bean. But don't proceed to render response on fail.
      */
-    private void validateActualBean(UIForm form, Object bean) {
+    private void validateActualBean(UIForm form, Object bean, Entry<String, String> showMessageForAndFallback) {
         var validateActualBean = new ValidateBeanCallback() {
 
             @Override
             public void invoke() {
                 var context = FacesContext.getCurrentInstance();
-                validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<>(0), false);
+                validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<>(0), showMessageForAndFallback, false);
             }
 
         };
@@ -476,7 +509,7 @@ public class ValidateBean extends TagHandler {
      * After validations phase of current request, create a copy of the bean, set all collected properties there, then validate copied bean and proceed to
      * render response on fail.
      */
-    private void validateCopiedBean(UIForm form, Object bean) {
+    private void validateCopiedBean(UIForm form, Object bean, Entry<String, String> showMessageForAndFallback) {
         var collectedClientIds = new HashSet<String>();
         var collectedProperties = new HashMap<PropertyPath, Object>();
         var knownBaseProperties = getBaseBeanPropertyPaths(bean, this::isValidAnnotationPresent);
@@ -506,7 +539,7 @@ public class ValidateBean extends TagHandler {
                 collectingInputs.forEach(ValidateBean::removeCollectingValidator);
                 var copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
                 setBeanProperties(copiedBean, collectedProperties);
-                validate(context, form, bean, copiedBean, collectedClientIds, true);
+                validate(context, form, bean, copiedBean, collectedClientIds, showMessageForAndFallback, true);
             }
 
         };
@@ -570,7 +603,11 @@ public class ValidateBean extends TagHandler {
     }
 
     @SuppressWarnings({ "rawtypes" })
-    private void validate(FacesContext context, UIForm form, Object actualBean, Object validableBean, Set<String> clientIds, boolean renderResponseOnFail) {
+    private void validate(
+        FacesContext context, UIForm form, Object actualBean, Object validableBean, Set<String> clientIds,
+        Entry<String, String> showMessageForAndFallback, boolean renderResponseOnFail
+    )
+    {
         var groupClasses = new ArrayList<Class>();
 
         for (var group : csvToList(validationGroups)) {
@@ -580,14 +617,18 @@ public class ValidateBean extends TagHandler {
         var violations = validateBean(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
 
         if (!violations.isEmpty()) {
-            if ("@violating".equals(showMessageFor)) {
-                invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, messageFormat);
+            var target = showMessageForAndFallback.getKey();
+
+            if (SHOWMESSAGEFOR_VIOLATING.equals(target)) {
+                invalidateInputsByPropertyPathAndShowMessages(
+                    context, form, actualBean, violations, clientIds, showMessageForAndFallback.getValue(), messageFormat
+                );
             }
-            else if (showMessageFor.charAt(0) != '@') {
-                invalidateInputsByShowMessageForAndShowMessages(context, form, violations, showMessageFor, messageFormat);
+            else if (target.charAt(0) != '@') {
+                invalidateInputsByShowMessageForAndShowMessages(context, form, violations, target, messageFormat);
             }
             else {
-                invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessageFor, messageFormat);
+                invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, target, messageFormat);
             }
 
             if (context.isValidationFailed() && renderResponseOnFail) {
@@ -597,6 +638,48 @@ public class ValidateBean extends TagHandler {
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the target of showMessageFor and the fallback of @violating, if any. There is only one target: either a keyword or a collection of client IDs.
+     * Only @violating can be followed by a fallback, which is in turn one target. Any other combination is logged as warning and resolved to its first valid
+     * part.
+     */
+    private static Entry<String, String> parseShowMessageFor(String showMessageFor) {
+        if (isBlank(showMessageFor)) {
+            return new SimpleEntry<>(DEFAULT_SHOWMESSAGEFOR, null);
+        }
+
+        var targets = asList(splitByWhitespace(showMessageFor.trim()));
+        var targetAndFallback = resolveShowMessageFor(targets);
+        var used = targetAndFallback.getValue() == null ? targetAndFallback.getKey() : targetAndFallback.getKey() + " " + targetAndFallback.getValue();
+
+        if (targets.stream().filter(ValidateBean::isKeyword).count() > MAX_SHOWMESSAGEFOR_KEYWORDS) {
+            logger.log(WARNING, () -> WARN_TOO_MANY_KEYWORDS.formatted(showMessageFor, used));
+        }
+        else if (!used.equals(String.join(" ", targets))) {
+            logger.log(WARNING, () -> WARN_INVALID_COMBINATION.formatted(showMessageFor, used));
+        }
+
+        return targetAndFallback;
+    }
+
+    private static Entry<String, String> resolveShowMessageFor(List<String> targets) {
+        if (!SHOWMESSAGEFOR_VIOLATING.equals(targets.get(0))) {
+            return new SimpleEntry<>(resolveSingleTarget(targets), null);
+        }
+
+        var fallbacks = new ArrayList<>(targets.subList(1, targets.size()));
+        fallbacks.removeIf(SHOWMESSAGEFOR_VIOLATING::equals);
+        return new SimpleEntry<>(SHOWMESSAGEFOR_VIOLATING, fallbacks.isEmpty() ? null : resolveSingleTarget(fallbacks));
+    }
+
+    private static String resolveSingleTarget(List<String> targets) {
+        return targets.stream().anyMatch(ValidateBean::isKeyword) ? targets.get(0) : String.join(" ", targets);
+    }
+
+    private static boolean isKeyword(String target) {
+        return target.charAt(0) == '@';
+    }
 
     private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, String property, Consumer<UIInput> callback) {
         forEachComponent(context)
@@ -683,16 +766,22 @@ public class ValidateBean extends TagHandler {
 
     private static void invalidateInputsByPropertyPathAndShowMessages(
         FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations,
-        String messageFormat
+        Set<String> clientIds, String fallback, String messageFormat
     )
     {
         var undisplayed = new HashSet<>(violations);
 
         for (var violation : violations) {
             for (var baseAndProperty : resolveViolatedBasesAndProperties(bean, violation)) {
+                var property = baseAndProperty.getValue();
+
+                if (property == null && fallback != null) {
+                    continue;
+                }
+
                 boolean[] displayed = { false };
 
-                forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), baseAndProperty.getValue(), input -> {
+                forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), property, input -> {
                     context.validationFailed();
                     input.setValid(false);
                     var clientId = input.getClientId(context);
@@ -707,10 +796,34 @@ public class ValidateBean extends TagHandler {
             }
         }
 
-        if (isDevelopment(context)) {
+        if (undisplayed.isEmpty()) {
+            return;
+        }
+
+        if (fallback != null) {
+            showFallbackMessages(context, form, undisplayed, clientIds, fallback, messageFormat);
+        }
+        else if (isDevelopment(context)) {
             for (var violation : undisplayed) {
                 logger.log(WARNING, () -> WARN_UNDISPLAYED_VIOLATION.formatted(violation.getMessage(), violation.getPropertyPath()));
             }
+        }
+    }
+
+    private static void showFallbackMessages(
+        FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations,
+        Set<String> clientIds, String fallback, String messageFormat
+    )
+    {
+        if (fallback.charAt(0) != '@') {
+            invalidateInputsByShowMessageForAndShowMessages(context, form, violations, fallback, messageFormat);
+        }
+        else if ("@all".equals(fallback)) {
+            invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, fallback, messageFormat);
+        }
+        else {
+            context.validationFailed();
+            showMessages(context, form, violations, clientIds, null, fallback, messageFormat);
         }
     }
 

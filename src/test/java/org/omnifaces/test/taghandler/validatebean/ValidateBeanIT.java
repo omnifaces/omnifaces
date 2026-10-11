@@ -69,6 +69,18 @@ public class ValidateBeanIT extends OmniFacesIT {
     @FindBy(id = "validateDefaultWithMessageForViolating:command")
     private WebElement validateDefaultWithMessageForViolatingCommand;
 
+    @FindBy(id = "validateDefaultWithMessageForViolatingAndForm:input")
+    private WebElement validateDefaultWithMessageForViolatingAndFormInput;
+
+    @FindBy(id = "validateDefaultWithMessageForViolatingAndForm:inputMessage")
+    private WebElement validateDefaultWithMessageForViolatingAndFormInputMessage;
+
+    @FindBy(id = "validateDefaultWithMessageForViolatingAndForm:formMessage")
+    private WebElement validateDefaultWithMessageForViolatingAndFormFormMessage;
+
+    @FindBy(id = "validateDefaultWithMessageForViolatingAndForm:command")
+    private WebElement validateDefaultWithMessageForViolatingAndFormCommand;
+
     @FindBy(id = "validateClassLevelDefault:number1")
     private WebElement validateClassLevelDefaultNumber1;
 
@@ -119,6 +131,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @FindBy(id = "validateClassLevelWithMessageForForm:command")
     private WebElement validateClassLevelWithMessageForFormCommand;
+
+    @FindBy(id = "validateClassLevelWithBlankMessageFor:number1")
+    private WebElement validateClassLevelWithBlankMessageForNumber1;
+
+    @FindBy(id = "validateClassLevelWithBlankMessageFor:number2")
+    private WebElement validateClassLevelWithBlankMessageForNumber2;
+
+    @FindBy(id = "validateClassLevelWithBlankMessageFor:formMessage")
+    private WebElement validateClassLevelWithBlankMessageForFormMessage;
+
+    @FindBy(id = "validateClassLevelWithBlankMessageFor:command")
+    private WebElement validateClassLevelWithBlankMessageForCommand;
 
     @FindBy(id = "validateClassLevelWithMessageForAll:number1")
     private WebElement validateClassLevelWithMessageForAllNumber1;
@@ -182,6 +206,174 @@ public class ValidateBeanIT extends OmniFacesIT {
 
     @FindBy(id = "validateClassLevelActualWithMessageForViolating:command")
     private WebElement validateClassLevelActualWithMessageForViolatingCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:number1")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:number1Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:number2")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:number2Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:formMessage")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalFormMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:globalMessage")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndGlobal:command")
+    private WebElement validateClassLevelWithMessageForViolatingAndGlobalCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:number1")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:number1Message")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:number2")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:number2Message")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:formMessage")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsFormMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:globalMessage")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsGlobalMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForTooManyKeywords:command")
+    private WebElement validateClassLevelWithMessageForTooManyKeywordsCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:number1")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:number1Message")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:number2")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:number2Message")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:formMessage")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationFormMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:globalMessage")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationGlobalMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForInvalidCombination:command")
+    private WebElement validateClassLevelWithMessageForInvalidCombinationCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:number1")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:number1Message")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:number2")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:number2Message")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:formMessage")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingFormMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolating:command")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:number1")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:number1Message")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:number2")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:number2Message")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:globalMessage")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalMessage;
+
+    @FindBy(id = "validateClassLevelWithMessageForDuplicateViolatingAndGlobal:command")
+    private WebElement validateClassLevelWithMessageForDuplicateViolatingAndGlobalCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndAll:number1")
+    private WebElement validateClassLevelWithMessageForViolatingAndAllNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndAll:number1Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndAllNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndAll:number2")
+    private WebElement validateClassLevelWithMessageForViolatingAndAllNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndAll:number2Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndAllNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndAll:command")
+    private WebElement validateClassLevelWithMessageForViolatingAndAllCommand;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndClientId:number1")
+    private WebElement validateClassLevelWithMessageForViolatingAndClientIdNumber1;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndClientId:number1Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndClientIdNumber1Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndClientId:number2")
+    private WebElement validateClassLevelWithMessageForViolatingAndClientIdNumber2;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndClientId:number2Message")
+    private WebElement validateClassLevelWithMessageForViolatingAndClientIdNumber2Message;
+
+    @FindBy(id = "validateClassLevelWithMessageForViolatingAndClientId:command")
+    private WebElement validateClassLevelWithMessageForViolatingAndClientIdCommand;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:number1")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalNumber1;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:number1Message")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalNumber1Message;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:number2")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalNumber2;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:number2Message")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalNumber2Message;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:globalMessage")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalMessage;
+
+    @FindBy(id = "validateClassLevelActualWithMessageForViolatingAndGlobal:command")
+    private WebElement validateClassLevelActualWithMessageForViolatingAndGlobalCommand;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:number1")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalNumber1;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:number1Message")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalNumber1Message;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:number2")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:number2Message")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2Message;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:formMessage")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalFormMessage;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:globalMessage")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalMessage;
+
+    @FindBy(id = "validateNestedClassLevelWithMessageForViolatingAndGlobal:command")
+    private WebElement validateNestedClassLevelWithMessageForViolatingAndGlobalCommand;
 
     @FindBy(id = "validateConvertedEntityActualWithMessageForViolating:input")
     private WebElement validateConvertedEntityActualWithMessageForViolatingInput;
@@ -525,12 +717,29 @@ public class ValidateBeanIT extends OmniFacesIT {
         validateDefaultWithMessageForViolatingInput.sendKeys("x");
         guardAjax(validateDefaultWithMessageForViolatingCommand::click);
         assertEquals("inputLabel: default", validateDefaultWithMessageForViolatingInputMessage.getText());
-        assertEquals("", validateDefaultWithMessageForViolatingFormMessage.getText()); // Should NOT equal "may not be null" coming from @NotNull unused.
+        assertEquals("", validateDefaultWithMessageForViolatingFormMessage.getText()); // Should NOT equal "unused" coming from @NotNull unused.
 
         validateDefaultWithMessageForViolatingInput.clear();
         validateDefaultWithMessageForViolatingInput.sendKeys("xx");
         guardAjax(validateDefaultWithMessageForViolatingCommand::click);
         assertEquals("actionSuccess", getMessagesText());
+    }
+
+    /**
+     * A violation without a matching input fails validation and is shown for the fallback after <code>@violating</code>.
+     */
+    @Test
+    void validateDefaultWithMessageForViolatingAndForm() {
+        validateDefaultWithMessageForViolatingAndFormInput.sendKeys("x");
+        guardAjax(validateDefaultWithMessageForViolatingAndFormCommand::click);
+        assertEquals("inputLabel: default", validateDefaultWithMessageForViolatingAndFormInputMessage.getText());
+        assertEquals("unused", validateDefaultWithMessageForViolatingAndFormFormMessage.getText());
+
+        validateDefaultWithMessageForViolatingAndFormInput.sendKeys("x"); // So it becomes xx
+        guardAjax(validateDefaultWithMessageForViolatingAndFormCommand::click);
+        assertEquals("", validateDefaultWithMessageForViolatingAndFormInputMessage.getText());
+        assertEquals("unused", validateDefaultWithMessageForViolatingAndFormFormMessage.getText());
+        assertEquals("", getMessagesText());
     }
 
     @Test
@@ -591,6 +800,23 @@ public class ValidateBeanIT extends OmniFacesIT {
         validateClassLevelWithMessageForFormNumber2.sendKeys("0"); // So it becomes 10
         guardAjax(validateClassLevelWithMessageForFormCommand::click);
         assertEquals("", validateClassLevelWithMessageForFormMessage.getText());
+    }
+
+    /**
+     * A blank <code>showMessageFor</code> defaults to <code>@form</code>.
+     */
+    @Test
+    void validateClassLevelWithBlankMessageFor() {
+        validateClassLevelWithBlankMessageForNumber1.sendKeys("2");
+        validateClassLevelWithBlankMessageForNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithBlankMessageForCommand::click);
+        assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithBlankMessageForFormMessage.getText());
+        assertEquals("", getMessagesText());
+
+        validateClassLevelWithBlankMessageForNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateClassLevelWithBlankMessageForCommand::click);
+        assertEquals("", validateClassLevelWithBlankMessageForFormMessage.getText());
+        assertEquals("actionSuccess", getMessagesText());
     }
 
     @Test
@@ -655,6 +881,193 @@ public class ValidateBeanIT extends OmniFacesIT {
         assertEquals("actionSuccess", getMessagesText());
     }
 
+    /**
+     * Without a fallback after <code>@violating</code>, a class level constraint violation is shown for all inputs bound to the validated bean.
+     */
+    @Test
+    void validateClassLevelWithMessageForViolatingFansOutToAllInputs() {
+        validateClassLevelWithMessageForViolatingNumber1.sendKeys("3");
+        validateClassLevelWithMessageForViolatingNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForViolatingCommand::click);
+        assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
+        assertEquals("number2Label: invalidEntity", validateClassLevelWithMessageForViolatingNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
+        assertEquals("", getMessagesText());
+    }
+
+    /**
+     * With a fallback after <code>@violating</code>, a class level constraint violation is shown for the fallback only, while a violation on a property node is
+     * still shown for the matching input.
+     */
+    @Test
+    void validateClassLevelWithMessageForViolatingAndGlobal() {
+        validateClassLevelWithMessageForViolatingAndGlobalNumber1.sendKeys("3");
+        validateClassLevelWithMessageForViolatingAndGlobalNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalFormMessage.getText());
+        assertEquals("invalidEntity", validateClassLevelWithMessageForViolatingAndGlobalMessage.getText());
+
+        validateClassLevelWithMessageForViolatingAndGlobalNumber1.clear();
+        validateClassLevelWithMessageForViolatingAndGlobalNumber1.sendKeys("2");
+        guardAjax(validateClassLevelWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalFormMessage.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalMessage.getText());
+
+        validateClassLevelWithMessageForViolatingAndGlobalNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateClassLevelWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndGlobalFormMessage.getText());
+        assertEquals("actionSuccess", validateClassLevelWithMessageForViolatingAndGlobalMessage.getText());
+    }
+
+    /**
+     * With more than two keywords, <code>@violating</code> keeps only its first fallback.
+     */
+    @Test
+    void validateClassLevelWithMessageForTooManyKeywords() {
+        validateClassLevelWithMessageForTooManyKeywordsNumber1.sendKeys("3");
+        validateClassLevelWithMessageForTooManyKeywordsNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForTooManyKeywordsCommand::click);
+        assertEquals("", validateClassLevelWithMessageForTooManyKeywordsNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForTooManyKeywordsNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForTooManyKeywordsFormMessage.getText());
+        assertEquals("invalidEntity", validateClassLevelWithMessageForTooManyKeywordsGlobalMessage.getText());
+    }
+
+    /**
+     * With an invalid combination of two keywords, only the first keyword is used.
+     */
+    @Test
+    void validateClassLevelWithMessageForInvalidCombination() {
+        validateClassLevelWithMessageForInvalidCombinationNumber1.sendKeys("3");
+        validateClassLevelWithMessageForInvalidCombinationNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForInvalidCombinationCommand::click);
+        assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForInvalidCombinationNumber1Message.getText());
+        assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForInvalidCombinationNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForInvalidCombinationFormMessage.getText());
+        assertEquals("", validateClassLevelWithMessageForInvalidCombinationGlobalMessage.getText());
+    }
+
+    /**
+     * A duplicate <code>@violating</code> without other fallback is treated as plain <code>@violating</code>.
+     */
+    @Test
+    void validateClassLevelWithMessageForDuplicateViolating() {
+        validateClassLevelWithMessageForDuplicateViolatingNumber1.sendKeys("3");
+        validateClassLevelWithMessageForDuplicateViolatingNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForDuplicateViolatingCommand::click);
+        assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForDuplicateViolatingNumber1Message.getText());
+        assertEquals("number2Label: invalidEntity", validateClassLevelWithMessageForDuplicateViolatingNumber2Message.getText());
+        assertEquals("", validateClassLevelWithMessageForDuplicateViolatingFormMessage.getText());
+        assertEquals("", getMessagesText());
+    }
+
+    /**
+     * A duplicate <code>@violating</code> in the fallback is ignored.
+     */
+    @Test
+    void validateClassLevelWithMessageForDuplicateViolatingAndGlobal() {
+        validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber1.sendKeys("3");
+        validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForDuplicateViolatingAndGlobalCommand::click);
+        assertEquals("", validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForDuplicateViolatingAndGlobalNumber2Message.getText());
+        assertEquals("invalidEntity", validateClassLevelWithMessageForDuplicateViolatingAndGlobalMessage.getText());
+    }
+
+    /**
+     * <code>@all</code> as fallback after <code>@violating</code> invalidates all validated inputs and shows the class level constraint violation for each of
+     * them, labeled with all of them.
+     */
+    @Test
+    void validateClassLevelWithMessageForViolatingAndAll() {
+        validateClassLevelWithMessageForViolatingAndAllNumber1.sendKeys("3");
+        validateClassLevelWithMessageForViolatingAndAllNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForViolatingAndAllCommand::click);
+        assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForViolatingAndAllNumber1Message.getText());
+        assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForViolatingAndAllNumber2Message.getText());
+        assertEquals("", getMessagesText());
+
+        validateClassLevelWithMessageForViolatingAndAllNumber1.clear();
+        validateClassLevelWithMessageForViolatingAndAllNumber1.sendKeys("2");
+        guardAjax(validateClassLevelWithMessageForViolatingAndAllCommand::click);
+        assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForViolatingAndAllNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndAllNumber2Message.getText());
+        assertEquals("", getMessagesText());
+
+        validateClassLevelWithMessageForViolatingAndAllNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateClassLevelWithMessageForViolatingAndAllCommand::click);
+        assertEquals("", validateClassLevelWithMessageForViolatingAndAllNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndAllNumber2Message.getText());
+        assertEquals("actionSuccess", getMessagesText());
+    }
+
+    /**
+     * A client ID as fallback after <code>@violating</code>, followed by whitespace, invalidates that input and shows the class level constraint violation for
+     * it, labeled with it.
+     */
+    @Test
+    void validateClassLevelWithMessageForViolatingAndClientId() {
+        validateClassLevelWithMessageForViolatingAndClientIdNumber1.sendKeys("3");
+        validateClassLevelWithMessageForViolatingAndClientIdNumber2.sendKeys("1");
+        guardAjax(validateClassLevelWithMessageForViolatingAndClientIdCommand::click);
+        assertEquals("", validateClassLevelWithMessageForViolatingAndClientIdNumber1Message.getText());
+        assertEquals("number2Label: invalidEntity", validateClassLevelWithMessageForViolatingAndClientIdNumber2Message.getText());
+        assertEquals("", getMessagesText());
+
+        validateClassLevelWithMessageForViolatingAndClientIdNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateClassLevelWithMessageForViolatingAndClientIdCommand::click);
+        assertEquals("", validateClassLevelWithMessageForViolatingAndClientIdNumber1Message.getText());
+        assertEquals("", validateClassLevelWithMessageForViolatingAndClientIdNumber2Message.getText());
+        assertEquals("actionSuccess", getMessagesText());
+    }
+
+    /**
+     * With <code>method="validateActual"</code>, a fallback after <code>@violating</code> fails validation and shows the class level constraint violation for
+     * the fallback.
+     */
+    @Test
+    void validateClassLevelActualWithMessageForViolatingAndGlobal() {
+        validateClassLevelActualWithMessageForViolatingAndGlobalNumber1.sendKeys("3");
+        validateClassLevelActualWithMessageForViolatingAndGlobalNumber2.sendKeys("1");
+        guardAjax(validateClassLevelActualWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateClassLevelActualWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelActualWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("invalidEntity actionValidationFailed", getMessagesText(validateClassLevelActualWithMessageForViolatingAndGlobalMessage));
+
+        validateClassLevelActualWithMessageForViolatingAndGlobalNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateClassLevelActualWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateClassLevelActualWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateClassLevelActualWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("actionSuccess", validateClassLevelActualWithMessageForViolatingAndGlobalMessage.getText());
+    }
+
+    /**
+     * With a fallback after <code>@violating</code>, a class level constraint violation on a nested bean is shown for the fallback only.
+     */
+    @Test
+    void validateNestedClassLevelWithMessageForViolatingAndGlobal() {
+        validateNestedClassLevelWithMessageForViolatingAndGlobalNumber1.sendKeys("3");
+        validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2.sendKeys("1");
+        guardAjax(validateNestedClassLevelWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalFormMessage.getText());
+        assertEquals("invalidEntity", validateNestedClassLevelWithMessageForViolatingAndGlobalMessage.getText());
+
+        validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2.sendKeys("0"); // So it becomes 10
+        guardAjax(validateNestedClassLevelWithMessageForViolatingAndGlobalCommand::click);
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalNumber1Message.getText());
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalNumber2Message.getText());
+        assertEquals("", validateNestedClassLevelWithMessageForViolatingAndGlobalFormMessage.getText());
+        assertEquals("actionSuccess", validateNestedClassLevelWithMessageForViolatingAndGlobalMessage.getText());
+    }
+
     @Test
     public void validateConvertedEntityActualWithMessageForViolating() {
         guardAjax(validateConvertedEntityActualWithMessageForViolatingCommand::click);
@@ -706,9 +1119,8 @@ public class ValidateBeanIT extends OmniFacesIT {
     }
 
     /**
-     * Issue #951: inputs bound beyond a non-{@code @Valid} nested property must still be collected into the copied bean when the containing property is
-     * {@code @Valid}. The class-level {@code @AssertTrue} on the intermediate depends on values inside the non-cascaded entity; pre-fix these values never
-     * reached the copy.
+     * Inputs bound beyond a non-{@code @Valid} nested property are collected into the copied bean when the containing property is {@code @Valid}, so that a
+     * class-level {@code @AssertTrue} on the intermediate can validate the values inside the non-cascaded entity.
      */
     @Test
     void validateDeepNestedClassLevel() {
@@ -978,6 +1390,10 @@ public class ValidateBeanIT extends OmniFacesIT {
     }
 
     private String getMessagesText() {
+        return getMessagesText(messages);
+    }
+
+    private static String getMessagesText(WebElement messages) {
         return messages.getText().replaceAll("\\s+", " ");
     }
 
