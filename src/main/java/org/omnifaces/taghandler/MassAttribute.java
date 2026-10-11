@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.util.Collections.newSetFromMap;
 import static org.omnifaces.util.Components.findComponentsInChildren;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
@@ -147,9 +148,9 @@ public class MassAttribute extends TagHandler {
                 Class<?> cls = null;
 
                 try {
-                    cls = Class.forName(className);
+                    cls = toClass(className);
                 }
-                catch (ClassNotFoundException e) {
+                catch (IllegalStateException e) {
                     throw new IllegalArgumentException(ERROR_UNAVAILABLE_TARGET.formatted(className), e);
                 }
 

@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Servlets.getWebXmlURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
@@ -285,17 +286,14 @@ class WebXmlImpl implements WebXml {
 
     /**
      * Create and return a mapping of all error page locations by exception type found in the given document.
-     *
-     * @throws ClassNotFoundException
      */
-    @SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-    private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException, ClassNotFoundException {
+    private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException {
         var exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
         var errorPageLocations = new HashMap<Class<Throwable>, String>(exceptionTypes.getLength(), 1);
 
         for (var i = 0; i < exceptionTypes.getLength(); i++) {
             var node = exceptionTypes.item(i);
-            var exceptionClass = (Class<Throwable>) Class.forName(getTextContent(node));
+            Class<Throwable> exceptionClass = toClass(getTextContent(node));
             var exceptionLocation = xpath.compile(XPATH_LOCATION).evaluate(node.getParentNode()).trim();
             var key = exceptionClass == Throwable.class ? null : exceptionClass;
             errorPageLocations.computeIfAbsent(key, k -> exceptionLocation);
