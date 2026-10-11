@@ -774,7 +774,7 @@ public final class FacesLocal {
             return null;
         }
 
-        return ResourceBundle.getBundle(messageBundle, getLocale(context));
+        return ResourceBundle.getBundle(messageBundle, getLocale(context), Thread.currentThread().getContextClassLoader());
     }
 
     /**

@@ -32,7 +32,7 @@ public final class WebappClassLoaders {
 
     /**
      * Compiles the given source into the given directory and returns a class loader which sees the compiled class. Its parent is the class loader of OmniFaces,
-     * which does not see the compiled class.
+     * which does not see the compiled class. The source is compiled against the test class path, so it may refer to OmniFaces and its dependencies.
      *
      * @param directory The directory to compile into, usually a JUnit <code>@TempDir</code>.
      * @param className The fully qualified name of the class declared by the given source.
@@ -47,7 +47,9 @@ public final class WebappClassLoaders {
         Files.createDirectories(classesDirectory);
         Files.writeString(sourceFile, source);
 
-        if (ToolProvider.getSystemJavaCompiler().run(null, null, null, "-d", classesDirectory.toString(), sourceFile.toString()) != 0) {
+        var classPath = System.getProperty("java.class.path");
+
+        if (ToolProvider.getSystemJavaCompiler().run(null, null, null, "-cp", classPath, "-d", classesDirectory.toString(), sourceFile.toString()) != 0) {
             throw new IllegalStateException("Cannot compile " + className);
         }
 
