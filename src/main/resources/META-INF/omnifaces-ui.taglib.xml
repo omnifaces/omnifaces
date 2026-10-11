@@ -5151,7 +5151,9 @@ public enum Baz {
 					parent <code>UIForm</code>. Other available values are "@all" which will show the message for all
 					invalidated components, "@global" which will show a global message, and "@violating" which will
 					match components by ConstraintViolation Property Path. Any other space separated value will be
-					treated as client ID of UI input component.
+					treated as client ID of UI input component. Since OmniFaces 3.14.28, "@violating" can be followed by
+					a space separated fallback, e.g. "@violating @global", which will be used for class level constraint
+					violations and violations without a matching component.
 				]]>
 			</description>
 			<name>showMessageFor</name>

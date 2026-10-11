@@ -29,8 +29,8 @@ public class ValidateBeanITDefaultBean {
 	@Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
 	private String input;
 
-	@NotNull
-	private String unused; // This one is not referenced in JSF form and should therefore not trigger validation fail on it.
+	@NotNull(message="unused")
+	private String unused; // This one is not referenced in JSF form and should therefore only trigger validation fail when @violating has a fallback.
 
 	public void action() {
 		if (isValidationFailed()) {
