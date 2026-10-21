@@ -36,8 +36,8 @@
                 <f:ajax render="result" />
             </h:commandButton>
             <h:panelGroup id="result">
-                <h:outputText id="bean" value="#{viewScopedUnrenderedITPostbackBean.id}" rendered="#{param['jakarta.faces.source'] eq 'form:show'}" />
-                <h:outputText value="#{viewScopedUnrenderedITPostbackBean.failingId}" rendered="#{param['jakarta.faces.source'] eq 'form:failRender'}" />
+                <h:outputText id="bean" value="#{viewScopedUnrenderedITPostbackBean.id}" rendered="#{facesContext.externalContext.requestParameterMap['jakarta.faces.source'] eq 'form:show'}" />
+                <h:outputText value="#{viewScopedUnrenderedITPostbackBean.failingId}" rendered="#{facesContext.externalContext.requestParameterMap['jakarta.faces.source'] eq 'form:failRender'}" />
             </h:panelGroup>
         </h:form>
     </h:body>
