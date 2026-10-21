@@ -493,6 +493,7 @@ public abstract class OmniFacesIT {
         private final WebArchive archive;
         private final boolean treatWarAsWebFragmentJar;
         private final Map<String, String> quarkusProperties = new HashMap<>();
+        private final Set<String> webResourcePaths = new HashSet<>();
         private boolean facesConfigSet;
         private boolean webXmlSet;
         private boolean primeFacesSet;
@@ -549,6 +550,8 @@ public abstract class OmniFacesIT {
         }
 
         private void addWebResource(File file, String path) {
+            webResourcePaths.add(path.replaceFirst("^/", ""));
+
             if (treatWarAsWebFragmentJar) {
                 archive.addAsResource(file, "META-INF/resources/" + path);
             }
@@ -558,6 +561,8 @@ public abstract class OmniFacesIT {
         }
 
         private void addWebResource(String name, String path) {
+            webResourcePaths.add(path.replaceFirst("^/", ""));
+
             if (treatWarAsWebFragmentJar) {
                 archive.addAsResource(name, "META-INF/resources/" + path);
             }
@@ -582,7 +587,7 @@ public abstract class OmniFacesIT {
         private void addErrorPageIfAbsent() {
             var path = "WEB-INF/500.xhtml";
 
-            if (!archive.contains(treatWarAsWebFragmentJar ? "META-INF/resources/" + path : path)) { // The test may have its own.
+            if (!webResourcePaths.contains(path)) { // The test may have its own.
                 addWebResource(path);
             }
         }

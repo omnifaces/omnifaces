@@ -331,10 +331,11 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         openWithoutUnload("ViewScopedUnrenderedITRenderFailure.xhtml");
         assertTrue(body.getText().contains("Expected exception."), "error page is rendered: " + body.getText());
         Map<String, Integer> after = awaitDelta(before, "destroyed.postback", 1);
-        assertDelta(before, after, "activeViewScopes", 1);
+        var errorPageViews = isQuarkusUsed() ? 0 : 1; // Quarkus renders its own error page instead of the one of web.xml.
+        assertDelta(before, after, "activeViewScopes", errorPageViews);
         assertDelta(before, after, "created.postback", 1);
         assertDelta(before, after, "destroyedWithoutFacesContext.postback", 0);
-        assertDelta(before, after, "created.errorPage", 1);
+        assertDelta(before, after, "created.errorPage", errorPageViews);
         assertDelta(before, after, "destroyed.errorPage", 0);
     }
 
