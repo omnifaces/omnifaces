@@ -17,7 +17,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.faces.context.FacesContext;
@@ -36,7 +36,7 @@ import javax.faces.event.PhaseListener;
  * slightly earlier for its before phase and slightly later for its after phase as compared to the view scoped ones.
  * Additionally, the phase listener instances and phase event callbacks registered via this phase listener will not
  * become part of the view state, but will execute only once during the current request instead of during every
- * (postback) request on the same view.
+ * (postback) request on the same view. They are invoked in the order in which they were subscribed.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -93,7 +93,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
-		return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
+		return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new LinkedHashSet<>(1) : null);
 	}
 
 	private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
@@ -103,7 +103,7 @@ public class CallbackPhaseListener implements PhaseListener {
 			return Collections.emptySet();
 		}
 
-		Set<PhaseListener> phaseListenersForEvent = new HashSet<>();
+		Set<PhaseListener> phaseListenersForEvent = new LinkedHashSet<>();
 
 		for (PhaseListener phaseListener : phaseListeners) {
 			if (isPhaseMatch(event, phaseListener.getPhaseId())) {

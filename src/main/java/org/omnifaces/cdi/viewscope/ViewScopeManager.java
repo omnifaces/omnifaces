@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_HEADER_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -24,6 +25,7 @@ import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.Components.addFormIfNecessary;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getRequest;
@@ -91,8 +93,8 @@ public class ViewScopeManager {
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
 	private static final String WARNING_UNSUPPORTED_STATE_SAVING = "@ViewScoped %s"
-			+ " requires non-stateless views in order to be able to properly destroy the bean."
-			+ " The current view %s is stateless and this may cause memory leaks."
+			+ " requires non-stateless views in order to be able to keep the bean during postbacks."
+			+ " The current view %s is stateless and therefore the bean is destroyed at the end of every request."
 			+ " Consider subclassing the bean with @javax.faces.view.ViewScoped annotation.";
 
 	private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
@@ -223,13 +225,27 @@ public class ViewScopeManager {
 	}
 
 	/**
-	 * Register unload script.
+	 * Register unload script. When the view is not yet being rendered, then the unload script is only added when the
+	 * view which is about to be rendered is still the one of the given bean storage, so that a view which is navigated
+	 * to doesn't initialize the unload of the view which is navigated away from.
 	 */
-	private static void registerUnloadScript(UUID beanStorageId) {
+	private void registerUnloadScript(UUID beanStorageId) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		String script = format(SCRIPT_INIT, beanStorageId);
 		addFormIfNecessary(); // Required to get view state ID.
 		addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Ensure it's always included BEFORE omnifaces.js.
 		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-		addScript(format(SCRIPT_INIT, beanStorageId));
+
+		if (context.getCurrentPhaseId() == RENDER_RESPONSE) {
+			addScript(script);
+		}
+		else {
+			subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> {
+				if (beanStorageId.equals(storageInSession.getBeanStorageId())) {
+					addScript(script);
+				}
+			});
+		}
 	}
 
 	/**

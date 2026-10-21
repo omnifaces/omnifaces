@@ -31,6 +31,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.cdi.viewscope.ViewScopeStateManager;
 import org.omnifaces.cdi.viewscope.ViewScopeStorage;
 import org.omnifaces.cdi.viewscope.ViewScopeStorageInSession;
 import org.omnifaces.cdi.viewscope.ViewScopeStorageInViewState;
@@ -74,6 +75,13 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <code>OmniFaces-View-Scope</code> and <code>OmniFaces-View-State</code> request headers as well, so that the server
  * can process the unload without the request body, which may be lost when the browser aborts the request while it is
  * still in transit.
+ * <p>
+ * Since OmniFaces 3.14.28, a view scoped bean of a view whose state is never saved is destroyed at the end of the
+ * request which created it. This is the case when the request is redirected or forwarded to another view, or when it
+ * responds with a file download or an error page. Such a view never reaches the client as a view whose unload script
+ * could destroy its view scoped beans. Previously, they stayed in the HTTP session until they were evicted from the
+ * active view scopes. A later postback on a view whose view scoped bean was destroyed this way gets a new instance,
+ * without a <code>ViewExpiredException</code>. On a stateless view, the bean is destroyed at the end of every request.
  * <p>
  * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
  * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
@@ -240,6 +248,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * @see ViewScopeStorageInSession
  * @see ViewScopeStorageInViewState
  * @see ViewScopeEventListener
+ * @see ViewScopeStateManager
  * @see BeanStorage
  * @see OmniViewHandler
  * @see OmniExternalContext

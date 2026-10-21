@@ -258,7 +258,9 @@ public abstract class OmniFacesIT {
 			switch (webXml) {
 				case withDevelopmentStage:
 				case withErrorPage:
-					archive.addAsWebInfResource("WEB-INF/500.xhtml");
+					if (!archive.contains("WEB-INF/500.xhtml")) { // The test may have its own.
+						archive.addAsWebInfResource("WEB-INF/500.xhtml");
+					}
 					break;
 				case withFacesViews:
 				case withFacesViewsLowercasedRequestURI:
