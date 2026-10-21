@@ -17,6 +17,7 @@ import static org.omnifaces.renderer.CorsAwareResourceRenderer.getIntegrityIfNec
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -62,6 +63,8 @@ public class DeferredScriptRenderer extends Renderer<DeferredScript> {
         if (!isOutputHtml5Doctype(context)) {
             writer.writeAttribute("type", "text/javascript", "type");
         }
+
+        writeNonceAttributeIfNecessary(context, writer);
 
         if (resource != null) {
             writer.write("OmniFaces.DeferredScript.add('");

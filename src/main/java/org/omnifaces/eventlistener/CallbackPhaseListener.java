@@ -16,7 +16,7 @@ import static jakarta.faces.event.PhaseId.ANY_PHASE;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +33,8 @@ import jakarta.faces.event.PhaseListener;
  * This differs in a few subtle ways from <code>subscribeToViewXxxPhase()</code> methods of the {@link org.omnifaces.util.Events} class which subscribes to the
  * view scope. Namely, this phase listener will execute slightly earlier for its before phase and slightly later for its after phase as compared to the view
  * scoped ones. Additionally, the phase listener instances and phase event callbacks registered via this phase listener will not become part of the view state,
- * but will execute only once during the current request instead of during every (postback) request on the same view.
+ * but will execute only once during the current request instead of during every (postback) request on the same view. They are invoked in the order in which
+ * they were subscribed.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -88,7 +89,7 @@ public class CallbackPhaseListener implements PhaseListener {
     // Helpers --------------------------------------------------------------------------------------------------------
 
     private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
-        return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
+        return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new LinkedHashSet<>(1) : null);
     }
 
     private static void invokeCallbacks(PhaseEvent event, boolean before) {

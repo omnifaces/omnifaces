@@ -12,19 +12,25 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static jakarta.faces.event.PhaseId.ANY_PHASE;
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static jakarta.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MYFACES_NUMBER_OF_VIEWS;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
+import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.getViewMap;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,7 +38,9 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseEvent;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -58,6 +66,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     };
     private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
         + " Encountered an invalid value of '%s'.";
+    private static final String BEAN_STORAGE_ID = ViewScopeStorageInSession.class.getName();
 
     // Static variables -----------------------------------------------------------------------------------------------
 
@@ -82,7 +91,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
     @Override
     public UUID getBeanStorageId() {
-        var beanStorageId = (UUID) getViewMap().get(getClass().getName());
+        var beanStorageId = getViewBeanStorageId();
         return beanStorageId != null && getBeanStorage(beanStorageId) != null ? beanStorageId : null;
     }
 
@@ -102,12 +111,52 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
         return beanStorage;
     }
 
+    /**
+     * Sets the given bean storage as the one of the current view. It is only put in the LRU map of active view scopes when the state of the current view is
+     * saved, see {@link ViewScopeUnloadScriptRenderer} and {@link ViewScopeStateManager}. Until then it is pending in the current HTTP request, and when the
+     * Faces lifecycle of the current HTTP request ends without saving the state of the current view, then its beans are destroyed, because the client never
+     * received a view on which the unload script could destroy them.
+     */
     @Override
     public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-        getActiveBeanStorages(true).acquire(beanStorageId, beanStorage); // Must happen before it's put in the LRU map, else a concurrent request could
-                                                                         // immediately evict and destroy it.
-        activeViewScopes.put(beanStorageId, beanStorage);
-        getViewMap().put(getClass().getName(), beanStorageId);
+        getActiveBeanStorages(true).acquirePending(beanStorageId, beanStorage);
+        getViewRoot().getTransientStateHelper().putTransient(BEAN_STORAGE_ID, beanStorageId);
+    }
+
+    /**
+     * Puts the bean storage of the current view, if it is still pending, in the LRU map of active view scopes and remembers its identifier in the view scope.
+     * This must be invoked right before the state of the current view is saved, so that the view scope is saved along with it. This is invoked by
+     * {@link ViewScopeUnloadScriptRenderer} when the unload script is rendered at the end of the body, and by
+     * {@link ViewScopeStateManager#getViewState(FacesContext)} when the view state is written into an ajax response.
+     *
+     * @param context The involved faces context.
+     */
+    static void activate(FacesContext context) {
+        var viewRoot = context.getViewRoot();
+
+        if (viewRoot == null || viewRoot.isTransient()) {
+            return;
+        }
+
+        var beanStorageId = (UUID) viewRoot.getTransientStateHelper().getTransient(BEAN_STORAGE_ID);
+
+        if (beanStorageId != null) {
+            var instance = Beans.getInstance(ViewScopeStorageInSession.class, false);
+
+            if (instance != null) {
+                instance.activate(viewRoot, beanStorageId);
+            }
+        }
+    }
+
+    private void activate(UIViewRoot viewRoot, UUID beanStorageId) {
+        var activeBeanStorages = getActiveBeanStorages(false);
+        var beanStorage = activeBeanStorages != null ? activeBeanStorages.activate(beanStorageId) : null;
+
+        if (beanStorage != null) {
+            activeViewScopes.put(beanStorageId, beanStorage);
+            viewRoot.getViewMap().put(BEAN_STORAGE_ID, beanStorageId);
+        }
     }
 
     /**
@@ -122,13 +171,16 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
             recentlyUnloadedViewStates.put(getRequestParameter(context, VIEW_STATE_PARAM), true);
         }
 
-        var storage = activeViewScopes.get(beanStorageId);
+        var activeBeanStorages = getActiveBeanStorages(false);
+        var storage = activeBeanStorages != null ? activeBeanStorages.getBeanStorage(beanStorageId) : null;
+
+        if (storage == null) {
+            storage = activeViewScopes.get(beanStorageId);
+        }
 
         if (storage != null) {
             storage.evict();
         }
-
-        var activeBeanStorages = getActiveBeanStorages(false);
 
         if (activeBeanStorages != null) {
             activeBeanStorages.release(beanStorageId); // The view scope is explicitly gone, so the current request must no longer resolve it.
@@ -159,6 +211,22 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the bean storage identifier of the current view. A pending one is remembered in the transient state of the view root, and an active one in the
+     * view map.
+     */
+    private static UUID getViewBeanStorageId() {
+        var viewRoot = getViewRoot();
+        var beanStorageId = (UUID) viewRoot.getTransientStateHelper().getTransient(BEAN_STORAGE_ID);
+
+        if (beanStorageId == null) {
+            var viewMap = viewRoot.getViewMap(false); // Don't create the view scope for nothing.
+            beanStorageId = viewMap != null ? (UUID) viewMap.get(BEAN_STORAGE_ID) : null;
+        }
+
+        return beanStorageId;
+    }
 
     /**
      * Returns the bean storages which are in use by the current HTTP request, or <code>null</code> when there are none and <code>create</code> is
@@ -213,6 +281,8 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
     public static class ActiveBeanStorages {
 
         private final Map<UUID, BeanStorage> beanStorages = new HashMap<>();
+        private final Set<UUID> pendingBeanStorageIds = new HashSet<>();
+        private boolean destroyPendingWhenLifecycleEndsSubscribed;
 
         /**
          * Returns the bean storage which the current HTTP request has acquired under the given bean storage identifier, or <code>null</code> if there is none.
@@ -247,6 +317,37 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
         }
 
         /**
+         * Acquires the given new bean storage for the duration of the current HTTP request, and marks it as pending until {@link #activate(UUID)}. When the
+         * Faces lifecycle of the current HTTP request ends while it is still pending, then its beans are destroyed.
+         *
+         * @param beanStorageId The bean storage identifier.
+         * @param beanStorage The new bean storage.
+         * @since 3.14.28
+         */
+        protected void acquirePending(UUID beanStorageId, BeanStorage beanStorage) {
+            if (!destroyPendingWhenLifecycleEndsSubscribed) {
+                subscribeToRequestAfterPhase(ANY_PHASE, this::destroyPendingWhenLifecycleEnds);
+                destroyPendingWhenLifecycleEndsSubscribed = true;
+            }
+
+            beanStorage.acquire();
+            beanStorages.put(beanStorageId, beanStorage);
+            pendingBeanStorageIds.add(beanStorageId);
+        }
+
+        /**
+         * Marks the bean storage identified by the given bean storage identifier as no longer pending. The returned bean storage is already acquired by the
+         * current HTTP request, so it is safe to put it in the LRU map, where a concurrent request could immediately evict it.
+         *
+         * @param beanStorageId The bean storage identifier.
+         * @return The bean storage if it was pending, else <code>null</code>.
+         * @since 3.14.28
+         */
+        protected BeanStorage activate(UUID beanStorageId) {
+            return pendingBeanStorageIds.remove(beanStorageId) ? beanStorages.get(beanStorageId) : null;
+        }
+
+        /**
          * Releases the bean storage identified by the given bean storage identifier, if the current HTTP request has acquired it. This is invoked when the view
          * scope is explicitly destroyed, such as during an unload or a navigation, so that the current HTTP request will no longer resolve it.
          *
@@ -259,15 +360,41 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
                 beanStorage.release();
                 beanStorages.remove(beanStorageId);
             }
+
+            pendingBeanStorageIds.remove(beanStorageId);
         }
 
         /**
-         * When the current HTTP request is about to be destroyed, release all bean storages which it still has acquired.
+         * When the current HTTP request is about to be destroyed, destroy the beans of all bean storages which are still pending, and release all bean storages
+         * which it still has acquired. Pending bean storages are normally already destroyed at the end of the Faces lifecycle, but not when it was aborted by
+         * an exception, nor when they were acquired after it had ended.
          */
         @PreDestroy
         protected void preDestroyRequest() {
+            destroyPending();
             beanStorages.values().forEach(BeanStorage::release);
             beanStorages.clear();
+        }
+
+        /**
+         * The Faces lifecycle ends after the render response, or else after the phase in which the response was completed, such as by a redirect or a file
+         * download. The beans are then destroyed while the faces context is still available to their pre destroy methods.
+         */
+        private void destroyPendingWhenLifecycleEnds(PhaseEvent event) {
+            if (event.getPhaseId() == RENDER_RESPONSE || event.getFacesContext().getResponseComplete()) {
+                destroyPending();
+            }
+        }
+
+        /**
+         * The bean storage stays resolvable while its beans are destroyed, so that their pre destroy methods can still reach other view scoped beans of the
+         * same view, as long as the current view is still the view of the bean storage, which is not the case after a forward navigation.
+         */
+        private void destroyPending() {
+            for (var beanStorageId : new ArrayList<>(pendingBeanStorageIds)) {
+                beanStorages.get(beanStorageId).evict();
+                release(beanStorageId);
+            }
         }
 
     }

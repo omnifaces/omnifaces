@@ -579,6 +579,14 @@ public abstract class OmniFacesIT {
             addWebResource(name, name);
         }
 
+        private void addErrorPageIfAbsent() {
+            var path = "WEB-INF/500.xhtml";
+
+            if (!archive.contains(treatWarAsWebFragmentJar ? "META-INF/resources/" + path : path)) { // The test may have its own.
+                addWebResource(path);
+            }
+        }
+
         private void addQuarkusPropertyIfNecessary(String name, String value) {
             quarkusProperties.put(name, value);
         }
@@ -611,10 +619,10 @@ public abstract class OmniFacesIT {
             switch (webXml) {
                 case withDevelopmentStage :
                     addQuarkusPropertyIfNecessary("jakarta.faces.PROJECT_STAGE", "Development");
-                    addWebResource("WEB-INF/500.xhtml");
+                    addErrorPageIfAbsent();
                     break;
                 case withErrorPage :
-                    addWebResource("WEB-INF/500.xhtml");
+                    addErrorPageIfAbsent();
                     break;
                 case withErrorPageAndParams :
                     addWebResource("WEB-INF/500-with-params.xhtml");
@@ -705,7 +713,8 @@ public abstract class OmniFacesIT {
         withVersionedResourceHandler,
         withCombinedResourceCacheTTL,
         withViewResources,
-        withTaglib;
+        withTaglib,
+        withCspNonce;
     }
 
 }

@@ -14,6 +14,7 @@ package org.omnifaces.component.script;
 
 import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
 import static org.omnifaces.util.Renderers.writeAttribute;
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
 
 import java.io.IOException;
 
@@ -80,6 +81,8 @@ public abstract class ScriptFamily extends UIComponentBase {
             if (!isOutputHtml5Doctype(context)) {
                 writeAttribute(writer, "type", "text/javascript");
             }
+
+            writeNonceAttributeIfNecessary(context, writer);
         }
     }
 

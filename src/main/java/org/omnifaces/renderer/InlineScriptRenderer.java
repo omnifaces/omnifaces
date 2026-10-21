@@ -13,6 +13,7 @@
 package org.omnifaces.renderer;
 
 import static org.omnifaces.util.FacesLocal.isOutputHtml5Doctype;
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -51,6 +52,7 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
             writer.writeAttribute("type", "text/javascript", "type");
         }
 
+        writeNonceAttributeIfNecessary(context, writer);
         writer.write("//<![CDATA[\n");
     }
 
