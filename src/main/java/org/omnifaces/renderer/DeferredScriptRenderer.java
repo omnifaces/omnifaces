@@ -14,6 +14,7 @@ package org.omnifaces.renderer;
 
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.FacesLocal.createResource;
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class DeferredScriptRenderer extends Renderer {
         var writer = context.getResponseWriter();
         writer.startElement("script", component);
         writer.writeAttribute("type", "text/javascript", "type");
+        writeNonceAttributeIfNecessary(context, writer);
 
         if (resource != null) {
             writer.write("OmniFaces.DeferredScript.add('");

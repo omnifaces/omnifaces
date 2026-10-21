@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.behavior.ClientBehaviorHolder;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.Renderer;
 
@@ -147,6 +148,19 @@ public final class Renderers {
         if (value != null) {
             writer.writeAttribute(html, value, property);
         }
+    }
+
+    /**
+     * Write the CSP nonce of the current request, if any, as <code>nonce</code> attribute of the script element which
+     * is currently being started.
+     * @param context The involved faces context.
+     * @param writer The involved response writer.
+     * @throws IOException When an I/O error occurs.
+     * @see Hacks#getCurrentNonce(FacesContext)
+     * @since 4.7.17
+     */
+    public static void writeNonceAttributeIfNecessary(FacesContext context, ResponseWriter writer) throws IOException {
+        writeAttribute(writer, "nonce", Hacks.getCurrentNonce(context));
     }
 
     /**

@@ -465,7 +465,8 @@ public abstract class OmniFacesIT {
         withInterpretEmptyStringSubmittedValuesAsNull,
         withVersionedResourceHandler,
         withViewResources,
-        withTaglib;
+        withTaglib,
+        withCspNonce;
     }
 
 }

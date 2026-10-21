@@ -12,11 +12,14 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
+
 import java.io.IOException;
 import java.io.Reader;
 
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 
@@ -46,6 +49,7 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
     public void startElement(ResponseWriter writer, UIComponent component) throws IOException {
         writer.startElement("script", component);
         writer.writeAttribute("type", "text/javascript", "type");
+        writeNonceAttributeIfNecessary(FacesContext.getCurrentInstance(), writer);
         writer.write("//<![CDATA[\n");
     }
 

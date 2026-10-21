@@ -13,6 +13,7 @@
 package org.omnifaces.component.script;
 
 import static org.omnifaces.util.Renderers.writeAttribute;
+import static org.omnifaces.util.Renderers.writeNonceAttributeIfNecessary;
 
 import java.io.IOException;
 
@@ -78,6 +79,7 @@ public abstract class ScriptFamily extends UIComponentBase {
 
             writer.startElement("script", this);
             writeAttribute(writer, "type", "text/javascript");
+            writeNonceAttributeIfNecessary(context, writer);
         }
     }
 
