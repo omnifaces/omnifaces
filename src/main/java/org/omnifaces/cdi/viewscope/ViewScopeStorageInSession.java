@@ -121,10 +121,10 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	/**
 	 * Sets the given bean storage as the one of the current view. It is only put in the LRU map of active view scopes
-	 * when the state of the current view is saved, see {@link ViewScopeStateManager}. Until then it is pending in the
-	 * current HTTP request, and when the JSF lifecycle of the current HTTP request ends without saving the state of the
-	 * current view, then its beans are destroyed, because the client never received a view on which the unload script
-	 * could destroy them.
+	 * when the state of the current view is saved, see {@link ViewScopeUnloadScriptRenderer} and
+	 * {@link ViewScopeStateManager}. Until then it is pending in the current HTTP request, and when the JSF lifecycle of
+	 * the current HTTP request ends without saving the state of the current view, then its beans are destroyed, because
+	 * the client never received a view on which the unload script could destroy them.
 	 */
 	@Override
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
@@ -133,12 +133,20 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	}
 
 	/**
-	 * Puts the bean storage of the given view, if it is still pending, in the LRU map of active view scopes and
-	 * remembers its identifier in the view scope. This must be invoked right before the state of the given view is
-	 * saved, so that the view scope is saved along with it.
-	 * @param viewRoot The view whose state is about to be saved.
+	 * Puts the bean storage of the current view, if it is still pending, in the LRU map of active view scopes and
+	 * remembers its identifier in the view scope. This must be invoked right before the state of the current view is
+	 * saved, so that the view scope is saved along with it. This is invoked by {@link ViewScopeUnloadScriptRenderer}
+	 * when the unload script is rendered at the end of the body, and by
+	 * {@link ViewScopeStateManager#getViewState(FacesContext)} when the view state is written into an ajax response.
+	 * @param context The involved faces context.
 	 */
-	static void activate(UIViewRoot viewRoot) {
+	static void activate(FacesContext context) {
+		UIViewRoot viewRoot = context.getViewRoot();
+
+		if (viewRoot == null || viewRoot.isTransient()) {
+			return;
+		}
+
 		UUID beanStorageId = (UUID) viewRoot.getTransientStateHelper().getTransient(BEAN_STORAGE_ID);
 
 		if (beanStorageId != null) {

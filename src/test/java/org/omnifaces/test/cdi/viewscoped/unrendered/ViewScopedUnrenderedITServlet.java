@@ -35,7 +35,7 @@ import org.omnifaces.util.Beans;
 public class ViewScopedUnrenderedITServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final String[] BEAN_NAMES = { "main", "viewAction", "preRenderView", "build", "postback", "errorPage", "sibling" };
+	private static final String[] BEAN_NAMES = { "main", "viewAction", "preRenderView", "build", "postback", "errorPage", "sibling", "jstl", "afterForm" };
 	private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
 	private static final String MYFACES_VIEW_SCOPE_BEAN_HOLDER = "org.apache.myfaces.cdi.view.ViewScopeBeanHolder";
 

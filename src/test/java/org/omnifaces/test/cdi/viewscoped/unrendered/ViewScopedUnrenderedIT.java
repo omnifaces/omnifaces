@@ -61,6 +61,12 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 	@FindBy(id="form:submit")
 	private WebElement submit;
 
+	@FindBy(id="form:nonAjaxSubmit")
+	private WebElement nonAjaxSubmit;
+
+	@FindBy(id="afterForm")
+	private WebElement afterForm;
+
 	@FindBy(id="form:increment")
 	private WebElement increment;
 
@@ -269,9 +275,92 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		assertDelta(before, after, "destroyed.main", 0);
 	}
 
+	/**
+	 * A view scoped bean which is first referenced by a JSTL tag must stay during postbacks. Such a bean is created
+	 * while the view is being built, so also again while the view is restored.
+	 */
+	@Test
+	public void beanCreatedDuringBuildOfRenderedViewMustStay() throws IOException {
+		Map<String, Integer> before = getCounts();
+		openWithoutUnload("ViewScopedUnrenderedITJstl.xhtml");
+		String beanId = bean.getText();
+		Map<String, Integer> afterOpen = getCounts();
+		assertDelta(before, afterOpen, "activeViewScopes", 1);
+		assertDelta(before, afterOpen, "created.jstl", 1);
+
+		guardAjax(submit).click();
+		assertEquals(beanId, bean.getText(), "bean after ajax postback");
+		guardHttp(nonAjaxSubmit).click();
+		assertEquals(beanId, bean.getText(), "bean after non-ajax postback");
+		guardAjax(submit).click();
+		assertEquals(beanId, bean.getText(), "bean after ajax postback following non-ajax postback");
+
+		Map<String, Integer> after = getCounts();
+		assertDelta(before, after, "activeViewScopes", 1);
+		assertDelta(before, after, "created.jstl", 1);
+		assertDelta(before, after, "destroyed.jstl", 0);
+	}
+
+	/**
+	 * A view scoped bean which is first referenced after the last form of its view must stay during postbacks.
+	 */
+	@Test
+	public void beanCreatedAfterFormOfRenderedViewMustStay() throws IOException {
+		Map<String, Integer> before = getCounts();
+		openWithoutUnload("ViewScopedUnrenderedITAfterForm.xhtml");
+		String beanId = afterForm.getText();
+		Map<String, Integer> afterOpen = getCounts();
+		assertDelta(before, afterOpen, "activeViewScopes", 1);
+		assertDelta(before, afterOpen, "created.afterForm", 1);
+
+		guardAjax(submit).click();
+		assertEquals(beanId, afterForm.getText(), "bean after ajax postback");
+		guardHttp(nonAjaxSubmit).click();
+		assertEquals(beanId, afterForm.getText(), "bean after non-ajax postback");
+
+		Map<String, Integer> after = getCounts();
+		assertDelta(before, after, "activeViewScopes", 1);
+		assertDelta(before, after, "created.afterForm", 1);
+		assertDelta(before, after, "destroyed.afterForm", 0);
+	}
+
+	/**
+	 * A view whose rendering fails after its form has written the view state never reaches the client along with its
+	 * unload script.
+	 */
+	@Test
+	public void exceptionDuringRenderAfterFormMustDestroyBean() throws IOException {
+		Map<String, Integer> before = getCounts();
+		openWithoutUnload("ViewScopedUnrenderedITRenderFailure.xhtml");
+		assertTrue(body.getText().contains("Expected exception."), "error page is rendered: " + body.getText());
+		Map<String, Integer> after = awaitDelta(before, "destroyed.postback", 1);
+		assertDelta(before, after, "activeViewScopes", 1);
+		assertDelta(before, after, "created.postback", 1);
+		assertDelta(before, after, "destroyedWithoutFacesContext.postback", 0);
+		assertDelta(before, after, "created.errorPage", 1);
+		assertDelta(before, after, "destroyed.errorPage", 0);
+	}
+
+	/**
+	 * A view without <code>&lt;h:body&gt;</code> can't render the unload script.
+	 */
+	@Test
+	public void viewWithoutBodyMustDestroyBean() throws IOException {
+		Map<String, Integer> before = getCounts();
+		openWithoutUnload("ViewScopedUnrenderedITWithoutBody.xhtml");
+		Map<String, Integer> after = awaitDelta(before, "destroyed.main", 1);
+		assertDelta(before, after, "activeViewScopes", 0);
+		assertDelta(before, after, "created.main", 1);
+		assertDelta(before, after, "destroyedWithoutFacesContext.main", 0);
+	}
+
 	private void openPostbackPage() {
+		openWithoutUnload("ViewScopedUnrenderedITPostback.xhtml");
+	}
+
+	private void openWithoutUnload(String pageName) {
 		executeScript("OmniFaces.Unload.disable()"); // So that the counts are not affected by an unload request of the page opened by init().
-		open("ViewScopedUnrenderedITPostback.xhtml");
+		open(pageName);
 	}
 
 	/**

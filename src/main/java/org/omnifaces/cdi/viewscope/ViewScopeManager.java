@@ -21,9 +21,9 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_HEADER_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.Components.addFormIfNecessary;
-import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getViewId;
@@ -43,12 +43,14 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.application.ViewExpiredException;
+import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.Hacks;
 
 /**
  * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
@@ -237,14 +239,33 @@ public class ViewScopeManager {
 		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 
 		if (context.getCurrentPhaseId() == RENDER_RESPONSE) {
-			addScript(script);
+			addUnloadScript(context, script);
 		}
 		else {
 			subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> {
 				if (beanStorageId.equals(storageInSession.getBeanStorageId())) {
-					addScript(script);
+					addUnloadScript(context, script);
 				}
 			});
+		}
+	}
+
+	/**
+	 * In an ajax response with partial rendering, the unload script is executed on complete, and the view scope is
+	 * activated when the view state is written into the ajax response, see {@link ViewScopeStateManager}. Otherwise,
+	 * the unload script is added to the end of the body, where {@link ViewScopeUnloadScriptRenderer} activates the view
+	 * scope while rendering it.
+	 */
+	private static void addUnloadScript(FacesContext context, String script) {
+		if (isAjaxRequestWithPartialRendering(context)) {
+			oncomplete(script);
+		}
+		else {
+			UIOutput unloadScript = new UIOutput();
+			unloadScript.setRendererType(ViewScopeUnloadScriptRenderer.RENDERER_TYPE);
+			unloadScript.setValue(script);
+			Hacks.setComponentResourceUniqueId(context, unloadScript);
+			context.getViewRoot().addComponentResource(context, unloadScript, "body");
 		}
 	}
 

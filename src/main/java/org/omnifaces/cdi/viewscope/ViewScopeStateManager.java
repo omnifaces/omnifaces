@@ -14,17 +14,18 @@ package org.omnifaces.cdi.viewscope;
 
 import javax.faces.application.StateManager;
 import javax.faces.application.StateManagerWrapper;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Right before the state of the current view is saved, puts the pending bean storage of OmniFaces {@link ViewScoped}
- * beans of the current view in the active view scopes, see {@link ViewScopeStorageInSession}. A view whose state is
- * never saved, such as a view which is redirected or forwarded away from, or a view which is replaced by a file
- * download, an error page or an exception, never reaches the client as a view on which the unload script could
- * destroy its view scoped beans. The beans of such a view are therefore destroyed at the end of the request.
+ * Right before the state of the current view is written into an ajax response, puts the pending bean storage of
+ * OmniFaces {@link ViewScoped} beans of the current view in the active view scopes, see
+ * {@link ViewScopeStorageInSession}. In a non-ajax response, this is done by {@link ViewScopeUnloadScriptRenderer}
+ * while it renders the unload script at the end of the body. A view which never reaches the client along with its
+ * unload script, such as a view which is redirected or forwarded away from, or a view which is replaced by a file
+ * download, an error page or an exception, can never have its view scoped beans destroyed by an unload. The beans of
+ * such a view are therefore destroyed at the end of the request.
  * <p>
  * This state manager is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
  * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
@@ -32,6 +33,7 @@ import org.omnifaces.cdi.ViewScoped;
  *
  * @author Bauke Scholtz
  * @see ViewScopeStorageInSession
+ * @see ViewScopeUnloadScriptRenderer
  * @since 3.14.28
  */
 public class ViewScopeStateManager extends StateManagerWrapper {
@@ -52,26 +54,9 @@ public class ViewScopeStateManager extends StateManagerWrapper {
 	 * Activates the pending view scope of the current view before delegating.
 	 */
 	@Override
-	public Object saveView(FacesContext context) {
-		activate(context);
-		return super.saveView(context);
-	}
-
-	/**
-	 * Activates the pending view scope of the current view before delegating.
-	 */
-	@Override
 	public String getViewState(FacesContext context) {
-		activate(context);
+		ViewScopeStorageInSession.activate(context);
 		return super.getViewState(context);
-	}
-
-	private static void activate(FacesContext context) {
-		UIViewRoot viewRoot = context.getViewRoot();
-
-		if (viewRoot != null && !viewRoot.isTransient()) {
-			ViewScopeStorageInSession.activate(viewRoot);
-		}
 	}
 
 }
