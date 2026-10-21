@@ -104,7 +104,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 
 		Map<String, Integer> after = awaitDelta(before, "destroyed.viewAction", DEFAULT_MAX_ACTIVE_VIEW_SCOPES + 1);
 		assertDelta(before, after, "activeViewScopes", 0);
-		assertDelta(before, after, "viewMaps", 0);
+		assertNoIncrease(before, after, "viewMaps");
 		assertDelta(before, after, "created.viewAction", DEFAULT_MAX_ACTIVE_VIEW_SCOPES + 1);
 		assertDelta(before, after, "destroyedWithoutFacesContext.viewAction", 0);
 
@@ -127,7 +127,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		assertEquals(HTTP_MOVED_TEMP, get("ViewScopedUnrenderedITPreRenderViewRedirect.xhtml").getResponseCode(), "redirect response status");
 		Map<String, Integer> after = awaitDelta(before, "destroyed.preRenderView", 1);
 		assertDelta(before, after, "activeViewScopes", 0);
-		assertDelta(before, after, "viewMaps", 0);
+		assertNoIncrease(before, after, "viewMaps");
 		assertDelta(before, after, "created.preRenderView", 1);
 		assertDelta(before, after, "destroyedWithoutFacesContext.preRenderView", 0);
 	}
@@ -138,7 +138,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		assertEquals(HTTP_MOVED_TEMP, get("ViewScopedUnrenderedITBuildRedirect.xhtml").getResponseCode(), "redirect response status");
 		Map<String, Integer> after = awaitDelta(before, "destroyed.build", 1);
 		assertDelta(before, after, "activeViewScopes", 0);
-		assertDelta(before, after, "viewMaps", 0);
+		assertNoIncrease(before, after, "viewMaps");
 		assertDelta(before, after, "created.build", 1);
 		assertDelta(before, after, "destroyedWithoutFacesContext.build", 0);
 	}
@@ -162,7 +162,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		Map<String, Integer> after = getCounts();
 		assertEquals(beanId, bean.getText(), "bean of open view");
 		assertDelta(before, after, "activeViewScopes", 0);
-		assertDelta(before, after, "viewMaps", 0);
+		assertNoIncrease(before, after, "viewMaps");
 		assertDelta(before, after, "created.main", 0);
 		assertDelta(before, after, "destroyed.main", 0);
 	}
@@ -183,7 +183,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		assertEquals("2", count.getText(), "count after download");
 		Map<String, Integer> after = getCounts();
 		assertDelta(before, after, "activeViewScopes", 0);
-		assertDelta(before, after, "viewMaps", 0);
+		assertNoIncrease(before, after, "viewMaps");
 		assertDelta(before, after, "created.main", 0);
 		assertDelta(before, after, "destroyed.main", 0);
 	}
@@ -197,7 +197,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 		assertTrue(String.valueOf(download.getHeaderField("Content-Disposition")).contains("download.txt"), "download response");
 		Map<String, Integer> afterDownload = awaitDelta(before, "destroyed.postback", 1);
 		assertDelta(before, afterDownload, "activeViewScopes", 0);
-		assertDelta(before, afterDownload, "viewMaps", 0);
+		assertNoIncrease(before, afterDownload, "viewMaps");
 		assertDelta(before, afterDownload, "created.postback", 1);
 		assertDelta(before, afterDownload, "destroyedWithoutFacesContext.postback", 0);
 
@@ -388,6 +388,14 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
 			Thread.currentThread().interrupt();
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Asserts that the count did not grow. A decrease is accepted, because the Faces implementation may destroy view
+	 * scopes of earlier views during the request.
+	 */
+	private static void assertNoIncrease(Map<String, Integer> before, Map<String, Integer> after, String name) {
+		assertTrue(after.get(name) <= before.get(name), () -> name + " before " + before + " after " + after);
 	}
 
 	private static void assertDelta(Map<String, Integer> before, Map<String, Integer> after, String name, int expectedDelta) {
