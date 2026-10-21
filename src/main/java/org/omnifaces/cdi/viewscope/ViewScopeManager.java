@@ -12,17 +12,19 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_HEADER_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.ComponentsLocal.addFacesScriptResource;
 import static org.omnifaces.util.ComponentsLocal.addFormIfNecessary;
-import static org.omnifaces.util.ComponentsLocal.addScript;
 import static org.omnifaces.util.ComponentsLocal.addScriptResource;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -39,12 +41,14 @@ import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.faces.application.ViewExpiredException;
+import jakarta.faces.component.UIOutput;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.Hacks;
 
 /**
  * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
@@ -89,8 +93,8 @@ public class ViewScopeManager {
     private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
     private static final String WARNING_UNSUPPORTED_STATE_SAVING = "@ViewScoped %s"
-            + " requires non-stateless views in order to be able to properly destroy the bean."
-            + " The current view %s is stateless and this may cause memory leaks."
+            + " requires non-stateless views in order to be able to keep the bean during postbacks."
+            + " The current view %s is stateless and therefore the bean is destroyed at the end of every request."
             + " Consider subclassing the bean with @jakarta.faces.view.ViewScoped annotation.";
 
     private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
@@ -232,13 +236,45 @@ public class ViewScopeManager {
     }
 
     /**
-     * Register unload script.
+     * Register unload script. When the view is not yet being rendered, then the unload script is only added when the
+     * view which is about to be rendered is still the one of the given bean storage, so that a view which is navigated
+     * to doesn't initialize the unload of the view which is navigated away from.
      */
-    private static void registerUnloadScript(FacesContext context, UUID beanStorageId) {
+    private void registerUnloadScript(FacesContext context, UUID beanStorageId) {
+        var script = format(SCRIPT_INIT, beanStorageId);
         addFormIfNecessary(context); // Required to get view state ID.
         addFacesScriptResource(context); // Ensure it's always included BEFORE omnifaces.js.
         addScriptResource(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
-        addScript(context, format(SCRIPT_INIT, beanStorageId));
+
+        if (context.getCurrentPhaseId() == RENDER_RESPONSE) {
+            addUnloadScript(context, script);
+        }
+        else {
+            subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> {
+                if (beanStorageId.equals(storageInSession.getBeanStorageId())) {
+                    addUnloadScript(context, script);
+                }
+            });
+        }
+    }
+
+    /**
+     * In an ajax response with partial rendering, the unload script is executed on complete, and the view scope is
+     * activated when the view state is written into the ajax response, see {@link ViewScopeStateManager}. Otherwise,
+     * the unload script is added to the end of the body, where {@link ViewScopeUnloadScriptRenderer} activates the view
+     * scope while rendering it.
+     */
+    private static void addUnloadScript(FacesContext context, String script) {
+        if (isAjaxRequestWithPartialRendering(context)) {
+            oncomplete(script);
+        }
+        else {
+            var unloadScript = new UIOutput();
+            unloadScript.setRendererType(ViewScopeUnloadScriptRenderer.RENDERER_TYPE);
+            unloadScript.setValue(script);
+            Hacks.setComponentResourceUniqueId(context, unloadScript);
+            context.getViewRoot().addComponentResource(context, unloadScript, "body");
+        }
     }
 
     /**
@@ -263,4 +299,4 @@ public class ViewScopeManager {
         return "unload".equals(request.getHeader(OMNIFACES_EVENT_HEADER_NAME)) || "unload".equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
     }
 
-}
+}
