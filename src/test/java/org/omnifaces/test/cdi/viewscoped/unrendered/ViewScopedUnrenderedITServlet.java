@@ -15,6 +15,8 @@ package org.omnifaces.test.cdi.viewscoped.unrendered;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,7 +38,10 @@ public class ViewScopedUnrenderedITServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final String[] BEAN_NAMES = { "main", "viewAction", "preRenderView", "build", "postback", "errorPage", "sibling", "jstl", "afterForm" };
-    private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
+    private static final String[] MOJARRA_ACTIVE_VIEW_MAPS = {
+        "com.sun.faces.application.view.activeViewMaps", // Mojarra 4.x
+        "org.glassfish.mojarra.application.view.activeViewMaps" // Mojarra 5.x
+    };
     private static final String[] MYFACES_VIEW_SCOPE_HOLDERS = {
         "org.apache.myfaces.cdi.view.ViewScopeBeanHolder", // MyFaces 3.x
         "org.apache.myfaces.cdi.view.ViewScopeContextualStorageHolder" // MyFaces 4.x
@@ -79,7 +84,7 @@ public class ViewScopedUnrenderedITServlet extends HttpServlet {
     }
 
     private static int getViewMaps(HttpSession session) {
-        Object mojarraViewMaps = session.getAttribute(MOJARRA_ACTIVE_VIEW_MAPS);
+        Object mojarraViewMaps = Stream.of(MOJARRA_ACTIVE_VIEW_MAPS).map(session::getAttribute).filter(Objects::nonNull).findFirst().orElse(null);
 
         if (mojarraViewMaps instanceof Map) {
             return ((Map<?, ?>) mojarraViewMaps).size();
