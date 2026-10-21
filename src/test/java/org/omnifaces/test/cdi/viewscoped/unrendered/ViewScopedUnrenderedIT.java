@@ -147,7 +147,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         assertEquals(HTTP_OK, get("ViewScopedUnrenderedIT.xhtml").getResponseCode(), "response status");
         Map<String, Integer> after = getCounts();
         assertDelta(before, after, "activeViewScopes", 1);
-        assertDelta(before, after, "viewMaps", 1);
+        assertViewMapCreated(before, after);
         assertDelta(before, after, "created.main", 1);
         assertDelta(before, after, "destroyed.main", 0);
     }
@@ -203,7 +203,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         assertFalse(bean.getText().isEmpty(), "bean rendered after download");
         Map<String, Integer> afterShow = getCounts();
         assertDelta(before, afterShow, "activeViewScopes", 1);
-        assertDelta(before, afterShow, "viewMaps", 1);
+        assertViewMapCreated(before, afterShow);
         assertDelta(before, afterShow, "created.postback", 2);
         assertDelta(before, afterShow, "destroyed.postback", 1);
     }
@@ -216,7 +216,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         assertTrue(body.getText().contains("Expected exception."), "error page is rendered: " + body.getText());
         Map<String, Integer> after = awaitDelta(before, "destroyed.postback", 1);
         assertDelta(before, after, "activeViewScopes", 1);
-        assertDelta(before, after, "viewMaps", 1);
+        assertViewMapCreated(before, after);
         assertDelta(before, after, "created.postback", 1);
         assertDelta(before, after, "destroyed.postback", 1);
         assertDelta(before, after, "created.errorPage", 1);
@@ -246,7 +246,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         assertEquals(1, browser.getPageSource().split("OmniFaces\\.Unload\\.init\\(", -1).length - 1, "unload scripts of navigated view");
         Map<String, Integer> after = awaitDelta(before, "destroyed.postback", 1);
         assertDelta(before, after, "activeViewScopes", 1);
-        assertDelta(before, after, "viewMaps", 1);
+        assertViewMapCreated(before, after);
         assertDelta(before, after, "created.postback", 1);
         assertDelta(before, after, "destroyedWithoutFacesContext.postback", 0);
         assertDelta(before, after, "created.main", 1);
@@ -385,6 +385,12 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static void assertViewMapCreated(Map<String, Integer> before, Map<String, Integer> after) {
+        if (!isLibertyUsed()) { // The probe servlet can't count the view scopes of MyFaces on Liberty.
+            assertDelta(before, after, "viewMaps", 1);
         }
     }
 
