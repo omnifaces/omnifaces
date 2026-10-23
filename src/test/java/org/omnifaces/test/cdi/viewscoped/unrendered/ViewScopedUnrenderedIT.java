@@ -31,6 +31,7 @@ import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -327,6 +328,7 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
      * unload script.
      */
     @Test
+    @DisabledIfSystemProperty(named = "profile.id", matches = "liberty-.*", disabledReason = "It fails with java.lang.IllegalStateException: setBufferSize() called after first write to Output Stream/Writer")
     public void exceptionDuringRenderAfterFormMustDestroyBean() throws IOException {
         Map<String, Integer> before = getCounts();
         openWithoutUnload("ViewScopedUnrenderedITRenderFailure.xhtml");
