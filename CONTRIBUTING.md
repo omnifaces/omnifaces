@@ -45,7 +45,8 @@ The same rules apply as to any other contribution, plus these:
   "The AI wrote it" is not an answer to a review comment.
 - **Disclose it.**
   State in the pull request description which tool and model you used, and for what, e.g. "Claude Code with Claude Opus 5.5 wrote the test, I wrote the fix".
-  Always include the model name and version, as your tool reports it, because model versions behave differently.
+  Always include the model name and version, as your tool reports it.
+  That keeps the history accountable and traceable, and shows over time which models and versions do the job well.
   A `Co-Authored-By` trailer in the commit message counts as disclosure when it names the model and version, e.g. `Co-Authored-By: Claude Opus 5.5`.
 - **Verify it.**
   Build and run the tests locally before opening the pull request.
