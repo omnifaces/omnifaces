@@ -12,9 +12,9 @@
  */
 package org.omnifaces.taghandler;
 
-import static java.lang.Math.max;
 import static java.lang.String.format;
 import static org.omnifaces.taghandler.ImportFunctions.toClass;
+import static org.omnifaces.taghandler.ImportFunctions.toSimpleName;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 import static org.omnifaces.util.Utils.isOneOf;
 
@@ -128,14 +128,7 @@ public class ImportConstants extends TagHandler {
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
-		String var = varValue;
-
-		if (var == null) {
-			int innerClass = type.lastIndexOf('$');
-			int outerClass = type.lastIndexOf('.');
-			var = type.substring(max(innerClass, outerClass) + 1);
-		}
-
+		String var = (varValue != null) ? varValue : toSimpleName(type);
 		context.setAttribute(var, constants);
 	}
 

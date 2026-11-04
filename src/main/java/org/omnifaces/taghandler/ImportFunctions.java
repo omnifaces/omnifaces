@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Math.max;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Facelets.getStringLiteral;
@@ -114,12 +115,22 @@ public class ImportFunctions extends TagHandler {
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		String type = typeAttribute.getValue(context);
-		String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		String var = (varValue != null) ? varValue : toSimpleName(type);
 		FunctionMapper originalFunctionMapper = context.getFunctionMapper();
 		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type)));
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the simple name of the given type, which may use either <code>$</code> or <code>.</code> as nested class
+	 * separator.
+	 * @param type The fully qualified name of the type.
+	 * @return The simple name of the given type.
+	 */
+	static String toSimpleName(String type) { // Package-private so that ImportConstants can also use it.
+		return type.substring(max(type.lastIndexOf('$'), type.lastIndexOf('.')) + 1);
+	}
 
 	/**
 	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
