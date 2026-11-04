@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Math.max;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
@@ -130,13 +131,23 @@ public class ImportFunctions extends TagHandler {
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
         String type = typeAttribute.getValue(context);
-        String varName = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
+        String varName = (varValue != null) ? varValue : toSimpleName(type);
         ClassLoader loader = getClassLoader(context, loaderAttribute);
         FunctionMapper originalFunctionMapper = context.getFunctionMapper();
         context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, varName, toClass(type, loader)));
     }
 
     // Helpers --------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the simple name of the given type, which may use either <code>$</code> or <code>.</code> as nested class separator.
+     *
+     * @param type The fully qualified name of the type.
+     * @return The simple name of the given type.
+     */
+    static String toSimpleName(String type) { // Package-private so that ImportConstants can also use it.
+        return type.substring(max(type.lastIndexOf('$'), type.lastIndexOf('.')) + 1);
+    }
 
     /**
      * Returns the class loader associated with the object specified in given tag attribute, if any.
