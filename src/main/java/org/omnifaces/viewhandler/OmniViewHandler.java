@@ -226,13 +226,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
      * and restore state of all other components in the tree. This is unnecessary during an unload request.
      */
     private static boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
-        var state = manager.getState(context, view.getViewId());
-
-        if (!(state instanceof Object[] stateArray) || stateArray.length < 2) {
-            return false;
-        }
-
-        var componentState = stateArray[1];
+        var componentState = getComponentState(manager.getState(context, view.getViewId()));
         Object viewRootState = null;
 
         if (componentState instanceof Map<?, ?> componentStateMap) { // Partial state saving.
@@ -256,6 +250,22 @@ public class OmniViewHandler extends ViewHandlerWrapper {
         }
 
         return false;
+    }
+
+    /**
+     * Returns the component state of the given raw state. Mojarra 5 saves the component state map alone. Mojarra 4 and MyFaces save an array whose second
+     * element is the component state.
+     */
+    private static Object getComponentState(Object state) {
+        if (state instanceof Map) {
+            return state;
+        }
+
+        if (state instanceof Object[] stateArray && stateArray.length >= 2) {
+            return stateArray[1];
+        }
+
+        return null;
     }
 
     private static void registerPendingViewStateRemoval(FacesContext context, UIViewRoot view) {
