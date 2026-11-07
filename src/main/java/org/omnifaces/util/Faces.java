@@ -1754,8 +1754,13 @@ public final class Faces {
     }
 
     /**
-     * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the <code>X-Forwarded-For</code> request header and
-     * if it's present, then return its first IP address, else just return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+     * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the request headers <code>Forwarded</code>,
+     * <code>X-Forwarded-For</code> and <code>X-Real-IP</code> and if any is present, then return its first IP address, else just return
+     * {@link HttpServletRequest#getRemoteAddr()} unmodified.
+     * <p>
+     * The client controls these request headers, unless a trusted proxy overwrites them. Do not use this method for security decisions such as rate limiting or
+     * access control; use {@link HttpServletRequest#getRemoteAddr()} instead, with the servlet container configured to resolve the client IP address from the
+     * proxy headers of trusted proxies only.
      * <p>
      * This is also available in EL as <code>#{faces.remoteAddr}</code>.
      *

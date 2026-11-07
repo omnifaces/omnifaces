@@ -76,6 +76,9 @@ import org.omnifaces.cdi.ratelimit.RateLimiter;
  * When no <code>clientId</code> is specified, the rate limiter will automatically use the client IP address from the current {@link HttpServletRequest}. If no
  * HTTP request is available in the current context, you must explicitly provide a <code>clientId</code>, otherwise an {@link IllegalArgumentException} will be
  * thrown.
+ * <p>
+ * The client IP address is obtained by {@link HttpServletRequest#getRemoteAddr()}, not from proxy headers. See
+ * {@link RateLimiter#checkRateLimit(HttpServletRequest, int, java.time.Duration, int)} for how to configure this behind a reverse proxy.
  *
  * @author Bauke Scholtz
  * @since 5.0
@@ -95,7 +98,7 @@ public @interface RateLimit {
 
     /**
      * (Optional) The client identifier to check, whether client IP, user ID, API key, etc. Defaults to client IP address associated with the current
-     * {@link HttpServletRequest}.
+     * {@link HttpServletRequest}, as obtained by {@link HttpServletRequest#getRemoteAddr()}.
      * <p>
      * Note thus that when you cannot guarantee that a {@link HttpServletRequest} is available in the context of the annotated method, then you'll definitely
      * need to explicitly provide a client ID, otherwise the {@link RateLimitInterceptor} will throw an {@link IllegalArgumentException}.

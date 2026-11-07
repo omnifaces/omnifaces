@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.ratelimit;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,8 @@ class RateLimiterTest {
 
     private static final String FIRST_IP = "192.0.2.1";
     private static final String SECOND_IP = "192.0.2.2";
+    private static final String SPOOFED_IP_PREFIX = "198.51.100.";
+    private static final String[] PROXY_HEADERS = { "Forwarded", "X-Forwarded-For", "X-Real-IP" };
 
     private RateLimiter rateLimiter;
     private HttpServletRequest request;
@@ -107,7 +110,7 @@ class RateLimiterTest {
     }
 
     @Test
-    void testAutomaticCleanupOfExpiredEntries() {
+    void testExpiredCounterIsReplacedOnNextCheck() {
         var timeWindow = Duration.ofMillis(50);
         var maxRequests = 1;
         freezeTicker();
@@ -126,6 +129,60 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request1, maxRequests, timeWindow, 0));
     }
 
+    /**
+     * The client controls proxy headers such as <code>X-Forwarded-For</code>, so they must not determine the rate limit key.
+     */
+    @Test
+    void testProxyHeadersDoNotDetermineClientIP() {
+        var timeWindow = Duration.ofSeconds(10);
+        var maxRequests = 2;
+
+        for (var i = 0; i < maxRequests; i++) {
+            stubProxyHeaders(SPOOFED_IP_PREFIX + i);
+            assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+        }
+
+        stubProxyHeaders(SPOOFED_IP_PREFIX + maxRequests);
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+    }
+
+    /**
+     * Each request counter expires by its own time window, so that a check with a shorter time window does not reset one with a longer time window.
+     */
+    @Test
+    void testShorterTimeWindowDoesNotExpireLongerTimeWindow() {
+        var longTimeWindow = Duration.ofSeconds(60);
+        var shortTimeWindow = Duration.ofSeconds(1);
+        var maxRequests = 1;
+        freezeTicker();
+
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, longTimeWindow, 0));
+        advanceTicker(shortTimeWindow);
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(SECOND_IP, maxRequests, shortTimeWindow, 0));
+        rateLimiter.removeExpiredCounters();
+
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, longTimeWindow, 0));
+    }
+
+    /**
+     * Expired request counters are removed by the periodic task, so that client identifiers which never return do not stay in the map.
+     */
+    @Test
+    void testExpiredCountersAreRemoved() {
+        var timeWindow = Duration.ofSeconds(10);
+        var maxRequests = 1;
+        freezeTicker();
+
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(SECOND_IP, maxRequests, timeWindow, 0));
+        rateLimiter.removeExpiredCounters();
+        assertEquals(2, rateLimiter.getTrackedClientCount());
+
+        advanceTicker(timeWindow);
+        rateLimiter.removeExpiredCounters();
+        assertEquals(0, rateLimiter.getTrackedClientCount());
+    }
+
     @Test
     void testMaxRetriesAllowsAdditionalAttempts() {
         var timeWindow = Duration.ofMillis(200); // Short window for testing
@@ -134,6 +191,12 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
         assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 1));
+    }
+
+    private void stubProxyHeaders(String ip) {
+        for (var header : PROXY_HEADERS) {
+            when(request.getHeader(header)).thenReturn(ip);
+        }
     }
 
     private void freezeTicker() {

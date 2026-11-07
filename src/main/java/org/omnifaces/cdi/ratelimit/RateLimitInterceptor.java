@@ -29,7 +29,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.omnifaces.cdi.RateLimit;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -39,7 +38,7 @@ import org.omnifaces.util.Servlets;
  * exceeded, a {@link RateLimitExceededException} is thrown. Otherwise, the method execution continues normally.
  * <p>
  * The interceptor automatically resolves the client identifier from the annotation configuration, falling back to the client IP address from the current HTTP
- * request if no explicit client ID is provided.
+ * request if no explicit client ID is provided, as per {@link RateLimiter#checkRateLimit(HttpServletRequest, int, Duration, int)}.
  *
  * @author Bauke Scholtz
  * @since 5.0
@@ -66,11 +65,18 @@ public class RateLimitInterceptor {
     @AroundInvoke
     public Object limitRate(InvocationContext context) throws Exception {
         var rateLimit = getRateLimitAnnotation(context);
-        var clientId = getRateLimitClientId(rateLimit);
+        var clientId = rateLimit.clientId();
         var maxRequests = rateLimit.maxRequestsPerTimeWindow();
         var timeWindow = Duration.ofSeconds(rateLimit.timeWindowInSeconds());
         var maxRetries = rateLimit.maxRetries();
-        rateLimiter.checkRateLimit(clientId, maxRequests, timeWindow, maxRetries);
+
+        if (clientId != null && !clientId.isBlank()) {
+            rateLimiter.checkRateLimit(clientId, maxRequests, timeWindow, maxRetries);
+        }
+        else {
+            rateLimiter.checkRateLimit(getRequest(), maxRequests, timeWindow, maxRetries);
+        }
+
         return context.proceed();
     }
 
@@ -84,19 +90,13 @@ public class RateLimitInterceptor {
         return rateLimit;
     }
 
-    private static String getRateLimitClientId(RateLimit rateLimit) {
-        var clientId = rateLimit.clientId();
-
-        if (clientId != null && !clientId.isBlank()) {
-            return clientId;
-        }
-
+    private static HttpServletRequest getRequest() {
         if (Faces.hasContext()) {
-            return Faces.getRemoteAddr();
+            return Faces.getRequest();
         }
 
         if (Beans.isActive(RequestScoped.class)) {
-            return Servlets.getRemoteAddr(getReference(HttpServletRequest.class));
+            return getReference(HttpServletRequest.class);
         }
 
         throw new IllegalArgumentException(ERROR_CLIENT_ID_REQUIRED);

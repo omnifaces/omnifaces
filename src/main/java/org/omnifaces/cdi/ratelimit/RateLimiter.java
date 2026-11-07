@@ -17,7 +17,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.WARNING;
-import static org.omnifaces.util.Servlets.getRemoteAddr;
 
 import java.time.Duration;
 import java.util.Map;
@@ -26,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongSupplier;
 import java.util.logging.Logger;
@@ -113,6 +114,7 @@ public class RateLimiter {
     private static final Logger logger = Logger.getLogger(RateLimiter.class.getName());
 
     private static final String THREAD_ID = "omnifaces.RateLimiter.executorService";
+    private static final long EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS = 10;
 
     private static final String WARNING_RETRY = "Rate limit exceeded for client ID '%s'; now retry attempt #%d ...";
     private static final String WARNING_INTERRUPTED = "Rate limit delay interrupted for client ID '%s'; continuing with retry ...";
@@ -124,12 +126,13 @@ public class RateLimiter {
     private LongSupplier ticker = System::nanoTime;
     private ScheduledExecutorService executorService;
     private boolean managedExecutorService;
+    private ScheduledFuture<?> expiredCountersRemoval;
 
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
      * First looks up the JEE default managed scheduled executor service in JNDI. If it isn't available, then create scheduled executor service ourselves with
-     * help of {@link Executors#newSingleThreadExecutor()}.
+     * help of {@link Executors#newSingleThreadScheduledExecutor(ThreadFactory)}. Then schedule the periodic removal of expired request counters on it.
      */
     @PostConstruct
     public void init() {
@@ -150,10 +153,19 @@ public class RateLimiter {
                 return thread;
             });
         }
+
+        expiredCountersRemoval = executorService.scheduleWithFixedDelay(
+            this::removeExpiredCounters, EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS,
+            EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS, SECONDS
+        );
     }
 
     /**
      * Checks if the current request exceeds the configured rate limit for the client IP address associated with the given request.
+     * <p>
+     * The client IP address is obtained by {@link HttpServletRequest#getRemoteAddr()}. Proxy headers such as <code>X-Forwarded-For</code> are not consulted,
+     * because the client controls them. When the application runs behind a reverse proxy, configure the servlet container to resolve the client IP address from
+     * the proxy headers of trusted proxies only, such as Tomcat's <code>RemoteIpValve</code>. Otherwise all clients share the IP address of the proxy.
      * <p>
      * This method implements a sliding window rate limiting algorithm. It tracks the number of requests per IP address within the specified time window and
      * throws an exception if the limit is exceeded. Expired tracking entries are automatically cleaned up to prevent memory leaks.
@@ -167,7 +179,7 @@ public class RateLimiter {
     public void checkRateLimit(HttpServletRequest request, int maxRequestsPerTimeWindow, Duration timeWindow, int maxRetries)
         throws RateLimitExceededException
     {
-        checkRateLimit(getRemoteAddr(request), maxRequestsPerTimeWindow, timeWindow, maxRetries);
+        checkRateLimit(request.getRemoteAddr(), maxRequestsPerTimeWindow, timeWindow, maxRetries);
     }
 
     /**
@@ -203,17 +215,31 @@ public class RateLimiter {
 
     private void checkRateLimit(String clientId, int maxRequestsPerTimeWindow, Duration timeWindow) {
         var now = ticker.getAsLong();
-        var timeWindowInNanos = timeWindow.toNanos();
-        requestCountsByClientId.entrySet().removeIf(entry -> now - entry.getValue().starttime >= timeWindowInNanos);
-        var counter = requestCountsByClientId.compute(clientId, ($, rc) -> (rc == null) ? new RequestCounter(now) : rc.increment());
+        var counter = requestCountsByClientId.compute(
+            clientId,
+            ($, rc) -> (rc == null || rc.isExpired(now)) ? new RequestCounter(now, timeWindow.toNanos(), 1) : rc.increment()
+        );
 
-        if (counter.count > maxRequestsPerTimeWindow) {
-            var elapsedTimeInNanos = now - counter.starttime;
-
-            if (elapsedTimeInNanos < timeWindowInNanos) {
-                throw new RateLimitExceededException(clientId, Math.max(1, NANOSECONDS.toMillis(timeWindowInNanos - elapsedTimeInNanos)));
-            }
+        if (counter.count() > maxRequestsPerTimeWindow) {
+            throw new RateLimitExceededException(clientId, Math.max(1, NANOSECONDS.toMillis(counter.getRemainingTimeInNanos(now))));
         }
+    }
+
+    /**
+     * Removes all request counters whose time window has expired.
+     */
+    void removeExpiredCounters() {
+        var now = ticker.getAsLong();
+        requestCountsByClientId.values().removeIf(counter -> counter.isExpired(now));
+    }
+
+    /**
+     * Returns the number of client identifiers currently being tracked.
+     *
+     * @return The number of client identifiers currently being tracked.
+     */
+    int getTrackedClientCount() {
+        return requestCountsByClientId.size();
     }
 
     private void executeDelay(String clientId, long delayInMillis) {
@@ -233,11 +259,16 @@ public class RateLimiter {
     }
 
     /**
-     * If the scheduled executor service was created with help of {@link Executors#newSingleThreadExecutor()}, then attempt to orderly shut down it. If it's
-     * still not shut down after 5 seconds, then terminate it.
+     * Cancels the periodic removal of expired request counters. If the scheduled executor service was created with help of
+     * {@link Executors#newSingleThreadScheduledExecutor(ThreadFactory)}, then attempt to orderly shut down it. If it's still not shut down after 5 seconds,
+     * then terminate it.
      */
     @PreDestroy
     public void destroy() {
+        if (expiredCountersRemoval != null) {
+            expiredCountersRemoval.cancel(false);
+        }
+
         if (!managedExecutorService && executorService != null) {
             executorService.shutdown();
 
@@ -266,21 +297,20 @@ public class RateLimiter {
     // Nested classes -------------------------------------------------------------------------------------------------
 
     /**
-     * Convenience class for a request counter.
+     * Immutable request counter, so that each caller of {@link Map#compute(Object, java.util.function.BiFunction)} gets its own snapshot.
      */
-    private static class RequestCounter {
-
-        long starttime;
-        int count;
-
-        public RequestCounter(long starttime) {
-            this.starttime = starttime;
-            this.count = 1;
-        }
+    private record RequestCounter(long starttime, long timeWindowInNanos, int count) {
 
         public RequestCounter increment() {
-            count++;
-            return this;
+            return new RequestCounter(starttime, timeWindowInNanos, count + 1);
+        }
+
+        public boolean isExpired(long now) {
+            return getRemainingTimeInNanos(now) <= 0;
+        }
+
+        public long getRemainingTimeInNanos(long now) {
+            return timeWindowInNanos - (now - starttime);
         }
 
     }
