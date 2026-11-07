@@ -18,7 +18,12 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.WARNING;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,12 +33,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongSupplier;
 import java.util.logging.Logger;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.RateLimit;
@@ -51,6 +59,14 @@ import org.omnifaces.util.JNDI;
  * When the rate limit is exceeded, the rate limiter will by default immediately throw a {@link RateLimitExceededException}. Optionally, you can configure
  * automatic retries via the {@code maxRetries} parameter, which will retry the request after a calculated delay based on the remaining time window. If all
  * retries are exhausted, a {@link RateLimitExceededException} is thrown.
+ * <p>
+ * The number of tracked client identifiers is capped by the {@value #PARAM_NAME_MAX_TRACKED_CLIENTS} context parameter, which defaults to
+ * {@value #DEFAULT_MAX_TRACKED_CLIENTS}. When the cap is reached and expired entries cannot be removed, which is attempted at most once per second, a new
+ * client identifier is rejected with a {@link RateLimitExceededException}, while already tracked client identifiers continue to be checked as usual.
+ * <p>
+ * A new client identifier is rejected rather than let through, so that filling the cap cannot be used to bypass the rate limit. The trade-off is that a client
+ * which can choose many client identifiers can fill the cap and lock out new clients for the duration of the time window. When the client identifier is derived
+ * from user input, such as a user name submitted to a login form, then validate it before passing it to {@link #checkRateLimit(String, int, Duration, int)}.
  *
  * <h2>Usage</h2>
  * <p>
@@ -111,18 +127,47 @@ public class RateLimiter {
 
     // Constants ------------------------------------------------------------------------------------------------------
 
+    /**
+     * The context parameter name to specify the maximum number of client identifiers to track: {@value}.
+     *
+     * @since 5.5.7
+     */
+    public static final String PARAM_NAME_MAX_TRACKED_CLIENTS = "org.omnifaces.RATE_LIMITER_MAX_TRACKED_CLIENTS";
+
+    /**
+     * The default maximum number of client identifiers to track: {@value}.
+     *
+     * @since 5.5.7
+     */
+    public static final int DEFAULT_MAX_TRACKED_CLIENTS = 100_000;
+
     private static final Logger logger = Logger.getLogger(RateLimiter.class.getName());
 
     private static final String THREAD_ID = "omnifaces.RateLimiter.executorService";
     private static final long EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS = 10;
+    private static final long EXPIRED_COUNTERS_REMOVAL_ON_FULL_INTERVAL_IN_NANOS = SECONDS.toNanos(1);
+    private static final long NEVER = Long.MIN_VALUE;
+    private static final int IPV6_NETWORK_PREFIX_LENGTH_IN_BYTES = 8;
+    private static final String IPV6_NETWORK_PREFIX_SUFFIX = "/" + IPV6_NETWORK_PREFIX_LENGTH_IN_BYTES * Byte.SIZE;
+    private static final byte[] NAT64_WELL_KNOWN_PREFIX = { 0, 0x64, (byte) 0xff, (byte) 0x9b, 0, 0, 0, 0, 0, 0, 0, 0 }; // RFC 6052: 64:ff9b::/96
+
+    private static final String ERROR_MAX_TRACKED_CLIENTS = "The '%s' context param must be a positive number. Encountered an invalid value of '%s'.";
 
     private static final String WARNING_RETRY = "Rate limit exceeded for client ID '%s'; now retry attempt #%d ...";
     private static final String WARNING_INTERRUPTED = "Rate limit delay interrupted for client ID '%s'; continuing with retry ...";
     private static final String WARNING_UNEXPECTED_ERROR = "Unexpected error during rate limit delay for client ID '%s'.";
+    private static final String WARNING_MAX_TRACKED_CLIENTS = "Rate limiter tracks the maximum of %d client IDs; new client IDs are rejected until"
+        + " tracked ones expire. Consider raising the '%s' context param.";
 
     // Variables ------------------------------------------------------------------------------------------------------
 
     private final Map<String, RequestCounter> requestCountsByClientId = new ConcurrentHashMap<>();
+    private final AtomicLong lastExpiredCountersRemovalOnFull = new AtomicLong(NEVER);
+
+    @Inject
+    private ServletContext servletContext;
+
+    private int maxTrackedClients = DEFAULT_MAX_TRACKED_CLIENTS;
     private LongSupplier ticker = System::nanoTime;
     private ScheduledExecutorService executorService;
     private boolean managedExecutorService;
@@ -131,11 +176,18 @@ public class RateLimiter {
     // Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * First looks up the JEE default managed scheduled executor service in JNDI. If it isn't available, then create scheduled executor service ourselves with
-     * help of {@link Executors#newSingleThreadScheduledExecutor(ThreadFactory)}. Then schedule the periodic removal of expired request counters on it.
+     * First reads the {@value #PARAM_NAME_MAX_TRACKED_CLIENTS} context parameter, if any. Then looks up the JEE default managed scheduled executor service in
+     * JNDI. If it isn't available, then create scheduled executor service ourselves with help of
+     * {@link Executors#newSingleThreadScheduledExecutor(ThreadFactory)}. Finally schedule the periodic removal of expired request counters on it.
+     *
+     * @throws IllegalArgumentException When the {@value #PARAM_NAME_MAX_TRACKED_CLIENTS} context parameter is not a positive number.
      */
     @PostConstruct
     public void init() {
+        if (servletContext != null) {
+            initMaxTrackedClients(servletContext.getInitParameter(PARAM_NAME_MAX_TRACKED_CLIENTS));
+        }
+
         try {
             executorService = JNDI.lookup("java:comp/DefaultManagedScheduledExecutorService");
         }
@@ -160,12 +212,28 @@ public class RateLimiter {
         );
     }
 
+    private void initMaxTrackedClients(String value) {
+        if (value == null) {
+            return;
+        }
+
+        try {
+            setMaxTrackedClients(Integer.parseInt(value.strip()));
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException(ERROR_MAX_TRACKED_CLIENTS.formatted(PARAM_NAME_MAX_TRACKED_CLIENTS, value), e);
+        }
+    }
+
     /**
      * Checks if the current request exceeds the configured rate limit for the client IP address associated with the given request.
      * <p>
      * The client IP address is obtained by {@link HttpServletRequest#getRemoteAddr()}. Proxy headers such as <code>X-Forwarded-For</code> are not consulted,
      * because the client controls them. When the application runs behind a reverse proxy, configure the servlet container to resolve the client IP address from
      * the proxy headers of trusted proxies only, such as Tomcat's <code>RemoteIpValve</code>. Otherwise all clients share the IP address of the proxy.
+     * <p>
+     * An IPv6 address is tracked by its <code>/64</code> network prefix, because a single client usually controls a whole <code>/64</code> network. An
+     * IPv4-mapped IPv6 address, or one in the NAT64 well-known prefix <code>64:ff9b::/96</code>, is tracked as its embedded IPv4 address.
      * <p>
      * This method implements a sliding window rate limiting algorithm. It tracks the number of requests per IP address within the specified time window and
      * throws an exception if the limit is exceeded. Expired tracking entries are automatically cleaned up to prevent memory leaks.
@@ -179,7 +247,59 @@ public class RateLimiter {
     public void checkRateLimit(HttpServletRequest request, int maxRequestsPerTimeWindow, Duration timeWindow, int maxRetries)
         throws RateLimitExceededException
     {
-        checkRateLimit(request.getRemoteAddr(), maxRequestsPerTimeWindow, timeWindow, maxRetries);
+        checkRateLimit(getClientId(request.getRemoteAddr()), maxRequestsPerTimeWindow, timeWindow, maxRetries);
+    }
+
+    /**
+     * Returns the client identifier of the given remote address: an IPv6 address, without its zone ID, is reduced to its <code>/64</code> network prefix, an
+     * IPv4-mapped IPv6 address or an IPv6 address in the NAT64 well-known prefix <code>64:ff9b::/96</code> to its embedded IPv4 address, and anything that is
+     * not an IP address literal is returned unmodified.
+     *
+     * @param remoteAddr The remote address as obtained by {@link HttpServletRequest#getRemoteAddr()}.
+     * @return The client identifier of the given remote address.
+     */
+    static String getClientId(String remoteAddr) {
+        if (!isIPv6LiteralCandidate(remoteAddr)) {
+            return remoteAddr;
+        }
+
+        var zoneIndex = remoteAddr.indexOf('%');
+        var literal = zoneIndex < 0 ? remoteAddr : remoteAddr.substring(0, zoneIndex) + (remoteAddr.endsWith("]") ? "]" : "");
+
+        try {
+            var address = InetAddress.getByName(literal);
+
+            return (address instanceof Inet6Address) ? getIPv6ClientId(address.getAddress()) : address.getHostAddress();
+        }
+        catch (UnknownHostException e) {
+            return remoteAddr;
+        }
+    }
+
+    /**
+     * Returns whether the given remote address can be parsed as an IPv6 address literal without querying the name service.
+     *
+     * @param remoteAddr The remote address as obtained by {@link HttpServletRequest#getRemoteAddr()}.
+     * @return Whether the given remote address can be parsed as an IPv6 address literal without querying the name service.
+     */
+    static boolean isIPv6LiteralCandidate(String remoteAddr) {
+        if (remoteAddr == null || remoteAddr.indexOf(':') < 0) {
+            return false;
+        }
+
+        var firstChar = remoteAddr.charAt(0);
+        return HexFormat.isHexDigit(firstChar) || firstChar == ':' || firstChar == '['; // InetAddress#getByName() queries the name service otherwise.
+    }
+
+    private static String getIPv6ClientId(byte[] bytes) throws UnknownHostException {
+        var prefixLength = NAT64_WELL_KNOWN_PREFIX.length;
+
+        if (Arrays.equals(bytes, 0, prefixLength, NAT64_WELL_KNOWN_PREFIX, 0, prefixLength)) {
+            return InetAddress.getByAddress(Arrays.copyOfRange(bytes, prefixLength, bytes.length)).getHostAddress();
+        }
+
+        Arrays.fill(bytes, IPV6_NETWORK_PREFIX_LENGTH_IN_BYTES, bytes.length, (byte) 0);
+        return InetAddress.getByAddress(bytes).getHostAddress() + IPV6_NETWORK_PREFIX_SUFFIX;
     }
 
     /**
@@ -187,6 +307,9 @@ public class RateLimiter {
      * <p>
      * This method implements a sliding window rate limiting algorithm. It tracks the number of requests per client identifier within the specified time window
      * and throws an exception if the limit is exceeded. Expired tracking entries are automatically cleaned up to prevent memory leaks.
+     * <p>
+     * When the number of tracked client identifiers has reached the cap set by the {@value #PARAM_NAME_MAX_TRACKED_CLIENTS} context parameter, a new client
+     * identifier is rejected immediately, without retries.
      *
      * @param clientId The client identifier to check, whether client IP, user ID, API key, etc.
      * @param maxRequestsPerTimeWindow The maximum number of requests allowed within the time window.
@@ -195,6 +318,7 @@ public class RateLimiter {
      * @throws RateLimitExceededException When the rate limit is exceeded for the given client identifier.
      */
     public void checkRateLimit(String clientId, int maxRequestsPerTimeWindow, Duration timeWindow, int maxRetries) throws RateLimitExceededException {
+        rejectNewClientIfFull(clientId, timeWindow);
         var attempt = new AtomicInteger(0);
 
         while (attempt.get() <= maxRetries) {
@@ -221,8 +345,42 @@ public class RateLimiter {
         );
 
         if (counter.count() > maxRequestsPerTimeWindow) {
-            throw new RateLimitExceededException(clientId, Math.max(1, NANOSECONDS.toMillis(counter.getRemainingTimeInNanos(now))));
+            throw new RateLimitExceededException(clientId, toDelayInMillis(counter.getRemainingTimeInNanos(now)));
         }
+    }
+
+    /**
+     * When the given client identifier is new and the tracked client identifiers are at the cap, then remove expired request counters, at most once per second,
+     * and reject the given client identifier when still at the cap. Concurrent new client identifiers may be rejected while the removal runs. Concurrent
+     * requests may exceed the cap by at most their own number.
+     */
+    private void rejectNewClientIfFull(String clientId, Duration timeWindow) {
+        if (requestCountsByClientId.containsKey(clientId) || requestCountsByClientId.size() < maxTrackedClients) {
+            return;
+        }
+
+        var now = ticker.getAsLong();
+        var lastRemoval = lastExpiredCountersRemovalOnFull.get();
+        var removalDue = (lastRemoval == NEVER || now - lastRemoval >= EXPIRED_COUNTERS_REMOVAL_ON_FULL_INTERVAL_IN_NANOS)
+            && lastExpiredCountersRemovalOnFull.compareAndSet(lastRemoval, now);
+
+        if (removalDue) {
+            removeExpiredCounters();
+        }
+
+        if (requestCountsByClientId.size() >= maxTrackedClients) {
+            if (removalDue) {
+                logger.log(WARNING, WARNING_MAX_TRACKED_CLIENTS.formatted(maxTrackedClients, PARAM_NAME_MAX_TRACKED_CLIENTS));
+            }
+
+            throw new RateLimitExceededException(
+                clientId, toDelayInMillis(Math.min(timeWindow.toNanos(), SECONDS.toNanos(EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS)))
+            );
+        }
+    }
+
+    private static long toDelayInMillis(long delayInNanos) {
+        return Math.max(1, NANOSECONDS.toMillis(delayInNanos));
     }
 
     /**
@@ -292,6 +450,29 @@ public class RateLimiter {
      */
     void setTicker(LongSupplier ticker) {
         this.ticker = ticker;
+    }
+
+    /**
+     * Sets the servlet context to read the context parameters from during {@link #init()}, so that a test can provide one without CDI.
+     *
+     * @param servletContext The servlet context to read the context parameters from.
+     */
+    void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
+    /**
+     * Sets the maximum number of client identifiers to track.
+     *
+     * @param maxTrackedClients The maximum number of client identifiers to track.
+     * @throws IllegalArgumentException When the given maximum is not a positive number.
+     */
+    void setMaxTrackedClients(int maxTrackedClients) {
+        if (maxTrackedClients < 1) {
+            throw new IllegalArgumentException(ERROR_MAX_TRACKED_CLIENTS.formatted(PARAM_NAME_MAX_TRACKED_CLIENTS, maxTrackedClients));
+        }
+
+        this.maxTrackedClients = maxTrackedClients;
     }
 
     // Nested classes -------------------------------------------------------------------------------------------------
