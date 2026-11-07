@@ -25,9 +25,17 @@ import org.omnifaces.cdi.ratelimit.RateLimitExceededException;
 public class RateLimitITBean {
 
     private String exampleApiResponse;
+    private String classApiResponse;
+    private String interfaceApiResponse;
 
     @Inject
     private RateLimitITService service;
+
+    @Inject
+    private RateLimitITGenericService genericService;
+
+    @Inject
+    private RateLimitITGenericApi<String> genericApi;
 
     public void submit() {
         try {
@@ -36,6 +44,24 @@ public class RateLimitITBean {
         catch (RateLimitExceededException e) {
             addGlobalError(e.getMessage());
         }
+    }
+
+    public void submitViaClassAndInterface() {
+        try {
+            classApiResponse = genericService.request();
+            interfaceApiResponse = genericApi.request();
+        }
+        catch (RateLimitExceededException e) {
+            addGlobalError(e.getMessage());
+        }
+    }
+
+    public String getClassApiResponse() {
+        return classApiResponse;
+    }
+
+    public String getInterfaceApiResponse() {
+        return interfaceApiResponse;
     }
 
     public String getExampleApiResponse() {

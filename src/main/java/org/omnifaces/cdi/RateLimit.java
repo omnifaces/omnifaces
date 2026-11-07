@@ -36,10 +36,15 @@ import org.omnifaces.cdi.ratelimit.RateLimiter;
  * This annotation can be applied to both methods and classes. When applied to a class, all methods in that class will be rate limited unless they have their
  * own <code>&#64;</code>{@link RateLimit} annotation which overrides the class-level configuration.
  * <p>
- * The rate limiting is enforced by the {@link RateLimitInterceptor} which uses a sliding window algorithm to track request counts per client identifier. When
- * the rate limit is exceeded, the interceptor will by default immediately throw a {@link RateLimitExceededException}. Optionally, you can configure automatic
- * retries via the {@link #maxRetries()} attribute, which will retry the request after a calculated delay based on the remaining time window. If all retries are
- * exhausted, a {@link RateLimitExceededException} is thrown.
+ * Without <code>clientId</code>, each annotated method, or each class which declares a class-level annotation, has its own counter per client IP address. With
+ * <code>clientId</code>, all methods with the same <code>clientId</code>, <code>maxRequestsPerTimeWindow</code> and <code>timeWindowInSeconds</code> share one
+ * counter, so that a <code>clientId</code> can represent a whole API. They also share it with
+ * {@link RateLimiter#checkRateLimit(String, int, java.time.Duration, int)} invoked with the same values.
+ * <p>
+ * The rate limiting is enforced by the {@link RateLimitInterceptor} which uses a fixed window algorithm: the time window of a counter starts at its first
+ * request, and the counter resets when the time window has expired. When the rate limit is exceeded, the interceptor will by default immediately throw a
+ * {@link RateLimitExceededException}. Optionally, you can configure automatic retries via the {@link #maxRetries()} attribute, which will retry the request
+ * after a calculated delay based on the remaining time window. If all retries are exhausted, a {@link RateLimitExceededException} is thrown.
  *
  * <h2>Usage</h2>
  * <p>

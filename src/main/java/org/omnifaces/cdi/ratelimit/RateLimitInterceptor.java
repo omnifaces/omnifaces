@@ -34,11 +34,12 @@ import org.omnifaces.util.Faces;
  * <p>
  * CDI interceptor that enforces rate limiting on methods annotated with {@link RateLimit}.
  * <p>
- * This interceptor intercepts method invocations and checks if the rate limit has been exceeded for the specified client identifier. If the rate limit is
- * exceeded, a {@link RateLimitExceededException} is thrown. Otherwise, the method execution continues normally.
+ * This interceptor intercepts method invocations and checks if the rate limit has been exceeded. If the rate limit is exceeded, a
+ * {@link RateLimitExceededException} is thrown. Otherwise, the method execution continues normally.
  * <p>
- * The interceptor automatically resolves the client identifier from the annotation configuration, falling back to the client IP address from the current HTTP
- * request if no explicit client ID is provided, as per {@link RateLimiter#checkRateLimit(HttpServletRequest, int, Duration, int)}.
+ * With an explicit client ID, the counter is shared by all methods with the same client ID and limits. Without it, the counter is per client IP address per
+ * annotated method, or per class which declares a class-level annotation. The client IP address is resolved as per
+ * {@link RateLimiter#checkRateLimit(HttpServletRequest, int, Duration, int)}.
  *
  * @author Bauke Scholtz
  * @since 5.0
@@ -64,7 +65,16 @@ public class RateLimitInterceptor {
 
     @AroundInvoke
     public Object limitRate(InvocationContext context) throws Exception {
-        var rateLimit = getRateLimitAnnotation(context);
+        var method = context.getMethod();
+        var rateLimit = method.getAnnotation(RateLimit.class);
+        Object scope = method;
+
+        if (rateLimit == null) {
+            var annotatedClass = getRateLimitAnnotatedClass(context.getTarget().getClass());
+            rateLimit = annotatedClass.getDeclaredAnnotation(RateLimit.class);
+            scope = annotatedClass;
+        }
+
         var clientId = rateLimit.clientId();
         var maxRequests = rateLimit.maxRequestsPerTimeWindow();
         var timeWindow = Duration.ofSeconds(rateLimit.timeWindowInSeconds());
@@ -74,20 +84,23 @@ public class RateLimitInterceptor {
             rateLimiter.checkRateLimit(clientId, maxRequests, timeWindow, maxRetries);
         }
         else {
-            rateLimiter.checkRateLimit(getRequest(), maxRequests, timeWindow, maxRetries);
+            rateLimiter.checkRateLimit(scope, getRequest(), maxRequests, timeWindow, maxRetries);
         }
 
         return context.proceed();
     }
 
-    private static RateLimit getRateLimitAnnotation(InvocationContext context) {
-        var rateLimit = context.getMethod().getAnnotation(RateLimit.class);
+    /**
+     * Returns the class which declares the {@link RateLimit} annotation, so that subclasses and container generated proxy classes share its counter.
+     */
+    private static Class<?> getRateLimitAnnotatedClass(Class<?> beanClass) {
+        var type = beanClass;
 
-        if (rateLimit == null) {
-            rateLimit = context.getTarget().getClass().getAnnotation(RateLimit.class);
+        while (type.getDeclaredAnnotation(RateLimit.class) == null) {
+            type = type.getSuperclass();
         }
 
-        return rateLimit;
+        return type;
     }
 
     private static HttpServletRequest getRequest() {

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.omnifaces.cdi.ratelimit.RateLimiter.PARAM_NAME_MAX_TRACKED_CLIENTS;
+import static org.omnifaces.cdi.ratelimit.RateLimiter.PARAM_NAME_MAX_TRACKED_COUNTERS;
 import static org.omnifaces.cdi.ratelimit.RateLimiter.getClientId;
 import static org.omnifaces.cdi.ratelimit.RateLimiter.isIPv6LiteralCandidate;
 
@@ -181,6 +181,20 @@ class RateLimiterTest {
     }
 
     /**
+     * Callers with the same client identifier but a different maximum or time window have separate counters, so that one limit cannot exhaust another.
+     */
+    @Test
+    void testSameClientIdWithDifferentLimitsHasSeparateCounters() {
+        var longTimeWindow = Duration.ofSeconds(60);
+        var shortTimeWindow = Duration.ofSeconds(1);
+
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, 1, longTimeWindow, 0));
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, 1, shortTimeWindow, 0));
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, 2, longTimeWindow, 0));
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(FIRST_IP, 1, longTimeWindow, 0));
+    }
+
+    /**
      * Expired request counters are removed by the periodic task, so that client identifiers which never return do not stay in the map.
      */
     @Test
@@ -192,11 +206,11 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(SECOND_IP, maxRequests, timeWindow, 0));
         rateLimiter.removeExpiredCounters();
-        assertEquals(2, rateLimiter.getTrackedClientCount());
+        assertEquals(2, rateLimiter.getTrackedCounterCount());
 
         advanceTicker(timeWindow);
         rateLimiter.removeExpiredCounters();
-        assertEquals(0, rateLimiter.getTrackedClientCount());
+        assertEquals(0, rateLimiter.getTrackedCounterCount());
     }
 
     /**
@@ -265,42 +279,42 @@ class RateLimiterTest {
     }
 
     /**
-     * When the tracked client identifiers are at the cap, a new client identifier is rejected, so that the map cannot grow unbounded.
+     * When the tracked request counters are at the cap, a request which needs a new counter is rejected, so that the map cannot grow unbounded.
      */
     @Test
-    void testNewClientIsRejectedWhenMaxTrackedClientsIsReached() {
+    void testNewCounterIsRejectedWhenMaxTrackedCountersIsReached() {
         var timeWindow = Duration.ofSeconds(10);
         var maxRequests = 2;
-        rateLimiter.setMaxTrackedClients(2);
+        rateLimiter.setMaxTrackedCounters(2);
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(SECOND_IP, maxRequests, timeWindow, 0));
         assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(THIRD_IP, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
-        assertEquals(2, rateLimiter.getTrackedClientCount());
+        assertEquals(2, rateLimiter.getTrackedCounterCount());
     }
 
     @Test
-    void testExpiredCountersAreRemovedBeforeRejectingNewClient() {
+    void testExpiredCountersAreRemovedBeforeRejectingNewCounter() {
         var timeWindow = Duration.ofSeconds(10);
         var maxRequests = 1;
-        rateLimiter.setMaxTrackedClients(1);
+        rateLimiter.setMaxTrackedCounters(1);
         freezeTicker();
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
         advanceTicker(timeWindow);
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(SECOND_IP, maxRequests, timeWindow, 0));
-        assertEquals(1, rateLimiter.getTrackedClientCount());
+        assertEquals(1, rateLimiter.getTrackedCounterCount());
     }
 
     /**
-     * A new client identifier is rejected immediately when the cap is reached, because retrying would hold the request thread for no benefit.
+     * A request which needs a new counter is rejected immediately when the cap is reached, because retrying would hold the request thread for no benefit.
      */
     @Test
-    void testNewClientIsNotRetriedWhenMaxTrackedClientsIsReached() {
+    void testNewCounterIsNotRetriedWhenMaxTrackedCountersIsReached() {
         var timeWindow = Duration.ofSeconds(10);
-        rateLimiter.setMaxTrackedClients(1);
+        rateLimiter.setMaxTrackedCounters(1);
         freezeTicker();
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, 1, timeWindow, 0));
@@ -311,14 +325,14 @@ class RateLimiterTest {
     }
 
     /**
-     * Expired request counters are removed at most once per second when the cap is reached, so that a flood of new client identifiers does not scan the whole
-     * map on every request.
+     * Expired request counters are removed at most once per second when the cap is reached, so that a flood of new counters does not scan the whole map on
+     * every request.
      */
     @Test
     void testExpiredCountersRemovalOnFullIsThrottled() {
         var timeWindow = Duration.ofMillis(500);
         var maxRequests = 1;
-        rateLimiter.setMaxTrackedClients(1);
+        rateLimiter.setMaxTrackedCounters(1);
         freezeTicker();
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(FIRST_IP, maxRequests, timeWindow, 0));
@@ -332,7 +346,7 @@ class RateLimiterTest {
     }
 
     @Test
-    void testMaxTrackedClientsIsReadFromContextParam() {
+    void testMaxTrackedCountersIsReadFromContextParam() {
         var limiter = createRateLimiterWithContextParam(" 1 ");
         limiter.init();
 
@@ -347,7 +361,7 @@ class RateLimiterTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "0", "-1", "many" })
-    void testInvalidMaxTrackedClientsContextParamIsRejected(String value) {
+    void testInvalidMaxTrackedCountersContextParamIsRejected(String value) {
         var limiter = createRateLimiterWithContextParam(value);
 
         try {
@@ -376,7 +390,7 @@ class RateLimiterTest {
 
     private static RateLimiter createRateLimiterWithContextParam(String value) {
         var servletContext = mock(ServletContext.class);
-        when(servletContext.getInitParameter(PARAM_NAME_MAX_TRACKED_CLIENTS)).thenReturn(value);
+        when(servletContext.getInitParameter(PARAM_NAME_MAX_TRACKED_COUNTERS)).thenReturn(value);
         var limiter = new RateLimiter();
         limiter.setServletContext(servletContext);
         return limiter;

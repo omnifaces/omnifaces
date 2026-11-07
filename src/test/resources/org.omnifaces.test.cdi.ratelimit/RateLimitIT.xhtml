@@ -26,6 +26,11 @@
                 <f:ajax render="@form" />
             </h:commandButton>
             <h:outputText id="result" value="#{rateLimitITBean.exampleApiResponse}" />
+            <h:commandButton id="submitViaClassAndInterface" value="submit via class and interface" action="#{rateLimitITBean.submitViaClassAndInterface}">
+                <f:ajax render="@form" />
+            </h:commandButton>
+            <h:outputText id="classResult" value="#{rateLimitITBean.classApiResponse}" />
+            <h:outputText id="interfaceResult" value="#{rateLimitITBean.interfaceApiResponse}" />
             <h:messages id="messages" />
         </o:form>
     </h:body>

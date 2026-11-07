@@ -14,6 +14,7 @@ package org.omnifaces.test.cdi.ratelimit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.omnifaces.test.cdi.ratelimit.RateLimitITService.TIME_WINDOW_IN_SECONDS;
 
 import java.time.Duration;
@@ -35,6 +36,15 @@ public class RateLimitIT extends OmniFacesIT {
 
     @FindBy(id = "form:messages")
     private WebElement messages;
+
+    @FindBy(id = "form:submitViaClassAndInterface")
+    private WebElement submitViaClassAndInterface;
+
+    @FindBy(id = "form:classResult")
+    private WebElement classResult;
+
+    @FindBy(id = "form:interfaceResult")
+    private WebElement interfaceResult;
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
@@ -66,6 +76,18 @@ public class RateLimitIT extends OmniFacesIT {
         assertNotEquals("", secondResult);
         assertNotEquals(firstResult, secondResult);
         assertEquals("", messages.getText());
+    }
+
+    /**
+     * An invocation via the class and one via the generic interface, which goes through the compiler generated bridge method, share one counter, so that the
+     * bridge method cannot double the limit.
+     */
+    @Test
+    void testRateLimitIsSharedByBridgeMethod() {
+        guardAjax(submitViaClassAndInterface::click);
+        assertEquals("genericApiResponse", classResult.getText());
+        assertEquals("", interfaceResult.getText());
+        assertTrue(messages.getText().startsWith("Rate limit exceeded for client ID '"), messages.getText());
     }
 
 }
