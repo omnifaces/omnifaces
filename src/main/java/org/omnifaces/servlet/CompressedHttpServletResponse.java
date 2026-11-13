@@ -321,7 +321,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
                 if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
                     addHeader("Content-Encoding", algorithm.getEncodingDirective());
-                    setHeader("Vary", (!isOneOf(vary, null, "*") ? vary + "," : "") + "Accept-Encoding");
+                    setHeader("Vary", (isOneOf(vary, null, "*") ? "" : vary + ",") + "Accept-Encoding");
                     return algorithm.createOutputStream(originalResponse);
                 }
             }

@@ -442,6 +442,13 @@ public abstract class OmniFacesIT {
         return connection;
     }
 
+    /**
+     * Returns the port of the given URL, or the default port of its protocol when the URL does not specify one.
+     */
+    public static int getPort(URL url) {
+        return url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
+    }
+
     protected static String readResponseBody(HttpURLConnection connection) throws IOException {
         try (var reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), UTF_8))) {
             return reader.lines().collect(joining("\n"));

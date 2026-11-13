@@ -166,7 +166,7 @@ public class ViewScopedTruncatedUnloadIT extends OmniFacesIT {
         var body = ("omnifaces.event=unload&id=" + viewScopeId + "&jakarta.faces.ViewState=" + URLEncoder.encode(viewStateValue, UTF_8))
             .getBytes(UTF_8);
         var cookies = getCookies();
-        var port = baseURL.getPort() != -1 ? baseURL.getPort() : baseURL.getDefaultPort();
+        var port = getPort(baseURL);
 
         var head = new StringBuilder()
             .append("POST ").append(action.getRawPath()).append(action.getRawQuery() != null ? "?" + action.getRawQuery() : "").append(" HTTP/1.1\r\n")

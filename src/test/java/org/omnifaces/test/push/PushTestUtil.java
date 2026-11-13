@@ -12,6 +12,8 @@
  */
 package org.omnifaces.test.push;
 
+import static org.omnifaces.test.OmniFacesIT.getPort;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +77,7 @@ public final class PushTestUtil {
      * cookie, and returns the still-open socket. The caller is responsible for closing it.
      */
     public static Socket sendRequest(URL baseURL, String uriPrefix, String channelId, String sessionCookie, String... headers) throws IOException {
-        int port = baseURL.getPort() != -1 ? baseURL.getPort() : baseURL.getDefaultPort();
+        int port = getPort(baseURL);
         String path = baseURL.getPath().replaceFirst("/$", "") + uriPrefix + "/" + channelId;
         Socket socket = new Socket(baseURL.getHost(), port);
         StringBuilder request = new StringBuilder();
