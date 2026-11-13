@@ -19,7 +19,6 @@ import static java.util.Optional.ofNullable;
 import static org.omnifaces.util.Exceptions.extract;
 import static org.omnifaces.util.Reflection.invokeStaticMethod;
 import static org.omnifaces.util.Reflection.toClassOrNull;
-import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.splitAndTrim;
 
 import java.io.IOException;
@@ -168,7 +167,6 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
     private final int threshold;
     private final Set<String> mimetypes;
     private long contentLength;
-    private String vary;
     private boolean dontCompress;
     private boolean closing;
     private CompressThresholdOutputStream output;
@@ -209,10 +207,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         if (name != null) {
             String lowerCasedName = name.toLowerCase();
 
-            if ("vary".equals(lowerCasedName)) {
-                vary = value;
-            }
-            else if ("content-range".equals(lowerCasedName)) {
+            if ("content-range".equals(lowerCasedName)) {
                 dontCompress = (value != null);
             }
             else if ("cache-control".equals(lowerCasedName)) {
@@ -228,15 +223,26 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         if (name != null && value != null) {
             String lowerCasedName = name.toLowerCase();
 
-            if ("vary".equals(lowerCasedName)) {
-                vary = ((vary != null) ? (vary + ",") : "") + value;
-            }
-            else if ("content-range".equals(lowerCasedName)) {
+            if ("content-range".equals(lowerCasedName)) {
                 dontCompress = true;
             }
             else if ("cache-control".equals(lowerCasedName)) {
                 dontCompress = (dontCompress || isCacheControlNoTransform(value));
             }
+        }
+    }
+
+    /**
+     * Add <code>Accept-Encoding</code> to the <code>Vary</code> header, unless the response already varies on anything
+     * (<code>*</code>) or on <code>Accept-Encoding</code>.
+     */
+    private void addVaryAcceptEncodingIfNecessary() {
+        boolean alreadyVaries = getHeaders("Vary").stream()
+                .flatMap(value -> splitAndTrim(value, ","))
+                .anyMatch(value -> "*".equals(value) || "Accept-Encoding".equalsIgnoreCase(value));
+
+        if (!alreadyVaries) {
+            addHeader("Vary", "Accept-Encoding");
         }
     }
 
@@ -257,7 +263,6 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
         if (!isCommitted()) {
             contentLength = 0;
-            vary = null;
             dontCompress = false;
 
             if (output != null) {
@@ -314,7 +319,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
 
                 if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
                     addHeader("Content-Encoding", algorithm.getEncodingDirective());
-                    setHeader("Vary", (!isOneOf(vary, null, "*") ? (vary + ",") : "") + "Accept-Encoding");
+                    addVaryAcceptEncodingIfNecessary();
                     return algorithm.createOutputStream(originalResponse);
                 }
             }
