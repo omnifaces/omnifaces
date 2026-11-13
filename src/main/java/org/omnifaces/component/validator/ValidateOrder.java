@@ -13,6 +13,8 @@
 package org.omnifaces.component.validator;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.reverseOrder;
+import static java.util.Comparator.naturalOrder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +72,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
         LTE(values -> {
             List<Comparable> sortedValues = new ArrayList<>(values);
-            Collections.sort(sortedValues);
+            sortedValues.sort(naturalOrder());
             return sortedValues.equals(values);
         }),
 
@@ -82,7 +84,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
         GTE(values -> {
             List<Comparable> sortedValues = new ArrayList<>(values);
-            Collections.sort(sortedValues, Collections.reverseOrder());
+            sortedValues.sort(reverseOrder());
             return sortedValues.equals(values);
         });
 
