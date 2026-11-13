@@ -151,22 +151,7 @@ class CompressedHttpServletResponseTest {
         when(response.getHeaders(anyString())).thenAnswer(invocation -> headers.getOrDefault(invocation.getArgument(0), List.of()));
         when(response.getContentType()).thenReturn("text/html");
         when(response.getBufferSize()).thenReturn(8192);
-        when(response.getOutputStream()).thenReturn(new ServletOutputStream() {
-
-            @Override
-            public void write(int b) {
-            }
-
-            @Override
-            public boolean isReady() {
-                return true;
-            }
-
-            @Override
-            public void setWriteListener(WriteListener writeListener) {
-            }
-
-        });
+        when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
 
         beforeWrapping.accept(response);
         var compressedResponse = new CompressedHttpServletResponse(response, Algorithm.GZIP, 1, Set.of("text/html"));
