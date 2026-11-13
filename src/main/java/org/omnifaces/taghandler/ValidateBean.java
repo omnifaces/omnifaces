@@ -772,26 +772,7 @@ public class ValidateBean extends TagHandler {
         var undisplayed = new HashSet<>(violations);
 
         for (var violation : violations) {
-            for (var baseAndProperty : resolveViolatedBasesAndProperties(bean, violation)) {
-                var property = baseAndProperty.getValue();
-
-                if (property != null || fallback == null) {
-                    boolean[] displayed = { false };
-
-                    forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), property, input -> {
-                        context.validationFailed();
-                        input.setValid(false);
-                        var clientId = input.getClientId(context);
-                        addError(clientId, formatMessage(violation.getMessage(), getLabel(context, input), messageFormat));
-                        undisplayed.remove(violation);
-                        displayed[0] = true;
-                    });
-
-                    if (displayed[0]) {
-                        break;
-                    }
-                }
-            }
+            invalidateFirstMatchingInputsAndShowMessage(context, form, bean, violation, fallback, messageFormat, undisplayed);
         }
 
         if (undisplayed.isEmpty()) {
@@ -804,6 +785,32 @@ public class ValidateBean extends TagHandler {
         else if (isDevelopment(context)) {
             for (var violation : undisplayed) {
                 logger.log(WARNING, () -> WARN_UNDISPLAYED_VIOLATION.formatted(violation.getMessage(), violation.getPropertyPath()));
+            }
+        }
+    }
+
+    private static void invalidateFirstMatchingInputsAndShowMessage(
+        FacesContext context, UIForm form, Object bean, ConstraintViolation<?> violation,
+        String fallback, String messageFormat, Set<ConstraintViolation<?>> undisplayed
+    )
+    {
+        for (var baseAndProperty : resolveViolatedBasesAndProperties(bean, violation)) {
+            var property = baseAndProperty.getValue();
+
+            if (property == null && fallback != null) {
+                continue;
+            }
+
+            forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), property, input -> {
+                context.validationFailed();
+                input.setValid(false);
+                var clientId = input.getClientId(context);
+                addError(clientId, formatMessage(violation.getMessage(), getLabel(context, input), messageFormat));
+                undisplayed.remove(violation);
+            });
+
+            if (!undisplayed.contains(violation)) {
+                return;
             }
         }
     }
