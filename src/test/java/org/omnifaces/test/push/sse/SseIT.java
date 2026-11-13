@@ -13,14 +13,14 @@
 package org.omnifaces.test.push.sse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.omnifaces.test.OmniFacesIT;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -31,6 +31,9 @@ import org.openqa.selenium.support.FindBy;
     named = "arquillian.browser", matches = "firefox", disabledReason = "EventSource client opening is unreliable in headless Firefox; messages element never receives the expected text"
 )
 public class SseIT extends OmniFacesIT {
+
+    private static final List<String> SESSION_AND_VIEW_CHANNELS = List.of("sessionScopedUserTargeted", "viewScopedAjaxAware");
+    private static final List<String> ALL_CHANNELS = List.of("applicationScopedServerEvent", "sessionScopedUserTargeted", "viewScopedAjaxAware");
 
     @FindBy(id = "messages")
     private WebElement messages;
@@ -107,45 +110,22 @@ public class SseIT extends OmniFacesIT {
     }
 
     private void testOnopen(boolean newtab) {
-        if (!newtab) {
-            waitUntilTextContains(clientOpenedMessages, "|applicationScopedServerEvent|");
-        }
-
-        waitUntilTextContains(clientOpenedMessages, "|sessionScopedUserTargeted|");
-        waitUntilTextContains(clientOpenedMessages, "|viewScopedAjaxAware|");
-
-        pollUntilOpenedEventsReceived();
-
-        var openedChannels = browser.findElement(By.id("serverOpenedMessages")).getText();
-
-        if (!newtab) {
-            assertTrue(openedChannels.contains("applicationScopedServerEvent"));
-        }
-
-        assertTrue(openedChannels.contains("sessionScopedUserTargeted"));
-        assertTrue(openedChannels.contains("viewScopedAjaxAware"));
+        var channels = newtab ? SESSION_AND_VIEW_CHANNELS : ALL_CHANNELS;
+        waitUntilChannelsListed(clientOpenedMessages.getAttribute("id"), null, channels);
+        waitUntilChannelsListed("serverOpenedMessages", pollOpenedChannels::click, channels);
     }
 
     private void testOnclose(String tabToSwitch) {
         closeAllSse.click();
-        waitUntilTextContains(clientClosedMessages, "|sessionScopedUserTargeted|");
-        waitUntilTextContains(clientClosedMessages, "|viewScopedAjaxAware|");
-
-        pollUntilClosedEventsReceived();
-
-        var closedChannels = browser.findElement(By.id("serverClosedMessages")).getText();
-        assertTrue(closedChannels.contains("sessionScopedUserTargeted"));
-        assertTrue(closedChannels.contains("viewScopedAjaxAware"));
-
+        waitUntilChannelsListed(clientClosedMessages.getAttribute("id"), null, SESSION_AND_VIEW_CHANNELS);
+        waitUntilChannelsListed("serverClosedMessages", pollClosedChannels::click, SESSION_AND_VIEW_CHANNELS);
         closeCurrentTabAndSwitchTo(tabToSwitch);
     }
 
-    private void pollUntilOpenedEventsReceived() {
-        waitUntilTextContent("serverOpenedMessages", pollOpenedChannels::click);
-    }
-
-    private void pollUntilClosedEventsReceived() {
-        waitUntilTextContent("serverClosedMessages", pollClosedChannels::click);
+    private void waitUntilChannelsListed(String elementId, Runnable ajaxPoller, List<String> channels) {
+        for (var channel : channels) {
+            waitUntilTextContains(elementId, "|" + channel + "|", ajaxPoller);
+        }
     }
 
     private String pushApplicationScopedServerEvent() {

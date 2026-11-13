@@ -344,7 +344,11 @@ public abstract class OmniFacesIT {
     }
 
     protected void waitUntilTextContains(String elementId, String expectedString) {
-        waitUntil(elementId, e -> e.getText().contains(expectedString), null);
+        waitUntilTextContains(elementId, expectedString, null);
+    }
+
+    protected void waitUntilTextContains(String elementId, String expectedString, Runnable ajaxPoller) {
+        waitUntil(elementId, e -> e.getText().contains(expectedString), ajaxPoller);
     }
 
     protected void waitUntilAttributeAbsent(WebElement element, String attributeName) {
