@@ -654,7 +654,7 @@ public abstract class OmniFacesIT {
 
             var maven = Maven.resolver();
             archive
-                .addAsLibraries(maven.resolve("org.primefaces:primefaces:jar:jakarta:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
+                .addAsLibraries(maven.resolve("org.primefaces:primefaces:" + System.getProperty("primefaces.version")).withTransitivity().asFile());
             primeFacesSet = true;
             return this;
         }

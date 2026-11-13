@@ -383,8 +383,8 @@ class RateLimiterTest {
     }
 
     /**
-     * The recommended delay is the remaining time of the time window rounded up to whole milliseconds: a retry which waits exactly the recommended delay
-     * finds the time window expired, and one which waits a millisecond less does not.
+     * The recommended delay is the remaining time of the time window rounded up to whole milliseconds: a retry which waits exactly the recommended delay finds
+     * the time window expired, and one which waits a millisecond less does not.
      */
     @Test
     void testRetryAfterRecommendedDelayIsAccepted() {
