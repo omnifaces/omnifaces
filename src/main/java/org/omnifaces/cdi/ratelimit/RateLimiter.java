@@ -287,11 +287,8 @@ public class RateLimiter {
             return remoteAddr;
         }
 
-        var zoneIndex = remoteAddr.indexOf('%');
-        var literal = zoneIndex < 0 ? remoteAddr : remoteAddr.substring(0, zoneIndex) + (remoteAddr.endsWith("]") ? "]" : "");
-
         try {
-            var address = InetAddress.getByName(literal);
+            var address = InetAddress.getByName(stripZoneId(remoteAddr));
 
             return (address instanceof Inet6Address) ? getIPv6ClientId(address.getAddress()) : address.getHostAddress();
         }
@@ -313,6 +310,16 @@ public class RateLimiter {
 
         var firstChar = remoteAddr.charAt(0);
         return HexFormat.isHexDigit(firstChar) || firstChar == ':' || firstChar == '['; // InetAddress#getByName() queries the name service otherwise.
+    }
+
+    private static String stripZoneId(String remoteAddr) {
+        var zoneIndex = remoteAddr.indexOf('%');
+
+        if (zoneIndex < 0) {
+            return remoteAddr;
+        }
+
+        return remoteAddr.substring(0, zoneIndex) + (remoteAddr.endsWith("]") ? "]" : "");
     }
 
     private static String getIPv6ClientId(byte[] bytes) throws UnknownHostException {
@@ -360,7 +367,7 @@ public class RateLimiter {
                     throw e;
                 }
 
-                logger.log(WARNING, WARNING_RETRY.formatted(key.clientId(), attempt.get()));
+                logger.log(WARNING, () -> WARNING_RETRY.formatted(key.clientId(), attempt.get()));
                 executeDelay(key.clientId(), e.getRecommendedDelayInMillis());
             }
         }
@@ -398,7 +405,7 @@ public class RateLimiter {
 
         if (requestCountsByKey.size() >= maxTrackedCounters) {
             if (removalDue) {
-                logger.log(WARNING, WARNING_MAX_TRACKED_COUNTERS.formatted(maxTrackedCounters, PARAM_NAME_MAX_TRACKED_COUNTERS));
+                logger.log(WARNING, () -> WARNING_MAX_TRACKED_COUNTERS.formatted(maxTrackedCounters, PARAM_NAME_MAX_TRACKED_COUNTERS));
             }
 
             throw new RateLimitExceededException(
@@ -437,10 +444,10 @@ public class RateLimiter {
         }
         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.log(WARNING, WARNING_INTERRUPTED.formatted(clientId));
+            logger.log(WARNING, () -> WARNING_INTERRUPTED.formatted(clientId));
         }
         catch (ExecutionException e) {
-            logger.log(WARNING, WARNING_UNEXPECTED_ERROR.formatted(clientId), e);
+            logger.log(WARNING, e, () -> WARNING_UNEXPECTED_ERROR.formatted(clientId));
         }
     }
 
