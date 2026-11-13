@@ -144,6 +144,7 @@ class CompressedHttpServletResponseTest {
     private static List<String> compressAndGetVary(Consumer<HttpServletResponse> beforeWrapping, Consumer<HttpServletResponse> afterWrapping) throws Exception {
         Map<String, List<String>> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
         var response = mock(HttpServletResponse.class);
+        var outputStream = mock(ServletOutputStream.class);
         doAnswer(invocation -> headers.put(invocation.getArgument(0), new ArrayList<>(List.of((String) invocation.getArgument(1)))))
             .when(response).setHeader(anyString(), anyString());
         doAnswer(invocation -> headers.computeIfAbsent(invocation.getArgument(0), name -> new ArrayList<>()).add(invocation.getArgument(1)))
@@ -151,7 +152,7 @@ class CompressedHttpServletResponseTest {
         when(response.getHeaders(anyString())).thenAnswer(invocation -> headers.getOrDefault(invocation.getArgument(0), List.of()));
         when(response.getContentType()).thenReturn("text/html");
         when(response.getBufferSize()).thenReturn(8192);
-        when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+        when(response.getOutputStream()).thenReturn(outputStream);
 
         beforeWrapping.accept(response);
         var compressedResponse = new CompressedHttpServletResponse(response, Algorithm.GZIP, 1, Set.of("text/html"));
