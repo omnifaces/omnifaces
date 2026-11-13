@@ -30,7 +30,7 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELResolver> {
 
-    private ELResolver wrapped;
+    private final ELResolver wrapped;
 
     /**
      * Construct EL resolver wrapper.

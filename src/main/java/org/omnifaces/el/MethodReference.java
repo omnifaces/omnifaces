@@ -31,8 +31,8 @@ public class MethodReference extends MethodInfo {
     /** An object array representing "no method parameters". */
     public static final Object[] NO_PARAMS = new Object[0];
 
-    private Object base;
-    private Method method;
+    private final Object base;
+    private final Method method;
     private Object[] actualParameters;
     private boolean fromMethod;
 

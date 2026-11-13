@@ -51,7 +51,7 @@ public class EagerExtension implements Extension {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private EagerBeansRepository.EagerBeans eagerBeans = new EagerBeansRepository.EagerBeans();
+    private final EagerBeansRepository.EagerBeans eagerBeans = new EagerBeansRepository.EagerBeans();
 
     // Actions --------------------------------------------------------------------------------------------------------
 

@@ -86,7 +86,7 @@ public class ValidateOrder extends ValidateMultipleFields {
             return sortedValues.equals(values);
         });
 
-        private Function<List<Comparable>, Boolean> callback;
+        private final Function<List<Comparable>, Boolean> callback;
 
         private Type(Function<List<Comparable>, Boolean> callback) {
             this.callback = callback;

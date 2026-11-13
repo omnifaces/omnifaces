@@ -49,10 +49,11 @@ public final class CombinedResourceInputStream extends InputStream {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private List<InputStream> streams;
-    private Iterator<InputStream> streamIterator;
-    private InputStream currentStream;
     private final boolean script;
+    private final List<InputStream> streams;
+    private final Iterator<InputStream> streamIterator;
+
+    private InputStream currentStream;
     private boolean preamble;
     private byte[] pendingOutput;
     private int pendingOutputOffset;

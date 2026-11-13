@@ -35,7 +35,7 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean hasAnyViewIdBeans;
+    private final boolean hasAnyViewIdBeans;
 
     /**
      * Construct eager beans phase listener.

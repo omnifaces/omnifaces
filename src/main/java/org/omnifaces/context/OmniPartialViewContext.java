@@ -280,8 +280,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
         // Variables --------------------------------------------------------------------------------------------------
 
-        private OmniPartialViewContext context;
-        private PartialResponseWriter wrapped;
+        private final OmniPartialViewContext context;
+        private final PartialResponseWriter wrapped;
+
         private boolean updating;
         private boolean updated;
 

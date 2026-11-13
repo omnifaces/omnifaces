@@ -36,6 +36,9 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
+    private final Map<String, Boolean> renderedIdCache = new HashMap<>();
+    private final Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
+
     private final FacesContext facesContext;
     private final List<String> componentIds;
     private final List<String> clientIds;
@@ -43,8 +46,6 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
     private UIComponent lastComponent;
     private boolean lastRendered;
-    private Map<String, Boolean> renderedIdCache = new HashMap<>();
-    private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
     /**
      * Construct conditional response writer.

@@ -33,7 +33,7 @@ public class ValueExpressionWrapper extends ValueExpression implements FacesWrap
 
     private static final long serialVersionUID = 1L;
 
-    private ValueExpression wrapped;
+    private final ValueExpression wrapped;
 
     /**
      * Construct the value expression wrapper.

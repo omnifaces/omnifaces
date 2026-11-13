@@ -188,10 +188,10 @@ public class EagerBeansRepository {
 
     static class EagerBeans {
 
-        private List<Bean<?>> applicationScoped = new ArrayList<>();
-        private List<Bean<?>> sessionScoped = new ArrayList<>();
-        private Map<String, List<Bean<?>>> byViewId = new ConcurrentHashMap<>();
-        private Map<String, List<Bean<?>>> byRequestURI = new ConcurrentHashMap<>();
+        private final List<Bean<?>> applicationScoped = new ArrayList<>();
+        private final List<Bean<?>> sessionScoped = new ArrayList<>();
+        private final Map<String, List<Bean<?>>> byViewId = new ConcurrentHashMap<>();
+        private final Map<String, List<Bean<?>>> byRequestURI = new ConcurrentHashMap<>();
 
         void addApplicationScoped(Bean<?> bean) {
             applicationScoped.add(bean);

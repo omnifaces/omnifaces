@@ -34,7 +34,7 @@ import jakarta.faces.FacesWrapper;
  */
 public class ELContextWrapper extends ELContext implements FacesWrapper<ELContext> {
 
-    private ELContext wrapped;
+    private final ELContext wrapped;
 
     /**
      * Construct EL context wrapper.

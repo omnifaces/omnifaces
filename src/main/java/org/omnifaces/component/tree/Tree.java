@@ -573,7 +573,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
         private static final long serialVersionUID = 1L;
 
-        private TreeModel node;
+        private final TreeModel node;
 
         public TreeFacesEvent(FacesEvent wrapped, Tree tree, TreeModel node) {
             super(wrapped, tree);

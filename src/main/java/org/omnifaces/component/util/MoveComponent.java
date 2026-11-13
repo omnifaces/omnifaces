@@ -121,12 +121,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         AFTER
     }
 
-    private String attachedEventName;
-    private ClientBehavior attachedBehavior;
-
     // Used to fool over-eager tag handlers that check in advance whether a given component indeed
     // supports the event for which a behavior is attached.
-    private List<String> containsTrueList = new ArrayList<>() {
+    private final List<String> containsTrueList = new ArrayList<>() {
 
         private static final long serialVersionUID = 1L;
 
@@ -136,6 +133,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         }
 
     };
+
+    private String attachedEventName;
+    private ClientBehavior attachedBehavior;
 
     // Actions --------------------------------------------------------------------------------------------------------
 

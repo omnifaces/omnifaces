@@ -35,7 +35,7 @@ public abstract class FacesEventWrapper extends FacesEvent implements FacesWrapp
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private FacesEvent wrapped;
+    private final FacesEvent wrapped;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 

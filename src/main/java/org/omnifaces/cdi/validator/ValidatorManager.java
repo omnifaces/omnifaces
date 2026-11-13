@@ -70,11 +70,14 @@ import org.omnifaces.application.OmniApplicationFactory;
 @SuppressWarnings("rawtypes")
 public class ValidatorManager {
 
+    // Properties -----------------------------------------------------------------------------------------------------
+
+    private final Map<String, Bean<Validator>> validatorsById = new HashMap<>();
+
     // Dependencies ---------------------------------------------------------------------------------------------------
 
     @Inject
     private BeanManager manager;
-    private Map<String, Bean<Validator>> validatorsById = new HashMap<>();
 
     // Actions --------------------------------------------------------------------------------------------------------
 

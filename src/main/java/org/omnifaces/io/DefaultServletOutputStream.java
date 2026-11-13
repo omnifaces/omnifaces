@@ -27,7 +27,7 @@ import jakarta.servlet.WriteListener;
  */
 public class DefaultServletOutputStream extends ServletOutputStream {
 
-    private OutputStream output;
+    private final OutputStream output;
 
     /**
      * Constructs a default servlet output stream which delegates to given output stream.

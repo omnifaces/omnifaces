@@ -237,9 +237,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private String disabledParam;
-    private Map<ResourceIdentifier, String> cdnResources;
-    private Set<ResourceIdentifier> excludedResources;
+    private final String disabledParam;
+    private final Map<ResourceIdentifier, String> cdnResources;
+    private final Set<ResourceIdentifier> excludedResources;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 

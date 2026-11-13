@@ -181,7 +181,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private String defaultMessage;
+    private final String defaultMessage;
+
     private boolean validationFailed;
 
     // Constructors ---------------------------------------------------------------------------------------------------

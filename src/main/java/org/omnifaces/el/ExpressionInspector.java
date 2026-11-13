@@ -280,7 +280,7 @@ public final class ExpressionInspector {
 
     static class FinalBaseHolder {
 
-        private Object base;
+        private final Object base;
 
         public FinalBaseHolder(Object base) {
             this.base = base;

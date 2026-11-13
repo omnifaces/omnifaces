@@ -324,7 +324,7 @@ public final class Validators {
 
     private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {
 
-        private MessageInterpolator wrapped;
+        private final MessageInterpolator wrapped;
 
         public FacesLocaleAwareMessageInterpolator(MessageInterpolator wrapped) {
             this.wrapped = wrapped;

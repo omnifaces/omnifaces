@@ -74,7 +74,7 @@ public class SourceMapResourceHandler extends DefaultResourceHandler {
     private static final String EXTENSION_CSS = ".css";
     private static final String HEADER_SOURCE_MAP = "SourceMap";
 
-    private String sourceMapPattern;
+    private final String sourceMapPattern;
 
     /**
      * Creates a new instance of this source map resource handler which wraps the given resource handler. This will also initialize the source map pattern based

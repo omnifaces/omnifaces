@@ -39,9 +39,9 @@ public class CombinedResource extends DynamicResource {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private String resourceId;
-    private CombinedResourceInfo info;
-    private Integer cacheTTL;
+    private final String resourceId;
+    private final CombinedResourceInfo info;
+    private final Integer cacheTTL;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 

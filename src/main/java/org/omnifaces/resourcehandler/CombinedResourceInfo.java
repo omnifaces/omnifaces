@@ -59,9 +59,10 @@ public final class CombinedResourceInfo implements Serializable {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
-    private String id;
-    private Set<ResourceIdentifier> resourceIdentifiers;
-    private boolean serverIssued;
+    private final String id;
+    private final Set<ResourceIdentifier> resourceIdentifiers;
+    private final boolean serverIssued;
+
     private transient Set<Resource> resources;
     private int contentLength;
     private long lastModified;
@@ -93,7 +94,7 @@ public final class CombinedResourceInfo implements Serializable {
 
         // Properties -------------------------------------------------------------------------------------------------
 
-        private Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
+        private final Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
 
         // Actions ----------------------------------------------------------------------------------------------------
 

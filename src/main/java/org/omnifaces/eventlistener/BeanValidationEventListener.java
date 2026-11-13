@@ -41,8 +41,8 @@ public class BeanValidationEventListener implements SystemEventListener {
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private String validationGroups;
-    private boolean disabled;
+    private final String validationGroups;
+    private final boolean disabled;
 
     // Constructors ---------------------------------------------------------------------------------------------------
 

@@ -32,10 +32,11 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
 
     // Variables ------------------------------------------------------------------------------------------------------
 
-    private Writer writer;
-    private Charset charset;
+    private final Writer writer;
+    private final Charset charset;
+    private final int bufferSize;
+
     private CharArrayWriter buffer;
-    private int bufferSize;
     private int writtenBytes;
 
     // Constructors ---------------------------------------------------------------------------------------------------

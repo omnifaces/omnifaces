@@ -242,7 +242,7 @@ public class ApplicationListener extends DefaultServletContextListener {
      */
     private static class ServletContextFacesContext extends FacesContextWrapper {
 
-        private ExternalContext externalContext;
+        private final ExternalContext externalContext;
 
         public ServletContextFacesContext(ServletContext servletContext) {
             super(null);
@@ -256,7 +256,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 
         private static class ServletContextExternalContext extends ExternalContextWrapper {
 
-            private ServletContext servletContext;
+            private final ServletContext servletContext;
 
             public ServletContextExternalContext(ServletContext servletContext) {
                 super(null);

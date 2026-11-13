@@ -82,7 +82,7 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
      */
     public static final String PARAM_NAME_EXCEPTION_TYPES_TO_SUPPRESS = "org.omnifaces.EXCEPTION_TYPES_TO_SUPPRESS";
 
-    private Class<? extends Throwable>[] exceptionTypesToSuppress;
+    private final Class<? extends Throwable>[] exceptionTypesToSuppress;
 
     /**
      * Construct a new exception suppressor around the given wrapped exception handler.

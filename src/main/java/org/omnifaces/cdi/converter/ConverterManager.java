@@ -83,13 +83,17 @@ import org.omnifaces.application.OmniApplicationFactory;
 @SuppressWarnings("rawtypes")
 public class ConverterManager {
 
+    // Properties -----------------------------------------------------------------------------------------------------
+
+    private final Map<String, Bean<Converter>> convertersById = new HashMap<>();
+    private final Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
+
+    private TimeZone dateTimeConverterDefaultTimeZone;
+
     // Dependencies ---------------------------------------------------------------------------------------------------
 
     @Inject
     private BeanManager manager;
-    private Map<String, Bean<Converter>> convertersById = new HashMap<>();
-    private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
-    private TimeZone dateTimeConverterDefaultTimeZone;
 
     // Init -----------------------------------------------------------------------------------------------------------
 

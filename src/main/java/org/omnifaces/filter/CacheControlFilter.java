@@ -180,7 +180,7 @@ public class CacheControlFilter extends HttpFilter {
         M(MINUTES.toSeconds(1)),
         S(1);
 
-        private long seconds;
+        private final long seconds;
 
         private Unit(long seconds) {
             this.seconds = seconds;

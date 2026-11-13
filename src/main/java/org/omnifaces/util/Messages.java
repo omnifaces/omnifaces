@@ -222,7 +222,7 @@ public final class Messages {
      */
     public static final class Message {
 
-        private FacesMessage facesMessage;
+        private final FacesMessage facesMessage;
 
         private Message(FacesMessage facesMessage) {
             this.facesMessage = facesMessage;

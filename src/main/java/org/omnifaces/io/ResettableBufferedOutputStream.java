@@ -34,9 +34,10 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 
     // Variables ------------------------------------------------------------------------------------------------------
 
+    private final int thresholdBufferSize;
+
     private OutputStream output;
     private ByteArrayOutputStream buffer;
-    private int thresholdBufferSize;
     private int writtenBytes;
     private boolean closed;
 

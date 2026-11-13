@@ -26,9 +26,9 @@ import jakarta.faces.context.FacesContext;
  */
 public class ScopedRunner {
 
-    private FacesContext context;
-    private Map<String, Object> scopedVariables;
-    private Map<String, Object> previousVariables = new HashMap<>();
+    private final FacesContext context;
+    private final Map<String, Object> scopedVariables;
+    private final Map<String, Object> previousVariables = new HashMap<>();
 
     /**
      * Construct a scoped runner.

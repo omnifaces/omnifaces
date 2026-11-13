@@ -277,8 +277,8 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 
     private static class PhaseTimer {
 
-        private Map<Integer, Long> startTimes = new HashMap<>();
-        private Map<Integer, Long> endTimes = new HashMap<>();
+        private final Map<Integer, Long> startTimes = new HashMap<>();
+        private final Map<Integer, Long> endTimes = new HashMap<>();
 
         public void start(PhaseId phaseId) {
             startTimes.putIfAbsent(phaseId.getOrdinal(), nanoTime());

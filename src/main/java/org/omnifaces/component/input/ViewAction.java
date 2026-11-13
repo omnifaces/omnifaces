@@ -111,8 +111,8 @@ public class ViewAction extends UIViewAction {
 
         private static final long serialVersionUID = 1L;
 
-        private FacesEvent wrapped;
-        private String message;
+        private final FacesEvent wrapped;
+        private final String message;
 
         public RedirectMessageEvent(FacesEvent wrapped, String message) {
             super(wrapped.getComponent());
@@ -129,7 +129,7 @@ public class ViewAction extends UIViewAction {
 
     private static class RedirectMessageFacesContext extends FacesContextWrapper {
 
-        private String message;
+        private final String message;
 
         public RedirectMessageFacesContext(FacesContext wrapped, String message) {
             super(wrapped);
@@ -145,7 +145,7 @@ public class ViewAction extends UIViewAction {
 
     private static class RedirectMessageExternalContext extends ExternalContextWrapper {
 
-        private String message;
+        private final String message;
 
         public RedirectMessageExternalContext(ExternalContext wrapped, String message) {
             super(wrapped);
