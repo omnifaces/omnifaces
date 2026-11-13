@@ -197,12 +197,13 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
         private static final long serialVersionUID = 1L;
 
-        private transient jakarta.faces.validator.Validator<Object> validator;
         private final ValueExpression binding;
         private final ValueExpression id;
         private final ValueExpression disabled;
         private final ValueExpression message;
         private final DeferredAttributes attributes;
+
+        private transient jakarta.faces.validator.Validator<Object> validator;
 
         /**
          * Construct the deferred validator.

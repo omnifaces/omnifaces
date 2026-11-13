@@ -347,9 +347,10 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
         private static final int ATTRIBUTES_SET_DURING_REMOVE_VIEW_STATE = 4;
 
-        private UIViewRoot viewRoot;
         private final Map<Object, Object> attributes;
         private final ExternalContext externalContext;
+
+        private UIViewRoot viewRoot;
 
         public RemoveViewStateFacesContext(FacesContext wrapped, UIViewRoot viewRoot, String viewState) {
             super(wrapped);

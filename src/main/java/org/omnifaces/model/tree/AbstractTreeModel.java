@@ -41,12 +41,13 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
     // Properties -----------------------------------------------------------------------------------------------------
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     private T data;
     private AbstractTreeModel<T> parent;
     private Collection<TreeModel<T>> children;
     private List<TreeModel<T>> unmodifiableChildren = Collections.emptyList();
     private int index;
-    private final ReentrantLock lock = new ReentrantLock();
 
     // Actions --------------------------------------------------------------------------------------------------------
 

@@ -64,9 +64,9 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     /** The default scope, which is "facelet". */
     public static final String DEFAULT_SCOPE = "facelet";
 
-    private ReadOnlyValueExpression readOnlyValueExpression;
-
     private final State state = new State(getStateHelper());
+
+    private ReadOnlyValueExpression readOnlyValueExpression;
 
     enum PropertyKeys {
         // Cannot be uppercased. They have to exactly match the attribute names.

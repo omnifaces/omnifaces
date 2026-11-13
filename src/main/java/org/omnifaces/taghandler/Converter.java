@@ -171,10 +171,11 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 
         private static final long serialVersionUID = 1L;
 
-        private transient jakarta.faces.convert.Converter<Object> converter;
         private final ValueExpression binding;
         private final ValueExpression id;
         private final DeferredAttributes attributes;
+
+        private transient jakarta.faces.convert.Converter<Object> converter;
 
         /**
          * Construct the deferred converter.

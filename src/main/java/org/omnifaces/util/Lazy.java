@@ -40,10 +40,12 @@ import java.util.function.Supplier;
 public final class Lazy<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private final Lock lock = new ReentrantLock();
+    private final SerializableSupplier<T> initFunction;
+
     private transient T delegate;
     private transient volatile boolean initialized;
-    private final SerializableSupplier<T> initFunction;
-    private final Lock lock = new ReentrantLock();
 
     public interface SerializableSupplier<T> extends Supplier<T>, Serializable {
     }

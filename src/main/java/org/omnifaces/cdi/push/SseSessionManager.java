@@ -54,11 +54,13 @@ public class SseSessionManager extends PushSessionManager<AsyncContext> {
 
     private static volatile int maxSessionsPerChannel = Integer.MAX_VALUE;
 
-    @Inject
-    private SseUserManager sseUsers;
-
     private final ConcurrentHashMap<AsyncContext, String> channelIds = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Serializable> users = new ConcurrentHashMap<>();
+
+    // Dependencies ---------------------------------------------------------------------------------------------------
+
+    @Inject
+    private SseUserManager sseUsers;
 
     // Actions --------------------------------------------------------------------------------------------------------
 
