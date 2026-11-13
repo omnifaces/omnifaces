@@ -112,7 +112,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
          * @return {@code true} if the given request accepts this algorithm.
          */
         public boolean accepts(HttpServletRequest request) {
-            return isAvailable() && list(request.getHeaders("Accept-Encoding")).stream()
+            return isAvailable() && list(request.getHeaders(HEADER_ACCEPT_ENCODING)).stream()
                     .flatMap(value -> splitAndTrim(value, ","))
                     .anyMatch(encodingDirective::equals);
         }
@@ -161,6 +161,14 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         }
     }
 
+    // Private constants ----------------------------------------------------------------------------------------------
+
+    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String HEADER_CACHE_CONTROL = "Cache-Control";
+    private static final String HEADER_CONTENT_ENCODING = "Content-Encoding";
+    private static final String HEADER_CONTENT_RANGE = "Content-Range";
+    private static final String HEADER_VARY = "Vary";
+
     // Properties -----------------------------------------------------------------------------------------------------
 
     private final Algorithm algorithm;
@@ -205,12 +213,10 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         super.setHeader(name, value);
 
         if (name != null) {
-            String lowerCasedName = name.toLowerCase();
-
-            if ("content-range".equals(lowerCasedName)) {
+            if (HEADER_CONTENT_RANGE.equalsIgnoreCase(name)) {
                 dontCompress = (value != null);
             }
-            else if ("cache-control".equals(lowerCasedName)) {
+            else if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name)) {
                 dontCompress = (value != null && isCacheControlNoTransform(value));
             }
         }
@@ -221,28 +227,12 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
         super.addHeader(name, value);
 
         if (name != null && value != null) {
-            String lowerCasedName = name.toLowerCase();
-
-            if ("content-range".equals(lowerCasedName)) {
+            if (HEADER_CONTENT_RANGE.equalsIgnoreCase(name)) {
                 dontCompress = true;
             }
-            else if ("cache-control".equals(lowerCasedName)) {
+            else if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name)) {
                 dontCompress = (dontCompress || isCacheControlNoTransform(value));
             }
-        }
-    }
-
-    /**
-     * Add <code>Accept-Encoding</code> to the <code>Vary</code> header, unless the response already varies on anything
-     * (<code>*</code>) or on <code>Accept-Encoding</code>.
-     */
-    private void addVaryAcceptEncodingIfNecessary() {
-        boolean alreadyVaries = getHeaders("Vary").stream()
-                .flatMap(value -> splitAndTrim(value, ","))
-                .anyMatch(value -> "*".equals(value) || "Accept-Encoding".equalsIgnoreCase(value));
-
-        if (!alreadyVaries) {
-            addHeader("Vary", "Accept-Encoding");
         }
     }
 
@@ -318,7 +308,7 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
                 String contentType = getContentType();
 
                 if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
-                    addHeader("Content-Encoding", algorithm.getEncodingDirective());
+                    addHeader(HEADER_CONTENT_ENCODING, algorithm.getEncodingDirective());
                     addVaryAcceptEncodingIfNecessary();
                     return algorithm.createOutputStream(originalResponse);
                 }
@@ -333,6 +323,20 @@ public class CompressedHttpServletResponse extends HttpServletResponseOutputWrap
             }
 
             return originalResponse.getOutputStream();
+        }
+
+        /**
+         * Add <code>Accept-Encoding</code> to the <code>Vary</code> header, unless the response already varies on
+         * anything (<code>*</code>) or on <code>Accept-Encoding</code>.
+         */
+        private void addVaryAcceptEncodingIfNecessary() {
+            boolean alreadyVaries = getHeaders(HEADER_VARY).stream()
+                    .flatMap(value -> splitAndTrim(value, ","))
+                    .anyMatch(value -> "*".equals(value) || HEADER_ACCEPT_ENCODING.equalsIgnoreCase(value));
+
+            if (!alreadyVaries) {
+                addHeader(HEADER_VARY, HEADER_ACCEPT_ENCODING);
+            }
         }
     }
 }
