@@ -84,8 +84,9 @@ class FacesLocalGetMessageBundleTest {
     private static FacesContext createFacesContext(String messageBundle) {
         var context = mock(FacesContext.class);
         var application = mock(Application.class);
+        var externalContext = mock(ExternalContext.class);
         when(context.getApplication()).thenReturn(application);
-        when(context.getExternalContext()).thenReturn(mock(ExternalContext.class));
+        when(context.getExternalContext()).thenReturn(externalContext);
         when(application.getMessageBundle()).thenReturn(messageBundle);
         when(application.getDefaultLocale()).thenReturn(ENGLISH);
         when(application.getSupportedLocales()).thenReturn(emptyIterator());
