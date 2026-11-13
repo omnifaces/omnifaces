@@ -364,7 +364,7 @@ public final class Numbers {
     }
 
     private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit, Locale locale) {
-        var exponent = (int) (Math.log(decimal.abs().longValue()) / Math.log(base));
+        var exponent = (int) (Math.log((double) decimal.abs().longValue()) / Math.log(base));
         var divisor = BigDecimal.valueOf(Math.pow(base, exponent));
         var divided = divisor.signum() == 0 ? divisor : decimal.divide(divisor);
         var maxfractions = fractions != null ? fractions : PRECISION - String.valueOf(divided.abs().longValue()).length();
