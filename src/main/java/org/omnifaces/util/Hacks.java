@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -134,10 +133,10 @@ public final class Hacks {
 
     // Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
+    private static final Lazy<Method> getCurrentNonceMethod = new Lazy<>(Hacks::findGetCurrentNonceMethod);
     private static Boolean mojarraUsed;
     private static Boolean myFacesUsed;
     private static Long defaultResourceMaxAge;
-    private static Optional<Method> getCurrentNonceMethod;
 
     // Constructors/init ----------------------------------------------------------------------------------------------
 
@@ -294,15 +293,12 @@ public final class Hacks {
      * @since 4.7.17
      */
     public static String getCurrentNonce(FacesContext context) {
-        if (getCurrentNonceMethod == null) {
-            getCurrentNonceMethod = Optional.ofNullable(findGetCurrentNonceMethod());
-        }
+        var method = getCurrentNonceMethod.get();
 
-        if (getCurrentNonceMethod.isEmpty()) {
+        if (method == null) {
             return null;
         }
 
-        var method = getCurrentNonceMethod.get();
         return invokeMethod(isStatic(method.getModifiers()) ? null : context.getApplication().getResourceHandler(), method, context);
     }
 
