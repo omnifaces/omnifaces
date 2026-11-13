@@ -775,23 +775,21 @@ public class ValidateBean extends TagHandler {
             for (var baseAndProperty : resolveViolatedBasesAndProperties(bean, violation)) {
                 var property = baseAndProperty.getValue();
 
-                if (property == null && fallback != null) {
-                    continue;
-                }
+                if (property != null || fallback == null) {
+                    boolean[] displayed = { false };
 
-                boolean[] displayed = { false };
+                    forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), property, input -> {
+                        context.validationFailed();
+                        input.setValid(false);
+                        var clientId = input.getClientId(context);
+                        addError(clientId, formatMessage(violation.getMessage(), getLabel(context, input), messageFormat));
+                        undisplayed.remove(violation);
+                        displayed[0] = true;
+                    });
 
-                forEachInputWithMatchingBase(context, form, singleton(baseAndProperty.getKey()), property, input -> {
-                    context.validationFailed();
-                    input.setValid(false);
-                    var clientId = input.getClientId(context);
-                    addError(clientId, formatMessage(violation.getMessage(), getLabel(context, input), messageFormat));
-                    undisplayed.remove(violation);
-                    displayed[0] = true;
-                });
-
-                if (displayed[0]) {
-                    break;
+                    if (displayed[0]) {
+                        break;
+                    }
                 }
             }
         }
