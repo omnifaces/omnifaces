@@ -108,7 +108,7 @@ export namespace Notification {
         const defaults = channels.get(channel) ?? {};
 
         navigator.serviceWorker.ready.then(function(registration) {
-            registration.showNotification(title, {
+            return registration.showNotification(title, {
                 tag: defaults.tag,
                 body,
                 requireInteraction: defaults.requireInteraction,
@@ -116,6 +116,8 @@ export namespace Notification {
                 icon: defaults.icon,
                 data: { channel, url: url ?? undefined }
             });
+        }).catch(function(error) {
+            console.warn("OmniFaces.Notification.show: notification could not be shown", error);
         });
     }
 

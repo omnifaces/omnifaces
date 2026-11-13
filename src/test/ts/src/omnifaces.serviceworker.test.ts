@@ -36,6 +36,19 @@ describe("OmniFaces.ServiceWorker.init", () => {
         expect(mockSW.register).toHaveBeenCalledWith("/sw.js", { scope: "/app/" });
     });
 
+    test("warns when the service worker cannot be registered", async () => {
+        mockSW = installMockServiceWorker();
+        const error = new TypeError("script not found");
+        mockSW.register.mockRejectedValue(error);
+        const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        serviceWorker().init("/sw.js", "/app/");
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining("OmniFaces.ServiceWorker.init"), error);
+        warn.mockRestore();
+    });
+
     test("adds message event listener", () => {
         mockSW = installMockServiceWorker();
         serviceWorker().init("/sw.js", "/");

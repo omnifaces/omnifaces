@@ -33,7 +33,9 @@ export namespace ServiceWorker {
             return; // Service workers not supported. End of story. https://caniuse.com/#feat=serviceworkers
         }
 
-        navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope });
+        navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope }).catch(function(error) {
+            console.warn("OmniFaces.ServiceWorker.init: service worker could not be registered", error);
+        });
         navigator.serviceWorker.addEventListener("message", function(event) {
             if (event.data?.type == EVENT) {
                 window.dispatchEvent(new CustomEvent(event.data.name, { detail: event.data.detail }));

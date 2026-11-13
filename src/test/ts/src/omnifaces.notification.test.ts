@@ -146,6 +146,19 @@ describe("OmniFaces.Notification.show", () => {
         }));
     });
 
+    test("warns when the notification cannot be shown", async () => {
+        installMockNotification("granted");
+        const error = new TypeError("permission revoked");
+        showNotificationMock.mockRejectedValue(error);
+        const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        notification().show("ch1", "Test Title");
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining("OmniFaces.Notification.show"), error);
+        warn.mockRestore();
+    });
+
     test("uses component defaults for icon, requireInteraction, silent", async () => {
         installMockNotification("granted");
         notification().init("ch1", { icon: "/default.png", requireInteraction: true, silent: true });
