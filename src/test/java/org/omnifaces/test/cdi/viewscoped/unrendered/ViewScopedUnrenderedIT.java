@@ -15,6 +15,7 @@ package org.omnifaces.test.cdi.viewscoped.unrendered;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +25,7 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +34,10 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.test.OmniFacesIT;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.FluentWait;
 
 /**
  * A request which creates a view scoped bean, but completes without rendering its view, never sends the unload script to the client, so no unload request can
@@ -365,25 +369,28 @@ public class ViewScopedUnrenderedIT extends OmniFacesIT {
      * A bean storage which is destroyed at the end of a request may be destroyed only after the client has received the response, so the counts are polled.
      */
     private Map<String, Integer> awaitDelta(Map<String, Integer> before, String name, int expectedDelta) throws IOException {
-        long timeout = System.currentTimeMillis() + AWAIT_TIMEOUT_IN_MILLIS;
-        Map<String, Integer> after = getCounts();
-
-        while (after.get(name) - before.get(name) != expectedDelta && System.currentTimeMillis() < timeout) {
-            sleep(AWAIT_INTERVAL_IN_MILLIS);
-            after = getCounts();
+        try {
+            return new FluentWait<>(before)
+                .withTimeout(ofMillis(AWAIT_TIMEOUT_IN_MILLIS))
+                .pollingEvery(ofMillis(AWAIT_INTERVAL_IN_MILLIS))
+                .until($ -> {
+                    var after = getCountsUnchecked();
+                    return after.get(name) - before.get(name) == expectedDelta ? after : null;
+                });
         }
-
-        assertDelta(before, after, name, expectedDelta);
-        return after;
+        catch (TimeoutException e) {
+            var after = getCounts();
+            assertDelta(before, after, name, expectedDelta);
+            return after;
+        }
     }
 
-    private static void sleep(long millis) {
+    private Map<String, Integer> getCountsUnchecked() {
         try {
-            Thread.sleep(millis);
+            return getCounts();
         }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(e);
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

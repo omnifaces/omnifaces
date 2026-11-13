@@ -15,7 +15,6 @@ package org.omnifaces.test.cdi.viewscoped.unrendered;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Faces.sendFile;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -55,7 +54,7 @@ public class ViewScopedUnrenderedITBean implements Serializable {
         count++;
     }
 
-    public void download() throws IOException {
+    public void download() {
         sendFile("download".getBytes(UTF_8), "download.txt", true);
     }
 
