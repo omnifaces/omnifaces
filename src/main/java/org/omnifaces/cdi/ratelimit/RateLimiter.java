@@ -14,7 +14,6 @@ package org.omnifaces.cdi.ratelimit;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.WARNING;
 
@@ -153,6 +152,7 @@ public class RateLimiter {
     private static final long EXPIRED_COUNTERS_REMOVAL_INTERVAL_IN_SECONDS = 10;
     private static final long EXPIRED_COUNTERS_REMOVAL_ON_FULL_INTERVAL_IN_NANOS = SECONDS.toNanos(1);
     private static final long NEVER = Long.MIN_VALUE;
+    private static final long NANOS_PER_MILLI = MILLISECONDS.toNanos(1);
     private static final int IPV6_NETWORK_PREFIX_LENGTH_IN_BYTES = 8;
     private static final String IPV6_NETWORK_PREFIX_SUFFIX = "/" + IPV6_NETWORK_PREFIX_LENGTH_IN_BYTES * Byte.SIZE;
     private static final byte[] NAT64_WELL_KNOWN_PREFIX = { 0, 0x64, (byte) 0xff, (byte) 0x9b, 0, 0, 0, 0, 0, 0, 0, 0 }; // RFC 6052: 64:ff9b::/96
@@ -408,7 +408,7 @@ public class RateLimiter {
     }
 
     private static long toDelayInMillis(long delayInNanos) {
-        return Math.max(1, NANOSECONDS.toMillis(delayInNanos));
+        return Math.max(1, delayInNanos / NANOS_PER_MILLI + (delayInNanos % NANOS_PER_MILLI > 0 ? 1 : 0));
     }
 
     /**

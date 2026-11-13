@@ -382,6 +382,26 @@ class RateLimiterTest {
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 1));
     }
 
+    /**
+     * The recommended delay is the remaining time of the time window rounded up to whole milliseconds: a retry which waits exactly the recommended delay
+     * finds the time window expired, and one which waits a millisecond less does not.
+     */
+    @Test
+    void testRetryAfterRecommendedDelayIsAccepted() {
+        var timeWindow = Duration.ofMillis(200);
+        var maxRequests = 1;
+        freezeTicker();
+
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+        advanceTicker(Duration.ofMillis(1).dividedBy(2));
+        var exception = assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+        advanceTicker(Duration.ofMillis(exception.getRecommendedDelayInMillis() - 1));
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+        advanceTicker(Duration.ofMillis(1));
+
+        assertDoesNotThrow(() -> rateLimiter.checkRateLimit(request, maxRequests, timeWindow, 0));
+    }
+
     private static HttpServletRequest requestFrom(String remoteAddr) {
         var request = mock(HttpServletRequest.class);
         when(request.getRemoteAddr()).thenReturn(remoteAddr);
