@@ -82,10 +82,12 @@ class RateLimitInterceptorTest {
      */
     @Test
     void testMethodsWithoutClientIdHaveSeparateCounters() {
+        var target = new MethodLevelRateLimits();
+
         try (var faces = mockFacesRequest()) {
-            assertAllowedUpToMaxRequests(new MethodLevelRateLimits(), "first");
-            assertDoesNotThrow(() -> invoke(new MethodLevelRateLimits(), "second"));
-            assertThrows(RateLimitExceededException.class, () -> invoke(new MethodLevelRateLimits(), "first"));
+            assertAllowedUpToMaxRequests(target, "first");
+            assertDoesNotThrow(() -> invoke(target, "second"));
+            assertThrows(RateLimitExceededException.class, () -> invoke(target, "first"));
         }
     }
 
@@ -94,24 +96,30 @@ class RateLimitInterceptorTest {
      */
     @Test
     void testExplicitClientIdIsSharedAcrossMethods() {
-        assertAllowedUpToMaxRequests(new MethodLevelRateLimits(), "firstApi");
-        assertThrows(RateLimitExceededException.class, () -> invoke(new MethodLevelRateLimits(), "secondApi"));
+        var target = new MethodLevelRateLimits();
+
+        assertAllowedUpToMaxRequests(target, "firstApi");
+        assertThrows(RateLimitExceededException.class, () -> invoke(target, "secondApi"));
     }
 
     @Test
     void testClassLevelAnnotationWithoutClientIdSharesOneCounterPerClass() {
+        var target = new ClassLevelRateLimit();
+
         try (var faces = mockFacesRequest()) {
-            assertAllowedUpToMaxRequests(new ClassLevelRateLimit(), "first");
-            assertThrows(RateLimitExceededException.class, () -> invoke(new ClassLevelRateLimit(), "second"));
+            assertAllowedUpToMaxRequests(target, "first");
+            assertThrows(RateLimitExceededException.class, () -> invoke(target, "second"));
         }
     }
 
     @Test
     void testMethodLevelAnnotationInClassLevelAnnotatedClassHasSeparateCounter() {
+        var target = new ClassLevelRateLimit();
+
         try (var faces = mockFacesRequest()) {
-            assertAllowedUpToMaxRequests(new ClassLevelRateLimit(), "first");
-            assertDoesNotThrow(() -> invoke(new ClassLevelRateLimit(), "own"));
-            assertThrows(RateLimitExceededException.class, () -> invoke(new ClassLevelRateLimit(), "second"));
+            assertAllowedUpToMaxRequests(target, "first");
+            assertDoesNotThrow(() -> invoke(target, "own"));
+            assertThrows(RateLimitExceededException.class, () -> invoke(target, "second"));
         }
     }
 
@@ -122,7 +130,8 @@ class RateLimitInterceptorTest {
     void testClassLevelAnnotationIsSharedAcrossSubclasses() {
         try (var faces = mockFacesRequest()) {
             assertAllowedUpToMaxRequests(new FirstClassLevelRateLimitSubclass(), "first");
-            assertThrows(RateLimitExceededException.class, () -> invoke(new SecondClassLevelRateLimitSubclass(), "first"));
+            var secondSubclass = new SecondClassLevelRateLimitSubclass();
+            assertThrows(RateLimitExceededException.class, () -> invoke(secondSubclass, "first"));
         }
     }
 
@@ -147,13 +156,15 @@ class RateLimitInterceptorTest {
     }
 
     private void assertRateLimitedDespiteSpoofedProxyHeaders() {
+        var target = new MethodLevelRateLimits();
+
         for (var i = 0; i < MAX_REQUESTS; i++) {
             stubProxyHeaders(SPOOFED_IP_PREFIX + i);
-            assertDoesNotThrow(() -> invoke(new MethodLevelRateLimits(), "first"));
+            assertDoesNotThrow(() -> invoke(target, "first"));
         }
 
         stubProxyHeaders(SPOOFED_IP_PREFIX + MAX_REQUESTS);
-        assertThrows(RateLimitExceededException.class, () -> invoke(new MethodLevelRateLimits(), "first"));
+        assertThrows(RateLimitExceededException.class, () -> invoke(target, "first"));
     }
 
     private void stubProxyHeaders(String ip) {

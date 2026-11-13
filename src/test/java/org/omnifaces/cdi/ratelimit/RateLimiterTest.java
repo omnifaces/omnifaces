@@ -222,7 +222,8 @@ class RateLimiterTest {
         var maxRequests = 1;
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(requestFrom(IPV6_IP), maxRequests, timeWindow, 0));
-        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(requestFrom(IPV6_IP_IN_SAME_NETWORK), maxRequests, timeWindow, 0));
+        var requestInSameNetwork = requestFrom(IPV6_IP_IN_SAME_NETWORK);
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(requestInSameNetwork, maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(requestFrom(IPV6_IP_IN_OTHER_NETWORK), maxRequests, timeWindow, 0));
     }
 
@@ -232,7 +233,8 @@ class RateLimiterTest {
         var maxRequests = 1;
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(requestFrom(FIRST_IP), maxRequests, timeWindow, 0));
-        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(requestFrom(IPV4_MAPPED_IPV6_IP), maxRequests, timeWindow, 0));
+        var ipv4MappedRequest = requestFrom(IPV4_MAPPED_IPV6_IP);
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(ipv4MappedRequest, maxRequests, timeWindow, 0));
     }
 
     /**
@@ -245,7 +247,8 @@ class RateLimiterTest {
 
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(requestFrom(NAT64_IPV6_IP), maxRequests, timeWindow, 0));
         assertDoesNotThrow(() -> rateLimiter.checkRateLimit(requestFrom(OTHER_NAT64_IPV6_IP), maxRequests, timeWindow, 0));
-        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(requestFrom(FIRST_IP), maxRequests, timeWindow, 0));
+        var ipv4Request = requestFrom(FIRST_IP);
+        assertThrows(RateLimitExceededException.class, () -> rateLimiter.checkRateLimit(ipv4Request, maxRequests, timeWindow, 0));
     }
 
     @Test
@@ -348,11 +351,12 @@ class RateLimiterTest {
     @Test
     void testMaxTrackedCountersIsReadFromContextParam() {
         var limiter = createRateLimiterWithContextParam(" 1 ");
+        var timeWindow = Duration.ofSeconds(10);
         limiter.init();
 
         try {
-            assertDoesNotThrow(() -> limiter.checkRateLimit(FIRST_IP, 1, Duration.ofSeconds(10), 0));
-            assertThrows(RateLimitExceededException.class, () -> limiter.checkRateLimit(SECOND_IP, 1, Duration.ofSeconds(10), 0));
+            assertDoesNotThrow(() -> limiter.checkRateLimit(FIRST_IP, 1, timeWindow, 0));
+            assertThrows(RateLimitExceededException.class, () -> limiter.checkRateLimit(SECOND_IP, 1, timeWindow, 0));
         }
         finally {
             limiter.destroy();
