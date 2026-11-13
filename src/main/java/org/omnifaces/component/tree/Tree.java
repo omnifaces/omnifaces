@@ -215,13 +215,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 
         process(context, getModel(phaseId), () -> {
             if (processValidations) {
-                context.getApplication().publishEvent(context, PreValidateEvent.class, Tree.this);
+                context.getApplication().publishEvent(context, PreValidateEvent.class, this);
             }
 
             processTreeNode(context, phaseId);
 
             if (processValidations) {
-                context.getApplication().publishEvent(context, PostValidateEvent.class, Tree.this);
+                context.getApplication().publishEvent(context, PostValidateEvent.class, this);
             }
 
             return null;
@@ -248,13 +248,13 @@ public class Tree extends TreeFamily implements NamingContainer {
         }
 
         return process(context.getFacesContext(), model, () -> {
-            var result = context.invokeVisitCallback(Tree.this, callback);
+            var result = context.invokeVisitCallback(this, callback);
 
             if (result == VisitResult.COMPLETE) {
                 return true;
             }
 
-            if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
+            if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(this).isEmpty()) {
                 return visitTreeNode(context, callback);
             }
 
