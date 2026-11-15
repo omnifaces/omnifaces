@@ -16,6 +16,8 @@ import static java.util.Optional.ofNullable;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.executeAtomically;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,8 +47,8 @@ public class BeanStorage implements Serializable {
     // Properties -----------------------------------------------------------------------------------------------------
 
     private final ConcurrentHashMap<String, Serializable> beans;
-    private final ConcurrentHashMap<String, ReentrantLock> locks;
-    private final ReentrantLock lock = new ReentrantLock();
+    private transient ConcurrentHashMap<String, ReentrantLock> locks;
+    private transient ReentrantLock lock;
 
     private transient int activeRequests;
     private transient boolean evicted;
@@ -60,7 +62,7 @@ public class BeanStorage implements Serializable {
      */
     public BeanStorage(int initialCapacity) {
         beans = new ConcurrentHashMap<>(initialCapacity, 1);
-        locks = new ConcurrentHashMap<>(initialCapacity, 1);
+        initLocks(initialCapacity);
     }
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -185,6 +187,18 @@ public class BeanStorage implements Serializable {
             beans.clear();
             destroyed = true;
         });
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    private void initLocks(int initialCapacity) {
+        locks = new ConcurrentHashMap<>(initialCapacity, 1);
+        lock = new ReentrantLock();
+    }
+
+    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        input.defaultReadObject();
+        initLocks(beans.size());
     }
 
 }
