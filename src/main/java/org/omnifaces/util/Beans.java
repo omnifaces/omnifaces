@@ -80,6 +80,12 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  * // Fire a CDI event.
  * Beans.fireEvent(someEvent);
  * </pre>
+ *
+ * <pre>
+ *
+ * // Get the annotation of the given type on an annotated program element, also when it is only declared on a stereotype of it.
+ * SomeAnnotation someAnnotation = Beans.getAnnotation(annotated, SomeAnnotation.class);
+ * </pre>
  * <p>
  * For a full list, check the <a href="#method.summary">method summary</a>.
  *

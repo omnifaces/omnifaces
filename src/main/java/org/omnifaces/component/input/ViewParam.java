@@ -70,6 +70,14 @@ import org.omnifaces.vdl.FacesAttribute;
  * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the <code>default</code> attribute. When the parameter is not available,
  * then the value specified in <code>default</code> attribute will be set in the model instead. The support was added in OmniFaces 2.2.
  *
+ * <h2>Order relative to view actions and preRenderView</h2>
+ * <p>
+ * On a GET request, the view parameters are set in the model during the <code>UPDATE_MODEL_VALUES</code> phase. A <code>&lt;f:viewAction&gt;</code> or
+ * <code>&lt;o:viewAction&gt;</code> is by default invoked after that, during the <code>INVOKE_APPLICATION</code> phase. A
+ * <code>&lt;f:event type="preRenderView"&gt;</code> listener is invoked after that, at the start of the <code>RENDER_RESPONSE</code> phase. So both can use the
+ * converted and validated view parameter values. On a postback, the <code>&lt;o:viewParam&gt;</code> does not set the model again and the view action is by
+ * default skipped, while the <code>preRenderView</code> listener is still invoked.
+ *
  * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.

@@ -87,6 +87,9 @@ import org.omnifaces.cdi.Startup;
  * return "items?faces-redirect=true";
  * </pre>
  * <p>
+ * The <code>addFlashXxx()</code> methods and the {@link Message#flash()} builder method set {@link Flash#setKeepMessages(boolean)} to <code>true</code>, so
+ * that the message survives the redirect. There is no need to set it yourself.
+ * <p>
  * For a full list, check the <a href="#method.summary">method summary</a>.
  *
  * <h2>Message resolver</h2>

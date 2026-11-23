@@ -53,6 +53,12 @@ import org.omnifaces.util.State;
  * <p>
  * Only when you set <code>immediate="true"</code>, then it will behave the same as the standard <code>&lt;f:viewAction&gt;</code>.
  *
+ * <h2>Postbacks</h2>
+ * <p>
+ * Like the standard <code>&lt;f:viewAction&gt;</code>, it is by default not invoked on postbacks, because its <code>onPostback</code> attribute defaults to
+ * <code>false</code>. Set <code>onPostback="true"</code> to invoke it on postbacks as well. It then runs in the same <code>INVOKE_APPLICATION</code> phase as
+ * the action of the submitted command, right before it.
+ *
  * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;f:viewAction&gt;</code>, you only need to change <code>f:</code> to <code>o:</code>.

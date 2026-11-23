@@ -54,6 +54,22 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;/f:metadata&gt;
  * </pre>
  *
+ * <h2>Combined with a view action</h2>
+ * <p>
+ * A <code>&lt;f:viewAction&gt;</code> which initializes a view scoped bean is by default not invoked on postbacks. After the view has been recreated, the bean
+ * is however new and empty. To invoke the view action on exactly such a postback, let its <code>onPostback</code> attribute check whether the session is absent
+ * or new:
+ *
+ * <pre>
+ * &lt;f:metadata&gt;
+ *     &lt;o:enableRestorableView/&gt;
+ *     &lt;f:viewAction action="#{bean.init}" onPostback="#{empty session or session.new}" /&gt;
+ * &lt;/f:metadata&gt;
+ * </pre>
+ * <p>
+ * The <code>empty session</code> check is needed because <code>#{session}</code> is still <code>null</code> at the moment the <code>onPostback</code> attribute
+ * is evaluated, unless the session has already been created earlier in the same request, e.g. by a servlet filter.
+ *
  * <h2>Stateless mode</h2>
  * <p>
  * Since Faces 2.2, it's possible to enable a stateless mode on the view by simply setting its <code>transient</code> attribute to <code>true</code>:
