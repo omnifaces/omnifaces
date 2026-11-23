@@ -138,6 +138,16 @@ public class FacesViewsIT extends OmniFacesIT {
         verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
     }
 
+    /**
+     * An excluded folder excludes only the views below it, not a view of the same name next to it.
+     */
+    @Test
+    void testViewNamedLikeExcludedFolder() {
+        open("excludedfolder");
+        assertEquals("excludedfolder", browser.getTitle());
+        assertEquals(contextPath + "/excludedfolder", stripHostAndJsessionid(browser.getCurrentUrl()));
+    }
+
     private void verify200(String title, String path) {
         assertEquals(title, browser.getTitle());
         assertEquals(contextPath + "/" + path, stripHostAndJsessionid(browser.getCurrentUrl()));

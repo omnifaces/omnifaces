@@ -25,6 +25,7 @@ import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.getReverseMappedResources;
+import static org.omnifaces.facesviews.FacesViews.isExcludedPath;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
@@ -136,7 +137,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     /**
      * Walk the scanned dynamic routes for a view whose bracketed directory names match the requested path, and forward to the physical view when one does,
-     * exposing the resolved segment values as a request attribute. An application without any bracketed directory never gets here.
+     * exposing the resolved segment values as a request attribute. An application without any bracketed directory never gets here, and a path excluded from
+     * FacesViews never matches.
      */
     private static boolean forwardDynamicRouteIfNecessary(
         HttpServletRequest request, HttpServletResponse response, ServletContext servletContext, String normalizedServletPath
@@ -149,7 +151,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         }
 
         var pathInfo = request.getPathInfo();
-        var match = dynamicRoutes.match(pathInfo == null ? normalizedServletPath : stripTrailingSlash(normalizedServletPath + pathInfo));
+        var path = pathInfo == null ? normalizedServletPath : stripTrailingSlash(normalizedServletPath + pathInfo);
+
+        if (isExcludedPath(servletContext, path)) {
+            return false;
+        }
+
+        var match = dynamicRoutes.match(path);
 
         if (match == null) {
             return false;

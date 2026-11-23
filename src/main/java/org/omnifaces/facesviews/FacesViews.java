@@ -26,6 +26,7 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import static org.omnifaces.util.Reflection.findMethod;
+import static org.omnifaces.util.ResourcePaths.PATH_SEPARATOR;
 import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
@@ -631,7 +632,6 @@ public final class FacesViews {
         Map<String, String> collectedViews = new HashMap<>();
         Set<String> collectedExtensions = new HashSet<>();
         Set<String> excludedPaths = new HashSet<>();
-        var dynamicRoutes = new DynamicRoutes();
 
         for (String[] rootPathAndExtension : getRootPathsAndExtensions(servletContext)) {
             String rootPath = rootPathAndExtension[0];
@@ -641,13 +641,12 @@ public final class FacesViews {
             }
             else {
                 String extension = rootPathAndExtension[1];
-                scanViews(
-                    servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extension, collectedExtensions, dynamicRoutes
-                );
+                scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extension, collectedExtensions);
             }
         }
 
         collectedViews.keySet().removeIf(collectedView -> excludedPaths.stream().anyMatch(collectedView::startsWith));
+        var dynamicRoutes = collectDynamicRoutes(servletContext, collectedViews);
 
         if (!collectedViews.isEmpty()) {
             if (isLowercasedRequestURI(servletContext)) {
@@ -798,7 +797,7 @@ public final class FacesViews {
      */
     private static void scanViews(
         ServletContext servletContext, String rootPath, Set<String> resourcePaths,
-        Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions, DynamicRoutes dynamicRoutes
+        Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions
     )
     {
         if (isEmpty(resourcePaths)) {
@@ -814,19 +813,19 @@ public final class FacesViews {
                 if (canScanDirectory(rootPath, normalizedResourcePath)) {
                     scanViews(
                         servletContext, rootPath, servletContext.getResourcePaths(normalizedResourcePath), collectedViews, extensionToScan,
-                        collectedExtensions, dynamicRoutes
+                        collectedExtensions
                     );
                 }
             }
             else if (canScanResource(normalizedResourcePath, extensionToScan)) {
-                scanView(servletContext, rootPath, normalizedResourcePath, collectedViews, collectedExtensions, hasMultiViewsWelcomeFile, dynamicRoutes);
+                scanView(servletContext, rootPath, normalizedResourcePath, collectedViews, collectedExtensions, hasMultiViewsWelcomeFile);
             }
         }
     }
 
     private static void scanView(
         ServletContext servletContext, String rootPath, String resourcePath,
-        Map<String, String> collectedViews, Set<String> collectedExtensions, boolean hasMultiViewsWelcomeFile, DynamicRoutes dynamicRoutes
+        Map<String, String> collectedViews, Set<String> collectedExtensions, boolean hasMultiViewsWelcomeFile
     )
     {
         // Strip the root path from the current path.
@@ -836,30 +835,9 @@ public final class FacesViews {
         // Store the resource with and without an extension, e.g. store both foo.xhtml and foo
         collectedViews.put(resource, resourcePath);
         String extensionlessResource = stripExtension(resource);
-        String extensionlessResourcePath = stripExtension(resourcePath);
 
-        boolean multiViews = MultiViews.isResource(servletContext, extensionlessResourcePath);
-
-        if (DynamicRoutes.isDynamicRoute(extensionlessResource)) {
-            dynamicRoutes.add(extensionlessResource, resourcePath, multiViews, isWelcomeFile(servletContext, extensionlessResource));
-        }
-        else if (multiViews) {
-            collectedViews.put(extensionlessResource + MultiViews.SUFFIX, resourcePath);
-        }
-        else {
-            if (hasMultiViewsWelcomeFile) { // This will install forwarding filter on /* and therefore we need to cover / ourselves.
-                collectedViews.put(extensionlessResource + "/", resourcePath);
-            }
-
-            collectedViews.put(extensionlessResource, resourcePath);
-
-            // If FacesServlet is explicitly mapped on virtual extensions (e.g. when FacesViews is later enabled on a legacy app with *.jsf),
-            // then we need to collect them as well so that these can properly be 301-redirected to extensionless one.
-            for (var facesServletExtension : getFacesServletExtensions(servletContext)) {
-                if (!resourcePath.endsWith(facesServletExtension)) {
-                    collectedViews.put(extensionlessResource + facesServletExtension, resourcePath);
-                }
-            }
+        if (!DynamicRoutes.isDynamicRoute(extensionlessResource)) {
+            scanExtensionlessView(servletContext, resourcePath, extensionlessResource, collectedViews, hasMultiViewsWelcomeFile);
         }
 
         DynamicRoutes.warnIfBracketedFileName(extensionlessResource);
@@ -868,6 +846,51 @@ public final class FacesViews {
         if (collectedExtensions != null) {
             collectedExtensions.add("*" + getExtension(resourcePath));
         }
+    }
+
+    private static void scanExtensionlessView(
+        ServletContext servletContext, String resourcePath, String extensionlessResource,
+        Map<String, String> collectedViews, boolean hasMultiViewsWelcomeFile
+    )
+    {
+        if (MultiViews.isResource(servletContext, stripExtension(resourcePath))) {
+            collectedViews.put(extensionlessResource + MultiViews.SUFFIX, resourcePath);
+            return;
+        }
+
+        if (hasMultiViewsWelcomeFile) { // This will install forwarding filter on /* and therefore we need to cover / ourselves.
+            collectedViews.put(extensionlessResource + "/", resourcePath);
+        }
+
+        collectedViews.put(extensionlessResource, resourcePath);
+
+        // If FacesServlet is explicitly mapped on virtual extensions (e.g. when FacesViews is later enabled on a legacy app with *.jsf),
+        // then we need to collect them as well so that these can properly be 301-redirected to extensionless one.
+        for (var facesServletExtension : getFacesServletExtensions(servletContext)) {
+            if (!resourcePath.endsWith(facesServletExtension)) {
+                collectedViews.put(extensionlessResource + facesServletExtension, resourcePath);
+            }
+        }
+    }
+
+    /**
+     * Collects the dynamic routes from the scanned resources among the given collected views, i.e. the entries whose resource path ends with their key.
+     */
+    private static DynamicRoutes collectDynamicRoutes(ServletContext servletContext, Map<String, String> collectedViews) {
+        var dynamicRoutes = new DynamicRoutes();
+
+        for (var collectedView : collectedViews.entrySet()) {
+            var resource = collectedView.getKey();
+            var resourcePath = collectedView.getValue();
+            var extensionlessResource = stripExtension(resource);
+
+            if (resourcePath.endsWith(resource) && DynamicRoutes.isDynamicRoute(extensionlessResource)) {
+                var multiViews = MultiViews.isResource(servletContext, stripExtension(resourcePath));
+                dynamicRoutes.add(extensionlessResource, resourcePath, multiViews, isWelcomeFile(servletContext, extensionlessResource));
+            }
+        }
+
+        return dynamicRoutes;
     }
 
     private static boolean isWelcomeFile(ServletContext servletContext, String extensionlessResource) {
@@ -1019,8 +1042,30 @@ public final class FacesViews {
         return getApplicationAttribute(servletContext, REVERSE_MAPPED_RESOURCES);
     }
 
-    static Set<String> getExcludedPaths(ServletContext servletContext) {
-        return getApplicationAttribute(servletContext, EXCLUDED_PATHS);
+    /**
+     * Returns whether the given path is the directory itself, or is below the directory, excluded from FacesViews by a <code>!</code> prefixed entry in
+     * {@value #FACES_VIEWS_SCAN_PATHS_PARAM_NAME}.
+     *
+     * @param servletContext The involved servlet context.
+     * @param path The path relative to the web root, e.g. <code>/foo/bar</code>.
+     * @return Whether the given path is the excluded directory itself or below it.
+     */
+    static boolean isExcludedPath(ServletContext servletContext, String path) {
+        Set<String> excludedPaths = getApplicationAttribute(servletContext, EXCLUDED_PATHS);
+
+        if (isEmpty(excludedPaths)) {
+            return false;
+        }
+
+        var directory = path + PATH_SEPARATOR;
+
+        for (var excludedPath : excludedPaths) {
+            if (directory.startsWith(excludedPath)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static Set<String> getEncounteredExtensions(ServletContext servletContext) {

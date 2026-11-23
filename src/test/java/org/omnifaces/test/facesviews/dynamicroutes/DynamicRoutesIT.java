@@ -284,6 +284,16 @@ public class DynamicRoutesIT extends OmniFacesIT {
         assertEquals("404", browser.getTitle());
     }
 
+    /**
+     * A bracketed file name is scanned literally and declares no dynamic route segment, also not as a MultiViews view next to the dynamic route directory
+     * <code>[locale]</code>. The deployment succeeding is the actual assertion.
+     */
+    @Test
+    void testBracketedFileNameDeclaresNoDynamicRoute() {
+        open("nonexisting");
+        assertEquals("index", browser.getTitle());
+    }
+
     private void verify200(String title, String path, String expectedViewId) {
         verify200(title, path, expectedViewId, path);
     }
