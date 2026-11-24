@@ -5166,7 +5166,7 @@ public enum Baz {
                 per-<code>UICommand</code> or <code>UIInput</code> component basis. Usage example:
                 <pre>
 &lt;h:commandButton&gt;
-    &lt;o:validateBean groups="jakarta.validation.groups.Default,com.example.MyGroup"/&gt;
+    &lt;o:validateBean validationGroups="jakarta.validation.groups.Default,com.example.MyGroup"/&gt;
 &lt;/h:commandButton&gt;
                 </pre>
             ]]>
