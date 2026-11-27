@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Utils.parseLocale;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -42,6 +43,8 @@ public final class Numbers {
     private static final int BYTES_1K = 1024;
     private static final int NUMBER_1K = 1000;
     private static final int PRECISION = 3;
+    private static final String UNIT_PREFIXES = "kMGTPE";
+    private static final int MAX_EXPONENT = UNIT_PREFIXES.length();
 
     // Constructors ---------------------------------------------------------------------------------------------------
 
@@ -229,8 +232,8 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99M
      * <li>9995000 will appear as 10M
      * </ul>
-     * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
-     * return <code>null</code>.
+     * Numbers from 999.5E upward stay in E, e.g. 1E21 will appear as 1000E. The default locale is the one as obtained by {@link Faces#getLocale()}. If the
+     * value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
      *
      * @param number The number to be formatted in the default pattern of the default locale.
      * @return The formatted number.
@@ -292,8 +295,8 @@ public final class Numbers {
      * <li>9994999 will appear as 9.99 MB
      * <li>9995000 will appear as 10 MB
      * </ul>
-     * The default locale is the one as obtained by {@link Faces#getLocale()}. If the value is <code>null</code>, <code>NaN</code> or infinity, then this will
-     * return <code>null</code>.
+     * Numbers from 999.5E upward stay in E, e.g. 1E21 will appear as 1000 EB. The default locale is the one as obtained by {@link Faces#getLocale()}. If the
+     * value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
      *
      * @param number The number to be formatted in the default pattern of the default locale.
      * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit is <code>null</code>, then this method
@@ -364,10 +367,24 @@ public final class Numbers {
     }
 
     private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit, Locale locale) {
-        var exponent = (int) (Math.log((double) decimal.abs().longValue()) / Math.log(base));
-        var divisor = BigDecimal.valueOf(Math.pow(base, exponent));
-        var divided = divisor.signum() == 0 ? divisor : decimal.divide(divisor);
-        var maxfractions = fractions != null ? fractions : PRECISION - String.valueOf(divided.abs().longValue()).length();
+        var abs = decimal.abs();
+        var baseDecimal = BigDecimal.valueOf(base);
+        var nextPower = baseDecimal;
+        var exponent = 0;
+
+        while (exponent < MAX_EXPONENT && abs.compareTo(nextPower) >= 0) {
+            exponent++;
+            nextPower = nextPower.multiply(baseDecimal);
+        }
+
+        return formatBase(decimal, base, exponent, fractions, iec, unit, locale);
+    }
+
+    private static String formatBase(BigDecimal decimal, int base, int exponent, Integer fractions, boolean iec, String unit, Locale locale) {
+        var baseDecimal = BigDecimal.valueOf(base);
+        var divided = decimal.divide(baseDecimal.pow(exponent));
+        var wholeDigits = divided.abs().setScale(0, RoundingMode.DOWN).precision();
+        var maxfractions = fractions != null ? fractions : Math.max(0, PRECISION - wholeDigits);
         var format = "%." + maxfractions + "f";
         var formatted = format(locale, format, divided);
         BigDecimal reparsed;
@@ -381,8 +398,9 @@ public final class Numbers {
             throw new IllegalStateException(e);
         }
 
-        if (reparsed.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
-            return formatBase(reparsed, base, fractions, iec, unit, locale);
+        if (exponent < MAX_EXPONENT && reparsed.abs().compareTo(baseDecimal) >= 0) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k, and 999999
+                                                                                     // as 1M.
+            return formatBase(decimal, base, exponent + 1, fractions, iec, unit, locale);
         }
         else {
             return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && (fractions == null || iec && exponent == 0));
@@ -412,9 +430,8 @@ public final class Numbers {
             return "";
         }
 
-        var unitPrefix = ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1);
-        var binaryPrefix = iec ? "i" : "";
-        return unitPrefix + binaryPrefix;
+        var unitPrefix = UNIT_PREFIXES.charAt(exponent - 1);
+        return iec ? Character.toUpperCase(unitPrefix) + "i" : String.valueOf(unitPrefix);
     }
 
 }
