@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Utils.parseLocale;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -41,6 +42,8 @@ public final class Numbers {
 	private static final int BYTES_1K = 1024;
 	private static final int NUMBER_1K = 1000;
 	private static final int PRECISION = 3;
+	private static final String UNIT_PREFIXES = "kMGTPE";
+	private static final int MAX_EXPONENT = UNIT_PREFIXES.length();
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -178,6 +181,7 @@ public final class Numbers {
 	 * <li>9994999 will appear as 9.99M
 	 * <li>9995000 will appear as 10M
 	 * </ul>
+	 * Numbers from 999.5E upward stay in E, e.g. 1E21 will appear as 1000E.
 	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
 	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
 	 * @param number The number to be formatted.
@@ -209,6 +213,7 @@ public final class Numbers {
 	 * <li>9994999 will appear as 9.99 MB
 	 * <li>9995000 will appear as 10 MB
 	 * </ul>
+	 * Numbers from 999.5E upward stay in E, e.g. 1E21 will appear as 1000 EB.
 	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
 	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
 	 * @param number The number to be formatted.
@@ -246,15 +251,24 @@ public final class Numbers {
 	}
 
 	private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
-		long whole = decimal.abs().longValue();
-		int exponent = (whole == 0) ? 0 : (int) (Math.log(whole) / Math.log(base)); // Math.log(0) is -Infinity, so e.g. 0.5 needs exponent 0 explicitly.
+		BigDecimal abs = decimal.abs();
+		BigDecimal baseDecimal = BigDecimal.valueOf(base);
+		BigDecimal nextPower = baseDecimal;
+		int exponent = 0;
+
+		while (exponent < MAX_EXPONENT && abs.compareTo(nextPower) >= 0) {
+			exponent++;
+			nextPower = nextPower.multiply(baseDecimal);
+		}
+
 		return formatBase(decimal, base, exponent, fractions, iec, unit);
 	}
 
 	private static String formatBase(BigDecimal decimal, int base, int exponent, Integer fractions, boolean iec, String unit) {
-		BigDecimal divisor = BigDecimal.valueOf(base).pow(exponent);
-		BigDecimal divided = decimal.divide(divisor);
-		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.abs().longValue()).length());
+		BigDecimal baseDecimal = BigDecimal.valueOf(base);
+		BigDecimal divided = decimal.divide(baseDecimal.pow(exponent));
+		int wholeDigits = divided.abs().setScale(0, RoundingMode.DOWN).precision();
+		int maxfractions = (fractions != null) ? fractions : Math.max(0, PRECISION - wholeDigits);
 		String format = "%." + maxfractions + "f";
 		String formatted = format(getLocale(), format, divided);
 		BigDecimal reparsed;
@@ -268,7 +282,7 @@ public final class Numbers {
 			throw new IllegalStateException(e);
 		}
 
-		if (reparsed.abs().longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k, and 999999 as 1M.
+		if (exponent < MAX_EXPONENT && reparsed.abs().compareTo(baseDecimal) >= 0) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k, and 999999 as 1M.
 			return formatBase(decimal, base, exponent + 1, fractions, iec, unit);
 		}
 		else {
@@ -291,9 +305,8 @@ public final class Numbers {
 			return "";
 		}
 
-		char unitPrefix = ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1);
-		String binaryPrefix = (iec ? "i" : "");
-		return unitPrefix + binaryPrefix;
+		char unitPrefix = UNIT_PREFIXES.charAt(exponent - 1);
+		return iec ? (Character.toUpperCase(unitPrefix) + "i") : String.valueOf(unitPrefix);
 	}
 
 }
