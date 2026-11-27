@@ -246,9 +246,14 @@ public final class Numbers {
 	}
 
 	private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
-		int exponent = (int) (Math.log(decimal.abs().longValue()) / Math.log(base));
-		BigDecimal divisor = BigDecimal.valueOf(Math.pow(base, exponent));
-		BigDecimal divided = (divisor.signum() == 0) ? divisor : decimal.divide(divisor);
+		long whole = decimal.abs().longValue();
+		int exponent = (whole == 0) ? 0 : (int) (Math.log(whole) / Math.log(base)); // Math.log(0) is -Infinity, so e.g. 0.5 needs exponent 0 explicitly.
+		return formatBase(decimal, base, exponent, fractions, iec, unit);
+	}
+
+	private static String formatBase(BigDecimal decimal, int base, int exponent, Integer fractions, boolean iec, String unit) {
+		BigDecimal divisor = BigDecimal.valueOf(base).pow(exponent);
+		BigDecimal divided = decimal.divide(divisor);
 		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.abs().longValue()).length());
 		String format = "%." + maxfractions + "f";
 		String formatted = format(getLocale(), format, divided);
@@ -263,8 +268,8 @@ public final class Numbers {
 			throw new IllegalStateException(e);
 		}
 
-		if (reparsed.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
-			return formatBase(reparsed, base, fractions, iec, unit);
+		if (reparsed.abs().longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k, and 999999 as 1M.
+			return formatBase(decimal, base, exponent + 1, fractions, iec, unit);
 		}
 		else {
 			return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && (fractions == null || (iec && exponent == 0)));
